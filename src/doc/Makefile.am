@@ -24,8 +24,9 @@ SUBDIRS = . manpages
 SUBST = @abs_top_builddir@/setup_tools/substvars.sh
 
 CLEANFILES = $(POD_FILES) $(nodist_doc_DATA)
+EXTRA_DIST = $(SRCPOD)
 
-EXTRA_DIST = \
+SRCPOD = \
 		install.pod.in \
 		rpnexpr.pod.in \
 		rrfw_torrus_migration.pod.in \
@@ -78,6 +79,8 @@ dist_devdoc_DATA = \
 		devdoc/wd.uptime-mon.pod
 
 SUFFIXES = .pod.in .pod .txt
+
+.PRECIOUS: $(POD_FILES)
 
 .pod.in.pod:
 	$(SUBST) $<  > $@

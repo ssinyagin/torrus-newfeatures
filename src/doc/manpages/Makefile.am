@@ -19,27 +19,13 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 
-XFORM_STRINGS = xformstrings.sed
+SUBST = @abs_top_builddir@/setup_tools/substvars.sh
 
-SUBST = $(SHELL) -c '$(top_srcdir)/setup_tools/substvars.sh $$0 | \
-	$(SED) -f $(XFORM_STRINGS)'
-
-CMDNAMES = \
-	acledit \
-	action_printemail \
-	action_snmptrap \
-	action_snmpv1trap \
-	clearcache \
-	collector \
-	compilexml \
-	configinfo \
-	configsnapshot \
-	devdiscover \
-	genddx \
-	monitor \
-	schedulerinfo
+EXTRA_DIST = $(SRCPOD)
+CLEANFILES = $(PODMAN) $(POD_FILES)
 
 SRCPOD = \
+	torrus.pod.in \
 	torrus_acledit.pod.in \
 	torrus_action_printemail.pod.in \
 	torrus_action_snmptrap.pod.in \
@@ -53,7 +39,8 @@ SRCPOD = \
 	torrus_monitor.pod.in \
 	torrus_schedulerinfo.pod.in
 
-XFORMEDPOD = \
+POD_FILES = \
+	torrus.pod \
 	torrus_acledit.pod \
 	torrus_action_printemail.pod \
 	torrus_action_snmptrap.pod \
@@ -68,47 +55,48 @@ XFORMEDPOD = \
 	torrus_schedulerinfo.pod
 
 PODMAN = \
-	torrus_acledit.1 \
-	torrus_action_printemail.7 \
-	torrus_action_snmptrap.7 \
-	torrus_clearcache.1 \
-	torrus_collector.1 \
-	torrus_compilexml.1 \
-	torrus_configinfo.1 \
-	torrus_configsnapshot.1 \
-	torrus_devdiscover.1 \
-	torrus_genddx.1 \
-	torrus_monitor.1 \
-	torrus_schedulerinfo.1
+	torrus.@mansec_usercmd@ \
+	torrus_acledit.@mansec_usercmd@ \
+	torrus_action_printemail.@mansec_misc@ \
+	torrus_action_snmptrap.@mansec_misc@ \
+	torrus_clearcache.@mansec_usercmd@ \
+	torrus_collector.@mansec_usercmd@ \
+	torrus_compilexml.@mansec_usercmd@ \
+	torrus_configinfo.@mansec_usercmd@ \
+	torrus_configsnapshot.@mansec_usercmd@ \
+	torrus_devdiscover.@mansec_usercmd@ \
+	torrus_genddx.@mansec_usercmd@ \
+	torrus_monitor.@mansec_usercmd@ \
+	torrus_schedulerinfo.@mansec_usercmd@
 
 
-EXTRA_DIST = $(SRCPOD)
-CLEANFILES = $(PODMAN) $(XFORMEDPOD) $(XFORM_STRINGS)
 
 if POD2MAN_PRESENT
-  man_MANS = $(PODMAN)
-endif
-
-$(XFORM_STRINGS): Makefile
-	rm -f $(XFORM_STRINGS)
-	for f in $(CMDNAMES); do \
-	  xx=`echo $$f | $(SED) -e '$(program_transform_name)'`; \
-	  echo "s,\@XFORM_$$f\@,"$$xx"," >>$(XFORM_STRINGS); \
+install-data-local: $(POD_FILES)
+	for f in $(PODMAN); do \
+	  base=`echo $$f | sed -e 's/\\.[0-9a-zA-Z]*$$//'`; \
+	  ext=`echo $$f | sed -e 's/^.*\\.//'`; \
+	  instdir=$(DESTDIR)$(mandir)/man$$ext; \
+	  echo BASE=$$base EXT=$$ext INSTDIR=$$instdir; \
+	  $(POD2MAN) --section=$$ext \
+	     --release="$(PACKAGE_STRING)" --center=torrus \
+             $$base.pod > $$f || exit 1; \
+	  -d $$instdir || $(mkinstalldirs) $$instdir || exit 1; \
+	  $(INSTALL_DATA) $$f $$instdir; \
+	  rm $$f; \
 	done
 
-SUFFIXES = .pod.in .pod .1 .7
 
-.PRECIOUS: $(XFORMEDPOD)
+	  
+
+endif
+
+
+SUFFIXES = .pod.in .pod
+
+.PRECIOUS: $(POD_FILES)
 
 .pod.in.pod:
-	$(MAKE) $(XFORM_STRINGS)
 	$(SUBST) $<  > $@
-
-.pod.1:
-	$(POD2MAN) --release="$(PACKAGE_STRING)" --center=torrus $<  > $@
-
-.pod.7:
-	$(POD2MAN) --section=7 \
-	   --release="$(PACKAGE_STRING)" --center=torrus $<  > $@
 
 

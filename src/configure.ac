@@ -222,6 +222,13 @@ AC_ARG_VAR(wrapperdir, [[BINDIR] CLI wrapper])
 if test -z "$wrapperdir"; then
    wrapperdir='${bindir}'; fi
 
+AC_ARG_VAR(mansec_usercmd, [[1] User commands man section])
+if test -z "$mansec_usercmd"; then
+   mansec_usercmd='1'; fi
+
+AC_ARG_VAR(mansec_misc, [[7] Miscellaneous man section])
+if test -z "$mansec_misc"; then
+   mansec_misc='7'; fi
 
 AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
 AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])

@@ -1,5 +1,9 @@
 2005-01-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* doc/Makefile.am: Variable substitution in doc files
+
+	* doc/manpages/Makefile.am: Man sections configurable
+
 	* perllib/Torrus/DevDiscover/CiscoIOS_Docsis.pm:
 	New discovery module for Cisco-specific DOCSIS statistics
 

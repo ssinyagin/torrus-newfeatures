@@ -80,7 +80,7 @@ sub handler : method
     }
 
     my $tree = $r->uri();
-    $tree =~ s/^.*\/(\w+)$/$1/;
+    $tree =~ s/^.*\/(.*)$/$1/;
 
     if( $Torrus::ApacheHandler::authorizeUsers )
     {

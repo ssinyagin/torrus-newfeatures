@@ -70,8 +70,7 @@ sub renderUserLogin
     }
 
     my $url = $Torrus::Renderer::rendererURL;
-    if( defined( $self->{'options'}->{'urlPassTree'} ) and
-        length( $self->{'options'}->{'urlPassTree'} ) > 0 )
+    if( length( $self->{'options'}->{'urlPassTree'} ) > 0 )
     {
         $url .= '/' . $self->{'options'}->{'urlPassTree'};
     }
@@ -176,7 +175,8 @@ sub renderTreeChooser
     my $ttvars =
     {
         'treeNames' => sub{ return Torrus::SiteConfig::listTreeNames() },
-        'treeDescr' => sub{ return Torrus::SiteConfig::treeDescription($_[0]) },
+        'treeDescr' => sub{ return
+                                Torrus::SiteConfig::treeDescription($_[0]) },
         'url'  => sub { return $Torrus::Renderer::rendererURL . '/' . $_[0] },
         'plainURL'   => $Torrus::Renderer::plainURL,
         'style'      => sub { return $self->style($_[0]); },

@@ -711,7 +711,7 @@ sub rrd_make_cdef
         my ($noderef, $timeoffset) = @_;
 
         my $function;
-        if( $noderef =~ s/^(.)\@// )
+        if( $noderef =~ s/^(.+)\@// )
         {
             $function = $1;
         }

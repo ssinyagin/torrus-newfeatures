@@ -21,11 +21,11 @@
 
 =head1 NAME
 
-@XFORM_acledit@ - Manage Torrus access control lists (ACLs).
+acledit - Manage Torrus access control lists (ACLs).
 
 =head1 SYNOPSIS
 
-B<@XFORM_acledit@> [I<options...>]
+B<torrus acledit> [I<options...>]
 
 =head1 DESCRIPTION
 
@@ -160,11 +160,11 @@ Displays a help message.
 
 =head1 EXAMPLES
 
-  @XFORM_acledit@ --addgroup=staff --permit=DisplayTree \
+  torrus acledit --addgroup=staff --permit=DisplayTree \
     --for=main --for=thecustomer
-  @XFORM_acledit@ --adduser=jsmith --password=mysecretpassword \
+  torrus acledit --adduser=jsmith --password=mysecretpassword \
     --cn="John Smith" --addtogroup=staff
-  @XFORM_acledit@ --addgroup=admin --permit=DisplayTree --for='*'
+  torrus acledit --addgroup=admin --permit=DisplayTree --for='*'
 
 This example creates a group I<staff> and gives all its members the permission
 to browse the datasource trees I<main> and I<thecustomer>. The next command
@@ -177,7 +177,7 @@ o browse all existing trees.
 
 =over 4
 
-=item F<@perlcfgdir@/torrus-siteconfig.pl>
+=item F<@siteconfdir@/torrus-siteconfig.pl>
 
 Torrus site configuration script.
 

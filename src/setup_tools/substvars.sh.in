@@ -57,6 +57,8 @@ devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
     -e "s,\@exmpdir\@,@exmpdir@,g" \
     -e "s,\@logdir\@,@logdir@,g" \
     -e "s,\@mandir\@,@mandir@,g" \
+    -e "s,\@mansec_misc\@,@mansec_misc@,g" \
+    -e "s,\@mansec_usercmd\@,@mansec_usercmd@,g" \
     -e "s,\@perllibdir\@,@perllibdir@,g" \
     -e "s,\@perllibdirs\@,@perllibdirs@,g" \
     -e "s,\@piddir\@,@piddir@,g" \

@@ -29,15 +29,59 @@ B<torrus> I<command> [I<options...>]
 
 =head1 DESCRIPTION
 
+All Torrus utilities use this common command-line wrapper, which simply
+passes all arguments to the appropriate utility.
+
+Accepted commands:
+
+=over 4
+
+=item B<acledit>
+
+=item B<cleanup>
+
+=item B<clearcache>
+
+=item B<collector>
+
+=item B<compilexml>
+
+=item B<configinfo>
+
+=item B<configsnapshot>
+
+=item B<devdiscover>
+
+=item B<genddx>
+
+=item B<genlist>
+
+=item B<install_plugin>
+
+=item B<monitor>
+
+=item B<schedulerinfo>
+
+=back
 
 =head1 OPTIONS
 
-=head1 FILES
-
+Refer to approproate manpages for options for each Torrus command.
 
 =head1 SEE ALSO
 
-B<torrus_acledit>(@mansec_usercmd@)
+L<torrus_acledit(@mansec_usercmd@)>,
+L<torrus_action_printemail(@mansec_misc@)>,
+L<torrus_action_snmptrap(@mansec_misc@)>,
+L<torrus_clearcache(@mansec_usercmd@)>,
+L<torrus_collector(@mansec_usercmd@)>,
+L<torrus_compilexml(@mansec_usercmd@)>,
+L<torrus_configinfo(@mansec_usercmd@)>,
+L<torrus_configsnapshot(@mansec_usercmd@)>,
+L<torrus_devdiscover(@mansec_usercmd@)>,
+L<torrus_genddx(@mansec_usercmd@)>,
+L<torrus_monitor(@mansec_usercmd@)>,
+L<torrus_schedulerinfo(@mansec_usercmd@)>
 
 =head1 NOTES
 

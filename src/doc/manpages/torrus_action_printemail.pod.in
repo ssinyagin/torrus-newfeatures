@@ -21,14 +21,14 @@
 
 =head1 NAME
 
-@XFORM_action_printemail@ - A script for sending email from monitor action.
+action_printemail - A script for sending email from monitor action.
 
 =head1 SYNOPSIS
 
  <action name="report-email">
    <param name="action-type" value="exec" />
    <param name="command">
-     $Torrus_BIN/action_printemail | mail alarms@example.com
+     $TORRUS_BIN/action_printemail | mail alarms@example.com
    </param>
    <param name="launch-when" value="set, clear" />
  </action>
@@ -76,13 +76,15 @@ defined:
 
 =over 4
 
-=item F<@perlcfgdir@/email-siteconfig.pl>
+=item F<@siteconfdir@/email-siteconfig.pl>
 
 Torrus site email configuration script.
 
 =item F<@tmpldir@>
 
-Torrus template directory.
+=item F<@tmpluserdir@>
+
+Torrus template directories.
 
 =back
 

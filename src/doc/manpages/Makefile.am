@@ -81,7 +81,7 @@ install-data-local: $(POD_FILES)
 	  $(POD2MAN) --section=$$ext \
 	     --release="$(PACKAGE_STRING)" --center=torrus \
              $$base.pod > $$f || exit 1; \
-	  -d $$instdir || $(mkinstalldirs) $$instdir || exit 1; \
+	  test -d $$instdir || $(mkinstalldirs) $$instdir || exit 1; \
 	  $(INSTALL_DATA) $$f $$instdir; \
 	  rm $$f; \
 	done

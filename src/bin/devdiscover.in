@@ -105,7 +105,8 @@ if( not -r $infile )
     my $altfile = $Torrus::Global::discoveryDir . $infile;
     if( not -r $altfile )
     {
-        Error('Cannot find file $infile neither in current directory nor in ' .
+        Error('Cannot find file ' . $infile .
+              ' neither in current directory nor in ' .
               $Torrus::Global::discoveryDir);
         exit 1;
     }

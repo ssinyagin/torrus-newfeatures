@@ -1,7 +1,7 @@
 2005-02-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* configure.ac (also in all plugins): AM_INIT_AUTOMAKE(1.9)
-	instead of 1.6. The ol version conflicted with plugins.
+	instead of 1.6. The old version conflicted with plugins.
 
 2005-01-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 

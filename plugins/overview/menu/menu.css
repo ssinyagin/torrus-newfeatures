@@ -14,12 +14,14 @@ body {
 form 				{
 						margin-top:0; margin-left:0; margin-right:0; margin-bottom:0;
 }
-.topRow				{ display:block; width:100%; ;margin:0;padding:0}
+.topRow				{ display:block; width:100%; margin:0;padding:0}
 .windowPickerField	{ display:block; float:left; padding-left:195px; margin:0}
+.cfPickerField		{ display:block; float:left; padding-left:10px; }
 .datePickerField	{ display:block; float:left; padding-left:20px; }
 .showHiddenField	{ display:block; float:left; padding-left:20px; }
-.autoScaleField	    { display:block; float:left; padding-left:20px; }
-.creditsField		{ display:block; float:right; padding-right:20px; }
+.autoScaleField	    { display:block; float:left; padding-left:10px; }
+.paddingField	    { display:block; float:right; padding-left:10px;}
+.creditsField		{ display:block; position:absolute; bottom:15px; left:10px }
 a 					{ text-decoration:none;}
 a:hover				{ text-decoration:underline;}
 

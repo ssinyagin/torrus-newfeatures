@@ -87,6 +87,12 @@ function toggleMenu() {
 		frames['displayFrame'].location.href = url + 'WINDOW=' + windowName;
 	};
 
+	function setCf(cf) {
+		var url = cleanUrl('CF');
+		if (url.indexOf('?') != (url.length-1)) { url = url + '&';};
+		frames['displayFrame'].location.href = url + 'CF=' + cf;
+	};
+
 	function clearDate() {
 		var url = cleanUrl('NOW');
 		if (url.indexOf('?') != (url.length-1)) { url = url + '&';};

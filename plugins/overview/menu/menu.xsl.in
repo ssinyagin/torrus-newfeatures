@@ -47,8 +47,7 @@
 		<form action="#" name="datePicker" method='get'>
 			<span class='topRow'>
 				<span class='windowPickerField'>
-						Window:
-						<select id='window' class='timebox'
+					<select id='window' class='timebox'
 							onchange='setWindow(this.options[this.selectedIndex].value)'
 							>
 							<option value='Hour' >Short</option>
@@ -58,8 +57,17 @@
 							<option value='Year' >Year</option>
 						</select>
 				</span>
+				<span class='cfPickerField'>
+						<select id='cf' class='timebox'
+							onchange='setCf(this.options[this.selectedIndex].value)'
+							>
+							<option value='MIN' >MIN</option>
+							<option value='AVERAGE' selected='true' >AVERAGE</option>
+							<option value='MAX' >MAX</option>
+						</select>
+				</span>
 				<span class='datePickerField'>
-						Date/Time:
+						Date:
 						<input type='text' id="dc" name="dc" size="10" class="plain"/>
 						<input id="NOW" value="now" type='hidden' />
 						<input type="reset" value=" ... "
@@ -100,11 +108,10 @@
 						<input id="showhidden" value="0" type='checkbox' onclick='setShowHidden();' />
 				</span>
 				<span class='autoScaleField'>
-						Auto-Scale: 
+						A-Scale: 
 						<input id="autoscale" value="0" type='checkbox' onclick='setAutoScale();' />
 				</span>
-				<span class='creditsField'>
-						<a href="javascript:frames['displayFrame'].location.href = '@plainUrl@/menu/credits.htm'; void(0);">Credits</a>
+				<span class='paddingField'>
 				</span>
 			</span>
 		</form>
@@ -139,6 +146,9 @@
 		</xsl:text>
 		</script>
 	</div>
+	<span class='creditsField'>
+		<a href="javascript:frames['displayFrame'].location.href = '@plainUrl@/menu/credits.htm'; void(0);">Credits</a>
+	</span>
 
 
 	</body>

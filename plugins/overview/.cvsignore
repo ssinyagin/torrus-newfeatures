@@ -4,11 +4,11 @@ config.log
 config.status
 Makefile
 Makefile.in
-substvars.sh
 mkvardir.sh
 configure
 configure.lineno
-torrus-plugin-overview-0.0.3.tar.gz
+tp-overview-*.tar.gz
 pod2htmi.tmp
 pod2htmd.tmp
-
+tp-overview.txt
+ov_substvars.sh

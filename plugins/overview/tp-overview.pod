@@ -100,13 +100,19 @@ Date Picker from http://sourceforge.net/projects/jscalendar/
 
 =head2 Installation
 
-Unpack Torrus main distribution and the plugin in some directories.
-From Torrus distribution directory, run
+Follow the Torrus installation guide for the main software installation.
 
-  ./configure --with-plugins=../torrus-plugin-overview-0.0.1
-  make install
+Unpack the plugin distribution package in some directory:
 
-After Torrus installation has finished:
+  gzip -dc tp-overview-1.X.tar.gz | tar xvf -
+
+Then run the Torrus plugin installation utility:
+
+  torrus install_plugin tp-overview-1.X
+
+Restart all Torrus processes, including Apache HTTP daemon.
+
+After the plugin installation has finished:
 
 Install the perl module Apache::ASP acording to the instructions on
 http://www.apache-asp.org/

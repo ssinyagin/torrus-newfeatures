@@ -85,10 +85,6 @@ install-data-local: $(POD_FILES)
 	  $(INSTALL_DATA) $$f $$instdir; \
 	  rm $$f; \
 	done
-
-
-	  
-
 endif
 
 

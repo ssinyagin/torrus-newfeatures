@@ -41,7 +41,7 @@ Unpack the plugin distribution package in some directory:
 
 Then run the Torrus plugin installation utility:
 
-  torrus install_plugin tp-randomcollector-X
+  torrus install_plugin tp-randomcollector-1.X
 
 Restart all Torrus processes, including Apache HTTP daemon.
 

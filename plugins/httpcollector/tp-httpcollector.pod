@@ -41,7 +41,7 @@ Unpack the plugin distribution package in some directory:
 
 Then run the Torrus plugin installation utility:
 
-  torrus install_plugin tp-httpcollector-X
+  torrus install_plugin tp-httpcollector-1.X
 
 Restart all Torrus processes, including Apache HTTP daemon.
 

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Copyright (C) 2003 Christian Schnidrig
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+	
+	$Id$
+	Christian Schnidrig <christian.schnidrig@bluewin.ch>
+
+-->
+<xsl:stylesheet version="1.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+<xsl:output method="html"
+	doctype-system="http://www.w3.org/TR/html4/loose.dtd"
+    doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN" 
+    />
+<xsl:template match="/">
+<html>
+	<head>
+		<link type="text/css" rel="stylesheet" href="@plainUrl@/menu/menu.css"/>
+		<link type="text/css" rel="stylesheet" href="@plainUrl@/xtree/xtree.css"/>
+		<link type="text/css" rel="stylesheet" media="all" 
+			href="@plainUrl@/calendar/calendar-system.css" title="system" />
+		<title><xsl:value-of select="/document/title"/></title>
+
+		<script src="@plainUrl@/xtree/xtree.js"></script>
+		<script type="text/javascript" src="@plainUrl@/calendar/calendar.js"></script>
+		<script type="text/javascript" src="@plainUrl@/calendar/lang/calendar-en.js"></script>
+
+	</head>
+
+	<body background='@plainUrl@/menu/bg.jpg' scroll='no'>
+		<span class='doc'>
+		<form action="#" name="datePicker" method='get'>
+			<span class='topRow'>
+				<span class='windowPickerField'>
+						Window:
+						<select id='window' class='timebox'
+							onchange='setWindow(this.options[this.selectedIndex].value)'
+							>
+							<option value='Hour' >Short</option>
+							<option value='Day' selected='true' >Day</option>
+							<option value='Week' >Week</option>
+							<option value='Month'>Month</option>
+							<option value='Year' >Year</option>
+						</select>
+				</span>
+				<span class='datePickerField'>
+						Date/Time:
+						<input type='text' id="dc" size="10" class="plain"/>
+						<input id="NOW" value="" type='hidden' />
+						<input type="reset" value=" ... "
+							onclick="return showCalendar('dc', 'dd.mm.y');"/>
+						<select id='timec' class='timebox'
+							onchange='this.form.NOW.value = this.options[this.selectedIndex].value + " " + this.form.dc.value'
+							>
+							<option value='00:00' >00:00</option>
+							<option value='01:00' >01:00</option>
+							<option value='02:00' >02:00</option>
+							<option value='03:00' >03:00</option>
+							<option value='04:00' >04:00</option>
+							<option value='05:00' >05:00</option>
+							<option value='06:00' >06:00</option>
+							<option value='07:00' >07:00</option>
+							<option value='08:00' >08:00</option>
+							<option value='09:00' >09:00</option>
+							<option value='10:00' >10:00</option>
+							<option value='11:00' >11:00</option>
+							<option value='12:00' >12:00</option>
+							<option value='13:00' >13:00</option>
+							<option value='14:00' >14:00</option>
+							<option value='15:00' >15:00</option>
+							<option value='16:00' >16:00</option>
+							<option value='17:00' >17:00</option>
+							<option value='18:00' >18:00</option>
+							<option value='19:00' >19:00</option>
+							<option value='20:00' >20:00</option>
+							<option value='21:00' >21:00</option>
+							<option value='22:00' >22:00</option>
+							<option value='23:00' >23:00</option>
+						</select>
+						<input type="button" value="Set" onclick="setDate();return void(0)"/>
+						<input type="button" value="Clear" onclick="clearDate();return void(0)"/>
+				</span>
+				<span class='showHiddenField'>
+						Unhide: 
+						<input id="showhidden" value="0" type='checkbox' onclick='setShowHidden();' />
+				</span>
+				<span class='autoScaleField'>
+						Auto-Scale: 
+						<input id="autoscale" value="0" type='checkbox' onclick='setAutoScale();' />
+				</span>
+				<span class='creditsField'>
+						<a href="javascript:frames['displayFrame'].location.href = '@plainUrl@/menu/credits.htm'; void(0);">Credits</a>
+				</span>
+			</span>
+		</form>
+		</span>
+	
+		<iframe id='displayFrame' class='displayFrame' name='displayFrame'
+			frameborder='0'
+			ALLOWTRANSPARENCY="true"
+			src="@plainUrl@/menu/welcome.htm"
+		></iframe>
+	<script src='@plainUrl@/menu/menu.js'></script>
+
+	<div class="menuFrame">
+		<script>
+		<xsl:text>
+			if (document.getElementById) {
+				var item1 = new WebFXTree('Toggle Menu', 'javascript:toggleMenu()');
+					item1.icon = '@plainUrl@/icons/menu.gif'; item1.openIcon = item1.icon;
+		</xsl:text>
+		<xsl:for-each select="//item">
+			var item<xsl:number level="multiple"  count='*' format='1_1'/> = new WebFXTreeItem('<xsl:value-of select="@legend"/>','<xsl:value-of select="@url"/>', item<xsl:for-each select='..'><xsl:number level="multiple"  count='*' format='1_1'/></xsl:for-each>);
+				<xsl:if test="string-length(@icon) > 0 ">
+				item<xsl:number level="multiple"  count='*' format='1_1'/>.icon = '@plainUrl@/icons/<xsl:value-of select="@icon"/>'; item<xsl:number level="multiple"  count='*' format='1_1'/>.openIcon = item<xsl:number level="multiple" count='*' format='1_1'/>.icon;
+				</xsl:if>
+		</xsl:for-each>
+		<xsl:text>
+			};
+			document.write(item1);
+			if (! item1.open) { 
+				toggleMenu()
+			};
+		</xsl:text>
+		</script>
+	</div>
+
+
+	</body>
+
+
+</html>
+</xsl:template>
+</xsl:stylesheet>

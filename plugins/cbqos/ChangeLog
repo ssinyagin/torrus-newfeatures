@@ -1,0 +1,12 @@
+2004-08-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Plugin Release 0.2
+
+	* DevDiscover/CiscoIOS_cbQoS.pm (buildChildrenConfigs):
+	Screened illegal characters in 'cbqos-object-nick'
+
+2004-05-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Plugin Release 0.1
+	
+

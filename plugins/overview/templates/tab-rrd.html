@@ -1,0 +1,88 @@
+[% PROCESS 'ov/ov-html-incblocks.txt' %]
+[% INCLUDE htmlstart title='Graphs for ' _ path(token) printpath=1%]
+
+[% parentComment = nodeParam(parent(token),'comment') %]
+[% IF parentComment %]<H1>Graphs for [% xmlnorm(parentComment) %]</H1>[% END %]
+
+[% INCLUDE variables %]
+
+<P>[% xmlnorm(nodeParam(token,'comment')) %]</P>
+
+[% INCLUDE legend %]
+
+[%
+  graphvars = [];
+  graphviews = nodeParam(token,'tab-views').split(',');
+  shortView = graphviews.1;
+  dayView = graphviews.2;
+  weekView = graphviews.3;
+  monthView = graphviews.4;
+  yearView = graphviews.5;
+  IF   nodeParam(token, 'rrd-hwpredict') == 'enabled' and
+       ( param(view, 'rrd-hwpredict') == 'disabled' or variables.NOHW );
+    graphvars = ['NOHW', 1];
+  END;
+%]
+
+<div class="tab-pane" id="tab-pane-1">
+	<div class="tab-page">
+		<h2 class="tab">Last few hours</h2>
+			[% INCLUDE rrgraph view=shortView alt="Last few hours graph" vars=graphvars %]
+	</div>
+	<div class="tab-page">
+		<h2 class="tab">Last day</h2>
+			[% INCLUDE rrgraph view=dayView alt="Last day graph" vars=graphvars %]
+	</div>
+	<div class="tab-page">
+		<h2 class="tab">Last week</h2>
+			[% INCLUDE rrgraph view=weekView alt="Last week graph" vars=graphvars %]
+	</div>
+	<div class="tab-page">
+		<h2 class="tab">Last month</h2>
+			[% INCLUDE rrgraph view=monthView alt="Last month graph" %]
+	</div>
+	<div class="tab-page">
+		<h2 class="tab">Last year</h2>
+			[% INCLUDE rrgraph view=yearView alt="Last year graph" %]
+	</div>
+</div>
+
+[% membersList = nodeParam(token,'members-list').split(','); %]
+[% permanent = nodeParam(token,'permanent-storage') %]
+[% IF membersList %]
+    <span class="MemberList">
+      <span class="MemberListHeader">
+    	  [% IF permanent == 'yes' %]
+    	  Graph is in permanent storage. Original data was taken from (Prefix: '[% membersList.0 %]'; Suffix: '[% membersList.1 %]'):
+    	  [%ELSE%]
+    	  Graph was generated on the fly with data taken from (Prefix: '[% membersList.0 %]'; Suffix: '[% membersList.1 %]'):
+    	  [%END%]
+      </span>
+      <span class="MemberListBody">[% urlList(membersList) %]</span>
+    </span>
+[% END %]
+
+<DIV CLASS="BottomShortcuts">
+[%
+  hwvars = [];
+  termvars = [];
+  IF nodeParam(token, 'rrd-hwpredict') == 'enabled' and
+     param(view, 'rrd-hwpredict') != 'disabled';
+    IF not variables.NOHW;       
+      hwaction = 'Disable';
+      hwvars = ['NOHW', 1];
+      termvars = ['NOHW', ''];
+    ELSE;
+      hwaction = 'Enable';
+      hwvars = ['NOHW', ''];
+      termvars = ['NOHW', 1];
+    END;
+    INCLUDE shortcut url=url(token, hwview, hwvars)
+                     text=hwaction _ " Holt-Winters"
+                     title="Switch Holt-Winters prediction boundaries";
+  END;
+%]
+</DIV>                   
+
+[% INCLUDE bottomline %]
+[% INCLUDE htmlend %]

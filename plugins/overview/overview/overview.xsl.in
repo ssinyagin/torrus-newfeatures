@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Copyright (C) 2003 Christian Schnidrig
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+	
+	$Id$
+	Christian Schnidrig <christian.schnidrig@bluewin.ch>
+
+-->
+<xsl:stylesheet version="1.0"
+				xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+<xsl:output method="html"
+	doctype-system="http://www.w3.org/TR/html4/strict.dtd"
+	doctype-public="-//W3C//DTD HTML 4.01//EN" />
+<xsl:template match="/">
+<html>
+	<head>
+		<META HTTP-EQUIV="refresh" CONTENT="180"/>
+		<link rel="stylesheet" type="text/css" href="@plainUrl@/overview.css"/>
+		<link rel="alternate stylesheet" type="text/css" href="@plainUrl@/ov-mozilla.css" title='Mozilla'/>
+		<title><xsl:value-of select="/overview/title"/></title>
+		<script type="text/javascript">
+			<![CDATA[
+			// load style sheet additions for Mozilla
+			//alert (navigator.userAgent);
+			var i, a, main;
+			for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
+				if(a.getAttribute("rel").indexOf("style") != -1 && a.getAttribute("title")) {
+					//a.disabled = true;
+					if(a.getAttribute("title") == 'Mozilla') a.disabled = false;
+					}
+				}
+			]]>
+		</script>
+	</head>
+
+	<body>
+		<span class='document'>
+		<xsl:if test="string-length(/overview/header) > 0 ">
+			<span class='header'><xsl:copy-of select="/overview/header"/></span>
+		</xsl:if>
+		<xsl:if test="/overview/@index = 'true'">
+			<xsl:for-each select="/overview/chapter">
+				<xsl:if test="string-length(@legend) > 0 ">
+					<span class="chapterIndex">
+						<a class='chapterLink'><xsl:attribute name='href'>#<xsl:value-of select = "position()" /></xsl:attribute>
+							<xsl:value-of select="@legend"/>
+						</a>
+					</span>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:if>
+
+		<xsl:for-each select="/overview/chapter">
+			<span class="chapter">
+				<a><xsl:attribute name='name'><xsl:value-of select="position()"/></xsl:attribute></a>
+
+				<xsl:if test="string-length(@legend) > 0 ">
+					<span class='chapterLegend'><xsl:value-of select="@legend"/></span>
+				</xsl:if>
+
+				<xsl:if test="@index = 'true'">
+					<xsl:for-each select="section">
+						<xsl:if test="string-length(@legend) > 0 ">
+							<span class='sectionIndex'>
+								<a class='sectionLink'><xsl:attribute name='href'>#<xsl:number level="multiple" count='*/*'/></xsl:attribute>
+									<xsl:value-of select="@legend"/>
+								</a>
+							</span>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:if>
+				
+				<xsl:if test="string-length(intro) > 0 ">
+					<span class='chapterIntro'><xsl:copy-of select="intro"/></span>
+				</xsl:if>
+				
+				<xsl:for-each select="section">
+					<span class='section'>
+						<a><xsl:attribute name='name'><xsl:number level="multiple" count='*/*'/></xsl:attribute></a>
+
+						<xsl:if test="string-length(@legend) > 0 ">
+							<span class='sectionLegend'><xsl:value-of select="@legend"/></span>
+						</xsl:if>
+
+						<xsl:if test="string-length(intro) > 0 ">
+								<span class='sectionIntro'><xsl:copy-of select="intro"/></span>
+						</xsl:if>
+
+						<xsl:for-each select="graph">
+							<span class='graph'>
+								<xsl:if test="string-length(@legend) > 0 ">
+									<span class='graphLegend'><xsl:value-of select="@legend"/></span>
+								</xsl:if>
+								<a class='graphLink'>
+									<xsl:if test="string-length(@tree) = 0 ">
+										<xsl:attribute name='href'><xsl:value-of select="//server"/>@rendererUrl@/<xsl:value-of select="//tree"/>?path=<xsl:value-of select="@path"/>&amp;<xsl:value-of select="/overview/modifiers"/></xsl:attribute>
+										<img class='image'>
+											<xsl:if test="string-length(/overview/view) > 0 ">
+												<xsl:attribute name='src'><xsl:value-of select="//server"/>@rendererUrl@/<xsl:value-of select="//tree"/>?path=<xsl:value-of select="@path"/>&amp;view=ov<xsl:value-of select="/overview/view"/>&amp;<xsl:value-of select="/overview/modifiers"/></xsl:attribute>
+											</xsl:if >
+											<xsl:if test="string-length(/overview/view) = 0 ">
+												<xsl:attribute name='src'><xsl:value-of select="//server"/>@rendererUrl@/<xsl:value-of select="//tree"/>?path=<xsl:value-of select="@path"/>&amp;view=ovDay&amp;<xsl:value-of select="/overview/modifiers"/></xsl:attribute>
+											</xsl:if>
+										</img>
+									</xsl:if>
+									<xsl:if test="string-length(@tree) > 0 ">
+										<xsl:attribute name='href'><xsl:value-of select="//server"/>@rendererUrl@/<xsl:value-of select="@tree"/>?path=<xsl:value-of select="@path"/>&amp;<xsl:value-of select="/overview/modifiers"/></xsl:attribute>
+										<img class='image'>
+											<xsl:if test="string-length(/overview/view) > 0 ">
+												<xsl:attribute name='src'><xsl:value-of select="//server"/>@rendererUrl@/<xsl:value-of select="@tree"/>?path=<xsl:value-of select="@path"/>&amp;view=ov<xsl:value-of select="/overview/view"/>&amp;<xsl:value-of select="/overview/modifiers"/></xsl:attribute>
+											</xsl:if >
+											<xsl:if test="string-length(/overview/view) = 0 ">
+												<xsl:attribute name='src'><xsl:value-of select="//server"/>@rendererUrl@/<xsl:value-of select="@tree"/>?path=<xsl:value-of select="@path"/>&amp;view=ovDay&amp;<xsl:value-of select="/overview/modifiers"/></xsl:attribute>
+											</xsl:if>
+										</img>
+									</xsl:if>
+								</a>
+							</span>
+						</xsl:for-each>
+					</span>
+				</xsl:for-each>
+			</span>
+		</xsl:for-each>
+
+		<xsl:if test="string-length(/overview/footer) > 0 ">
+			<span class='footer'><xsl:copy-of select="/overview/footer"/></span>
+		</xsl:if>
+	</span>
+	</body>
+</html>
+</xsl:template>
+</xsl:stylesheet>

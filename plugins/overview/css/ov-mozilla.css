@@ -1,0 +1,9 @@
+/*
+   Torrus Overview plugin stylesheet.
+   Designed by Christian Schnidrig
+
+   $Id$
+   */
+.chapter { display:block; float:left; margin-top:20px; width:100%}
+.section { display:block; float:left; padding-top:20px;width:100%;}
+.graph   { display:block; float:left; width:50%; vertical-align:text-top;}

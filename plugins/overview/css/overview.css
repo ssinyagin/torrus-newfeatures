@@ -1,0 +1,39 @@
+/*
+   Torrus Overview plugin stylesheet.
+   Designed by Christian Schnidrig
+
+   $Id$
+   */
+   
+body { 
+	width:800px;
+	text-align:center;
+	font-family:times;
+	font-size:12px;
+	background-color: transparent;
+	margin:0;
+	padding:0;
+}
+.document {display:block; width:800px}
+.chapterLegend { display:block; background:red; color:white; width:100%; margin:20px,0px,10px,0px; font-size:25px; font-family:arial; font-weight:bold; }
+.sectionLegend { display:block; background:blue; color:white; width:100%; margin:0px,0px,0px,0px;  font-size:20px; font-family:arial; font-weight:bold; }
+.graphLegend   { display:block; width:100%; font-size:15px; font-family:arial;}
+
+.header       { display:block; padding:10px,0px,20px,0px}
+.chapterIntro { display:block; padding:10px,0px,0px,0px}
+.sectionIntro { display:block; padding:10px,0px,10px,0px}
+.footer       { display:block; padding:10px,0px,0px,0px}
+
+
+.chapterLink {text-decoration: none;}
+.sectionLink {text-decoration: none;}
+.graphLink   {text-decoration: none;}
+
+.chapterIndex {line-height:30px; margin-left:5px; margin-right:5px;}
+.sectionIndex {line-height:30px; margin-left:5px; margin-right:5px;}
+
+
+.chapter { display:block; margin-top:20px; width:100%}
+.section { display:block; padding-top:20px;width:100%;}
+.graph   { display:inline-block;width:50%; vertical-align:text-top;}
+.image   { border:0;}

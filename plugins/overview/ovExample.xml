@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<!--
+	Copyright (C) 2002  Stanislav Sinyagin
+	Copyright (C) 2003 Christian Schnidrig
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+	
+	$Id$
+	Christian Schnidrig <christian.schnidrig@bluewin.ch>
+
+-->
+
+<!--
+	This example shows how to use some of the new features.
+ -->
+
+<configuration>
+<datasources>
+	<!-- define a dummy router device for demonstration -->
+	<subtree name="OV_Examples">
+		<param name="ds-type"						value="collector" />
+		<param name="collector-type"				value="random" />
+		<param name="collector-period"				value="60" />
+		<param name="collector-timeoffset"			value="3" />
+
+		<param name="storage-type"					value="rrd" />
+		<param name="data-dir"						value="/var/snmpcollector" />
+
+		<param name="rrd-create-rra">
+			RRA:AVERAGE:0:1:209664 RRA:MAX:0:36:5824 RRA:MIN:0:36:5824
+			RRA:AVERAGE:0:288:1456 RRA:MAX:0:288:1456 RRA:MIN:0:288:1456
+		</param>
+
+		<param name="rrd-create-heartbeat"			value="90"/>
+		<param name="rrd-create-min"				value="U"/>
+		<param name="rrd-create-max"				value="U"/>
+
+		<param name="leaf-type"						value="rrd-def" />
+		<param name="rrd-cf"						value="AVERAGE" />
+
+		<param name="rrd-create-dstype"				value="GAUGE" />
+		
+		<subtree name="Sample_Router1">
+			<subtree name="Interface_1">
+				<param name="comment"				value="Interface with random bit couters" />
+				<param name="rnd-baseline-offset"	value="1000" />
+				<param name="graph-lower-limit"			value="0" />
+				<param name="graph-upper-limit"			value="3000" />
+				<param name="data-file"				value="random_sample1.rrd" />
+				<apply-template name="dummy-interface-counters" />
+			</subtree>
+			<subtree name="Interface_2">
+				<param name="comment"				value="Interface with random bit couters" />
+				<param name="rnd-baseline-offset"	value="0" />
+				<param name="graph-lower-limit"			value="0" />
+				<param name="graph-upper-limit"			value="3000" />
+				<param name="data-file"				value="random_sample2.rrd" />
+				<apply-template name="dummy-interface-counters" />
+			</subtree>
+		</subtree>
+		<subtree name="Sample_Router2">
+			<subtree name="Interface_1">
+				<param name="comment"				value="Interface with random bit couters" />
+				<param name="rnd-baseline-offset"	value="1000" />
+				<param name="graph-lower-limit"			value="0" />
+				<param name="graph-upper-limit"			value="3000" />
+				<param name="data-file"				value="random_sample1.rrd" />
+				<apply-template name="dummy-interface-counters" />
+			</subtree>
+			<subtree name="Interface_2">
+				<param name="comment"				value="Interface with random bit couters" />
+				<param name="rnd-baseline-offset"	value="0" />
+				<param name="graph-lower-limit"			value="0" />
+				<param name="graph-upper-limit"			value="3000" />
+				<param name="data-file"				value="random_sample2.rrd" />
+				<apply-template name="dummy-interface-counters" />
+			</subtree>
+		</subtree>
+	</subtree>
+	<template name="dummy-interface-counters">
+		<apply-template name="dummy-interface-counters-bits" />
+	</template>
+
+	<template name="dummy-interface-counters-bits">
+		<apply-template name="dummy-ifBits"/>
+		<apply-template name="dummy-inOutBits"/>
+	</template>
+
+	<template name="dummy-inOutBits">
+		<leaf name="InOutBps">
+			<param name="ifInBits"			value="{ifInBits}" />
+			<param name="ifOutBits"			value="{ifOutBits}" />
+			<apply-template name="dummy-inOutBps"/>
+			<param name="ds-names"			value="in,out" />
+			<param name="precedence"		value="-1" />
+		</leaf>
+	</template>
+
+	<template name="dummy-inOutBps">
+		<param name="comment"				value="Input and Output bits per second graphs" />
+		<param name="rrd-hwpredict"			value="disabled" />
+		<param name="ds-type"				value="rrd-multigraph" />
+
+		<param name="graph-legend-in"		value="Bits per second in" /> 
+		<param name="ds-expr-in"			value="%ifInBits%" />
+
+		<param name="ds-expr-out"			value="%ifOutBits%" />
+		<param name="graph-legend-out"		value="Bits per second out" /> 
+
+		<apply-template name="dummy-inOutColors"/>
+	</template>
+
+	<template name="dummy-inOutColors">
+		<param name="line-style-in"			value="AREA" />
+		<param name="line-color-in"			value="#00B000" />
+		<param name="line-order-in"			value="1" />
+
+		<param name="line-style-out"		value="LINE2" />
+		<param name="line-color-out"		value="#0000FF" />
+		<param name="line-order-out"		value="10" />
+	</template>
+
+	<template name="dummy-ifBits">
+		<leaf name="ifInBits">
+			<param name="hidden"					value="yes"/>
+			<param name="monitor"					value="ovMonitorSample" />
+			<param name="rnd-baseline-type"			value="sin" />
+			<param name="rnd-baseline-height"		value="1500" />
+			<param name="rnd-baseline-period"		value="3600" />
+			<param name="rnd-baseline-amplitude"	value="1000" />
+			<param name="rnd-amplitude"				value="100" />
+			<param name="rrd-ds"					value="ifInBits" />
+			<param name="rrd-create-dstype"			value="GAUGE" />
+			<param name="comment"					value="Input bits counter for the interface" />
+			<param name="graph-legend"				value="Bits in" />
+			<param name="rrd-create-max"			value="U"/>
+			<param name="precedence"				value="-30" />
+		</leaf>
+
+		<leaf name="ifOutBits">
+			<param name="hidden"					value="yes"/>
+			<param name="monitor"					value="ovMonitorSample" />
+			<param name="rnd-baseline-type"			value="sin" />
+			<param name="rnd-baseline-height"		value="1000" />
+			<param name="rnd-baseline-period"		value="3600" />
+			<param name="rnd-baseline-amplitude"	value="800" />
+			<param name="rnd-amplitude"				value="100" />
+			<param name="rrd-ds"					value="ifOutBits" />
+			<param name="rrd-create-dstype"			value="GAUGE" />
+			<param name="comment"					value="Output bits counter for the interface" />
+			<param name="graph-legend"				value="Bits out" />
+			<param name="rrd-create-max"			value="U"/>
+			<param name="precedence"				value="-31" />
+		</leaf>
+	</template>
+
+</datasources>
+
+<token-sets>
+	<token-set name="ovTokensetSample">
+		<param name="comment"		value="Sample Tokenset" />
+	</token-set>
+</token-sets>
+
+<monitors>
+	<action name="ovActionSample">
+		<param name="action-type"	value="tset" />
+		<param name="tset-name"		value="ovTokensetSample" />
+	</action>
+	
+	<monitor name="ovMonitorSample">
+		<param name="monitor-type"	value="expression" />
+		<param name="rpn-expr">1</param>
+		<param name="action"		value="ovActionSample" />
+		<param name="expires"		value="600" />
+		<param name="comment"		value="ov monitor sample" />
+	</monitor>
+</monitors>
+
+
+</configuration>
+
+

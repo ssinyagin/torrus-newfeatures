@@ -1,0 +1,252 @@
+[%#
+  $Id$
+  All BLOCK statements are defined here
+%]
+
+[%#  ###########    Print the starting HTML blahblah   ################ %]
+
+[% BLOCK htmlstart;
+   IF ! contentClass; contentClass="Content"; END %]
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<!-- Torrus Copyright (c) 2003 Stanislav Sinyagin -->
+<HEAD>
+<TITLE>[% title %]</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<STYLE type="text/css" media="all">
+  @import url( [% plainURL _ style('ovStylesheet') %] );
+  [% cssoverlay = style('cssoverlay'); IF cssoverlay; %]
+  @import url( [% plainURL _ cssoverlay %] );
+  [% END %]
+</STYLE>
+<!-- WebFx tab pane stuff -->
+[% IF variables.MEDIA != 'printer' %]
+	<script type="text/javascript" 
+		src="[% plainURL _ 'tabpane/js/tabpane.js' %]"></script>
+	<STYLE type="text/css" media="all" d="webfx-tab-style-sheet">
+	  @import url( [% plainURL _ 'tabpane/css/tab.webfx.css' %] );
+	</STYLE>
+[% END %]
+</HEAD>
+<BODY style='background-color:transparent'>
+<DIV CLASS="Header">
+<A TITLE="company info" HREF="[%companyURL%]">[%companyName%]</A>
+</DIV>
+[% IF userAuth and uid;
+     commonname = userAttr('cn');
+     IF commonname == ''; commonname = uid; END; %]
+<DIV CLASS="LoginInfo">
+<SPAN CLASS="UserName">[% commonname %]</SPAN>
+<SPAN CLASS="Logout"><A HREF="[% topURL _ '?LOGOUT=1' %]">Logout</A></SPAN>
+</DIV>
+[% END %]
+</DIV>
+<DIV CLASS="CurrentTime">[% timestamp %]</DIV>
+[% IF printpath %]
+  <DIV CLASS="PathMenu">
+    [% INCLUDE treename %]
+    <DIV CLASS="CurrentPath">
+      <SPAN CLASS="PathMenuHeader">Current path:</SPAN>
+      <SPAN CLASS="PathURLs">[% splitUrls(token) %]</SPAN>
+    </DIV>
+  </DIV>
+[% END %]
+<DIV CLASS="[%contentClass%]">
+[% global.contentFinished = 0;
+END %]
+
+[%#  ###########    Print the legend   ################ %]
+
+[% BLOCK legend %]
+[%   legend = nodeParam(token, 'legend') %]
+[%   IF legend.length > 0 %]
+<DIV CLASS="Legend">
+[%     FOREACH legpairstring = legend.split(';') %]
+[%       SET legpair = legpairstring.split(':') %]
+         <DIV CLASS="LegendRow">
+           <SPAN CLASS="LegendName">[% xmlnorm(legpair.0) %]:</SPAN>
+           <SPAN CLASS="LegendValue">[% xmlnorm(legpair.1) %]</SPAN>
+         </DIV>
+[%     END %]
+</DIV>
+[%   END %]
+[% END %]
+
+[%# ###########    Print the TZ and NOW variables   ################ %]
+
+[% BLOCK variables %]
+[%   IF variables.TZ or variables.NOW %]
+<P CLASS="Variables">
+[%     IF variables.TZ %]
+          <SPAN CLASS="VariableName">Timezone:</SPAN>
+          <SPAN CLASS="VariableValue">[% variables.TZ %].</SPAN>
+[%     END %]
+[%     IF variables.NOW %]
+          <SPAN CLASS="VariableName">Report date:</SPAN>
+          <SPAN CLASS="VariableValue">[% variables.NOW %].</SPAN>
+[%     END %]
+</P>
+[%   END %]
+[% END %]
+
+
+[%# ###########    Print the current path menu   ################ %]
+
+[% BLOCK currentpath %]
+<DIV CLASS="PathMenu">
+[% INCLUDE treename %]
+  <DIV CLASS="CurrentPath">
+    <SPAN CLASS="PathMenuHeader">Current path:</SPAN>
+    <SPAN CLASS="PathURLs">[% splitUrls(token) %]</SPAN>
+  </DIV>
+</DIV>
+[% END %]
+
+[%# ###########    Print the current tree name   ################ %]
+
+[% BLOCK treename %]
+  <DIV CLASS="CurrentTree">
+    <SPAN CLASS="PathMenuHeader">Tree:</SPAN>
+    <SPAN CLASS="TreeName">[% treeName %]</SPAN>
+  </DIV>
+[% END %]
+
+[%# ###########    Print the shortcut   ################ %]
+
+[% BLOCK shortcut %]
+  <SPAN CLASS="Shortcut">
+  [&nbsp;<A TITLE="[%title%]" HREF="[%url%]"
+            [%IF newwindow; 'TARGET="_blank"'; END%]>[%text%]</A>&nbsp;]
+  </SPAN>
+[% END %]
+
+[%# ###########    Print the common bottomline   ################ %]
+
+[% BLOCK bottomline %]
+</DIV><!-- Content -->[% global.contentFinished = 1 %]
+<DIV CLASS="BottomMenu">
+[% INCLUDE shortcut url=topURL text="Top"
+                    title="Choose from the list of trees"%]
+[% INCLUDE shortcut url=pathUrl(token,view) text="Bookmark"
+                    title="Permanent link to this page"%]
+[% INCLUDE shortcut url=url('SS')           text="Tokensets"
+                    title="List of non-empty tokensets"%]
+[% INCLUDE shortcut url=url(token,view,'MEDIA','printer')
+                    text="Printable view"
+                    title="Prepare this page for printing"
+                    newwindow=1%]
+</DIV>
+[% END %]
+
+[%# ###########    Print the Tokensets bottomline   ################ %]
+
+[% BLOCK tsetbottomline %]
+</DIV><!-- Content -->[% global.contentFinished = 1 %]
+<DIV CLASS="BottomMenu">
+[% INCLUDE shortcut url=topURL text="Top"
+                    title="Choose from the list of trees"%]
+[% INCLUDE shortcut url=url(pathToken('/')) text="Datasources tree"
+                    title="Back to the datasources tree" %]
+[% INCLUDE shortcut url=url(token,view,'MEDIA','printer')
+                    text="Printable view"
+                    title="Prepare this page for printing"
+                    newwindow=1%]
+</DIV>
+[% END %]
+
+
+[%# ###########    Print the ending HTML blahblah   ################ %]
+
+[% BLOCK htmlend %]
+[% IF ! global.contentFinished %]</DIV><!-- Content -->[% END %]
+<DIV CLASS="Footer">
+  Powered by <A HREF="http://torrus.sourceforge.net">Torrus</A> [% version %]
+</DIV>
+</BODY>
+</HTML>
+[% END %]
+
+[%# ########   Print the RRD graph image   ####### %]
+
+[% BLOCK rrgraph %]
+      [%IF variables.AUTOSCALE == '1';
+		SET view = view _ "Auto";
+      END %]
+<DIV CLASS="GraphImage">
+<IMG SRC="[%url(token, view, vars)%]"
+     ALT="[% alt %]">
+</DIV>
+[% END %]
+
+
+[%# ########   Print the ts RRD graph image   ####### %]
+
+[% BLOCK tsgraph %]
+<DIV CLASS="ShortGraph">
+      <DIV CLASS="NodeName">
+        <A HREF="[%url(token)%]">[% nodename %]</A>
+      </DIV>
+      [%IF comment%]<DIV CLASS="NodeDescr">[%comment%]</DIV>[%END%]
+      
+      [%
+	DEFAULT variables.WINDOW = 'Day';
+	SET shortView = "ts$variables.WINDOW";
+        IF variables.AUTOSCALE == '1';
+		SET shortView = shortView _ "Auto";
+        END;
+        shortvars = [];
+      %]
+      <DIV CLASS="GraphImage">
+      <A HREF="[%url(token)%]">
+      <IMG SRC="[%url(token, shortView, shortvars)%]"
+           ALT="Short Graph">
+      </A>
+      </DIV>
+</DIV>
+[% END %]
+
+[%# ########   Print the overview RRD graph image   ####### %]
+
+[% BLOCK overviewgraph %]
+[%
+  hidden = 0;
+  IF nodeParam(token,'hidden') == 'yes';
+    hidden = 1;
+  END;
+  IF not hidden or variables.SHOWHIDDEN
+%]
+<DIV CLASS="ShortGraph">
+      [% hidden ? '<SPAN CLASS="ShowHidden">':'' %]
+      <DIV CLASS="NodeName">
+        <A HREF="[%url(token)%]">[%IF nodeparent %][%nodeparent%]/[%END%][% nodename %]</A>
+      </DIV>
+      [%IF comment%]<DIV CLASS="NodeDescr">[%comment%]</DIV>[%END%]
+      [% hidden ? '</SPAN>':'' %]
+      
+      [% 
+	DEFAULT variables.WINDOW = 'Day';
+	SET overviewView = "exp$variables.WINDOW";
+        IF variables.AUTOSCALE == '1';
+		SET overviewView = overviewView _ "Auto";
+        END;
+        overviewvars = [];
+        IF nodeParam(token, 'rrd-hwpredict') == 'enabled' and
+           param(view, 'rrd-hwpredict') != 'disabled';
+          global.hwpredict = 1;
+          IF variables.NOHW;
+            overviewvars = ['NOHW', 1];
+          ELSE;
+            overviewvars = ['NOHW', ''];          
+          END;
+        END
+      %]
+      <DIV CLASS="GraphImage">
+      <A HREF="[%url(token)%]">
+      <IMG SRC="[%url(token, overviewView, overviewvars)%]"
+           ALT="Last Day Graph">
+      </A>
+      </DIV>
+</DIV>
+  [% END %]
+[% END %]

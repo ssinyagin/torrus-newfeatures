@@ -1,0 +1,84 @@
+[% PROCESS 'ov/ov-html-incblocks.txt' %]
+[% thepath=path(token) %]
+[% INCLUDE htmlstart title=thepath printpath=1 %]
+
+<H1>[% xmlnorm(nodeParam(token,'comment')) %]</H1>
+
+[% INCLUDE legend %]
+
+<P>Directories you can jump to:</P>
+<DIV CLASS="Listing">
+[%   hasLeaves = 0; 
+     hasSubNodes = 0;
+     evenRow = 0;
+     FOREACH child = sortTokens(children(token));
+       hidden = 0;
+       counter = counter + 1;
+       IF nodeParam(child,'hidden') == 'yes';
+         hidden = 1;
+       END;
+       comment = nodeParam(child,'comment',1);
+       IF isLeaf(child);
+         hasLeaves = 1;
+       ELSE;
+         hasSubNodes = 1;
+         IF isAlias(child);
+           thisIsAlias = 1;
+           urlTitle = ' TITLE="Symbolic link to ' _ path(isAlias(child)) _'"';
+         ELSE;
+           urlTitle = '';
+         END;
+       END;
+       IF counter % 2 == 0;
+         evenRow = 1;
+       ELSE;
+         evenRow = 0;
+       END;
+       IF not hidden or variables.SHOWHIDDEN
+%]
+  <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
+    <SPAN CLASS="NodeName">
+      [% thisIsAlias ? '<EM CLASS="Alias">':'';
+         hidden ? '<EM CLASS="ShowHidden">':'' %]
+      <A HREF="[%url(child)%]"[%urlTitle%]>[% nodeName(path(child)) %]</A>
+      [% hidden ? '</EM>':'';
+         thisIsAlias ? '</EM>':''; %]
+    </SPAN>
+       [% IF comment %]
+    <SPAN CLASS="NodeDescr">
+      [% hidden ? '<EM CLASS="ShowHidden">':'' %]
+      [% xmlnorm(comment) %]
+      [% hidden ? '</EM>':'' %]
+    </SPAN>
+       [% END %]
+  </DIV>
+    [% END %]
+  [% END %]
+</DIV>
+
+[% IF hasLeaves %]
+<DIV CLASS="BottomShortcuts">
+[% INCLUDE shortcut url=url(token, 'expanded-dir-html')
+                    text="Expand leaves"
+                    title="Show all leaf graphs in one page" %]
+</DIV>                   
+[% END %]
+[% IF hasSubNodes %]
+<DIV CLASS="BottomShortcuts">
+[% INCLUDE shortcut url=url(token, 'sub-nodes-dir-html')
+                    text="Expand leaves &amp; sub-nodes"
+                    title="Show all leaf & sub-nodes graphs in one page" %]
+</DIV>                   
+[% END %]
+
+[% IF nodeParam(token, 'has-overview-subleaves', 1) == 'yes' %]
+<DIV CLASS="BottomShortcuts">
+[% INCLUDE shortcut url=url(token, 'overview-subleaves-html')
+                    text=nodeParam(token, 'overview-shortcut-text', 1)
+                    title=nodeParam(token, 'overview-shortcut-title', 1) %]
+</DIV>
+[% END %]
+
+
+[% INCLUDE bottomline %]
+[% INCLUDE htmlend %]

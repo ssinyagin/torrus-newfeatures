@@ -1,0 +1,653 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2004  Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+  $Id$
+  Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+-->
+
+<!-- Cisco IOS Class-based QoS definitions.
+     cbQoS monitoring requires a specialized Collector module -->
+
+<configuration>
+
+<definitions>
+ <!-- CISCO-CLASS-BASED-QOS-MIB -->
+
+  <def name="cbQosCMPrePolicyPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.3"/>
+  <def name="cbQosCMPrePolicyByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.6"/>
+  <def name="cbQosCMPrePolicyBitRate"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.7"/>
+  <def name="cbQosCMPostPolicyByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.10"/>
+  <def name="cbQosCMPostPolicyBitRate"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.11"/>
+  <def name="cbQosCMDropPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.14"/>
+  <def name="cbQosCMDropByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.17"/>
+  <def name="cbQosCMDropBitRate"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.18"/>
+  <def name="cbQosCMNoBufDropPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.15.1.1.21"/>
+
+  <def name="cbQosMatchPrePolicyPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.16.1.1.3"/>
+  <def name="cbQosMatchPrePolicyByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.16.1.1.6"/>
+  <def name="cbQosMatchPrePolicyBitRate"
+                      value="1.3.6.1.4.1.9.9.166.1.16.1.1.7"/>
+
+  <def name="cbQosPoliceConformedPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.3"/>
+  <def name="cbQosPoliceConformedByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.6"/>
+  <def name="cbQosPoliceConformedBitRate"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.7"/>
+  <def name="cbQosPoliceExceededPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.10"/>
+  <def name="cbQosPoliceExceededByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.13"/>
+  <def name="cbQosPoliceExceededBitRate"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.14"/>
+  <def name="cbQosPoliceViolatedPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.17"/>
+  <def name="cbQosPoliceViolatedByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.20"/>
+  <def name="cbQosPoliceViolatedBitRate"
+                      value="1.3.6.1.4.1.9.9.166.1.17.1.1.21"/>
+
+  <def name="cbQosQueueingCurrentQDepth"
+                      value="1.3.6.1.4.1.9.9.166.1.18.1.1.1"/>
+  <def name="cbQosQueueingMaxQDepth"
+                      value="1.3.6.1.4.1.9.9.166.1.18.1.1.2"/>
+  <def name="cbQosQueueingDiscardByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.18.1.1.5"/>
+  <def name="cbQosQueueingDiscardPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.18.1.1.8"/>
+
+  <def name="cbQosTSStatsDelayedByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.19.1.1.3"/>
+  <def name="cbQosTSStatsDelayedPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.19.1.1.6"/>
+  <def name="cbQosTSStatsDropByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.19.1.1.9"/>
+  <def name="cbQosTSStatsDropPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.19.1.1.12"/>
+  <def name="cbQosTSStatsCurrentQSize"
+                      value="1.3.6.1.4.1.9.9.166.1.19.1.1.14"/>
+                      
+  <def name="cbQosREDRandomDropPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.20.1.1.3"/>
+  <def name="cbQosREDRandomDropByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.20.1.1.6"/>
+  <def name="cbQosREDTailDropPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.20.1.1.9"/>
+  <def name="cbQosREDTailDropByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.20.1.1.12"/>
+  <def name="cbQosREDTransmitPkt64"
+                      value="1.3.6.1.4.1.9.9.166.1.20.1.1.15"/>
+  <def name="cbQosREDTransmitByte64"
+                      value="1.3.6.1.4.1.9.9.166.1.20.1.1.18"/>
+                                            
+</definitions>
+
+<datasources>
+
+  <template name="cisco-cbqos-subtree">
+    <param name="comment"           value="Class-based QoS monitoring" />
+    <param name="collector-type"    value="cisco-cbqos" />
+    <param name="rrd-create-max"    value="1e15"/>
+    <param name="graph-lower-limit" value="0" />
+    <param name="data-file"
+       value="%system-id%_cbqos_%cbqos-policy-nick%_%cbqos-object-nick%.rrd" />
+    <param name="collector-timeoffset-hashstring"
+           value="%system-id%:%cbqos-policy-nick%:%cbqos-object-nick%" />
+  </template>
+
+  <template name="cisco-cbqos-pkt">
+    <param name="rrd-create-dstype" value="COUNTER" />
+    <param name="snmp-object-type"  value="COUNTER64" />
+    <param name="vertical-label"    value="pps" />
+  </template>
+
+  <template name="cisco-cbqos-byte">
+    <param name="rrd-create-dstype" value="COUNTER" />
+    <param name="snmp-object-type"  value="COUNTER64" />
+    <param name="vertical-label"    value="Bps" />
+  </template>
+
+  <template name="cisco-cbqos-bitrate">
+    <param name="rrd-create-dstype" value="GAUGE" />
+    <param name="vertical-label"    value="bps" />
+  </template>
+
+  <template name="cisco-cbqos-policymap-subtree">
+    <param name="has-overview-subleaves" value="yes"/>
+    <param name="overview-subleave-name" value="Summary"/>
+    <param name="overview-direct-link"      value="yes"/>
+    <param name="overview-direct-link-view" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text"
+           value="Show traffic summary for all classes"/>
+    <param name="overview-shortcut-title">
+      Show pre-policy and dropped traffic for all classes in one page
+    </param>
+    <param name="overview-page-title" value="Policymap Summary"/>
+  </template>
+
+<!-- ===================================================================
+                          Classmap meters
+    =================================================================== -->
+
+  <template name="cisco-cbqos-classmap-meters">
+
+    <leaf name="Summary">
+      <param name="ds-type"           value="rrd-multigraph" />
+      <param name="ds-names"          value="prepolicy, dropped" />
+      <param name="rrd-hwpredict"     value="disabled" />
+
+      <param name="precedence"        value="5000" />
+      <param name="comment"    value="Pre-policy and dropped trafic summary" />
+      <param name="vertical-label"    value="bps" />
+
+      <param name="ds-expr-prepolicy"      value="{Pre_Policy_Bytes},8,*"/>
+      <param name="graph-legend-prepolicy" value="Pre-policy" />
+      <param name="line-style-prepolicy"   value="##SingleGraph" />
+      <param name="line-color-prepolicy"   value="##blue" />
+      <param name="line-order-prepolicy"   value="1" />
+
+      <param name="ds-expr-dropped"      value="{Dropped_Bytes},8,*"/>
+      <param name="graph-legend-dropped" value="Dropped" />
+      <param name="line-style-dropped"   value="##SingleGraph" />
+      <param name="line-color-dropped"   value="##red" />
+      <param name="line-order-dropped"   value="2" />      
+    </leaf>
+    
+    <!-- ******  Pre-policy meters ****** -->
+
+    <leaf name="Pre_Policy_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosCMPrePolicyPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="PrePolicyPkt" />
+      <param name="comment">
+        Inbound packets prior to executing any QoS policies
+      </param>
+      <param name="graph-legend"    value="Pre-policy pakets" />
+      <param name="precedence"      value="1000" />
+    </leaf>
+
+    <leaf name="Pre_Policy_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosCMPrePolicyByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="PrePolicyByte" />
+      <param name="comment">
+        Inbound octets prior to executing any QoS policies
+      </param>
+      <param name="graph-legend"    value="Pre-policy bytes" />
+      <param name="precedence"      value="990" />
+    </leaf>
+
+    <leaf name="Pre_Policy_Bitrate">
+      <apply-template name="cisco-cbqos-bitrate" />
+      <param name="snmp-object" value="$cbQosCMPrePolicyBitRate.POL.OBJ" />
+      <param name="rrd-ds"      value="PrePolicyBitRate" />
+      <param name="comment">
+        The bit rate of the traffic prior to executing any QoS policies
+      </param>
+      <param name="graph-legend"    value="Pre-policy bitrate" />
+      <param name="precedence"      value="980" />
+    </leaf>
+
+    <!-- ******  Post-policy meters ****** -->
+
+    <leaf name="Post_Policy_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosCMPostPolicyByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="PostPolicyByte" />
+      <param name="comment">
+        Outbound octets after executing QoS policies
+      </param>
+      <param name="graph-legend"    value="post-policy bytes" />
+      <param name="precedence"      value="970" />
+    </leaf>
+
+    <leaf name="Post_Policy_Bitrate">
+      <apply-template name="cisco-cbqos-bitrate" />
+      <param name="snmp-object" value="$cbQosCMPostPolicyBitRate.POL.OBJ" />
+      <param name="rrd-ds"      value="PostPolicyBitRate" />
+      <param name="comment">
+        The bit rate of the traffic after executing QoS policies
+      </param>
+      <param name="graph-legend"    value="Post-policy bitrate" />
+      <param name="precedence"      value="960" />
+    </leaf>
+
+    <!-- ******  Dropped packets meters ****** -->
+
+    <leaf name="Dropped_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosCMDropPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="DropPkt" />
+      <param name="comment">
+        Dropped packets as the result of all features that can produce drops
+        (e.g., police, random detect, etc.)
+      </param>
+      <param name="graph-legend"    value="Dropped pakets" />
+      <param name="precedence"      value="950" />
+    </leaf>
+
+    <leaf name="Dropped_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosCMDropByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="DropByte" />
+      <param name="comment">
+        Dropped bytes as the result of all features that can produce drops
+        (e.g., police, random detect, etc.)
+      </param>
+      <param name="graph-legend"    value="Dropped bytes" />
+      <param name="precedence"      value="940" />
+    </leaf>
+
+    <leaf name="Dropped_Bitrate">
+      <apply-template name="cisco-cbqos-bitrate" />
+      <param name="snmp-object" value="$cbQosCMDropBitRate.POL.OBJ" />
+      <param name="rrd-ds"      value="DropBitRate" />
+      <param name="comment">
+        The bit rate of the drops as the result of all features that can
+        produce drops (e.g., police, random detect, etc.)
+      </param>
+      <param name="graph-legend"    value="Dropped bitrate" />
+      <param name="precedence"      value="930" />
+    </leaf>
+
+    <iftrue var="CiscoIOS_cbQoS::CMNoBufDrop">
+      <leaf name="Dropped_No_Buffer">
+        <apply-template name="cisco-cbqos-pkt" />
+        <param name="snmp-object" value="$cbQosCMNoBufDropPkt64.POL.OBJ" />
+        <param name="rrd-ds"      value="NoBufDropPkt" />
+        <param name="comment">
+          Dropped packets which occured due to a lack of SRAM buffers
+          during output processing on an interface
+        </param>
+        <param name="graph-legend"    value="Dropped no-buffer pakets" />
+        <param name="precedence"      value="920" />
+      </leaf>
+    </iftrue>
+
+  </template>
+
+
+<!-- ===================================================================
+                          Match Statement meters
+    =================================================================== -->
+
+  <template name="cisco-cbqos-match-stmt-meters">
+
+  <leaf name="Pre_Policy_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosMatchPrePolicyPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="PrePolicyPkt" />
+      <param name="comment">
+        Inbound packets prior to executing any QoS policies
+      </param>
+      <param name="graph-legend"    value="Pre-policy pakets" />
+      <param name="precedence"      value="1000" />
+    </leaf>
+
+    <leaf name="Pre_Policy_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosMatchPrePolicyByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="PrePolicyByte" />
+      <param name="comment">
+        Inbound octets prior to executing any QoS policies
+      </param>
+      <param name="graph-legend"    value="Pre-policy bytes" />
+      <param name="precedence"      value="990" />
+    </leaf>
+
+    <leaf name="Pre_Policy_Bitrate">
+      <apply-template name="cisco-cbqos-bitrate" />
+      <param name="snmp-object" value="$cbQosMatchPrePolicyBitRate.POL.OBJ" />
+      <param name="rrd-ds"      value="PrePolicyBitRate" />
+      <param name="comment">
+        The bit rate of the traffic prior to executing any QoS policies
+      </param>
+      <param name="graph-legend"    value="Pre-policy bitrate" />
+      <param name="precedence"      value="980" />
+    </leaf>
+
+  </template>
+
+
+<!-- ===================================================================
+                          Police meters
+    =================================================================== -->
+
+  <template name="cisco-cbqos-police-meters">
+
+    <!-- ******  Conformed meters ****** -->
+
+    <leaf name="Conformed_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosPoliceConformedPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="ConformedPkt" />
+      <param name="comment">
+        Packets treated as conforming by the policing feature
+      </param>
+      <param name="graph-legend"    value="Conformed pakets" />
+      <param name="precedence"      value="1000" />
+    </leaf>
+
+    <leaf name="Conformed_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosPoliceConformedByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="ConformedByte" />
+      <param name="comment">
+        Bytes treated as conforming by the policing feature
+      </param>
+      <param name="graph-legend"    value="Conformed bytes" />
+      <param name="precedence"      value="990" />
+    </leaf>
+
+    <leaf name="Conformed_Bitrate">
+      <apply-template name="cisco-cbqos-bitrate" />
+      <param name="snmp-object" value="$cbQosPoliceConformedBitRate.POL.OBJ" />
+      <param name="rrd-ds"      value="ConformedBitRate" />
+      <param name="comment">
+        The bit rate of conforming traffic
+      </param>
+      <param name="graph-legend"    value="Conformed bitrate" />
+      <param name="precedence"      value="980" />
+    </leaf>
+
+    <!-- ******  Exceeded meters ****** -->
+
+    <leaf name="Exceeded_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosPoliceExceededPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="ExceededPkt" />
+      <param name="comment">
+        Packets treated as conforming by the policing feature
+      </param>
+      <param name="graph-legend"    value="Exceeded pakets" />
+      <param name="precedence"      value="970" />
+    </leaf>
+
+    <leaf name="Exceeded_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosPoliceExceededByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="ExceededByte" />
+      <param name="comment">
+        Bytes treated as conforming by the policing feature
+      </param>
+      <param name="graph-legend"    value="Exceeded bytes" />
+      <param name="precedence"      value="960" />
+    </leaf>
+
+    <leaf name="Exceeded_Bitrate">
+      <apply-template name="cisco-cbqos-bitrate" />
+      <param name="snmp-object" value="$cbQosPoliceExceededBitRate.POL.OBJ" />
+      <param name="rrd-ds"      value="ExceededBitRate" />
+      <param name="comment">
+        The bit rate of conforming traffic
+      </param>
+      <param name="graph-legend"    value="Exceeded bitrate" />
+      <param name="precedence"      value="950" />
+    </leaf>
+
+    <!-- ******  Violated meters ****** -->
+
+    <leaf name="Violated_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosPoliceViolatedPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="ViolatedPkt" />
+      <param name="comment">
+        Packets treated as conforming by the policing feature
+      </param>
+      <param name="graph-legend"    value="Violated pakets" />
+      <param name="precedence"      value="940" />
+    </leaf>
+
+    <leaf name="Violated_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosPoliceViolatedByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="ViolatedByte" />
+      <param name="comment">
+        Bytes treated as conforming by the policing feature
+      </param>
+      <param name="graph-legend"    value="Violated bytes" />
+      <param name="precedence"      value="930" />
+    </leaf>
+
+    <leaf name="Violated_Bitrate">
+      <apply-template name="cisco-cbqos-bitrate" />
+      <param name="snmp-object" value="$cbQosPoliceViolatedBitRate.POL.OBJ" />
+      <param name="rrd-ds"      value="ViolatedBitRate" />
+      <param name="comment">
+        The bit rate of conforming traffic
+      </param>
+      <param name="graph-legend"    value="Violated bitrate" />
+      <param name="precedence"      value="920" />
+    </leaf>
+
+  </template>
+
+<!-- ===================================================================
+                           Queueing meters
+    =================================================================== -->
+
+  <template name="cisco-cbqos-queueing-meters">
+
+    <leaf name="Queue_Depth">
+      <param name="snmp-object" value="$cbQosQueueingCurrentQDepth.POL.OBJ" />
+      <param name="rrd-ds"      value="CurrentQDepth" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="vertical-label"    value="Bytes" />
+      <param name="comment">
+        The current depth of the queue
+      </param>
+      <param name="graph-legend"    value="Queue depth" />
+      <param name="precedence"      value="1000" />
+    </leaf>
+    
+    <leaf name="Discarded_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosQueueingDiscardByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="DiscardByte" />
+      <param name="comment">
+        The number of octets that were dropped by queueing
+      </param>
+      <param name="graph-legend"    value="Discarded bytes" />
+      <param name="precedence"      value="990" />
+    </leaf>
+
+    <leaf name="Discarded_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosQueueingDiscardPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="DiscardPkt" />
+      <param name="comment">
+        The number of packets that were dropped by queueing
+      </param>
+      <param name="graph-legend"    value="Discarded pakets" />
+      <param name="precedence"      value="980" />
+    </leaf>
+  
+  </template>
+
+<!-- ===================================================================
+                           Traffic Shaping meters
+    =================================================================== -->
+
+  <template name="cisco-cbqos-shaping-meters">
+  
+    <leaf name="Delayed_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosTSStatsDelayedByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="DelayedByte" />
+      <param name="comment">
+        The number of octets that have been delayed
+      </param>
+      <param name="graph-legend"    value="Delayed bytes" />
+      <param name="precedence"      value="990" />
+    </leaf>
+
+    <leaf name="Delayed_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosTSStatsDelayedPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="DelayedPkt" />
+      <param name="comment">
+        The number of packets that have been delayed
+      </param>
+      <param name="graph-legend"    value="Delayed packets" />
+      <param name="precedence"      value="980" />
+    </leaf>
+
+    <leaf name="Dropped_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object" value="$cbQosTSStatsDropByte64.POL.OBJ" />
+      <param name="rrd-ds"      value="DropByte" />
+      <param name="comment">
+        The number of octets that have been dropped
+      </param>
+      <param name="graph-legend"    value="Dropped bytes" />
+      <param name="precedence"      value="970" />
+    </leaf>
+
+    <leaf name="Dropped_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object" value="$cbQosTSStatsDropPkt64.POL.OBJ" />
+      <param name="rrd-ds"      value="DropPkt" />
+      <param name="comment">
+        The number of packets that have been Dropped
+      </param>
+      <param name="graph-legend"    value="Dropped packets" />
+      <param name="precedence"      value="960" />
+    </leaf>
+
+    <leaf name="Queue_Size">
+      <param name="snmp-object" value="$cbQosTSStatsCurrentQSize.POL.OBJ" />
+      <param name="rrd-ds"      value="CurrentQSize" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="vertical-label"    value="Packets" />
+      <param name="comment">
+        The current depth of the queue
+      </param>
+      <param name="graph-legend"    value="Queue size" />
+      <param name="precedence"      value="950" />
+    </leaf>
+          
+  </template>
+
+  
+<!-- ===================================================================
+                           WRED meters
+    =================================================================== -->
+    
+  <template name="cisco-cbqos-red-subtree">
+    <param name="data-file"
+       value="%system-id%_cbqos_%cbqos-policy-nick%_%cbqos-parent-name%_red_%cbqos-red-dscp%.rrd" />
+    <param name="collector-timeoffset-hashstring"
+           value="%system-id%:%cbqos-policy-nick%:%cbqos-red-dscp%" />
+  </template>
+
+  <template name="cisco-cbqos-red-meters">  
+    <leaf name="Random_Dropped_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object"
+             value="$cbQosREDRandomDropPkt64.POL.OBJ.%cbqos-red-dscp%" />
+      <param name="rrd-ds"      value="RandomDropPkt" />
+      <param name="comment">
+        Count of packets dropped when the number of packets in the
+        associated queue was greater than the minimum threshold and less
+        than the maximum threshold
+      </param>
+      <param name="graph-legend"    value="Random dropped pakets" />
+      <param name="precedence"      value="1000" />
+    </leaf>
+
+    <leaf name="Random_Dropped_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object"
+             value="$cbQosREDRandomDropByte64.POL.OBJ.%cbqos-red-dscp%" />
+      <param name="rrd-ds"      value="RandomDropByte" />
+      <param name="comment">
+        Count of octets dropped when the number of packets in the
+        associated queue was greater than the minimum threshold and less
+        than the maximum threshold
+      </param>
+      <param name="graph-legend"    value="Random dropped bytes" />
+      <param name="precedence"      value="990" />
+    </leaf>
+    
+    <leaf name="Tail_Dropped_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object"
+             value="$cbQosREDTailDropPkt64.POL.OBJ.%cbqos-red-dscp%" />
+      <param name="rrd-ds"      value="TailDropPkt" />
+      <param name="comment">
+        Count of packets dropped when the number of packets in the
+        associated queue was greater than the maximum threshold
+      </param>
+      <param name="graph-legend"    value="Tail dropped pakets" />
+      <param name="precedence"      value="980" />
+    </leaf>
+
+    <leaf name="Tail_Dropped_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object"
+             value="$cbQosREDTailDropByte64.POL.OBJ.%cbqos-red-dscp%" />
+      <param name="rrd-ds"      value="TailDropByte" />
+      <param name="comment">
+        Count of octets dropped when the number of packets in the
+        associated queue was greater than the maximum threshold
+      </param>
+      <param name="graph-legend"    value="Tail dropped bytes" />
+      <param name="precedence"      value="970" />
+    </leaf>
+
+    <leaf name="Transmit_Packets">
+      <apply-template name="cisco-cbqos-pkt" />
+      <param name="snmp-object"
+             value="$cbQosREDTransmitPkt64.POL.OBJ.%cbqos-red-dscp%" />
+      <param name="rrd-ds"      value="TransmitPkt" />
+      <param name="comment">
+        Packets transmitted
+      </param>
+      <param name="graph-legend"    value="Transmitted pakets" />
+      <param name="precedence"      value="960" />
+    </leaf>
+
+    <leaf name="Transmit_Bytes">
+      <apply-template name="cisco-cbqos-byte" />
+      <param name="snmp-object"
+             value="$cbQosREDTransmitByte64.POL.OBJ.%cbqos-red-dscp%" />
+      <param name="rrd-ds"      value="TransmitByte" />
+      <param name="comment">
+        Octets transmitted
+      </param>
+      <param name="graph-legend"    value="Transmitted bytes" />
+      <param name="precedence"      value="950" />
+    </leaf>
+
+  </template>
+  
+</datasources>
+
+</configuration>

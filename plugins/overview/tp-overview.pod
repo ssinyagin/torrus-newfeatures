@@ -1,0 +1,211 @@
+
+#  overview.pod - Torrus configuration guide
+#  Copyright (C) 2003  Christian Schnidrig
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Christian Schnidrig <christian.schnidrig@bluewin.ch>
+#
+#
+
+=head1 Overview Plugin
+
+
+=head2 Introduction
+
+This plugin adds an alternative user interface to Torrus.
+The main feature is that it
+allows for creation of overview pages showing counters from
+different parts of a tree. For example a page containing all
+CPU usage counters of all network devices.
+
+Other features are:
+
+=over 2
+
+=item * date and time picker
+
+allowing for chosing of the vieving date and time. (In oder to take full 
+advantage of this features one has to make sure the RRD files do keep 
+full history data for longer then just a couple of days. For example 
+to keep 2 years worth of history data:
+
+=back
+
+    <param name="rrd-create-rra">
+	RRA:AVERAGE:0:1:209664
+	RRA:AVERAGE:0.1:12:17472 RRA:MAX:0.1:12:17472 RRA:MIN:0.1:12:17472
+	RRA:AVERAGE:0.1:288:1456 RRA:MAX:0.1:288:1456 RRA:MIN:0.1:288:1456
+	RRA:AVERAGE:0.1:2016:416 RRA:MAX:0.1:2016:416 RRA:MIN:0.1:2016:416
+    </param>
+
+=over 2
+
+
+=item * 'window' picker.
+
+This allows for choosing the time
+range which is to be displayed: day, week, month etc.
+
+=item * show hidden checkbox.
+
+Toggle display of hidden counters.
+
+=item * auto-scale checkbox.
+
+Toggle display between auto-scaling and fixed scaling.
+
+=back
+
+This plugin has been tested with Internet Explorer 6.0, Netscape 7.1,
+and Mozilla 1.4. Other browsers were not tested and will most likely
+not work.
+
+=head2 Required Software (apart from Torrus)
+
+=over 2
+
+=item * Perl Modules
+
+Apache::ASP http://www.apache-asp.org/
+
+XML::Sablotron http://www.cpan.org/
+
+XML::LibXSLT http://www.cpan.org/
+
+=item * WebFx modules
+
+Tab Pane http://webfx.eae.net/download/tabpane102.zip
+
+Xtree (modified version is included in this plugin)
+
+=item * jscalendar
+
+Date Picker from http://sourceforge.net/projects/jscalendar/
+
+=back
+
+=head2 Installation
+
+Unpack Torrus main distribution and the plugin in some directories.
+From Torrus distribution directory, run
+
+  ./configure --with-plugins=../torrus-plugin-overview-0.0.1
+  make install
+
+After Torrus installation has finished:
+
+Install the perl module Apache::ASP acording to the instructions on
+http://www.apache-asp.org/
+
+Add the following lines to your apache config file (http.conf).
+(Note: WEBPLAINDIR is /usr/local/torrus-xyz/web/plain by default):
+
+
+  ScriptAlias /menu/ "WEBPLAINDIR/menu/"
+  ScriptAlias /overviews/ "WEBPLAINDIR/overviews/"
+
+  <Location /menu>
+  SetHandler  perl-script
+  PerlModule  Apache::ASP
+  PerlHandler Apache::ASP
+  PerlSetVar  Global /www/asp
+  PerlSetVar  StateDir /tmp/asp
+  PerlSetVar NoState 1
+  PerlSetVar XSLTParser XML::Sablotron
+  PerlSetVar XSLTParser XML::LibXSLT
+  PerlSetVar XSLTMatch xml$
+  PerlSetVar XSLT menu.xsl
+  PerlSetVar RequestParams 1
+  </Location>
+
+  <Location /overviews>
+  SetHandler  perl-script
+  PerlModule  Apache::ASP
+  PerlHandler Apache::ASP
+  PerlSetVar  Global /www/asp
+  PerlSetVar  StateDir /tmp/asp
+  PerlSetVar NoState 1
+  PerlSetVar XSLTParser XML::Sablotron
+  PerlSetVar XSLTParser XML::LibXSLT
+  PerlSetVar XSLTMatch xml$
+  PerlSetVar XSLT overview.xsl
+  PerlSetVar RequestParams 1
+  </Location>
+
+Create the directories /www/asp and /tmp/asp.
+
+Copy the contents of http://webfx.eae.net/download/tabpane102.zip to
+'WEBPLAINDIR'/tabpane
+
+Copy the contents of the jscalendar package to 'WEBPLAINDIR'/calendar
+
+=head2 Usage
+
+Now you're ready to go. A usage example has been included. In order to
+use the example you need to follow these additional steps:
+
+=over 2
+
+=item * install torrus-plugin-overview
+
+
+=item * Edit your torrus-siteconfig.pl:
+
+Add the following item to Torrus::Global::treeConfig
+
+=back
+
+    'ovExamples' => {
+        'description' => 'Example data for overview',
+        'xmlfiles' => [
+            'defaults.xml',
+            'ovDefaults.xml',
+            'examples/ovExample.xml',
+        ],
+        'run' => { 'collector' => 1, 'monitor' => 1 } },
+
+Also add the following lines:
+
+    %Torrus::Renderer::styling =
+        ( 'default' => {'stylesheet' => 'torrus.css',
+                        'ovStylesheet' => 'ov.css',
+                       },
+          'printer' => {'stylesheet' => 'torrus-printer.css',
+                        'ovStylesheet' => 'ov-printer.css',
+                       },
+         );
+
+    $Torrus::Renderer::Chooser::template = 'ov/ov-chooser.html';
+
+
+=over 2
+
+=item * run the collector
+
+Wait a few minutes for it to create all RRDs and collect some data.
+
+=item * Enjoy!
+
+You can access the sample menu at: http://your-server/menu/sampleMenu.xml
+
+
+=back
+
+=head1 Author
+
+Copyright (c) 2003-2004 Christian Schnidrig
+E<lt>christian.schnidrig@bluewin.chE<gt>

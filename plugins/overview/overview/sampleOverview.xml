@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+	Copyright (C) 2003 Christian Schnidrig
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+	
+	$Id$
+	Christian Schnidrig <christian.schnidrig@bluewin.ch>
+
+-->
+<overview index='true'>
+	<!--#include file=common.inc-->
+
+	<title>Title bla bla</title>
+
+	<header>
+		This is some header info. Try setting overview-index to 
+		false-> the links below will disappear.
+	</header>
+
+	<footer>This is some footer info</footer>
+
+	<tree>ovExamples</tree>
+
+	<chapter	legend='Chapter 1'
+				index='true'>
+
+		<intro>Chapter intro: notice that this chapter has index set to <span style="color:green">true</span></intro>
+
+		<section legend='Section 1'>
+
+			<intro>Section intro: note that section 2 has no legend</intro>
+
+			<graph	legend='Router1-Interface1'
+					path='/OV_Examples/Sample_Router1/Interface_1/InOutBps'
+			/>
+
+		</section>
+
+		<section legend=''>
+			<!-- the features of Apache::ASP are all available of course -->
+			<% for my $router (1..2) { %>
+				<% for my $interface (1..2) { %>
+					<graph	legend='Router<%=$router%>-Interface<%=$interface%>'
+							path='/OV_Examples/Sample_Router<%=$router%>/Interface_<%=$interface%>/InOutBps'
+					/>
+				<% } %>
+			<% } %>
+		</section>
+
+		<section legend='Section 3'>
+			<graph	legend='Router1-Interface1'
+					path='/OV_Examples/Sample_Router1/Interface_1/InOutBps'
+			/>
+			<graph	legend='Router1-Interface2'
+					path='/OV_Examples/Sample_Router1/Interface_2/InOutBps'
+			/>
+		</section>
+
+	</chapter>
+
+
+	<chapter	legend='Chapter 2'
+				index='false'>
+
+		<intro>Chapter intro: notice that this chapter has index set to <span style="color:red">false</span></intro>
+
+		<section legend='Section legend'>
+			<graph	legend='Router1-Interface1'
+					path='/OV_Examples/Sample_Router1/Interface_1/InOutBps'
+			/>
+			<graph	legend='Router1-Interface2'
+					path='/OV_Examples/Sample_Router1/Interface_2/InOutBps'
+			/>
+		</section>
+
+	</chapter>
+</overview>

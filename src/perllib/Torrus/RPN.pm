@@ -55,7 +55,7 @@ my $operators = {
     'IF' => [ 3, sub{ $_[0] ? $_[1] : $_[2]; } ],
     'MIN' => [ 2, sub{ $_[0] <  $_[1] ? $_[0] : $_[1]; } ],
     'MAX' => [ 2, sub{ $_[0] >  $_[1] ? $_[0] : $_[1]; } ],
-    'UN'   => [ 1, sub{ defined($_[0]) ? 0 : $_[0]->is_nan(); }, 1 ],
+    'UN'   => [ 1, sub{ defined($_[0]) ? $_[0]->is_nan() : 1; }, 1 ],
     'UNKN' => [ 0, sub{ undef; } ],
     # Operators not defined in RRDtool graph
     'NE'  => [ 2, sub{ $_[0] != $_[1] ? 1:0; } ],

@@ -157,6 +157,7 @@ sub discover
             elsif( $hint eq 'ifIndex' )
             {
                 $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
+                storeIfIndexParams( $devdetails );
             }
             else
             {
@@ -650,6 +651,23 @@ sub retrieveMacAddresses
                                                '.' . $ifIndex);
             $interface->{'param'}{'interface-macaddr'} = $macaddr;
         }
+    }
+}
+
+
+# For devices with fixed ifIndex mapping it populates interface-index parameter
+
+
+sub storeIfIndexParams
+{
+    my $devdetails = shift;
+
+    my $data = $devdetails->data();
+
+    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        $interface->{'param'}{'interface-index'} = $ifIndex;        
     }
 }
 

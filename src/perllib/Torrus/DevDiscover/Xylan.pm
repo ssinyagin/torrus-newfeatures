@@ -135,6 +135,8 @@ sub discover
         return 0;
     }
 
+    storeIfIndexParams( $devdetails );
+
     $devdetails->storeSnmpVars( $phyPortTable );
 
     foreach my $slotDotPort
@@ -150,8 +152,6 @@ sub discover
 
         if( defined $interface )
         {
-            $interface->{'param'}{'interface-index'} = $ifIndex;
-
             $interface->{'xylanInterfaceNick'} =
                 sprintf( '%d_%d', $slot, $port );
 
@@ -173,8 +173,6 @@ sub discover
         if( not defined( $interface->{'xylanInterfaceNick'} ) )
         {
             Warn('Interface ' . $ifIndex . ' is not in phyPortTable');
-
-            $interface->{'param'}{'interface-index'} = $ifIndex;
 
             my $nick = sprintf( 'PORT%d', $ifIndex );
             $interface->{'xylanInterfaceNick'} = $nick;

@@ -87,7 +87,7 @@ sub checkdevtype
     $data->{'nameref'}{'ifNick'}        = 'axxInterfaceNick';
     $data->{'nameref'}{'ifSubtreeName'} = 'axxInterfaceNick';
     $data->{'nameref'}{'ifComment'}     = 'axxInterfaceComment';
-    $data->{'nameref'}{'ifHumanName'}   = 'axxInterfaceHumanName';
+    $data->{'nameref'}{'ifReferenceName'}  = 'axxInterfaceHumanName';
 
     return 1;
 }

@@ -110,7 +110,7 @@ sub checkdevtype
     $data->{'nameref'}{'ifNick'}        = 'xylanInterfaceNick';
     $data->{'nameref'}{'ifSubtreeName'} = 'xylanInterfaceNick';
     $data->{'nameref'}{'ifComment'}     = 'xylanInterfaceComment';
-    $data->{'nameref'}{'ifHumanName'}   = 'xylanInterfaceHumanName';
+    $data->{'nameref'}{'ifReferenceName'}   = 'xylanInterfaceHumanName';
 
     $devdetails->setCap('interfaceIndexingManaged');
 

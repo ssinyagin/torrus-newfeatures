@@ -118,7 +118,7 @@ sub discover
     ## Set default interface index mapping
     
     $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
-    $data->{'nameref'}{'ifHumanName'}   = 'ifDescr';
+    $data->{'nameref'}{'ifReferenceName'}   = 'ifDescr';
 
     if( $devdetails->hasCap('ifName') )
     {
@@ -132,54 +132,6 @@ sub discover
     if( $devdetails->hasCap('ifAlias') )
     {
         $data->{'nameref'}{'ifComment'} = 'ifAlias';
-    }
-
-    ## Process hints on interface indexing
-    ## The capability 'interfaceIndexingManaged' disables the hints
-    ## and lets the vendor discovery module to operate the indexing
-    
-    if( not $devdetails->hasCap('interfaceIndexingManaged') )
-    {
-        my $hint =
-            $devdetails->param('RFC2863_IF_MIB::ifindex-map-hint');
-        if( defined( $hint ) )
-        {
-            if( $hint eq 'ifName' )
-            {
-                $data->{'nameref'}{'ifHumanName'} = 'ifName';
-                $data->{'param'}{'ifindex-table'} = '$ifName';
-            }
-            elsif( $hint eq 'ifPhysAddress' )
-            {
-                $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
-                retrieveMacAddresses( $dd, $devdetails );
-            }
-            elsif( $hint eq 'ifIndex' )
-            {
-                $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
-                storeIfIndexParams( $devdetails );
-            }
-            else
-            {
-                Error('Unknown value of RFC2863_IF_MIB::ifindex-map-hint: ' .
-                      $hint);
-            }
-        }
-
-        $hint =
-            $devdetails->param('RFC2863_IF_MIB::subtree-name-hint');
-        if( defined( $hint ) )
-        {
-            if( $hint eq 'ifName' )
-            {
-                $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
-            }
-            else
-            {
-                Error('Unknown value of RFC2863_IF_MIB::subtree-name-hint: ' .
-                      $hint);
-            }
-        }
     }
     
     # Pre-populate the interfaces table, so that other modules may
@@ -234,13 +186,62 @@ sub discover
         }
     }
 
-    push( @{$data->{'templates'}}, 'RFC2863_IF_MIB::rfc2863-ifmib-hostlevel' );
-
+    ## Process hints on interface indexing
+    ## The capability 'interfaceIndexingManaged' disables the hints
+    ## and lets the vendor discovery module to operate the indexing
     
-    # Generate parameter values from data that was built above
-    # and in other modules
+    if( not $devdetails->hasCap('interfaceIndexingManaged') )
+    {
+        my $hint =
+            $devdetails->param('RFC2863_IF_MIB::ifindex-map-hint');
+        if( defined( $hint ) )
+        {
+            if( $hint eq 'ifName' )
+            {
+                if( not $devdetails->hasCap('ifName') )
+                {
+                    Error('Cannot use ifName interface mapping: ifName is '.
+                          'not supported by device');
+                    return 0;
+                }
+                else
+                {
+                    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
+                    $data->{'param'}{'ifindex-table'} = '$ifName';
+                }
+            }
+            elsif( $hint eq 'ifPhysAddress' )
+            {
+                $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
+                retrieveMacAddresses( $dd, $devdetails );
+            }
+            elsif( $hint eq 'ifIndex' )
+            {
+                $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
+                storeIfIndexParams( $devdetails );
+            }
+            else
+            {
+                Error('Unknown value of RFC2863_IF_MIB::ifindex-map-hint: ' .
+                      $hint);
+            }
+        }
 
-    my $data = $devdetails->data();
+        $hint =
+            $devdetails->param('RFC2863_IF_MIB::subtree-name-hint');
+        if( defined( $hint ) )
+        {
+            if( $hint eq 'ifName' )
+            {
+                $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+            }
+            else
+            {
+                Error('Unknown value of RFC2863_IF_MIB::subtree-name-hint: ' .
+                      $hint);
+            }
+        }
+    }
 
     # Filter out the interfaces if needed
 
@@ -273,7 +274,7 @@ sub discover
             if( $match )
             {
                 Debug('Excluding interface: ' .
-                      $interface->{$data->{'nameref'}{'ifHumanName'}});
+                      $interface->{$data->{'nameref'}{'ifReferenceName'}});
                 delete $data->{'interfaces'}{$ifIndex};
             }
         }
@@ -352,6 +353,8 @@ sub discover
         }
     }
 
+    push( @{$data->{'templates'}}, 'RFC2863_IF_MIB::rfc2863-ifmib-hostlevel' );
+
     return 1;
 }
 
@@ -388,7 +391,7 @@ sub buildConfig
         $interface->{'param'}{'interface-iana-type'} = $interface->{'ifType'};
 
         $interface->{'param'}{'interface-name'} =
-            $interface->{$data->{'nameref'}{'ifHumanName'}};
+            $interface->{$data->{'nameref'}{'ifReferenceName'}};
 
         $interface->{'param'}{'interface-nick'} =
             $interface->{$data->{'nameref'}{'ifNick'}};
@@ -639,17 +642,22 @@ sub retrieveMacAddresses
 
     my $data = $devdetails->data();
 
-    foreach my $ifIndex
-        ( $devdetails->getSnmpIndices( $dd->oiddef('ifPhysAddress') ) )
+    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
-        # Check if the interface wasn't filtered out
-        if( exists( $data->{'interfaces'}{$ifIndex} ) )
+        my $interface = $data->{'interfaces'}{$ifIndex};
+
+        my $macaddr = $devdetails->snmpVar($dd->oiddef('ifPhysAddress') .
+                                           '.' . $ifIndex);
+
+        if( defined( $macaddr ) and length( $macaddr ) > 0 )
         {
-            my $interface = $data->{'interfaces'}{$ifIndex};
-            
-            my $macaddr = $devdetails->snmpVar($dd->oiddef('ifPhysAddress') .
-                                               '.' . $ifIndex);
             $interface->{'param'}{'interface-macaddr'} = $macaddr;
+        }
+        else
+        {
+            Warn('Excluding interface without MAC address: ' .
+                  $interface->{$data->{'nameref'}{'ifReferenceName'}});
+            delete $data->{'interfaces'}{$ifIndex};
         }
     }
 }

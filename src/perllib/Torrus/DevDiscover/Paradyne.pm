@@ -77,7 +77,7 @@ sub checkdevtype
 
     my $data = $devdetails->data();
 
-    $data->{'nameref'}{'ifHumanName'} = 'ifName';
+    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
     $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
     $data->{'param'}{'ifindex-table'} = '$ifName';
 

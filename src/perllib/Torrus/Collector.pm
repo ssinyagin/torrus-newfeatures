@@ -137,7 +137,8 @@ sub addTarget
 
     if( ref( $Torrus::Collector::initTarget{$collector_type} ) )
     {
-        $ok = &{$Torrus::Collector::initTarget{$collector_type}}($self, $token);
+        $ok = &{$Torrus::Collector::initTarget{$collector_type}}($self,
+                                                                 $token);
     }
 
     if( $ok and ref( $Torrus::Collector::initTarget{$storage_string} ) )

@@ -1,4 +1,6 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+
+#  Copyright (C) 2003  Stanislav Sinyagin
+#  Copyright (C) 2003  Christian Schnidrig
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,43 +17,29 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 # $Id$
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Christian Schnidrig <christian.schnidrig@bluewin.ch>
 #
 
-# Dummy Torrus plugin Autoconf script
+# Http Torrus plugin Autoconf script
 
-AC_INIT(tp-dummy, 1.0d, ssinyagin@users.sourceforge.net)
+AC_INIT(tp-httpcollector, 1.0d, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.6)    
 
 AC_PATH_PROG(PERL, perl, no)
-AC_PATH_PROG(SED, sed, no)
-
 
 AC_ARG_ENABLE(pkgonly,
         [AC_HELP_STRING([--enable-pkgonly],
                         [Skip all checking])])
-
         
-# Check the necessary Perl modules
-# This is the example of AutoLoader search, which is always in Perl
-# distribution anyway
-
-if test "$enable_pkgonly" != yes; then
-  AC_MSG_CHECKING([presence of AutoLoader])
-  if ${PERL} -e 'use AutoLoader' 2>/dev/null; then
-      AC_MSG_RESULT([Ok])
-  else
-      AC_MSG_ERROR([Perl cannot find AutoLoader]);
-  fi
-
-  AC_MSG_CHECKING([environment variables])
-  if test -z "$pkghome" -o -z "$sitedir"; then
-    AC_MSG_ERROR([Missing mandatory environment variables]);
-  else
-    AC_MSG_RESULT([Ok])
-  fi
+if test "$enable_pkgonly" != yes; then        
+   AC_MSG_CHECKING([presence of LWP::UserAgent])
+   if ${PERL} -e 'use LWP::UserAgent' 2>/dev/null; then
+       AC_MSG_RESULT([Ok])
+   else
+       AC_MSG_ERROR([Perl cannot find LWP::UserAgent]);
+   fi
 fi
 
 AC_ARG_VAR(pkghome,   [[PREFIX/torrus] Place for Torrus static files])
@@ -80,9 +68,7 @@ AC_ARG_VAR(dbhome, [[VARPREFIX/db] Berkeley DB files])
 AC_ARG_VAR(seslockdir, [[VARPREFIX/session_data/lock] Web session locks])
 AC_ARG_VAR(sesstordir, [[VARPREFIX/session_data/store] Web session storage])
 AC_ARG_VAR(wrapperdir, [[BINDIR] CLI wrapper])
-
-
+                           
+                   
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([substvars.sh],[chmod +x substvars.sh])
-
 AC_OUTPUT

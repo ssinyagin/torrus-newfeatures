@@ -1,0 +1,162 @@
+#!@PERL@
+#  Copyright (C) 2003  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+# Generate the huge configuration for performance tests
+
+# We need this for $Torrus::Global::templateDir
+BEGIN { require '@torrus_config_pl@'; }
+
+use strict;
+use Template;
+use Getopt::Long;
+
+use Torrus::Log;
+
+my $depth   = 2;
+my $leaves  = 1000;
+my $bunch   = 10;
+
+my $template = 'genrandomcfg.xml';
+my $outfile  = 'random.xml';
+
+my $subtree = 'RandomTest';
+my $datadir = '/var/snmpcollector';
+
+my $creator = $0 . " \\\n";
+foreach my $arg ( @ARGV )
+{
+    if( $arg =~ /^--/ )
+    {
+        $creator .= ' ' . $arg . ' ';
+    }
+    else
+    {
+        $creator .= "\'" . $arg . "\'\\\n";
+    }
+}
+
+my $ok = GetOptions(
+                    'depth=i'     => \$depth,
+                    'leaves=i'    => \$leaves,
+                    'bunch=i'     => \$bunch,
+                    'template=s'  => \$template,
+                    'out=s'       => \$outfile,
+                    'subtree=s'   => \$subtree,
+                    'datadir=s'   => \$datadir
+                    );
+
+if( not $ok or
+    scalar( @ARGV ) > 0 )
+{
+    print STDERR "Usage: $0 options...\n",
+    "Options:\n",
+    " --leaves=N              number of datasources. [1000]\n",
+    " --depth=N               tree depth.            [3]\n",
+    " --bunch=N               leaves per subtree     [10]\n",
+    " --template              template filename      [genrandomcfg.xml]\n",
+    " --out=filename          output file.           [random.xml]\n",
+    " --subtree=name          Torrus Subtree name      [RandomTest]\n",
+    " --datadir=path          data-dir parameter     [/var/snmpcollector]\n";
+    exit 1;
+}
+
+
+if( $subtree !~ /^[0-9A-Za-z_\-\.]+$/ or
+    $subtree =~ /\.\./ )
+{
+    Error("Invalid format for subtree name: " . $subtree);
+    exit 1;
+}
+
+
+my %treedata = ();
+
+for( my $s=0; $s < $leaves/$bunch; $s++ )
+{
+    my $sname = sprintf( "A%.8d", $s );
+    $treedata{$sname}{'params'} = {
+        'rnd_baseline_height' => int(rand(100000)),
+        'rnd_baseline_period' => int(rand(86400)),
+        'rnd_baseline_offset' => int(rand(86400)) };
+
+    for( my $l = 0; $l < $bunch; $l++ )
+    {
+        my $lname = sprintf( "B%.8d", $l );
+        $treedata{$sname}{'leaves'}{$lname}{'params'} = {
+            'rnd_baseline_amplitude' => int(rand(100000)),
+            'rnd_amplitude' => int(rand(100000)) };
+    }
+}
+
+
+my $tt = new Template(INCLUDE_PATH => $Torrus::Global::templateDirs);
+
+my $vars = {
+    'T'          => \%treedata,
+    'leaves'     => $leaves,
+    'depth'      => $depth,
+    'timestamp'  => scalar(localtime(time())),
+    'creator'    => $creator,
+    'subtree'    => $subtree,
+    'datadir'    => $datadir,
+    'color'      => \&gencolor,
+    'order'      => sub{ my $l = shift; $l =~ s/^B//; return $l; }
+};
+
+my @colors = qw(000000 0000FF 00FF00 FF0000 00FFFF FF00FF FFFF00
+                000080 008000 800000 808000 800080 008080);
+sub gencolor
+{
+    my $leaf = shift;
+    $leaf =~ s/^B0*//;
+
+    if( defined $colors[$leaf] )
+    {
+        return '#'.$colors[$leaf];
+    }
+    else
+    {
+        return '#00FF00';
+    }
+}
+
+
+my $ok = $tt->process($template, $vars, $outfile);
+
+if( not $ok )
+{
+    print STDERR "Error while processing template: ".$tt->error()."\n";
+}
+else
+{
+    print STDERR "Wrote $outfile\n";
+}
+
+
+
+
+exit( $ok ? 0:1 );
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:

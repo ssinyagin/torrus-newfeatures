@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2002  Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+  $Id$
+  Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+-->
+
+<!--
+  This example shows how plugin Perl modules may be used as collector sources
+ -->
+
+<configuration>
+
+<datasources>
+
+  <subtree name="SampleRandom">
+
+    <param name="ds-type" value="collector" />
+    <param name="collector-type" value="random" />
+    <param name="collector-period" value="60" />
+    <param name="collector-timeoffset" value="3" />
+
+    <param name="storage-type" value="rrd" />
+    <param name="data-dir" value="/var/snmpcollector" />
+    <param name="data-file" value="random_sample.rrd" />
+
+    <param name="rrd-create-rra">
+      RRA:AVERAGE:0:1:10080
+      RRA:AVERAGE:0:60:720     RRA:MAX:0:60:720
+      RRA:AVERAGE:0:1440:732    RRA:MAX:0:1440:732
+    </param>
+
+    <param name="rrd-create-heartbeat" value="300"/>
+    <param name="rrd-create-min" value="U"/>
+    <param name="rrd-create-max" value="U"/>
+
+    <param name="leaf-type" value="rrd-def" />
+    <param name="rrd-cf"    value="AVERAGE" />
+    <param name="rrd-create-dstype" value="GAUGE" />
+
+    <leaf name="sample1">
+      <param name="comment" value="Random value with sine baseline" />
+
+      <param name="rnd-baseline-type" value="sin" />
+      <param name="rnd-baseline-height" value="300" />
+      <param name="rnd-baseline-period" value="86400" />
+      <param name="rnd-baseline-offset" value="32400" />
+      <param name="rnd-baseline-amplitude" value="1000" />
+      <param name="rnd-amplitude" value="200" />
+
+      <param name="rrd-ds"    value="sample1" />
+    </leaf>
+
+    <leaf name="sample2">
+      <param name="comment" value="Random value with flat baseline" />
+
+      <param name="rnd-baseline-type" value="flat" />
+      <param name="rnd-baseline-height" value="500" />
+      <param name="rnd-amplitude" value="500" />
+
+      <param name="rrd-ds"    value="sample2" />
+    </leaf>
+  </subtree>
+
+</datasources>
+
+</configuration>

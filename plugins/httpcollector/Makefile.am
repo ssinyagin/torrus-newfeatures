@@ -1,5 +1,5 @@
 
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2003  Christian Schnidrig
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,56 +16,39 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 # $Id$
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Christian Schnidrig <christian.schnidrig@bluewin.ch>
 #
 
-# Dummy Torrus plugin Automake script
-
-SUBST = @abs_top_builddir@/substvars.sh
-
-noinst_SCRIPTS = substvars.sh
+# HTTP Torrus plugin Automake script
 
 
 #####   Perl modules  #####
-myperlmoddir = $(perllibdir)/Torrus
-dist_myperlmod_DATA = DummyModule.pm
+myperlmoddir = $(perllibdir)/Torrus/Collector
+dist_myperlmod_DATA = Http.pm
 
 #####   Perl configuration files  #####
 torruscfgdir = $(plugtorruscfgdir)
-dist_torruscfg_DATA = dummy-torruscfg.pl
-devdisccfgdir = $(plugdevdisccfgdir)
-dist_devdisccfg_DATA = dummy-ddcfg.pl
-
-
+dist_torruscfg_DATA = httpcollector-torruscfg.pl
 
 #####   XML configuration   #####
-myxmldir = $(distxmldir)
-dist_myxml_DATA = dummy.xml
+vendorxmldir = $(distxmldir)/vendor
+dist_vendorxml_DATA = apache.httpd.xml
 
-
-#####   Executable scripts  #####
-pkgbindir = @pkgbindir@
-pkgbin_SCRIPTS = dummyscript 
-EXTRA_DIST = dummyscript.in
-dummyscript: dummyscript.in
-	$(SUBST) dummyscript.in > dummyscript
+xmpxmldir = $(distxmldir)/examples
+dist_xmpxml_DATA = localhost-apache2.xml localhost-apache1.xml
 
 
 #####   Documentation files   #####
 docdir  = @docdir@
-dist_doc_DATA = dummydoc.txt dummydoc.pod 
+dist_doc_DATA = httpcollector.txt httpcollector.pod 
 SUFFIXES = .pod .txt
 .pod.txt:
 	pod2text $< $@ 
 
-
-#####   HTML and text Templates   #####
-tmpldir = @tmpldir@
-dist_tmpl_DATA = dummytemplate.html
-
-#####   What you do not need after "make clean"  #####
-CLEANFILES = $(pkgbin_SCRIPTS)
-
+htdocs:
+	for f in *.pod; do \
+	  pod2html -css=../torrusdoc.css $$f > ../../htdocs/plugins/$$f.html; \
+	done
 
 UPLOADPATH = \
    ssinyagin@shell.sourceforge.net:/home/groups/t/to/torrus/htdocs/devel

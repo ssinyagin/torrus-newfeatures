@@ -20,7 +20,7 @@
 
 # Dummy Torrus plugin Autoconf script
 
-AC_INIT(tp-dummy, 1.0d, ssinyagin@users.sourceforge.net)
+AC_INIT(tp-randomcollector, 1.0d, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.6)
@@ -28,31 +28,10 @@ AM_INIT_AUTOMAKE(1.6)
 AC_PATH_PROG(PERL, perl, no)
 AC_PATH_PROG(SED, sed, no)
 
-
 AC_ARG_ENABLE(pkgonly,
         [AC_HELP_STRING([--enable-pkgonly],
                         [Skip all checking])])
 
-        
-# Check the necessary Perl modules
-# This is the example of AutoLoader search, which is always in Perl
-# distribution anyway
-
-if test "$enable_pkgonly" != yes; then
-  AC_MSG_CHECKING([presence of AutoLoader])
-  if ${PERL} -e 'use AutoLoader' 2>/dev/null; then
-      AC_MSG_RESULT([Ok])
-  else
-      AC_MSG_ERROR([Perl cannot find AutoLoader]);
-  fi
-
-  AC_MSG_CHECKING([environment variables])
-  if test -z "$pkghome" -o -z "$sitedir"; then
-    AC_MSG_ERROR([Missing mandatory environment variables]);
-  else
-    AC_MSG_RESULT([Ok])
-  fi
-fi
 
 AC_ARG_VAR(pkghome,   [[PREFIX/torrus] Place for Torrus static files])
 AC_ARG_VAR(pkgbindir,   [[PKGHOME/bin] Torrus executables])

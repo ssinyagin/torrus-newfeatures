@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2004  Christian Schnidrig, Shawn Ferry, Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+ 
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+  $Id$
+  Christian Schnidrig <christian.schnidrig@bluewin.ch>
+  
+-->
+
+<!--
+  Templates to use with HTTP colletor plugin.
+  
+  In addition to these templates, you would need collector period definitions
+  from generic/collector-periods.xml.
+  Templates requred to build the datasource:
+    "one-minute-period" or "five-minute-period"
+    "apache-httpd-common"
+    "apache-httpd-v1" or "apache-httpd-v2"
+  Parameters required:
+    "http-host"
+    "data-dir"
+
+  You need to enable the status module and /server-status location in your
+  Apache server.
+ -->
+
+<configuration>
+
+<datasources>
+
+  <template name="apache-httpd-common">
+    <param name="ds-type"               value="collector"/>
+    <param name="collector-type"        value="http"/>
+    <param name="storage-type"          value="rrd"/>
+    <param name="data-file"
+           value="%system-id%_apache_httpd.rrd" />
+    <param name="system-id"             value="%http-host%" />
+
+    <param name="rrd-create-min"        value="0"/>
+    <param name="rrd-create-max"        value="U"/>
+
+    <param name="graph-lower-limit"     value="0"/>
+    <param name="leaf-type"             value="rrd-def"/>
+    <param name="rrd-cf"                value="AVERAGE"/>
+
+    <param name="http-url"
+           value="http://%http-host%/server-status?auto" />
+    <param name="http-timeout"          value="5"/>
+      
+    <param name="comment"               value="Apache HTTPd statistics"/>
+
+    <leaf name="Accesses">
+      <param name="comment"             value="HTTP accesses per second"/>
+      <param name="graph-legend"        value="Hits per second"/>
+      <param name="vertical-label"      value="hits/s" />
+      <param name="http-object"
+             value="1:/Total Accesses:\s*(\d+)\s*/"/>
+      <param name="rrd-ds"              value="accesses"/>
+      <param name="rrd-create-dstype"   value="COUNTER"/>
+      <param name="rrd-create-max"      value="1e6"/>
+      <param name="precedence"          value="100"/>
+    </leaf>
+    
+    <leaf name="Traffic">
+      <param name="comment"
+             value="HTTP traffic in bits per second"/>
+      <param name="graph-legend"        value="Bits per second"/>
+      <param name="vertical-label"      value="bps" />
+      <param name="http-object"
+             value="*:/Total kBytes:\s*(\d+)\s*\n/, 8192,*"/>
+      <param name="rrd-ds"              value="traffic"/>
+      <param name="rrd-create-dstype"   value="COUNTER"/>
+      <param name="rrd-create-max"      value="1e8"/>
+      <param name="precedence"          value="80"/>
+    </leaf>
+    
+    <leaf name="BusyServers">
+      <param name="comment"             value="Number of busy HTTP servers"/>
+      <param name="graph-legend"        value="Busy Servers"/>
+      <param name="rrd-ds"              value="busy"/>
+      <param name="precedence"          value="60"/>
+      <param name="rrd-create-dstype"   value="GAUGE"/>
+    </leaf>
+    
+    <leaf name="IdleServers">
+      <param name="comment"             value="Number of idle http servers"/>
+      <param name="graph-legend"        value="Idle Servers"/>
+      <param name="rrd-ds"              value="idle"/>
+      <param name="precedence"          value="40"/>
+      <param name="rrd-create-dstype"   value="GAUGE"/>
+    </leaf>      
+  </template>
+
+
+  <!-- Apache 1.0 statistics -->
+  <template name="apache-httpd-v1">
+    <leaf name="BusyServers">
+      <param name="http-object"         value="*:/BusyServers:\s*(\d+)\s*\n/"/>
+    </leaf>    
+    <leaf name="IdleServers">
+      <param name="http-object"         value="*:/IdleServers:\s*(\d+)\s*\n/"/>
+    </leaf>
+  </template>
+
+
+  <!-- Apache 2.0 statistics -->
+  <template name="apache-httpd-v2">    
+    <leaf name="BusyServers">
+      <param name="http-object"         value="*:/BusyWorkers:\s*(\d+)\s*\n/"/>
+    </leaf>    
+    <leaf name="IdleServers">
+      <param name="http-object"         value="*:/IdleWorkers:\s*(\d+)\s*\n/"/>
+    </leaf>
+  </template>
+  
+
+</datasources>
+
+</configuration>
+
+

@@ -1,0 +1,12 @@
+2004-09-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* localhost-apache2.xml: New examples for Apache stats
+
+	* apache.httpd.xml: New templates for Apache stats
+
+2003-03-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+	* First incarnation of the Dummy plugin 
+
+2003-07-03 Christia Schnidrig <christian.schnidrig@bluewin.ch>
+
+	First draft of HTTP plugin

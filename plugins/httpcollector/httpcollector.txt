@@ -1,0 +1,47 @@
+Http Collector Plugin
+  Introduction
+    This plugin adds the http collector type. It can get and parse web pages
+    using the GET method.
+
+  Installation
+    Unpack Torrus main distribution and the plugin in some directories. From
+    Torrus distribution directory, run
+
+      ./configure --with-plugins=../torrus-plugin-http-0.0.1
+      make install
+
+    After Torrus installation has finished, add the following lines to your
+    torrus-siteconfig.pl file:
+
+      push( @Torrus::Collector::loadModules, 'Torrus::Collector::Http' );
+      push( @Torrus::Validator::loadLeafValidators, 'Torrus::Collector::Http' );
+
+    That is all, now you can use the parameters described below in your XML
+    configuration.
+
+  XML configuration parameters
+    * "collector-type"
+        New value "http" is supported by this plugin.
+
+    * "http-url"
+        Mandatory when "collector-type=http".
+
+    * "http-timeout"
+        Mandatory when "collector-type=http".
+
+    * "http-object"
+        Mandatory when "collector-type=http". Specifies an object to look
+        for in the web page.The object is an RPN expression containing
+        search-items. A search-item takes the following form:
+
+                lineNumber:/pattern/
+
+        LineNumber my be a number or *, * means treat the whole web page as
+        one single line. The pattern is a regular expression and must
+        contain a (). The value between () will be replaced in the RPN
+        before it is evaluated.
+
+Author
+    Copyright (c) 2003-2004 Christian Schnidrig
+    <christian.schnidrig@bluewin.ch>
+

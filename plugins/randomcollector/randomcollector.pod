@@ -1,0 +1,88 @@
+#  xmlconfig.pod - Torrus configuration guide
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 Random Collector Plugin
+
+
+=head2 Introduction
+
+This plugin adds the new collector type. It actually doesn't collect anything,
+but generates randomly generated values. The main purpose of this plugin is
+testing various aspects of Torrus, and particularly
+its modular Collector design.
+
+
+=head2 Installation
+
+Follow the Torrus installation guide for the main software installation.
+
+Unpack the plugin distribution package in some directory:
+
+  gzip -dc tp-randomcollector-1.X.tar.gz | tar xvf -
+
+Then run the Torrus plugin installation utility:
+
+  torrus install_plugin tp-randomcollector-X
+
+Restart all Torrus processes, including Apache HTTP daemon.
+
+That is all, now you can use the parameters described below in your XML
+configuration.
+
+C<genrandomcfg> utility may be used to create a typical configuration for
+the random collector. 
+
+=head2 XML configuration parameters
+
+=over 4
+
+=item * C<collector-type>
+
+New value C<random> is supported by this plugin.
+
+=item * C<rnd-baseline-type>
+
+Mandatory when C<collector-type=random>. Values supported: C<sin> (Sine
+baseline curve), C<flat> (horizontal baseline).
+
+=item * C<rnd-baseline-height>
+
+Mandatory when C<collector-type=random>. Specifies the constant baseline
+height above the X axis.
+
+=item * C<rnd-amplitude>
+
+Mandatory when C<collector-type=random>. Specifies the amplitude of the
+random value.
+
+=item * C<rnd-baseline-period>, C<rnd-baseline-offset>,
+C<rnd-baseline-amplitude>
+
+Mandatory when C<collector-type=random> and
+C<rnd-baseline-type=sin>. These options determine the parameters of the
+sine curve: C<Y = height + amplitude * sin( 2*pi*(TIME+offset)/period )>
+
+=back
+
+=head1 Author
+
+Copyright (c) 2003-2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

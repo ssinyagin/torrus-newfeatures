@@ -1,0 +1,101 @@
+
+#  xmlconfig.pod - Torrus configuration guide
+#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2003  Christian Schnidrig
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Christian Schnidrig <christian.schnidrig@bluewin.ch>
+#
+#
+
+=head1 Http Collector Plugin
+
+
+=head2 Introduction
+
+This plugin adds the http collector type. It can get and parse web pages
+using the GET method.
+
+
+=head2 Installation
+
+Follow the Torrus installation guide for the main software installation.
+
+Unpack the plugin distribution package in some directory:
+
+  gzip -dc tp-httpcollector-1.X.tar.gz | tar xvf -
+
+Then run the Torrus plugin installation utility:
+
+  torrus install_plugin tp-httpcollector-X
+
+Restart all Torrus processes, including Apache HTTP daemon.
+
+That is all, now you can use the parameters described below in your XML
+configuration.
+
+The plugin distribution adds the following files that you can use in
+your setup:
+
+=over 4
+
+=item * F<vendor/apache.httpd.xml>
+
+Templates for Apache server-status checking, for Apache versions 1.0 and 2.0.
+
+=item * F<examples/localhost-apache1.xml>, F<examples/localhost-apache2.xml>
+
+Sample configurations for Apache server-status, Apache version 1.0 and 2.0
+correspondingly. The statistics are placed into C<localhost/HTTP_Stats>
+subtree.
+
+=back
+
+=head2 XML configuration parameters
+
+=over 4
+
+=item * C<collector-type>
+
+New value C<http> is supported by this plugin.
+
+=item * C<http-url>
+
+Mandatory when C<collector-type=http>.
+
+=item * C<http-timeout>
+
+Mandatory when C<collector-type=http>.
+
+=item * C<http-object>
+
+Mandatory when C<collector-type=http>. Specifies an object to look for in the
+web page.The object is an RPN expression containing search-items.
+A search-item takes the following form:
+
+	lineNumber:/pattern/
+
+LineNumber my be a number or *, * means treat the whole web page as one
+single line. The pattern is a regular expression and must contain a ().
+The value between () will be replaced in the RPN before it is evaluated.
+
+=back
+
+=head1 Author
+
+Copyright (c) 2003-2004 Christian Schnidrig
+E<lt>christian.schnidrig@bluewin.chE<gt>

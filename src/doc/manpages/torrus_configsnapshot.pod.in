@@ -21,11 +21,11 @@
 
 =head1 NAME
 
-@XFORM_configsnapshot@ - Generates a configuration snapshot for a Torrus tree.
+configsnapshot - Generates a configuration snapshot for a Torrus tree.
 
 =head1 SYNOPSIS
 
-B<@XFORM_configsnapshot@> --tree=I<TREENAME> [I<options...>]
+B<torrus configsnapshot> --tree=I<TREENAME> [I<options...>]
 
 =head1 DESCRIPTION
 
@@ -37,9 +37,9 @@ and file patterns are expanded inside the file. It does not require
 any other XML configuration files, except for F<defaults.xml> and your
 custom view definitions.
 
-B<Warning:> C<configsnapshot> from Torrus release 0.1.5 will not work
-correctly with databases from previous releases. Use release
-C<0.1.4bf2> instead.  C<configsnapshot> utility from release 0.1.4bf2
+B<Warning:> C<configsnapshot> from RRFW release 0.1.5 will not work
+correctly with databases from previous releases. Use RRFW release
+C<0.1.4bf2> instead.  C<configsnapshot> utility from RRFW release 0.1.4bf2
 does not preserve aliases.
 
 This utility is useful in Torrus upgrade process. In case when RRD files
@@ -60,8 +60,8 @@ Install newest Torrus software and do not run C<compilexml> immediately.
 
 Create snapshots of the trees that you want to preserve for historical reasons:
 
-  @XFORM_configsnapshot@ --tree=myrouters \
-    --out=share/xmlconfig/myrouters-snapshot.xml
+  torrus configsnapshot --tree=myrouters \
+    --out=@sitexmldir@/myrouters-snapshot.xml
 
 =item *
 
@@ -103,20 +103,20 @@ Displays a help message.
 
 =over 4
 
-=item F<@xmldir@/defaults.xml>
+=item F<@distxmldir@/defaults.xml>
 
 XML configuration file with default settings for the datasources and
 tokensets, as well as default view definitions.
 
 =item F<snapshot.xml>
 
-Default B<@XFORM_configsnapshot@> output file.
+Default B<configsnapshot> output file.
 
 =back
 
 =head1 SEE ALSO
 
-B<@XFORM_compilexml@>(1)
+L<torrus(@mansec_usercmd@)>, L<torrus_compilexml(@mansec_usercmd@)>
 
 =head1 NOTES
 

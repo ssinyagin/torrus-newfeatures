@@ -21,17 +21,21 @@
 
 =head1 NAME
 
-@XFORM_configinfo@ - Displays useful statistics for all Torrus trees.
+configinfo - Displays useful statistics for all Torrus trees.
 
 =head1 SYNOPSIS
 
-B<@XFORM_configinfo@>
+B<torrus configinfo>
 
 =head1 DESCRIPTION
 
 This command displays information on all available Torrus trees, including 
 the names of the trees, counts of leaves, subtrees, views, monitors and
 actions, and other information.
+
+=head1 SEE ALSO
+
+L<torrus(@mansec_usercmd@)>
 
 =head1 NOTES
 

@@ -79,6 +79,10 @@ Torrus site configuration script for SNMP traps.
 
 =back
 
+=head1 SEE ALSO
+
+L<torrus(@mansec_usercmd@)>
+
 =head1 NOTES
 
 See more documentation at Torrus home page: http://torrus.sf.net

@@ -21,16 +21,20 @@
 
 =head1 NAME
 
-@XFORM_clearcache@ - Clears the Torrus Renderer's cache.
+clearcache - Clears the Torrus Renderer's cache.
 
 =head1 SYNOPSIS
 
-B<@XFORM_clearcache@>
+B<torrus clearcache>
 
 =head1 DESCRIPTION
 
 This program clears Torrus Renderer's cache. It is intended for debugging
 purposes only.
+
+=head1 SEE ALSO
+
+L<torrus(@mansec_usercmd@)>
 
 =head1 NOTES
 

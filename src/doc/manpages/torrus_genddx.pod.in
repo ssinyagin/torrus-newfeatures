@@ -21,18 +21,18 @@
 
 =head1 NAME
 
-@XFORM_genddx@ - Generates SNMP discovery instructions file for 
-@XFORM_devdiscover@.
+genddx - Generates SNMP discovery instructions file for 
+B<devdiscover>
 
 =head1 SYNOPSIS
 
-B<@XFORM_genddx@> --host=I<HOSTNAME> | --hostfile=I<HOSTFILENAME> \
+B<torrus genddx> --host=I<HOSTNAME> | --hostfile=I<HOSTFILENAME> \
 [I<options...>]
 
 =head1 DESCRIPTION
 
-B<@XFORM_genddx@> generates the SNMP discovery instructions file, which may
-be later used as input for the B<@XFORM_devdiscover@> utility to produce the 
+B<genddx> generates the SNMP discovery instructions file, which may
+be later used as input for the B<devdiscover> utility to produce the 
 corresponding Torrus XML configuration file. The hostname(s) of router(s) to
 be included in SNMP discovery must be specified either using the 
 B<--host> (for a single router) or B<--hostfile> option.  In the latter
@@ -53,14 +53,16 @@ More information is available in B<Torrus SNMP Discovery User Guide>.
 
 =item B<--out>=I<OUTFILENAME>
 
-Sets the output file to I<OUTFILENAME>. Default is F<routers.ddx>.
+Sets the output file to I<OUTFILENAME>. Default is F<routers.ddx>. Without
+absolute path, the file will be placed in F<@sitedir@/discovery>.
 
 =item B<--discout>=I<FILENAME>
 
 Sets the discovery output file to I<FILENAME>. This will be the filename of
-the Torrus XML configuration file once the output file of the B<@XFORM_genddx@>
-is processed by the B<@XFORM_devdiscover@> utility. Default value is
-F<@xmldir@/routers.xml>.
+the Torrus XML configuration file once the output file of the B<genddx>
+is processed by the B<devdiscover> utility. Default value is
+F<routers.xml>. Without absolute path, the file would be resided in
+F<@sitexmldir@>.
 
 =item B<--domain>=I<DOMAIN>
 
@@ -94,7 +96,7 @@ Sets the subtree name to I<SUBTREE>. Default is C</Routers>.
 =item B<--datadir>=I<DATADIR>
 
 Sets the path of the directory where SNMP data is collected to I<DATADIR>.
-Default value is F</var/snmpcollector>.
+Default value is F</srv/torrus/collector_rrd>.
 
 =item B<--holtwinters>
 
@@ -106,20 +108,20 @@ Enables Holt-Winters analysis.
 
 =over 4
 
-=item F<routers.ddx>
+=item F<@sitedir@/discovery/routers.ddx>
 
-Default output file of @XFORM_genddx@.
+Default output file of genddx.
 
-=item F<@xmldir@/routers.xml>
+=item F<@sitexmldir@/routers.xml>
 
 Default Torrus XML configuration file which will be written once the 
-@XFORM_genddx@ output file is processed with @XFORM_devdiscover@ utility. 
+genddx output file is processed with devdiscover utility. 
 
 =back
 
 =head1 SEE ALSO
 
-B<@XFORM_devdiscover@>(1)
+L<torrus(@mansec_usercmd@)>, L<torrus_devdiscover>(@mansec_usercmd@)>
 
 =head1 NOTES
 

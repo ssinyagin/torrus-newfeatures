@@ -21,11 +21,11 @@
 
 =head1 NAME
 
-@XFORM_collector@ - Torrus data Collector.
+collector - Torrus data Collector.
 
 =head1 SYNOPSIS
 
-B<@XFORM_collector@> --tree=I<TREENAME> [I<options...>]
+B<torrus collector> --tree=I<TREENAME> [I<options...>]
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ Displays a help message.
 
 =over 4
 
-=item F<@perlcfgdir@/torrus-siteconfig.pl>
+=item F<@siteconfdir@/torrus-siteconfig.pl>
 
 Torrus site configuration script.
 
@@ -84,11 +84,15 @@ Torrus site configuration script.
 
 Collector's log for the tree I<TREENAME>.
 
-=item F<@xmldir@/snmp-defs.xml>
+=item F<@distxmldir@/snmp-defs.xml>
 
 Basic variable definitions for the SNMP collector.
 
 =back
+
+=head1 SEE ALSO
+
+L<torrus(@mansec_usercmd@)>
 
 =head1 NOTES
 

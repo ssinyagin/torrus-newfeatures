@@ -21,11 +21,11 @@
 
 =head1 NAME
 
-@XFORM_monitor@ - Torrus Monitor.
+monitor - Torrus Monitor.
 
 =head1 SYNOPSIS
 
-B<@XFORM_monitor@> --tree=I<TREENAME> [I<options...>]
+B<torrus monitor> --tree=I<TREENAME> [I<options...>]
 
 =head1 DESCRIPTION
 
@@ -83,7 +83,7 @@ Displays a help message.
 
 =over 4
 
-=item F<@perlcfgdir@/torrus-siteconfig.pl>
+=item F<@siteconfdir@/torrus-siteconfig.pl>
 
 Torrus site configuration script.
 
@@ -92,6 +92,10 @@ Torrus site configuration script.
 Monitor's log for the tree I<TREENAME>.
 
 =back
+
+=head1 SEE ALSO
+
+L<torrus(@mansec_usercmd@)>
 
 =head1 NOTES
 

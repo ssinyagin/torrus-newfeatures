@@ -21,22 +21,22 @@
 
 =head1 NAME
 
-@XFORM_devdiscover@ - Performs SNMP discovery and generates Torrus XML
+devdiscover - Performs SNMP discovery and generates Torrus XML
 configuration file.
 
 =head1 SYNOPSIS
 
-B<@XFORM_devdiscover@> --in=I<XMLFILE> [I<options...>]
+B<torrus devdiscover> --in=I<XMLFILE> [I<options...>]
 
 =head1 DESCRIPTION
 
-B<@XFORM_devdiscover@> performs SNMP discovery using the I<XMLFILE>
+B<devdiscover> performs SNMP discovery using the I<XMLFILE>
 for the discovery instructions. It generates a corresponding
 Torrus XML configuration file. See B<Torrus SNMP Discovery User Guide> for
 details.
 
 The generic input file, or device discovery XML (DDX), may be generated 
-by the B<@XFORM_genddx@> utility, and then edited and maintained manually.
+by the B<genddx> utility, and then edited and maintained manually.
 
 Input file name is searched in the current directory, and then in
 F<@sitedir@/discovery/>.
@@ -72,20 +72,20 @@ Prints SNMP protocol details
 
 =over 4
 
-=item F<@perlcfgdir@/devdiscover-siteconfig.pl>
+=item F<@siteconfdir@/devdiscover-siteconfig.pl>
 
-B<@XFORM_devdiscover@> site configuration file.
+B<devdiscover> site configuration file.
 
 =back
 
 =head1 SEE ALSO
 
-B<@XFORM_genddx@>(1)
+L<torrus(@mansec_usercmd@)>, L<torrus_genddx>(@mansec_usercmd@)
 
 =head1 NOTES
 
 See I<Torrus SNMP Discovery User Guide> for more details at Torrus home
-page: http://torrus.sf.net
+page: http://torrus.org
 
 =head1 AUTHOR
 

@@ -187,6 +187,10 @@ Default template for the exports of ACL configuration.
 
 =back
 
+=head1 SEE ALSO
+
+L<torrus(@mansec_usercmd@)>
+
 =head1 NOTES
 
 See more documentation at Torrus home page: http://torrus.sf.net

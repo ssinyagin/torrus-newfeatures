@@ -21,11 +21,11 @@
 
 =head1 NAME
 
-@XFORM_schedulerinfo@ - Displays extended scheduler tasks information.
+schedulerinfo - Displays extended scheduler tasks information.
 
 =head1 SYNOPSIS
 
-B<@XFORM_schedulerinfo@> --tree=I<TREENAME> [I<options...>]
+B<torrus schedulerinfo> --tree=I<TREENAME> [I<options...>]
 
 =head1 DESCRIPTION
 
@@ -51,6 +51,10 @@ late starts etc.
 Displays a help message.
 
 =back
+
+=head1 SEE ALSO
+
+L<torrus(@mansec_usercmd@)>
 
 =head1 NOTES
 

@@ -27,7 +27,8 @@ shift
 case "$cmd" in
 
 acledit | cleanup | clearcache | collector | compilexml | configinfo \
- | configsnapshot | devdiscover | genddx | genlist | monitor | schedulerinfo)
+ | configsnapshot | devdiscover | genddx | genlist | install_plugin \
+ | monitor | schedulerinfo)
     @pkgbindir@/${cmd} $@
 ;;
 *)
@@ -35,7 +36,7 @@ acledit | cleanup | clearcache | collector | compilexml | configinfo \
     echo "   cmd - one of:" 1>&2
     echo "      acledit | cleanup | clearcache | collector | compilexml" 1>&2
     echo "      configinfo | configsnapshot | devdiscover | genddx" 1>&2
-    echo "      genlist | monitor | schedulerinfo" 1>&2
+    echo "      genlist | install_plugin | monitor | schedulerinfo" 1>&2
     exit 1
 ;;
 esac

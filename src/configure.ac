@@ -38,17 +38,16 @@ AC_PATH_PROG(SLEEP, sleep, no)
 AC_PATH_PROG(POD2MAN, pod2man, no)
 AM_CONDITIONAL([POD2MAN_PRESENT], [test "$POD2MAN" != no])
 
-
-AC_ARG_ENABLE(modcheck,
-        [AC_HELP_STRING(--disable-modcheck,Disable Perl modules checking)],
-        [],
-        [enable_modcheck="yes"])
+AC_ARG_ENABLE(pkgonly,
+        [AC_HELP_STRING([--enable-pkgonly],
+                        [Skip all checking])])
+AC_SUBST(enable_pkgonly)
 
 perllibdirs="\'\${perllibdir}\'"
 
 find_rrdtool () {
     if ${PERL} -e 'use RRDs' 2>/dev/null; then :; else
-        if test $enable_modcheck = yes; then
+        if test "$enable_pkgonly" != yes; then
             AC_MSG_NOTICE([RRDs.pm is not in default Perl search paths.])
             AC_MSG_CHECKING([RRDtool in /usr/local/rrdtool*])
             with_rrdtool=`ls -1dr /usr/local/rrdtool* | head -1`
@@ -65,7 +64,7 @@ find_rrdtool () {
 }
 
 test_rrdtool () {
-    if test $enable_modcheck = yes; then
+    if test "$enable_pkgonly" != yes; then
         if test ! -r ${with_rrdtool}/lib/perl/RRDs.pm; then
             AC_MSG_ERROR([There is no lib/perl/RRDs.pm in ${with_rrdtool}])
         fi
@@ -82,7 +81,7 @@ AC_SUBST(perllibdirs, [${perllibdirs}])
 
 # Check the necessary Perl modules
 
-if test $enable_modcheck = yes; then
+if test "$enable_pkgonly" != yes; then
 
    for module in 'BerkeleyDB' 'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session'
@@ -126,10 +125,6 @@ AC_ARG_VAR(cfgdefdir,   [[PKGHOME/conf_defaults] torrus-config.pl and others])
 if test -z "$cfgdefdir"; then
    cfgdefdir='${pkghome}/conf_defaults'; fi
 
-AC_ARG_VAR(plgcfgdir,   [[CFGDEFDIR/plugins] Plugin configurations])
-if test -z "$plgcfgdir"; then
-   plgcfgdir='${cfgdefdir}/plugins'; fi
-
 AC_ARG_VAR(docdir, [[PKGHOME/doc] Documentation files])
 if test -z "$docdir"; then
    docdir='${pkghome}/doc'; fi
@@ -142,6 +137,18 @@ AC_ARG_VAR(perllibdir,  [[PKGHOME/perllib] Torrus Perl libraries])
 if test -z "$perllibdir"; then
    perllibdir='${pkghome}/perllib'; fi
 
+AC_ARG_VAR(pluginsdir,   [[PKGHOME/plugins] Plugin configurations])
+if test -z "$pluginsdir"; then
+   pluginsdir='${pkghome}/plugins'; fi
+
+AC_ARG_VAR(plugtorruscfgdir, [[PLUGINSDIR/torrus-config]])
+if test -z "$plugtorruscfgdir"; then
+   plugtorruscfgdir='${pluginsdir}/torrus-config'; fi
+
+AC_ARG_VAR(plugdevdisccfgdir, [[PLUGINSDIR/devdiscover-config]])
+if test -z "$plugdevdisccfgdir"; then
+   plugdevdisccfgdir='${pluginsdir}/devdiscover-config'; fi
+   
 AC_ARG_VAR(scriptsdir, [[PKGHOME/scripts] Script files])
 if test -z "$scriptsdir"; then
    scriptsdir='${pkghome}/scripts'; fi

@@ -178,6 +178,20 @@ $Torrus::ACL::minPasswordLength = 6;
 $Torrus::Renderer::LoginScreen::mimeType = 'text/html; charset=UTF-8';
 $Torrus::Renderer::LoginScreen::template = 'default-login.html';
 
+# Read plugin configurations
+{
+    my $dir = '@plugtorruscfgdir@';
+    opendir(CFGDIR, $dir) or die("Cannot open directory $dir: $!");
+    my @files = grep { !/^\./ } readdir(CFGDIR);
+    closedir( CFGDIR );
+    foreach my $file ( @files )
+    {
+        require $dir . '/' . $file;
+    }
+}
+
+    
+
 require '@torrus_siteconfig_pl@';
 
 1;

@@ -67,7 +67,9 @@ install-data-local:
 	$(mkvardir) $(DESTDIR)$(logdir)
 	$(mkvardir) $(DESTDIR)$(sesstordir)
 	$(mkvardir) $(DESTDIR)$(seslockdir)	
-	$(mkinstalldirs) $(DESTDIR)@tmpluserdir@
+	$(mkinstalldirs) $(DESTDIR)$(tmpluserdir)
+	$(mkinstalldirs) $(DESTDIR)$(plugtorruscfgdir)
+	$(mkinstalldirs) $(DESTDIR)$(plugdevdisccfgdir)
 
 HTMLDIR = @abs_top_builddir@/../htdocs
 

@@ -1,3 +1,12 @@
+2004-12-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* configure.ac: replaced --disable-modcheck with --enable-pkgonly
+	
+2004-11-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.1.8
+	* Started Torrus development
+
 2004-11-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* lib/Torrus/ConfigTree/Validator.pm:

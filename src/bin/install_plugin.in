@@ -34,14 +34,12 @@ if test ! -d $plugin; then
   exit 1
 fi
 
+echo Installing Torrus plugin from $plugin
+
 cd $plugin
 eval './configure '`cat @cfgdefdir@/instvars`' '$@ || exit 1
 make || exit 1
 make install || exit 1
-
-if -x ./postinstall; then
-  ./postinstall || exit 1
-fi
 
 echo Plugin installation finished
 

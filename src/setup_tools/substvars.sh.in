@@ -24,6 +24,7 @@ prefix=@prefix@
 pkghome=@pkghome@
 exec_prefix=@exec_prefix@
 perllibdir=@perllibdir@
+pluginsdir=@pluginsdir@
 sysconfdir=@sysconfdir@
 varprefix=@varprefix@
 sitedir=@sitedir@
@@ -49,6 +50,9 @@ devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
     -e "s,\@siteconfdir\@,@siteconfdir@,g" \
     -e "s,\@perllibdirs\@,@perllibdirs@,g" \
     -e "s,\@pkgbindir\@,@pkgbindir@,g" \
+    -e "s,\@pluginsdir\@,@pluginsdir@,g" \
+    -e "s,\@plugtorruscfgdir\@,@plugtorruscfgdir@,g" \
+    -e "s,\@plugdevdisccfgdir\@,@plugdevdisccfgdir@,g" \
     -e "s,\@distxmldir\@,@distxmldir@,g" \
     -e "s,\@sitedir\@,@sitedir@,g" \
     -e "s,\@sitexmldir\@,@sitexmldir@,g" \

@@ -22,6 +22,8 @@
 
 =head1 RRFW to Torrus migration guide
 
+
+
 =head2 Introduction
 
 Torrus is the new marketing name for RRFW (Round-robin Database Framework),
@@ -49,6 +51,8 @@ Further on, we assume that RRFW is installed in its default directory,
 F</usr/local/rrfw-0.1>, and Torrus is installed with default paths.
 We refer to TORRUS_DISTR as the unpacked Torrus distribution path.
 
+
+
 =head2 Software installation
 
 Create a new user: C<torrus> and group: C<torrus>. The user ID that is
@@ -68,6 +72,8 @@ execute
 
   torrus install_plugin <UNPACKED_PLUGIN_DIR>
 
+
+
 =head2 Perl configuration files
 
 Te distribution contains a short Shell script called
@@ -84,6 +90,8 @@ Copy the site configuration files from RRFW to Torrus directory:
 
 If needed, follow the same procedure for F<devdiscover-siteconfig.pl>
 and other site configs.
+
+
 
 =head2 XML configuration files
 
@@ -104,16 +112,32 @@ After copying XML files, compile them in Torrus:
 
   torrus compilexml --all --verbose
 
+
+
 =head2 SNMP discovery files
 
   cd /usr/local/etc/torrus/
   cp /usr/local/rrfw-0.1/share/rrfw/discovery/*.ddx discovery/
+
+
 
 =head2 Web interface ACLs
 
   cd /usr/local/etc/torrus/
   /usr/local/rrfw-0.1/bin/acledit --export=acl.xml
   torrus acledit --import=acl.xml
+
+
+
+=head2 Site-specific text templates
+
+If you used some custom templates (HTML templates for the Web interface,
+or text templates for e-mail notifications), copy them to
+F</usr/local/etc/torrus/templates>. This directory should contain only
+your custom templates. Those delivered with the distribution packages are
+located in F</usr/local/torrus/templates>.
+
+
 
 =head2 Apache configuration
 
@@ -125,6 +149,8 @@ use the old URL:
 
 After changing the configuration, stop and start Apache.
 
+
+
 =head2 Stop RRFW collector and monitor processes
 
 Depending on your system configuration, the command would look like
@@ -134,12 +160,16 @@ Depending on your system configuration, the command would look like
 Make sure that all old processes are stopped. Then remove the RRFW startup
 script from all rc.d directories.
 
+
+
 =head2 Change the RRD files ownership
 
 Depending on your system configuration, the paths for RRD files might be
 different.
 
   chown torrus:torrus /var/snmpcollector/*
+
+
 
 =head2 Test and run processes
 
@@ -160,72 +190,6 @@ Sun Solaris:
 
 
 
-root@vmlab#cd /usr/local/etc/
-apache2           pam.d             torrus            xsltConf.sh
-lynx.cfg          rc.d              wgetrc            
-lynx.cfg.default  snmp              xml2Conf.sh       
-root@vmlab#cd /usr/local/etc/torrus/
-root@vmlab#ls -l 
-total 6
-drwxr-xr-x  2 root  wheel  512 Nov 24 16:24 conf
-drwxr-xr-x  2 root  wheel  512 Nov 24 16:24 discovery
-drwxr-xr-x  2 root  wheel  512 Nov 24 16:24 xmlconfig
-root@vmlab#cd xmlconfig/
-root@vmlab#ls
-site-global.xml
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/site-global.xml .
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/                 
-defaults.xml     monrandom.xml    routers.xml      snmp-defs.xml
-examples         old              site-global.xml  vendor
-generic          random.xml       snapshot.xml     
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/monrandom.xml .
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/random.xml .   
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/routers.xml .
-root@vmlab#ls -l 
-total 82
--rw-r--r--  1 root  wheel   1488 Nov 24 16:25 monrandom.xml
--rw-r--r--  1 root  wheel  72217 Nov 24 16:25 random.xml
--rw-r--r--  1 root  wheel   4960 Nov 24 16:26 routers.xml
--rw-r--r--  1 root  wheel    639 Nov 24 16:25 site-global.xml
-root@vmlab#cd ..
-root@vmlab#ls
-conf            discovery       xmlconfig
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/discovery/             
-172.16.16.16.xml           access-1.swissline.ch.ddx
-JTI-SAA.ddx                localhost.ddx
-JTI-routers.xml            usrSureConnect.xml
-README                     vmhost.ddx
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/discovery/* discovery/
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/rrfw-siteconfig.pl conf/
-devdiscover-siteconfig.pl  snmptrap-siteconfig.pl
-email-siteconfig.pl        torrus-siteconfig.pl
-root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/rrfw-siteconfig.pl conf/torrus-siteconfig.pl
-
-/opt/sources/torrus-1.0.0d/setup_tools/replace_rrfw.sh conf/torrus-siteconfig.pl
-
-root@vmlab#./rrfw-0.1/bin/acledit --export=etc/torrus/acl.xml
-[24-Nov-2004 18:40:41 ] Wrote etc/torrus/acl.xml
-root@vmlab#torrus acledit --import=etc/torrus/acl.xml
-[24-Nov-2004 18:40:56 ] Group added: thegroup
-[24-Nov-2004 18:40:56 ] Privilege DisplayAdmInfo for object * set for group thegroup
-[24-Nov-2004 18:40:56 ] Privilege DisplayTree for object random set for group thegroup
-[24-Nov-2004 18:40:56 ] Privilege DisplayTree for object routers set for group thegroup
-[24-Nov-2004 18:40:56 ] Group added: them
-[24-Nov-2004 18:40:56 ] Privilege DisplayTree for object * set for group them
-[24-Nov-2004 18:40:56 ] User added: test
-[24-Nov-2004 18:40:56 ] Added test to group thegroup
-[24-Nov-2004 18:40:56 ] User added: t2
-[24-Nov-2004 18:40:56 ] Added t2 to group them
-
-
-root@swigva01-srv-01#rm /usr/local/etc/rc.d/rrfw.sh 
-root@swigva01-srv-01#cp init.d/torrus /usr/local/etc/rc.d/
-
-chown torrus:torrus /var/snmpcollector/*
-
-Apache:
-  Redirect /rrfw http://host.example.com/torrus
-
 =head1 Author
 
-Copyright (c) 2002-2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -238,7 +238,7 @@ configuration procedure, while those who manually install the software,
 will use the helper.
 
 There are two special directories: F</usr/local/torrus/plugins/torrus-config>
-and F<F</usr/local/torrus/plugins/devdiscover-config>. Plugins are
+and F</usr/local/torrus/plugins/devdiscover-config>. Plugins are
 allowed to add Perl files there. They will be automatically I<require>'d by
 F<torrus-config.pl> and F<devdiscover-config.pl>.
 

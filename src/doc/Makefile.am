@@ -26,6 +26,7 @@ docdir  = @docdir@
 dist_doc_DATA = \
 		install.txt           install.pod \
 		rpnexpr.txt           rpnexpr.pod \
+		rrfw_torrus_migration.txt rrfw_torrus_migration.pod \
 		scalability.pod	      scalability.txt \
 		snmpdiscovery.txt     snmpdiscovery.pod \
 		stylingprofile.txt    stylingprofile.pod \

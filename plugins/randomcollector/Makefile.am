@@ -35,6 +35,9 @@ dist_myperlmod_DATA = Random.pm
 torruscfgdir = $(plugtorruscfgdir)
 dist_torruscfg_DATA = randomcollector-torruscfg.pl
 
+#####   CLI wrapper  #####
+wrapperdir = $(plugwrapperdir)
+dist_wrapper_DATA = randomcollector-wrapper.sh
 
 #####   XML configuration   #####
 myxmldir = $(distxmldir)/examples

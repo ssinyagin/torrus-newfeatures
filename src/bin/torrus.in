@@ -22,23 +22,22 @@
 # CLI wrapper for Torrus utilities
 
 cmd=$1
-shift
 
 commands="acl=acledit acledit=acledit cleanup=cleanup \
-clc=clearcache clearcache=clearcache \
-collector=collector \
-compile=compilexml compilexml=compilexml \
-configinfo=configinfo ci=configinfo \
-snapshot=configsnapshot configsnapshot=configsnapshot \
-discover=devdiscover devdiscover=devdiscover \
-genddx=genddx \
-genlist=genlist \
-install_plugin=install_plugin \
-monitor=monitor \
-schedulerinfo=schedulerinfo si=schedulerinfo"
+          clc=clearcache clearcache=clearcache \
+          collector=collector \
+          compile=compilexml compilexml=compilexml \
+          configinfo=configinfo ci=configinfo \
+          snapshot=configsnapshot configsnapshot=configsnapshot \
+          discover=devdiscover devdiscover=devdiscover \
+          genddx=genddx \
+          genlist=genlist \
+          install_plugin=install_plugin \
+          monitor=monitor \
+          schedulerinfo=schedulerinfo si=schedulerinfo"
 
 for f in `ls -1 @plugwrapperdir@`; do
-  . $f
+  . @plugwrapperdir@/${f}
 done
 
 for pair in ${commands}; do
@@ -47,14 +46,16 @@ done
 
 eval expanded_cmd='${execcmd_'${cmd}'}'
 
-if test -z ${expanded_cmd}; then
+
+if test ${expanded_cmd:-no} = no; then
   echo "Usage: $0 cmd [options...]" 1>&2
   echo "   cmd is one of:" 1>&2
   for pair in ${commands}; do
     eval `echo ${pair} | sed -e 's/=.*//' -e 's/^/a=/'`
-    echo $a
+    echo "     "${a}
   done
 else
+    shift
     @pkgbindir@/${expanded_cmd} "$@"
 fi
 

@@ -23,8 +23,7 @@
 SUBST = @abs_top_builddir@/ov_substvars.sh
 
 noinst_SCRIPTS = \
-	ov_substvars.sh \
-	apache2.conf
+	ov_substvars.sh
 
 EXTRA_DIST = \
 	menu/bg.jpg \
@@ -38,7 +37,9 @@ EXTRA_DIST = \
 	overview/overview.xsl.in \
 	overview/sampleOverview.xml \
 	xtree/xtree.css \
-	xtree/xtree.js.in 
+	xtree/xtree.js.in  \
+	ov_substvars.sh.in \
+	tp-overview.apache.conf.in
 
 welcome_htm = $(webplaindir)/menu/welcome.htm
 credits_htm = $(webplaindir)/menu/credits.htm
@@ -148,8 +149,13 @@ torruscfgdir = $(plugtorruscfgdir)
 dist_torruscfg_DATA = overview-torruscfg.pl
 
 
-apache2.conf: apache2.conf.in
-	$(SUBST) apache2.conf.in > apache2.conf
+##### Apache configuration #####
+
+apachedir = $(supdir)/apache
+nodist_apache_DATA = tp-overview.apache.conf
+
+tp-overview.apache.conf: tp-overview.apache.conf.in
+	$(SUBST) tp-overview.apache.conf.in > tp-overview.apache.conf
 
 
 htdocs:

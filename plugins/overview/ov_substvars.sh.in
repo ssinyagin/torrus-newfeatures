@@ -19,6 +19,10 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 
+prefix=@prefix@
+pkghome=@pkghome@
+supdir=@supdir@
+
 rendererUrl=@rendererUrl@
 
 @SED@ \

@@ -7,7 +7,7 @@ PerlModule Apache::ASP
 	Allow from all
 	SetHandler  perl-script
 	PerlHandler Apache::ASP
-	PerlSetVar  Global /tmp/asp
+	PerlSetVar  Global @aspglobal@
 	PerlSetVar NoState 1
 	PerlSetVar XSLTParser XML::Sablotron
 	PerlSetVar XSLTParser XML::LibXSLT
@@ -19,7 +19,7 @@ PerlModule Apache::ASP
 <Location /overviews>
 	SetHandler  perl-script
 	PerlHandler Apache::ASP
-	PerlSetVar  Global /tmp/asp
+	PerlSetVar  Global @aspglobal@
 	PerlSetVar NoState 1
 	PerlSetVar XSLTParser XML::Sablotron
 	PerlSetVar XSLTParser XML::LibXSLT

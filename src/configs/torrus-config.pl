@@ -178,7 +178,6 @@ $Torrus::ACL::minPasswordLength = 6;
 $Torrus::Renderer::LoginScreen::mimeType = 'text/html; charset=UTF-8';
 $Torrus::Renderer::LoginScreen::template = 'default-login.html';
 
-
 require '@torrus_siteconfig_pl@';
 
 1;

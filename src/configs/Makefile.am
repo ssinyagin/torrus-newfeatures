@@ -29,6 +29,8 @@ EXTRA_DIST = \
 	webmux.pl \
 	webmux2.pl
 
+instvarsdir = $(cfgdefdir)
+nodist_instvars_DATA = instvars
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(cfgdefdir) $(DESTDIR)$(siteconfdir)

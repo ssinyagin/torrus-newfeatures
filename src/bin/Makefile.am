@@ -36,6 +36,7 @@ pkgbin_SCRIPTS = \
 	devdiscover		\
 	genddx			\
 	genlist			\
+	install_plugin		\
 	monitor      		\
 	schedulerinfo
 
@@ -59,6 +60,7 @@ EXTRA_DIST = \
 	devdiscover.in		\
 	genddx.in		\
 	genlist.in		\
+	install_plugin.in	\
 	monitor.in      	\
 	schedulerinfo.in	\
 	torrus.in
@@ -106,6 +108,9 @@ genddx: genddx.in
 
 genlist: genlist.in
 	$(SUBST) genlist.in > genlist
+
+install_plugin: install_plugin.in
+	$(SUBST) install_plugin.in > install_plugin
 
 monitor: monitor.in
 	$(SUBST) monitor.in > monitor

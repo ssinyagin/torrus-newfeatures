@@ -126,6 +126,10 @@ AC_ARG_VAR(cfgdefdir,   [[PKGHOME/conf_defaults] torrus-config.pl and others])
 if test -z "$cfgdefdir"; then
    cfgdefdir='${pkghome}/conf_defaults'; fi
 
+AC_ARG_VAR(plgcfgdir,   [[CFGDEFDIR/plugins] Plugin configurations])
+if test -z "$plgcfgdir"; then
+   plgcfgdir='${cfgdefdir}/plugins'; fi
+
 AC_ARG_VAR(docdir, [[PKGHOME/doc] Documentation files])
 if test -z "$docdir"; then
    docdir='${pkghome}/doc'; fi
@@ -202,24 +206,6 @@ AC_ARG_VAR(wrapperdir, [[BINDIR] CLI wrapper])
 if test -z "$wrapperdir"; then
    wrapperdir='${bindir}'; fi
 
-# Process plugins
-
-AC_ARG_WITH(plugins,
-        [AC_HELP_STRING(--with-plugins=DIR:DIR...,Torrus plugin directories)])
-
-if test x"$with_plugins" != x && test "$with_plugins" != "no"; then
-   torrus_plugins=`echo $with_plugins | sed -e 's/:/ /g'`
-   for plugdir in $torrus_plugins; do
-      if test ! -d $plugdir; then
-         AC_MSG_ERROR([No such plugin directory: $plugdir]);
-      fi
-      if test ! -x $plugdir/configure; then
-         AC_MSG_ERROR([Missing configure in plugin directory: $plugdir]);
-      fi
-   done
-fi
-
-AC_SUBST(torrus_plugins)
 
 AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
 AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])
@@ -234,32 +220,19 @@ AC_SUBST(VERSION)
 
 AC_OUTPUT
 
-if test x"$torrus_plugins" != x; then
-   export torrus_user pkghome cfgdefdir docdir exmpdir perllibdir \
-          scriptsdir supdir tmpldir distxmldir sitedir siteconfdir logdir \
-          piddir varprefix cachedir dbhome sesstordir seslockdir webplaindir 
-   torrus_src_dir=${ac_abs_top_srcdir}
-   torrus_disable_modcheck=
-   if test $enable_modcheck != yes; then
-     torrus_disable_modcheck='--disable-modcheck'
-   fi
-   for plugdir in $torrus_plugins; do
-      AC_MSG_NOTICE([Configuring plugin in $plugdir ...])
-      cd $plugdir
-      if ./configure \
-          --with-substvars=${torrus_src_dir}/setup_tools/substvars.sh \
-          --with-mkvardir=${torrus_src_dir}/setup_tools/mkvardir.sh \
-          --prefix=$prefix \
-          --exec-prefix=$exec_prefix \
-          --bindir=$bindir \
-          --datadir=$datadir \
-          --localstatedir=$localstatedir \
-          --libdir=$libdir \
-          $torrus_disable_modcheck
-        then :; else
-          AC_MSG_ERROR([Error executing $plugdir/configure]);
-      fi
-      cd ${torrus_src_dir}
-   done
-fi
-
+VARSAVE=configs/instvars
+echo creating $VARSAVE
+rm -f $VARSAVE
+for VAR in $ac_subst_vars; do
+    case ${VAR} in
+      DEFS | PACKAGE* | INSTALL* | VERSION | ACLOCAL | AUTO* | MAKEINFO |\
+      install_sh | AM* | am* | ac* | ECHO* | build* | host* | target* |\
+      CYG* | PATH_SEPARATOR | AWK | STRIP | mkdir* |\
+      perllibdirs )
+      ;;
+      *)
+        eval 'VAL=${'$VAR'}'
+        echo ${VAR}=\'${VAL}\' >>$VARSAVE
+      ;;
+    esac
+done

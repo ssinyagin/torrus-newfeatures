@@ -1,3 +1,8 @@
+2005-01-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS_Docsis.pm:
+	New discovery module for Cisco-specific DOCSIS statistics
+
 2005-01-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):

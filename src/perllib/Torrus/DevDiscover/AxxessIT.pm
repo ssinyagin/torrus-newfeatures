@@ -25,7 +25,7 @@
 
 # Tested with:
 #
-# Cisco ONS 15305
+# Cisco ONS 15305 software release 1.1.1
 
     
 

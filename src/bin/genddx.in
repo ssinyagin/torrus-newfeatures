@@ -36,7 +36,7 @@ our $hostfile;
 
 our %globalParams =
     (
-     'output-file'         => '@xmldir@/routers.xml',
+     'output-file'         => '@sitexmldir@/routers.xml',
      'domain-name'         => '',
      'host-subtree'        => '/Routers',
      'snmp-port'           => '161',

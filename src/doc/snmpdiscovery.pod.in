@@ -33,6 +33,9 @@ The result of its work is a new Torrus datasource configuration file.
 Another utility, C<torrus genddx>, is a program that generates the
 basic discovery instructions file based on a set of commandline options.
 
+The device discovery XML, or as we call them DDX files, are usually
+resided in F<@siteconfdir@/discovery/> directory. This is the default
+path to search for them when the absolute path is not given.
 
 =head2 C<torrus genddx>: Discovery instructions generator
 
@@ -40,7 +43,7 @@ basic discovery instructions file based on a set of commandline options.
   Options:
      --host=hostname         router hostname
      --hostfile=filename     space-separated router hostnames file
-     --out=outfile           output file.         [discover-routers.xml]
+     --out=outfile           output file.         [routers.ddx]
      --discout=filename      discovery output file [routers.xml]
      --domain=domain         optional DNS domain name
      --version=v             SNMP version         [2c]
@@ -49,12 +52,12 @@ basic discovery instructions file based on a set of commandline options.
      --retries=number        SNMP retries         [2]
      --timeout=number        SNMP timeout         [10]
      --subtree=string        Subtree name         [/Routers]
-     --datadir=path          data-dir parameter   [/srv/torrus/collector_rrd]
+     --datadir=path          data-dir parameter [/srv/torrus/collector_rrd]
      --holtwinters           Enable Holt-Winters analysis
 
-This utility generates C<devdiscover> instructions XML file based on
+This utility generates C<devdiscover> instructions XML file (DDX) based on
 commandline options and a plain list of SNMP agents' hostnames.
-Hostnames are apecified with one or many C<--host=hostname> options,
+Hostnames are specified with one or many C<--host=hostname> options,
 or a plain text file with space-separated hostnames.
 
 Each host may have a symbolic name. This symbolic name is used as
@@ -82,28 +85,29 @@ Examples:
 
   torrus devdiscover --in=ch-langenthal.ddx
 
-C<genddx> is designed as a one-time utility. You may run it to create
+B<Note:> C<genddx> is designed as a one-time utility. You may run it to create
 a typical discovery file with basic set of options. Then the discovery
-configuration XML woild be the primary source of information, and it should
+configuration XML would be the primary source of information, and it should
 be maintained by manual editing, or by some other automated means.
 
-STOPPED HERE
+
 
 =head2 C<torrus devdiscover>: SNMP discovery tool
 
-  Usage: torrus devdiscover --in=filename.xml options...
+  Usage: torrus devdiscover --in=filename.ddx options...
   Options:
-   --in=infile             discovery instructions XML file
+   --in=filename.ddx       discovery instructions XML file
    --mkdir                 create data-dir directories
    --limit=regexp          limit the discovery by output files
    --verbose               print extra information
    --debug                 print debugging information
+   --snmpdebug             print SNMP protocol details
 
 This utility performs the SNMP discovery of devices listed in the input
-XML file. The output XML file is the Torrus datasources configuration.
-Output file name is taken from C<output-file> parameter in the instructions
-XML file. If the output file is not an absolute path, the file is placed
-in the site XML configuration directory.
+DDX file. The output XML file is the Torrus datasources configuration.
+Output file name is taken from C<output-file> parameter in the DDX.
+If the output file is not an absolute path, the file is placed
+in the site XML configuration directory (F<@sitexmldir@>).
 
 C<devdiscover> is accompanied by a number of MIB- or vendor-specific
 modules, each responsible for finding specific SNMP variables in
@@ -117,8 +121,8 @@ The output file automatically includes all required prerequisite
 generic and vendor template definition files.
 
 Behaviour of C<devdiscover> is controlled by variables in
-F<$Torrus_HOME/share/torrus/devdiscover-siteconfig.pl> file. Default values for
-those variables reside in F<$Torrus_HOME/share/torrus/devdiscover-config.pl>.
+F<@siteconfdir@/devdiscover-siteconfig.pl> file. Default values for
+those variables reside in F<@cfgdefdir@/devdiscover-config.pl>.
 
 For large installations, it is recommended to place RRD files into
 a hashed directory structure. You can enable this feature by setting
@@ -134,13 +138,12 @@ with some local site-specific scripts. See XUpdate usage example in
 I<Torrus User Guide>.
 
 
-=head2 Discovery Instructions File
+=head2 DDX, the discovery instructions file
 
 The input file for C<devdiscover> is an XML file. Its DTD is available
 in Torrus distribution in F<snmp-discovery.dtd>.
 
-A typical place to store the discovery XML is F<share/torrus/discovery/>
-directory under the Torrus installation path.
+A typical place to store the discovery XML is F<@siteconfdir@/discovery/>.
 
 Example:
 
@@ -237,8 +240,7 @@ template in F<snmp-defs.xml>.
 =item * C<output-file>
 
 Mandatory. Specifies the output filename for generated Torrus configuration.
-If no absolute path given, the default site XML configuration directory
-is used.
+If it's a relative path, the file is placed in F<@sitexmldir@> directory.
 
 =item * C<output-bundle>
 
@@ -447,8 +449,9 @@ which have a port name (set up by C<set port name> command).
 
 =back
 
-
+See also: I<Torrus Vendor Support List> for the list of supported MIBs and
+vendors.
 
 =head1 Author
 
-Copyright (c) 2002-2003 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

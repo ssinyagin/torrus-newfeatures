@@ -2,17 +2,7 @@ Round Robin Database Framework
   
 To do now:
 
--- Documentation status:
-Done:
-install.pod
-rpnexpr.pod
-rrfw_torrus_migration.pod
-scalability.pod
-userguide.pod
-webintf.pod
-
 -- ./configure_fhs
--- Update installation guide (DESTDIR)
 -- Update manpages for the new wrapper
 -- Add synonyms to wrapper
 -- Plugins to extend wrapper

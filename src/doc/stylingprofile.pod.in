@@ -24,7 +24,7 @@
 =head2 Styling Profiles
 
 Styling profiles allow for symbolic names to be used in place of hard
-coded values for line-color and line-style.
+coded values for C<line-color> and C<line-style>.
 
 =head3 Schema Definitions
 
@@ -32,7 +32,7 @@ The following styles are defined in the default schema.
 
 =over 3
 
-=item * Required Styles  (line-style,line-color)
+=item * Required Styles  (C<line-style>, C<line-color>)
 
 
            SingleGraph            HWBoundary             HWFailure
@@ -40,28 +40,29 @@ The following styles are defined in the default schema.
                  BpsIn                BpsOut
 
 
-=item * Generic Symbolic styles (line-color only)
+=item * Generic Symbolic styles (C<line-color> only)
 
                     in                   out
 
 =item * Symbolic, Symbolic names, for default use in graphs that have up
-to ten items. (line-color only)
+to ten items (C<line-color> only)
 
                    one                   two                 three
                   four                  five                   six
                  seven                 eight                  nine
                    ten
 
-=item * Symbolic names for combinatorial graphing. (line-color,line-style)
+=item * Symbolic names for combinatorial graphing (C<line-style>,
+C<line-color>)
 
                   red1                  red2                  red3
                   red4                green1                green2
                 green3                green4                 blue1
                  blue2                 blue3                 blue4
 
-=item * Color definitions from the TT2 rgb example set. (line-color only)
+=item * Color definitions from the TT2 rgb example set (C<line-color> only)
 
-Defined in F<styling/colornames.pl>
+Defined in F<@supdir@/styling/colornames.pl>
 
                  black                grey25                grey50
                 grey75                 white                   red
@@ -74,10 +75,9 @@ Defined in F<styling/colornames.pl>
                 marine                   sky                 mauve
                  lilac
 
-=item * Color definitions for web html colors. (line-color only)
+=item * Color definitions for web html colors (C<line-color> only)
 
-Defined in F<styling/colornames.pl>
-
+Defined in F<@supdir@/styling/colornames.pl>
 
              aliceblue          antiquewhite                  aqua
             aquamarine                 azure                 beige
@@ -200,7 +200,7 @@ Remember some styles are mandatory.
 
 =item * Applying your Schema
 
-In the torrus-siteconfig.pl file, add the variable
+In the F<torrus-siteconfig.pl> file, add the variable
 
   $Torrus::Renderer::stylingProfile = "Your-schema";
 

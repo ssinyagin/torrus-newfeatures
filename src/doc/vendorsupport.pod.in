@@ -24,7 +24,7 @@
 =head2 Introduction
 
 This document provides a listing of vendor devices and generic MIBs
-that are suppported by Torrus's SNMP discovery utilities and/or templates
+that are suppported by Torrus'es SNMP discovery utilities and/or templates
 and other supporting files.
 
 All SNMP MIBs described below are supported through C<devdiscover>,
@@ -82,6 +82,11 @@ The discovery process would run very slow unless you specify the
 following parameter in the discovery instructions XML:
 
  <param name="only-devtypes" value="ATMEL"/>
+
+=item * AxxessIT Ethernet over SDH switches (aka Cisco ONS 15300)
+
+The module arranges the Ethernet interface statistics with
+such information as slot/port mapping and interface descriptions.
 
 =item * Cisco CatOS
 
@@ -143,4 +148,4 @@ Port indexing for OmniSwitch and OmniStack ethernet switches.
 
 =head1 Author
 
-Copyright (c) 2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2004-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

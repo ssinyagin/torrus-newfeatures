@@ -48,7 +48,8 @@ scripts in special directories, so that there's no need for plugin
 initialization in F<torrus-siteconfig.pl> and other files. 
 
 Further on, we assume that RRFW is installed in its default directory,
-F</usr/local/rrfw-0.1>, and Torrus is installed with default paths.
+F</usr/local/rrfw-0.1>, and Torrus is installed with default paths. These
+paths may differ in your installation.
 We refer to TORRUS_DISTR as the unpacked Torrus distribution path.
 
 

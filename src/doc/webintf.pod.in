@@ -24,7 +24,7 @@
 
 =head2 Directory structure
 
-By default, the directory F</usr/local/torrus/sup/webplain/> is the place
+By default, the directory F<@webplaindir@/> is the place
 for static HTML, CSS stylesheets and images.
 
 The default CSS stylesheet files are installed in this directory.
@@ -54,7 +54,7 @@ This will clear the cache on the server. Then you may use your browser's
 =head2 Site configuration options
 
 The following variables may need to be set in your
-F</usr/local/etc/torrus/conf/torrus-siteconfig.pl> file:
+F<@siteconfdir@/torrus-siteconfig.pl> file:
 
 =over 4
 
@@ -93,8 +93,8 @@ However, you still need access to the F<plain> directory where your CSS
 resides. Typical Apache configuration would look like follows. Make sure
 your configuration does not contain tab characters:
 
-  Alias /torrus/plain "/usr/local/torrus/sup/webplain"
-  PerlRequire "/usr/local/torrus/conf_defaults/webmux.pl"
+  Alias /torrus/plain "@webplaindir@"
+  PerlRequire "@cfgdefdir@/webmux.pl"
   <Location /torrus>
     SetHandler perl-script
     PerlHandler Torrus::ApacheHandler
@@ -130,8 +130,8 @@ with Torrus.
 
 Typical Apache 2.0 configuration follows:
 
-  Alias /torrus/plain "/usr/local/torrus/sup/webplain"
-  PerlRequire "/usr/local/torrus/conf_defaults/webmux2.pl"
+  Alias /torrus/plain "@webplaindir@"
+  PerlRequire "@cfgdefdir@/webmux2.pl"
   <Location /torrus>
     SetHandler modperl
     PerlResponseHandler Torrus::Apache2Handler
@@ -207,4 +207,4 @@ to the HTML template as-is, and may be used for your custom purposes.
 
 =head1 Author
 
-Copyright (c) 2002-2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -69,9 +69,9 @@ my $ok = GetOptions(
 
 if( not $ok or not $infile or scalar( @ARGV ) > 0 )
 {
-    print STDERR "Usage: $0 --in=filename.xml options...\n",
+    print STDERR "Usage: $0 --in=filename.ddx options...\n",
     "Options:\n",
-    " --in=infile             discovery instructions XML file\n",
+    " --in=filename.ddx       discovery instructions XML file\n",
     " --mkdir                 create data-dir directories\n",
     " --limit=regexp          limit the discovery by output files\n",
     " --verbose               print extra information\n",

@@ -24,10 +24,11 @@
 
 =head2 Common rules
 
-The Round Robin Database Framework configuration consists of
-several XML files. Once the XML configuration is changed, it must
-be compiled into the database by executing C<$Torrus_HOME/bin/compilexml>.
-Also, when I<Renderer> notices the database changes, it flushes its cache.
+The Torrus configuration consists of several XML files.
+Once the XML configuration is changed, it must
+be compiled into the database by executing C<torrus compilexml>.
+In addition, when I<Renderer>, I<Collector> and I<Monitor> processes
+notice the configuration changes, they refresh their information automatically.
 
 The top-level XML element is always C<E<lt>configurationE<gt>>, with
 sub-elements defining various sections, like datasources or views:
@@ -1284,8 +1285,7 @@ $Torrus::Renderer::stylingProfile variable.
 
 =head2 Token sets definitions
 
-I<Token> is a symbolic identifier for each subtree or a leaf. See
-I<Round Robin Framework Architecture> manual for more details.
+I<Token> is a symbolic identifier for each subtree or a leaf. 
 
 A I<tokenset> is a named list of tokens. Its contents can be
 rendered, and its members can be added or removed at any time.
@@ -1602,4 +1602,4 @@ Example:
 
 =head1 Author
 
-Copyright (c) 2002-2003 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -133,14 +133,14 @@ When using lots of collectors and/or lots of HTTP processes, it is
 important to increase the size of BerkeleyDB lock region.
 The command
 
-  db_stat -h /var/torrus/db -c
+  db_stat -h @dbhome@ -c
 
 would show you the current number of locks and lockers, and their maximum
 quantities during the database history.
-These parameters can be tuned
-by creating the file F<DB_CONFIG> in the database home directory, which is
-usually resided in F</var/torrus/db/>. The following settings would
-work fine with about 20 collector processes and 5 HTTP daemon processes:
+The maximum numbers of lock objects and lockers can be tuned by creating the
+file F<DB_CONFIG> in the database home directory, F<@dbhome@>.
+The following settings would work fine with about 20 collector processes
+and 5 HTTP daemon processes:
 
    set_lk_max_lockers	6000
    set_lk_max_locks	3000
@@ -148,7 +148,7 @@ work fine with about 20 collector processes and 5 HTTP daemon processes:
 After updating DB_CONFIG, stop all Torrus processes, including Apache server,
 then run
 
-  db_recover -h /var/torrus/db
+  db_recover -h @dbhome@
 
 Then start the processes again. Futher info is available at:
 

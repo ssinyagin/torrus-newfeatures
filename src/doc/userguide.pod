@@ -28,23 +28,30 @@
 The steps below will explain you how to make the thing running.
 
 B<Install Torrus>. Follow the I<Torrus Installation Instructions> document,
-all prerequisits and necessary steps are described there. By default,
-the software will be installed in F</usr/local/torrus-0.1> (as long
-as the major release version is 0.1). Further in this document,
-we reference this path as a hypothetical variable F<$Torrus_HOME>.
+all prerequisits and necessary steps are described there.
+Further in this document, we assume the default installation paths,
+and they may differ on your system.
 
-B<What is where>. The executables may be surprisingly found in
-F<$Torrus_HOME/bin/>. All site-specific behaviour is controlled by
-F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl>. In this file, you
-must list your XML configuration sources. All the configuration is
-read out of XML files resided in F<$Torrus_HOME/share/torrus/xmlconfig/>.
-Site-specific global XML configuration parameters may be defined in
-F<$Torrus_HOME/share/torrus/xmlconfig/site-global.xml>.
+B<What is where>. The executables reside in 
+F</usr/local/torrus/bin/>. You normally don't need to access this
+directory, because the commandline wrapper, C<torrus>, is installed
+in a usual execution path (F</usr/local/bin> by default).
+All site-specific behaviour is controlled by
+configuration files in F</usr/local/etc/torrus/conf/>.
+Usually you need to change F<torrus-siteconfig.pl> only. In this file, you
+must list your XML configuration sources. The datasource trees configuration
+is read out of XML files. They are searched in several directories,
+normally F</usr/local/torrus/xmlconfig/> and
+F</usr/local/etc/torrus/xmlconfig/>. The first one contains files that
+come with Torrus distribution, and the second one is for your local
+site-specific XML files.
+Global site-specific XML configuration parameters may be defined in
+F<site-global.xml>.
 XML configuration is compiled into internal database representation
-by F<$Torrus_HOME/bin/compilexml>. The database itself is resided in
-F<$Torrus_HOME/var/db/>, and must be writable by your Apache server
+by C<torrus compilexml> command. The database itself is usually resided in
+F</var/torrus/db/>, and must be writable by your Apache server
 (normally the installer takes care of it). It is safe to re-compile the
-configuration while the other daemons are running.
+configuration while the Torrus daemons are running.
 
 B<The datasource trees>. Torrus configuration consists of a number of I<trees>.
 Each tree is independent from the others. Each of them may or may not run
@@ -54,18 +61,19 @@ differentiate the user rights by datasource trees.
 B<Inside the tree>. A tree defines the hierarchy of Torrus datasources.
 The structure of the tree is solely defined by XML configuration files.
 The tree consists of I<nodes>, each being either a I<subtree> or a I<leaf>.
-Subtree contains child subtrees and/or leaves. Leaf represents a datasource:
-normally this is a numerical value that changes over time. The leaf is
-the entity that may be presented as a graph. There are leaves of special
-type: I<multigraph>. They are not numerical values, and are designed for
+Subtrees contain child subtrees and/or leaves. The leaf represents a
+datasource: normally this is a numerical value that changes over time.
+The leaf is the entity that may be presented as a graph.
+There are leaves of special type: I<multigraph>.
+They are not numerical values, and are designed for
 drawing several values in one graph. Each node has I<path>, a
 string that consists of slashes and node names, and uniquely identifies this
 node. The path of a subtree always ends with slash, and the root of the tree
 has the path consisting of a single slash.
 
-B<Trees configuration>. The trees are defined in
-F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl>. See I<Torrus Installation
-Instructions> for a basic example of tree configuration.
+B<Trees configuration>. The trees are defined in F<torrus-siteconfig.pl>.
+See I<Torrus Installation Instructions> for a basic example of tree
+configuration.
 
 B<Round-robin databases>. Currently only one type of data storage is
 supported: Round-robin database (RRD) files. See I<RRDtool> manuals
@@ -73,22 +81,25 @@ for more details. Each leaf represents a datasource stored in an
 RRD file. Of course, several leaves may refer to different datasources within
 the same RRD file. Even more, more than one leaf may refer to the same
 datasource within an RRD file. RRD files are created and updated either by
-C<$Torrus_HOME/bin/collector>, or by some other external programs.
+C<collector>, or by some other external programs.
 
 B<Define the targets>. If you only want to collect SNMP counters
-from some network devices' interfaces, there's a copule of tools
-called C<$Torrus_HOME/bin/genddx> and C<$Torrus_HOME/bin/devdisover>.
+from some network devices' interfaces, there's a couple of tools
+called C<torrus genddx> and C<torrus devdisover>.
 The first one creates a basic discovery instructions file, and the second
-one uses the discovery instructions to explore the device capabilities
+one uses the discovery instructions to explore the SNMP device capabilities
 and information: interface names, input/output counters,
-CPU and memory usage, temperature sensors (Cisco devices).
+CPU and memory usage, temperature sensors (for Cisco devices), and many
+other vendor-specific statistics sources.
 
 Torrus is much more than just an SNMP collector. So, when you decide
 to use it in a more advanced way, you will have to read the whole bit of
 this guide, and also I<Torrus XML Configuration Guide> and probably some
 other documents too.
 
-B<Build the hierarchy>. By default, C<genddx> will put all your
+STOPPED HERE
+
+B<Build the hierarchy>. By default, C<torrus genddx> will put all your
 devices into one hierarchy: C</Routers/E<lt>hostnameE<gt>/...>.
 The subtree name, C<Routers>, may be changed with a command line option
 of C<genddx>. This program may also read the device names (or IP addresses

@@ -50,7 +50,7 @@ sub renderUserLogin
     # We don't check the expiration time for login screen
     if( not defined( $filename ) )
     {
-        $filename = Torrus::Renderer::newCacheFileName();
+        $filename = Torrus::Renderer::newCacheFileName( $cachekey );
     }
 
     my $outfile = $Torrus::Global::cacheDir.'/'.$filename;
@@ -153,7 +153,7 @@ sub renderTreeChooser
     }
     else
     {
-        $filename = Torrus::Renderer::newCacheFileName();
+        $filename = Torrus::Renderer::newCacheFileName( $cachekey );
     }
 
     my $outfile = $Torrus::Global::cacheDir.'/'.$filename;

@@ -20,6 +20,7 @@
 package Torrus::Renderer;
 
 use strict;
+use Digest::MD5 qw(md5);
 
 use Torrus::DB;
 use Torrus::ConfigTree;
@@ -128,7 +129,7 @@ sub render
     }
     else
     {
-        $filename = Torrus::Renderer::newCacheFileName();
+        $filename = Torrus::Renderer::newCacheFileName( $cachekey );
     }
 
     my $cachefile = $Torrus::Global::cacheDir.'/'.$filename;
@@ -245,15 +246,8 @@ sub clearcache
 
 sub newCacheFileName
 {
-    while(1)
-    {
-        my $name = sprintf('%.10d', rand(1e9));
-        if( not -r $Torrus::Global::cacheDir.'/'.$name )
-        {
-            Debug("Random file name: $name");
-            return $name;
-        }
-    }
+    my $cachekey = shift;
+    return sprintf('%s_%.5d', md5_hex( $cachekey ), rand(1e5));
 }
 
 sub xmlnormalize

@@ -81,21 +81,20 @@ a semicolon.</p>
 You may change the subtree name with the <em>--subtree</em> option.
 Single slash as subtree name would cause host-level subtrees placed at the top
 of the datasources tree.</p>
-<p>By default, <code>genddx</code> specifies the Torrus configuration output file
-with absolute path pointing to <code>xmlconfig</code> subdirectory of the installation,
-with the file name &lt;routers.xml&gt;. You most probably will change this by
-using the <code>--discout</code> option.</p>
+<p>By default, <code>genddx</code> specifies the discovery output file as &lt;routers.xml&gt;,
+and it would be placed in site XML configuration directory.
+You most probably will change this by using the <code>--discout</code> option.</p>
 <p>Examples:</p>
 <pre>
-  ./bin/genddx --out=share/torrus/discovery/ch-langenthal.ddx \
-    --discout=share/torrus/xmlconfig/ch-langenthal.xml
+  ./bin/genddx --out=ch-langenthal.ddx \
+    --discout=ch-langenthal.xml \
     --host=192.168.34.35:Langenthal_PE1 \
     --host=192.168.34.36:Langenthal_PE2 \
     --host=192.168.34.37:Langenthal_CE_Stadtverwaltung \
     --community=blahBlah \
     --subtree=/MPLS/CH/Bern/Langenthal</pre>
 <pre>
-  ./bin/devdiscover --in=share/torrus/discovery/ch-langenthal.ddx</pre>
+  ./bin/devdiscover --in=ch-langenthal.ddx</pre>
 <p>
 </p>
 <h2><a name="devdiscover__snmp_discovery_tool"><code>devdiscover</code>: SNMP discovery tool</a></h2>
@@ -110,7 +109,8 @@ using the <code>--discout</code> option.</p>
 <p>This utility performs the SNMP discovery of devices listed in the input
 XML file. The output XML file is the Torrus datasources configuration.
 Output file name is taken from <a href="#item_output_2dfile"><code>output-file</code></a> parameter in the instructions
-XML file.</p>
+XML file. If the output file is not an absolute path, the file is placed
+in the site XML configuration directory.</p>
 <p><code>devdiscover</code> is accompanied by a number of MIB- or vendor-specific
 modules, each responsible for finding specific SNMP variables in
 the SNMP device, and for generating a piece of Torrus configuration XML
@@ -160,7 +160,7 @@ directory under the Torrus installation path.</p>
       &lt;param name=&quot;data-dir&quot; value=&quot;/var/snmpcollector&quot;/&gt;
       &lt;param name=&quot;domain-name&quot; value=&quot;&quot;/&gt;
       &lt;param name=&quot;host-subtree&quot; value=&quot;/Routers&quot;/&gt;
-      &lt;param name=&quot;output-file&quot; value=&quot;share/torrus/xmlconfig/myrouters.xml&quot;/&gt;
+      &lt;param name=&quot;output-file&quot; value=&quot;myrouters.xml&quot;/&gt;
       &lt;param name=&quot;rrd-hwpredict&quot; value=&quot;no&quot;/&gt;
       &lt;param name=&quot;snmp-community&quot; value=&quot;blahblah&quot;/&gt;
       &lt;param name=&quot;snmp-port&quot; value=&quot;161&quot;/&gt;
@@ -229,16 +229,14 @@ template in <em>snmp-defs.xml</em>.
 <li><strong><a name="item_output_2dfile"><code>output-file</code></a></strong><br />
 </li>
 Mandatory. Specifies the output filename for generated Torrus configuration.
-In the parameter value, <code>$XMLCONFIG</code> is replaced with the default Torrus XML
-configuration directory name.
+If no absolute path given, the default site XML configuration directory
+is used.
 <p></p>
 <li><strong><a name="item_output_2dbundle"><code>output-bundle</code></a></strong><br />
 </li>
 Optional. Specifies a comma-separated list of XML file names for bundle
 output. Each bundle file will contain &lt;include&gt; statement for each
 corresponding <a href="#item_output_2dfile"><code>output-file</code></a>.
-In the parameter value, <code>$XMLCONFIG</code> is replaced with the default Torrus XML
-configuration directory name.
 <p></p>
 <li><strong><a name="item_snmp_2dport_2c_snmp_2dcommunity_2c_snmp_2dversion_"><code>snmp-port</code>, <code>snmp-community</code>,  <code>snmp-version</code>, <code>snmp-timeout</code>,
         <code>snmp-retries</code>, <code>snmp-host</code></a></strong><br />

@@ -131,6 +131,16 @@ referred as I<$TORRUS_BIN/action_printemail>.
   cd /usr/local/etc/torrus/
   cp /usr/local/rrfw-0.1/share/rrfw/discovery/*.ddx discovery/
 
+The treatment of C<output-file> parameter has slightly changed.
+In RRFW, relative filename meant relative to the current working directory,
+and C<$XMLCONFIG> macro was used for referring the default XML files directory.
+In Torrus, C<$XMLCONFIG> is still supported, but it is advisory to get rid
+of it. Now the relative filenames refer to the user's XML directory,
+F</usr/local/torrus/xmlconfig>. Absolute filenames are used as they are.
+
+In addition, C<torrus devdiscover> acepts the relative input file names,
+and searches for them in F</usr/local/torrus/discovery>.
+
 
 
 =head2 Web interface ACLs

@@ -127,6 +127,14 @@ referred as <em>$TORRUS_BIN/action_printemail</em>.</p>
 <pre>
   cd /usr/local/etc/torrus/
   cp /usr/local/rrfw-0.1/share/rrfw/discovery/*.ddx discovery/</pre>
+<p>The treatment of <code>output-file</code> parameter has slightly changed.
+In RRFW, relative filename meant relative to the current working directory,
+and <code>$XMLCONFIG</code> macro was used for referring the default XML files directory.
+In Torrus, <code>$XMLCONFIG</code> is still supported, but it is advisory to get rid
+of it. Now the relative filenames refer to the user's XML directory,
+<em>/usr/local/torrus/xmlconfig</em>. Absolute filenames are used as they are.</p>
+<p>In addition, <code>torrus devdiscover</code> acepts the relative input file names,
+and searches for them in <em>/usr/local/torrus/discovery</em>.</p>
 <p>
 </p>
 <h2><a name="web_interface_acls">Web interface ACLs</a></h2>

@@ -1,0 +1,30 @@
+ScriptAlias /menu/ "@webplaindir@/menu/"
+ScriptAlias /overviews/ "@webplaindir@/overviews/"
+
+PerlModule Apache::ASP
+
+<Location /menu>
+	Allow from all
+	SetHandler  perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar  Global /tmp/asp
+	PerlSetVar NoState 1
+	PerlSetVar XSLTParser XML::Sablotron
+	PerlSetVar XSLTParser XML::LibXSLT
+	PerlSetVar XSLTMatch xml$
+	PerlSetVar XSLT menu.xsl
+	PerlSetVar RequestParams 1
+</Location>
+
+<Location /overviews>
+	SetHandler  perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar  Global /tmp/asp
+	PerlSetVar NoState 1
+	PerlSetVar XSLTParser XML::Sablotron
+	PerlSetVar XSLTParser XML::LibXSLT
+	PerlSetVar XSLTMatch xml$
+	PerlSetVar XSLT overview.xsl
+	PerlSetVar RequestParams 1
+</Location>
+

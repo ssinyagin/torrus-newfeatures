@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Round Robin Framework Architecture</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#round_robin_framework_architecture">Round Robin Framework Architecture</a></li>
+	<ul>
+
+		<li><a href="#configuration_processing">Configuration Processing</a></li>
+		<li><a href="#database_architecture">Database Architecture</a></li>
+		<li><a href="#modular_structure">Modular Structure</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="round_robin_framework_architecture">Round Robin Framework Architecture</a></h1>
+<p>
+</p>
+<h2><a name="configuration_processing">Configuration Processing</a></h2>
+<p>The XML configuration is compiled into the database representation by
+operator's manual request.</p>
+<p>The compiled version of the configuration is not a one-to-one
+representation of the XML version. All aliases and templates are
+expanded. Thus, the backwards restoration of XML from the database
+is possible, but is not our urgent task.</p>
+<p>Aliases are the way to represent the data in a more convinient format.
+An alias can point to a subtree or a leaf, and it works similarly as
+a symbolic link in a filesystem.</p>
+<p>A template defines a piece of configuration which can be used in
+multiple places. Templates and aliases are not supported within a template.</p>
+<p>The configuration can consist of several XML files. They will be
+processed in the specified order. Each new file is treated as an additive
+information to the existing tree.</p>
+<p>The configuration processing module should contain information about parameter
+dependency and mandatority. Should the mandatory parameter be missing,
+the configuration processing should stop with an explanative error message.</p>
+<p>
+</p>
+<h2><a name="database_architecture">Database Architecture</a></h2>
+<p>All runtime data is stored in
+<strong>Berkeley DB</strong> database environment (http://www.sleepycat.com).</p>
+<p>The compiled version of the configuration XML is stored in
+the <strong>ds_config_INST.db</strong> and <strong>other_config_INST.db</strong>.
+These databases have similar structure, and
+<strong>ds_config_INST.db</strong> keeps all datasource-related information.
+<code>INST</code> stands for the productive instance number, and has value 0 or 1.
+Current productive instance numbers are stored in <strong>db_config_instances.db</strong>
+database.</p>
+<p>For each datasource tree, the database files are resided in
+<em>$RRFW_HOME/var/db/sub/&gt;tree_name&lt;</em> directory.</p>
+<p>The runtime modules access the configuration via <code>ConfigTree</code> objects.</p>
+<p>Each datasource subtree or leaf is identified by a <em>token</em>.
+Token is a short string of word characters, generated internally.
+Two types of tokens are recognized: single tokens and token sets.</p>
+<p>Single token starts with letter <em>T</em>. The rest is a number of decimal digts.</p>
+<p>Token set name starts with letter <em>S</em>. The rest is an arbitrary sequence of
+word characters.</p>
+<p>The special token <em>SS</em> is reserved for tokensets list. Also tokenset
+parameters are inherited from this token's parameters.</p>
+<p>View and monitor names must be unique, and must
+start with a small letter.</p>
+<p><strong>db_config_instances.db</strong> is a <em>Hash</em> database, with keys of form
+<code>ds:&gt;tree_name&lt;</code> or <code>other:&gt;tree_name&lt;</code>, and 0 or 1 as
+values.</p>
+<p><strong>ds_config_INST.db</strong> is a <em>Btree</em> database, with the keys and values
+defined as follows:</p>
+<ul>
+<li><strong><a name="item_tp_3a_3cpath_3e__2d_2d__3ctoken_3e">tp:&lt;path&gt; -- &lt;token&gt;</a></strong><br />
+</li>
+Gives the token correspondig to the given element name.
+<p></p>
+<li><strong><a name="item_pt_3a_3ctoken_3e__2d_2d__3cpath_3e">pt:&lt;token&gt; -- &lt;path&gt;</a></strong><br />
+</li>
+Gives the path name by the given token.
+<p></p>
+<li><strong><a name="item_c_3a_3ctoken_3e__2d_2d__3cctoken_3e_2c_2e_2e_2e">c:&lt;token&gt; -- &lt;ctoken&gt;,...</a></strong><br />
+</li>
+For given subtree, contains the list of child tokens separated by comma.
+<p></p>
+<li><strong><a name="item_p_3a_3ctoken_3e__2d_2d__3cptoken_3e">p:&lt;token&gt; -- &lt;ptoken&gt;</a></strong><br />
+</li>
+For given subtree or leaf, contains the parent token.
+<p></p>
+<li><strong><a name="item_p_3a_3ctoken_3e_3a_3cpname_3e__2d_2d__3cvalue_3e">P:&lt;token&gt;:&lt;pname&gt; -- &lt;value&gt;</a></strong><br />
+</li>
+Contains the parameter value for specified leaf or subtree.
+Each leaf or subtree inherits parameters from its parent.
+Thus, we must climb up the tree in order to get the parameter's
+value if not defined locally.
+<p></p>
+<li><strong><a name="item_pl_3a_3ctoken_3e__2d_2d__3cpname_3e_2c_2e_2e_2e">Pl:&lt;token&gt; -- &lt;pname&gt;,...</a></strong><br />
+</li>
+Contains the list of parameter names for specified leaf or subtree.
+<p></p>
+<li><strong><a name="item_a_3a_3ctoken_3e__2d_2d__3ctoken_3e">a:&lt;token&gt; -- &lt;token&gt;</a></strong><br />
+</li>
+If this subtree or leaf is an alias, specifies the reference to the real node.
+<p></p>
+<li><strong><a name="item_ar_3a_3ctoken_3e__2d_2d__3ctoken_3e_2c_2e_2e_2e">ar:&lt;token&gt; -- &lt;token&gt;,...</a></strong><br />
+</li>
+Specifies all alias subtrees or leaves pointing to this token.
+<p></p>
+<li><strong><a name="item_d_3a_3cname_3e__2d_2d__3cvalue_3e">d:&lt;name&gt; -- &lt;value&gt;</a></strong><br />
+</li>
+Definition value for the given name
+<p></p>
+<li><strong><a name="item_d_3a__2d_2d__3cname_3e_2c_3cname_3e_2c_2e_2e_2e">D: -- &lt;name&gt;,&lt;name&gt;,...</a></strong><br />
+</li>
+List of all known definitions
+<p></p>
+<li><strong><a name="item_n_3a_3ctoken_3e__2d_2d__3ctype_3e">n:&lt;token&gt; -- &lt;type&gt;</a></strong><br />
+</li>
+Defines a node type. Type is a number with the following values:
+0 for subtree, 1 for leaf, 2 for alias.
+<p></p></ul>
+<p><strong>other_config.db</strong> is a <em>Btree</em> database, with the keys and values
+defined as follows:</p>
+<ul>
+<li><strong><a name="item_configurationready__2d_2d_1_3a0">ConfigurationReady -- 1:0</a></strong><br />
+</li>
+When nonzero, the configuration is ready for usage.
+Otherwise, the configuration status is undefined.
+<p></p>
+<li><strong><a name="item_p_3a_3cname_3e_3a_3cpname_3e__2d_2d__3cvalue_3e">P:&lt;name&gt;:&lt;pname&gt; -- &lt;value&gt;</a></strong><br />
+</li>
+Contains the parameter value for specified view, monitor or action.
+<p></p>
+<li><strong><a name="item_pl_3a_3cname_3e__2d_2d__3cpname_3e_2c_2e_2e_2e">Pl:&lt;name&gt; -- &lt;pname&gt;,...</a></strong><br />
+</li>
+Contains the list of parameter names for specified  view,
+monitor, or action.
+<p></p>
+<li><strong><a name="item_v_3a__2d_2d__3cvname_3e_2c_2e_2e_2e">V: -- &lt;vname&gt;,...</a></strong><br />
+</li>
+Specifies comma-separated list of all views defined.
+<p></p>
+<li><strong><a name="item_v_3a_3ctoken_3e__2d_2d__3cvname_3e_2c_2e_2e_2e">v:&lt;token&gt; -- &lt;vname&gt;,...</a></strong><br />
+</li>
+Specifies comma-separated list of view names for the path given.
+The first view in the list is interpreted as default.
+<p></p>
+<li><strong><a name="item_m_3a__2d_2d__3cmname_3e_2c_2e_2e_2e">M: -- &lt;mname&gt;,...</a></strong><br />
+</li>
+Specifies comma-separated list of all monitor names defined
+<p></p>
+<li><strong><a name="item_a_3a__2d_2d__3caname_3e_2c_2e_2e_2e">A: -- &lt;aname&gt;,...</a></strong><br />
+</li>
+Comma-separated list of actions defined
+<p></p></ul>
+<p><strong>aliases.db</strong> is a <em>Btree</em> database with aliase paths as keys and target
+tokens as values. It is used for quick alias expansion.</p>
+<p><strong>tokensets.db</strong> is a <em>Hash</em> database containing the token sets.
+The keys and values are as follows:</p>
+<ul>
+<li><strong><a name="item_s_3a__2d_2d__3ctokenset_3e_2c_2e_2e_2e">S: -- &lt;tokenset&gt;,...</a></strong><br />
+</li>
+Keeps the list of all known token sets.
+<p></p>
+<li><strong><a name="item_s_3a_3ctokenset_3e__2d_2d__3ctoken_3e_2c_2e_2e_2e">s:&lt;tokenset&gt; -- &lt;token&gt;,...</a></strong><br />
+</li>
+For given tokenset, keeps its contents.
+<p></p></ul>
+<p><strong>nodepcache.db</strong> is a <em>Btree</em> database containing the cached node parameter
+values. The keys and values are as follows:</p>
+<ul>
+<li><strong><a name="item__3cname_3e_3a_3cpname_3e__2d_2d__3cstatus_3e_3cval">&lt;name&gt;:&lt;pname&gt; -- &lt;status&gt;&lt;value&gt;</a></strong><br />
+</li>
+Keeps the status and the value for a given token and parameter.
+Status is a one-byte prefix, with values <code>U</code> for undefined parameter, and
+<code>D</code> for a parameter with value.
+<p></p></ul>
+<p><strong>config_readers.db</strong> is a <em>Hash</em> database which contains the informaton
+about active processes which read the configuration. The configuration
+compiler waits until all readers finish using the current configuration
+database. Process IDs are used as keys, and the values contain timestamps.</p>
+<p><strong>timestamps.db</strong> is a <em>Hash</em> database containing various kinds of
+timestamps. The timestamp name is the key, and the number of seconds
+since epoch is the value.</p>
+<p><strong>render_cache.db</strong> keeps the status information about the graphs
+ready to display. Last known timestamp of the configuration is
+compared with the actual one. When the actual timestamp
+differs from known, the renderer cache is cleaned up.
+This is a <em>Hash</em> database, with the following
+keys and values:</p>
+<ul>
+<li><strong><a name="item__3ctoken_3e_3a_3cvname_3e__2d_2d_e_3clt_3et_render">&lt;token&gt;:&lt;vname&gt; --
+ &lt;t_render&gt;:&lt;t_expires&gt;:&lt;filename&gt;:&lt;mime_type&gt;</a></strong><br />
+</li>
+For the leaf/subtree and view name given, specifies two timestamps: the
+moment of last rendering and expiration time. The filename is automatically
+generated unique name in the spool directory. The contents type is determined
+by the MIME type.
+<p></p></ul>
+<p><strong>monitor_cache.db</strong> is a <em>Hash</em> database used in order to avoid the
+unneccessary configuration tree walk. The keys are the leaf tokens, and
+the values are comma-separated monitor names. At each monitor invocation,
+the confguration timestamp is compared against the last known, and the
+cache database is rebuilt if needed.</p>
+<p><strong>monitor_alarms.db</strong> is a <em>Hash</em> database that keeps alarm status information
+from previous runs of Monitor, with the keys and values as follows:</p>
+<ul>
+<li><strong><a name="item__3ctoken_3e_3a_3cmname_3e__2d_2d_e_3clt_3et_sete_3">&lt;token&gt;:&lt;mname&gt; --
+&lt;t_set&gt;:&lt;t_expires&gt;:&lt;status&gt;:
+&lt;t_last_change&gt;</a></strong><br />
+</li>
+Key consists of the leaf token and monitor name. In the value, <strong>t_set</strong>
+is the time when the alarm was raised. If two subsequent runs of Monitor
+raise the same alarm, <strong>t_set</strong> does not change. <strong>t_expires</strong> is the
+timestamp that shows when it's still important to keep the entry after the
+alarm is cleared. <strong>status</strong> is 1 if the alarm is active, and 0 otherwise.
+<strong>t_last_change</strong> is the timestamp of last status change.
+<p>When <strong>status</strong> is 1, the record is kept regardless of timestamps.
+When <strong>status</strong> is 0, and the current time is more than <strong>t_expires</strong>,
+the record is not reliable and may be deleted by Monitor.</p>
+<p></p></ul>
+<p><strong>collector_tokens.db</strong> is a <em>Hash</em> database used in order to avoid the
+unneccessary configuration tree walk. Keys and values are as follows:</p>
+<ul>
+<li><strong><a name="item__3ctoken_3e__2d_2d__3cperiod_3e_3a_3coffset_3e">&lt;token&gt; -- &lt;period&gt;:&lt;offset&gt;</a></strong><br />
+</li>
+For each leaf token, period and time offset values are stored.
+<p></p></ul>
+<p><strong>scheduler_stats.db</strong> is a <em>Btree</em> database which stores the runtime
+statistics of Scheduler tasks. Each key is of structure
+<strong>&lt;taskname&gt;:&lt;period&gt;:&lt;offset&gt;:&lt;variable&gt;</strong>,
+and the value is a number representing the current value of the variable.
+Depending on variable purpose, the number is floating point or integer.</p>
+<p><strong>users.db</strong> is a <em>Hash</em> database containing user details, passwords,
+and group membership:</p>
+<ul>
+<li><strong><a name="item_ua_3a_3cuid_3e_3a_3cattr_3e__2d_2d__3cvalue_3e">ua:&lt;uid&gt;:&lt;attr&gt; -- &lt;value&gt;</a></strong><br />
+</li>
+User attributes, such as <code>cn</code> (Common name) or <code>userPassword</code>, are stored
+here. For each user, there is a record consisting of the attribute <code>uid</code>,
+with the value equal to the user identifier.
+<p></p>
+<li><strong><a name="item_ua_3a_3cuid_3e__2d_2d__3cattr_3e_2c__2e_2e_2e">uA:&lt;uid&gt; -- &lt;attr&gt;, ...</a></strong><br />
+</li>
+Comma-separated list of attribute names for the given user.
+<p></p>
+<li><strong><a name="item_gm_3a_3cuid_3e__2d_2d__3cgroup_3e_2c__2e_2e_2e">gm:&lt;uid&gt; -- &lt;group&gt;, ...</a></strong><br />
+</li>
+For each user ID, stores the comma-separated list of groups it belongs to.
+<p></p>
+<li><strong><a name="item_ga_3a_3cgroup_3e_3a_3cattr_3e__2d_2d__3cvalue_3e">ga:&lt;group&gt;:&lt;attr&gt; -- &lt;value&gt;</a></strong><br />
+</li>
+Group attributes, such as group description.
+<p></p>
+<li><strong><a name="item_ga_3a_3cgroup_3e__2d_2d__3cattr_3e_2c__2e_2e_2e">gA:&lt;group&gt; -- &lt;attr&gt;, ...</a></strong><br />
+</li>
+Comma-separated list of attribute names for the given group.
+<p></p>
+<li><strong><a name="item_g_3a__2d_2d__3cgroup_3e_2c__2e_2e_2e">G: -- &lt;group&gt;, ...</a></strong><br />
+</li>
+List of all groups
+<p></p></ul>
+<p><strong>acl.db</strong> is a <em>Hash</em> database containing group privileges information:</p>
+<ul>
+<li><strong><a name="item_u_3a_3cgroup_3e_3a_3cobject_3e_3a_3cprivilege_3e__">u:&lt;group&gt;:&lt;object&gt;:&lt;privilege&gt; -- 1</a></strong><br />
+</li>
+The entry exists if and only if the group members have this privilege
+over the object given. Most common privilege is <code>DisplayTree</code>, where
+the object is the tree name.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="modular_structure">Modular Structure</a></h2>
+<p>The Framework will consist of several functional modules:</p>
+<ul>
+<li><strong><a name="item_configuration_management">Configuration management</a></strong><br />
+</li>
+Once the configuration XML files get changed, the configuration compiler
+should be run manually. This guarantees that the actual framework
+configuration is changed only when the files are ready.
+<p>The configuration management module provides access methods for
+enumeration and enquery of the configuratin objects.</p>
+<p></p>
+<li><strong><a name="item_data_threshold_monitoring">Data threshold monitoring</a></strong><br />
+</li>
+This module is able to work in two modes: daemon and on-demand
+invocation. In daemon mode, it performs the monitoring tasks periodically.
+<p>Upon activation, it checks the conditions for each leaf having a monitor.
+In case of the alarm, it executes the action instructions synchronousely.</p>
+<p></p>
+<li><strong><a name="item_rendering_module">Rendering module</a></strong><br />
+</li>
+Upon a request, this module generates the graph and HTML files for the
+requested view and its subviews. It first checks availability of
+cached objects and avoids unneeded regeneration. It must be possible
+to force the renderer to flush the cache.
+<p></p>
+<li><strong><a name="item_web_interface_module">Web interface module</a></strong><br />
+</li>
+Web interface module passes the Renderer output to a HTTP client.
+<p></p>
+<li><strong><a name="item_data_collection_module">Data collection module</a></strong><br />
+</li>
+Collector program runs as a separate process.
+<p>Collector program supports two modes of invocation: daemon and one-time.</p>
+<p>In daemon mode, it first runs all registered collectors. After that,
+the collectors are grouped depending on period and time offset, and launched
+periodically at the moments defined by formula:</p>
+<pre>
+  time + period - (time mod period) + timeoffset</pre>
+<p>The datasources are grouped by collector type.
+For SNMP collector type, the datasources are grouped by host.
+SNMP requests are sent in non-blocking mode (see Net::SNMP Perl module
+manual).</p>
+<p>For each SNMP host, system uptime is verified. For RRD datasource types
+``COUNTER'', if the device reload is
+detected, the corresponding RRD file is updated with ``undefined''
+value at the calculated moment of reload.</p>
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2002-2004 Stanislav Sinyagin <a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a></p>
+
+</body>
+
+</html>

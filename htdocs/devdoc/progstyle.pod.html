@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RRFW Programming Style Guide</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#rrfw_programming_style_guide">RRFW Programming Style Guide</a></li>
+	<ul>
+
+		<li><a href="#perl_indentation_style">Perl indentation style</a></li>
+		<li><a href="#common_file_properties">Common file properties</a></li>
+		<li><a href="#gnu_emacs_settings">GNU Emacs settings</a></li>
+		<li><a href="#xemacs_settings">X-Emacs settings</a></li>
+		<li><a href="#normalizing_multiple_files">Normalizing multiple files</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="rrfw_programming_style_guide">RRFW Programming Style Guide</a></h1>
+<p>
+</p>
+<h2><a name="perl_indentation_style">Perl indentation style</a></h2>
+<p>The indentation style is a kind of BSD/Allman style:</p>
+<pre>
+    while( not $success and time() &lt; $waitingTimeout )
+    {
+        $self-&gt;clearReader();</pre>
+<pre>
+        Info('Sleeping ' . $RRFW::Global::ConfigReadyRetryPeriod .
+              ' seconds');
+        sleep $RRFW::Global::ConfigReadyRetryPeriod;</pre>
+<pre>
+        $self-&gt;setReader();</pre>
+<pre>
+        if( $self-&gt;isReady() )
+        {
+            $success = 1;
+            Info('Now configuration is ready');
+        }
+        else
+        {
+            Info('Configuration is still not ready');
+        }
+    }</pre>
+<p>Indentation is 4 characters. Opening and closing braces are aligned.
+There's no space between the keyword (<code>while</code>, <code>if</code>, etc.) and the opening
+parenthesis.</p>
+<p>Tab characters are prohibited.</p>
+<p>Page width is strictly 80 characters. All longer lines must be wrapped.</p>
+<p>When possible, leave space between parentheses and the inside content.
+This is not necessary for debug or print statements.</p>
+<p>There's always space around the equal sign (<code>=</code>).</p>
+<p>The object method calls always have parentheses, even if no arguments are
+reqiured.</p>
+<p>Use keywords for logical operations instead of C operators: <code>and</code>, <code>or</code>,
+<code>not</code>.</p>
+<p>Use single quotes in hash references: <code>$a-&gt;{'abc'}</code>.</p>
+<p>
+</p>
+<h2><a name="common_file_properties">Common file properties</a></h2>
+<p>With the exception of special-purpose files, each source file
+must ontain the GNU copying statement, CVS <code>Id</code> tag, and author's name and
+e-mail address.</p>
+<p>C, Perl, and Bourne shell files must contain Gnu Emacs variables
+at the end of the file:</p>
+<pre>
+ # Local Variables:
+ # mode: perl
+ # indent-tabs-mode: nil
+ # perl-indent-level: 4
+ # End:</pre>
+<p>Each file must always end with the linebreak. Otherwise it might conflict
+with CVS. All files must have Unix linebreak format.</p>
+<p>
+</p>
+<h2><a name="gnu_emacs_settings">GNU Emacs settings</a></h2>
+<p>Standard <code>perl-mode.el</code> does the thing:</p>
+<pre>
+ ;; Set up Perl mode
+ (autoload 'perl-mode &quot;perl-mode&quot;)
+ (setq auto-mode-alist
+     (append (list (cons &quot;\\.pl$&quot; 'perl-mode)
+                   (cons &quot;\\.pm$&quot; 'perl-mode)
+                   (cons &quot;\\.pl\\.cgi$&quot; 'perl-mode))
+             auto-mode-alist))</pre>
+<pre>
+ (custom-set-variables
+   ;; custom-set-variables was added by Custom -- don't edit or cut/paste it!
+   ;; Your init file should contain only one such instance.
+  '(indent-tabs-mode nil)
+  '(tab-width 8)
+  )</pre>
+<p>
+</p>
+<h2><a name="xemacs_settings">X-Emacs settings</a></h2>
+<p>In X-Emacs, the default handler for Perl files is <code>cperl-mode.el</code>.
+The following custom variables must be set in order to comply to our styling
+standards:</p>
+<pre>
+ (custom-set-variables
+   ;; custom-set-variables was added by Custom -- don't edit or cut/paste it!
+   ;; Your init file should contain only one such instance.
+  '(cperl-brace-offset -4)
+  '(cperl-continued-statement-offset 4)
+  '(cperl-indent-level 4)
+  '(indent-tabs-mode nil)
+  '(tab-width 8)
+  )</pre>
+<p>
+</p>
+<h2><a name="normalizing_multiple_files">Normalizing multiple files</a></h2>
+<p>In RRFW CVS repository, in the root of module <code>src</code>, there is a small
+utility that fixes some styling issues for all the sources in
+current directory and subdirectories:</p>
+<pre>
+  perl normalize-all-sources.pl</pre>
+<p>It replaces tabs with spaces, deletes space at the end of line,
+and removes empty lines at the start and the end of file.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2003 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

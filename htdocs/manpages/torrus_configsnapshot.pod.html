@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>configsnapshot - Generates a configuration snapshot for a Torrus tree.</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#files">FILES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>configsnapshot - Generates a configuration snapshot for a Torrus tree.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>configsnapshot</strong> --tree=<em>TREENAME</em> [<em>options...</em>]</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This command generates a configuration snapshot from current
+datasources for tree <em>TREENAME</em>. The output is an XML file, ready for
+compilation, representing all datasources, monitors and tokensets of a
+given tree. The snapshot does not include view definitions. Templates
+and file patterns are expanded inside the file. It does not require
+any other XML configuration files, except for <em>defaults.xml</em> and your
+custom view definitions.</p>
+<p><strong>Warning:</strong> <code>configsnapshot</code> from Torrus release 0.1.5 will not work
+correctly with databases from previous releases. Use release
+<code>0.1.4bf2</code> instead.  <code>configsnapshot</code> utility from release 0.1.4bf2
+does not preserve aliases.</p>
+<p>This utility is useful in Torrus upgrade process. In case when RRD files
+structure is changing in Torrus default templates, and <code>user(s)</code> demand to
+preserve the historical data, the following steps could be done:</p>
+<ul>
+<li></li>
+Stop the collector and monitor processes.
+<p></p>
+<li></li>
+Install newest Torrus software and do not run <code>compilexml</code> immediately.
+<p></p>
+<li></li>
+Create snapshots of the trees that you want to preserve for historical reasons:
+<pre>
+  configsnapshot --tree=myrouters \
+    --out=share/xmlconfig/myrouters-snapshot.xml</pre>
+<p></p>
+<li></li>
+If needed, move the existing RRD files into different directory. Then
+change the <code>data-dir</code> parameters in the snapshot XML accordingly.
+<p></p>
+<li></li>
+Create a new tree with only the snapshot file in it. Compile the tree.
+<p></p>
+<li></li>
+At this stage, it is up to the user to decide wether to continue running the
+collector and monitor daemons for this new tree. The old data may be preserved
+for historical reference, and collector may be run with the newest tree
+structure and definitions.
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dout_3dfile"><strong>--out</strong>=<em>FILE</em></a></strong><br />
+</dt>
+<dd>
+Sets the output file to <em>FILE</em>. Default is <em>snapshot.xml</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
+</dt>
+<dd>
+Displays some extra information.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
+</dt>
+<dd>
+Displays a help message.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="files">FILES</a></h1>
+<dl>
+<dt><strong><a name="item__40xmldir_40_2fdefaults_2exml"><em>@xmldir@/defaults.xml</em></a></strong><br />
+</dt>
+<dd>
+XML configuration file with default settings for the datasources and
+tokensets, as well as default view definitions.
+</dd>
+<p></p>
+<dt><strong><a name="item_snapshot_2exml"><em>snapshot.xml</em></a></strong><br />
+</dt>
+<dd>
+Default <strong>configsnapshot</strong> output file.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><strong>compilexml</strong>(1)</p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

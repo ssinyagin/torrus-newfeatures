@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>compilexml - Torrus XML configurationcompiler.</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>compilexml - Torrus XML configuration (re)compiler.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>compilexml</strong> --tree=<em>TREENAME</em> [<em>options...</em>]</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This command (re)compiles the Torrus's XML configuration for the <code>tree(s)</code>
+<em>TREENAME</em>. It does not require any other processes to be restarted
+after the configuration is changed. Renderer's cache is automatically
+flushed on on the next Renderer's run. Monitor automatically resets on
+the next monitoring cycle. All tokensets in the given tree are
+emptied.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dall"><strong>--all</strong></a></strong><br />
+</dt>
+<dd>
+Instructs to (re)compile configuration for all trees.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dnods"><strong>--nods</strong></a></strong><br />
+</dt>
+<dd>
+Instructs to (re)compile non-datasource configuration only.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dnoval"><strong>--noval</strong></a></strong><br />
+</dt>
+<dd>
+Disables all validation of the XML configuration. This speeds up the
+compilation up to 2 times, while adding a risk to end up with an
+unusable configuration. In addition, the first initialization cycle of
+Collector and Monitor in this case would be much longer.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
+</dt>
+<dd>
+Sets the log level to debug.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
+</dt>
+<dd>
+Sets the debug level to info.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
+</dt>
+<dd>
+Displays a help message.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RRD Framework Requirements Version 0.0</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#rrd_framework_requirements_version_0_0">RRD Framework Requirements Version 0.0</a></li>
+	<ul>
+
+		<li><a href="#flexible_hierarchical_configuration">Flexible Hierarchical Configuration</a></li>
+	</ul>
+
+	<li><a href="#data_monitoring_principles">Data Monitoring Principles</a></li>
+	<ul>
+
+		<li><a href="#file_naming_flexibility">File Naming Flexibility</a></li>
+		<li><a href="#datasource_naming">Datasource Naming</a></li>
+		<li><a href="#monitoring_rules">Monitoring Rules</a></li>
+		<li><a href="#event_processing">Event Processing</a></li>
+	</ul>
+
+	<li><a href="#data_displaying_principles">Data Displaying Principles</a></li>
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="rrd_framework_requirements_version_0_0">RRD Framework Requirements Version 0.0</a></h1>
+<p>Date: Jul 10 2002</p>
+<p>This article defines some principles that a supposedly future
+RRD framework should have. The framework should consist of 3
+independent subsystems:</p>
+<dl>
+<dt><strong><a name="item_data_collection">Data Collection</a></strong><br />
+</dt>
+<dt><strong><a name="item_data_monitoring">Data Monitoring</a></strong><br />
+</dt>
+<dt><strong><a name="item_data_displaying">Data Displaying</a></strong><br />
+</dt>
+</dl>
+<p>
+</p>
+<h2><a name="flexible_hierarchical_configuration">Flexible Hierarchical Configuration</a></h2>
+<p>Inspired by Cricket hierarchical configuration, we state here that
+the configuration should be hierarchical. Child nodes should
+inherit the properties from parents.</p>
+<p>The format of the configuration files has not to be neccessary
+as in Cricket. I'm not sure if it's worth keeping them in a directory
+structure representing the hierarchy tree, but it's definitive
+that multiple files should be supported.</p>
+<p>A good step ahead would be the configuration in XML format.
+It is also possible to have a converter from some other formats
+(plain text, or an SQL database) into XML which will be consumed by the
+framework.</p>
+<p>I leave the Data collection uncovered, since all of the existing
+RRD frontends do this part already.</p>
+<p>
+</p>
+<hr />
+<h1><a name="data_monitoring_principles">Data Monitoring Principles</a></h1>
+<p>At the moment, the only known solution for RRD data monitoring is
+Cricket. Its threshold monitoring has certain limitation and drawbacks.
+Nevertheless, it may be used as the basis for the ideas in the further
+development.</p>
+<p>The major idea is to build data monitoring as a part of a bigger RRD
+framework, still being the independent part of the whole. The data can come
+from many differet sources, from RRDs produced by any of the existing
+and future frontends.</p>
+<p>
+</p>
+<h2><a name="file_naming_flexibility">File Naming Flexibility</a></h2>
+<p>In most existing RRD frontends, each RRD datafile should be described
+individually. This is not very convenient, especially for the cases
+when you have several (dozens) files containing one type of data.
+(e.g., input traffic per source autonomous system).
+Also the files of same type can be created and deleted by their sourcing
+frontend, and it would be more convenient not having to change
+the monitoring configuration.</p>
+<p>Thus, we need a wildcards language which would allow to specify
+multiple files and derive the datasource names from thir names.</p>
+<p>
+</p>
+<h2><a name="datasource_naming">Datasource Naming</a></h2>
+<p>Each data being monitored (for RRDs, its definition specifies the
+&lt;filename, DS, RRA&gt; triple) has to have a universal name.
+The name can be fully or partly qualified, depending on the
+configuration tree. Examples of such data reference follow:</p>
+<pre>
+  /Netflow/Exporters/63.2.3.224/if3/bps /* Interface #3 on router 63.2.3.224 */
+  /Netflow/Subnets/Dialin/bps   /* Dial-in address pool */
+  /* different grouping for the rack temperature in Server Room 1 */
+  /Envmon/RackTemp/SR1
+  /SR1/Envmon/RackTemp</pre>
+<p>Name aliasing should allow short or symbolic names for data sources:</p>
+<pre>
+  /* Alias for /Netflow/Exporters/63.2.3.224/if3 */
+  /Netflow/Upstream/FranceTelecom1</pre>
+<p>
+</p>
+<h2><a name="monitoring_rules">Monitoring Rules</a></h2>
+<p>Data threshold monitoring should be described in a hierarchical
+manner.</p>
+<p>It would be interesting to have monitoring rules separate from
+the data hierarchy. On the other hand, 1) some data sources might need
+special and unique monitoring rules; 2) in some cases, several
+data sources need to be combined in order to build a threshold rule.
+I'm not yet sure how this must be achieved.</p>
+<p>
+</p>
+<h2><a name="event_processing">Event Processing</a></h2>
+<p>Once the threshold violation occurs, the monitoring system
+should produce the alarm event.</p>
+<p>Cricket has a good set of ways to report the alarm, and they can be taken
+as the basis.</p>
+<p>Also what Cricket is really missing, is displaying those data sources
+being alarmed. The Monitoring system should produce the instructions
+to the Displaying system in order to display the summary of those
+data sources which produce alarms within certain time.</p>
+<p>
+</p>
+<hr />
+<h1><a name="data_displaying_principles">Data Displaying Principles</a></h1>
+<p>View profiles should be configured in a hierarchical manner.</p>
+<p>Again as with data monitoring, some Views should be configured independently
+of the data hierarchy, but also some data should be able to define
+specific view profiles.</p>
+<p>There should be view profiles of different types:</p>
+<ul>
+<li></li>
+HTML Framework. Defines the HTML elements that should be displayed around
+the graphs. It also should define the child graphs. Also it should define
+the controls which would cause the option changes in the child graphs
+(e.g., enabling ``Show Holt-Winters Boundaries'' would produce the
+corresponding graph).
+<p></p>
+<li></li>
+Individual Graph. Defines the way the graph should look. It should
+also be capable of displaying an arbitrary number of data sources.
+It should have tunable options, like color, size, or time period.
+<p></p></ul>
+<p>The Displaying system should allow the following ways of viewing:
+1) hierarchical browsing, like Cricket; 2) alarm summary display;
+3) individual graph display, without HTML surrounding.</p>
+<p>The graph images should be cashed and reused whenever possible.
+In alarm summary browsing, these images can be generated at the moment
+of the event.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2002 Stanislav Sinyagin <a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a></p>
+
+</body>
+
+</html>

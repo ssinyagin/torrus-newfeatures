@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>devdiscover - Performs SNMP discovery and generates Torrus XML
+configuration file.</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#files">FILES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>devdiscover - Performs SNMP discovery and generates Torrus XML
+configuration file.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>devdiscover</strong> --in=<em>XMLFILE</em> [<em>options...</em>]</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><strong>devdiscover</strong> performs SNMP discovery using the <em>XMLFILE</em>
+for the discovery instructions. It generates a corresponding
+Torrus XML configuration file. See <strong>Torrus SNMP Discovery User Guide</strong> for
+details.</p>
+<p>The generic input file, or device discovery XML (DDX), may be generated 
+by the <strong>genddx</strong> utility, and then edited and maintained manually.</p>
+<p>Input file name is searched in the current directory, and then in
+<em>/usr/local/etc/torrus/discovery/</em>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dmkdir"><strong>--mkdir</strong></a></strong><br />
+</dt>
+<dd>
+Creates <code>data-dir</code> directories.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dlimit_3dregexp"><strong>--limit</strong>=<em>REGEXP</em></a></strong><br />
+</dt>
+<dd>
+Limits the discovery to the output files matching the regular expression
+<em>REGEXP</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
+</dt>
+<dd>
+Prints extra information.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
+</dt>
+<dd>
+Prints debugging information.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dsnmpdebug"><strong>--snmpdebug</strong></a></strong><br />
+</dt>
+<dd>
+Prints SNMP protocol details
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="files">FILES</a></h1>
+<dl>
+<dt><strong><a name="item__40perlcfgdir_40_2fdevdiscover_2dsiteconfig_2epl"><em>@perlcfgdir@/devdiscover-siteconfig.pl</em></a></strong><br />
+</dt>
+<dd>
+<strong>devdiscover</strong> site configuration file.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><strong>genddx</strong>(1)</p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See <em>Torrus SNMP Discovery User Guide</em> for more details at Torrus home
+page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

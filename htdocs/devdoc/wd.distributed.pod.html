@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RRFW Working Draft: Distributed collector architecture</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#rrfw_working_draft__distributed_collector_architecture">RRFW Working Draft: Distributed collector architecture</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#terminology">Terminology</a></li>
+		<li><a href="#transport">Transport</a></li>
+		<li><a href="#operation">Operation</a></li>
+		<li><a href="#message_format">Message format</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="rrfw_working_draft__distributed_collector_architecture">RRFW Working Draft: Distributed collector architecture</a></h1>
+<p>Status: pending implementation.
+Date: May 26, 2004. Last revised: June 14, 2004</p>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<p>In large installations, one server has often not enough capacity
+to collect the data from all the data sources. In other cases,
+because of the network bandwidth or security restrictions it is
+preferrable to collect (SNMP) data locally on the site, and transfer
+the updates to the central location less frequently.</p>
+<p>
+</p>
+<h2><a name="terminology">Terminology</a></h2>
+<p>We call <em>Hub</em> servers those which run the user web interfaces and
+optionally threshold monitors. These are normally placed in the central
+location or NOC datacenter.</p>
+<p><em>Spoke</em> servers are those running SNMP or other data collectors.
+They periodically transfer the data to Hub servers. One Spoke
+server may send copies of data to several Hub servers, and one
+Hub server may receive data from many Spoke servers.</p>
+<p>In general, the property of being a Hub or a Spoke is local to a pair
+of servers and their datasource trees, and it only describes the functions
+of data collection and transfer. In complex installations, the same
+instance of RRFW may function as a Hub for some remote Spokes, and as a
+Spoke for some other Hubs simultaneousely.</p>
+<p>We call <em>Association</em> a set of attributes that describe a single connection
+between Hub and Spoke servers. These attributes are:</p>
+<ul>
+<li><strong><a name="item_association_id">Association ID</a></strong><br />
+</li>
+Unique symbolic name across the whole range of interconnected servers.
+<p></p>
+<li><strong><a name="item_hub_server_id_2c_spoke_server_id">Hub server ID, Spoke server ID</a></strong><br />
+</li>
+Names of the servers, usually hostnames.
+<p></p>
+<li><strong><a name="item_transport_type">Transport type</a></strong><br />
+</li>
+One of SSH, RSH, HTTP, etc.
+<p></p>
+<li><strong><a name="item_transport_mode">Transport mode</a></strong><br />
+</li>
+PUSH or PULL
+<p></p>
+<li><strong><a name="item_transport_parameters">Transport parameters</a></strong><br />
+</li>
+Parameters needed for this transport connection, like login name, password,
+URL, etc.
+<p></p>
+<li><strong><a name="item_compression_type_and_level">Compression type and level</a></strong><br />
+</li>
+Optional, gzip or bzip2 or something else, with compression levels from 1 to 9.
+<p></p>
+<li><strong><a name="item_tree_name_on_hub_server">Tree name on Hub server</a></strong><br />
+</li>
+Target datasource tree that will receive data from Spokes
+<p></p>
+<li><strong><a name="item_subtree_path_on_hub_server">Subtree path on Hub server</a></strong><br />
+</li>
+The data updates from this association will be placed in a subtree
+under the specified path.
+<p></p>
+<li><strong><a name="item_tree_name_on_spoke_server">Tree name on Spoke server</a></strong><br />
+</li>
+The tree where a collector runs and stores data into this association.
+<p></p>
+<li><strong><a name="item_path_translation_rules">Path translation rules</a></strong><br />
+</li>
+Datasource paths from Spoke server may be changed to look different
+in the tree of Hub server.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="transport">Transport</a></h2>
+<p>The modular architecture design should allow different types of data
+transfer. The default transport is Secure Shell version 2 (SSH). Other
+possible transports may be RSH, HTTP/HTTPS, rsync.</p>
+<p>Two transport modes should be implemented: PUSH and PULL.
+In PUSH mode, Spoke servers initiate the data transfer and push the data to
+Hub servers. In PULL mode, Hub servers initiate the data
+transfer and ask Spokes for data updates. It should be possible
+to mix the transport modes for different Associations on the same
+server, but within each Association the mode should be strictly
+determined. The choice of transport mode should be based on local security
+policies, and server and network performance.</p>
+<p>Optionally the compression method and level can be configured. Although
+SSH protocol supports its own compression, more aggressive compression
+methods may be used for the sake of better bandwidth usage.</p>
+<p>Transport agents should notify the operator in cases of delivery failures.</p>
+<p>
+</p>
+<h2><a name="operation">Operation</a></h2>
+<p>For Spoke servers, distributed data transfer will be implemented as
+additional storage type. For Hub servers, this will be a new collector
+type.</p>
+<p>Each data transfer is a concatenation of <em>messages</em>. Messages
+may be of one of two types: <em>CONFIG</em> and <em>DATA</em>. Spoke server generates
+the messages and stores them for the transfer. Messages are delivered
+to Hub servers with a certain delay, but they are guaranteed to
+arrive in sequential order. For each pair of servers, messages are
+consecutively numbered. These numbers are used for failure detection.</p>
+<p>A Spoke server keeps track of its configuration, and after each
+configuration change, it sends a CONFIG message. This message contains
+information about mapping between Spoke server tokens and datasource paths,
+and a limited set of parameters for displaying and monitoring the data.</p>
+<p>After each collector cycle, Spoke server sends DATA messages.
+These messages contain the following information: timestamp of the
+update, token, and value. The format of the message should be designed
+to consume minimum bandwidth.</p>
+<p>Hub server picks up the messages delivered by the transport agents.
+Upon receiving a CONFIG message, it sets a preconfigured delay, in order
+to collect as many as possible CONFIG messages. Then the data transfer agent
+generates a new XML configuration based on the messages, and starts
+the compilation of configuration. The DATA messages are queued for the
+collector to pick up and and store the values. It must be ensured that
+all DATA messages queued for the old configuration are processed before
+the compilation starts.</p>
+<p>In case of fatal failure and loss of data, Hub server ignores all DATA
+messages until it gets a new CONFIG message. A periodic configuration update
+schedule should be defined. If no configuration changes occur within a
+certain period of time, Spoke server periodically sends the CONFIG messages
+with the same timestamp.</p>
+<p>
+</p>
+<h2><a name="message_format">Message format</a></h2>
+<p>Message is a text in email-like format: it starts with a header, followed by
+an empty line and the body. Single dot (.) in a line specifies the end of
+the message. Blocks within a CONFIG message are separated with semicolon (;),
+each block representing a single datasource leaf.</p>
+<p>Example:</p>
+<pre>
+ MsgID:100001
+ Type:CONFIG
+ Timestamp:1085528682</pre>
+<pre>
+ level2-token:T0005
+ level2-path:/Routers/RTR1/Interface_Counters/Ethernet0/InOctets
+ vertical-label:bps
+ ....
+ ;
+ level2-token:T0006
+ level2-path:/Routers/RTR1/Interface_Counters/Ethernet0/OutOctets
+ vertical-label:bps
+ .
+ MsgID:100002
+ Type:DATA
+ Timestamp:1085528690</pre>
+<pre>
+ T0005:12345678
+ T0006:987654321
+ .</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2004 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>collector - Torrus data Collector.</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#files">FILES</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>collector - Torrus data Collector.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>collector</strong> --tree=<em>TREENAME</em> [<em>options...</em>]</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This command starts the Collector process for the tree <em>TREENAME</em>. By
+default it forks into a daemon, sets the log output file to
+<em>/var/log/torrus/collector.TREENAME.log</em>, performs one
+Collector cycle, and sleeps until the next cycle is scheduled. In
+daemon mode the log file can be reopened by sending it a SIGHUP
+signal.</p>
+<p>Collector cycle scheduling is controlled by two parameters defined
+for each individual configuration leaf: <code>collector-period</code> and
+<code>collector-timeoffset</code>. See the <strong>Torrus Configuration Guide</strong> for more
+details.</p>
+<p>The number of OID (Object IDentifier) variable bindings sent by 
+Collector is controlled by the datasource parameter <code>snmp-oids-per-pdu</code>.
+It is set to a default value of 40 in <em>snmp-defs.xml</em>, and may be
+overwritten at the host level.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dnodaemon"><strong>--nodaemon</strong></a></strong><br />
+</dt>
+<dd>
+Prevents the process from becoming a daemon and sets the log to STDERR.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2drunonce"><strong>--runonce</strong></a></strong><br />
+</dt>
+<dd>
+Instructs the script to run once and exit. Implies <strong>--nodaemon</strong>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
+</dt>
+<dd>
+Sets the log level to debug.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
+</dt>
+<dd>
+Sets the debug level to info.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
+</dt>
+<dd>
+Displays a help message.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="files">FILES</a></h1>
+<dl>
+<dt><strong><a name="item__40perlcfgdir_40_2ftorrus_2dsiteconfig_2epl"><em>@perlcfgdir@/torrus-siteconfig.pl</em></a></strong><br />
+</dt>
+<dd>
+Torrus site configuration script.
+</dd>
+<p></p>
+<dt><strong><a name="item__2fvar_2flog_2ftorrus_2fcollector_2etreename_2elog"><em>/var/log/torrus/collector.TREENAME.log</em></a></strong><br />
+</dt>
+<dd>
+Collector's log for the tree <em>TREENAME</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item__40xmldir_40_2fsnmp_2ddefs_2exml"><em>@xmldir@/snmp-defs.xml</em></a></strong><br />
+</dt>
+<dd>
+Basic variable definitions for the SNMP collector.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

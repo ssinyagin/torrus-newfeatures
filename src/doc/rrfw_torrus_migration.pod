@@ -27,9 +27,9 @@
 =head2 Introduction
 
 Torrus is the new marketing name for RRFW (Round-robin Database Framework),
-a robust and flexible software data series processing. The last release
-of RRFW is 0.1.8. The upcoming release 1.0.0 of Torrus will introduce
-some significant changes and design improvements.
+a robust and flexible software package for data series processing.
+The last release of RRFW is 0.1.8. The upcoming release 1.0.0 of Torrus
+will introduce some significant changes and design improvements.
 
 The directory structure of Torrus is more standards-compliant, and more
 convenient for system adminisrators. The user files are strictly separated
@@ -74,7 +74,7 @@ execute
 
 
 
-=head2 Perl configuration files
+=head2 The Perl configuration files
 
 Te distribution contains a short Shell script called
 C<TORRUS_DISTR/setup_tools/replace_rrfw.sh>. This script takes one file name
@@ -116,7 +116,7 @@ After copying XML files, compile them in Torrus:
 
 =head2 Monitor actions
 
-In case if you utilize the monitor daemon, you will most probably need
+If you utilize the monitor daemon, you will most probably need
 to change the action statements.
 
 In the action of type C<exec>, the C<command> parameter should be edited.

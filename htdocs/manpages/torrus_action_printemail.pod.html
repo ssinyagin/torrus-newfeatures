@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>action_printemail - A script for sending email from monitor action.</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#files">FILES</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>action_printemail - A script for sending email from monitor action.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ &lt;action name=&quot;report-email&quot;&gt;
+   &lt;param name=&quot;action-type&quot; value=&quot;exec&quot; /&gt;
+   &lt;param name=&quot;command&quot;&gt;
+     $Torrus_BIN/action_printemail | mail alarms@example.com
+   &lt;/param&gt;
+   &lt;param name=&quot;launch-when&quot; value=&quot;set, clear&quot; /&gt;
+ &lt;/action&gt;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This program is designed for usage from a monitor action only. It takes
+the arguments from environment variables, as described in action-type
+<code>exec</code> in <strong>Torrus XML Configuration Guide</strong>. In addition, some values
+may be supplied via command-line arguments (see section OPTIONS below).</p>
+<p>Site-specific variables must be specified in the file <em>email-siteconfig.pl</em>. 
+Default values are installed by the first run of <code>make install</code>. Subsequent 
+runs of <code>make install</code> do not override this file.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2durl_3dgrapher_2durl"><strong>--url</strong>=<em>GRAPHER-URL</em></a></strong><br />
+</dt>
+<dd>
+Sets the URL of the grapher CGI script.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dtemplate_3dtemplate_2dfile"><strong>--template</strong>=<em>TEMPLATE-FILE</em></a></strong><br />
+</dt>
+<dd>
+Uses given file as a template. The template file must reside in /usr/local/torrus/templates 
+directory. It must be a Template-toolkit file, with the following variables 
+defined:
+</dd>
+<dd>
+<pre>
+ tree       Tree name
+ token      Leaf token
+ path       Leaf path
+ url        URL for browsing this leaf
+ ncomment   This leaf comment
+ npcomment  Leaf's parent comment
+ event      Event type
+ monitor    Monitor name
+ mcomment   Monitor comment
+ timestamp  Time and date of the event
+ env(VAR)   Environment variable VAR</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="files">FILES</a></h1>
+<dl>
+<dt><strong><a name="item__40perlcfgdir_40_2femail_2dsiteconfig_2epl"><em>@perlcfgdir@/email-siteconfig.pl</em></a></strong><br />
+</dt>
+<dd>
+Torrus site email configuration script.
+</dd>
+<p></p>
+<dt><strong><a name="item__2fusr_2flocal_2ftorrus_2ftemplates"><em>/usr/local/torrus/templates</em></a></strong><br />
+</dt>
+<dd>
+Torrus template directory.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

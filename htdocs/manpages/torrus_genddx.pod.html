@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>genddx - Generates SNMP discovery instructions file for 
+devdiscover.</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#files">FILES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>genddx - Generates SNMP discovery instructions file for 
+devdiscover.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>genddx</strong> --host=<em>HOSTNAME</em> | --hostfile=<em>HOSTFILENAME</em> \
+[<em>options...</em>]</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><strong>genddx</strong> generates the SNMP discovery instructions file, which may
+be later used as input for the <strong>devdiscover</strong> utility to produce the 
+corresponding Torrus XML configuration file. The <code>hostname(s)</code> of <code>router(s)</code> to
+be included in SNMP discovery must be specified either using the 
+<strong>--host</strong> (for a single router) or <strong>--hostfile</strong> option.  In the latter
+case the file <em>HOSTFILENAME</em> must contain a space-separated list of router 
+hostnames. Hostnames may have the form <code>host:devname</code> where <code>devname</code> is
+a symbolic device name.</p>
+<p>This utility is designed to be used only once, in order to generate
+the discovery XML canvas, for futher manual editing. It generates only
+basic set of parameters, and there are much more of those that you may
+use to customize the discovery process.</p>
+<p>More information is available in <strong>Torrus SNMP Discovery User Guide</strong>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dout_3doutfilename"><strong>--out</strong>=<em>OUTFILENAME</em></a></strong><br />
+</dt>
+<dd>
+Sets the output file to <em>OUTFILENAME</em>. Default is <em>routers.ddx</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2ddiscout_3dfilename"><strong>--discout</strong>=<em>FILENAME</em></a></strong><br />
+</dt>
+<dd>
+Sets the discovery output file to <em>FILENAME</em>. This will be the filename of
+the Torrus XML configuration file once the output file of the <strong>genddx</strong>
+is processed by the <strong>devdiscover</strong> utility. Default value is
+<em>@xmldir@/routers.xml</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2ddomain_3ddomain"><strong>--domain</strong>=<em>DOMAIN</em></a></strong><br />
+</dt>
+<dd>
+Sets the DNS domain name to <em>DOMAIN</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dversion_3dsnmpversion"><strong>--version</strong>=<em>SNMPVERSION</em></a></strong><br />
+</dt>
+<dd>
+Sets discovery SNMP version to SNMPVERSION. Default value is <code>2c</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dcommunity_3dcommunity"><strong>--community</strong>=<em>COMMUNITY</em></a></strong><br />
+</dt>
+<dd>
+Sets discovery SNMP read community value to string <em>COMMUNITY</em>. Default 
+is <code>public</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dport_3dport"><strong>--port</strong>=<em>PORT</em></a></strong><br />
+</dt>
+<dd>
+Sets SNMP port to <em>PORT</em>. Default is 161.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dretries_3dnumretries"><strong>--retries</strong>=<em>NUMRETRIES</em></a></strong><br />
+</dt>
+<dd>
+Sets number of retries to <em>NUMRETRIES</em>. Default value is 2.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dtimeout_3dtimeout"><strong>--timeout</strong>=<em>TIMEOUT</em></a></strong><br />
+</dt>
+<dd>
+Sets SNMP timeout to <em>TIMEOUT</em> seconds. Default value is 10.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dsubtree_3dsubtree"><strong>--subtree</strong>=<em>SUBTREE</em></a></strong><br />
+</dt>
+<dd>
+Sets the subtree name to <em>SUBTREE</em>. Default is <code>/Routers</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2ddatadir_3ddatadir"><strong>--datadir</strong>=<em>DATADIR</em></a></strong><br />
+</dt>
+<dd>
+Sets the path of the directory where SNMP data is collected to <em>DATADIR</em>.
+Default value is <em>/var/snmpcollector</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dholtwinters"><strong>--holtwinters</strong></a></strong><br />
+</dt>
+<dd>
+Enables Holt-Winters analysis.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="files">FILES</a></h1>
+<dl>
+<dt><strong><a name="item_routers_2eddx"><em>routers.ddx</em></a></strong><br />
+</dt>
+<dd>
+Default output file of genddx.
+</dd>
+<p></p>
+<dt><strong><a name="item__40xmldir_40_2frouters_2exml"><em>@xmldir@/routers.xml</em></a></strong><br />
+</dt>
+<dd>
+Default Torrus XML configuration file which will be written once the 
+genddx output file is processed with devdiscover utility.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><strong>devdiscover</strong>(1)</p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

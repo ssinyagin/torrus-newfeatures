@@ -18,8 +18,9 @@
 
 		<li><a href="#introduction">Introduction</a></li>
 		<li><a href="#software_installation">Software installation</a></li>
-		<li><a href="#perl_configuration_files">Perl configuration files</a></li>
+		<li><a href="#the_perl_configuration_files">The Perl configuration files</a></li>
 		<li><a href="#xml_configuration_files">XML configuration files</a></li>
+		<li><a href="#monitor_actions">Monitor actions</a></li>
 		<li><a href="#snmp_discovery_files">SNMP discovery files</a></li>
 		<li><a href="#web_interface_acls">Web interface ACLs</a></li>
 		<li><a href="#sitespecific_text_templates">Site-specific text templates</a></li>
@@ -27,6 +28,7 @@
 		<li><a href="#stop_rrfw_collector_and_monitor_processes">Stop RRFW collector and monitor processes</a></li>
 		<li><a href="#change_the_rrd_files_ownership">Change the RRD files ownership</a></li>
 		<li><a href="#test_and_run_processes">Test and run processes</a></li>
+		<li><a href="#update_documentation">Update documentation</a></li>
 	</ul>
 
 	<li><a href="#author">Author</a></li>
@@ -41,9 +43,9 @@
 </p>
 <h2><a name="introduction">Introduction</a></h2>
 <p>Torrus is the new marketing name for RRFW (Round-robin Database Framework),
-a robust and flexible software data series processing. The last release
-of RRFW is 0.1.8. The upcoming release 1.0.0 of Torrus will introduce
-some significant changes and design improvements.</p>
+a robust and flexible software package for data series processing.
+The last release of RRFW is 0.1.8. The upcoming release 1.0.0 of Torrus
+will introduce some significant changes and design improvements.</p>
 <p>The directory structure of Torrus is more standards-compliant, and more
 convenient for system adminisrators. The user files are strictly separated
 from the distribution files. The XML configurations and HTML templates
@@ -79,7 +81,7 @@ execute</p>
   torrus install_plugin &lt;UNPACKED_PLUGIN_DIR&gt;</pre>
 <p>
 </p>
-<h2><a name="perl_configuration_files">Perl configuration files</a></h2>
+<h2><a name="the_perl_configuration_files">The Perl configuration files</a></h2>
 <p>Te distribution contains a short Shell script called
 <code>TORRUS_DISTR/setup_tools/replace_rrfw.sh</code>. This script takes one file name
 as an argument, replaces all occurrences of <em>RRFW</em> to <em>Torrus</em> and <em>rrfw</em>
@@ -109,6 +111,15 @@ distribution supplied files:</p>
 <p>After copying XML files, compile them in Torrus:</p>
 <pre>
   torrus compilexml --all --verbose</pre>
+<p>
+</p>
+<h2><a name="monitor_actions">Monitor actions</a></h2>
+<p>If you utilize the monitor daemon, you will most probably need
+to change the action statements.</p>
+<p>In the action of type <code>exec</code>, the <code>command</code> parameter should be edited.
+RRFW was usually referencing the email notification command as
+<em>$RRFW_HOME/bin/action_printemail</em>. In Torrus, this command should be
+referred as <em>$TORRUS_BIN/action_printemail</em>.</p>
 <p>
 </p>
 <h2><a name="snmp_discovery_files">SNMP discovery files</a></h2>
@@ -170,6 +181,12 @@ Sun Solaris:</p>
   ln -s S90torrus ../init.d/torrus
   cd /etc/rc0.d
   ln -s K90torrus ../init.d/torrus</pre>
+<p>Run the startup script and verify that RRD files get updated.</p>
+<p>
+</p>
+<h2><a name="update_documentation">Update documentation</a></h2>
+<p>Update your site operational manuals to reflect the new software name,
+paths and URLs.</p>
 <p>
 </p>
 <hr />

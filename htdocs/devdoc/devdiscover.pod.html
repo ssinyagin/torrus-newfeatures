@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>RRFW SNMP Device Discovery Developer's Guide</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#rrfw_snmp_device_discovery_developer_s_guide">RRFW SNMP Device Discovery Developer's Guide</a></li>
+	<ul>
+
+		<li><a href="#devdiscover_overview"><code>devdiscover</code> overview</a></li>
+		<li><a href="#discovery_module_internals">Discovery Module Internals</a></li>
+		<ul>
+
+			<li><a href="#module_registration">Module Registration</a></li>
+			<li><a href="#oid_definitions">OID Definitions</a></li>
+			<li><a href="#template_references">Template References</a></li>
+			<li><a href="#interface_filtering">Interface filtering</a></li>
+		</ul>
+
+		<li><a href="#authors">Authors</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="rrfw_snmp_device_discovery_developer_s_guide">RRFW SNMP Device Discovery Developer's Guide</a></h1>
+<p>
+</p>
+<h2><a name="devdiscover_overview"><code>devdiscover</code> overview</a></h2>
+<p><code>devdiscover</code> is an extensible, module based, SNMP device discovery
+utility. It is intended to automatically generate RRFW configuration
+files, based on SNMP discovery results and templates.</p>
+<p>See <em>RRFW Command Reference</em> for command usage and functionality overview.</p>
+<p>In general, <code>devdiscover</code> consists of the following files and functional
+parts:</p>
+<ul>
+<li><strong><a name="item_bin_2fdevdiscover_2ein"><code>bin/devdiscover.in</code></a></strong><br />
+</li>
+This file is installed as <code>bin/devdiscover</code> in RRFW installation directory,
+with certain variables substituted. The program provides all the commandline
+functionality and options processing. Once the CLI options are processed and
+verified, the control is passed to an <a href="#item_rrfw_3a_3adevdiscover"><code>RRFW::DevDiscover</code></a> object.
+<p></p>
+<li><strong><a name="item_rrfw_3a_3adevdiscover"><code>RRFW::DevDiscover</code></a></strong><br />
+</li>
+This Perl module is responsible for the SNMP discovery process organization:
+<ul>
+<li></li>
+registers the discovery modules;
+<p></p>
+<li></li>
+establishes an SNMP session to the target host;
+<p></p>
+<li></li>
+initiates a new <a href="#item_rrfw_3a_3adevdiscover_3a_3adevdetails"><code>RRFW::DevDiscover::DevDetails</code></a> object for the target host;
+<p></p>
+<li></li>
+stores the connection-specific parameters to the device object;
+<p></p>
+<li></li>
+for each registered discovery module, executes <a href="#item_checkdevtype"><code>checkdevtype()</code></a> in
+<em>sequential</em> order;
+<p></p>
+<li></li>
+for those discovery modules which paid interest in this target host,
+executes <a href="#item_discover"><code>discover()</code></a> in <em>sequential</em> order;
+<p></p>
+<li></li>
+upon request from <code>bin/devdiscover</code>, builds the configuration
+XML tree, by calling <a href="#item_buildconfig"><code>buildConfig()</code></a> in <em>sequential</em> order for each
+relevant discovery module for each target host.
+<p></p></ul>
+<li><strong><a name="item_rrfw_3a_3adevdiscover_3a_3adevdetails"><code>RRFW::DevDiscover::DevDetails</code></a></strong><br />
+</li>
+This Perl module is defined in <em>lib/RRFW/DevDiscover.pm</em>, and provides
+the functionality to store the results of SNMP device discovery.
+<p></p>
+<li><strong><a name="item_rrfw_3a_3aconfigbuilder"><code>RRFW::ConfigBuilder</code></a></strong><br />
+</li>
+This module is an encapsulation wrapper for XML configuration builder.
+It provides methods for every element of RRFW configuration.
+<p></p>
+<li><strong><a name="item_discovery_modules">Discovery Modules</a></strong><br />
+</li>
+These provide all the functionality for SNMP discovery. Normally
+one module covers one MIB, or sometimes several vendor-specific MIBs,
+and it is responsible for finding out the device details necessary
+for RRFW configuration building. Usually a discovery module refers to one or
+several <em>template definition files</em>. A module may depend on
+other modules' discovery results. This is controlled by its
+<code>sequence number</code>. Vendor-independent discovery modules are normally named
+as <code>RRFW::DevDiscover::RFCXXXX_SOME_HUMAN_NAME</code>, and vendor-specific
+ones are named as <code>RRFW::DevDiscover::VendorProduct[Subsystem]</code>.
+<p></p>
+<li><strong><a name="item_template_definition_files">Template definition files</a></strong><br />
+</li>
+These are XML documents residing in <em>xmlconfig/vendor</em> and
+<em>xmlconfig/generic</em> directories. Each file is a piece of RRFW configuration,
+and contains definitions and templates for particular MIB or vendor.
+Generic template definition files are for vendor-independent MIBs,
+and normally they are named as <em>rfcXXXX.some-human-name.xml</em>.
+Vendor-specific files are named as <em>vendor.product[.subsystem].xml</em>.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="discovery_module_internals">Discovery Module Internals</a></h2>
+<p>Discovery modules are Perl packages with few required components.
+Before creating your own modules, please read and follow
+<em>RRFW Programming Style Guide</em>.</p>
+<p>Upon initialization, <a href="#item_rrfw_3a_3adevdiscover"><code>RRFW::DevDiscover</code></a> loads the modules listed in
+<code>@RRFW::DevDiscover::loadModules</code> array. This array is pre-populated
+by standard module names in <em>/share/rrfw/devdiscover-config.pl</em>.
+You can add new module names by pushing them onto this array in your
+local <em>/share/rrfw/devdiscover-siteconfig.pl</em>.</p>
+<p>
+</p>
+<h3><a name="module_registration">Module Registration</a></h3>
+<p>Each discovery module should register itself in DevDiscover registry.
+Normally there's only one registry entry per discovery module, though
+it's not a limitation. The registry entry is identified by a registry
+name, which normally repeats the module name.</p>
+<p>Example:</p>
+<pre>
+    $RRFW::DevDiscover::registry{'RFC2790_HOST_RESOURCES'} = {
+        'sequence'     =&gt; 100,
+        'checkdevtype' =&gt; \&amp;checkdevtype,
+        'discover'     =&gt; \&amp;discover,
+        'buildConfig'  =&gt; \&amp;buildConfig
+        };</pre>
+<p>Each registry entry must contain 4 fields:</p>
+<ul>
+<li><strong><a name="item_sequence"><code>sequence</code></a></strong><br />
+</li>
+The sequence number determines the order in which every discovery module's
+procedure is executed. Sequence numbers of dependant modules must
+be higher than those of their dependencies.
+<p>Generic MIB discovery modules should have the sequence number 100. If
+a particular generic module depends on other generic modules, its sequence
+number may be 110.</p>
+<p>Vendor-specific modules should have the sequence number 500.
+Vendor-specific modules that depend on other vendor-specific modules,
+should have sequence number 510.</p>
+<p>Dependencies deeper than one level may exist, but it's recommended
+to avoid them. For most cases this should be enough.</p>
+<p>Exceptional is <code>RFC2863_IF_MIB</code> module, which has the sequence number 10.
+That is because it provides the basic interface discovery,
+and many other modules depend on its results.</p>
+<p></p>
+<li><strong><a name="item_checkdevtype"><code>checkdevtype</code></a></strong><br />
+</li>
+Must be a subroutine reference. This subroutine is called with two
+arguments: <a href="#item_rrfw_3a_3adevdiscover"><code>RRFW::DevDiscover</code></a> and <a href="#item_rrfw_3a_3adevdiscover_3a_3adevdetails"><code>RRFW::DevDiscover::DevDetails</code></a>.
+The purpose of this subroutine is to determine if the target host is
+of required type, or supports the required MIB.
+The subroutine should return true if and only if the target host
+supports the MIB variables this module is supposed to discover.
+<p>In general, <a href="#item_checkdevtype"><code>checkdevtype</code></a> subroutine is small, and checks one or several
+OIDs presence on the host, or their values, e.g. the value of <em>sysObjectID</em>
+variable. The <code>RFC2863_IF_MIB</code> module is an exception, because it tries
+to deliver the host interfaces information to the dependant modules
+as early as possible.</p>
+<p></p>
+<li><strong><a name="item_discover"><code>discover</code></a></strong><br />
+</li>
+Must be a subroutine reference. This subroutine is called with the same
+two arguments as <a href="#item_checkdevtype"><code>checkdevtype()</code></a>. It is called for those modules only,
+whose <a href="#item_checkdevtype"><code>checkdevtype()</code></a> returned true. The subroutine should return true
+if no errors occured during the discovery.
+<p>The purpose of <a href="#item_discover"><code>discover()</code></a> is to perform the actual SNMP discovery,
+and prepare the parameter values for future XML configuration.</p>
+<p></p>
+<li><strong><a name="item_buildconfig"><code>buildConfig</code></a></strong><br />
+</li>
+Must be a subroutine reference. This subroutine is called with three object
+references as arguments: <a href="#item_rrfw_3a_3adevdiscover_3a_3adevdetails"><code>RRFW::DevDiscover::DevDetails</code></a>,
+<a href="#item_rrfw_3a_3aconfigbuilder"><code>RRFW::ConfigBuilder</code></a>, and an XML element object, which should be used only
+to pass data to ConfigBuilder methods.
+<p>This subroutine is designed to construct the resulting XML configuration
+subtree as a child of a given XML element. Upper level subtrees
+are handled by CLI options processing code.</p>
+<p></p></ul>
+<p>
+</p>
+<h3><a name="oid_definitions">OID Definitions</a></h3>
+<p>OID definitions are designed to provide symbolic names to OIDs
+in numerical notation. Normally the symbolic names repeat the names from
+corresponding MIBs.</p>
+<p>The definitions must be defined in an <code>oiddef</code> hash defined in the
+package namespace. Then they are automatically imported by DevDiscover
+initialization procerure.</p>
+<p>Example:</p>
+<pre>
+    our %oiddef =
+        (
+         'hrSystemUptime'               =&gt; '1.3.6.1.2.1.25.1.1.0',
+         'hrSystemNumUsers'             =&gt; '1.3.6.1.2.1.25.1.5.0',
+         'hrSystemProcesses'            =&gt; '1.3.6.1.2.1.25.1.6.0',
+         'hrSystemMaxProcesses'         =&gt; '1.3.6.1.2.1.25.1.7.0',
+         'hrMemorySize'                 =&gt; '1.3.6.1.2.1.25.2.2.0',
+         'hrStorageTable'               =&gt; '1.3.6.1.2.1.25.2.3.1',
+         'hrStorageIndex'               =&gt; '1.3.6.1.2.1.25.2.3.1.1',
+         'hrStorageType'                =&gt; '1.3.6.1.2.1.25.2.3.1.2',
+         'hrStorageDescr'               =&gt; '1.3.6.1.2.1.25.2.3.1.3',
+         'hrStorageAllocationUnits'     =&gt; '1.3.6.1.2.1.25.2.3.1.4',
+         'hrStorageSize'                =&gt; '1.3.6.1.2.1.25.2.3.1.5',
+         'hrStorageUsed'                =&gt; '1.3.6.1.2.1.25.2.3.1.6',
+         'hrStorageAllocationFailures'  =&gt; '1.3.6.1.2.1.25.2.3.1.7'
+         );</pre>
+<p>
+</p>
+<h3><a name="template_references">Template References</a></h3>
+<p>Normally a discovery module would refer to configuration templates
+defined in template definition files. In order to provide an extra level of
+flexibility, these templates should be defined in
+<em>/share/rrfw/devdiscover-config.pl</em> or in
+<em>/share/rrfw/devdiscover-siteconfig.pl</em>.</p>
+<p>It is recommended that the template references in the discovery modules
+follow the naming standard: <code>module::template-name</code>.</p>
+<p>ConfigBuilder's <code>addTemplateApplication()</code> method looks up every
+template name in the global hash <code>%RRFW::ConfigBuilder::templateRegistry</code>
+and figures out the source XML file and the actual template name.</p>
+<p>Example:</p>
+<pre>
+    $RRFW::ConfigBuilder::templateRegistry{
+        'RFC2790_HOST_RESOURCES::hr-system-uptime'} = {
+            'name'   =&gt; 'mytest-hr-system-uptime',
+            'source' =&gt; 'mytest.templates.xml'
+            };</pre>
+<p>
+</p>
+<h3><a name="interface_filtering">Interface filtering</a></h3>
+<p>Usually not all interfaces from ifTable need to be monitored.
+For example, Loopback and Null0 interfaces on Cisco routers.</p>
+<p><code>RRFW::DevDiscover::RFC2863_IF_MIB</code> provides the functionality to
+automatically filter out the interfaces, based on filter definitions.
+Filter definitions are registered by calling the subroutine
+<code>RRFW::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+($devdetails, $interfaceFilter)</code>. The second argument is a reference
+to a hash of the following structure:</p>
+<p>Keys are symbolic names that mean nothing and need only to be unique.
+Values are hash references with the following entries: <code>ifType</code>
+specifies the IANA interface type, and optional <code>ifDescr</code> specifies
+a regular expression to match against interface description.</p>
+<p>The filters are usually registered within <a href="#item_checkdevtype"><code>checkdevtype</code></a> subroutine
+of the vendor module, after the device type is identified. See
+<em>CiscoIOS.pm</em> and <em>CiscoCatOS.pm</em> as examples.</p>
+<p>
+</p>
+<h2><a name="authors">Authors</a></h2>
+<p>Shawn Ferry: initial draft.</p>
+<p>Stanislav Sinyagin: revision and detailed content.</p>
+
+</body>
+
+</html>

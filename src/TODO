@@ -2,8 +2,6 @@ Round Robin Database Framework
   
 To do now:
 
--- Install Wiki at torrus.org
-
 -- Document ./setup_tools/configure_fhs
 -- Change the implementation of hrule-legend-X view parameter
 -- Tokenset members sorting

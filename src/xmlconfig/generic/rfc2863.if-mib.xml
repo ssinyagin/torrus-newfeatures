@@ -64,6 +64,7 @@
   <!-- Some parameters need to be at host level -->
   <template name="rfc2863-ifmib-hostlevel">
     <param name="ifindex-map" value="M(%ifindex-table%, %interface-name%)"/>
+    <param name="ifindex-table" value="$ifDescr" />
   </template>
 
   <!-- Parameters for interfaces parent subtree -->

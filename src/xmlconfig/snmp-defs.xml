@@ -72,9 +72,6 @@
     <!-- Number of SNMP OIDs per one UDP packet -->
     <param name="snmp-oids-per-pdu" value="40" />
 
-    <!-- Where the interface index is looked up -->
-    <param name="ifindex-table" value="$ifDescr" />
-
     <!-- RRD Parameters -->
 
     <!-- Round-robin arrays to be created, separated by space.

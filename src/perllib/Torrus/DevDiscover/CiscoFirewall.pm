@@ -52,7 +52,7 @@ sub checkdevtype
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    if( $devdetails->{'devtype'}{'CiscoGeneric'} )
+    if( $devdetails->isDevType('CiscoGeneric') )
     {
         my $CiscoFirewall =
             $session->get_table( -baseoid =>

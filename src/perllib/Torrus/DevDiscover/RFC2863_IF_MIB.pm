@@ -115,6 +115,8 @@ sub discover
 
     $data->{'param'}{'has-inout-leaves'} = 'yes';
 
+    ## Set default interface index mapping
+    
     $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
     $data->{'nameref'}{'ifHumanName'}   = 'ifDescr';
 
@@ -132,6 +134,53 @@ sub discover
         $data->{'nameref'}{'ifComment'} = 'ifAlias';
     }
 
+    ## Process hints on interface indexing
+    ## The capability 'interfaceIndexingManaged' disables the hints
+    ## and lets the vendor discovery module to operate the indexing
+    
+    if( not $devdetails->hasCap('interfaceIndexingManaged') )
+    {
+        my $hint =
+            $devdetails->param('RFC2863_IF_MIB::ifindex-map-hint');
+        if( defined( $hint ) )
+        {
+            if( $hint eq 'ifName' )
+            {
+                $data->{'nameref'}{'ifHumanName'} = 'ifName';
+                $data->{'param'}{'ifindex-table'} = '$ifName';
+            }
+            elsif( $hint eq 'ifPhysAddress' )
+            {
+                $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
+                retrieveMacAddresses( $dd, $devdetails );
+            }
+            elsif( $hint eq 'ifIndex' )
+            {
+                $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
+            }
+            else
+            {
+                Error('Unknown value of RFC2863_IF_MIB::ifindex-map-hint: ' .
+                      $hint);
+            }
+        }
+
+        $hint =
+            $devdetails->param('RFC2863_IF_MIB::subtree-name-hint');
+        if( defined( $hint ) )
+        {
+            if( $hint eq 'ifName' )
+            {
+                $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+            }
+            else
+            {
+                Error('Unknown value of RFC2863_IF_MIB::subtree-name-hint: ' .
+                      $hint);
+            }
+        }
+    }
+    
     # Pre-populate the interfaces table, so that other modules may
     # delete unneeded interfaces
     foreach my $ifIndex

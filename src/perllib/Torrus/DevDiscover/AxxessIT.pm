@@ -64,27 +64,6 @@ our %oiddef =
      'axxEdgeDcnManagementPortIfIndex' => '1.3.6.1.4.1.7546.1.4.1.2.3.2.2.0',
      );
 
-# Not all interfaces are normally needed to monitor.
-# You may override the interface filtering in devdiscover-siteconfig.pl:
-# redefine $Torrus::DevDiscover::AxxessIT::interfaceFilter
-# or define $Torrus::DevDiscover::AxxessIT::interfaceFilterOverlay
-
-our $interfaceFilter;
-our $interfaceFilterOverlay;
-my %axxInterfaceFilter;
-
-if( not defined( $interfaceFilter ) )
-{
-    $interfaceFilter = \%axxInterfaceFilter;
-}
-
-
-# Key is some unique symbolic name, does not mean anything
-# ifType is the number to match the interface type
-# ifDescr is the regexp to match the interface description
-%axxInterfaceFilter =
-    (
-     );
 
 sub checkdevtype
 {
@@ -100,15 +79,6 @@ sub checkdevtype
 
     # Leave room for AXX155 devices, maybe someone needs them in the future
     $devdetails->setCap('axxEdge');
-        
-    &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
-        ($devdetails, $interfaceFilter);
-
-    if( defined( $interfaceFilterOverlay ) )
-    {
-        &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
-            ($devdetails, $interfaceFilterOverlay);
-    }
 
     my $data = $devdetails->data();
 

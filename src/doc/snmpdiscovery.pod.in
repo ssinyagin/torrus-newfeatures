@@ -390,7 +390,25 @@ the discovery configuration file. Example:
     <param name="RFC2863_IF_MIB::intf-error-threshold::2_1" value="900"/>
   </host>
 
+=item * C<RFC2863_IF_MIB::ifindex-map-hint>
 
+Optional. For a device that doesn't have a corresponding vendor-specific
+discovery module, this parameter would advice C<devdiscover> how to build
+C<ifTable> index mapping. By default, the interfaces are mapped by
+C<ifDescr> variables. For many vendors, this would not give reliable
+mapping. Valid values are: C<ifName>, C<ifPhysAddress>, and C<ifIndex>.
+The first two suggest the mapping by corresponding SNMP variables, and
+the third one should be used for devices with fixed C<ifIndex> layout: in
+this case, the C<ifIndex> values are recorded as they are at the moment of
+discovery. This option is ignored if the device is supported by a vendor
+specific discovery module.
+
+=item * C<RFC2863_IF_MIB::subtree-name-hint>
+
+Optional. By default, per-interface subtrees are named after the values of
+C<ifDescr> SNMP variables. If this option is set to C<ifName>, this
+SNMP variable would be used for subtree naming. This option is ignored if
+the device is supported by a vendor specific discovery module.
 
 =back
 

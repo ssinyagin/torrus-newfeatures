@@ -83,6 +83,8 @@ sub checkdevtype
 
     $data->{'nameref'}{'ifComment'} = 'ifDescr';
 
+    $devdetails->setCap('interfaceIndexingManaged');
+
     if( not defined( $data->{'param'}{'snmp-oids-per-pdu'} ) )
     {
         $data->{'param'}{'snmp-oids-per-pdu'} = '10';

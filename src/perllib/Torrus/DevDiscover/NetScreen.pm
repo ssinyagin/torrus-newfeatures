@@ -55,6 +55,8 @@ sub checkdevtype
     my $data = $devdetails->data();
     $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
     $data->{'nameref'}{'ifDescr'} = '';
+
+    $devdetails->setCap('interfaceIndexingManaged');
     
     return 1;
 }

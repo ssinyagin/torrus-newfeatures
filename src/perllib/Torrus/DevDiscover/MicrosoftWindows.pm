@@ -103,6 +103,8 @@ sub checkdevtype
             ($devdetails, $interfaceFilterOverlay);
     }
 
+    $devdetails->setCap('interfaceIndexingManaged');
+    
     return 1;
 }
 

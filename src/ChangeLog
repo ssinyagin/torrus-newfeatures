@@ -1,5 +1,13 @@
 2005-03-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):
+	New device capability: 'interfaceIndexingManaged'.
+	New DDX parameters: 'RFC2863_IF_MIB::ifindex-map-hint'
+	and 'RFC2863_IF_MIB::subtree-name-hint'.
+
+	* xmlconfig/generic/rfc2863.if-mib.xml: Moved "ifindex-table"
+	definition from snmp-defs to IF-MIB host template
+
 	* perllib/Torrus/DevDiscover.pm (discover):
 	In the legend, replace ':' with '=' and ';' with ','
 

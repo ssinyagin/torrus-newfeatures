@@ -112,6 +112,8 @@ sub checkdevtype
     $data->{'nameref'}{'ifComment'}     = 'xylanInterfaceComment';
     $data->{'nameref'}{'ifHumanName'}   = 'xylanInterfaceHumanName';
 
+    $devdetails->setCap('interfaceIndexingManaged');
+
     return 1;
 }
 

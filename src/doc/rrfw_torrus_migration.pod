@@ -103,10 +103,14 @@ do not occur in F</usr/local/torrus/xmlconfig>, the default path for
 distribution supplied files:
 
   cd /usr/local/rrfw-0.1/share/rrfw/xmlconfig/
+
   find . -name '*.xml' -exec test ! -f /usr/local/torrus/xmlconfig/'{}' ';' \
     -print | cpio --create --file=/tmp/allxml.cpio
+
   cd /usr/local/etc/torrus/xmlconfig/
-  cpio --extract --file=/tmp/allxml.cpio
+
+  cpio --extract --make-directories --preserve-modification-time \
+    --file=/tmp/allxml.cpio
 
 After copying XML files, compile them in Torrus:
 

@@ -84,6 +84,8 @@
       <param name="precedence"          value="1000" />
 
       <param name="monitor"             value="docsis-snr-lower-20db" />
+      <param name="monitor-period"      value="900" />
+      <param name="monitor-timeoffset"  value="0" />
       <param name="tokenset-member"     value="docsis-snr" />
     </leaf>
 

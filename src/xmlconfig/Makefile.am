@@ -33,6 +33,7 @@ dist_vendor_DATA = \
 	vendor/cisco.firewall.xml \
 	vendor/cisco.generic.xml \
 	vendor/cisco.ios.xml \
+	vendor/cisco.ios.docsis.xml \
 	vendor/cisco.ios.mac-accounting.xml \
 	vendor/compaq.cim.xml \
 	vendor/empire.systemedge.xml \

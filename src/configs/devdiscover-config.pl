@@ -43,6 +43,7 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
      'Torrus::DevDiscover::CiscoFirewall',
      'Torrus::DevDiscover::CiscoGeneric',
      'Torrus::DevDiscover::CiscoIOS',
+     'Torrus::DevDiscover::CiscoIOS_Docsis',
      'Torrus::DevDiscover::CiscoIOS_SAA',
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::EmpireSystemedge',
@@ -246,6 +247,22 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
      'CiscoIOS::cisco-ipsec-flow-globals' => {
          'name'   => 'cisco-ipsec-flow-globals',
          'source' => 'vendor/cisco.ios.xml'
+         },
+     'CiscoIOS_Docsis::cisco-docsis-util-mac-subtree' => {
+         'name'   => 'cisco-docsis-util-mac-subtree',
+         'source' => 'vendor/cisco.ios.docsis.xml'
+         },
+     'CiscoIOS_Docsis::cisco-docsis-util-mac-intf' => {
+         'name'   => 'cisco-docsis-util-mac-intf',
+         'source' => 'vendor/cisco.ios.docsis.xml'
+         },
+     'CiscoIOS_Docsis::cisco-docsis-util-up-subtree' => {
+         'name'   => 'cisco-docsis-util-up-subtree',
+         'source' => 'vendor/cisco.ios.docsis.xml'
+         },
+     'CiscoIOS_Docsis::cisco-docsis-util-up-intf' => {
+         'name'   => 'cisco-docsis-util-up-intf',
+         'source' => 'vendor/cisco.ios.docsis.xml'
          },
      'CiscoIOS_SAA::cisco-saa-subtree' => {
          'name'   => 'cisco-saa-subtree',

@@ -57,6 +57,7 @@ devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
     -e "s,\@sitedir\@,@sitedir@,g" \
     -e "s,\@sitexmldir\@,@sitexmldir@,g" \
     -e "s,\@tmpldir\@,@tmpldir@,g" \
+    -e "s,\@tmpluserdir\@,@tmpluserdir@,g" \
     -e "s,\@styldir\@,$styldir,g" \
     -e "s,\@dbhome\@,@dbhome@,g" \
     -e "s,\@cachedir\@,@cachedir@,g" \

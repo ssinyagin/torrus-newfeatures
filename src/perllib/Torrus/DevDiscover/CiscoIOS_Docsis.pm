@@ -18,9 +18,6 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # DOCSIS interface, Cisco specific
-# MIB used:
-# CISCO-DOCS-EXT-MIB:cdxCmtsMacExtTable
-# CISCO-DOCS-EXT-MIB:cdxIfUpstreamChannelExtTable
 
 package Torrus::DevDiscover::CiscoIOS_Docsis;
 
@@ -73,7 +70,8 @@ sub buildConfig
     # Build Docsis_Utilization subtree
 
     my $utilNode =
-        $cb->addSubtree( $devNode, 'Docsis_Utilization', {}, [] );
+        $cb->addSubtree( $devNode, 'Docsis_Utilization',
+                         {'precedence' => '-600'}, [] );
 
     my $macNode =
         $cb->addSubtree( $utilNode, 'MAC_Layer', {},

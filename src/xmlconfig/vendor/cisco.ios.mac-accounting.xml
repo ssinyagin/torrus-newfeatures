@@ -86,7 +86,7 @@
       <param name="graph-legend"     value="Bits out" />
     </leaf>
 
-    <leaf name="InOutBps">
+    <leaf name="InOut_bps">
       <param name="comment" value="Input and Output bits per second graphs" />
       <param name="rrd-hwpredict"    value="disabled" />
       <param name="precedence"       value="1000" />

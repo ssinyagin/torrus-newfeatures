@@ -166,19 +166,21 @@
       <param name="graph-upper-limit"   value="100" />
       <param name="upper-limit"         value="90" />
     </leaf>
-    
-    <leaf name="Active_UGS">
-      <param name="snmp-object"
-                value="$cdxIfUpChannelNumActiveUGS.%ifindex-map%"/>
-      <param name="rrd-ds"       value="ActiveUGS" />
-      <param name="comment"
-          value="the number of active Unsolicited Grant Services"/>
-      <param name="graph-legend" value="Active UGS" />
-      <param name="precedence"   value="600" />
-      <param name="rrd-create-dstype"   value="GAUGE" />
-      <param name="vertical-label"      value="UGS" />
-      <param name="graph-lower-limit"   value="0" />
-    </leaf>
+
+    <iftrue var="CiscoIOS_Docsis::ugs-supported">    
+      <leaf name="Active_UGS">
+        <param name="snmp-object"
+                  value="$cdxIfUpChannelNumActiveUGS.%ifindex-map%"/>
+        <param name="rrd-ds"       value="ActiveUGS" />
+        <param name="comment"
+            value="the number of active Unsolicited Grant Services"/>
+        <param name="graph-legend" value="Active UGS" />
+        <param name="precedence"   value="600" />
+        <param name="rrd-create-dstype"   value="GAUGE" />
+        <param name="vertical-label"      value="UGS" />
+        <param name="graph-lower-limit"   value="0" />
+      </leaf>
+    </iftrue>
   </template>
   
 </datasources>

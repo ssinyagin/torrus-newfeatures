@@ -34,6 +34,12 @@ $Torrus::DevDiscover::registry{'CiscoIOS_Docsis'} = {
     };
 
 
+our %oiddef =
+    (
+     # CISCO-DOCS-EXT-MIB:cdxIfUpstreamChannelExtTable
+     'cdxIfUpChannelNumActiveUGS' => '1.3.6.1.4.1.9.9.116.1.4.1.1.10'
+     );
+
 
 sub checkdevtype
 {
@@ -54,6 +60,11 @@ sub discover
 {
     my $dd = shift;
     my $devdetails = shift;
+
+    if( $dd->checkSnmpTable( 'cdxIfUpChannelNumActiveUGS' ) )
+    {
+        $devdetails->setCap('cdxIfUpChannelNumActiveUGS');
+    }
 
     return 1;
 }
@@ -98,6 +109,11 @@ sub buildConfig
         $cb->addSubtree( $utilNode, 'Upstream_Channels', {},
                          ['CiscoIOS_Docsis::cisco-docsis-util-up-subtree'] );
 
+    if( $devdetails->hasCap('cdxIfUpChannelNumActiveUGS') )
+    {
+        $cb->setVar( $upsNode, 'CiscoIOS_Docsis::ugs-supported', 'true' );
+    }
+    
     foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};

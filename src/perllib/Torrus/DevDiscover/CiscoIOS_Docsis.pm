@@ -12,7 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
@@ -72,10 +72,46 @@ sub buildConfig
 
     # Build Docsis_Utilization subtree
 
-    my $subtreeNode =
-        $cb->addSubtree( $devNode, 'Docsis_Utilization', {},
-                         ['CiscoIOS_Docsis::docsis-utilization-subtree'] );
-    
+    my $utilNode =
+        $cb->addSubtree( $devNode, 'Docsis_Utilization', {}, [] );
+
+    my $macNode =
+        $cb->addSubtree( $utilNode, 'MAC_Layer', {},
+                         ['CiscoIOS_Docsis::cisco-docsis-util-mac-subtree'] );
+
+    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        
+        my $param = {
+            'interface-name' => $interface->{'param'}{'interface-name'},
+            'interface-nick' => $interface->{'param'}{'interface-nick'},
+            'comment'        => $interface->{'param'}{'comment'}
+        };
+
+        $cb->addSubtree
+            ( $macNode, $interface->{$data->{'nameref'}{'ifSubtreeName'}},
+              $param, ['CiscoIOS_Docsis::cisco-docsis-util-mac-intf'] );
+    }
+
+    my $upsNode =
+        $cb->addSubtree( $utilNode, 'Upstream_Channels', {},
+                         ['CiscoIOS_Docsis::cisco-docsis-util-up-subtree'] );
+
+    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        
+        my $param = {
+            'interface-name' => $interface->{'param'}{'interface-name'},
+            'interface-nick' => $interface->{'param'}{'interface-nick'},
+            'comment'        => $interface->{'param'}{'comment'}
+        };
+
+        $cb->addSubtree
+            ( $upsNode, $interface->{$data->{'nameref'}{'ifSubtreeName'}},
+              $param, ['CiscoIOS_Docsis::cisco-docsis-util-up-intf'] );
+    }
 }
 
 

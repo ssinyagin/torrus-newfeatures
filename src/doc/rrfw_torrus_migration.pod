@@ -200,6 +200,15 @@ Sun Solaris:
   cd /etc/rc0.d
   ln -s K90torrus ../init.d/torrus
 
+Run the startup script and verify that RRD files get updated.
+
+
+
+=head2 Update documentation
+
+Update your site operational manuals to reflect the new software name,
+paths and URLs.
+
 
 
 =head1 Author

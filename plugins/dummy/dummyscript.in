@@ -1,0 +1,7 @@
+#!@PERL@
+
+BEGIN { require '@torrus_config_pl@'; }
+
+print "This is a dummy script\n";
+
+exit 1;

@@ -66,16 +66,8 @@ install-data-local:
 	$(mkvardir) $(DESTDIR)$(piddir)
 	$(mkvardir) $(DESTDIR)$(logdir)
 	$(mkvardir) $(DESTDIR)$(sesstordir)
-	$(mkvardir) $(DESTDIR)$(seslockdir)
-	if test ! -z "$(torrus_plugins)"; then \
-	  for plugdir in `echo $(torrus_plugins)`; do \
-	    echo "Installing plugin: $$plugdir"; \
-	    cd $$plugdir; \
-	    $(MAKE) install; \
-	    cd @abs_top_builddir@; \
-	  done; \
-	fi
-
+	$(mkvardir) $(DESTDIR)$(seslockdir)	
+	$(mkinstalldirs) $(DESTDIR)@tmpluserdir@
 
 HTMLDIR = @abs_top_builddir@/../htdocs
 

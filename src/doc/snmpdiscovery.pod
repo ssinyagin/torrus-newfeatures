@@ -27,22 +27,21 @@ In many (but not only) cases Torrus is used for SNMP monitoring.
 It provides powerful tools which automate the process of devices' MIB
 discovery.
 
-The discovery tools consist of two programs: C<devdiscover> performs
+The discovery tools consist of two programs: C<torrus devdiscover> performs
 the SNMP discovery, based on the discovery instructions XML file.
 The result of its work is a new Torrus datasource configuration file.
-Another utility, C<genddx>, is a program that generates the basic discovery
-instructions file based on a set of commandline options.
+Another utility, C<torrus genddx>, is a program that generates the
+basic discovery instructions file based on a set of commandline options.
 
 
-=head2 C<genddx>: Discovery instructions generator
+=head2 C<torrus genddx>: Discovery instructions generator
 
-  Usage: $Torrus_HOME/bin/genddx options...
+  Usage: torrus genddx options...
   Options:
      --host=hostname         router hostname
      --hostfile=filename     space-separated router hostnames file
      --out=outfile           output file.         [discover-routers.xml]
-     --discout=filename      discovery output file
-            [/usr/local/torrus-0.1/share/torrus/xmlconfig/routers.xml]
+     --discout=filename      discovery output file [routers.xml]
      --domain=domain         optional DNS domain name
      --version=v             SNMP version         [2c]
      --community=string      SNMP read community  [public]
@@ -50,7 +49,7 @@ instructions file based on a set of commandline options.
      --retries=number        SNMP retries         [2]
      --timeout=number        SNMP timeout         [10]
      --subtree=string        Subtree name         [/Routers]
-     --datadir=path          data-dir parameter   [/var/snmpcollector]
+     --datadir=path          data-dir parameter   [/srv/torrus/collector_rrd]
      --holtwinters           Enable Holt-Winters analysis
 
 This utility generates C<devdiscover> instructions XML file based on
@@ -59,7 +58,7 @@ Hostnames are apecified with one or many C<--host=hostname> options,
 or a plain text file with space-separated hostnames.
 
 Each host may have a symbolic name. This symbolic name is used as
-the host-level subtree name. Symbolic name follows the hostname with
+the host-level subtree name. The symbolic name follows the hostname with
 a semicolon.
 
 By default, the devices are placed into C</Routers/> subtree hierarchy.
@@ -73,7 +72,7 @@ You most probably will change this by using the C<--discout> option.
 
 Examples:
 
-  ./bin/genddx --out=ch-langenthal.ddx \
+  torrus genddx --out=ch-langenthal.ddx \
     --discout=ch-langenthal.xml \
     --host=192.168.34.35:Langenthal_PE1 \
     --host=192.168.34.36:Langenthal_PE2 \
@@ -81,13 +80,18 @@ Examples:
     --community=blahBlah \
     --subtree=/MPLS/CH/Bern/Langenthal
 
-  ./bin/devdiscover --in=ch-langenthal.ddx
+  torrus devdiscover --in=ch-langenthal.ddx
 
+C<genddx> is designed as a one-time utility. You may run it to create
+a typical discovery file with basic set of options. Then the discovery
+configuration XML woild be the primary source of information, and it should
+be maintained by manual editing, or by some other automated means.
 
+STOPPED HERE
 
-=head2 C<devdiscover>: SNMP discovery tool
+=head2 C<torrus devdiscover>: SNMP discovery tool
 
-  Usage: $Torrus_HOME/bin/devdiscover --in=filename.xml options...
+  Usage: torrus devdiscover --in=filename.xml options...
   Options:
    --in=infile             discovery instructions XML file
    --mkdir                 create data-dir directories

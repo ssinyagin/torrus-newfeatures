@@ -5,7 +5,9 @@ To do now:
 -- Documentation status:
 Done:
 install.pod
-rrfw_torrus_migration.pod (needs update about discovery path)
+rpnexpr.pod
+rrfw_torrus_migration.pod
+scalability.pod
 userguide.pod
 webintf.pod
 

@@ -20,7 +20,7 @@
 package Torrus::Renderer;
 
 use strict;
-use Digest::MD5 qw(md5);
+use Digest::MD5 qw(md5_hex);
 
 use Torrus::DB;
 use Torrus::ConfigTree;
@@ -247,7 +247,7 @@ sub clearcache
 sub newCacheFileName
 {
     my $cachekey = shift;
-    return sprintf('%s_%.5d', md5_hex( $cachekey ), rand(1e5));
+    return sprintf('%s_%.5d', md5_hex($cachekey), rand(1e5));
 }
 
 sub xmlnormalize

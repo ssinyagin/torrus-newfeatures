@@ -531,7 +531,7 @@ so the disk speed is important here. If possible, it is better to spread
 the RRD files across several physical disks.
 
 Berkeley DB database is used to keep all the configuratiuon data
-for your datasource trees, and also it keeps some live status information.
+for your datasource trees, and it also keeps some live status information.
 It's intensively updated during XML compilation only.
 During normal Torrus working cycle, there are only few updates, not
 very critical in time. The database is read quite intensively during

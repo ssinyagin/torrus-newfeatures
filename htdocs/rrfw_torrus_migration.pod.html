@@ -104,11 +104,15 @@ all locally defined files into <em>/usr/local/etc/torrus/xmlconfig</em>.</p>
 do not occur in <em>/usr/local/torrus/xmlconfig</em>, the default path for
 distribution supplied files:</p>
 <pre>
-  cd /usr/local/rrfw-0.1/share/rrfw/xmlconfig/
+  cd /usr/local/rrfw-0.1/share/rrfw/xmlconfig/</pre>
+<pre>
   find . -name '*.xml' -exec test ! -f /usr/local/torrus/xmlconfig/'{}' ';' \
-    -print | cpio --create --file=/tmp/allxml.cpio
-  cd /usr/local/etc/torrus/xmlconfig/
-  cpio --extract --file=/tmp/allxml.cpio</pre>
+    -print | cpio --create --file=/tmp/allxml.cpio</pre>
+<pre>
+  cd /usr/local/etc/torrus/xmlconfig/</pre>
+<pre>
+  cpio --extract --make-directories --preserve-modification-time \
+    --file=/tmp/allxml.cpio</pre>
 <p>After copying XML files, compile them in Torrus:</p>
 <pre>
   torrus compilexml --all --verbose</pre>

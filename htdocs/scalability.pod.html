@@ -66,8 +66,8 @@ before purchasing the hardware.</p>
 going to monitor, with some room for future growth. It is a good practice
 first to model the situation on a test server, and then project the
 results to a bigger number of network devices. The utilities that
-would help you in assessing the requirements are <code>configinfo</code> and
-<code>schedulerinfo</code>.</p>
+would help you in assessing the requirements are <code>torrus configinfo</code> and
+<code>torrus schedulerinfo</code>.</p>
 <p>The resources for planning are the server CPU, RAM, and disks.
 While CPU and RAM are of great importance, it is the disk subsystem that
 often becomes the bottleneck.</p>
@@ -145,12 +145,12 @@ See the manuals for your operating system  for more details.</p>
 important to increase the size of BerkeleyDB lock region.
 The command</p>
 <pre>
-  db_stat -h var/db -c</pre>
+  db_stat -h /var/torrus/db -c</pre>
 <p>would show you the current number of locks and lockers, and their maximum
 quantities during the database history.
 These parameters can be tuned
 by creating the file <em>DB_CONFIG</em> in the database home directory, which is
-usually resided in <em>Torrus_PREFIX/var/db/</em>. The following settings would
+usually resided in <em>/var/torrus/db/</em>. The following settings would
 work fine with about 20 collector processes and 5 HTTP daemon processes:</p>
 <pre>
    set_lk_max_lockers   6000
@@ -158,7 +158,7 @@ work fine with about 20 collector processes and 5 HTTP daemon processes:</p>
 <p>After updating DB_CONFIG, stop all Torrus processes, including Apache server,
 then run</p>
 <pre>
-  db_recover -h var/db</pre>
+  db_recover -h /var/torrus/db</pre>
 <p>Then start the processes again. Futher info is available at:</p>
 <pre>
    <a href="http://www.sleepycat.com/docs/ref/env/db_config.html">http://www.sleepycat.com/docs/ref/env/db_config.html</a>
@@ -201,7 +201,8 @@ to different trees. This may be achieved by manually specifying the
 <code>collector-timeoffset</code> parameter in discovery configuration files.</p>
 <p>In large installations, the collector schedules need thorough planning and
 tuning to insure maximum performance and minimize load on the network devices'
-CPUs. The <code>schedulerinfo</code> utility is designed to help you in this planning.
+CPUs. The <code>torrus schedulerinfo</code> utility is designed to help you in
+this planning.
 It shows two types of reports: configuration report gives you the idea
 of how many datasources are queried at which moments in time. The runtime
 report gives you realtime statistics of collector schedules, including
@@ -242,7 +243,7 @@ it is preferred that at least 50% of average CPU time is idle.</p>
 </p>
 <hr />
 <h1><a name="authors">Authors</a></h1>
-<p>Copyright (c) 2004 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2004-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 <p>Copyright (c) 2004 Christian Schnidrig &lt;<a href="mailto:christian.schnidrig@bluewin.ch">christian.schnidrig@bluewin.ch</a>&gt;</p>
 
 </body>

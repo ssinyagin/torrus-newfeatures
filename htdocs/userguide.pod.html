@@ -728,8 +728,8 @@ the contents of the database.</p>
   ## The brutal way
   /etc/init.d/apache stop
   /etc/init.d/torrus stop
-  cd /var/torrus
-  rm -r db/*
+  cd /var/torrus/db
+  rm -r *
   torrus compilexml --verbose
   /etc/init.d/torrus start
   /etc/init.d/apache start</pre>

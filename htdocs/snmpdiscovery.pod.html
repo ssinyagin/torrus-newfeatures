@@ -17,8 +17,8 @@
 	<ul>
 
 		<li><a href="#introduction">Introduction</a></li>
-		<li><a href="#genddx__discovery_instructions_generator"><code>genddx</code>: Discovery instructions generator</a></li>
-		<li><a href="#devdiscover__snmp_discovery_tool"><code>devdiscover</code>: SNMP discovery tool</a></li>
+		<li><a href="#torrus_genddx__discovery_instructions_generator"><code>torrus genddx</code>: Discovery instructions generator</a></li>
+		<li><a href="#torrus_devdiscover__snmp_discovery_tool"><code>torrus devdiscover</code>: SNMP discovery tool</a></li>
 		<li><a href="#discovery_instructions_file">Discovery Instructions File</a></li>
 		<ul>
 
@@ -45,22 +45,21 @@
 <p>In many (but not only) cases Torrus is used for SNMP monitoring.
 It provides powerful tools which automate the process of devices' MIB
 discovery.</p>
-<p>The discovery tools consist of two programs: <code>devdiscover</code> performs
+<p>The discovery tools consist of two programs: <code>torrus devdiscover</code> performs
 the SNMP discovery, based on the discovery instructions XML file.
 The result of its work is a new Torrus datasource configuration file.
-Another utility, <code>genddx</code>, is a program that generates the basic discovery
-instructions file based on a set of commandline options.</p>
+Another utility, <code>torrus genddx</code>, is a program that generates the
+basic discovery instructions file based on a set of commandline options.</p>
 <p>
 </p>
-<h2><a name="genddx__discovery_instructions_generator"><code>genddx</code>: Discovery instructions generator</a></h2>
+<h2><a name="torrus_genddx__discovery_instructions_generator"><code>torrus genddx</code>: Discovery instructions generator</a></h2>
 <pre>
-  Usage: $Torrus_HOME/bin/genddx options...
+  Usage: torrus genddx options...
   Options:
      --host=hostname         router hostname
      --hostfile=filename     space-separated router hostnames file
      --out=outfile           output file.         [discover-routers.xml]
-     --discout=filename      discovery output file
-            [/usr/local/torrus-0.1/share/torrus/xmlconfig/routers.xml]
+     --discout=filename      discovery output file [routers.xml]
      --domain=domain         optional DNS domain name
      --version=v             SNMP version         [2c]
      --community=string      SNMP read community  [public]
@@ -68,14 +67,14 @@ instructions file based on a set of commandline options.</p>
      --retries=number        SNMP retries         [2]
      --timeout=number        SNMP timeout         [10]
      --subtree=string        Subtree name         [/Routers]
-     --datadir=path          data-dir parameter   [/var/snmpcollector]
+     --datadir=path          data-dir parameter   [/srv/torrus/collector_rrd]
      --holtwinters           Enable Holt-Winters analysis</pre>
 <p>This utility generates <code>devdiscover</code> instructions XML file based on
 commandline options and a plain list of SNMP agents' hostnames.
 Hostnames are apecified with one or many <code>--host=hostname</code> options,
 or a plain text file with space-separated hostnames.</p>
 <p>Each host may have a symbolic name. This symbolic name is used as
-the host-level subtree name. Symbolic name follows the hostname with
+the host-level subtree name. The symbolic name follows the hostname with
 a semicolon.</p>
 <p>By default, the devices are placed into <code>/Routers/</code> subtree hierarchy.
 You may change the subtree name with the <em>--subtree</em> option.
@@ -86,7 +85,7 @@ and it would be placed in site XML configuration directory.
 You most probably will change this by using the <code>--discout</code> option.</p>
 <p>Examples:</p>
 <pre>
-  ./bin/genddx --out=ch-langenthal.ddx \
+  torrus genddx --out=ch-langenthal.ddx \
     --discout=ch-langenthal.xml \
     --host=192.168.34.35:Langenthal_PE1 \
     --host=192.168.34.36:Langenthal_PE2 \
@@ -94,12 +93,17 @@ You most probably will change this by using the <code>--discout</code> option.</
     --community=blahBlah \
     --subtree=/MPLS/CH/Bern/Langenthal</pre>
 <pre>
-  ./bin/devdiscover --in=ch-langenthal.ddx</pre>
+  torrus devdiscover --in=ch-langenthal.ddx</pre>
+<p><code>genddx</code> is designed as a one-time utility. You may run it to create
+a typical discovery file with basic set of options. Then the discovery
+configuration XML woild be the primary source of information, and it should
+be maintained by manual editing, or by some other automated means.</p>
+<p>STOPPED HERE</p>
 <p>
 </p>
-<h2><a name="devdiscover__snmp_discovery_tool"><code>devdiscover</code>: SNMP discovery tool</a></h2>
+<h2><a name="torrus_devdiscover__snmp_discovery_tool"><code>torrus devdiscover</code>: SNMP discovery tool</a></h2>
 <pre>
-  Usage: $Torrus_HOME/bin/devdiscover --in=filename.xml options...
+  Usage: torrus devdiscover --in=filename.xml options...
   Options:
    --in=infile             discovery instructions XML file
    --mkdir                 create data-dir directories

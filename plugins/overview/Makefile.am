@@ -67,8 +67,8 @@ SUFFIXES = .pod .txt
 
 
 #####   XSLT scripts  #####
-scriptsdir = $(webscriptsdir)/tp-overview
-scripts_DATA = \
+tpovscriptsdir = $(webscriptsdir)/tp-overview
+tpovscripts_DATA = \
 	menu/menu.xsl \
 	overview/overview.xsl
 

@@ -1,5 +1,5 @@
-ScriptAlias /menu/      "@webscriptsdir@/tp-overview/"
-ScriptAlias /overviews/ "@webscriptsdir@/tp-overview/"
+ScriptAlias /menu/      "@webplaindir@/menu/"
+ScriptAlias /overviews/ "@webplaindir@/overviews/"
 
 PerlModule Apache::ASP
 
@@ -12,7 +12,7 @@ PerlModule Apache::ASP
 	PerlSetVar XSLTParser XML::Sablotron
 	PerlSetVar XSLTParser XML::LibXSLT
 	PerlSetVar XSLTMatch xml$
-	PerlSetVar XSLT menu.xsl
+	PerlSetVar XSLT @webscriptsdir@/tp-overview/menu.xsl
 	PerlSetVar RequestParams 1
 </Location>
 
@@ -24,7 +24,7 @@ PerlModule Apache::ASP
 	PerlSetVar XSLTParser XML::Sablotron
 	PerlSetVar XSLTParser XML::LibXSLT
 	PerlSetVar XSLTMatch xml$
-	PerlSetVar XSLT overview.xsl
+	PerlSetVar XSLT @webscriptsdir@/tp-overview/overview.xsl
 	PerlSetVar RequestParams 1
 </Location>
 

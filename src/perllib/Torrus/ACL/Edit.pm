@@ -346,10 +346,15 @@ sub setUserAttributes
     my $uid = shift;
     my $attrValues = shift;
 
+    my $ok = 1;
+    
     foreach my $attr ( keys %{$attrValues} )
     {
-        $self->setUserAttribute( $uid, $attr, $attrValues->{$attr} );
+        $ok = $self->setUserAttribute( $uid, $attr, $attrValues->{$attr} )
+            ? $ok:0;
     }
+    
+    return $ok;
 }
 
 

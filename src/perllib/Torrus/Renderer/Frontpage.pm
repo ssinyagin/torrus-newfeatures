@@ -70,7 +70,8 @@ sub renderUserLogin
     }
 
     my $url = $Torrus::Renderer::rendererURL;
-    if( defined( $self->{'options'}->{'urlPassTree'} ) )
+    if( defined( $self->{'options'}->{'urlPassTree'} ) and
+        length( $self->{'options'}->{'urlPassTree'} ) > 0 )
     {
         $url .= '/' . $self->{'options'}->{'urlPassTree'};
     }

@@ -29,7 +29,7 @@ case "$cmd" in
 acledit | cleanup | clearcache | collector | compilexml | configinfo \
  | configsnapshot | devdiscover | genddx | genlist | install_plugin \
  | monitor | schedulerinfo)
-    @pkgbindir@/${cmd} $@
+    @pkgbindir@/${cmd} "$@"
 ;;
 *)
     echo "Usage: $0 cmd [options...]" 1>&2

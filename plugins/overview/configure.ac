@@ -101,6 +101,19 @@ AC_ARG_VAR(plainUrl, [[/torrus/plain] Plain URL])
 if test -z "$plainUrl"; then
    plainUrl='${rendererUrl}/plain'; fi
 
+AC_ARG_VAR(aspglobal, [[VARPREFIX/asp] Apache::ASP Global storage])
+if test -z "$aspglobal"; then
+   aspglobal='${varprefix}/asp'; fi
+
+AC_ARG_VAR(aspglbowner, [[torrus:torrus] Apache::ASP Global directory owner])
+if test -z "$aspglbowner"; then
+   aspglbowner='torrus:torrus'; fi
+
+AC_ARG_VAR(aspglbmode, [[775] Apache::ASP Global directory mode])
+if test -z "$aspglbmode"; then
+   aspglbmode='775'; fi
+
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([ov_substvars.sh], [chmod +x ov_substvars.sh])
 

@@ -36,7 +36,7 @@
 		<param name="collector-timeoffset"			value="3" />
 
 		<param name="storage-type"					value="rrd" />
-		<param name="data-dir"						value="/var/torrus/collector" />
+		<param name="data-dir"						value="/srv/torrus/collector_rrd" />
 
 		<param name="rrd-create-rra">
 			RRA:AVERAGE:0:1:209664 RRA:MAX:0:36:5824 RRA:MIN:0:36:5824

@@ -120,7 +120,7 @@ http://www.apache-asp.org/
 Add the following lines to your apache config file (http.conf). Or
 if you are using apache2 simply copy the file apache2.conf to the
 /etc/apache2/conf/modules.d directory.
-(Note: WEBPLAINDIR is /usr/local/torrus-xyz/web/plain by default):
+(Note: WEBPLAINDIR is /usr/local/torrus/sup/webplain by default):
 
 
   ScriptAlias /menu/ "WEBPLAINDIR/menu/"
@@ -152,7 +152,9 @@ if you are using apache2 simply copy the file apache2.conf to the
   PerlSetVar RequestParams 1
   </Location>
 
-Create the directory /var/torrus/asp.
+The plugin installer creates the directory F</var/torrus/asp> with
+the default owner C<torrus> and group C<torrus> and mode 775.
+
 
 Copy the contents of http://webfx.eae.net/download/tabpane102.zip to
 'WEBPLAINDIR'/tabpane

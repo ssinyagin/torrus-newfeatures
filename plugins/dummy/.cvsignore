@@ -9,4 +9,5 @@ configure.lineno
 dummyscript
 substvars.sh
 tp-dummy-*.tar.gz
+*.txt
 

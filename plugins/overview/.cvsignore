@@ -10,5 +10,5 @@ configure.lineno
 tp-overview-*.tar.gz
 pod2htmi.tmp
 pod2htmd.tmp
-tp-overview.txt
+*.txt
 ov_substvars.sh

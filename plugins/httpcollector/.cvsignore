@@ -9,4 +9,5 @@ configure.lineno
 tp-httpcollector-*.tar.gz
 pod2htmi.tmp
 pod2htmd.tmp
+*.txt
 

@@ -71,7 +71,9 @@ sub discover
 
     foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
+        my $interface = $data->{'interfaces'}{$ifIndex};
         my $ifType = $interface->{'ifType'};
+
         if( $ifType == 127 )
         {
             push( @{$data->{'docsCableMaclayer'}}, $ifIndex );

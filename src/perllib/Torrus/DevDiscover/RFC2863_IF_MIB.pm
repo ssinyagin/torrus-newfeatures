@@ -76,6 +76,17 @@ sub checkdevtype
     }
     $devdetails->storeSnmpVars( $ifTable );
 
+    return 1;
+}
+
+
+sub discover
+{
+    my $dd = shift;
+    my $devdetails = shift;
+    
+    my $session = $dd->session();
+
     my $ifXTable =
         $session->get_table( -baseoid => $dd->oiddef('ifXTable') );
     if( defined $ifXTable )
@@ -175,17 +186,9 @@ sub checkdevtype
 
     push( @{$data->{'templates'}}, 'RFC2863_IF_MIB::rfc2863-ifmib-hostlevel' );
 
-    return 1;
-}
-
-
-sub discover
-{
-    my $dd = shift;
-    my $devdetails = shift;
-
-    # Generate parameter values from data that was built in checkdevtype()
-    # and other modules
+    
+    # Generate parameter values from data that was built above
+    # and in other modules
 
     my $data = $devdetails->data();
 

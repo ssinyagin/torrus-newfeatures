@@ -22,6 +22,7 @@ SUBDIRS = . bin configs doc examples perllib sup xmlconfig
 
 EXTRA_DIST = \
 	setup_tools/replace_rrfw.sh
+	setup_tools/configure_fhs
 
 noinst_SCRIPTS = \
 	setup_tools/substvars.sh \

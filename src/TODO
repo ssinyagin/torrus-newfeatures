@@ -2,11 +2,11 @@ Round Robin Database Framework
   
 To do now:
 
--- ./configure_fhs
 -- Add synonyms to wrapper
 -- Plugins to extend wrapper
 -- Customize /var/snmpcollector path in torrus and plugins
 
+-- Document ./setup_tools/configure_fhs
 -- Change the implementation of hrule-legend-X view parameter
 -- Tokenset members sorting
 -- Renderer unique file name generator (replace rand with md5)

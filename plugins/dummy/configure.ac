@@ -23,7 +23,7 @@
 AC_INIT(tp-dummy, 1.0d, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
-AM_INIT_AUTOMAKE(1.6)
+AM_INIT_AUTOMAKE(1.9)
 
 AC_PATH_PROG(PERL, perl, no)
 AC_PATH_PROG(SED, sed, no)

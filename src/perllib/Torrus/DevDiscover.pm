@@ -231,10 +231,13 @@ sub discover
     my $legend = '';
     foreach my $key ( sort keys %legendValues )
     {
-        if( length( $legendValues{$key}{'value'} ) > 0 )
+        my $text = $legendValues{$key}{'value'};
+        if( length( $text ) > 0 )
         {
-            $legend .= $legendValues{$key}{'name'} . ':' .
-                $legendValues{$key}{'value'} . ';';
+            # Replace ':' with '=' and ';' with ','
+            $text =~ s/:/=/g;
+            $text =~ s/;/,/g;            
+            $legend .= $legendValues{$key}{'name'} . ':' . $text;
         }
     }
     $data->{'param'}{'legend'} = $legend;

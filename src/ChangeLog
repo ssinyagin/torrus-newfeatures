@@ -1,3 +1,8 @@
+2005-03-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm (discover):
+	In the legend, replace ':' with '=' and ';' with ','
+
 2005-03-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm (oidBaseMatch): better OID comparison

@@ -15,6 +15,7 @@ To do now:
 -- Update website
 
 -- Minus sign in tree name (ApacheHadler.pm line 75)
+-- Optionally show Admin info when authentication disabled
 -- Startup script that verifies database consistency at server boot
 -- Collector that reports the BerkeleyDB stats
 -- Sysedge ntregperf discovery optimization (Shawn)

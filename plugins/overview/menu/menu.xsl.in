@@ -61,10 +61,14 @@
 						<select id='cf' class='timebox'
 							onchange='setCf(this.options[this.selectedIndex].value)'
 							>
-							<option value='MIN' >MIN</option>
-							<option value='AVERAGE' selected='true' >AVERAGE</option>
 							<option value='MAX' >MAX</option>
+							<option value='AVERAGE' selected='true' >AVERAGE</option>
+							<option value='MIN' >MIN</option>
 						</select>
+				</span>
+				<span class='autoScaleField'>
+						A-Scale: 
+						<input id="autoscale" value="0" type='checkbox' onclick='setAutoScale();' />
 				</span>
 				<span class='datePickerField'>
 						Date:
@@ -106,10 +110,6 @@
 				<span class='showHiddenField'>
 						Unhide: 
 						<input id="showhidden" value="0" type='checkbox' onclick='setShowHidden();' />
-				</span>
-				<span class='autoScaleField'>
-						A-Scale: 
-						<input id="autoscale" value="0" type='checkbox' onclick='setAutoScale();' />
 				</span>
 				<span class='paddingField'>
 				</span>

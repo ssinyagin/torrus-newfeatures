@@ -28,6 +28,7 @@
 		<li><a href="#stop_rrfw_collector_and_monitor_processes">Stop RRFW collector and monitor processes</a></li>
 		<li><a href="#change_the_rrd_files_ownership">Change the RRD files ownership</a></li>
 		<li><a href="#test_and_run_processes">Test and run processes</a></li>
+		<li><a href="#update_the_cron_jobs">Update the cron jobs</a></li>
 		<li><a href="#update_documentation">Update documentation</a></li>
 	</ul>
 
@@ -182,6 +183,11 @@ Sun Solaris:</p>
   cd /etc/rc0.d
   ln -s K90torrus ../init.d/torrus</pre>
 <p>Run the startup script and verify that RRD files get updated.</p>
+<p>
+</p>
+<h2><a name="update_the_cron_jobs">Update the cron jobs</a></h2>
+<p>RRFW's cron job <em>/usr/local/rrfw-0.1/bin/cleanup</em> should be replaced with
+the analogous job from Torrus: <em>/usr/local/torrus/bin/cleanup</em></p>
 <p>
 </p>
 <h2><a name="update_documentation">Update documentation</a></h2>

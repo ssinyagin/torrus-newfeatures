@@ -204,6 +204,13 @@ Run the startup script and verify that RRD files get updated.
 
 
 
+=head2 Update the cron jobs
+
+RRFW's cron job F</usr/local/rrfw-0.1/bin/cleanup> should be replaced with
+the analogous job from Torrus: F</usr/local/torrus/bin/cleanup>
+
+
+
 =head2 Update documentation
 
 Update your site operational manuals to reflect the new software name,

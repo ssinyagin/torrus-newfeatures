@@ -1,5 +1,5 @@
-#  architecture.pod: The pre-planning document
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  architecture.pod: The Torrus internals
+#  Copyright (C) 2002-2005  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,32 +20,31 @@
 #
 #
 
-=head1 Round Robin Framework Architecture
+=head1 Torrus Framework Architecture
 
 =head2 Configuration Processing
 
 The XML configuration is compiled into the database representation by
 operator's manual request.
 
-The compiled version of the configuration is not a one-to-one
+The compiled version of configuration is not a one-to-one
 representation of the XML version. All aliases and templates are
-expanded. Thus, the backwards restoration of XML from the database
-is possible, but is not our urgent task.
+expanded. The backwards restoration of XML from the database
+is available with the snapshot utility.
 
-Aliases are the way to represent the data in a more convinient format.
+Aliases are the way to represent the data in a more convenient format.
 An alias can point to a subtree or a leaf, and it works similarly as
 a symbolic link in a filesystem.
 
 A template defines a piece of configuration which can be used in
-multiple places. Templates and aliases are not supported within a template.
+multiple places. Templates can be nested.
 
 The configuration can consist of several XML files. They will be
 processed in the specified order. Each new file is treated as an additive
 information to the existing tree.
 
-The configuration processing module should contain information about parameter
-dependency and mandatority. Should the mandatory parameter be missing,
-the configuration processing should stop with an explanative error message.
+The XML configuration compiler validates all the mandatory parameters.
+
 
 =head2 Database Architecture
 
@@ -61,15 +60,15 @@ Current productive instance numbers are stored in B<db_config_instances.db>
 database.
 
 For each datasource tree, the database files are resided in
-F<$RRFW_HOME/var/db/sub/E<gt>tree_nameE<lt>> directory.
+F</var/torrus/db/sub/E<gt>tree_nameE<lt>> directory.
 
 The runtime modules access the configuration via C<ConfigTree> objects.
 
 Each datasource subtree or leaf is identified by a I<token>.
-Token is a short string of word characters, generated internally.
+A token is a short alphanumeric string, generated internally.
 Two types of tokens are recognized: single tokens and token sets.
 
-Single token starts with letter I<T>. The rest is a number of decimal digts.
+Single token starts with letter I<T>. The rest is made with decimal digts.
 
 Token set name starts with letter I<S>. The rest is an arbitrary sequence of
 word characters.
@@ -78,7 +77,7 @@ The special token I<SS> is reserved for tokensets list. Also tokenset
 parameters are inherited from this token's parameters.
 
 View and monitor names must be unique, and must
-start with a small letter.
+start with a lower case letter.
 
 B<db_config_instances.db> is a I<Hash> database, with keys of form
 C<ds:E<gt>tree_nameE<lt>> or C<other:E<gt>tree_nameE<lt>>, and 0 or 1 as
@@ -332,7 +331,7 @@ the object is the tree name.
 
 =head2 Modular Structure
 
-The Framework will consist of several functional modules:
+The Torrus framework consists of several functional modules:
 
 =over 4
 
@@ -345,32 +344,10 @@ configuration is changed only when the files are ready.
 The configuration management module provides access methods for
 enumeration and enquery of the configuratin objects.
 
-=item * Data threshold monitoring
+=item * Data Collector module
 
-This module is able to work in two modes: daemon and on-demand
-invocation. In daemon mode, it performs the monitoring tasks periodically.
-
-Upon activation, it checks the conditions for each leaf having a monitor.
-In case of the alarm, it executes the action instructions synchronousely.
-
-=item * Rendering module
-
-Upon a request, this module generates the graph and HTML files for the
-requested view and its subviews. It first checks availability of
-cached objects and avoids unneeded regeneration. It must be possible
-to force the renderer to flush the cache.
-
-=item * Web interface module
-
-Web interface module passes the Renderer output to a HTTP client.
-
-=item * Data collection module
-
-Collector program runs as a separate process.
-
-Collector program supports two modes of invocation: daemon and one-time.
-
-In daemon mode, it first runs all registered collectors. After that,
+Collector program runs as a separate process for each datasource tree.
+Upon startup, it first runs all registered collectors. After that,
 the collectors are grouped depending on period and time offset, and launched
 periodically at the moments defined by formula:
 
@@ -386,8 +363,27 @@ For each SNMP host, system uptime is verified. For RRD datasource types
 detected, the corresponding RRD file is updated with "undefined"
 value at the calculated moment of reload.
 
+=item * Data threshold monitoring
+
+This module performs the monitoring tasks periodically, based on each
+monitored leaf schedule.
+It checks the conditions for each leaf having a monitor.
+In case of the alarm, it executes the action instructions synchronously.
+
+=item * Rendering module
+
+Upon a request, this module generates the graph and HTML files for the
+requested view and its subviews. It first checks availability of
+cached objects and avoids unneeded regeneration. It must be possible
+to force the renderer to flush the cache.
+
+=item * Web interface module
+
+Web interface module passes the Renderer output to an HTTP client.
+
+
 =back
 
 =head1 Author
 
-Copyright (c) 2002-2004 Stanislav Sinyagin ssinyagin@yahoo.com
+Copyright (c) 2002-2005 Stanislav Sinyagin ssinyagin@yahoo.com

@@ -1,4 +1,4 @@
-#  rpnexpr.pod - RRFW RPN expressions guide
+#  rpnexpr.pod - Torrus RPN expressions guide
 #  Copyright (C) 2002  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -20,19 +20,19 @@
 #
 #
 
-=head1 RRFW Programming Style Guide
+=head1 Torrus Programming Style Guide
 
 =head2 Perl indentation style
 
-The indentation style is a kind of BSD/Allman style:
+The code indentation style is a kind of BSD/Allman style:
 
     while( not $success and time() < $waitingTimeout )
     {
         $self->clearReader();
 
-        Info('Sleeping ' . $RRFW::Global::ConfigReadyRetryPeriod .
+        Info('Sleeping ' . $Torrus::Global::ConfigReadyRetryPeriod .
               ' seconds');
-        sleep $RRFW::Global::ConfigReadyRetryPeriod;
+        sleep $Torrus::Global::ConfigReadyRetryPeriod;
 
         $self->setReader();
 
@@ -124,7 +124,7 @@ standards:
 
 =head2 Normalizing multiple files
 
-In RRFW CVS repository, in the root of module C<src>, there is a small
+In Torrus CVS repository, in the root of module C<src>, there is a small
 utility that fixes some styling issues for all the sources in
 current directory and subdirectories:
 
@@ -135,4 +135,4 @@ and removes empty lines at the start and the end of file.
 
 =head1 Author
 
-Copyright (c) 2003 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2003-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

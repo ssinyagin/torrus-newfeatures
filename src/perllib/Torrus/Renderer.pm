@@ -254,6 +254,11 @@ sub xmlnormalize
 {
     my( $txt )= @_;
 
+    # Unscreen special characters
+    $txt =~ s/{COLON}/:/gm;
+    $txt =~ s/{SEMICOL}/;/gm;
+    $txt =~ s/{PERCENT}/%/gm;
+
     $txt =~ s/\&/\&amp\;/gm;
     $txt =~ s/\</\&lt\;/gm;
     $txt =~ s/\>/\&gt\;/gm;

@@ -234,9 +234,7 @@ sub discover
         my $text = $legendValues{$key}{'value'};
         if( length( $text ) > 0 )
         {
-            # Replace ':' with '=' and ';' with ','
-            $text =~ s/:/=/g;
-            $text =~ s/;/,/g;            
+            $text = $self->screenSpecialChars( $text );
             $legend .= $legendValues{$key}{'name'} . ':' . $text . ';';
         }
     }
@@ -562,6 +560,19 @@ sub oidBaseMatch
         $base_oid = $self->oiddef( $base_oid );
     }
     return Net::SNMP::oid_base_match( $base_oid, $oid );
+}
+
+
+sub screenSpecialChars
+{
+    my $self = shift;
+    my $txt = shift;
+
+    $txt =~ s/:/{COLON}/gm;
+    $txt =~ s/;/{SEMICOL}/gm;
+    $txt =~ s/%/{PERCENT}/gm;
+
+    return $txt;
 }
 
 

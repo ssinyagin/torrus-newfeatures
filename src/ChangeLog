@@ -1,3 +1,8 @@
+2005-03-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm (discover): Screening coli and
+	semicoli in legend text
+
 2005-03-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):

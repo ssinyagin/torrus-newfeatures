@@ -2,14 +2,12 @@ Round Robin Database Framework
   
 To do now:
 
--- Update plugins
 -- ./configure_fhs
 -- Update installation guide (DESTDIR)
 -- Update manpages for the new wrapper
 -- Add synonyms to wrapper
 -- Plugins to extend wrapper
 -- Customize /var/snmpcollector path in torrus and plugins
--- Add other guys to CVS access
 -- CVS notifictions
 -- Move mailing lists
 -- Update website

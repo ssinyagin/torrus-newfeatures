@@ -460,7 +460,7 @@ In this release:
      is highly appreciated (due to the author's lack of those talents).
 
   3) mkroutercfg is now not changing any output files when some
-     of the routers are unreacheable. This allows you to run it periodically,
+     of the routers are unreachable. This allows you to run it periodically,
      without the risk that the config is screwed due to network outage.
 
   4) HTML renderer is now more optimized for mod_perl, and the navigation

@@ -105,9 +105,9 @@ sub initTargetAttributes
         return probablyDead( $token,  $collector );
     }
 
-    if( defined( $tref->{'lastUnreacheableSeen'} ) )
+    if( defined( $tref->{'lastUnreachableSeen'} ) )
     {
-        delete $tref->{'lastUnreacheableSeen'};
+        delete $tref->{'lastUnreachableSeen'};
     }
 
     # Collector should be able to find the target
@@ -221,16 +221,16 @@ sub expandOidMappings
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
 
-    if( exists( $cref->{'lastUnreacheableSeen'}{$ipaddr} ) )
+    if( exists( $cref->{'lastUnreachableSeen'}{$ipaddr} ) )
     {
-        if( time() < $cref->{'lastUnreacheableSeen'}{$ipaddr} +
-            $Torrus::Collector::SNMP::unreacheableRetryDelay )
+        if( time() < $cref->{'lastUnreachableSeen'}{$ipaddr} +
+            $Torrus::Collector::SNMP::unreachableRetryDelay )
         {
             return undef;
         }
         else
         {
-            delete $cref->{'lastUnreacheableSeen'}{$ipaddr} ;
+            delete $cref->{'lastUnreachableSeen'}{$ipaddr} ;
         }
     }
 
@@ -307,7 +307,7 @@ sub expandOidMappings
             {
                 Error("Error retrieving $key from $ipaddr: " .
                       $session->error());
-                $cref->{'lastUnreacheableSeen'}{$ipaddr} = time();
+                $cref->{'lastUnreachableSeen'}{$ipaddr} = time();
                 $session->close();
                 return undef;
             }
@@ -369,7 +369,7 @@ sub lookupMap
         {
             Error("Error retrieving table $map from $ipaddr: " .
                   $session->error());
-            $cref->{'lastUnreacheableSeen'}{$ipaddr} = time();
+            $cref->{'lastUnreachableSeen'}{$ipaddr} = time();
         }
         $session->close();
     }
@@ -399,7 +399,7 @@ sub lookupMap
     }
 }
 
-# The target host is unreacheable. We try to reach it few more times and
+# The target host is unreachable. We try to reach it few more times and
 # give it the final diagnose.
 
 sub probablyDead
@@ -412,31 +412,31 @@ sub probablyDead
 
     my $probablyAlive = 1;
 
-    if( defined( $tref->{'lastUnreacheableSeen'} ) )
+    if( defined( $tref->{'lastUnreachableSeen'} ) )
     {
-        if( $Torrus::Collector::SNMP::unreacheableTimeout > 0 and
-            time() - $tref->{'lastUnreacheableSeen'} >
-            $Torrus::Collector::SNMP::unreacheableTimeout )
+        if( $Torrus::Collector::SNMP::unreachableTimeout > 0 and
+            time() - $tref->{'lastUnreachableSeen'} >
+            $Torrus::Collector::SNMP::unreachableTimeout )
         {
             $probablyAlive = 0;
         }
     }
     else
     {
-        $tref->{'lastUnreacheableSeen'} = time();
+        $tref->{'lastUnreachableSeen'} = time();
     }
 
     if( $probablyAlive )
     {
-        Info('Target host or OID is unreacheable. Will try again later:' .
+        Info('Target host or OID is unreachable. Will try again later:' .
              $collector->path($token));
         $cref->{'needsRemapping'}{$token} = 1;
     }
     else
     {
         # It is dead indeed.
-        Info('Target host or OID is unreacheable during last ' .
-             $Torrus::Collector::SNMP::unreacheableTimeout .
+        Info('Target host or OID is unreachable during last ' .
+             $Torrus::Collector::SNMP::unreachableTimeout .
              ' seconds. Giving it up:' . $collector->path($token));
         $collector->deleteTarget($token);
     }
@@ -610,11 +610,12 @@ sub callback
     my $cref = $collector->collectorData( 'snmp' );
     my $ipaddr = $session->hostname();
 
-    Debug("SNMP Callbak executed for $ipaddr:$port:$community");
+    Debug("SNMP Callback executed for $ipaddr:$port:$community");
 
     if( not defined( $session->var_bind_list() ) )
     {
-        Error("SNMP Error for $ipaddr:$port:$community: " . $session->error());
+        Error("SNMP Error for $ipaddr:$port:$community: " . $session->error() .
+              ' when retrieving ' . join(' ', sort keys %{$pdu_tokens}));
         return;
     }
 

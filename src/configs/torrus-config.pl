@@ -58,11 +58,11 @@ $Torrus::Global::ConfigReadersWaitPeriod = 5;
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;
 
-# The time period when we retry to reach an unreacheable host
-$Torrus::Collector::SNMP::unreacheableTimeout = 900;
+# The time period when we retry to reach an unreachable host
+$Torrus::Collector::SNMP::unreachableTimeout = 900;
 
-# For unreacheable host, we retry SNMP query not earlier than this
-$Torrus::Collector::SNMP::unreacheableRetryDelay = 60;
+# For unreachable host, we retry SNMP query not earlier than this
+$Torrus::Collector::SNMP::unreachableRetryDelay = 60;
 
 
 # Sleep interval when scheduler initialization failed (i.e. configuration

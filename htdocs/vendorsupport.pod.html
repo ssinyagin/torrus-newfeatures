@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Torrus Vendor Support List</title>
+<link rel="stylesheet" href="torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#torrus_vendor_support_list">Torrus Vendor Support List</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#generic_snmp_mibs">Generic SNMP MIBs</a></li>
+		<li><a href="#vendorspecific_snmp_monitoring">Vendor-specific SNMP monitoring</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="torrus_vendor_support_list">Torrus Vendor Support List</a></h1>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<p>This document provides a listing of vendor devices and generic MIBs
+that are suppported by Torrus's SNMP discovery utilities and/or templates
+and other supporting files.</p>
+<p>All SNMP MIBs described below are supported through <code>devdiscover</code>,
+the SNMP discovery utility. Where possible, the system contact, location,
+and interface descriptions are copied to the generated Torrus configuration.</p>
+<p>
+</p>
+<h2><a name="generic_snmp_mibs">Generic SNMP MIBs</a></h2>
+<ul>
+<li><strong><a name="item_rfc1697">RFC1697 (RDBMS-MIB)</a></strong><br />
+</li>
+Provides the database engine performance statistics. Tested with Oracle only.
+<p></p>
+<li><strong><a name="item_rfc2662">RFC2662 (ADSL-LINE-MIB)</a></strong><br />
+</li>
+ADSL DSLAM statitics and line status. Tested with Paradyne DSLAM.
+<p></p>
+<li><strong><a name="item_rfc2670">RFC2670 (DOCS-IF-MIB)</a></strong><br />
+</li>
+DOCSIS cable status and statistics. Tested with Cisco uBR.
+<p></p>
+<li><strong><a name="item_rfc2737">RFC2737 (ENTITY-MIB)</a></strong><br />
+</li>
+Used to retrieve information about chassis and temperature sensors in Cisco
+devices.
+<p></p>
+<li><strong><a name="item_rfc2790">RFC2790 (HOST-RESOURCES-MIB)</a></strong><br />
+</li>
+Server CPU, memory, and disk statistics. Tested with net-snmp and MS Windows.
+<p></p>
+<li><strong><a name="item_rfc2863">RFC2863 (IF-MIB)</a></strong><br />
+</li>
+Generic network interface statistics from <code>ifTable</code> and <code>ifXTable</code>.
+Most servers and network devices support this MIB. Featuring custom
+vendor-dependent indexing and interface type/name filtering.
+Tested with many different vendors.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="vendorspecific_snmp_monitoring">Vendor-specific SNMP monitoring</a></h2>
+<ul>
+<li><strong><a name="item_ascend_max">Ascend MAX</a></strong><br />
+</li>
+Provides statistics for analog and ISDN interfaces, and the total number
+of lines used.
+<p></p>
+<li><strong><a name="item_atmel_wireless_access_points_and_bridges">Atmel wireless access points and bridges</a></strong><br />
+</li>
+Privides link quality and traffic statistics for wireless devices.
+The discovery process would run very slow unless you specify the
+following parameter in the discovery instructions XML:
+<pre>
+ &lt;param name=&quot;only-devtypes&quot; value=&quot;ATMEL&quot;/&gt;</pre>
+<p></p>
+<li><strong><a name="item_cisco_catos">Cisco CatOS</a></strong><br />
+</li>
+Memory, CPU, and temperature information. Per-interface statistics may be
+limited to the ports with description only.
+<p></p>
+<li><strong><a name="item_cisco_ios">Cisco IOS</a></strong><br />
+</li>
+Provides per-interface traffic statistics; CPU, memory, and
+temperature information; I/O buffer statistics; IPSec traffic information;
+SAA agents statistics; cbQoS monitoring (implemented in a separate plugin).
+<p></p>
+<li><strong><a name="item_cisco_pix_firewall">Cisco PIX Firewall</a></strong><br />
+</li>
+Firewall performance statistics.
+<p></p>
+<li><strong><a name="item_compaq_insite_manager">Compaq Insite Manager</a></strong><br />
+</li>
+Temperature and memory health information statistics for Compaq servers.
+<p></p>
+<li><strong><a name="item_empire">Empire (Concord) SystemEDGE</a></strong><br />
+</li>
+Provides lots of statistics and information that a SystemEDGE agent
+may provide about the server health and performance.
+<p></p>
+<li><strong><a name="item_f5_bigip_load_balancer">F5 BigIp Load Balancer</a></strong><br />
+</li>
+In-detail traffic statistics.
+<p></p>
+<li><strong><a name="item_microsoft_windows_2000_2fxp">Microsoft Windows 2000/XP</a></strong><br />
+</li>
+Sets up proper interface indexing and provides FTP and HTTP server statistics.
+<p></p>
+<li><strong><a name="item_netapp_2ecom_storage_products">NetApp.com storage products</a></strong><br />
+</li>
+Storage arrays performance and health information.
+<p></p>
+<li><strong><a name="item_netscreen_firewall">NetScreen Firewall</a></strong><br />
+</li>
+Firewall performance statistics.
+<p></p>
+<li><strong><a name="item_oracle">Oracle</a></strong><br />
+</li>
+Database engine statistics.
+<p></p>
+<li><strong><a name="item_paradyne_grandslam">Paradyne GranDSLAM</a></strong><br />
+</li>
+xDSL statistics and line status.
+<p></p>
+<li><strong><a name="item_ucd_snmp_and_net_2dsnmp">UCD SNMP and Net-SNMP</a></strong><br />
+</li>
+Memory, CPU, and disk usage information.
+<p></p>
+<li><strong><a name="item_xylan_ethernet_switches">Xylan ethernet switches</a></strong><br />
+</li>
+Port indexing for OmniSwitch and OmniStack ethernet switches.
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2004 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

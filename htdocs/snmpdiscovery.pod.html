@@ -1,0 +1,439 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Torrus SNMP Discovery User Guide</title>
+<link rel="stylesheet" href="torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#torrus_snmp_discovery_user_guide">Torrus SNMP Discovery User Guide</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#genddx__discovery_instructions_generator"><code>genddx</code>: Discovery instructions generator</a></li>
+		<li><a href="#devdiscover__snmp_discovery_tool"><code>devdiscover</code>: SNMP discovery tool</a></li>
+		<li><a href="#discovery_instructions_file">Discovery Instructions File</a></li>
+		<ul>
+
+			<li><a href="#xml_elements">XML elements</a></li>
+			<li><a href="#common_parameters">Common parameters</a></li>
+			<li><a href="#parameters_for_rfc2863_if_mib">Parameters for <code>RFC2863_IF_MIB</code></a></li>
+			<li><a href="#other_generic_mib_parameters">Other generic MIB parameters</a></li>
+			<li><a href="#vendor_parameters">Vendor parameters</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="torrus_snmp_discovery_user_guide">Torrus SNMP Discovery User Guide</a></h1>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<p>In many (but not only) cases Torrus is used for SNMP monitoring.
+It provides powerful tools which automate the process of devices' MIB
+discovery.</p>
+<p>The discovery tools consist of two programs: <code>devdiscover</code> performs
+the SNMP discovery, based on the discovery instructions XML file.
+The result of its work is a new Torrus datasource configuration file.
+Another utility, <code>genddx</code>, is a program that generates the basic discovery
+instructions file based on a set of commandline options.</p>
+<p>
+</p>
+<h2><a name="genddx__discovery_instructions_generator"><code>genddx</code>: Discovery instructions generator</a></h2>
+<pre>
+  Usage: $Torrus_HOME/bin/genddx options...
+  Options:
+     --host=hostname         router hostname
+     --hostfile=filename     space-separated router hostnames file
+     --out=outfile           output file.         [discover-routers.xml]
+     --discout=filename      discovery output file
+            [/usr/local/torrus-0.1/share/torrus/xmlconfig/routers.xml]
+     --domain=domain         optional DNS domain name
+     --version=v             SNMP version         [2c]
+     --community=string      SNMP read community  [public]
+     --port=number           SNMP port            [161]
+     --retries=number        SNMP retries         [2]
+     --timeout=number        SNMP timeout         [10]
+     --subtree=string        Subtree name         [/Routers]
+     --datadir=path          data-dir parameter   [/var/snmpcollector]
+     --holtwinters           Enable Holt-Winters analysis</pre>
+<p>This utility generates <code>devdiscover</code> instructions XML file based on
+commandline options and a plain list of SNMP agents' hostnames.
+Hostnames are apecified with one or many <code>--host=hostname</code> options,
+or a plain text file with space-separated hostnames.</p>
+<p>Each host may have a symbolic name. This symbolic name is used as
+the host-level subtree name. Symbolic name follows the hostname with
+a semicolon.</p>
+<p>By default, the devices are placed into <code>/Routers/</code> subtree hierarchy.
+You may change the subtree name with the <em>--subtree</em> option.
+Single slash as subtree name would cause host-level subtrees placed at the top
+of the datasources tree.</p>
+<p>By default, <code>genddx</code> specifies the Torrus configuration output file
+with absolute path pointing to <code>xmlconfig</code> subdirectory of the installation,
+with the file name &lt;routers.xml&gt;. You most probably will change this by
+using the <code>--discout</code> option.</p>
+<p>Examples:</p>
+<pre>
+  ./bin/genddx --out=share/torrus/discovery/ch-langenthal.ddx \
+    --discout=share/torrus/xmlconfig/ch-langenthal.xml
+    --host=192.168.34.35:Langenthal_PE1 \
+    --host=192.168.34.36:Langenthal_PE2 \
+    --host=192.168.34.37:Langenthal_CE_Stadtverwaltung \
+    --community=blahBlah \
+    --subtree=/MPLS/CH/Bern/Langenthal</pre>
+<pre>
+  ./bin/devdiscover --in=share/torrus/discovery/ch-langenthal.ddx</pre>
+<p>
+</p>
+<h2><a name="devdiscover__snmp_discovery_tool"><code>devdiscover</code>: SNMP discovery tool</a></h2>
+<pre>
+  Usage: $Torrus_HOME/bin/devdiscover --in=filename.xml options...
+  Options:
+   --in=infile             discovery instructions XML file
+   --mkdir                 create data-dir directories
+   --limit=regexp          limit the discovery by output files
+   --verbose               print extra information
+   --debug                 print debugging information</pre>
+<p>This utility performs the SNMP discovery of devices listed in the input
+XML file. The output XML file is the Torrus datasources configuration.
+Output file name is taken from <a href="#item_output_2dfile"><code>output-file</code></a> parameter in the instructions
+XML file.</p>
+<p><code>devdiscover</code> is accompanied by a number of MIB- or vendor-specific
+modules, each responsible for finding specific SNMP variables in
+the SNMP device, and for generating a piece of Torrus configuration XML
+file responsible for that specific MIB. The list of supported generic MIBs and
+vendors is constantly growing. It is quite easy to create new discovery
+modules, and the internals are documented in
+<em>Torrus SNMP Device Discovery Developer's Guide</em>.</p>
+<p>The output file automatically includes all required prerequisite
+generic and vendor template definition files.</p>
+<p>Behaviour of <code>devdiscover</code> is controlled by variables in
+<em>$Torrus_HOME/share/torrus/devdiscover-siteconfig.pl</em> file. Default values for
+those variables reside in <em>$Torrus_HOME/share/torrus/devdiscover-config.pl</em>.</p>
+<p>For large installations, it is recommended to place RRD files into
+a hashed directory structure. You can enable this feature by setting</p>
+<pre>
+  $Torrus::DevDiscover::hashDataDirEnabled = 1;</pre>
+<p>in your <em>devdiscover-siteconfig.pl</em> file.
+Then launching <code>devdiscover</code> with <code>--mkdir</code> option would automatically
+create the subdirectories inside <a href="#item_data_2ddir"><code>data-dir</code></a>.</p>
+<p>The XML files produced by <code>devdiscover</code> may be automatically changed
+with some local site-specific scripts. See XUpdate usage example in
+<em>Torrus User Guide</em>.</p>
+<p>
+</p>
+<h2><a name="discovery_instructions_file">Discovery Instructions File</a></h2>
+<p>The input file for <code>devdiscover</code> is an XML file. Its DTD is available
+in Torrus distribution in <em>snmp-discovery.dtd</em>.</p>
+<p>A typical place to store the discovery XML is <em>share/torrus/discovery/</em>
+directory under the Torrus installation path.</p>
+<p>Example:</p>
+<pre>
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF8&quot;?&gt;
+    &lt;snmp-discovery&gt;
+      &lt;file-info&gt;
+        &lt;format-version&gt;
+    1.0
+        &lt;/format-version&gt;
+      &lt;/file-info&gt;
+      &lt;creator-info&gt;
+    Torrus version 0.1.4d
+    This file was generated by command:
+    /usr/local/torrus-0.1/bin/genddx \
+     --discout=share/torrus/xmlconfig/myrouters.xml \
+     --community=blahblah  --host=10.0.0.1  --host=10.0.1.1
+    On Tue Dec  2 17:43:30 2003
+      &lt;/creator-info&gt;
+      &lt;param name=&quot;data-dir&quot; value=&quot;/var/snmpcollector&quot;/&gt;
+      &lt;param name=&quot;domain-name&quot; value=&quot;&quot;/&gt;
+      &lt;param name=&quot;host-subtree&quot; value=&quot;/Routers&quot;/&gt;
+      &lt;param name=&quot;output-file&quot; value=&quot;share/torrus/xmlconfig/myrouters.xml&quot;/&gt;
+      &lt;param name=&quot;rrd-hwpredict&quot; value=&quot;no&quot;/&gt;
+      &lt;param name=&quot;snmp-community&quot; value=&quot;blahblah&quot;/&gt;
+      &lt;param name=&quot;snmp-port&quot; value=&quot;161&quot;/&gt;
+      &lt;param name=&quot;snmp-retries&quot; value=&quot;2&quot;/&gt;
+      &lt;param name=&quot;snmp-timeout&quot; value=&quot;10&quot;/&gt;
+      &lt;param name=&quot;snmp-version&quot; value=&quot;2c&quot;/&gt;
+      &lt;host&gt;
+        &lt;param name=&quot;snmp-host&quot; value=&quot;10.0.0.1&quot;/&gt;
+        &lt;param name=&quot;symbolic-name&quot; value=&quot;10.0.0.1&quot;/&gt;
+      &lt;/host&gt;
+      &lt;host&gt;
+        &lt;param name=&quot;snmp-host&quot; value=&quot;10.0.1.1&quot;/&gt;
+        &lt;param name=&quot;symbolic-name&quot; value=&quot;10.0.1.1&quot;/&gt;
+      &lt;/host&gt;
+    &lt;/snmp-discovery&gt;</pre>
+<p>
+</p>
+<h3><a name="xml_elements">XML elements</a></h3>
+<ul>
+<li><strong><a name="item_snmp_2ddiscovery"><code>snmp-discovery</code></a></strong><br />
+</li>
+Mandatory. The top-level element.
+<p></p>
+<li><strong><a name="item_file_2dinfo"><code>file-info</code></a></strong><br />
+</li>
+Mandatory. It must contain the element <a href="#item_format_2dversion"><code>format-version</code></a>.
+<p></p>
+<li><strong><a name="item_format_2dversion"><code>format-version</code></a></strong><br />
+</li>
+Mandatory. It must contain a format version currently
+supported by devdiscover. Currently supported version is <code>1.0</code>.
+<p></p>
+<li><strong><a name="item_creator_2dinfo"><code>creator-info</code></a></strong><br />
+</li>
+Optional. May contain the information about the file creator: a human author
+name, or a program.
+<p></p>
+<li><strong><a name="item_param"><code>param</code></a></strong><br />
+</li>
+Some parameters are mandatory. This element defines a global or host-specific
+parameter. Mandatory attribute <code>name</code> identifies the parameter,
+and the value is taken eother from <code>value</code> attribute, or from the
+textual content of the element.
+<p><a href="#item_param"><code>param</code></a> element should be the child element of <a href="#item_snmp_2ddiscovery"><code>snmp-discovery</code></a> for global
+parameters or <a href="#item_host"><code>host</code></a> for host-level parameters. Host-level parameters
+override the values of global parameters.</p>
+<p>These parameters are for <code>devdiscover</code> only. They are not Torrus configuration
+parameters, although some of them are directly copied into the generated
+configuration file.</p>
+<p></p>
+<li><strong><a name="item_host"><code>host</code></a></strong><br />
+</li>
+Mandatory. Defines a host to run SNMP discovery.
+<p></p></ul>
+<p>
+</p>
+<h3><a name="common_parameters">Common parameters</a></h3>
+<ul>
+<li><strong><a name="item_collector_2dperiod_2c_collector_2dtimeoffset_2c_c_"><code>collector-period</code>, <code>collector-timeoffset</code>,
+<code>collector-dispersed-timeoffset</code>, <code>collector-timeoffset-min</code>,
+<code>collector-timeoffset-max</code>, <code>collector-timeoffset-step</code></a></strong><br />
+</li>
+Optional. When defined, these parameters override those from <code>snmp-defaults</code>
+template in <em>snmp-defs.xml</em>.
+<p></p>
+<li><strong><a name="item_output_2dfile"><code>output-file</code></a></strong><br />
+</li>
+Mandatory. Specifies the output filename for generated Torrus configuration.
+In the parameter value, <code>$XMLCONFIG</code> is replaced with the default Torrus XML
+configuration directory name.
+<p></p>
+<li><strong><a name="item_output_2dbundle"><code>output-bundle</code></a></strong><br />
+</li>
+Optional. Specifies a comma-separated list of XML file names for bundle
+output. Each bundle file will contain &lt;include&gt; statement for each
+corresponding <a href="#item_output_2dfile"><code>output-file</code></a>.
+In the parameter value, <code>$XMLCONFIG</code> is replaced with the default Torrus XML
+configuration directory name.
+<p></p>
+<li><strong><a name="item_snmp_2dport_2c_snmp_2dcommunity_2c_snmp_2dversion_"><code>snmp-port</code>, <code>snmp-community</code>,  <code>snmp-version</code>, <code>snmp-timeout</code>,
+        <code>snmp-retries</code>, <code>snmp-host</code></a></strong><br />
+</li>
+Mandatory. These parameters define the SNMP agent properties and are
+copied one-to-one to the output configuration.
+<p></p>
+<li><strong><a name="item_domain_2dname"><code>domain-name</code></a></strong><br />
+</li>
+Optional. Defines a DNS domain name to be appended to <code>snmp-host</code>.
+<p></p>
+<li><strong><a name="item_data_2ddir"><code>data-dir</code></a></strong><br />
+</li>
+Mandatory. Defines the directory path where RRD files for this host
+are stored. In case if hashed directories are enabled, <a href="#item_data_2ddir"><code>data-dir</code></a> specifies
+the base path under which the hashed subdirectories are created.
+<p></p>
+<li><strong><a name="item_symbolic_2dname"><code>symbolic-name</code></a></strong><br />
+</li>
+Optional. Determines the host-specific subtree name. If not specified,
+the subtree is named by <a href="#item_system_2did"><code>system-id</code></a>, or by <code>snmp-host</code> if system ID is
+not defined.
+<p></p>
+<li><strong><a name="item_system_2did"><code>system-id</code></a></strong><br />
+</li>
+Optional. If defined, it overrides the default value of system ID, which
+is equal to the value of <code>snmp-host</code>.
+<p></p>
+<li><strong><a name="item_snmp_2doids_2dper_2dpdu"><code>snmp-oids-per-pdu</code></a></strong><br />
+</li>
+Optional. When defined, these parameters overwrites the value from the
+template and vendor-specific discovery modules.
+<p></p>
+<li><strong><a name="item_snmp_2dcheck_2dsysuptime"><code>snmp-check-sysuptime</code></a></strong><br />
+</li>
+Optional. Default: <code>yes</code>. Devdiscover sets this parameter to <code>no</code> when it
+finds SNMPv2-MIB::sysUpTime variable unavailable in the device.
+<p></p>
+<li><strong><a name="item_host_2dsubtree"><code>host-subtree</code></a></strong><br />
+</li>
+Optional. Defines the datasourse tree path under which the host-specific
+subtree is created.
+<p></p>
+<li><strong><a name="item_rrd_2dhwpredict"><code>rrd-hwpredict</code></a></strong><br />
+</li>
+Optional. Valid values: <code>yes</code>, <code>no</code>. Determines if Holt-Winters forecasting
+should be enabled for the given host.
+<p></p>
+<li><strong><a name="item_disable_2ddevtypes"><code>disable-devtypes</code></a></strong><br />
+</li>
+Optional. Comma-separated list of discovery device types that need to be
+excluded from discovery process. For example, ATMEL appliances conflict with
+Empire SystemEdge MIBs, and you need to disable <code>EmpireSystemedge</code> module
+in order to run the discovery on those appliances.
+<p></p>
+<li><strong><a name="item_only_2ddevtypes"><code>only-devtypes</code></a></strong><br />
+</li>
+Optional comma-separated list of device types. If defined, only the specified
+types will be used for device probing.
+<p></p>
+<li><strong><a name="item_host_2daliases"><code>host-aliases</code></a></strong><br />
+</li>
+Optional comma-separated list of alias paths for a given host. Aliases
+must be unique for each host.
+<p></p>
+<li><strong><a name="item_custom_2dhost_2dtemplates"><code>custom-host-templates</code></a></strong><br />
+</li>
+Optional comma-separated list of template names that will be applied
+to the resulting XML configuration at the host level.
+<p></p>
+<li><strong><a name="item_host_2dcopy_2dparams"><code>host-copy-params</code></a></strong><br />
+</li>
+Optional comma-separated list of parameter names that should be copied
+from the discovery configuration file to the generated Torrus configuration
+at the host level.
+<p></p></ul>
+<p>
+</p>
+<h3><a name="parameters_for_rfc2863_if_mib">Parameters for <code>RFC2863_IF_MIB</code></a></h3>
+<p>This discovery module is responsible for agent's interfaces table and
+interface counters. Recognized optional parameters are:</p>
+<ul>
+<li><strong><a name="item_rfc2863_if_mib_3a_3asuppress_2dhc_2dcounters"><code>RFC2863_IF_MIB::suppress-hc-counters</code></a></strong><br />
+</li>
+Some agents do not implement 64-bit counters correctly. When this parameter
+is set to <code>yes</code>, 64-bit interface counters are not used for the host.
+For Cisco IOS devices, the <code>CiscoIOS</code> discovery module tries to detect
+such situation automatically.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dname"><code>RFC2863_IF_MIB::subtree-name</code></a></strong><br />
+</li>
+Defines the child subtree name within host-level subtree where interface
+counters are located. Default: <code>Interface_Counters</code>.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3aexclude_2dinterfaces"><code>RFC2863_IF_MIB::exclude-interfaces</code></a></strong><br />
+</li>
+Comma-separated list of interface names which should be excluded from
+configuration. Spaces are allowed between the names and commas.
+The names should be the ones that are used for interface subtrees.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a></strong><br />
+</li>
+This parameter defines which interfaces' <code>InOut_bps</code> leaves to add to
+which tokensets. The value is a semicolon-separated (;) list of
+entries of form <em>tset:interface,interface</em>, where <em>tset</em> is a name of the
+tokenset, and the <em>interface</em> is the subtree name of the corresponding
+interface. The token sets must be defined elsewhere in Torrus configuration.
+Example:
+<pre>
+  &lt;host&gt;
+    &lt;param name=&quot;snmp-host&quot; value=&quot;192.168.49.131&quot;/&gt;
+    &lt;param name=&quot;RFC2863_IF_MIB::tokenset-members&quot;&gt;
+     clusters: 10_1, 10_2;
+     uplinks: 1_1, 1_2
+    &lt;/param&gt;
+  &lt;/host&gt;</pre>
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3aerrors_2dmonitor"><code>RFC2863_IF_MIB::errors-monitor</code></a></strong><br />
+</li>
+When set to <code>yes</code>, all interface error and discard counters are assigned to
+a monitor called <code>RFC2863_IF_MIB-errors</code>. It is up to you to define the
+monitor somewhere in the configuration.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a></strong><br />
+</li>
+Optional comma-separated list of parameter names that would be copied
+to the output Torrus configuration at interface level.
+For each parameter <em>param</em>, the value for a particular interface <em>intf</em>
+will be taken from parameter <code>RFC2863_IF_MIB::param::intf</code> in
+the discovery configuration file. Example:
+<pre>
+  &lt;host&gt;
+    &lt;param name=&quot;snmp-host&quot; value=&quot;192.168.49.131&quot;/&gt;
+    &lt;param name=&quot;RFC2863_IF_MIB::copy-params&quot; value=&quot;intf-error-threshold&quot;/&gt;
+    &lt;param name=&quot;RFC2863_IF_MIB::intf-error-threshold::10_1&quot; value=&quot;300&quot;/&gt;
+    &lt;param name=&quot;RFC2863_IF_MIB::intf-error-threshold::2_1&quot; value=&quot;900&quot;/&gt;
+  &lt;/host&gt;</pre>
+<p></p></ul>
+<p>
+</p>
+<h3><a name="other_generic_mib_parameters">Other generic MIB parameters</a></h3>
+<ul>
+<li><strong><a name="item_rfc2790_host_resources_3a_3asysperf_2dsubtree_2dna"><code>RFC2790_HOST_RESOURCES::sysperf-subtree-name</code></a></strong><br />
+</li>
+Defines the child subtree name within host-level subtree where system CPU
+and memory statistics are located. Default: <code>System_Performance</code>.
+<p></p></ul>
+<p>
+</p>
+<h3><a name="vendor_parameters">Vendor parameters</a></h3>
+<ul>
+<li><strong><a name="item_ciscogeneric_3a_3adisable_2dcpu_2dstats"><code>CiscoGeneric::disable-cpu-stats</code></a></strong><br />
+</li>
+When set to <code>yes</code>, Cisco CPU usage statistics are excluded from discovery.
+<p></p>
+<li><strong><a name="item_ciscogeneric_3a_3adisable_2dmemory_2dpools"><code>CiscoGeneric::disable-memory-pools</code></a></strong><br />
+</li>
+When set to <code>yes</code>, Cisco memory pool usage statistics are excluded from
+discovery.
+<p></p>
+<li><strong><a name="item_ciscogeneric_3a_3adisable_2dsensors"><code>CiscoGeneric::disable-sensors</code></a></strong><br />
+</li>
+When set to <code>yes</code>, Cisco temperature sensors are excluded from discovery.
+<p></p>
+<li><strong><a name="item_ciscogeneric_3a_3ause_2dfahrenheit"><code>CiscoGeneric::use-fahrenheit</code></a></strong><br />
+</li>
+When set to <code>yes</code>, Cisco temperature sensors are recorded and displayed
+in degrees Fahrenheit.
+<p></p>
+<li><strong><a name="item_ciscogeneric_3a_3afile_2dper_2dsensor"><code>CiscoGeneric::file-per-sensor</code></a></strong><br />
+</li>
+When set to <code>yes</code>, Cisco temperature sensor values are stored in
+a separate RRD file per sensor ID. This is useful for modular big routers
+like Cisco GSR.
+<p></p>
+<li><strong><a name="item_ciscoios_3a_3adisable_2dmembuf_2dstats"><code>CiscoIOS::disable-membuf-stats</code></a></strong><br />
+</li>
+When set to <code>yes</code>, Cisco memory buffer statistics are excluded from
+discovery.
+<p></p>
+<li><strong><a name="item_ciscoios_3a_3adisable_2dipsec_2dstats"><code>CiscoIOS::disable-ipsec-stats</code></a></strong><br />
+</li>
+When set to <code>yes</code>, IPSec statistics are excluded from discovery.
+<p></p>
+<li><strong><a name="item_ciscocatos_3a_3asuppress_2dnoname_2dports"><code>CiscoCatOS::suppress-noname-ports</code></a></strong><br />
+</li>
+When set to <code>yes</code>, only those Catalyst ports are included in configuration
+which have a port name (set up by <code>set port name</code> command).
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2002-2003 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

@@ -1,0 +1,75 @@
+/*
+   RRFW Documentation stylesheet.
+   Copyrigt (c) 2003 Stanislav Sinyagin
+
+   $Id$
+   */
+   
+BODY {
+  font-family : verdana, arial, helvetica, sans-serif;
+  font-size: 10pt;
+  line-height: 1.2;
+  text-align: justify;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+BLOCKQUOTE {
+  margin: 10pt;
+}
+
+LI {
+  margin-bottom: 0.8ex;
+}
+
+PRE {
+  font-size: 10pt;
+}
+
+H1, H2, A, CODE, EM {
+  color: #336699;
+}
+
+A[name] {
+  color: inherit;
+}
+
+H1 {
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 16pt;
+}
+
+H2 {
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 14pt;
+}
+
+H2 CODE {
+  font-weight: 800;  
+}
+
+H3 {
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 11pt;
+}
+
+DL {
+  font-weight: normal;
+  text-decoration: none;
+  color: #333333;
+  font-size: 10pt;
+}
+
+
+DIV.Custlogos {
+}
+
+IMG.Custlogo {
+  border: 0;  
+  background-color: #ffffff;
+  margin: 10px;
+  vertical-align: bottom;
+}

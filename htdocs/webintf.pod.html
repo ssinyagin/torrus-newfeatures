@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Torrus Web Interface Reference</title>
+<link rel="stylesheet" href="torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#torrus_web_interface_reference">Torrus Web Interface Reference</a></li>
+	<ul>
+
+		<li><a href="#directory_structure">Directory structure</a></li>
+		<li><a href="#css_stylesheets">CSS Stylesheets</a></li>
+		<li><a href="#cache_files">Cache files</a></li>
+		<li><a href="#site_configuration_options">Site configuration options</a></li>
+		<li><a href="#mod_perl_1_0_handler__torrus__apachehandler">mod_perl 1.0 handler: Torrus::ApacheHandler</a></li>
+		<li><a href="#mod_perl_2_0_handler__torrus__apache2handler">mod_perl 2.0 handler: Torrus::Apache2Handler</a></li>
+		<li><a href="#known_cgi_parameters">Known CGI parameters</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="torrus_web_interface_reference">Torrus Web Interface Reference</a></h1>
+<p>
+</p>
+<h2><a name="directory_structure">Directory structure</a></h2>
+<p>By default, the directory <em>/usr/local/torrus/sup/webplain/</em> is the place
+for static HTML, CSS stylesheets and images.</p>
+<p>The default CSS stylesheet files are installed in this directory.
+This directory must be configured with <em>SetHandler default-handler</em>
+directive.</p>
+<p>
+</p>
+<h2><a name="css_stylesheets">CSS Stylesheets</a></h2>
+<p>Additional user-defined stylesheet files may be added in
+<em>webplain</em> directory.
+The default HTML templates that come with the Torrus distribution use the
+global configuration variable <code>$Torrus::Renderer::stylesheet</code>, which is set
+in <em>torrus-config.pl</em> and may be overwritten in <em>torrus-siteconfig.pl</em>.</p>
+<p>
+</p>
+<h2><a name="cache_files">Cache files</a></h2>
+<p>All generated HTML and graphical images are cached twice: first on the server,
+and then in your browser. Thus, if you change somehow the HTML
+appearance of your Torrus installation, you need to clean both caches:</p>
+<pre>
+   torrus clearcache</pre>
+<p>This will clear the cache on the server. Then you may use your browser's
+``reload'' button, or clear the whole browser cache.</p>
+<p>
+</p>
+<h2><a name="site_configuration_options">Site configuration options</a></h2>
+<p>The following variables may need to be set in your
+<em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em> file:</p>
+<ul>
+<li><strong><a name="item__24torrus_3a_3arenderer_3a_3acompanyname"><code>$Torrus::Renderer::companyName</code></a></strong><br />
+</li>
+The text that you specify here will appear in the top left corner
+of all HTML pages.
+<p></p>
+<li><strong><a name="item__24torrus_3a_3arenderer_3a_3acompanyurl"><code>$Torrus::Renderer::companyURL</code></a></strong><br />
+</li>
+The company name text will be clickable with the URL specified in
+this variable.
+<p></p>
+<li><strong><a name="item__24torrus_3a_3arenderer_3a_3arendererurl"><code>$Torrus::Renderer::rendererURL</code></a></strong><br />
+</li>
+Default: <code>'/torrus'</code>. A URL that points to Torrus renderer.
+<p></p>
+<li><strong><a name="item__24torrus_3a_3arenderer_3a_3aplainurl"><code>$Torrus::Renderer::plainURL</code></a></strong><br />
+</li>
+Default: <code>'/torrus/plain'</code>. A URL that points to Torrus plain files directory.
+Normally CSS stylesheet files are resided there..
+<p></p>
+<li><strong><a name="item__24torrus_3a_3aapachehandler_3a_3aauthorizeusers"><code>$Torrus::ApacheHandler::authorizeUsers</code></a></strong><br />
+</li>
+Default: <code>1</code>. When true, the web interface users are required to log in.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="mod_perl_1_0_handler__torrus__apachehandler">mod_perl 1.0 handler: Torrus::ApacheHandler</a></h2>
+<p>For more documentation, see &lt;<a href="http://perl.apache.org/">http://perl.apache.org/</a>&gt;.</p>
+<p>The whole output generation is performed by the <code>Torrus::ApacheHandler</code> class.
+However, you still need access to the <em>plain</em> directory where your CSS
+resides. Typical Apache configuration would look like follows. Make sure
+your configuration does not contain tab characters:</p>
+<pre>
+  Alias /torrus/plain &quot;/usr/local/torrus/sup/webplain&quot;
+  PerlRequire &quot;/usr/local/torrus/conf_defaults/webmux.pl&quot;
+  &lt;Location /torrus&gt;
+    SetHandler perl-script
+    PerlHandler Torrus::ApacheHandler
+  &lt;/Location&gt;
+  &lt;Location /torrus/plain/&gt;
+    SetHandler default-handler
+    Options None
+  &lt;/Location&gt;</pre>
+<p>The base URL would be in this case:</p>
+<pre>
+  <a href="http://yourhost/torrus/">http://yourhost/torrus/</a></pre>
+<p>
+</p>
+<h2><a name="mod_perl_2_0_handler__torrus__apache2handler">mod_perl 2.0 handler: Torrus::Apache2Handler</a></h2>
+<p><em>Note:</em> Apache 2.0 support in Torrus is currently in its early
+development stage.</p>
+<p><em>Note:</em> As of now, <code>libapreq2</code> library is not released yet, and only the
+development version is available. You have to download and install it
+manually.</p>
+<p>mod_perl version <strong>1.99_15</strong> or later is supported. To the moment,
+<code>libapreq2</code> version <code>2.04_03-dev</code> is tested.</p>
+<p>Make sure you use <code>webmux2.pl</code> and <code>Torrus::Apache2Handler</code> in your
+configuration.</p>
+<p><code>SetHandler modperl</code> directive should give better performance
+than <code>SetHandler perl-script</code>. Both Perl handlers work the same way
+with Torrus.</p>
+<p>Typical Apache 2.0 configuration follows:</p>
+<pre>
+  Alias /torrus/plain &quot;/usr/local/torrus/sup/webplain&quot;
+  PerlRequire &quot;/usr/local/torrus/conf_defaults/webmux2.pl&quot;
+  &lt;Location /torrus&gt;
+    SetHandler modperl
+    PerlResponseHandler Torrus::Apache2Handler
+  &lt;/Location&gt;
+  &lt;Location /torrus/plain/&gt;
+    SetHandler default-handler
+    Options None
+  &lt;/Location&gt;</pre>
+<p>The base URL would be in this case:</p>
+<pre>
+  <a href="http://yourhost/torrus/">http://yourhost/torrus/</a></pre>
+<p>
+</p>
+<h2><a name="known_cgi_parameters">Known CGI parameters</a></h2>
+<p>The following CGI parameters are recognized by mod_perl handler:</p>
+<dl>
+<dt><strong><a name="item_token">token</a></strong><br />
+</dt>
+<dd>
+Optional. Each configuration tree element is referenced by a <em>token</em>, a short
+unique identifier. If not given, the root of the tree (<code>/</code>) is displayed.
+</dd>
+<p></p>
+<dt><strong><a name="item_path">path</a></strong><br />
+</dt>
+<dd>
+Optional. Alternatively to token reference, the full path of the tree element
+may be referenced.
+</dd>
+<p></p>
+<dt><strong><a name="item_view">view</a></strong><br />
+</dt>
+<dd>
+Optional. Specifies the <a href="#item_view"><code>view</code></a> name for displaying the tree element.
+If not specified, the defaul view is used.
+</dd>
+<p></p>
+<dt><strong><a name="item_tz">TZ</a></strong><br />
+</dt>
+<dd>
+Optional. If given, specifies the timezone that you want the graphs to be
+displayed for. This must be the URL-encoded zone name which is understood by
+your server system. You may use <code>zdump(8)</code> for testing.
+</dd>
+<p></p>
+<dt><strong><a name="item_now">NOW</a></strong><br />
+</dt>
+<dd>
+Optional. If given, presents the output for the given moment, instead of the
+current time. Must be of the form understood by <code>rrdtool</code> (see
+RRDTool manuals).
+</dd>
+<p></p>
+<dt><strong><a name="item_debug">DEBUG</a></strong><br />
+</dt>
+<dd>
+Optional. If true, turns on the debug level of logging. The debug messages
+are sent to HTTP server's error log.
+</dd>
+<p></p>
+<dt><strong><a name="item_showhidden">SHOWHIDDEN</a></strong><br />
+</dt>
+<dd>
+Optional. If true, makes the grapher display those subtree and leaves
+which have <code>hidden</code> parameter set to <code>yes</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_nohw">NOHW</a></strong><br />
+</dt>
+<dd>
+Optional. If true, disables the displaying of Holt-Winters
+boundaries and failures.
+</dd>
+<p></p>
+<dt><strong><a name="item_logout">LOGOUT</a></strong><br />
+</dt>
+<dd>
+Optional. When user authorization is enabled, causes the current user
+session to log out.
+</dd>
+<p></p></dl>
+<p>All other parameters whose name starts with capital letter, are passed
+to the HTML template as-is, and may be used for your custom purposes.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2002-2004 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

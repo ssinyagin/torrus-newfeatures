@@ -193,7 +193,7 @@ END %]
 [% BLOCK htmlend %]
 [% IF ! global.contentFinished %]</DIV><!-- Content -->[% END %]
 <DIV CLASS="Footer">
-  Powered by <A HREF="http://torrus.sourceforge.net">Torrus</A> [% version %]
+  Powered by <A HREF="http://torrus.org">Torrus</A> [% version %]
 </DIV>
 </BODY>
 </HTML>

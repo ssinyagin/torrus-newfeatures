@@ -13,6 +13,7 @@ To do now:
 
 -- Minus sign in tree name (ApacheHadler.pm line 75)
 -- Optionally show Admin info when authentication disabled
+-- RRD Renderer to take CF from the view definition
 -- Startup script that verifies database consistency at server boot
 -- Collector that reports the BerkeleyDB stats
 -- Sysedge ntregperf discovery optimization (Shawn)

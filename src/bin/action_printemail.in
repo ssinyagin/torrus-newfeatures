@@ -27,7 +27,7 @@ use Getopt::Long;
 
 require '@email_siteconfig_pl@';
 
-if( not $ENV{'TORRUS_HOME'} )
+if( not $ENV{'TORRUS_TREE'} )
 {
     print STDERR ("Torrus environment variables missing. This program ",
                   "must be run from Torrus Monitor\n");

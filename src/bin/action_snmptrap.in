@@ -27,10 +27,10 @@ use Getopt::Long;
 
 require '@snmptrap_siteconfig_pl@';
 
-if( not $ENV{'Torrus_HOME'} or not $ENV{'Torrus_TOKEN'} )
+if( not $ENV{'TORRUS_TOKEN'} )
 {
-    print STDERR ("Torrus environment variables missing. This program must be ",
-                  "run from Torrus Monitor\n");
+    print STDERR ("Torrus environment variables missing. This program ",
+                  "must be run from Torrus Monitor\n");
     exit 1;
 }
 
@@ -63,22 +63,22 @@ my @varbindlist = ( $oid_prefix . '.1',
                     INTEGER32, 1,
 
                     $oid_prefix . '.2',
-                    OCTET_STRING, $ENV{'Torrus_TOKEN'},
+                    OCTET_STRING, $ENV{'TORRUS_TOKEN'},
 
                     $oid_prefix . '.3',
-                    OCTET_STRING, $ENV{'Torrus_MONITOR'},
+                    OCTET_STRING, $ENV{'TORRUS_MONITOR'},
 
                     $oid_prefix . '.4',
-                    INTEGER, $event_type{$ENV{'Torrus_EVENT'}},
+                    INTEGER, $event_type{$ENV{'TORRUS_EVENT'}},
 
                     $oid_prefix . '.5',
-                    OCTET_STRING, $ENV{'Torrus_NODEPATH'},
+                    OCTET_STRING, $ENV{'TORRUS_NODEPATH'},
 
                     $oid_prefix . '.6',
-                    OCTET_STRING, snmp_dateandtime( $ENV{'Torrus_TSTAMP'} ),
+                    OCTET_STRING, snmp_dateandtime( $ENV{'TORRUS_TSTAMP'} ),
 
                     $oid_prefix . '.7',
-                    OCTET_STRING, $ENV{'Torrus_TREE'}
+                    OCTET_STRING, $ENV{'TORRUS_TREE'}
                     );
 
 foreach my $host ( @Torrus::Snmptrap::hosts )

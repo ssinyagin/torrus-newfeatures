@@ -33,10 +33,10 @@ require '@snmptrap_siteconfig_pl@';
 $Torrus::Snmptrap::enterprise = '1.3.6.1.4.1.14697.1.1.1';
 
 
-if( not $ENV{'Torrus_HOME'} )
+if( not $ENV{'TORRUS_TOKEN'} )
 {
-    print STDERR ("Torrus environment variables missing. This program must be ",
-                  "run from Torrus Monitor\n");
+    print STDERR ("Torrus environment variables missing. This program ",
+                  "must be run from Torrus Monitor\n");
     exit 1;
 }
 
@@ -65,22 +65,22 @@ my %specifictrap = ( 'set'    => 1,
                      );
 
 my @varbindlist = ( $Torrus::Snmptrap::enterprise . '.2',
-                    OCTET_STRING, $ENV{'Torrus_TOKEN'},
+                    OCTET_STRING, $ENV{'TORRUS_TOKEN'},
 
                     $Torrus::Snmptrap::enterprise . '.5',
-                    OCTET_STRING, $ENV{'Torrus_NODEPATH'},
+                    OCTET_STRING, $ENV{'TORRUS_NODEPATH'},
 
                     $Torrus::Snmptrap::enterprise . '.3',
-                    OCTET_STRING, $ENV{'Torrus_MONITOR'},
+                    OCTET_STRING, $ENV{'TORRUS_MONITOR'},
 
                     $Torrus::Snmptrap::enterprise . '.4',
-                    OCTET_STRING, $ENV{'Torrus_EVENT'},
+                    OCTET_STRING, $ENV{'TORRUS_EVENT'},
 
                     $Torrus::Snmptrap::enterprise . '.6',
-                    OCTET_STRING, scalar(localtime($ENV{'Torrus_TSTAMP'})),
+                    OCTET_STRING, scalar(localtime($ENV{'TORRUS_TSTAMP'})),
 
                     $Torrus::Snmptrap::enterprise . '.7',
-                    OCTET_STRING, $ENV{'Torrus_TREE'}
+                    OCTET_STRING, $ENV{'TORRUS_TREE'}
                     );
 
 foreach my $host ( @Torrus::Snmptrap::hosts )
@@ -101,8 +101,8 @@ foreach my $host ( @Torrus::Snmptrap::hosts )
     my $result =
         $session->trap( -enterprise   => $Torrus::Snmptrap::enterprise,
                         -generictrap  => ENTERPRISE_SPECIFIC,
-                        -specifictrap => $specifictrap{$ENV{'Torrus_EVENT'}},
-                        -timestamp    => $ENV{'Torrus_UPTIME'} * 100,
+                        -specifictrap => $specifictrap{$ENV{'TORRUS_EVENT'}},
+                        -timestamp    => $ENV{'TORRUS_UPTIME'} * 100,
                         -varbindlist  => \@varbindlist
                         );
 

@@ -336,7 +336,6 @@ sub run_event_exec
         $cmd =~ s/\&gt\;/\>/;
         $cmd =~ s/\&lt\;/\</;
 
-        $ENV{'TORRUS_HOME'}      = $Torrus::Global::prefix;
         $ENV{'TORRUS_BIN'}       = $Torrus::Global::pkgbindir;
         $ENV{'TORRUS_UPTIME'}    = time() - $self->whenStarted();
 

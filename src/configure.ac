@@ -158,6 +158,10 @@ AC_ARG_VAR(tmpldir, [[PKGHOME/templates] Template files])
 if test -z "$tmpldir"; then
    tmpldir='${pkghome}/templates'; fi
 
+AC_ARG_VAR(tmpluserdir, [[SITEDIR/templates] User-defined Template files])
+if test -z "$tmpluserdir"; then
+   tmpluserdir='${sitedir}/templates'; fi
+
 AC_ARG_VAR(distxmldir, [[PKGHOME/xmlconfig] Distribution XML config files])
 if test -z "$distxmldir"; then
    distxmldir='${pkghome}/xmlconfig'; fi

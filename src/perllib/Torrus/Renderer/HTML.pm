@@ -40,12 +40,6 @@ sub render_html
     my $view = shift;
     my $outfile = shift;
 
-    if( not -d $Torrus::Global::templateDir )
-    {
-        Error('$Torrus::Global::templateDir is not defined or incorrect');
-        exit(1);
-    }
-
     my $tmplfile = $config_tree->getParam($view, 'html-template');
 
     # Create the Template Toolkit processor once, and reuse
@@ -54,7 +48,7 @@ sub render_html
     if( not defined( $self->{'tt'} ) )
     {
         $self->{'tt'} =
-            new Template(INCLUDE_PATH => $Torrus::Global::templateDir,
+            new Template(INCLUDE_PATH => $Torrus::Global::templateDirs,
                          TRIM => 1);
     }
     my $ttvars =

@@ -65,7 +65,7 @@ sub renderUserLogin
     if( not defined( $self->{'tt'} ) )
     {
         $self->{'tt'} =
-            new Template(INCLUDE_PATH => $Torrus::Global::templateDir,
+            new Template(INCLUDE_PATH => $Torrus::Global::templateDirs,
                          TRIM => 1);
     }
 
@@ -168,7 +168,7 @@ sub renderTreeChooser
     if( not defined( $self->{'tt'} ) )
     {
         $self->{'tt'} =
-            new Template(INCLUDE_PATH => $Torrus::Global::templateDir,
+            new Template(INCLUDE_PATH => $Torrus::Global::templateDirs,
                          TRIM => 1);
     }
 

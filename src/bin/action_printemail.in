@@ -18,7 +18,7 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
-# We need this for $Torrus::Global::templateDir
+# We need this for $Torrus::Global::templateDirs
 BEGIN { require '@torrus_config_pl@'; }
 
 use strict;
@@ -29,8 +29,8 @@ require '@email_siteconfig_pl@';
 
 if( not $ENV{'Torrus_HOME'} )
 {
-    print STDERR ("Torrus environment variables missing. This program must be ",
-                  "run from Torrus Monitor\n");
+    print STDERR ("Torrus environment variables missing. This program ",
+                  "must be run from Torrus Monitor\n");
     exit 1;
 }
 
@@ -44,7 +44,7 @@ if( not $ok )
     exit 1;
 }
 
-my $tt = new Template(INCLUDE_PATH => $Torrus::Global::templateDir);
+my $tt = new Template(INCLUDE_PATH => $Torrus::Global::templateDirs);
 
 my $vars =
 {

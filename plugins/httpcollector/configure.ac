@@ -76,6 +76,8 @@ AC_ARG_VAR(dbhome, [[VARPREFIX/db] Berkeley DB files])
 AC_ARG_VAR(seslockdir, [[VARPREFIX/session_data/lock] Web session locks])
 AC_ARG_VAR(sesstordir, [[VARPREFIX/session_data/store] Web session storage])
 AC_ARG_VAR(wrapperdir, [[BINDIR] CLI wrapper])
+AC_ARG_VAR(defrrddir, [[/srv/torrus/collector_rrd] Default RRD storage path])
+
                            
                    
 AC_CONFIG_FILES([Makefile])

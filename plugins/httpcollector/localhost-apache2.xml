@@ -40,7 +40,7 @@
       <apply-template name="apache-httpd-v2"/>
       
       <param name="http-host"  value="127.0.0.1"/>
-      <param name="data-dir"   value="/var/snmpcollector"/>
+      <param name="data-dir"   value="/srv/torrus/collector_rrd"/>
     </subtree>    
   </subtree>
 

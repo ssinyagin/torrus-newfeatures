@@ -2,8 +2,6 @@ Round Robin Database Framework
   
 To do now:
 
--- Customize /var/snmpcollector path in torrus and plugins
-
 -- Document ./setup_tools/configure_fhs
 -- Change the implementation of hrule-legend-X view parameter
 -- Tokenset members sorting

@@ -9,7 +9,7 @@
 #
 
 # Where the RRD files are located. Separate multiple paths with space
-RRDSTORAGE=/var/snmpcollector
+RRDSTORAGE=/srv/torrus/collector_rrd
 
 # Maximum allowed age of an RRD file, in minutes.
 MAXAGE=60

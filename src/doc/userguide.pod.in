@@ -106,7 +106,7 @@ of C<torrus genddx>. This program may also read the device names
     --out=myrouters.ddx \
     --discout=myrouters.xml \
     --subtree=/My_Routers \
-    --datadir=/data1/snmpcollector
+    --datadir=/data1/torrus/collector_rrd
 
   torrus genddx \
     --hostfile=myswitches.txt \
@@ -115,7 +115,7 @@ of C<torrus genddx>. This program may also read the device names
     --out=myswitches.ddx \
     --discout=myswitches.xml \
     --subtree=/My_Switches \
-    --datadir=/data1/snmpcollector
+    --datadir=/data1/torrus/collector_rrd
 
   torrus devdiscover  --in=myrouters.ddx
 
@@ -130,7 +130,7 @@ you would find them in F<@sitedir@/discovery/>.
 The result of C<devdiscover> is the Torrus configuration files:
 F<myrouters.xml> and F<myswitches.xml>, placed into
 F<@sitexmldir@/>. The C<collector> will place the
-RRD files into F</data1/snmpcollector>. Make sure that this directory
+RRD files into F</data1/torrus/collector_rrd>. Make sure that this directory
 exists, has enough free space, and is writable by C<torrus> user. B<Note:>
 the C<genddx> utility is designed as a one-time helper, so that you create
 your basic discovery instructions files from scratch. Further on, the discovery

@@ -235,6 +235,11 @@ AC_ARG_VAR(mansec_misc, [[7] Miscellaneous man section])
 if test -z "$mansec_misc"; then
    mansec_misc='7'; fi
 
+AC_ARG_VAR(defrrddir, [[/srv/torrus/collector_rrd] Default RRD storage path])
+if test -z "$defrrddir"; then
+   defrrddir='/srv/torrus/collector_rrd'; fi
+
+   
 AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
 AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])
 AC_CONFIG_FILES([examples/Makefile perllib/Makefile])

@@ -37,7 +37,7 @@ my $template = 'genrandomcfg.xml';
 my $outfile  = 'random.xml';
 
 my $subtree = 'RandomTest';
-my $datadir = '/var/snmpcollector';
+my $datadir = '@defrrddir@';
 
 my $creator = $0 . " \\\n";
 foreach my $arg ( @ARGV )
@@ -73,7 +73,7 @@ if( not $ok or
     " --template              template filename      [genrandomcfg.xml]\n",
     " --out=filename          output file.           [random.xml]\n",
     " --subtree=name          Torrus Subtree name      [RandomTest]\n",
-    " --datadir=path          data-dir parameter     [/var/snmpcollector]\n";
+    " --datadir=path          data-dir parameter     [@defrrddir@]\n";
     exit 1;
 }
 

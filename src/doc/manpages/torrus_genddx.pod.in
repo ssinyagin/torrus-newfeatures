@@ -96,7 +96,7 @@ Sets the subtree name to I<SUBTREE>. Default is C</Routers>.
 =item B<--datadir>=I<DATADIR>
 
 Sets the path of the directory where SNMP data is collected to I<DATADIR>.
-Default value is F</srv/torrus/collector_rrd>.
+Default value is F<@defrrddir@>.
 
 =item B<--holtwinters>
 

@@ -49,6 +49,7 @@ devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
     -e "s,\@cachedir\@,@cachedir@,g" \
     -e "s,\@cfgdefdir\@,@cfgdefdir@,g" \
     -e "s,\@dbhome\@,@dbhome@,g" \
+    -e "s,\@defrrddir\@,@defrrddir@,g" \
     -e "s,\@devdiscover_config_pl\@,$devdiscover_config_pl,g" \
     -e "s,\@devdiscover_siteconfig_pl\@,$devdiscover_siteconfig_pl,g" \
     -e "s,\@distxmldir\@,@distxmldir@,g" \

@@ -45,7 +45,7 @@ our %globalParams =
      'snmp-timeout'        => 10,
      'snmp-retries'        => 2,
      'rrd-hwpredict'       => 0,
-     'data-dir'            => '/srv/torrus/collector_rrd',
+     'data-dir'            => '@defrrddir@',
      );
 
 our $outfile = 'routers.ddx';

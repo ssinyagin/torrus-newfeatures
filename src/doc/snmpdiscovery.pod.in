@@ -52,7 +52,7 @@ path to search for them when the absolute path is not given.
      --retries=number        SNMP retries         [2]
      --timeout=number        SNMP timeout         [10]
      --subtree=string        Subtree name         [/Routers]
-     --datadir=path          data-dir parameter [/srv/torrus/collector_rrd]
+     --datadir=path          data-dir parameter [@defrrddir@]
      --holtwinters           Enable Holt-Winters analysis
 
 This utility generates C<devdiscover> instructions XML file (DDX) based on
@@ -162,7 +162,7 @@ Example:
      --community=blahblah  --host=10.0.0.1  --host=10.0.1.1
     On Tue Dec  2 17:43:30 2003
       </creator-info>
-      <param name="data-dir" value="/var/snmpcollector"/>
+      <param name="data-dir" value="@defrrddir@"/>
       <param name="domain-name" value=""/>
       <param name="host-subtree" value="/Routers"/>
       <param name="output-file" value="myrouters.xml"/>

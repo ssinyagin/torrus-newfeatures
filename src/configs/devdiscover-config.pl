@@ -26,7 +26,8 @@
 use lib(@perllibdirs@);
 
 $Torrus::Global::version        = '@VERSION@';
-$Torrus::Global::perlConfigDir  = '@perlcfgdir@';
+$Torrus::Global::discoveryDir   = '@sitedir@/discovery/';
+$Torrus::Global::siteXmlDir     = '@sitexmldir@';
 
 @Torrus::DevDiscover::loadModules =
     (

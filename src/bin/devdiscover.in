@@ -39,8 +39,6 @@ our $snmpdebug = 0;
 our $debug = 0;
 our $verbose = 0;
 
-my $searchdir = '@sitedir@/discovery/';
-
 my %formatsSupported = ( '1.0' => 1 );
 
 
@@ -104,11 +102,11 @@ elsif( $verbose )
 
 if( not -r $infile )
 {
-    my $altfile = $searchdir . $infile;
+    my $altfile = $Torrus::Global::discoveryDir . $infile;
     if( not -r $altfile )
     {
         Error('Cannot find file $infile neither in current directory nor in ' .
-              $searchdir);
+              $Torrus::Global::discoveryDir);
         exit 1;
     }
     else
@@ -392,7 +390,14 @@ sub absXmlFilename
     if( $offset >= 0 )
     {
         my $len = length( $subst );
-        substr( $filename, $offset, $len ) = '@sitexmldir@';
+        substr( $filename, $offset, $len ) = $Torrus::Global::siteXmlDir;
+    }
+    else
+    {
+        if( $filename !~ /^\// )
+        {
+            $filename = $Torrus::Global::siteXmlDir . '/' . $filename;
+        }
     }
     return $filename;
 }
@@ -403,7 +408,7 @@ sub relXmlFilename
 {
     my $filename = shift;
 
-    my $subst = '@sitexmldir@';
+    my $subst = $Torrus::Global::siteXmlDir;
     my $len = length( $subst );
 
     if( $filename =~ /^\// )

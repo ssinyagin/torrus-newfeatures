@@ -36,7 +36,7 @@ our $hostfile;
 
 our %globalParams =
     (
-     'output-file'         => '@sitexmldir@/routers.xml',
+     'output-file'         => 'routers.xml',
      'domain-name'         => '',
      'host-subtree'        => '/Routers',
      'snmp-port'           => '161',
@@ -124,8 +124,16 @@ if( not $ok or
     " --holtwinters           Enable Holt-Winters analysis\n",
     "\n",
     "Host names may be of form \"host:devname\" where devname is a symbolic\n",
-    "device name.\n";
+    "device name.\n",
+    "Output file is placed into " . $Torrus::Global::discoveryDir,
+    "\n if no path is given.\n";
     exit 1;
+}
+
+# Place the output file in discovery directory if the path is not given
+if( $outfile !~ /\// )
+{
+    $outfile = $Torrus::Global::discoveryDir . '/' . $outfile;
 }
 
 # Convert flags from true/false to yes/no

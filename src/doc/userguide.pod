@@ -97,51 +97,53 @@ to use it in a more advanced way, you will have to read the whole bit of
 this guide, and also I<Torrus XML Configuration Guide> and probably some
 other documents too.
 
-STOPPED HERE
-
 B<Build the hierarchy>. By default, C<torrus genddx> will put all your
 devices into one hierarchy: C</Routers/E<lt>hostnameE<gt>/...>.
 The subtree name, C<Routers>, may be changed with a command line option
-of C<genddx>. This program may also read the device names (or IP addresses
-in case if you don't use DNS) from space-delimited text files.
+of C<torrus genddx>. This program may also read the device names
+(or IP addresses in case if you don't use DNS) from space-delimited text files.
 
-  cd /usr/local/torrus-0.1
-  ./bin/genddx \
-    --hostfile=share/torrus/myrouters.txt \
+  torrus genddx \
+    --hostfile=myrouters.txt \
     --domain=example.net \
     --community=MySecretSNMPCommunity \
-    --out=share/torrus/discovery/myrouters.ddx \
-    --discout=share/torrus/xmlconfig/myrouters.xml \
+    --out=myrouters.ddx \
+    --discout=myrouters.xml \
     --subtree=/My_Routers \
     --datadir=/data1/snmpcollector
 
-  ./bin/genddx \
-    --hostfile=share/torrus/myswitches.txt \
+  torrus genddx \
+    --hostfile=myswitches.txt \
     --domain=example.net \
     --community=MySecretSNMPCommunity \
-    --out=share/torrus/discovery/myswitches.ddx \
-    --discout=share/torrus/xmlconfig/myswitches.xml \
+    --out=myswitches.ddx \
+    --discout=myswitches.xml \
     --subtree=/My_Switches \
     --datadir=/data1/snmpcollector
 
-  ./bin/devdiscover  --in=share/torrus/discovery/myrouters.ddx
+  torrus devdiscover  --in=myrouters.ddx
 
-  ./bin/devdiscover  --in=share/torrus/discovery/myswitches.ddx
+  torrus devdiscover  --in=myswitches.ddx
 
 In the example above, the routers' and switches' names are read from
-F<myrouters.txt> and F<myswitches.txt>. They form a hierarchy with
-two subtrees: C</My_Routers/> and C</My_Switches/>.
+F<myrouters.txt> and F<myswitches.txt> in the user's current directory.
+They form a hierarchy with two subtrees: C</My_Routers/> and C</My_Switches/>.
 C<genddx> creates the discovery instruction XML files into
-F<myrouters.ddx> and F<myswitches.ddx> accordingly.
-The result of C<devdiscover> is the Torrus configuration files: F<myrouters.xml>
-and F<myswitches.xml>. The C<collector> will place the RRD files into
-F</data1/snmpcollector>. Make sure that this directory exists and has enough
-free space.
+F<myrouters.ddx> and F<myswitches.ddx> accordingly. By default,
+you would find them in F</usr/local/etc/torrus/discovery/>.
+The result of C<devdiscover> is the Torrus configuration files:
+F<myrouters.xml> and F<myswitches.xml>, placed into
+F</usr/local/etc/torrus/xmlconfig/>. The C<collector> will place the
+RRD files into F</data1/snmpcollector>. Make sure that this directory
+exists, has enough free space, and is writable by C<torrus> user. B<Note:>
+the C<genddx> utility is designed as a one-time helper, so that you create
+your basic discovery instructions files from scratch. Further on, the discovery
+files should be maintained separately.
 
 B<Add your XML files to the tree configuration>.  Next step would be to
 add F<myrouters.xml> and F<myswitches.xml>
 into C<xmlfiles> array in the tree configuration in your
-F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl>.
+F</usr/local/etc/torrus/conf/torrus-siteconfig.pl>.
 
 See I<Torrus SNMP Discovery User Guide> for more details on how
 C<genddx> and C<devdisover> interact and how you can customize
@@ -156,7 +158,7 @@ in building the data hierarchies.
 B<Compile the configuration>. Now that your configuration is
 ready, you need to execute the compiler:
 
-  ./bin/compilexml --tree=treename --verbose
+  torrus compilexml --tree=treename --verbose
 
 For most of the processes that you run within Torrus, you need to specify
 the tree name with C<--tree> option. Some prorams accept C<--all> option,
@@ -168,17 +170,16 @@ It will also tell you if there's any error in your configuration.
 B<Launch the collector>. Assuming that compilation went smoothly,
 you may now launch the data collector:
 
-  ./bin/collector --tree=treename
+  torrus collector --tree=treename
 
 Without additional options, the collector will fork as a daemon
 process, and write only error messages in its log file,
-F<$Torrus_HOME/var/log/collector.treename.log>.
+F</var/log/torrus/collector.treename.log>.
 
-There is a file that is created by C<make install>, F<init.torrus>.
+There is a file that is created by C<./configure>, called F<init.d/torrus>.
 You may place it into a directory where your system looks for startup scripts
 (F</etc/init.d/> on Solaris and some Linuxes, F</usr/local/etc/rc.d/>
-on FreeBSD). Most probably, you need to rename and edit the script
-before using.
+on FreeBSD). Probably you need to rename and edit the script before using.
 Note that it also executes another daemon, C<monitor>. You will read
 later about it in more details.
 
@@ -191,9 +192,8 @@ has access to a set of datasource trees. See
 I<Torrus Installation Instructions> for a basic example.
 
 B<Browse with your browser>. Provided that you followed the
-installation guide to the
-end, and your HTTP server is running, your Torrus hierarchy must be visible
-with your favorite web browser.
+installation guide to the end, and your HTTP server is running,
+your Torrus hierarchy must be visible  with your favorite web browser.
 
 
 =head2 Configuration guidelines
@@ -225,8 +225,8 @@ and then re-used in multiple places.
 
 =head3 Comments, descriptions, and legends
 
-C<devdiscover> will extract some useful information from your SNMP devices,
-and place it in the XML configuration:
+C<torrus devdiscover> will extract some useful information from
+your SNMP devices, and place it in the XML configuration:
 
 =over 4
 
@@ -387,12 +387,11 @@ This example is part of Torrus distribution, and the file is named
 F<examples/setmonitor.xupdate.xml>. Your commands to apply these XUpdate
 instructions would be like
 
-  ./bin/devdiscover \
-     --in=share/torrus/discovery/routers.ddx \
-     --out=share/torrus/xmlconfig/routers.xml
+  torrus devdiscover --in=routers.ddx --out=routers.xml
 
-  xupdate -j share/torrus/examples/xupdate/setmonitor.xup \
-    share/torrus/xmlconfig/routers.xml > share/torrus/xmlconfig/routers1.xml
+  cd /usr/local/etc/torrus/xmlconfig
+  xupdate -j /usr/local/torrus/examples/setmonitor.xupdate.xml \
+    routers.xml > routers1.xml
 
 More XUpdate examples will be included in the future.
 
@@ -401,15 +400,14 @@ More XUpdate examples will be included in the future.
 
 Another aproach to amending the autogenerated confguration is as follows.
 
-Torrus distribution has a special-purpose XSLT template, F<extract-skeleton.xsl>,
-designed to strip all parameters and template applications from a given
-XML configuration, and leave the tree structure only. Given that
-F<share/torrus/xmlconfig/routers.xml> is some autogenerated configuration,
+Torrus distribution has a special-purpose XSLT template,
+F<extract-skeleton.xsl>, designed to strip all parameters and template
+applications from a given XML configuration, and leave the tree structure
+only. Given that F<routers.xml> is some autogenerated configuration,
 you may run
 
-  xsltproc share/torrus/sup/extract-skeleton.xsl \
-    share/torrus/xmlconfig/routers.xml  | \
-  xmllint --format --output routers-skeleton.xml -
+  xsltproc /usr/local/torrus/scripts/xml/extract-skeleton.xsl routers.xml  | \
+    xmllint --format --output routers-skeleton.xml -
 
 You can add your changes to the new file, F<routers-skeleton.xml>, and add
 it to your Torrus configuration. These changes may be performed manually
@@ -421,7 +419,7 @@ or by means of XUpdate technique described above.
 It is quite common task that you want Torrus to monitor certain set of
 devices, and C<devdiscover> does not (yet) support them. Of course,
 it's quite a pain to maintain a manually written XML file, especially if
-the number of homogenious devices is more than one.
+the there are more than one devices of the same type.
 
 In such case you may benefit from the approach suggested by
 Christian Schnidrig:
@@ -462,7 +460,7 @@ The first one would contain data about our devices:
     %]
 
 Then F<gizmos.tmpl> would contain the XML template that would produce
-the TorrusQ configuration file:
+the Torrus configuration file:
 
     [% PROCESS $data %]
     <?xml version="1.0"?>
@@ -530,10 +528,17 @@ subdirectories here: F<etc>, F<htdocs>, and F<var>.
 
 =item * F</usr/testtorrus/home>
 
-This is the installation directory of Torrus. All other manuals refer it as
-C<$Torrus_HOME>.
+This is the installation directory of Torrus. 
 
-=item * F</usr/testtorrus/snmpcollector>
+=item * F</usr/testtorrus/etc>
+
+Directory for configuration files.
+
+=item * F</usr/testtorrus/var>
+
+Directory for logs, database and PID files.
+
+=item * F</usr/testtorrus/collector_rrd>
 
 Collector will store RRD files here.
 
@@ -547,17 +552,21 @@ Distribution files will be stored and unpacked here.
 =item * Installation procedure
 
   cd /usr/testtorrus/src
-  gzip -dc torrus-0.1.5.tar.gz | tar xvf -
-  cd torrus-0.1.5
-  ./configure --prefix=/usr/testtorrus/home
+  gzip -dc torrus-1.0.0.tar.gz | tar xvf -
+  cd torrus-1.0.0
+  ./configure pkghome=/usr/testtorrus/home \
+    sitedir=/usr/testtorrus/etc \
+    logdir=/usr/testtorrus/var/log \
+    piddir=/usr/testtorrus/var/run \
+    varprefix=/usr/testtorrus/var \
+    wrapperdir=/usr/testtorrus
   make install
 
 =item * Devdiscover configuration
 
 Use devdiscover as usual. Place your discovery instruction files in
-F</usr/testtorrus/home/share/torrus/discovery/>, and make sure that the
-C<output-file> points inside F</usr/testtorrus/home/share/torrus/xmlconfig/>,
-and C<data-dir> is set to F</usr/testtorrus/snmpcollector>.
+F</usr/testtorrus/etc/discovery/>, and make sure that
+C<data-dir> is set to F</usr/testtorrus/collector_rrd>.
 
 =item * Apache configuration
 
@@ -614,7 +623,8 @@ given below:
     ServerName torrus.myserver.com
     CustomLog /usr/testtorrus/apache/var/torrus.myserver.com.log "combined"
     PerlModule Apache::PerlRun
-    PerlRequire "/usr/testtorrus/home/share/torrus/webmux.pl"
+    PerlRequire "/usr/testtorrus/home/conf_defaults/webmux.pl"
+    Alias /plain/ "/usr/testtorrus/home/sup/webplain"
     <Location />
       SetHandler perl-script
       PerlHandler Torrus::ApacheHandler
@@ -667,8 +677,7 @@ graph. Somewhere in Torrus configuration, you may have:
     </param>
   </datasources>
 
-The best place for this would be
-F<$Torrus_HOME/share/torrus/xmlconfig/site-global.xml>.
+The best place for this would be F<site-global.xml>.
 
 
 =head3 Watching the collector failures
@@ -745,7 +754,7 @@ generally works.
 It may happen sometimes, that a process accessing Torrus database
 terminates incorrectly, and the database becomes blocked.
 A typical symptom of this is that the command
-C<./bin/compilexml --all --verbose>
+C<torrus compilexml --all --verbose>
 does not print anything and stays running forever, occupying zero
 percent of CPU.
 
@@ -760,21 +769,21 @@ the contents of the database.
   ## (might be located in /usr/local/BerkeleyDB.4.1/bin/)
   /etc/init.d/apache stop
   /etc/init.d/torrus stop
-  cd /usr/local/torrus-0.1
-  db_recover -h var/db/
-  ./bin/compilexml --verbose --all
+  cd /var/torrus/db
+  db_recover -h .
+  torrus compilexml --verbose --all
   /etc/init.d/torrus start
   /etc/init.d/apache start
 
   ## The brutal way
   /etc/init.d/apache stop
   /etc/init.d/torrus stop
-  cd /usr/local/torrus-0.1
-  rm -r var/db/*
-  ./bin/compilexml --verbose
+  cd /var/torrus
+  rm -r db/*
+  torrus compilexml --verbose
   /etc/init.d/torrus start
   /etc/init.d/apache start
 
 =head1 Author
 
-Copyright (c) 2002-2003 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -3,7 +3,7 @@
 <head>
 <title>action_snmpv1trap - Scripts for sending 
 SNMP traps from monitor action. 
-action_snmpv1trap is obsolete as the preferred SNMP version is 2c.</title>
+C&lt;action_snmpv1trap&gt; is obsolete as the preferred SNMP version is 2c.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
 <link rev="made" href="mailto:gp@familiehaase.de" />
 </head>
@@ -21,6 +21,7 @@ action_snmpv1trap is obsolete as the preferred SNMP version is 2c.</title>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#options">OPTIONS</a></li>
 	<li><a href="#files">FILES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#notes">NOTES</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 </ul>
@@ -32,7 +33,7 @@ action_snmpv1trap is obsolete as the preferred SNMP version is 2c.</title>
 <h1><a name="name">NAME</a></h1>
 <p>action_snmptrap, action_snmpv1trap - Scripts for sending 
 SNMP traps (version 2c and 1 respectively) from monitor action. 
-action_snmpv1trap is obsolete as the preferred SNMP version is 2c.</p>
+<code>action_snmpv1trap</code> is obsolete as the preferred SNMP version is 2c.</p>
 <p>
 </p>
 <hr />
@@ -40,7 +41,7 @@ action_snmpv1trap is obsolete as the preferred SNMP version is 2c.</p>
 <pre>
  &lt;action name=&quot;snmptrap&quot;&gt;
    &lt;param name=&quot;action-type&quot; value=&quot;exec&quot; /&gt;
-   &lt;param name=&quot;command&quot; value=&quot;$Torrus_BIN/action_snmptrap&quot; /&gt;
+   &lt;param name=&quot;command&quot; value=&quot;$TORRUS_BIN/action_snmptrap&quot; /&gt;
    &lt;param name=&quot;launch-when&quot; value=&quot;set, clear&quot; /&gt;
  &lt;/action&gt;</pre>
 <p>
@@ -83,7 +84,7 @@ Sets the destination UDP port.
 <dd>
 Sets the <code>enterprise</code> field of the SNMPv1 trap to a given OID (see
 RFC 1157 for more details). This option is only available for
-action_snmpv1trap and will be ignored for action_snmptrap.
+<code>action_snmpv1trap</code> and will be ignored for <code>action_snmptrap</code>.
 </dd>
 <p></p></dl>
 <p>
@@ -91,7 +92,7 @@ action_snmpv1trap and will be ignored for action_snmptrap.
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__40perlcfgdir_40_2fsnmptrap_2dsiteconfig_2epl"><em>@perlcfgdir@/snmptrap-siteconfig.pl</em></a></strong><br />
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2fsnmptrap_2d"><em>/usr/local/etc/torrus/conf/snmptrap-siteconfig.pl</em></a></strong><br />
 </dt>
 <dd>
 Torrus site configuration script for SNMP traps.
@@ -100,8 +101,13 @@ Torrus site configuration script for SNMP traps.
 <p>
 </p>
 <hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>torrus(1)</em></p>
+<p>
+</p>
+<hr />
 <h1><a name="notes">NOTES</a></h1>
-<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>See more documentation at Torrus home page: <a href="http://torrus.org">http://torrus.org</a></p>
 <p>
 </p>
 <hr />

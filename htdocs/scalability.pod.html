@@ -148,10 +148,10 @@ The command</p>
   db_stat -h /var/torrus/db -c</pre>
 <p>would show you the current number of locks and lockers, and their maximum
 quantities during the database history.
-These parameters can be tuned
-by creating the file <em>DB_CONFIG</em> in the database home directory, which is
-usually resided in <em>/var/torrus/db/</em>. The following settings would
-work fine with about 20 collector processes and 5 HTTP daemon processes:</p>
+The maximum numbers of lock objects and lockers can be tuned by creating the
+file <em>DB_CONFIG</em> in the database home directory, <em>/var/torrus/db</em>.
+The following settings would work fine with about 20 collector processes
+and 5 HTTP daemon processes:</p>
 <pre>
    set_lk_max_lockers   6000
    set_lk_max_locks     3000</pre>

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>RRFW Programming Style Guide</title>
+<title>Torrus Programming Style Guide</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
 <link rev="made" href="mailto:gp@familiehaase.de" />
 </head>
@@ -13,7 +13,7 @@
 
 <ul>
 
-	<li><a href="#rrfw_programming_style_guide">RRFW Programming Style Guide</a></li>
+	<li><a href="#torrus_programming_style_guide">Torrus Programming Style Guide</a></li>
 	<ul>
 
 		<li><a href="#perl_indentation_style">Perl indentation style</a></li>
@@ -30,19 +30,19 @@
 <hr />
 <p>
 </p>
-<h1><a name="rrfw_programming_style_guide">RRFW Programming Style Guide</a></h1>
+<h1><a name="torrus_programming_style_guide">Torrus Programming Style Guide</a></h1>
 <p>
 </p>
 <h2><a name="perl_indentation_style">Perl indentation style</a></h2>
-<p>The indentation style is a kind of BSD/Allman style:</p>
+<p>The code indentation style is a kind of BSD/Allman style:</p>
 <pre>
     while( not $success and time() &lt; $waitingTimeout )
     {
         $self-&gt;clearReader();</pre>
 <pre>
-        Info('Sleeping ' . $RRFW::Global::ConfigReadyRetryPeriod .
+        Info('Sleeping ' . $Torrus::Global::ConfigReadyRetryPeriod .
               ' seconds');
-        sleep $RRFW::Global::ConfigReadyRetryPeriod;</pre>
+        sleep $Torrus::Global::ConfigReadyRetryPeriod;</pre>
 <pre>
         $self-&gt;setReader();</pre>
 <pre>
@@ -123,7 +123,7 @@ standards:</p>
 <p>
 </p>
 <h2><a name="normalizing_multiple_files">Normalizing multiple files</a></h2>
-<p>In RRFW CVS repository, in the root of module <code>src</code>, there is a small
+<p>In Torrus CVS repository, in the root of module <code>src</code>, there is a small
 utility that fixes some styling issues for all the sources in
 current directory and subdirectories:</p>
 <pre>
@@ -134,7 +134,7 @@ and removes empty lines at the start and the end of file.</p>
 </p>
 <hr />
 <h1><a name="author">Author</a></h1>
-<p>Copyright (c) 2003 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2003-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

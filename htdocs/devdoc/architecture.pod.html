@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Round Robin Framework Architecture</title>
+<title>Torrus Framework Architecture</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
 <link rev="made" href="mailto:gp@familiehaase.de" />
 </head>
@@ -13,7 +13,7 @@
 
 <ul>
 
-	<li><a href="#round_robin_framework_architecture">Round Robin Framework Architecture</a></li>
+	<li><a href="#torrus_framework_architecture">Torrus Framework Architecture</a></li>
 	<ul>
 
 		<li><a href="#configuration_processing">Configuration Processing</a></li>
@@ -28,27 +28,25 @@
 <hr />
 <p>
 </p>
-<h1><a name="round_robin_framework_architecture">Round Robin Framework Architecture</a></h1>
+<h1><a name="torrus_framework_architecture">Torrus Framework Architecture</a></h1>
 <p>
 </p>
 <h2><a name="configuration_processing">Configuration Processing</a></h2>
 <p>The XML configuration is compiled into the database representation by
 operator's manual request.</p>
-<p>The compiled version of the configuration is not a one-to-one
+<p>The compiled version of configuration is not a one-to-one
 representation of the XML version. All aliases and templates are
-expanded. Thus, the backwards restoration of XML from the database
-is possible, but is not our urgent task.</p>
-<p>Aliases are the way to represent the data in a more convinient format.
+expanded. The backwards restoration of XML from the database
+is available with the snapshot utility.</p>
+<p>Aliases are the way to represent the data in a more convenient format.
 An alias can point to a subtree or a leaf, and it works similarly as
 a symbolic link in a filesystem.</p>
 <p>A template defines a piece of configuration which can be used in
-multiple places. Templates and aliases are not supported within a template.</p>
+multiple places. Templates can be nested.</p>
 <p>The configuration can consist of several XML files. They will be
 processed in the specified order. Each new file is treated as an additive
 information to the existing tree.</p>
-<p>The configuration processing module should contain information about parameter
-dependency and mandatority. Should the mandatory parameter be missing,
-the configuration processing should stop with an explanative error message.</p>
+<p>The XML configuration compiler validates all the mandatory parameters.</p>
 <p>
 </p>
 <h2><a name="database_architecture">Database Architecture</a></h2>
@@ -62,18 +60,18 @@ These databases have similar structure, and
 Current productive instance numbers are stored in <strong>db_config_instances.db</strong>
 database.</p>
 <p>For each datasource tree, the database files are resided in
-<em>$RRFW_HOME/var/db/sub/&gt;tree_name&lt;</em> directory.</p>
+<em>/var/torrus/db/sub/&gt;tree_name&lt;</em> directory.</p>
 <p>The runtime modules access the configuration via <code>ConfigTree</code> objects.</p>
 <p>Each datasource subtree or leaf is identified by a <em>token</em>.
-Token is a short string of word characters, generated internally.
+A token is a short alphanumeric string, generated internally.
 Two types of tokens are recognized: single tokens and token sets.</p>
-<p>Single token starts with letter <em>T</em>. The rest is a number of decimal digts.</p>
+<p>Single token starts with letter <em>T</em>. The rest is made with decimal digts.</p>
 <p>Token set name starts with letter <em>S</em>. The rest is an arbitrary sequence of
 word characters.</p>
 <p>The special token <em>SS</em> is reserved for tokensets list. Also tokenset
 parameters are inherited from this token's parameters.</p>
 <p>View and monitor names must be unique, and must
-start with a small letter.</p>
+start with a lower case letter.</p>
 <p><strong>db_config_instances.db</strong> is a <em>Hash</em> database, with keys of form
 <code>ds:&gt;tree_name&lt;</code> or <code>other:&gt;tree_name&lt;</code>, and 0 or 1 as
 values.</p>
@@ -280,7 +278,7 @@ the object is the tree name.
 <p>
 </p>
 <h2><a name="modular_structure">Modular Structure</a></h2>
-<p>The Framework will consist of several functional modules:</p>
+<p>The Torrus framework consists of several functional modules:</p>
 <ul>
 <li><strong><a name="item_configuration_management">Configuration management</a></strong><br />
 </li>
@@ -290,31 +288,12 @@ configuration is changed only when the files are ready.
 <p>The configuration management module provides access methods for
 enumeration and enquery of the configuratin objects.</p>
 <p></p>
-<li><strong><a name="item_data_threshold_monitoring">Data threshold monitoring</a></strong><br />
+<li><strong><a name="item_data_collector_module">Data Collector module</a></strong><br />
 </li>
-This module is able to work in two modes: daemon and on-demand
-invocation. In daemon mode, it performs the monitoring tasks periodically.
-<p>Upon activation, it checks the conditions for each leaf having a monitor.
-In case of the alarm, it executes the action instructions synchronousely.</p>
-<p></p>
-<li><strong><a name="item_rendering_module">Rendering module</a></strong><br />
-</li>
-Upon a request, this module generates the graph and HTML files for the
-requested view and its subviews. It first checks availability of
-cached objects and avoids unneeded regeneration. It must be possible
-to force the renderer to flush the cache.
-<p></p>
-<li><strong><a name="item_web_interface_module">Web interface module</a></strong><br />
-</li>
-Web interface module passes the Renderer output to a HTTP client.
-<p></p>
-<li><strong><a name="item_data_collection_module">Data collection module</a></strong><br />
-</li>
-Collector program runs as a separate process.
-<p>Collector program supports two modes of invocation: daemon and one-time.</p>
-<p>In daemon mode, it first runs all registered collectors. After that,
+Collector program runs as a separate process for each datasource tree.
+Upon startup, it first runs all registered collectors. After that,
 the collectors are grouped depending on period and time offset, and launched
-periodically at the moments defined by formula:</p>
+periodically at the moments defined by formula:
 <pre>
   time + period - (time mod period) + timeoffset</pre>
 <p>The datasources are grouped by collector type.
@@ -325,12 +304,30 @@ manual).</p>
 ``COUNTER'', if the device reload is
 detected, the corresponding RRD file is updated with ``undefined''
 value at the calculated moment of reload.</p>
+<p></p>
+<li><strong><a name="item_data_threshold_monitoring">Data threshold monitoring</a></strong><br />
+</li>
+This module performs the monitoring tasks periodically, based on each
+monitored leaf schedule.
+It checks the conditions for each leaf having a monitor.
+In case of the alarm, it executes the action instructions synchronously.
+<p></p>
+<li><strong><a name="item_rendering_module">Rendering module</a></strong><br />
+</li>
+Upon a request, this module generates the graph and HTML files for the
+requested view and its subviews. It first checks availability of
+cached objects and avoids unneeded regeneration. It must be possible
+to force the renderer to flush the cache.
+<p></p>
+<li><strong><a name="item_web_interface_module">Web interface module</a></strong><br />
+</li>
+Web interface module passes the Renderer output to an HTTP client.
 <p></p></ul>
 <p>
 </p>
 <hr />
 <h1><a name="author">Author</a></h1>
-<p>Copyright (c) 2002-2004 Stanislav Sinyagin <a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a></p>
+<p>Copyright (c) 2002-2005 Stanislav Sinyagin <a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a></p>
 
 </body>
 

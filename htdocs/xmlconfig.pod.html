@@ -62,10 +62,11 @@
 <p>
 </p>
 <h2><a name="common_rules">Common rules</a></h2>
-<p>The Round Robin Database Framework configuration consists of
-several XML files. Once the XML configuration is changed, it must
-be compiled into the database by executing <code>$Torrus_HOME/bin/compilexml</code>.
-Also, when <em>Renderer</em> notices the database changes, it flushes its cache.</p>
+<p>The Torrus configuration consists of several XML files.
+Once the XML configuration is changed, it must
+be compiled into the database by executing <code>torrus compilexml</code>.
+In addition, when <em>Renderer</em>, <em>Collector</em> and <em>Monitor</em> processes
+notice the configuration changes, they refresh their information automatically.</p>
 <p>The top-level XML element is always <code>&lt;configuration&gt;</code>, with
 sub-elements defining various sections, like datasources or views:</p>
 <pre>
@@ -1226,8 +1227,7 @@ $Torrus::Renderer::stylingProfile variable.
 <p>
 </p>
 <h2><a name="token_sets_definitions">Token sets definitions</a></h2>
-<p><em>Token</em> is a symbolic identifier for each subtree or a leaf. See
-<em>Round Robin Framework Architecture</em> manual for more details.</p>
+<p><em>Token</em> is a symbolic identifier for each subtree or a leaf.</p>
 <p>A <em>tokenset</em> is a named list of tokens. Its contents can be
 rendered, and its members can be added or removed at any time.</p>
 <p>Each tokenset can have a number of parameters defined. It also
@@ -1510,7 +1510,7 @@ in the environment variable.
 </p>
 <hr />
 <h1><a name="author">Author</a></h1>
-<p>Copyright (c) 2002-2003 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2002-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

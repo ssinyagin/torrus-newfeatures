@@ -22,6 +22,7 @@
 	<li><a href="#general_options">GENERAL OPTIONS</a></li>
 	<li><a href="#examples">EXAMPLES</a></li>
 	<li><a href="#files">FILES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#notes">NOTES</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 </ul>
@@ -36,7 +37,7 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p><strong>acledit</strong> [<em>options...</em>]</p>
+<p><strong>torrus acledit</strong> [<em>options...</em>]</p>
 <p>
 </p>
 <hr />
@@ -210,11 +211,11 @@ Displays a help message.
 <hr />
 <h1><a name="examples">EXAMPLES</a></h1>
 <pre>
-  acledit --addgroup=staff --permit=DisplayTree \
+  torrus acledit --addgroup=staff --permit=DisplayTree \
     --for=main --for=thecustomer
-  acledit --adduser=jsmith --password=mysecretpassword \
+  torrus acledit --adduser=jsmith --password=mysecretpassword \
     --cn=&quot;John Smith&quot; --addtogroup=staff
-  acledit --addgroup=admin --permit=DisplayTree --for='*'</pre>
+  torrus acledit --addgroup=admin --permit=DisplayTree --for='*'</pre>
 <p>This example creates a group <em>staff</em> and gives all its members the permission
 to browse the datasource trees <em>main</em> and <em>thecustomer</em>. The next command
 creates a user <em>jsmith</em> and addts it to this group. The user name will
@@ -226,7 +227,7 @@ o browse all existing trees.</p>
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__40perlcfgdir_40_2ftorrus_2dsiteconfig_2epl"><em>@perlcfgdir@/torrus-siteconfig.pl</em></a></strong><br />
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2ftorrus_2dsi"><em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em></a></strong><br />
 </dt>
 <dd>
 Torrus site configuration script.
@@ -241,8 +242,13 @@ Default template for the exports of ACL configuration.
 <p>
 </p>
 <hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>torrus(1)</em></p>
+<p>
+</p>
+<hr />
 <h1><a name="notes">NOTES</a></h1>
-<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>See more documentation at Torrus home page: <a href="http://torrus.org">http://torrus.org</a></p>
 <p>
 </p>
 <hr />

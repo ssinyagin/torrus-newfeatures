@@ -9,14 +9,467 @@
 
 <h1>Torrus: The Data Series Processing Framework</h1>
 
-<p>The Torrus documentation is not ready yet. Please refer to
-<a href="http://torrus.org/">RRFW home page</a>
+<p>
+<b>Torrus</b> is the new name for RRFW, the Round Robin Database
+Framework. The changes are summarized in the
+<a href="devdoc/torrus_roadmap.pod.html">transition roadmap</a>.
+Old RRFW documentation is available at
+<a href="http://rrfw.sourceforge.net/">RRFW home page</a>.
+</p>
 
+<p>
+Torrus is designed to be the universal data series processing 
+framework. Its scalable hierarchical design, application-independent core,
+and highly customizable architecture make Torrus an attractive choice
+both for small installations and for big enterprise or carrier networks.
+Although most of our users deploy Torrus for SNMP monitoring, it might be
+useful for data series of any nature. Tobi Oetiker's RRDtool is used for
+data storage.
+</p>
+
+<p>
+See the <strong><a href="http://rrfwdemo.tbw.ch">Torrus demo
+server</a></strong>, provided by
+<a href="http://www.bluewin.ch/">Bluewin AG</a>.
+</p>
+
+<p>
+Currently Torrus consists of the following parts:
+<ul>
+
+<li>
+<strong>Configuration compiler and validator.</strong>
+It processes the XML configuration files and saves the configuration
+into a database.
+</li>
+
+<li>
+<strong>View renderer and the web interface.</strong>
+They generate HTML and the graphical representation of the datasources
+and provide user authentication and authorization.
+All generated output is controlled by the configuration parameters
+and templates.
+The users can easily create their own presentation of data series.
+</li>
+
+<li>
+<strong>SNMP Collector.</strong>
+Thanks to David M. Town's
+<a href="http://search.cpan.org/search?module=Net::SNMP">
+Net::SNMP Perl module</a>, Torrus has got an extremely efficient SNMP
+data poller, with ability to poll dozens of thousands of SNMP variables
+from a single server. Modular collector core architecture allows
+further extension with new collector and storage types.
+Any datasource can have its own polling schedule.
+</li>
+
+<li>
+<strong>SNMP Device Discovery Tool</strong>.
+<em>Devdiscover</em> is a new, modular, flexible, and expandable tool for
+automatic generation of Torrus configuration files. New device types
+and MIBs are easily added as independent Perl modules. Thanks to our
+contributors, the number of supported devices and vendors is constantly
+growing.
+</li>
+
+<li>
+<strong>Threshold monitor.</strong>
+All data, regardless of their type and nature,
+can be monitored according to the user-defined rules. The rules can also
+include the datasource-specific parameters, e.g. boundary values etc.
+The following types of action may be combined for event reporting:
+1) Displaying the list of alarmed datasources; 2) E-mail notification;
+3) SNMPv2c trap; 4) Any custom executable. Thresholds are specified by RPN
+expressions.
+</li>
+
+</ul>
+
+</p>
+
+
+<p>See the <strong><a href="http://sourceforge.net/projects/torrus/">Project
+summary and Download Area at SourceForge.Net</a></strong>. Today the release
+version is <a href="http://sourceforge.net/projects/rrfw/">availabe only for
+RRFW</a>.</p>
+
+<p>Current <a href="http://torrus.sourceforge.net/devel/">development
+snapshot</a> is available for testing.
+
+<h2>Documentation</h2>
+
+<!-- <i>Note:</i> The documentation reflects the latest development status,
+and some features might be missing in the release distribution. -->
+
+<ul>
+<li>
+<a href="install.pod.html">Installation Instructions</a>:
+system requirements and installation steps
+</li>
+<li>
+<a href="webintf.pod.html">Web Interface Reference</a>:
+installation details for mod_perl handler
+</li>
+<li>
+<a href="rrfw_torrus_migration.pod.html">RRFW to Torrus migration guide</a>:
+step by step guide for those having an RRFW installation.
+</li>
+<li>
+<a href="userguide.pod.html">User Guide</a>:
+explains what is where and how to start using the system.
+</li>
+<li>
+<a href="scalability.pod.html">Scalability Guide</a>:
+advanced setup guidelines for large-scale monitoring platforms.
+</li>
+<li>
+<a href="snmpdiscovery.pod.html">SNMP Discovery User Guide</a>:
+Guide to SNMP discovery tools
+</li>
+<li>
+<a href="xmlconfig.pod.html">Configuration Guide</a>:
+XML configuration reference
+</li>
+<li>
+<a href="vendorsupport.pod.html">Vendor Support List</a>:
+List of vendors and MIBs supported.
+</li>
+<li>
+<a href="manpages/">Manual pages</a>:
+all executables documented
+</li>
+<li>
+<a href="rpnexpr.pod.html">RPN expressions in Torrus</a>:
+Torrus-specific features in RPN expressions, as compared to
+<i>rrdtool graph</i>
+</li>
+<li>
+<a href="stylingprofile.pod.html">Styling Profile Guide</a>:
+how to create your own display styles for Torrus graphs
+</li>
+<li>
+<a href="devdoc/">Development documentation</a>: internals documented,
+working drafts, and technical reqirements.
+</li>
+<li>
+<a href="plugins/">Plugins documentation</a>: optional features and
+contributions.
+</li>
+</ul>
+
+
+
+<h2>Features of Torrus</h2>
+
+<ul>
+<li>
+<em>Data-oriented design</em>. Most of the existing frontends are SNMP-centric.
+In Torrus, the SNMP collector is not the central part,
+but rather one of possible data sources. It is easy to integrate
+some existing RRD files that are updated by some external agents.
+</li>
+<li>
+<em>Multiple independent datasource trees</em> in one instance
+of Torrus.
+</li>
+<li>
+<em>User authentication and authorization</em>. Users belong to groups,
+and each group has privileges to browse a certain subset of trees.
+</li>
+<li>
+Flexible hierarchical <em>configuration in XML</em> format. Multuiple XML
+files are processed additively.
+</li>
+<li>
+Externally generated RRD files can be automatically grouped,
+based on the filename regular expressions.
+</li>
+<li>
+Flexible representation of the data. One datasource may be displayed in
+multiple subtrees of the hierarchy. It allows you to group them at your
+convenience.
+</li>
+<li>
+<em>Aberrant behaviour detection</em> based on <em>Holt-Winters prediction</em>
+is fully supported (requires rrdtool version 1.1.x). See the
+references below for more information.
+</li>
+<li>
+Support for <em>international</em> character sets (Latin1 and Unicode).
+</li>
+<li>
+First open-source complete
+<a href="plugins/cisco-cbqos.pod.html">implementation</a>
+of
+<a href=
+"http://www.cisco.com/pcgi-bin/Support/browse/index.pl?i=Technologies&f=773">
+Cisco QoS</a> (CISCO-CLASS-BASED-QOS-MIB) discovery and monitoring.
+</li>
+</ul>
+</p>
+
+
+<p>
+Up-to-date list of ongoing tasks is published in 
+<strong><a href="devel/TODO">TODO document</a></strong>.
+</p>
+
+
+
+<h2>Product Support</h2>
+
+<p>
+Torrus is free software. It is distributed under the
+<a href="http://www.gnu.org/licenses/licenses.html#GPL">GNU General
+Public License</a>.
+</p>
+<p>
+Please send all your requests, comments, and bug reports to the
+<strong><a href="http://lists.sourceforge.net/lists/listinfo/torrus-users">
+torrus-users</a></strong> mailing list. Only list subscribers are allowed to
+post the messages there. All new release announcements are sent to this list.
+</p>
+
+<p>
+The development issues of Torrus are discussed in
+<strong><a href="http://lists.sourceforge.net/lists/listinfo/torrus-devel">
+torrus-devel</a></strong> mailing list.
+Copies of all CVS commits are posted to
+<strong><a href="http://lists.sourceforge.net/lists/listinfo/torrus-commit">
+torrus-commit</a></strong> mailing list.
+</p>
+
+<p>
+Archives of the old mailing lists are available for 
+<strong><a href="http://lists.sourceforge.net/lists/listinfo/rrfw-users">
+rrfw-users</a></strong> and
+<strong><a href="http://lists.sourceforge.net/lists/listinfo/rrfw-devel">
+rrfw-devel</a></strong> .
+</p>
+
+
+<p>
+<strong>Commercial support</strong> for Torrus is provided by:
+<blockquote>
+<a href="http://www.gpstechnik.ch/">GPS-Technik AG</a><br>
+Zuercherstrasse 139<br>
+8952 Schlieren<br>
+Switzerland<br>
+<br>
+Tel. +41 1 732 99 77<br>
+Fax  +41 1 731 18 40<br>
+</blockquote>
+Commercial support includes:
+<ul>
+<li>Software installation and customizing</li>
+<li>Development of custom user data import utilities</li>
+<li>Development of new Torrus features</li>
+<li>Software maintenance contracts</li>
+</ul>
+For more details about commercial support, please contact
+<a href="mailto:ssinyagin@yahoo.com">the author</a>.
+</p>
+
+<h2>SNMP MIBs</h2>
+
+By courtesy of Tobi Oetiker, we are using the subtree of
+<a href="http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/iana/">
+RRDtool Enterprise ID</a>.
+
+Torrus is now capable of sending the SNMPv2c traps, with the variables
+described in the corresponding MIB file.
+
+<ul>
+<li>
+<a href="RRDTOOL-SMI.txt">RRDTOOL-SMI</a>: the original file from
+<a href="http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/iana/">
+RRDtool enterprise tree</a>
+</li>
+<li>
+<a href="TORRUS-MIB.txt">Torrus-MIB</a>: The MIB which describes the SNMPv2c
+traps sent by <tt>action_snmptrap</tt> (see <i>Manpages</i> for
+details)
+</li>
+</ul>
+
+
+<h2>References</h2>
+
+<ul>
+
+<li>
+Development of RRFW releases 0.0.1 to 0.0.7, as well as development and testing
+of Cisco class-based QoS monitoring was sponsored by
+<a href="http://www.cablecom.ch/">Cablecom GmbH</a>
+Internet Core Routing Services Team.
+<br>
+<font size="-1">
+Cablecom is the leading country-wide cable-TV and Internet
+provider in Switzerland.
+</font>
+</li>
+
+<li>
+This project would not even start without
+<a href="http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/index.html">
+Tobi Oetiker's RRDTool</a>.
+<br>
+<font size="-1">
+RRD is a very efficient and popular system to store and
+display time-series data.
+</font>
+</li>
+
+<li>
+Many concepts and ideas were taken from
+<a href="http://cricket.sourceforge.net">Cricket</a>.
+<br>
+<font size="-1">
+Cricket is a widely used and very efficient network monitoring system.
+However, its limitations were actually the reason to start this project.
+</font>
+</li>
+
+<li>
+Jake Brutlag.
+<a href="http://www.usenix.org/events/lisa2000/brutlag.html">
+Aberrant Behavior Detection in Time Series for Network Service Monitoring</a>.
+<br>
+LISA 2000 paper.
+<br>
+<font size="-1">
+The article gives the basic theory overview of Holt-Winters forecasting
+algorithm, and describes its implementation in RRDTool.
+</font>
+</li>
+
+<li>
+Jake Brutlag.
+<a href="http://cricket.sourceforge.net/aberrant/rrd_hw.htm">
+Notes on RRDTOOL implementation of Aberrant Behavior Detection</a>.
+<br>
+<font size="-1">
+The article describes the implementation of
+aberrant behavior detection for RRDTOOL.
+</font>
+</li>
+
+</ul>
+
+<h2>Credits</h2>
+
+<ul>
+
+<li>
+Chris Amley. Xylan switches SNMP discovery
+</li>
+
+<li>
+<a href="mailto:sbrooks@binary-solutions.net">Scott Brooks</a>.
+Atmel wireless devices SNMP discovery
+</li>
+
+<li>
+<a href="mailto:abush@microcenter.com">Aaron Bush</a>.
+Contributed APC and HP vendor templates.
+</li>
+
+<li>
+Shawn Ferry &lt;sferry at sevenspace.com&gt;
+&lt;lalartu at obscure.org&gt;.
+Many contributions in various parts.
+</li>
+
+<li>
+<a href="mailto:mh+torrus@zugschlus.de">Marc Haber</a>.
+Lots of bug reports and architecture ideas.
+</li>
+
+<li>
+<a href="mailto:roman@hochu.li">Roman Hochuli</a>.
+Bug reports and new feature ideas.
+Vendor templates for Ascend and DOCSIS.
+</li>
+
+<li>
+<a href="mailto:ian@holsman.net">Ian Holsman</a>
+&lt;<a href="http://holsman.net">http://holsman.net</a>&gt;.
+Adapted the <a href="http://bluerobot.com">bluerobot.com</a>
+HTML layout design for Torrus.
+</li>
+
+<li>
+<a href="mailto:tech@gordphilpott.com">Gord Philpott</a>.
+Numerous bug reports.
+</li>
+
+<li>
+<a href="mailto:christian.schnidrig@gmx.ch">Christian Schnidrig</a>.
+Architecture ideas and interface improvements.
+</li>
+
+<li>
+<a href="mailto:jurij@wooyd.org">Jurij Smakov</a>.
+Contributed in manpages creation. Maintainer of
+<a href="http://pkg-torrus.alioth.debian.org/">Torrus Debian package</a>
+</li>
+
+
+</ul>
+
+<h2>Companies that use Torrus</h2>
+
+<div class="Custlogos">
+
+<a href="http://www.binary-solutions.net/">
+<img class="Custlogo"
+src="logo/binary_solutions.png" width="120" height="30"
+alt="Binary Solutions Ltd., wireless technology company, Canada"/></a>
+
+<a href="http://www.bluewin.ch/">
+<img class="Custlogo"
+src="logo/bluewin.png" width="100" height="19"
+alt="Bluewin AG, large ADSL provider in Switzerland"/></a>
+
+<a href="http://www.cablecom.ch/">
+<img class="Custlogo"
+src="logo/cablecom.png" width="80" height="49"
+alt="Cablecom GmbH,
+largest cable TV and Internet provider in Switzerland"/></a>
+
+<a href="http://www.gpstechnik.ch/">
+<img class="Custlogo"
+src="logo/gpstechnik.png" width="100" height="54"
+alt="GPS Technik AG, network solution provider in Switzerland"/></a>
+
+<a href="http://www.kfn-ag.ch/">
+<img class="Custlogo"
+src="logo/kfn.png" width="98" height="33"
+alt="Kabelfernsehen Nidwalden AG,
+cable TV and Internet provider in Switzerland"/></a>
+
+<a href="http://www.nexellent.ch/">
+<img class="Custlogo"
+src="logo/nexellent.png" width="120" height="41"
+alt="Nexellent AG,
+Internet services and consulting company in Switzerland"/></a>
+
+<a href="http://www.sevenspace.com/">
+<img class="Custlogo"
+src="logo/sevenspace.png" width="140" height="28"
+alt="SevenSpace Inc., outsourcing services provider, U.S."/></a>
+
+<a href="http://www.syscovery.com/">
+<img class="Custlogo"
+src="logo/syscovery.png" width="149" height="41"
+alt="syscovery AG, an IT services company, Germany"/></a>
+
+</div>
 <hr>
 <p>Copyright &copy; 2002-2005 Stanislav Sinyagin
 &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 <A href="http://sourceforge.net">
-<IMG src="http://sourceforge.net/sflogo.php?group_id=56022&amp;type=1"
+<IMG src="http://sourceforge.net/sflogo.php?group_id=119282&amp;type=1"
  width="88" height="31" border="0" alt="SourceForge Logo">
 </A>
 

@@ -60,26 +60,22 @@
 <h2><a name="quick_start_guide">Quick start guide</a></h2>
 <p>The steps below will explain you how to make the thing running.</p>
 <p><strong>Install Torrus</strong>. Follow the <em>Torrus Installation Instructions</em> document,
-all prerequisits and necessary steps are described there.
-Further in this document, we assume the default installation paths,
-and they may differ on your system.</p>
+all prerequisits and necessary steps are described there.</p>
 <p><strong>What is where</strong>. The executables reside in 
 <em>/usr/local/torrus/bin/</em>. You normally don't need to access this
 directory, because the commandline wrapper, <code>torrus</code>, is installed
-in a usual execution path (<em>/usr/local/bin</em> by default).
+in a usual execution path (<em>/usr/local/bin</em>).
 All site-specific behaviour is controlled by
 configuration files in <em>/usr/local/etc/torrus/conf/</em>.
 Usually you need to change <em>torrus-siteconfig.pl</em> only. In this file, you
 must list your XML configuration sources. The datasource trees configuration
 is read out of XML files. They are searched in several directories,
-normally <em>/usr/local/torrus/xmlconfig/</em> and
-<em>/usr/local/etc/torrus/xmlconfig/</em>. The first one contains files that
-come with Torrus distribution, and the second one is for your local
-site-specific XML files.
-Global site-specific XML configuration parameters may be defined in
-<em>site-global.xml</em>.
+normally <em>/usr/local/torrus/xmlconfig/</em> and <em>/usr/local/etc/torrus/xmlconfig/</em>. The first one contains
+files that come with Torrus distribution, and the second one is for your local
+site-specific XML files. Global site-specific XML configuration parameters
+may be defined in <em>site-global.xml</em>.
 XML configuration is compiled into internal database representation
-by <code>torrus compilexml</code> command. The database itself is usually resided in
+by <code>torrus compilexml</code> command. The database itself is resided in
 <em>/var/torrus/db/</em>, and must be writable by your Apache server
 (normally the installer takes care of it). It is safe to re-compile the
 configuration while the Torrus daemons are running.</p>
@@ -170,7 +166,7 @@ into <code>xmlfiles</code> array in the tree configuration in your
 <code>genddx</code> and <code>devdisover</code> interact and how you can customize
 the discovery process.</p>
 <p><strong>Tip</strong>: in most cases, your hierarchy division will be different.
-This might be arranged by geographical locations, or by customer names.
+It might be arranged by geographical locations, or by customer names.
 There is a configuration statement that allows you to include other
 XML files into configuration, thus giving you a big flexibility
 in building the data hierarchies.</p>
@@ -719,8 +715,7 @@ the contents of the database.</p>
   ## (might be located in /usr/local/BerkeleyDB.4.1/bin/)
   /etc/init.d/apache stop
   /etc/init.d/torrus stop
-  cd /var/torrus/db
-  db_recover -h .
+  db_recover -h /var/torrus/db
   torrus compilexml --verbose --all
   /etc/init.d/torrus start
   /etc/init.d/apache start</pre>
@@ -737,7 +732,7 @@ the contents of the database.</p>
 </p>
 <hr />
 <h1><a name="author">Author</a></h1>
-<p>Copyright (c) 2002-2004 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2002-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

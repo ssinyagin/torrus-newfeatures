@@ -34,7 +34,7 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p><strong>configsnapshot</strong> --tree=<em>TREENAME</em> [<em>options...</em>]</p>
+<p><strong>torrus configsnapshot</strong> --tree=<em>TREENAME</em> [<em>options...</em>]</p>
 <p>
 </p>
 <hr />
@@ -46,9 +46,9 @@ given tree. The snapshot does not include view definitions. Templates
 and file patterns are expanded inside the file. It does not require
 any other XML configuration files, except for <em>defaults.xml</em> and your
 custom view definitions.</p>
-<p><strong>Warning:</strong> <code>configsnapshot</code> from Torrus release 0.1.5 will not work
-correctly with databases from previous releases. Use release
-<code>0.1.4bf2</code> instead.  <code>configsnapshot</code> utility from release 0.1.4bf2
+<p><strong>Warning:</strong> <code>configsnapshot</code> from RRFW release 0.1.5 will not work
+correctly with databases from previous releases. Use RRFW release
+<code>0.1.4bf2</code> instead.  <code>configsnapshot</code> utility from RRFW release 0.1.4bf2
 does not preserve aliases.</p>
 <p>This utility is useful in Torrus upgrade process. In case when RRD files
 structure is changing in Torrus default templates, and <code>user(s)</code> demand to
@@ -63,8 +63,8 @@ Install newest Torrus software and do not run <code>compilexml</code> immediatel
 <li></li>
 Create snapshots of the trees that you want to preserve for historical reasons:
 <pre>
-  configsnapshot --tree=myrouters \
-    --out=share/xmlconfig/myrouters-snapshot.xml</pre>
+  torrus configsnapshot --tree=myrouters \
+    --out=/usr/local/etc/torrus/xmlconfig/myrouters-snapshot.xml</pre>
 <p></p>
 <li></li>
 If needed, move the existing RRD files into different directory. Then
@@ -107,7 +107,7 @@ Displays a help message.
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__40xmldir_40_2fdefaults_2exml"><em>@xmldir@/defaults.xml</em></a></strong><br />
+<dt><strong><a name="item__2fusr_2flocal_2ftorrus_2fxmlconfig_2fdefaults_2ex"><em>/usr/local/torrus/xmlconfig/defaults.xml</em></a></strong><br />
 </dt>
 <dd>
 XML configuration file with default settings for the datasources and
@@ -124,12 +124,12 @@ Default <strong>configsnapshot</strong> output file.
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p><strong>compilexml</strong>(1)</p>
+<p><em>torrus(1)</em>, <em>torrus_compilexml(1)</em></p>
 <p>
 </p>
 <hr />
 <h1><a name="notes">NOTES</a></h1>
-<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>See more documentation at Torrus home page: <a href="http://torrus.org">http://torrus.org</a></p>
 <p>
 </p>
 <hr />

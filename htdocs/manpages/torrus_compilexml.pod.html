@@ -18,6 +18,7 @@
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#notes">NOTES</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 </ul>
@@ -32,16 +33,16 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p><strong>compilexml</strong> --tree=<em>TREENAME</em> [<em>options...</em>]</p>
+<p><strong>torrus compilexml</strong> --tree=<em>TREENAME</em> [<em>options...</em>]</p>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>This command (re)compiles the Torrus's XML configuration for the <code>tree(s)</code>
+<p>This command compiles the Torrus's XML configuration for the tree
 <em>TREENAME</em>. It does not require any other processes to be restarted
 after the configuration is changed. Renderer's cache is automatically
 flushed on on the next Renderer's run. Monitor automatically resets on
-the next monitoring cycle. All tokensets in the given tree are
+the next monitoring cycle. All dynamic tokensets in the given tree are
 emptied.</p>
 <p>
 </p>
@@ -51,13 +52,13 @@ emptied.</p>
 <dt><strong><a name="item__2d_2dall"><strong>--all</strong></a></strong><br />
 </dt>
 <dd>
-Instructs to (re)compile configuration for all trees.
+Instructs to compile configuration for all trees.
 </dd>
 <p></p>
 <dt><strong><a name="item__2d_2dnods"><strong>--nods</strong></a></strong><br />
 </dt>
 <dd>
-Instructs to (re)compile non-datasource configuration only.
+Instructs to compile non-datasource configuration only.
 </dd>
 <p></p>
 <dt><strong><a name="item__2d_2dnoval"><strong>--noval</strong></a></strong><br />
@@ -90,8 +91,13 @@ Displays a help message.
 <p>
 </p>
 <hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>torrus(1)</em></p>
+<p>
+</p>
+<hr />
 <h1><a name="notes">NOTES</a></h1>
-<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>See more documentation at Torrus home page: <a href="http://torrus.org">http://torrus.org</a></p>
 <p>
 </p>
 <hr />

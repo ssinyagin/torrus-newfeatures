@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>RRFW SNMP Device Discovery Developer's Guide</title>
+<title>Torrus SNMP Device Discovery Developer's Guide</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
 <link rev="made" href="mailto:gp@familiehaase.de" />
 </head>
@@ -13,7 +13,7 @@
 
 <ul>
 
-	<li><a href="#rrfw_snmp_device_discovery_developer_s_guide">RRFW SNMP Device Discovery Developer's Guide</a></li>
+	<li><a href="#torrus_snmp_device_discovery_developer_s_guide">Torrus SNMP Device Discovery Developer's Guide</a></li>
 	<ul>
 
 		<li><a href="#devdiscover_overview"><code>devdiscover</code> overview</a></li>
@@ -35,36 +35,36 @@
 <hr />
 <p>
 </p>
-<h1><a name="rrfw_snmp_device_discovery_developer_s_guide">RRFW SNMP Device Discovery Developer's Guide</a></h1>
+<h1><a name="torrus_snmp_device_discovery_developer_s_guide">Torrus SNMP Device Discovery Developer's Guide</a></h1>
 <p>
 </p>
 <h2><a name="devdiscover_overview"><code>devdiscover</code> overview</a></h2>
 <p><code>devdiscover</code> is an extensible, module based, SNMP device discovery
-utility. It is intended to automatically generate RRFW configuration
+utility. It is intended to automatically generate Torrus configuration
 files, based on SNMP discovery results and templates.</p>
-<p>See <em>RRFW Command Reference</em> for command usage and functionality overview.</p>
+<p>See <em>Torrus Command Reference</em> for command usage and functionality overview.</p>
 <p>In general, <code>devdiscover</code> consists of the following files and functional
 parts:</p>
 <ul>
 <li><strong><a name="item_bin_2fdevdiscover_2ein"><code>bin/devdiscover.in</code></a></strong><br />
 </li>
-This file is installed as <code>bin/devdiscover</code> in RRFW installation directory,
+This file is installed as <code>bin/devdiscover</code> in Torrus installation directory,
 with certain variables substituted. The program provides all the commandline
 functionality and options processing. Once the CLI options are processed and
-verified, the control is passed to an <a href="#item_rrfw_3a_3adevdiscover"><code>RRFW::DevDiscover</code></a> object.
+verified, the control is passed to the <a href="#item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a> object.
 <p></p>
-<li><strong><a name="item_rrfw_3a_3adevdiscover"><code>RRFW::DevDiscover</code></a></strong><br />
+<li><strong><a name="item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a></strong><br />
 </li>
 This Perl module is responsible for the SNMP discovery process organization:
 <ul>
 <li></li>
-registers the discovery modules;
+it registers the discovery modules;
 <p></p>
 <li></li>
 establishes an SNMP session to the target host;
 <p></p>
 <li></li>
-initiates a new <a href="#item_rrfw_3a_3adevdiscover_3a_3adevdetails"><code>RRFW::DevDiscover::DevDetails</code></a> object for the target host;
+initiates a new <a href="#item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a> object for the target host;
 <p></p>
 <li></li>
 stores the connection-specific parameters to the device object;
@@ -82,32 +82,32 @@ upon request from <code>bin/devdiscover</code>, builds the configuration
 XML tree, by calling <a href="#item_buildconfig"><code>buildConfig()</code></a> in <em>sequential</em> order for each
 relevant discovery module for each target host.
 <p></p></ul>
-<li><strong><a name="item_rrfw_3a_3adevdiscover_3a_3adevdetails"><code>RRFW::DevDiscover::DevDetails</code></a></strong><br />
+<li><strong><a name="item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a></strong><br />
 </li>
-This Perl module is defined in <em>lib/RRFW/DevDiscover.pm</em>, and provides
+This Perl module is defined in <em>perllib/Torrus/DevDiscover.pm</em>, and provides
 the functionality to store the results of SNMP device discovery.
 <p></p>
-<li><strong><a name="item_rrfw_3a_3aconfigbuilder"><code>RRFW::ConfigBuilder</code></a></strong><br />
+<li><strong><a name="item_torrus_3a_3aconfigbuilder"><code>Torrus::ConfigBuilder</code></a></strong><br />
 </li>
 This module is an encapsulation wrapper for XML configuration builder.
-It provides methods for every element of RRFW configuration.
+It provides methods for every element of Torrus configuration.
 <p></p>
 <li><strong><a name="item_discovery_modules">Discovery Modules</a></strong><br />
 </li>
 These provide all the functionality for SNMP discovery. Normally
 one module covers one MIB, or sometimes several vendor-specific MIBs,
 and it is responsible for finding out the device details necessary
-for RRFW configuration building. Usually a discovery module refers to one or
+for Torrus configuration building. Usually a discovery module refers to one or
 several <em>template definition files</em>. A module may depend on
 other modules' discovery results. This is controlled by its
 <code>sequence number</code>. Vendor-independent discovery modules are normally named
-as <code>RRFW::DevDiscover::RFCXXXX_SOME_HUMAN_NAME</code>, and vendor-specific
-ones are named as <code>RRFW::DevDiscover::VendorProduct[Subsystem]</code>.
+as <code>Torrus::DevDiscover::RFCXXXX_SOME_HUMAN_NAME</code>, and vendor-specific
+ones are named as <code>Torrus::DevDiscover::Vendor[Product[Subsystem]]</code>.
 <p></p>
 <li><strong><a name="item_template_definition_files">Template definition files</a></strong><br />
 </li>
 These are XML documents residing in <em>xmlconfig/vendor</em> and
-<em>xmlconfig/generic</em> directories. Each file is a piece of RRFW configuration,
+<em>xmlconfig/generic</em> directories. Each file is a piece of Torrus configuration,
 and contains definitions and templates for particular MIB or vendor.
 Generic template definition files are for vendor-independent MIBs,
 and normally they are named as <em>rfcXXXX.some-human-name.xml</em>.
@@ -118,12 +118,12 @@ Vendor-specific files are named as <em>vendor.product[.subsystem].xml</em>.
 <h2><a name="discovery_module_internals">Discovery Module Internals</a></h2>
 <p>Discovery modules are Perl packages with few required components.
 Before creating your own modules, please read and follow
-<em>RRFW Programming Style Guide</em>.</p>
-<p>Upon initialization, <a href="#item_rrfw_3a_3adevdiscover"><code>RRFW::DevDiscover</code></a> loads the modules listed in
-<code>@RRFW::DevDiscover::loadModules</code> array. This array is pre-populated
-by standard module names in <em>/share/rrfw/devdiscover-config.pl</em>.
+<em>Torrus Programming Style Guide</em>.</p>
+<p>Upon initialization, <a href="#item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a> loads the modules listed in
+<code>@Torrus::DevDiscover::loadModules</code> array. This array is pre-populated
+by standard module names in <em>devdiscover-config.pl</em>.
 You can add new module names by pushing them onto this array in your
-local <em>/share/rrfw/devdiscover-siteconfig.pl</em>.</p>
+local <em>devdiscover-siteconfig.pl</em>.</p>
 <p>
 </p>
 <h3><a name="module_registration">Module Registration</a></h3>
@@ -133,7 +133,7 @@ it's not a limitation. The registry entry is identified by a registry
 name, which normally repeats the module name.</p>
 <p>Example:</p>
 <pre>
-    $RRFW::DevDiscover::registry{'RFC2790_HOST_RESOURCES'} = {
+    $Torrus::DevDiscover::registry{'RFC2790_HOST_RESOURCES'} = {
         'sequence'     =&gt; 100,
         'checkdevtype' =&gt; \&amp;checkdevtype,
         'discover'     =&gt; \&amp;discover,
@@ -154,29 +154,29 @@ Vendor-specific modules that depend on other vendor-specific modules,
 should have sequence number 510.</p>
 <p>Dependencies deeper than one level may exist, but it's recommended
 to avoid them. For most cases this should be enough.</p>
-<p>Exceptional is <code>RFC2863_IF_MIB</code> module, which has the sequence number 10.
-That is because it provides the basic interface discovery,
+<p>Exception is made for <code>RFC2863_IF_MIB</code> module, which has the sequence
+number 10. That is because it provides the basic interface discovery,
 and many other modules depend on its results.</p>
 <p></p>
 <li><strong><a name="item_checkdevtype"><code>checkdevtype</code></a></strong><br />
 </li>
-Must be a subroutine reference. This subroutine is called with two
-arguments: <a href="#item_rrfw_3a_3adevdiscover"><code>RRFW::DevDiscover</code></a> and <a href="#item_rrfw_3a_3adevdiscover_3a_3adevdetails"><code>RRFW::DevDiscover::DevDetails</code></a>.
+Must be a subroutine reference. This subroutine is called with two object
+references as arguments: <a href="#item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a> and
+<a href="#item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a>.
 The purpose of this subroutine is to determine if the target host is
-of required type, or supports the required MIB.
+of required type, or if it supports the required MIB.
 The subroutine should return true if and only if the target host
 supports the MIB variables this module is supposed to discover.
 <p>In general, <a href="#item_checkdevtype"><code>checkdevtype</code></a> subroutine is small, and checks one or several
 OIDs presence on the host, or their values, e.g. the value of <em>sysObjectID</em>
-variable. The <code>RFC2863_IF_MIB</code> module is an exception, because it tries
-to deliver the host interfaces information to the dependant modules
-as early as possible.</p>
+variable. It should perform as less as possible SNMP requests, in order to
+speed up the pre-discovery process.</p>
 <p></p>
 <li><strong><a name="item_discover"><code>discover</code></a></strong><br />
 </li>
 Must be a subroutine reference. This subroutine is called with the same
 two arguments as <a href="#item_checkdevtype"><code>checkdevtype()</code></a>. It is called for those modules only,
-whose <a href="#item_checkdevtype"><code>checkdevtype()</code></a> returned true. The subroutine should return true
+whose <a href="#item_checkdevtype"><code>checkdevtype()</code></a> has returned true. The subroutine should return true
 if no errors occured during the discovery.
 <p>The purpose of <a href="#item_discover"><code>discover()</code></a> is to perform the actual SNMP discovery,
 and prepare the parameter values for future XML configuration.</p>
@@ -184,8 +184,8 @@ and prepare the parameter values for future XML configuration.</p>
 <li><strong><a name="item_buildconfig"><code>buildConfig</code></a></strong><br />
 </li>
 Must be a subroutine reference. This subroutine is called with three object
-references as arguments: <a href="#item_rrfw_3a_3adevdiscover_3a_3adevdetails"><code>RRFW::DevDiscover::DevDetails</code></a>,
-<a href="#item_rrfw_3a_3aconfigbuilder"><code>RRFW::ConfigBuilder</code></a>, and an XML element object, which should be used only
+references as arguments: <a href="#item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a>,
+<a href="#item_torrus_3a_3aconfigbuilder"><code>Torrus::ConfigBuilder</code></a>, and an XML element object, which should be used only
 to pass data to ConfigBuilder methods.
 <p>This subroutine is designed to construct the resulting XML configuration
 subtree as a child of a given XML element. Upper level subtrees
@@ -224,16 +224,15 @@ initialization procerure.</p>
 <p>Normally a discovery module would refer to configuration templates
 defined in template definition files. In order to provide an extra level of
 flexibility, these templates should be defined in
-<em>/share/rrfw/devdiscover-config.pl</em> or in
-<em>/share/rrfw/devdiscover-siteconfig.pl</em>.</p>
+<em>devdiscover-config.pl</em> or in <em>devdiscover-siteconfig.pl</em>.</p>
 <p>It is recommended that the template references in the discovery modules
 follow the naming standard: <code>module::template-name</code>.</p>
 <p>ConfigBuilder's <code>addTemplateApplication()</code> method looks up every
-template name in the global hash <code>%RRFW::ConfigBuilder::templateRegistry</code>
+template name in the global hash <code>%Torrus::ConfigBuilder::templateRegistry</code>
 and figures out the source XML file and the actual template name.</p>
 <p>Example:</p>
 <pre>
-    $RRFW::ConfigBuilder::templateRegistry{
+    $Torrus::ConfigBuilder::templateRegistry{
         'RFC2790_HOST_RESOURCES::hr-system-uptime'} = {
             'name'   =&gt; 'mytest-hr-system-uptime',
             'source' =&gt; 'mytest.templates.xml'
@@ -243,10 +242,10 @@ and figures out the source XML file and the actual template name.</p>
 <h3><a name="interface_filtering">Interface filtering</a></h3>
 <p>Usually not all interfaces from ifTable need to be monitored.
 For example, Loopback and Null0 interfaces on Cisco routers.</p>
-<p><code>RRFW::DevDiscover::RFC2863_IF_MIB</code> provides the functionality to
+<p><code>Torrus::DevDiscover::RFC2863_IF_MIB</code> provides the functionality to
 automatically filter out the interfaces, based on filter definitions.
 Filter definitions are registered by calling the subroutine
-<code>RRFW::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+<code>Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
 ($devdetails, $interfaceFilter)</code>. The second argument is a reference
 to a hash of the following structure:</p>
 <p>Keys are symbolic names that mean nothing and need only to be unique.

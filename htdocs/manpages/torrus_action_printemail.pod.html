@@ -19,6 +19,7 @@
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#options">OPTIONS</a></li>
 	<li><a href="#files">FILES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#notes">NOTES</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 </ul>
@@ -37,7 +38,7 @@
  &lt;action name=&quot;report-email&quot;&gt;
    &lt;param name=&quot;action-type&quot; value=&quot;exec&quot; /&gt;
    &lt;param name=&quot;command&quot;&gt;
-     $Torrus_BIN/action_printemail | mail alarms@example.com
+     $TORRUS_BIN/action_printemail | mail alarms@example.com
    &lt;/param&gt;
    &lt;param name=&quot;launch-when&quot; value=&quot;set, clear&quot; /&gt;
  &lt;/action&gt;</pre>
@@ -90,7 +91,7 @@ defined:
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__40perlcfgdir_40_2femail_2dsiteconfig_2epl"><em>@perlcfgdir@/email-siteconfig.pl</em></a></strong><br />
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2femail_2dsit"><em>/usr/local/etc/torrus/conf/email-siteconfig.pl</em></a></strong><br />
 </dt>
 <dd>
 Torrus site email configuration script.
@@ -98,15 +99,22 @@ Torrus site email configuration script.
 <p></p>
 <dt><strong><a name="item__2fusr_2flocal_2ftorrus_2ftemplates"><em>/usr/local/torrus/templates</em></a></strong><br />
 </dt>
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2ftemplates"><em>/usr/local/etc/torrus/templates</em></a></strong><br />
+</dt>
 <dd>
-Torrus template directory.
+Torrus template directories.
 </dd>
 <p></p></dl>
 <p>
 </p>
 <hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>torrus(1)</em></p>
+<p>
+</p>
+<hr />
 <h1><a name="notes">NOTES</a></h1>
-<p>See more documentation at Torrus home page: <a href="http://torrus.sf.net">http://torrus.sf.net</a></p>
+<p>See more documentation at Torrus home page: <a href="http://torrus.org">http://torrus.org</a></p>
 <p>
 </p>
 <hr />

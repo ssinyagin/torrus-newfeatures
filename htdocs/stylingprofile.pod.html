@@ -38,40 +38,41 @@
 </p>
 <h2><a name="styling_profiles">Styling Profiles</a></h2>
 <p>Styling profiles allow for symbolic names to be used in place of hard
-coded values for line-color and line-style.</p>
+coded values for <code>line-color</code> and <code>line-style</code>.</p>
 <p>
 </p>
 <h3><a name="schema_definitions">Schema Definitions</a></h3>
 <p>The following styles are defined in the default schema.</p>
 <ul>
-<li><strong><a name="item_styles">Required Styles  (line-style,line-color)</a></strong><br />
+<li><strong><a name="item_styles">Required Styles  (<code>line-style</code>, <code>line-color</code>)</a></strong><br />
 </li>
 <pre>
            SingleGraph            HWBoundary             HWFailure
               HruleMin           HruleNormal              HruleMax
                  BpsIn                BpsOut</pre>
-<li><strong><a name="item_styles">Generic Symbolic styles (line-color only)</a></strong><br />
+<li><strong><a name="item_styles">Generic Symbolic styles (<code>line-color</code> only)</a></strong><br />
 </li>
 <pre>
                     in                   out</pre>
-<li><strong><a name="item_symbolic_2c_symbolic_names_2c_for_default_use_in_g">Symbolic, Symbolic names, for default use in graphs that have up
-to ten items. (line-color only)</a></strong><br />
+<li><strong><a name="item_items">Symbolic, Symbolic names, for default use in graphs that have up
+to ten items (<code>line-color</code> only)</a></strong><br />
 </li>
 <pre>
                    one                   two                 three
                   four                  five                   six
                  seven                 eight                  nine
                    ten</pre>
-<li><strong><a name="item_symbolic_names_for_combinatorial_graphing_2e__28li">Symbolic names for combinatorial graphing. (line-color,line-style)</a></strong><br />
+<li><strong><a name="item_graphing">Symbolic names for combinatorial graphing (<code>line-style</code>,
+<code>line-color</code>)</a></strong><br />
 </li>
 <pre>
                   red1                  red2                  red3
                   red4                green1                green2
                 green3                green4                 blue1
                  blue2                 blue3                 blue4</pre>
-<li><strong><a name="item_color_definitions_from_the_tt2_rgb_example_set_2e_">Color definitions from the TT2 rgb example set. (line-color only)</a></strong><br />
+<li><strong><a name="item_set">Color definitions from the TT2 rgb example set (<code>line-color</code> only)</a></strong><br />
 </li>
-Defined in <em>styling/colornames.pl</em>
+Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em>
 <pre>
                  black                grey25                grey50
                 grey75                 white                   red
@@ -84,9 +85,9 @@ Defined in <em>styling/colornames.pl</em>
                 marine                   sky                 mauve
                  lilac</pre>
 <p></p>
-<li><strong><a name="item_color_definitions_for_web_html_colors_2e__28line_2">Color definitions for web html colors. (line-color only)</a></strong><br />
+<li><strong><a name="item_colors">Color definitions for web html colors (<code>line-color</code> only)</a></strong><br />
 </li>
-Defined in <em>styling/colornames.pl</em>
+Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em>
 <pre>
              aliceblue          antiquewhite                  aqua
             aquamarine                 azure                 beige
@@ -192,7 +193,7 @@ Remember some styles are mandatory.</p>
 <ul>
 <li><strong><a name="item_applying_your_schema">Applying your Schema</a></strong><br />
 </li>
-In the torrus-siteconfig.pl file, add the variable
+In the <em>torrus-siteconfig.pl</em> file, add the variable
 <pre>
   $Torrus::Renderer::stylingProfile = &quot;Your-schema&quot;;</pre>
 <p></p>

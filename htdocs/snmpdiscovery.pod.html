@@ -19,7 +19,7 @@
 		<li><a href="#introduction">Introduction</a></li>
 		<li><a href="#torrus_genddx__discovery_instructions_generator"><code>torrus genddx</code>: Discovery instructions generator</a></li>
 		<li><a href="#torrus_devdiscover__snmp_discovery_tool"><code>torrus devdiscover</code>: SNMP discovery tool</a></li>
-		<li><a href="#discovery_instructions_file">Discovery Instructions File</a></li>
+		<li><a href="#ddx__the_discovery_instructions_file">DDX, the discovery instructions file</a></li>
 		<ul>
 
 			<li><a href="#xml_elements">XML elements</a></li>
@@ -50,6 +50,9 @@ the SNMP discovery, based on the discovery instructions XML file.
 The result of its work is a new Torrus datasource configuration file.
 Another utility, <code>torrus genddx</code>, is a program that generates the
 basic discovery instructions file based on a set of commandline options.</p>
+<p>The device discovery XML, or as we call them DDX files, are usually
+resided in <em>/usr/local/etc/torrus/conf/discovery/</em> directory. This is the default
+path to search for them when the absolute path is not given.</p>
 <p>
 </p>
 <h2><a name="torrus_genddx__discovery_instructions_generator"><code>torrus genddx</code>: Discovery instructions generator</a></h2>
@@ -58,7 +61,7 @@ basic discovery instructions file based on a set of commandline options.</p>
   Options:
      --host=hostname         router hostname
      --hostfile=filename     space-separated router hostnames file
-     --out=outfile           output file.         [discover-routers.xml]
+     --out=outfile           output file.         [routers.ddx]
      --discout=filename      discovery output file [routers.xml]
      --domain=domain         optional DNS domain name
      --version=v             SNMP version         [2c]
@@ -67,11 +70,11 @@ basic discovery instructions file based on a set of commandline options.</p>
      --retries=number        SNMP retries         [2]
      --timeout=number        SNMP timeout         [10]
      --subtree=string        Subtree name         [/Routers]
-     --datadir=path          data-dir parameter   [/srv/torrus/collector_rrd]
+     --datadir=path          data-dir parameter [/srv/torrus/collector_rrd]
      --holtwinters           Enable Holt-Winters analysis</pre>
-<p>This utility generates <code>devdiscover</code> instructions XML file based on
+<p>This utility generates <code>devdiscover</code> instructions XML file (DDX) based on
 commandline options and a plain list of SNMP agents' hostnames.
-Hostnames are apecified with one or many <code>--host=hostname</code> options,
+Hostnames are specified with one or many <code>--host=hostname</code> options,
 or a plain text file with space-separated hostnames.</p>
 <p>Each host may have a symbolic name. This symbolic name is used as
 the host-level subtree name. The symbolic name follows the hostname with
@@ -94,27 +97,27 @@ You most probably will change this by using the <code>--discout</code> option.</
     --subtree=/MPLS/CH/Bern/Langenthal</pre>
 <pre>
   torrus devdiscover --in=ch-langenthal.ddx</pre>
-<p><code>genddx</code> is designed as a one-time utility. You may run it to create
+<p><strong>Note:</strong> <code>genddx</code> is designed as a one-time utility. You may run it to create
 a typical discovery file with basic set of options. Then the discovery
-configuration XML woild be the primary source of information, and it should
+configuration XML would be the primary source of information, and it should
 be maintained by manual editing, or by some other automated means.</p>
-<p>STOPPED HERE</p>
 <p>
 </p>
 <h2><a name="torrus_devdiscover__snmp_discovery_tool"><code>torrus devdiscover</code>: SNMP discovery tool</a></h2>
 <pre>
-  Usage: torrus devdiscover --in=filename.xml options...
+  Usage: torrus devdiscover --in=filename.ddx options...
   Options:
-   --in=infile             discovery instructions XML file
+   --in=filename.ddx       discovery instructions XML file
    --mkdir                 create data-dir directories
    --limit=regexp          limit the discovery by output files
    --verbose               print extra information
-   --debug                 print debugging information</pre>
+   --debug                 print debugging information
+   --snmpdebug             print SNMP protocol details</pre>
 <p>This utility performs the SNMP discovery of devices listed in the input
-XML file. The output XML file is the Torrus datasources configuration.
-Output file name is taken from <a href="#item_output_2dfile"><code>output-file</code></a> parameter in the instructions
-XML file. If the output file is not an absolute path, the file is placed
-in the site XML configuration directory.</p>
+DDX file. The output XML file is the Torrus datasources configuration.
+Output file name is taken from <a href="#item_output_2dfile"><code>output-file</code></a> parameter in the DDX.
+If the output file is not an absolute path, the file is placed
+in the site XML configuration directory (<em>/usr/local/etc/torrus/xmlconfig</em>).</p>
 <p><code>devdiscover</code> is accompanied by a number of MIB- or vendor-specific
 modules, each responsible for finding specific SNMP variables in
 the SNMP device, and for generating a piece of Torrus configuration XML
@@ -125,8 +128,8 @@ modules, and the internals are documented in
 <p>The output file automatically includes all required prerequisite
 generic and vendor template definition files.</p>
 <p>Behaviour of <code>devdiscover</code> is controlled by variables in
-<em>$Torrus_HOME/share/torrus/devdiscover-siteconfig.pl</em> file. Default values for
-those variables reside in <em>$Torrus_HOME/share/torrus/devdiscover-config.pl</em>.</p>
+<em>/usr/local/etc/torrus/conf/devdiscover-siteconfig.pl</em> file. Default values for
+those variables reside in <em>/usr/local/torrus/conf_defaults/devdiscover-config.pl</em>.</p>
 <p>For large installations, it is recommended to place RRD files into
 a hashed directory structure. You can enable this feature by setting</p>
 <pre>
@@ -139,11 +142,10 @@ with some local site-specific scripts. See XUpdate usage example in
 <em>Torrus User Guide</em>.</p>
 <p>
 </p>
-<h2><a name="discovery_instructions_file">Discovery Instructions File</a></h2>
+<h2><a name="ddx__the_discovery_instructions_file">DDX, the discovery instructions file</a></h2>
 <p>The input file for <code>devdiscover</code> is an XML file. Its DTD is available
 in Torrus distribution in <em>snmp-discovery.dtd</em>.</p>
-<p>A typical place to store the discovery XML is <em>share/torrus/discovery/</em>
-directory under the Torrus installation path.</p>
+<p>A typical place to store the discovery XML is <em>/usr/local/etc/torrus/conf/discovery/</em>.</p>
 <p>Example:</p>
 <pre>
     &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF8&quot;?&gt;
@@ -233,8 +235,7 @@ template in <em>snmp-defs.xml</em>.
 <li><strong><a name="item_output_2dfile"><code>output-file</code></a></strong><br />
 </li>
 Mandatory. Specifies the output filename for generated Torrus configuration.
-If no absolute path given, the default site XML configuration directory
-is used.
+If it's a relative path, the file is placed in <em>/usr/local/etc/torrus/xmlconfig</em> directory.
 <p></p>
 <li><strong><a name="item_output_2dbundle"><code>output-bundle</code></a></strong><br />
 </li>
@@ -430,11 +431,13 @@ When set to <code>yes</code>, IPSec statistics are excluded from discovery.
 When set to <code>yes</code>, only those Catalyst ports are included in configuration
 which have a port name (set up by <code>set port name</code> command).
 <p></p></ul>
+<p>See also: <em>Torrus Vendor Support List</em> for the list of supported MIBs and
+vendors.</p>
 <p>
 </p>
 <hr />
 <h1><a name="author">Author</a></h1>
-<p>Copyright (c) 2002-2003 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2002-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

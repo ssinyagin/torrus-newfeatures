@@ -24,22 +24,39 @@
 cmd=$1
 shift
 
-case "$cmd" in
+commands="acl=acledit acledit=acledit cleanup=cleanup \
+clc=clearcache clearcache=clearcache \
+collector=collector \
+compile=compilexml compilexml=compilexml \
+configinfo=configinfo ci=configinfo \
+snapshot=configsnapshot configsnapshot=configsnapshot \
+discover=devdiscover devdiscover=devdiscover \
+genddx=genddx \
+genlist=genlist \
+install_plugin=install_plugin \
+monitor=monitor \
+schedulerinfo=schedulerinfo si=schedulerinfo"
 
-acledit | cleanup | clearcache | collector | compilexml | configinfo \
- | configsnapshot | devdiscover | genddx | genlist | install_plugin \
- | monitor | schedulerinfo)
-    @pkgbindir@/${cmd} "$@"
-;;
-*)
-    echo "Usage: $0 cmd [options...]" 1>&2
-    echo "   cmd - one of:" 1>&2
-    echo "      acledit | cleanup | clearcache | collector | compilexml" 1>&2
-    echo "      configinfo | configsnapshot | devdiscover | genddx" 1>&2
-    echo "      genlist | install_plugin | monitor | schedulerinfo" 1>&2
-    exit 1
-;;
-esac
+for f in `ls -1 @plugwrapperdir@`; do
+  . $f
+done
+
+for pair in ${commands}; do
+  eval execcmd_${pair}
+done
+
+eval expanded_cmd='${execcmd_'${cmd}'}'
+
+if test -z ${expanded_cmd}; then
+  echo "Usage: $0 cmd [options...]" 1>&2
+  echo "   cmd is one of:" 1>&2
+  for pair in ${commands}; do
+    eval `echo ${pair} | sed -e 's/=.*//' -e 's/^/a=/'`
+    echo $a
+  done
+else
+    @pkgbindir@/${expanded_cmd} "$@"
+fi
 
 
 # Local Variables:

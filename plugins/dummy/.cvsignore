@@ -6,6 +6,7 @@ Makefile
 Makefile.in
 configure
 configure.lineno
+config.status.lineno
 dummyscript
 substvars.sh
 tp-dummy-*.tar.gz

@@ -36,6 +36,9 @@ dist_torruscfg_DATA = dummy-torruscfg.pl
 devdisccfgdir = $(plugdevdisccfgdir)
 dist_devdisccfg_DATA = dummy-ddcfg.pl
 
+#####   CLI wrapper  #####
+wrapperdir = $(plugwrapperdir)
+dist_wrapper_DATA = dummy-wrapper.sh
 
 
 #####   XML configuration   #####

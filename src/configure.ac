@@ -148,7 +148,12 @@ if test -z "$plugtorruscfgdir"; then
 AC_ARG_VAR(plugdevdisccfgdir, [[PLUGINSDIR/devdiscover-config]])
 if test -z "$plugdevdisccfgdir"; then
    plugdevdisccfgdir='${pluginsdir}/devdiscover-config'; fi
-   
+
+AC_ARG_VAR(plugwrapperdir, [[PLUGINSDIR/wrapper]])
+if test -z "$plugwrapperdir"; then
+   plugwrapperdir='${pluginsdir}/wrapper'; fi
+
+      
 AC_ARG_VAR(scriptsdir, [[PKGHOME/scripts] Script files])
 if test -z "$scriptsdir"; then
    scriptsdir='${pkghome}/scripts'; fi

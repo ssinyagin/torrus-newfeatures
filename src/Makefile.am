@@ -71,6 +71,7 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(tmpluserdir)
 	$(mkinstalldirs) $(DESTDIR)$(plugtorruscfgdir)
 	$(mkinstalldirs) $(DESTDIR)$(plugdevdisccfgdir)
+	$(mkinstalldirs) $(DESTDIR)$(plugwrapperdir)
 
 HTMLDIR = @abs_top_builddir@/../htdocs
 

@@ -22,7 +22,7 @@
 
 =head1 Torrus Installation Instructions
 
-These are the Round Robin Database Framework installation instructions.
+
 
 =head2 Required Software
 
@@ -40,20 +40,22 @@ guest machine needs to be compiled with the following feature enabled:
 C<Character devices ---E<gt> Enhanced Real Time Clock Support>.
 For other guest operating systems (e.g. FreeBSD), in order to let the
 Torrus collector and monitor run properly, you need to add the following
-lines to your F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl>:
+lines to your F<torrus-siteconfig.pl>:
 
   $Torrus::Scheduler::maxSleepTime = 15;
   $Torrus::Scheduler::ignoreClockSkew = 1;
 
-B<Debian> package is maintained by Jurij Smakov and is available at
-E<lt>http://pkg-torrus.alioth.debian.orgE<gt>.
+# B<Debian> package is maintained by Jurij Smakov and is available at
+# E<lt>http://pkg-torrus.alioth.debian.orgE<gt>.
 
 =item * Perl
 
-Perl version C<5.8.0> or higher is required. Version C<5.8.0> is not
-recommended because of memory access bugs and unpredictable behaviour.
-Perl interpreter must be in PATH environment variable when
-running C<./configure>.
+Perl version C<5.8.1> or higher is required. B<Version C<5.8.0> is not
+recommended> because of memory access bugs and unpredictable behaviour.
+Perl interpreter should be in PATH environment variable when
+running C<./configure>, otherwise use
+
+  ./configure PERL=/path/to/perl
 
 =item * RRDtool
 
@@ -63,8 +65,9 @@ Both stable version C<1.0.x> and the development version C<1.1.x>
 are supported.
 
 As of this writing, rrdtool version C<1.1.x> is still in its development
-stage, but it is ready to use in production. There's a small glitch
-in legend text alignment, and it will hopefully be fixed.
+stage, but it is quite ready for using in production environments.
+There's a small glitch in legend text alignment, and it will
+hopefully be fixed.
 
 =item * libxml2
 
@@ -75,19 +78,25 @@ Versions C<2.4.23> and above were tested.
 
 =item * Berkeley DB version 4.2.52 or later
 
-The Berkeley DB from Sleepycat Software E<lt>http://www.sleepycat.comE<gt>
-is used for all data storage. Versions C<4.2.52> and above are recommended.
+There are two distinct packages with slightly conflicting names:
+The Berkeley DB from Sleepycat Software E<lt>http://www.sleepycat.comE<gt>,
+and C<BerkeleyDB> Perl module available from CPAN. We will always refer
+the latter as I<BerkeleyDB Perl module>.
+
+The Berkeley DB database engine is used for all data storage.
+Versions C<4.2.52> and above are recommended.
 Older versions of Berkeley DB had problems with database integrity
 in concurrent usage. By default, it installs
 into F</usr/local/BerkeleyDB.4.2/>.
-Unfortunately, Perl module C<BerkeleyDB> cannot find the include and
-library files in that directory. So, it either needs C<--prefix=/usr/local>
-configure option, or you need to edit F<config.in> in C<BerkeleyDB>
-distribution.
+
+Unfortunately, the BerkeleyDB Perl module cannot find the include and
+library files in that directory. Thus either configure Berkeley DB
+with the option C<--prefix=/usr/local>, or you need to edit
+F<config.in> in BerkeleyDB Perl module distribution.
 
 =item * HTTP Server
 
-This software requires Apache HTTP server (E<lt>http://httpd.apache.orgE<gt>)
+Torrus requires Apache HTTP server (E<lt>http://httpd.apache.orgE<gt>)
 and mod_perl (E<lt>http://perl.apache.orgE<gt>).
 
 Apache version 1.3 and mod_perl version 1.0 are supported by ApacheHandler.
@@ -96,7 +105,6 @@ Apache version 2.0 and mod_perl 2.0 are supported by Apache2Handler.
 Minimum supported mod_perl 2.0 version is B<1.99_15>. The handler also requires
 C<libapreq2> library, see the note below.
 
-Plain CGI interface is no longer supported since Torrus version 0.1.1.
 See I<Torrus Web Interface Reference> for details on mod_perl configuration.
 
 =item * Perl Modules
@@ -107,7 +115,7 @@ Some of them require other modules to be installed.
 You can install all required modules with the following command,
 executed from within the distribution directory:
 
-  perl -I `pwd`/lib -MCPAN -e 'install Bundle::Torrus'
+  perl -I `pwd`/setup_tools -MCPAN -e 'install Bundle::Torrus'
 
 =over 8
 
@@ -116,7 +124,7 @@ executed from within the distribution directory:
 This is a Perl interface for libxml2, providing DOM standards compliant
 interface. It is recommended that you use version C<1.54_3> or higher.
 
-=item * BerkeleyDB
+=item * BerkeleyDB perl module
 
 Perl interface to the database software.
 Version C<0.19> or higher is required.
@@ -133,7 +141,7 @@ Daemon invocation routines.
 
 =item * Net::SNMP
 
-SNMP queries and traps interface. Version C<4.0.3> is required.
+SNMP queries and traps interface. Version C<4.0.3> or higher is required.
 
 =item * URI::Escape
 
@@ -152,15 +160,15 @@ User session tracking helper
 =item * C<libapreq2> Perl library
 
 Apache 2.0 handler requires an additional Perl library, C<libapreq2>.
-It is available from CPAN E<lt>http://search.cpan.org/E<gt>, and only in
-development version. You need to download and install it manually in order
-for Apache2Handler to work.
+It is available from CPAN E<lt>http://search.cpan.org/E<gt>, and currently
+only in development version. You need to download and install it manually
+in order for Apache2Handler to work.
 
 =item * HTTP Browser requirements
 
 The HTTP browser must be compatible with I<HTML 4.01 Strict> and I<CSS2>
-specifications. The tests were made with: IE 5.5, Opera 6.12B1/Solaris,
-Opera 7.03/Win2K, Netscape 7.02.
+specifications. The tests were made with the following browsers:
+IE 5.5, Opera 6.12B1/Solaris, Opera 7.03/Win2K, Netscape 7.02.
 
 =back
 
@@ -188,9 +196,13 @@ examples of its usage.
 
 =back
 
+
+
 =head2 Installation Procedure
 
-Create the group C<torrus> and a user C<torrus> belonging to that group.
+Create the group C<torrus> and a user C<torrus>. The user should be a member of
+this group.
+
 Add your Apache daemon user to the group C<torrus>.
 Other users that will run any of Torrus processes must be included in
 this group.
@@ -199,7 +211,7 @@ For example, in Solaris (you may need to specify the GID and UID numbers
 according to your local administration policy):
 
   groupadd torrus
-  useradd -c 'Torrus Daemon' -d /usr/local/torrus-0.0 -g torrus torrus
+  useradd -c 'Torrus Daemon' -d /usr/local/torrus -g torrus torrus
   usermod -G www,torrus www
 
 Further installation process is mostly as usual:
@@ -208,72 +220,112 @@ Further installation process is mostly as usual:
   make
   make install
 
-The package is installed by default in the directory
-F</usr/local/torrus-X.Y> where X.Y.Z is the release version.
-Further on, we reference this directory as
-F<$Torrus_HOME>.
+The default directory layout is described below. Should you need to change it,
+there is a number of variables and configuration options that you may use
+as C<./configure> arguments. See C<./configure --help> for details. Example:
 
-Prerequisite Perl modules are checked at the time of C<./configure>. You
-can disable this by giving I<--disable-modcheck> option.
+  ./configure pkghome=/opt/torrus
 
-The only files that are not overwritten during C<make install> are
-F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl> and
-F<$Torrus_HOME/share/torrus/xmlconfig/site-global.xml>.
+Do not try to change any paths by supplying them as C<make> variables,
+this would most probably break the installation. The only C<make> variable
+that is supported is C<DESTDIR>. It may be used for preparing the package for
+further distribution. For example, the following command would install
+all Torrus files as if F</tmp/stage> were the root of the filesystem:
 
-The following directories and their contents must be writable by your Torrus
-processes, including the HTTP server (usually Apache web server):
+  make DESTDIR=/tmp/stage install
 
-=over 4
+The presence of prerequisite Perl modules is checked during the execution
+of C<./configure>. You can disable this by giving I<--enable-pkgonly> option.
 
-=item * F<$Torrus_HOME/var/cache/>
+The installer sets up the site configuration files, but only if
+they don't already exist.
 
-The placeholder directory for Renderer cache files. These are PNG and HTML
-files ready for display by Apache handler.
+Plugin modules should be installed separately, after the Torrus software is
+successfully installed. For each plugin, unpack the plugin distribution archive
+to some directory, and execute
 
-=item * F<$Torrus_HOME/var/db/>
+  torrus install_plugin <UNPACKED_PLUGIN_DIR>
 
-The home directory for Berkeley DB environment. Here all the databases are
-stored.
-
-=item * F</var/snmpcollector/>
-
-This is the default directory for SNMP collector RRD files.
-It may be changed with the I<--datadir> option of C<devdiscover>.
-
-=back
+A number of directories is set up by default under the path C</var>,
+and they must be writable by all Torrus processes, including the
+Apache web server.
 
 You can control these directories' access rights by setting the following
 environment variables: I<var_user>, I<var_group>, I<var_mode>, like follows:
 
   ./configure var_group=wwwrun
 
-Default values for a non-Cygwin OS are: I<var_user=torrus>,
+Default values for operating systems other than Cygwin are: I<var_user=torrus>,
 I<var_group=torrus>, I<var_mode=775>. Setgid bit is set by default for these
 directories.
 
-If available, you may place these directories onto a faster media, by
-changing the I<--localstatedir=DIR> option of C<./configure>.
+If available, you may place these directories on a fast media, for example,
+a robust disk array. Changing the C<varprefix> variable would be generally
+enough, for example:
 
-Additional third-party components (plugins) may be included
-in your installation. These components must be designed for this use.
-Before running C<./configure>, unpack the plugin distribution archives into
-some directory:
+  ./configure varprefix=/vol1/torrus_var
 
-  gzip -dc torrus-plugin-ABC-0.0.1.tar.gz | tar xvf -
-  gzip -dc torrus-plugin-XYZ-0.0.1.tar.gz | tar xvf -
 
-Then, specify the plugin distribution paths separated by colon (:) in the
-option I<--with-plugins> of C<./configure>:
+=head2 Torrus directory layout
 
-  ./configure [VARIABLE=VALUE...] \
-    --with-plugins=../torrus-plugin-ABC-0.0.1:../torrus-plugin-XYZ-0.0.1 \
-    [other options...]
+By default, Torrus uses the following directory structure:
 
-After that, C<make install> will install Torrus together with the specified
-plugins.
 
-From the Torrus home page, you may download an example plugin called
-I<torrus-plugin-dummy>, and use it as a template for your own add-ons.
+  /usr/local/torrus/    Home directory for Torrus distribution files
+        |
+        +- conf_defaults/  torrus-config.pl and others
+        |
+        +- bin/         Command-line executables
+        |
+        +- doc/         POD and TXT documentation files
+        |
+        +- examples/    Miscelaneous example files
+        |
+        +- perllib/     Perl libraries
+        |
+        +- plugins/     Plugins configuration
+        |
+        +- scripts/     Scripts
+        |
+        +- sup/         Supplementary files, DTDs, MIBs, color schemas,
+        |               Web plain files
+        |
+        +- templates/   Renderer output templates
+        |
+        +- xmlconfig/   Distrubution XML files
+
+  /usr/local/etc/torrus/   Site configurable files
+        |
+        +- conf/        Place for torrus-siteconfig.pl and other siteconfigs
+        |
+        +- discovery/   Devdiscover input files
+        |
+        +- templates/   User-defined Renderer output templates
+        |
+        +- xmlconfig/   User XML configuration files
+
+  /usr/local/man/       Place for man pages. All articles will have the
+                        prefix C<torrus_>
+
+  /var/log/torrus/      Daemon logfiles
+
+  /var/run/torrus/      Daemon PID files
+
+  /var/torrus/cache/    Renderer cache
+
+  /var/torrus/db/       Configuration databases
+
+  /var/torrus/session_data/  Web interface session files
+
+  /srv/torrus/collector_rrd/  Default directory for collector
+                              generated RRD files
+
+B<Note:> RRFW used the path F</var/snmpcollector> as the default path for
+storing the RRD files. According to FHS specification, the recommended
+path for service data files is recommended to be a subdirectory of F</srv>.
+The path F</srv/torrus/collector_rrd> is used as default by C<torrus genddx>
+utility, and you can always change it in the command line or in your 
+DDX files.
 
 =head2 Configuring Torrus
 

@@ -126,9 +126,12 @@ sub checkdevtype
     foreach my $ifIndex
         ( $devdetails->getSnmpIndices( $dd->oiddef('ifDescr') ) )
     {
-        if( $Torrus::DevDiscover::listAdminDownInterfaces or
-            $devdetails->snmpVar($dd->oiddef('ifAdminStatus') .
-                                 '.' . $ifIndex) == 1 )
+        if( ( $Torrus::DevDiscover::listAdminDownInterfaces or
+              $devdetails->snmpVar($dd->oiddef('ifAdminStatus') .
+                                   '.' . $ifIndex) == 1 ) and
+            ( $Torrus::DevDiscover::listNotPresentInterfaces or
+              $devdetails->snmpVar($dd->oiddef('ifOperStatus') .
+                                   '.' . $ifIndex) != 6 ) )
         {
             my $interface = {};
             $data->{'interfaces'}{$ifIndex} = $interface;

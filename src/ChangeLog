@@ -1,3 +1,8 @@
+2005-01-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (checkdevtype):
+	Interface excluded when ifOperStatus=6 [notPresent]
+
 2004-12-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/devdiscover.in (absXmlFilename): output file is placed in

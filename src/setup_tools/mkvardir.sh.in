@@ -26,10 +26,8 @@ mode=@var_mode@
 
 parent=`echo $dir | sed -e 's/\/$//' -e 's/\/[^\/]*$//'`
 
-mkinstalldirs="@SHELL@ @abs_top_builddir@/conftools/mkinstalldirs"
-
 if test ! -d $parent; then
-  ${mkinstalldirs} ${parent}
+  @mkdir_p@ ${parent}
 fi
 
 if test ! -d $dir; then

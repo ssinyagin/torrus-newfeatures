@@ -38,6 +38,7 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
      'Torrus::DevDiscover::AscendMax',
      'Torrus::DevDiscover::ATMEL',
+     'Torrus::DevDiscover::AxxessIT',
      'Torrus::DevDiscover::CiscoCatOS',
      'Torrus::DevDiscover::CiscoFirewall',
      'Torrus::DevDiscover::CiscoGeneric',

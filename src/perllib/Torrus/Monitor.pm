@@ -336,35 +336,35 @@ sub run_event_exec
         $cmd =~ s/\&gt\;/\>/;
         $cmd =~ s/\&lt\;/\</;
 
-        $ENV{'Torrus_HOME'}      = $Torrus::Global::prefix;
-        $ENV{'Torrus_BIN'}       = $Torrus::Global::pkgbindir;
-        $ENV{'Torrus_UPTIME'}    = time() - $self->whenStarted();
+        $ENV{'TORRUS_HOME'}      = $Torrus::Global::prefix;
+        $ENV{'TORRUS_BIN'}       = $Torrus::Global::pkgbindir;
+        $ENV{'TORRUS_UPTIME'}    = time() - $self->whenStarted();
 
-        $ENV{'Torrus_TREE'}      = $config_tree->treeName();
-        $ENV{'Torrus_TOKEN'}     = $token;
-        $ENV{'Torrus_NODEPATH'}  = $config_tree->path( $token );
+        $ENV{'TORRUS_TREE'}      = $config_tree->treeName();
+        $ENV{'TORRUS_TOKEN'}     = $token;
+        $ENV{'TORRUS_NODEPATH'}  = $config_tree->path( $token );
 
         my $nick =
             $config_tree->getNodeParam( $token, 'descriptive-nickname' );
         if( not defined( $nick ) )
         {
-            $nick = $ENV{'Torrus_NODEPATH'};
+            $nick = $ENV{'TORRUS_NODEPATH'};
         }
-        $ENV{'Torrus_NICKNAME'} = $nick;
+        $ENV{'TORRUS_NICKNAME'} = $nick;
         
-        $ENV{'Torrus_NCOMMENT'}  =
+        $ENV{'TORRUS_NCOMMENT'}  =
             $config_tree->getNodeParam( $token, 'comment', 1 );
-        $ENV{'Torrus_NPCOMMENT'} =
+        $ENV{'TORRUS_NPCOMMENT'} =
             $config_tree->getNodeParam( $config_tree->getParent( $token ),
                                         'comment', 1 );
-        $ENV{'Torrus_EVENT'}     = $event;
-        $ENV{'Torrus_MONITOR'}   = $mname;
-        $ENV{'Torrus_MCOMMENT'}  = $config_tree->getParam($mname, 'comment');
-        $ENV{'Torrus_TSTAMP'}    = $timestamp;
+        $ENV{'TORRUS_EVENT'}     = $event;
+        $ENV{'TORRUS_MONITOR'}   = $mname;
+        $ENV{'TORRUS_MCOMMENT'}  = $config_tree->getParam($mname, 'comment');
+        $ENV{'TORRUS_TSTAMP'}    = $timestamp;
 
         if( defined( $obj->{'value'} ) )
         {
-            $ENV{'Torrus_VALUE'} = $obj->{'value'};
+            $ENV{'TORRUS_VALUE'} = $obj->{'value'};
         }
         
         my $setenv_params =
@@ -379,11 +379,11 @@ sub run_event_exec
                 {
                     Warn('Parameter ' . $param . ' referenced in action '.
                          $aname . ', but not defined for ' .
-                         $ENV{'Torrus_NODEPATH'});
+                         $ENV{'TORRUS_NODEPATH'});
                     $value = '';
                 }
                 $param =~ s/\W/_/g;
-                my $envName = 'Torrus_P_'.$param;
+                my $envName = 'TORRUS_P_'.$param;
                 Debug("Setting environment $envName to $value");
                 $ENV{$envName} = $value;
             }
@@ -403,7 +403,7 @@ sub run_event_exec
                 my $da = new Torrus::DataAccess;
                 my ($value, $timestamp) =
                     $da->read_RPN( $config_tree, $token, $expr );
-                my $envName = 'Torrus_'.$env;
+                my $envName = 'TORRUS_'.$env;
                 $ENV{$envName} = $value;
             }
         }
@@ -418,7 +418,7 @@ sub run_event_exec
         # Clean up the environment
         foreach my $envName ( keys %ENV )
         {
-            if( $envName =~ /^Torrus_/ )
+            if( $envName =~ /^TORRUS_/ )
             {
                 delete $ENV{$envName};
             }

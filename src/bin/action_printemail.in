@@ -27,7 +27,7 @@ use Getopt::Long;
 
 require '@email_siteconfig_pl@';
 
-if( not $ENV{'Torrus_HOME'} )
+if( not $ENV{'TORRUS_HOME'} )
 {
     print STDERR ("Torrus environment variables missing. This program ",
                   "must be run from Torrus Monitor\n");
@@ -48,19 +48,19 @@ my $tt = new Template(INCLUDE_PATH => $Torrus::Global::templateDirs);
 
 my $vars =
 {
-    'tree'       => $ENV{'Torrus_TREE'},
-    'token'      => $ENV{'Torrus_TOKEN'},
-    'path'       => $ENV{'Torrus_NODEPATH'},
-    'nickname'   => $ENV{'Torrus_NICKNAME'},
+    'tree'       => $ENV{'TORRUS_TREE'},
+    'token'      => $ENV{'TORRUS_TOKEN'},
+    'path'       => $ENV{'TORRUS_NODEPATH'},
+    'nickname'   => $ENV{'TORRUS_NICKNAME'},
     'url'        => $Torrus::Email::url . '/' .
-        $ENV{'Torrus_TREE'} . '?token='.$ENV{'Torrus_TOKEN'},
-    'ncomment'   => $ENV{'Torrus_NCOMMENT'},
-    'npcomment'  => $ENV{'Torrus_NPCOMMENT'},
-    'event'      => $ENV{'Torrus_EVENT'},
-    'monitor'    => $ENV{'Torrus_MONITOR'},
-    'mcomment'   => $ENV{'Torrus_MCOMMENT'},
-    'timestamp'  => scalar(localtime($ENV{'Torrus_TSTAMP'})),
-    'value'      => $ENV{'Torrus_VALUE'},
+        $ENV{'TORRUS_TREE'} . '?token='.$ENV{'TORRUS_TOKEN'},
+    'ncomment'   => $ENV{'TORRUS_NCOMMENT'},
+    'npcomment'  => $ENV{'TORRUS_NPCOMMENT'},
+    'event'      => $ENV{'TORRUS_EVENT'},
+    'monitor'    => $ENV{'TORRUS_MONITOR'},
+    'mcomment'   => $ENV{'TORRUS_MCOMMENT'},
+    'timestamp'  => scalar(localtime($ENV{'TORRUS_TSTAMP'})),
+    'value'      => $ENV{'TORRUS_VALUE'},
     'env'        => sub  { return $ENV{$_[0]} }
 };
 

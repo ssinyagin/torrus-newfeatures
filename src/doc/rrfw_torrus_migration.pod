@@ -114,6 +114,18 @@ After copying XML files, compile them in Torrus:
 
 
 
+=head2 Monitor actions
+
+In case if you utilize the monitor daemon, you will most probably need
+to change the action statements.
+
+In the action of type C<exec>, the C<command> parameter should be edited.
+RRFW was usually referencing the email notification command as
+I<$RRFW_HOME/bin/action_printemail>. In Torrus, this command should be
+referred as I<$TORRUS_BIN/action_printemail>.
+
+
+
 =head2 SNMP discovery files
 
   cd /usr/local/etc/torrus/

@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Cisco Class-based QoS discovery and collection plugin</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#cisco_classbased_qos_discovery_and_collection_plugin">Cisco Class-based QoS discovery and collection plugin</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#installation">Installation</a></li>
+		<li><a href="#usage">Usage</a></li>
+		<li><a href="#tunable_parameters">Tunable parameters</a></li>
+		<li><a href="#implementation_details">Implementation details</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="cisco_classbased_qos_discovery_and_collection_plugin">Cisco Class-based QoS discovery and collection plugin</a></h1>
+<p>Status: Released; Last modified: 03-MAY-2004</p>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<p>DiffServ-based quality of service is being deployed in many networks
+these days, and the choice of management systems able to monitor QoS
+parameters is too narrow.</p>
+<p>Cisco IOS provides QoS statistics in its CISCO-CLASS-BASED-QOS-MIB.
+This MIB is far too complex for a regular SNMP collector.</p>
+<p>The <code>cbqos</code> Torrus plugin provides a complete solution for automated
+SNMP discovery and collection for QoS objects on Cisco routers.
+It is the first open source solution of this kind.</p>
+<p>Other existing tools for QoS monitoring are:</p>
+<ul>
+<li><strong><a name="item_mikus"><code>genRtrConfig</code> by Francois Mikus (http://www.acktomic.com).</a></strong><br />
+</li>
+This tool is an add-on to Cricket (http://cricket.sourceforge.net).
+It provides discovery and statistics for non-hierarchical classmaps counters:
+pre-policy, post-policy, and drop counters.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="installation">Installation</a></h2>
+<p>Follow the Torrus installation guide for the main software installation.</p>
+<p>Unpack the plugin distribution package in some directory:</p>
+<pre>
+  gzip -dc tp-cisco-cbqos-1.X.tar.gz | tar xvf -</pre>
+<p>Then run the Torrus plugin installation utility:</p>
+<pre>
+  torrus install_plugin tp-cisco-cbqos-1.X</pre>
+<p>Restart all Torrus processes, including Apache HTTP daemon.</p>
+<p>
+</p>
+<h2><a name="usage">Usage</a></h2>
+<p>Use your Torrus the usual way: <code>devdiscover</code> will automatically find
+QoS objects on your routers, <code>compilexml</code> will find the required
+templates, and <code>collector</code> will initialize all required tables and
+will start collecting data.</p>
+<p><strong>Note:</strong> QoS is a software feature, and there's no means to determine
+that the configuration has changed. You need to re-run <code>devdiscover</code>
+and <code>compilexml</code> whenever your QoS configuration changes.
+As usual, the collector will automatically detect the router reload
+or Torrus configuration change, and re-initialize its tables.</p>
+<p>
+</p>
+<h2><a name="tunable_parameters">Tunable parameters</a></h2>
+<p>The following parameters may be specified in <code>devdiscover</code> input XML:</p>
+<ul>
+<li><strong><a name="item_ciscoios_cbqos_3a_3ared_2ddscp_2dvalues"><code>CiscoIOS_cbQoS::red-dscp-values</code></a></strong><br />
+</li>
+Optional. Comma-separated list of DSCP values to be used for WRED
+statistics. Symbolic names like <code>AF31</code> or <code>EF</code> are recognized.
+When specified, it overrides the default list defined in
+<code>@Torrus::DevDiscover::CiscoIOS_cbQoS::RedDscpValues</code> in <em>cbqos-config.pl</em>
+or in <em>devdiscover-siteconfig.pl</em>.
+<p></p>
+<li><strong><a name="item_ciscoios_cbqos_3a_3aclassmaps_2donly"><code>CiscoIOS_cbQoS::classmaps-only</code></a></strong><br />
+</li>
+Optional. When set to <code>yes</code>, only classmap statistics are set for collection.
+Suppressed are statistics for match statements, queueing, RED, shaping,
+and policying. This significantly reduces the size of datasource tree,
+amount of SNMP queries, and collector execution time.
+<p></p>
+<li><strong><a name="item_ciscoios_cbqos_3a_3asuppress_2dmatch_2dstatements"><code>CiscoIOS_cbQoS::suppress-match-statements</code></a></strong><br />
+</li>
+Optional. When set to <code>yes</code>, disables the match statement statistics.
+These statistics usually don't bring much of additional information.
+Besides, in some IOS versions they are almost always not updated (known
+for: 12.2(15)T7, ...).
+<p></p>
+<li><strong><a name="item_ciscoios_cbqos_3a_3asuppress_2ddropnobuf"><code>CiscoIOS_cbQoS::suppress-dropnobuf</code></a></strong><br />
+</li>
+Optional. When set to <code>yes</code>, disables classmap Dropped No Buffer statistics.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="implementation_details">Implementation details</a></h2>
+<p>CISCO-CLASS-BASED-QOS-MIB uses complex indexing for statistics objects:</p>
+<ol>
+<li></li>
+<code>cbQosPolicyIndex</code> in <code>cbQosServicePolicyTable</code> is found by matching
+6 values: <code>cbQosIfType</code>, <code>cbQosPolicyDirection</code>, <code>cbQosIfIndex</code>,
+<code>cbQosFrDLCI</code>, <code>cbQosAtmVPI</code>, <code>cbQosAtmVCI</code>
+<p></p>
+<li></li>
+Use <code>cbQosPolicyIndex</code> to access the <code>cbQosObjectsTable</code>, and find the
+<code>cbQosObjectsIndex</code> and <code>cbQosConfigIndex</code> assigned to the QoS feature.
+<p></p>
+<li></li>
+Use <code>cbQosConfigIndex</code> to access configuration tables
+(<code>cbQosxxxCfgTable</code>) for information about the feature.
+<p></p>
+<li></li>
+Use <code>cbQosPolicyIndex</code> and <code>cbQosObjectsIndex</code> to access QoS statistics
+tables (<code>cbQosxxxStatsTable</code>) for information about the QoS feature.
+<p></p></ol>
+<p>The plugin introduces a special Torrus collector type, ``cisco-cbqos''.</p>
+<p>Each Torrus datasource is identified by Service Policy, QoS Feature, and
+associated SNMP objects type.</p>
+<p>The following parameters identify the Service Policy:</p>
+<pre>
+ cbqos-direction =&gt;
+   &quot;input&quot;
+   &quot;output&quot;</pre>
+<pre>
+ cbqos-interface-name (mapping to IF-MIB interface index)</pre>
+<pre>
+ cbqos-interface-type =&gt;
+   &quot;mainInterface&quot;
+   &quot;subInterface&quot;
+   &quot;frDLCI&quot; =&gt;
+     cbqos-fr-dlci
+   &quot;atmPVC&quot; =&gt;
+     cbqos-atm-vpi
+     cbqos-atm-vci</pre>
+<p>The following parameters identify the QoS Feature:</p>
+<pre>
+ cbqos-object-type =&gt;
+   &quot;policymap&quot;
+   &quot;classmap&quot; =&gt;
+     cbqos-class-map-name
+   &quot;matchStatement&quot; =&gt;
+     cbqos-match-statement-name
+   &quot;queueing&quot; =&gt;
+     cbqos-queueing-bandwidth
+   &quot;randomDetect&quot;
+   &quot;trafficShaping&quot; =&gt;
+     cbqos-shaping-rate
+   &quot;police&quot; =&gt;
+     cbqos-police-rate</pre>
+<p>SNMP objects are defined in reguar Torrus XML templates. Collector
+substitutes <code>POL</code> and <code>OBJ</code> strings in <code>snmp-object</code> parameter with
+the current values of policy and object index correspondingly.</p>
+<p>Development of this plugin was sponsored by Cablecom GmbH.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2004 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

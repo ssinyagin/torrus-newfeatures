@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Random Collector Plugin</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#random_collector_plugin">Random Collector Plugin</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#installation">Installation</a></li>
+		<li><a href="#xml_configuration_parameters">XML configuration parameters</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="random_collector_plugin">Random Collector Plugin</a></h1>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<p>This plugin adds the new collector type. It actually doesn't collect anything,
+but generates randomly generated values. The main purpose of this plugin is
+testing various aspects of Torrus, and particularly
+its modular Collector design.</p>
+<p>
+</p>
+<h2><a name="installation">Installation</a></h2>
+<p>Follow the Torrus installation guide for the main software installation.</p>
+<p>Unpack the plugin distribution package in some directory:</p>
+<pre>
+  gzip -dc tp-randomcollector-1.X.tar.gz | tar xvf -</pre>
+<p>Then run the Torrus plugin installation utility:</p>
+<pre>
+  torrus install_plugin tp-randomcollector-1.X</pre>
+<p>Restart all Torrus processes, including Apache HTTP daemon.</p>
+<p>That is all, now you can use the parameters described below in your XML
+configuration.</p>
+<p><code>genrandomcfg</code> utility may be used to create a typical configuration for
+the random collector.</p>
+<p>
+</p>
+<h2><a name="xml_configuration_parameters">XML configuration parameters</a></h2>
+<ul>
+<li><strong><a name="item_collector_2dtype"><code>collector-type</code></a></strong><br />
+</li>
+New value <code>random</code> is supported by this plugin.
+<p></p>
+<li><strong><a name="item_rnd_2dbaseline_2dtype"><code>rnd-baseline-type</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=random</code>. Values supported: <code>sin</code> (Sine
+baseline curve), <code>flat</code> (horizontal baseline).
+<p></p>
+<li><strong><a name="item_rnd_2dbaseline_2dheight"><code>rnd-baseline-height</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=random</code>. Specifies the constant baseline
+height above the X axis.
+<p></p>
+<li><strong><a name="item_rnd_2damplitude"><code>rnd-amplitude</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=random</code>. Specifies the amplitude of the
+random value.
+<p></p>
+<li><strong><a name="item_rnd_2dbaseline_2dperiod_2c_rnd_2dbaseline_2doffset"><code>rnd-baseline-period</code>, <code>rnd-baseline-offset</code>,
+<code>rnd-baseline-amplitude</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=random</code> and
+<code>rnd-baseline-type=sin</code>. These options determine the parameters of the
+sine curve: <code>Y = height + amplitude * sin( 2*pi*(TIME+offset)/period )</code>
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2003-2004 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

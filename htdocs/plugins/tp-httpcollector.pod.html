@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Http Collector Plugin</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#http_collector_plugin">Http Collector Plugin</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#installation">Installation</a></li>
+		<li><a href="#xml_configuration_parameters">XML configuration parameters</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="http_collector_plugin">Http Collector Plugin</a></h1>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<p>This plugin adds the http collector type. It can get and parse web pages
+using the GET method.</p>
+<p>
+</p>
+<h2><a name="installation">Installation</a></h2>
+<p>Follow the Torrus installation guide for the main software installation.</p>
+<p>Unpack the plugin distribution package in some directory:</p>
+<pre>
+  gzip -dc tp-httpcollector-1.X.tar.gz | tar xvf -</pre>
+<p>Then run the Torrus plugin installation utility:</p>
+<pre>
+  torrus install_plugin tp-httpcollector-1.X</pre>
+<p>Restart all Torrus processes, including Apache HTTP daemon.</p>
+<p>That is all, now you can use the parameters described below in your XML
+configuration.</p>
+<p>The plugin distribution adds the following files that you can use in
+your setup:</p>
+<ul>
+<li><strong><a name="item_vendor_2fapache_2ehttpd_2exml"><em>vendor/apache.httpd.xml</em></a></strong><br />
+</li>
+Templates for Apache server-status checking, for Apache versions 1.0 and 2.0.
+<p></p>
+<li><strong><a name="item_examples_2flocalhost_2dapache1_2exml_2c_examples_2"><em>examples/localhost-apache1.xml</em>, <em>examples/localhost-apache2.xml</em></a></strong><br />
+</li>
+Sample configurations for Apache server-status, Apache version 1.0 and 2.0
+correspondingly. The statistics are placed into <code>localhost/HTTP_Stats</code>
+subtree.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="xml_configuration_parameters">XML configuration parameters</a></h2>
+<ul>
+<li><strong><a name="item_collector_2dtype"><code>collector-type</code></a></strong><br />
+</li>
+New value <code>http</code> is supported by this plugin.
+<p></p>
+<li><strong><a name="item_http_2durl"><code>http-url</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=http</code>.
+<p></p>
+<li><strong><a name="item_http_2dtimeout"><code>http-timeout</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=http</code>.
+<p></p>
+<li><strong><a name="item_http_2dobject"><code>http-object</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=http</code>. Specifies an object to look for in the
+web page.The object is an RPN expression containing search-items.
+A search-item takes the following form:
+<pre>
+        lineNumber:/pattern/</pre>
+<p>LineNumber my be a number or *, * means treat the whole web page as one
+single line. The pattern is a regular expression and must contain a ().
+The value between () will be replaced in the RPN before it is evaluated.</p>
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2003-2004 Christian Schnidrig
+&lt;<a href="mailto:christian.schnidrig@bluewin.ch">christian.schnidrig@bluewin.ch</a>&gt;</p>
+
+</body>
+
+</html>

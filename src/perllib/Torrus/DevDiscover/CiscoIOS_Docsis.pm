@@ -90,6 +90,8 @@ sub buildConfig
         $cb->addSubtree( $utilNode, 'MAC_Layer', {},
                          ['CiscoIOS_Docsis::cisco-docsis-util-mac-subtree'] );
 
+    my @macLayerInterfaces = ();
+    
     foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
@@ -100,9 +102,12 @@ sub buildConfig
             'comment'        => $interface->{'param'}{'comment'}
         };
 
+        my $ifSubtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
         $cb->addSubtree
-            ( $macNode, $interface->{$data->{'nameref'}{'ifSubtreeName'}},
+            ( $macNode, $ifSubtreeName,
               $param, ['CiscoIOS_Docsis::cisco-docsis-util-mac-intf'] );
+
+        push( @macLayerInterfaces, $ifSubtreeName );
     }
 
     my $upsNode =
@@ -128,6 +133,48 @@ sub buildConfig
             ( $upsNode, $interface->{$data->{'nameref'}{'ifSubtreeName'}},
               $param, ['CiscoIOS_Docsis::cisco-docsis-util-up-intf'] );
     }
+
+    # Build All_Modems summary graph
+    my $param = {
+      'ds-type'              => 'rrd-multigraph',
+      'ds-names'             => 'total,active',
+      'graph-lower-limit'    => '0',
+      'precedence'           => '-1000',
+      'comment'              => 'Active and Total modems on all interfaces',
+      'vertical-label'       => 'Modems',
+
+      'graph-legend-total'   => 'Total',
+      'line-style-total'     => '##totalresource',
+      'line-color-total'     => '##totalresource',
+      'line-order-total'     => '1',
+
+      'graph-legend-active'  => 'Active',
+      'line-style-active'    => '##resourceusage',
+      'line-color-active'    => '##resourceusage',
+      'line-order-active'    => '2'
+      };
+
+    my $first = 1;
+    foreach my $intf ( @macLayerInterfaces )
+    {
+        if( $first )
+        {
+            $param->{'ds-expr-total'} =
+                '{MAC_Layer/' . $intf . '/Modems_Total}';
+            $param->{'ds-expr-active'} =
+                '{MAC_Layer/' . $intf . '/Modems_Active}';
+            $first = 0;
+        }
+        else
+        {
+            $param->{'ds-expr-total'} .=
+                ',{MAC_Layer/' . $intf . '/Modems_Total},+';
+            $param->{'ds-expr-active'} .=
+                ',{MAC_Layer/' . $intf . '/Modems_Active},+';
+        }
+    }
+
+    $cb->addLeaf( $utilNode, 'All_Modems', $param, [] );
 }
 
 

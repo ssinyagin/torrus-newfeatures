@@ -465,6 +465,11 @@ When set to C<yes>, IPSec statistics are excluded from discovery.
 When set to C<yes>, only those Catalyst ports are included in configuration
 which have a port name (set up by C<set port name> command).
 
+=item * C<Paradyne::slot-name>
+
+Mandatory for Paradyne DSLAM devices. It should uniquely identify
+the slot within the device. Any sequence of word characters is allowed.
+
 =back
 
 See also: I<Torrus Vendor Support List> for the list of supported MIBs and

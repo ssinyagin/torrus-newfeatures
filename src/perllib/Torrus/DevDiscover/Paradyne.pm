@@ -18,6 +18,12 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # Paradyne devices discovery
+# A typical Paradyne device has several slots, and all slots are managed
+# through the same IP address, with different community strings.
+# That's why you have to configure "Paradyne::slot-name" parameter
+# in your discovery file, uniquely for each slot. A slot name should
+# not contain special characters.
+
 
 # Tested with:
 #
@@ -75,6 +81,16 @@ sub checkdevtype
         return 0;
     }
 
+    if( length( $devdetails->param('Paradyne::slot-name') ) == 0 )
+    {
+        Error('Mandatory discovery parameter "Paradyne::slot-number" ' .
+              'is not defined for a Paradyne device: ' .
+              $devdetails->param('snmp-host') . ':' .
+              $devdetails->param('snmp-port') . ':' .
+              $devdetails->param('snmp-community'));
+        return 0;
+    }
+    
     $devdetails->setCap('interfaceIndexingManaged');
 
     return 1;
@@ -92,6 +108,7 @@ sub discover
     $data->{'nameref'}{'ifReferenceName'} = 'ifName';
     $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
     $data->{'param'}{'ifindex-table'} = '$ifName';
+    $data->{'nameref'}{'ifNick'} = 'ParadyneIfNick';
 
     $data->{'nameref'}{'ifComment'} = 'ifDescr';
 
@@ -99,7 +116,15 @@ sub discover
     {
         $data->{'param'}{'snmp-oids-per-pdu'} = '10';
     }
-
+    
+    my $slot = $devdetails->param('Paradyne::slot-name');    
+    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        $interface->{'ParadyneIfNick'} =
+            $slot . '_' . $interface->{'ifNameT'};
+    }
+    
     my $xdslOID = $dd->oiddef('xdslDevIfStatsElapsedTimeLinkUp');
 
     my $xdslTable = $session->get_table( -baseoid => $xdslOID );

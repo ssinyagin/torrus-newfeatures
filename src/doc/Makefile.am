@@ -21,19 +21,47 @@
 
 SUBDIRS = . manpages
 
-docdir  = @docdir@
+SUBST = @abs_top_builddir@/setup_tools/substvars.sh
 
-dist_doc_DATA = \
-		install.txt           install.pod \
-		rpnexpr.txt           rpnexpr.pod \
-		rrfw_torrus_migration.txt rrfw_torrus_migration.pod \
-		scalability.pod	      scalability.txt \
-		snmpdiscovery.txt     snmpdiscovery.pod \
-		stylingprofile.txt    stylingprofile.pod \
-		userguide.txt         userguide.pod \
-		vendorsupport.txt     vendorsupport.pod \
-		webintf.txt	      webintf.pod \
-		xmlconfig.txt         xmlconfig.pod
+CLEANFILES = $(POD_FILES) $(nodist_doc_DATA)
+
+EXTRA_DIST = \
+		install.pod.in \
+		rpnexpr.pod.in \
+		rrfw_torrus_migration.pod.in \
+		scalability.pod.in \
+		snmpdiscovery.pod.in \
+		stylingprofile.pod.in \
+		userguide.pod.in \
+		vendorsupport.pod.in \
+		webintf.pod.in \
+		xmlconfig.pod.in
+
+POD_FILES = \
+		install.pod \
+		rpnexpr.pod \
+		rrfw_torrus_migration.pod \
+		scalability.pod \
+		snmpdiscovery.pod \
+		stylingprofile.pod \
+		userguide.pod \
+		vendorsupport.pod \
+		webintf.pod \
+		xmlconfig.pod
+
+
+docdir  = @docdir@
+nodist_doc_DATA = \
+		install.txt \
+		rpnexpr.txt \
+		rrfw_torrus_migration.txt \
+		scalability.txt \
+		snmpdiscovery.txt \
+		stylingprofile.txt \
+		userguide.txt \
+		vendorsupport.txt \
+		webintf.txt \
+		xmlconfig.txt
 
 devdocdir  = $(docdir)/devdoc
 
@@ -49,13 +77,15 @@ dist_devdoc_DATA = \
 		devdoc/wd.monitor-escalation.pod \
 		devdoc/wd.uptime-mon.pod
 
+SUFFIXES = .pod.in .pod .txt
 
-SUFFIXES = .pod .txt
+.pod.in.pod:
+	$(SUBST) $<  > $@
 
 .pod.txt:
 	pod2text $< $@ 
 
 
-htdocs:
+htdocs: $(POD_FILES)
 	HTMLDIR=@abs_top_builddir@/../htdocs $(SHELL) mkhtdocs.sh
 

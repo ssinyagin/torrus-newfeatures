@@ -11,4 +11,4 @@ substvars.sh
 tp-randomcollector-*.tar.gz
 pod2htmi.tmp
 pod2htmd.tmp
-
+*.txt

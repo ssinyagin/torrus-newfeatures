@@ -161,6 +161,11 @@ AC_ARG_VAR(webplaindir, [[SUPDIR/webplain] Web interface plain files path])
 if test -z "$webplaindir"; then
    webplaindir='${supdir}/webplain'; fi
 
+AC_ARG_VAR(webscriptsdir,
+        [[SUPDIR/webscripts] Directory for optional web scripts])
+if test -z "$webscriptsdir"; then
+   webscriptsdir='${supdir}/webscripts'; fi
+
 AC_ARG_VAR(tmpldir, [[PKGHOME/templates] Template files])
 if test -z "$tmpldir"; then
    tmpldir='${pkghome}/templates'; fi

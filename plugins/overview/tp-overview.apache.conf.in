@@ -1,5 +1,5 @@
-ScriptAlias /menu/ "@webplaindir@/menu/"
-ScriptAlias /overviews/ "@webplaindir@/overviews/"
+ScriptAlias /menu/      "@webscriptsdir@/tp-overview/"
+ScriptAlias /overviews/ "@webscriptsdir@/tp-overview/"
 
 PerlModule Apache::ASP
 

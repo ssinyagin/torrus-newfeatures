@@ -22,13 +22,16 @@
 prefix=@prefix@
 pkghome=@pkghome@
 supdir=@supdir@
+varprefix=@varprefix@
 
 rendererUrl=@rendererUrl@
 
 @SED@ \
     -e "s,\@webplaindir\@,@webplaindir@,g" \
+    -e "s,\@webscriptsdir\@,@webscriptsdir@,g" \
     -e "s,\@rendererUrl\@,${rendererUrl},g" \
     -e "s,\@plainUrl\@,@plainUrl@,g" \
+    -e "s,\@aspglobal\@,@aspglobal@,g" \
     $1
 
 # Local Variables:

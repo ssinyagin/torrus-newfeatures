@@ -40,4 +40,5 @@ dist_webplain_DATA = \
 	webplain/torrus-printer.css
 
 
-
+install-data-local:
+	$(mkinstalldirs) $(DESTDIR)$(webscriptsdir)

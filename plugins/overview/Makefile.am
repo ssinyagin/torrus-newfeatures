@@ -22,20 +22,18 @@
 
 SUBST = @abs_top_builddir@/ov_substvars.sh
 
+CLEANFILES = \
+	ov_substvars.sh \
+	tp-overview.apache.conf
+
 noinst_SCRIPTS = \
 	ov_substvars.sh
 
 EXTRA_DIST = \
-	menu/bg.jpg \
 	menu/credits.htm \
-	menu/menu.css \
-	menu/menu.js \
 	menu/menu.xsl.in \
-	menu/sampleMenu.xml \
 	menu/welcome.htm \
-	overview/common.inc \
 	overview/overview.xsl.in \
-	overview/sampleOverview.xml \
 	xtree/xtree.css \
 	xtree/xtree.js.in  \
 	ov_substvars.sh.in \
@@ -67,27 +65,32 @@ SUFFIXES = .pod .txt
 .pod.txt:
 	pod2text $< $@
 
-#####   Menu files   #####
-menudir	= $(webplaindir)/menu
-menu_DATA = \
-	menu/bg.jpg \
-	menu/menu.css \
-	menu/menu.js \
+
+#####   XSLT scripts  #####
+scriptsdir = $(webscriptsdir)/tp-overview
+scripts_DATA = \
 	menu/menu.xsl \
-	menu/sampleMenu.xml
+	overview/overview.xsl
 
 menu/menu.xsl: menu/menu.xsl.in
 	$(SUBST) menu/menu.xsl.in > menu/menu.xsl
 
-#####   Overview files   #####
-overviewsdir	= $(webplaindir)/overviews
-overviews_DATA = \
-	overview/common.inc \
-	overview/overview.xsl \
-	overview/sampleOverview.xml
-
 overview/overview.xsl: overview/overview.xsl.in
 	$(SUBST) overview/overview.xsl.in > overview/overview.xsl
+
+#####   Menu files   #####
+menudir	= $(webplaindir)/menu
+dist_menu_DATA = \
+	menu/bg.jpg \
+	menu/menu.css \
+	menu/menu.js \
+	menu/sampleMenu.xml
+
+#####   Overview files   #####
+overviewsdir	= $(webplaindir)/overviews
+dist_overviews_DATA = \
+	overview/common.inc \
+	overview/sampleOverview.xml
 
 #####   xtree files   #####
 xtreedir	= $(webplaindir)/xtree

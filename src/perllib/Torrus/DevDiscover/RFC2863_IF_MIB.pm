@@ -556,6 +556,10 @@ sub uniqueEntries
         my $interface = $data->{'interfaces'}{$ifIndex};
 
         my $entry = $interface->{$nameref};
+        if( length($entry) == 0 )
+        {
+            $entry = $interface->{$nameref} = '_';
+        }
         if( int( $count{$entry} ) > 0 )
         {
             my $new_entry = sprintf('%s%d', $entry, int( $count{$entry} ) );

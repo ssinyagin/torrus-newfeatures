@@ -60,6 +60,8 @@ sub new
         return undef;
     }
 
+    srand( time() * $$ );
+    
     return $self;
 }
 

@@ -24,6 +24,11 @@ BEGIN { require '@torrus_config_pl@'; }
 use Torrus::DB;
 use Torrus::ApacheHandler;
 
+if( $Torrus::Renderer::globalDebug )
+{
+    &Torrus::Log::setLevel('debug');
+}
+
 Apache->server->register_cleanup( sub {
     my $r = shift;
     Torrus::DB::cleanupEnvironment();

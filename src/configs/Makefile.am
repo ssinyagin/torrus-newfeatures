@@ -41,7 +41,7 @@ install-data-local:
 	done
 	for f in devdiscover-siteconfig.pl email-siteconfig.pl \
 	         snmptrap-siteconfig.pl torrus-siteconfig.pl; do \
-	  if test ! -r $(siteconfdir)/$$f; then \
+	  if test ! -r $(DESTDIR)$(siteconfdir)/$$f; then \
 	    $(INSTALL_DATA) $$f $(DESTDIR)$(siteconfdir)/$$f; \
 	  fi \
 	done

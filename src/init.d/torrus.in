@@ -31,10 +31,10 @@ else
 fi
 
 prefix=@prefix@
-exec_prefix=@exec_prefix@
-cmddir=@bindir@
-piddir=@localstatedir@/run
-torrus_config_pl=@perlcfgdir@/torrus-config.pl
+pkghome=@pkghome@
+cmddir=@pkgbindir@
+piddir=@piddir@
+torrus_config_pl=@cfgdefdir@/torrus-config.pl
 
 # you may want to change this, currently we will wait up to
 # 90s for stubborn processes to exit before forcibly killing them.

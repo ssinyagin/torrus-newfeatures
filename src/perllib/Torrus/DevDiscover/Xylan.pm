@@ -87,8 +87,9 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    if( index( $devdetails->snmpVar( $dd->oiddef('sysObjectID') ),
-               $dd->oiddef('xylanSwitchDevice') ) != 0 )
+    if( not $dd->oidBaseMatch
+        ( 'xylanSwitchDevice',
+          $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
     {
         return 0;
     }

@@ -133,8 +133,9 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    if( index( $devdetails->snmpVar( $dd->oiddef('sysObjectID') ),
-               $dd->oiddef('ciscoProducts') ) != 0 )
+    if( not $dd->oidBaseMatch
+        ( 'ciscoProducts',
+          $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
     {
         return 0;
     }
@@ -237,8 +238,9 @@ sub discover
                   'CiscoIOS::cisco-ipsec-flow-globals' );
         }
         
-        if( index( $devdetails->snmpVar( $dd->oiddef('sysObjectID') ),
-                   $dd->oiddef('ciscoLS1010') ) != 0 )
+        if( $dd->oidBaseMatch
+            ( 'ciscoLS1010',
+              $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
         {
             $data->{'param'}{'snmp-oids-per-pdu'} = 10;
         }

@@ -545,6 +545,21 @@ sub retrieveSnmpOIDs
     return undef;
 }
 
+##
+# Simple wrapper for Net::SNMP::oid_base_match
+
+sub oidBaseMatch
+{
+    my $self = shift;
+    my $base_oid = shift;
+    my $oid = shift;
+
+    if( $base_oid =~ /^\D/ )
+    {
+        $base_oid = $self->oiddef( $base_oid );
+    }
+    return Net::SNMP::oid_base_match( $base_oid, $oid );
+}
 
 
 ###########################################################################

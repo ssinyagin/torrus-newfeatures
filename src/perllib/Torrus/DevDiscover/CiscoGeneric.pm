@@ -63,12 +63,12 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    if( index( $devdetails->snmpVar( $dd->oiddef('sysObjectID') ),
-               $dd->oiddef('cisco') ) != 0 )
+    if( not $dd->oidBaseMatch
+        ( 'cisco', $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
     {
         return 0;
     }
-
+    
     return 1;
 }
 

@@ -104,8 +104,9 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    if( index( $devdetails->snmpVar( $dd->oiddef('sysObjectID') ),
-               $dd->oiddef('ASCEND-MIB::max') ) != 0 )
+    if( not $dd->oidBaseMatch
+        ( 'ASCEND-MIB::max',
+          $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
     {
         return 0;
     }

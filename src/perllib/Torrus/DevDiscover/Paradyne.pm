@@ -68,8 +68,9 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    if( index( $devdetails->snmpVar( $dd->oiddef('sysObjectID') ),
-               $dd->oiddef('paradyne-products') ) != 0 )
+    if( not $dd->oidBaseMatch
+        ( 'paradyne-products',
+          $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
     {
         return 0;
     }

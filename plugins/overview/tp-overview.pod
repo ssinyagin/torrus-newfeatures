@@ -117,7 +117,9 @@ After the plugin installation has finished:
 Install the perl module Apache::ASP acording to the instructions on
 http://www.apache-asp.org/
 
-Add the following lines to your apache config file (http.conf).
+Add the following lines to your apache config file (http.conf). Or
+if you are using apache2 simply copy the file apache2.conf to the
+/etc/apache2/conf/modules.d directory.
 (Note: WEBPLAINDIR is /usr/local/torrus-xyz/web/plain by default):
 
 
@@ -128,8 +130,7 @@ Add the following lines to your apache config file (http.conf).
   SetHandler  perl-script
   PerlModule  Apache::ASP
   PerlHandler Apache::ASP
-  PerlSetVar  Global /www/asp
-  PerlSetVar  StateDir /tmp/asp
+  PerlSetVar  Global /var/torrus/asp
   PerlSetVar NoState 1
   PerlSetVar XSLTParser XML::Sablotron
   PerlSetVar XSLTParser XML::LibXSLT
@@ -142,8 +143,7 @@ Add the following lines to your apache config file (http.conf).
   SetHandler  perl-script
   PerlModule  Apache::ASP
   PerlHandler Apache::ASP
-  PerlSetVar  Global /www/asp
-  PerlSetVar  StateDir /tmp/asp
+  PerlSetVar  Global /var/torrus/asp
   PerlSetVar NoState 1
   PerlSetVar XSLTParser XML::Sablotron
   PerlSetVar XSLTParser XML::LibXSLT
@@ -152,7 +152,7 @@ Add the following lines to your apache config file (http.conf).
   PerlSetVar RequestParams 1
   </Location>
 
-Create the directories /www/asp and /tmp/asp.
+Create the directory /var/torrus/asp.
 
 Copy the contents of http://webfx.eae.net/download/tabpane102.zip to
 'WEBPLAINDIR'/tabpane
@@ -166,7 +166,7 @@ use the example you need to follow these additional steps:
 
 =over 2
 
-=item * install torrus-plugin-overview
+=item * install randomcollector-plugin
 
 
 =item * Edit your torrus-siteconfig.pl:
@@ -178,25 +178,10 @@ Add the following item to Torrus::Global::treeConfig
     'ovExamples' => {
         'description' => 'Example data for overview',
         'xmlfiles' => [
-            'defaults.xml',
             'ovDefaults.xml',
             'examples/ovExample.xml',
         ],
         'run' => { 'collector' => 1, 'monitor' => 1 } },
-
-Also add the following lines:
-
-    %Torrus::Renderer::styling =
-        ( 'default' => {'stylesheet' => 'torrus.css',
-                        'ovStylesheet' => 'ov.css',
-                       },
-          'printer' => {'stylesheet' => 'torrus-printer.css',
-                        'ovStylesheet' => 'ov-printer.css',
-                       },
-         );
-
-    $Torrus::Renderer::Chooser::template = 'ov/ov-chooser.html';
-
 
 =over 2
 

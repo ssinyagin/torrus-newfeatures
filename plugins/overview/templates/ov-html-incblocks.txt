@@ -12,6 +12,15 @@
 <HTML>
 <!-- Torrus Copyright (c) 2003 Stanislav Sinyagin -->
 <HEAD>
+<SCRIPT language="JavaScript"> 
+<!--
+function helpwindow() 
+{ 
+window.open('[%url(token) _ '&view=helptext-html'%]','helpwindow',
+'width=600,height=400,resizable=yes,left=200,top=100'); 
+} 
+//--> 
+</SCRIPT>
 <TITLE>[% title %]</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
 <STYLE type="text/css" media="all">
@@ -31,8 +40,20 @@
 </HEAD>
 <BODY style='background-color:transparent'>
 <DIV CLASS="Header">
+<SPAN CLASS="CompanyInfo">
 <A TITLE="company info" HREF="[%companyURL%]">[%companyName%]</A>
-</DIV>
+</SPAN>
+[% IF siteInfo %]
+<SPAN CLASS="SiteInfo">
+[% siteInfo %]
+</SPAN>
+[% END %]
+
+[% IF treeName and treeInfo %]
+<SPAN CLASS="TreeInfo">
+[% treeInfo %]
+</SPAN>
+[% END %]
 [% IF userAuth and uid;
      commonname = userAttr('cn');
      IF commonname == ''; commonname = uid; END; %]
@@ -52,6 +73,9 @@
     </DIV>
   </DIV>
 [% END %]
+[% IF not noTopMenu %]
+[% END %]
+
 <DIV CLASS="[%contentClass%]">
 [% global.contentFinished = 0;
 END %]
@@ -121,6 +145,16 @@ END %]
   </SPAN>
 [% END %]
 
+[%# ###########    Print the Help shortcut   ################ %]
+[% BLOCK helpshortcut;
+     IF nodeParam(token, 'help-text', 1);
+       INCLUDE shortcut
+         url="javascript:helpwindow()"
+         text="Help"
+         title="Open a help window for this page";
+     END;
+   END %]
+
 [%# ###########    Print the common bottomline   ################ %]
 
 [% BLOCK bottomline %]
@@ -136,6 +170,14 @@ END %]
                     text="Printable view"
                     title="Prepare this page for printing"
                     newwindow=1%]
+[% INCLUDE helpshortcut %]
+[% IF mayDisplayAdmInfo(token);
+     INCLUDE shortcut url=url(token,'adminfo')
+                      text="AdmInfo"
+                      title="Administrative details"
+                      newwindow=1;
+   END
+%]
 </DIV>
 [% END %]
 
@@ -152,6 +194,7 @@ END %]
                     text="Printable view"
                     title="Prepare this page for printing"
                     newwindow=1%]
+[% INCLUDE helpshortcut %]
 </DIV>
 [% END %]
 
@@ -217,11 +260,12 @@ END %]
   IF not hidden or variables.SHOWHIDDEN
 %]
 <DIV CLASS="ShortGraph">
+      [% IF not urltoken; urltoken = token; END %]
       [% hidden ? '<SPAN CLASS="ShowHidden">':'' %]
       <DIV CLASS="NodeName">
-        <A HREF="[%url(token)%]">[%IF nodeparent %][%nodeparent%]/[%END%][% nodename %]</A>
+        <A HREF="[%url(urltoken,urlview)%]">[%IF nodeparent %][%nodeparent%]/[%END%][% nodename %]</A>
       </DIV>
-      [%IF comment%]<DIV CLASS="NodeDescr">[%comment%]</DIV>[%END%]
+      [%IF comment%]<DIV CLASS="NodeDescr">[%xmlnorm(comment)%]</DIV>[%END%]
       [% hidden ? '</SPAN>':'' %]
       
       [% 
@@ -244,7 +288,7 @@ END %]
       <DIV CLASS="GraphImage">
       <A HREF="[%url(token)%]">
       <IMG SRC="[%url(token, overviewView, overviewvars)%]"
-           ALT="Last Day Graph">
+           ALT="[% param(overviewView, 'description') %]">
       </A>
       </DIV>
 </DIV>

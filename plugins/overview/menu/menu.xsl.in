@@ -60,10 +60,10 @@
 				</span>
 				<span class='datePickerField'>
 						Date/Time:
-						<input type='text' id="dc" size="10" class="plain"/>
-						<input id="NOW" value="" type='hidden' />
+						<input type='text' id="dc" name="dc" size="10" class="plain"/>
+						<input id="NOW" value="now" type='hidden' />
 						<input type="reset" value=" ... "
-							onclick="return showCalendar('dc', 'dd.mm.y');"/>
+							onclick="return showCalendar('dc', '%d.%m.%Y');"/>
 						<select id='timec' class='timebox'
 							onchange='this.form.NOW.value = this.options[this.selectedIndex].value + " " + this.form.dc.value'
 							>

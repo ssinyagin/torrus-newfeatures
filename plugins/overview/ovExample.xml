@@ -36,7 +36,7 @@
 		<param name="collector-timeoffset"			value="3" />
 
 		<param name="storage-type"					value="rrd" />
-		<param name="data-dir"						value="/var/snmpcollector" />
+		<param name="data-dir"						value="/var/torrus/collector" />
 
 		<param name="rrd-create-rra">
 			RRA:AVERAGE:0:1:209664 RRA:MAX:0:36:5824 RRA:MIN:0:36:5824
@@ -52,20 +52,23 @@
 
 		<param name="rrd-create-dstype"				value="GAUGE" />
 		
+		<param name="monitor-period"				value="300" />
+		<param name="monitor-timeoffset"			value="200" />
+		
 		<subtree name="Sample_Router1">
 			<subtree name="Interface_1">
 				<param name="comment"				value="Interface with random bit couters" />
 				<param name="rnd-baseline-offset"	value="1000" />
-				<param name="graph-lower-limit"			value="0" />
-				<param name="graph-upper-limit"			value="3000" />
+				<param name="graph-lower-limit"		value="0" />
+				<param name="graph-upper-limit"		value="3000" />
 				<param name="data-file"				value="random_sample1.rrd" />
 				<apply-template name="dummy-interface-counters" />
 			</subtree>
 			<subtree name="Interface_2">
 				<param name="comment"				value="Interface with random bit couters" />
 				<param name="rnd-baseline-offset"	value="0" />
-				<param name="graph-lower-limit"			value="0" />
-				<param name="graph-upper-limit"			value="3000" />
+				<param name="graph-lower-limit"		value="0" />
+				<param name="graph-upper-limit"		value="3000" />
 				<param name="data-file"				value="random_sample2.rrd" />
 				<apply-template name="dummy-interface-counters" />
 			</subtree>
@@ -74,16 +77,16 @@
 			<subtree name="Interface_1">
 				<param name="comment"				value="Interface with random bit couters" />
 				<param name="rnd-baseline-offset"	value="1000" />
-				<param name="graph-lower-limit"			value="0" />
-				<param name="graph-upper-limit"			value="3000" />
+				<param name="graph-lower-limit"		value="0" />
+				<param name="graph-upper-limit"		value="3000" />
 				<param name="data-file"				value="random_sample1.rrd" />
 				<apply-template name="dummy-interface-counters" />
 			</subtree>
 			<subtree name="Interface_2">
 				<param name="comment"				value="Interface with random bit couters" />
 				<param name="rnd-baseline-offset"	value="0" />
-				<param name="graph-lower-limit"			value="0" />
-				<param name="graph-upper-limit"			value="3000" />
+				<param name="graph-lower-limit"		value="0" />
+				<param name="graph-upper-limit"		value="3000" />
 				<param name="data-file"				value="random_sample2.rrd" />
 				<apply-template name="dummy-interface-counters" />
 			</subtree>

@@ -10,17 +10,21 @@
 
 [% SET pos = 1; SET global.hwpredict = 0 %]
 [% FOREACH node = sortTokens(tsetMembers(token)) %]
-  [% comment = nodeParam(parent(node),'comment',1) %]
 <DIV>
   [% IF pos == 1 %]
 <DIV CLASS="ShortLeft">
   [% ELSE %]
 <DIV CLASS="ShortRight"> 
   [% END %]
-  [%  INCLUDE tsgraph
+  [% nodename=nodeParam(node,'descriptive-nickname');
+     IF nodename=='';
+       nodename=path(node);
+     END;
+     INCLUDE tsgraph
         token=node
-        nodename=path(node)
-        comment=nodeParam(parent(node),'comment',1) %]
+        nodename=nodename
+        comment=nodeParam(parent(node),'comment',1)
+  %]
 </DIV>
 </DIV>
   [% IF pos == 1 %]

@@ -22,7 +22,9 @@
 
 SUBST = @abs_top_builddir@/ov_substvars.sh
 
-noinst_SCRIPTS = ov_substvars.sh
+noinst_SCRIPTS = \
+	ov_substvars.sh \
+	apache2.conf
 
 EXTRA_DIST = \
 	menu/bg.jpg \
@@ -36,8 +38,9 @@ EXTRA_DIST = \
 	overview/overview.xsl.in \
 	overview/sampleOverview.xml \
 	xtree/xtree.css \
-	xtree/xtree.js.in
+	xtree/xtree.js.in 
 
+webplaindir = @webplaindir@
 welcome_htm = $(webplaindir)/menu/welcome.htm
 credits_htm = $(webplaindir)/menu/credits.htm
 
@@ -52,6 +55,7 @@ install-data-local:
 
 
 #####   Documentation files   #####
+pkghome = @pkghome@
 docdir  = @docdir@
 dist_doc_DATA = tp-overview.txt tp-overview.pod
 SUFFIXES = .pod .txt
@@ -110,7 +114,7 @@ dist_css_DATA = \
 	css/overview.css
 
 #####   templates files   #####
-tmpldir	= $(tmpldir)/ov
+tmpldir	= @tmpldir@/ov
 dist_tmpl_DATA = \
 	templates/item-rrd.html \
 	templates/ov-chooser.html \
@@ -125,6 +129,7 @@ dist_tmpl_DATA = \
 	templates/tab-rrd.html
 
 #####   xmlconfig files   #####
+distxmldir = @distxmldir@
 xmldir	= $(distxmldir)
 dist_xml_DATA = ovDefaults.xml
 
@@ -135,7 +140,18 @@ dist_xmlsample_DATA = ovExample.xml
 iconsdir	= $(webplaindir)/icons
 dist_icons_DATA = menu/menu.gif menu/torrus.ico
 
+#####   Perl configuration files  #####
+pluginsdir=@pluginsdir@
+plugtorruscfgdir=@plugtorruscfgdir@
+torruscfgdir = $(plugtorruscfgdir)
+dist_torruscfg_DATA = overview-torruscfg.pl
 
+
+apache2.conf: apache2.conf.in
+	$(SUBST) apache2.conf.in > apache2.conf
+	
+	
+	
 htdocs:
 	for f in *.pod; do \
 	  pod2html -css=../torrusdoc.css $$f > ../../htdocs/plugins/$$f.html; \

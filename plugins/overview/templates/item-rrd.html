@@ -54,7 +54,7 @@
   termvars = [];
   IF nodeParam(token, 'rrd-hwpredict') == 'enabled' and
      param(view, 'rrd-hwpredict') != 'disabled';
-    IF not variables.NOHW;       
+    IF not variables.NOHW;
       hwaction = 'Disable';
       hwvars = ['NOHW', 1];
       termvars = ['NOHW', ''];
@@ -67,9 +67,14 @@
                      text=hwaction _ " Holt-Winters"
                      title="Switch Holt-Winters prediction boundaries";
   END;
+                  
+  INCLUDE shortcut url=plainURL _ 'explain-rrdgraph.html'
+                  text='Explain graph'
+                  title='Describe graph elements and values'
+                  newwindow=1;
   
 %]
-</DIV>                   
+</DIV>
 
 
 [% INCLUDE htmlend %]

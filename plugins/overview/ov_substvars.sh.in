@@ -19,10 +19,12 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 
+rendererUrl=@rendererUrl@
 
 @SED@ \
+    -e "s,\@webplaindir\@,@webplaindir@,g" \
+    -e "s,\@rendererUrl\@,${rendererUrl},g" \
     -e "s,\@plainUrl\@,@plainUrl@,g" \
-    -e "s,\@rendererUrl\@,@rendererUrl@,g" \
     $1
 
 # Local Variables:

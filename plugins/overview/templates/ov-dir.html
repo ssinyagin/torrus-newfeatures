@@ -8,12 +8,12 @@
 
 <P>Directories you can jump to:</P>
 <DIV CLASS="Listing">
-[%   hasLeaves = 0; 
+[%   hasLeaves = 0;
+     childCounter = 0;
      hasSubNodes = 0;
      evenRow = 0;
      FOREACH child = sortTokens(children(token));
        hidden = 0;
-       counter = counter + 1;
        IF nodeParam(child,'hidden') == 'yes';
          hidden = 1;
        END;
@@ -29,12 +29,9 @@
            urlTitle = '';
          END;
        END;
-       IF counter % 2 == 0;
-         evenRow = 1;
-       ELSE;
-         evenRow = 0;
-       END;
-       IF not hidden or variables.SHOWHIDDEN
+       IF not hidden or variables.SHOWHIDDEN;
+         childCounter = childCounter + 1;
+         evenRow = childCounter % 2 == 0;
 %]
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
     <SPAN CLASS="NodeName">
@@ -61,13 +58,13 @@
 [% INCLUDE shortcut url=url(token, 'expanded-dir-html')
                     text="Expand leaves"
                     title="Show all leaf graphs in one page" %]
-</DIV>                   
+</DIV>
 [% END %]
 [% IF hasSubNodes %]
 <DIV CLASS="BottomShortcuts">
 [% INCLUDE shortcut url=url(token, 'sub-nodes-dir-html')
-                    text="Expand leaves &amp; sub-nodes"
-                    title="Show all leaf & sub-nodes graphs in one page" %]
+                    text="Expand leaves and leaves of sub-nodes"
+                    title="Show all graphs of leaves & of leaves of sub-nodes in one page" %]
 </DIV>                   
 [% END %]
 

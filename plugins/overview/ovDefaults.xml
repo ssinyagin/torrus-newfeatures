@@ -38,18 +38,6 @@
 	overview,hour,day,week,month,year
 	</param>
 
-	<param name="graph-cfplot-ignore-ds"		value="up,down,off,unkn" />
-	<param name="gprint-ignore-ds"				value="up,down,off,unkn" />
-	<param name="gprint-format"					value="%7.3lf%s" />
-		
-	<param name="line-style"					value="LINE2" />
-	<param name="line-color"					value="##blue" />
-	<param name="line-style-AVERAGE"			value="LINE2" />
-	<param name="line-color-AVERAGE"			value="##blue" />
-	<param name="line-style-MIN"				value="LINE2" />
-	<param name="line-color-MIN"				value="##green" />
-	<param name="line-style-MAX"				value="LINE2" />
-	<param name="line-color-MAX"				value="##red" />
 </datasources>
 
 <token-sets>
@@ -61,11 +49,6 @@
 
 	<!-- Defaults being used by other graphs -->
 	<view name="default-rrgraph">
-		<param name="expires"					value="1" />
-		<param name="graph-cfplot"				value="no" />
-		<param name="graph-cfplot-list"			value="MAX,AVERAGE,MIN" />
-		<param name="gprint"					value="yes" />
-		<param name="gprint-list"				value="MIN,AVERAGE,MAX,LAST" />
 		<param name="ignore-limits"				value="no" />
 		<param name="view-type"					value="rrgraph" />
 		<param name="start"						value="-36h" />
@@ -74,110 +57,58 @@
 		<param name="height-hint"				value="305" />
 		<param name="width-hint"				value="595" />
 
-		<param name="hw-bndr-style"				value="LINE1" />
-		<param name="hw-bndr-color"				value="##red" />
-		<param name="hw-fail-color"				value="#FFFFA0" />
-
-		<!-- foregrounds -->
-		<!-- these are thin marks at beginning of day and week -->
-		<param name="dec-expr-dayMarker"	value="LTIME,86400,%,10,LT,INF,UNKN,IF" />
-		<param name="dec-color-dayMarker"	value="##timeMark" />
-		<param name="dec-style-dayMarker"	value="##timeMark" />
-		<param name="dec-order-dayMarker"	value="1" />
-		
-		<param name="dec-expr-weekMarker"	value="LTIME,259200,+,604800,%,2100,LT,INF,UNKN,IF" />
-		<param name="dec-color-weekMarker"	value="##timeMark" />
-		<param name="dec-style-weekMarker"	value="##timeMark" />
-		<param name="dec-order-weekMarker"	value="1" />
-
-		<!-- backgrounds -->
-		<param name="dec-expr-night"		value="LTIME,86400,%,DUP,25200,LE,EXC,82800,GE,+,INF,UNKN,IF" />
-		<param name="dec-color-night"		value="##night" />
-		<param name="dec-style-night"		value="##night" />
-		<param name="dec-order-night"		value="-1" />
-		
-		<param name="dec-expr-evening"		value="LTIME,86400,%,DUP,64800,GE,EXC,82800,LE,*,INF,UNKN,IF" />
-		<param name="dec-color-evening"		value="##evening" />
-		<param name="dec-style-evening"		value="##evening" />
-		<param name="dec-order-evening"		value="-2" />
-		
-		<param name="dec-expr-hourOdd"		value="LTIME,7200,%,3600,LT,INF,UNKN,IF" />
-		<param name="dec-color-hourOdd"		value="##hour" />
-		<param name="dec-style-hourOdd"		value="##hour" />
-		<param name="dec-order-hourOdd"		value="-3" />
-		
-		<param name="dec-expr-dayOdd"		value="LTIME,172800,%,86400,LT,INF,UNKN,IF" />
-		<param name="dec-color-dayOdd"		value="##day" />
-		<param name="dec-style-dayOdd"		value="##day" />
-		<param name="dec-order-dayOdd"		value="-4" />
-		
-		<param name="dec-expr-weekOdd"		value="LTIME,259200,+,1209600,%,604800,LT,INF,UNKN,IF" />
-		<param name="dec-color-weekOdd"		value="##week" />
-		<param name="dec-style-weekOdd"		value="##week" />
-		<param name="dec-order-weekOdd"		value="-5" />
-
 		<view name="hour">
 			<param name="start"					value="-8h" />
-			<param name="decorations"			value="dayMarker,night,evening" />
 			<view name="hourAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 		<view name="day">
 			<param name="start"					value="-36h" />
-			<param name="decorations"			value="dayMarker,night,evening" />
 			<view name="dayAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 		<view name="week">
 			<param name="start"					value="-9days" />
-			<param name="decorations"			value="weekMarker,dayOdd" />
 			<view name="weekAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 		<view name="month">
 			<param name="start"					value="-45days" />
-			<param name="graph-cfplot"			value="yes" />
 			<param name="rrd-hwpredict"			value="disabled" />
-			<param name="decorations"			value="weekOdd" />
 			<view name="monthAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 		<view name="year">
 			<param name="start"					value="-15month" />
-			<param name="graph-cfplot"			value="yes" />
 			<param name="rrd-hwpredict"			value="disabled" />
-			<param name="decorations"			value="weekOdd" />
 			<view name="yearAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 
 		<view name="expand-views"> <!--used in expand leaves...-->
-				<param name="width"				value="595" />
-				<param name="height"			value="100" />
-				<param name="ignore-limits"		value="no" />
+
+			<param name="width"					value="595" />
+			<param name="height"				value="100" />
+			<param name="ignore-limits"			value="no" />
 			<view name="expHour">
 				<param name="start"				value="-8h" />
-				<param name="foreground"		value="day" />
-				<param name="decorations"		value="night,evening" />
 				<view name="expHourAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="expDay">
 				<param name="start"				value="-36hours" />
-				<param name="decorations"		value="dayMarker,night,evening" />
 				<view name="expDayAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="expWeek">
 				<param name="start"				value="-9days" />
-				<param name="decorations"		value="weekMarker,dayOdd" />
 				<view name="expWeekAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
@@ -185,7 +116,6 @@
 			<view name="expMonth">
 				<param name="start"				value="-45days" />
 				<param name="rrd-hwpredict"		value="disabled" />
-				<param name="decorations"		value="weekOdd" />
 				<view name="expMonthAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
@@ -193,35 +123,36 @@
 			<view name="expYear">
 				<param name="start"				value="-15month" />
 				<param name="rrd-hwpredict"		value="disabled" />
-				<param name="decorations"		value="weekOdd" />
 				<view name="expYearAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 		</view>
 		<view name="token-set-views"> <!--used in tokensets-->
-			<param name="gprint-list"			value="MAX,LAST" />
+			# GPRINT stuff
+			<param name="gprint-values"         value="max,last"/>
+			<param name="gprint-header"         value=""/>
+			<param name="gprint-format-last"    value="LAST:LAST\: %8.2lf%s"/>
+			<param name="gprint-format-max"     value="MAX:MAX\: %8.2lf%s"/>
+
 			<param name="width"					value="300" />
 			<param name="height"				value="30" />
 			<param name="width-hint"			value="400" />
 			<param name="ignore-limits"			value="no" />
 			<view name="tsHour">
 				<param name="start"				value="-8h" />
-				<param name="decorations"		value="dayMarker,night,evening" />
 				<view name="tsHourAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="tsDay">
 				<param name="start"				value="-36hours" />
-				<param name="decorations"		value="dayMarker,night,evening" />
 				<view name="tsDayAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="tsWeek">
 				<param name="start"				value="-9days" />
-				<param name="decorations"		value="weekMarker,dayOdd" />
 				<view name="tsWeekAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
@@ -229,7 +160,6 @@
 			<view name="tsMonth">
 			<param name="start"					value="-45days" />
 				<param name="rrd-hwpredict"		value="disabled" />
-				<param name="decorations"		value="weekOdd" />
 				<view name="tsMonthAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
@@ -237,49 +167,48 @@
 			<view name="tsYear">
 				<param name="start"				value="-15month" />
 				<param name="rrd-hwpredict"		value="disabled" />
-				<param name="decorations"		value="weekOdd" />
 				<view name="tsYearAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 		</view>
-		<view name="ov-views"> <!--used in overviews by NIC-->
-			<param name="gprint-list"			value="MAX,LAST" />
+		<view name="ov-views"> <!--used in overviews-->
+			# GPRINT stuff
+			<param name="gprint-values"         value="max,last"/>
+			<param name="gprint-header"         value=""/>
+			<param name="gprint-format-last"    value="LAST:LAST\: %8.2lf%s"/>
+			<param name="gprint-format-max"     value="MAX:MAX\: %8.2lf%s"/>
+
 			<param name="width"					value="300" />
 			<param name="height"				value="70" />
 			<param name="ignore-limits"			value="no" />
 			<param name="rrd-hwpredict"			value="disabled" />
 			<view name="ovHour">
 				<param name="start"				value="-8h" />
-				<param name="decorations"		value="dayMarker,night,evening" />
 				<view name="ovHourAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="ovDay">
 				<param name="start"				value="-36hours" />
-				<param name="decorations"		value="dayMarker,night,evening" />
 				<view name="ovDayAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="ovWeek">
 				<param name="start"				value="-9days" />
-				<param name="decorations"		value="weekMarker,dayOdd" />
 				<view name="ovWeekAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="ovMonth">
 				<param name="start"				value="-45days" />
-				<param name="decorations"		value="weekOdd" />
 				<view name="ovMonthAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="ovYear">
 				<param name="start"				value="-15month" />
-				<param name="decorations"		value="weekOdd" />
 				<view name="ovYearAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
@@ -333,14 +262,12 @@
 		<param name="view-type"		value="rrprint" />
 		<param name="expires"		value="300" />
 		<param name="start"			value="-24h" />
-		<param name="print-cf"		value="MIN,AVERAGE,MAX" />
 	</view>
 
 	<view name="rrd-print-last">
 		<param name="view-type"		value="rrprint" />
 		<param name="expires"		value="300" />
 		<param name="start"			value="-1h" />
-		<param name="print-cf"		value="LAST" />
 	</view>
 
 	<!-- This is the HTML page for tokenset browsing -->
@@ -352,7 +279,7 @@
 
 	<view name="ov-tset-list-html">
 		<param name="view-type"		value="html" />
-		<param name="expires"		value="60" />
+		<param name="expires"		value="300" />
 		<param name="html-template"	value="ov/ov-tset-list.html" />
 	</view>
 

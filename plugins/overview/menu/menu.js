@@ -88,8 +88,10 @@ function toggleMenu() {
 	};
 
 	function clearDate() {
-		document.getElementById('NOW').value = '';
-		frames['displayFrame'].location.href = cleanUrl('NOW');
+		var url = cleanUrl('NOW');
+		if (url.indexOf('?') != (url.length-1)) { url = url + '&';};
+		document.getElementById('NOW').value = 'now';
+		frames['displayFrame'].location.href = url + 'NOW=' + document.getElementById('NOW').value;
 	};
 
 	function setShowHidden() {

@@ -20,7 +20,8 @@ webintf.pod
 -- Move mailing lists
 -- Update website
 
--- Finalize CiscoDocsis.pm
+-- Change the implementation of hrule-legend-X view parameter
+-- Tokenset members sorting
 -- Discovery support for HP ProCurve 2524 (Marc Haber provided snmpwalks)
 -- Better Networks sensors discovery (Marc Haber)
 -- Minus sign in tree name (ApacheHadler.pm line 75)

@@ -20,6 +20,7 @@ webintf.pod
 -- Move mailing lists
 -- Update website
 
+-- Update automake version requirement (1.6 fails with plugins)
 -- Change the implementation of hrule-legend-X view parameter
 -- Tokenset members sorting
 -- Renderer unique file name generator (replace rand with md5)

@@ -237,7 +237,7 @@ sub discover
             # Replace ':' with '=' and ';' with ','
             $text =~ s/:/=/g;
             $text =~ s/;/,/g;            
-            $legend .= $legendValues{$key}{'name'} . ':' . $text;
+            $legend .= $legendValues{$key}{'name'} . ':' . $text . ';';
         }
     }
     $data->{'param'}{'legend'} = $legend;

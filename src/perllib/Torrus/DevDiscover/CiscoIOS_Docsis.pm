@@ -71,7 +71,9 @@ sub buildConfig
 
     my $utilNode =
         $cb->addSubtree( $devNode, 'Docsis_Utilization',
-                         {'precedence' => '-600'}, [] );
+                         {'precedence' => '-450',
+                          'comment' => 'DOCSIS resources utilization'},
+                         [] );
 
     my $macNode =
         $cb->addSubtree( $utilNode, 'MAC_Layer', {},

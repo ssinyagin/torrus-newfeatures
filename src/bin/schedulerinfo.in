@@ -182,6 +182,8 @@ if( $report_config )
 
     # print results
 
+    printf("Tasks execution timeline:\n");
+
     thinLine();
     printf("%-10s%-10s%-20s%-10s\n",
            'Offset', 'Interval', 'Type', 'Data');

@@ -39,12 +39,92 @@ and analysis.
 
 =item B<--config>
 
-Reports scheduler's configuration.
+Reports scheduler's configuration. The values are explained below.
+
+=over 8
+
+=item Total collector/monitor leaves: I<N>
+
+Total number of datasources being processed by collector or monitor daemon.
+
+=item Scheduled leaves by type
+
+Torrus supports arbitrary number of collector types, and this report
+shows how many datasources belong to every type. Currently the monitor leaves
+are not divided into types.
+
+=item Least common period: I<N> seconds
+
+The report below shows how the tasks are distributed across the time line,
+and the least common period shows the period of this time line.
+
+=item Tasks execution timeline
+
+This report tells which task and how many datasources are involved in
+each task startup event, and how these events are dispersed across the time.
+The column I<Interval> shows the time interval from each task execution
+event to the next event on the timeline.
+
+=back
 
 =item B<--runtime>
 
 Reports scheduler's runtime statistics, such as running cycle times,
-late starts etc.
+late starts etc. The meaning of the output values is as follows. Values
+that have zero values are usually not printed.
+
+=over 8
+
+=item Task: I<Name>, Period: I<N> seconds, Offset: I<M> seconds
+
+Each scheduler task is characterized by its name (usually Collector or
+Monitor), period, and timeoffset. Fore example, if period is set to 300
+seconds, and offset is 14 seconds, then the task would be executed at
+00:00:14, 00:05:14, 00:10:14, and so on for every hour in a day.
+
+=item I<N> running cycles passed
+
+How many times the task was executed since last reset. The counter
+is normally reset after L<torrus_compilexml(@mansec_usercmd@)> successfully
+compiles the configuration.
+
+=item I<N> late starts
+
+How many times the task has started with a delay from its normal schedule.
+
+=item I<N> too long runs
+
+How many times the task execution time was longer than its period.
+
+=item I<N> overrun periods
+
+How many periods have been missed because of too long executions.
+
+=item I<N> missed periods
+
+How many periods were missed because of any reason (such as other tasks
+delaying).
+
+=item Min, Max, Average, Exp Average
+
+The time values are displayed in four columns: Mimimum, Maximum and Average
+values since last reset, and Exponential decay value, which may be interpreted
+as the average for last several values. With defaults defined in
+F<torrus-config.pl>, 95% of the average is calculated from last 3 values.
+
+=item Running Time
+
+How long the task executes each period.
+
+=item Late Start
+
+How long the task start was delayed.
+
+=item Too Long
+
+How much time the too long run took.
+
+=back
 
 =item B<--help>
 
@@ -52,9 +132,12 @@ Displays a help message.
 
 =back
 
+
+
 =head1 SEE ALSO
 
-L<torrus(@mansec_usercmd@)>
+L<torrus(@mansec_usercmd@)>,
+L<torrus_compilexml(@mansec_usercmd@)>
 
 =head1 NOTES
 

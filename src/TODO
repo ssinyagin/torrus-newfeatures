@@ -4,6 +4,7 @@ To do now:
 
 -- Update plugins
 -- test DESTDIR with plugins
+-- ./configure_fhs
 -- Update installation guide (DESTDIR)
 -- Update manpages for the new wrapper
 -- Add synonyms to wrapper

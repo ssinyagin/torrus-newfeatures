@@ -100,7 +100,8 @@ sub new
     $self->{'oidrev'} = {};
 
     # Combine all %MODULE::oiddef hashes into one
-    foreach my $module ( 'Torrus::DevDiscover', @Torrus::DevDiscover::loadModules )
+    foreach my $module ( 'Torrus::DevDiscover',
+                         @Torrus::DevDiscover::loadModules )
     {
         while( my($name, $oid) = each %{eval('\%'.$module.'::oiddef')} )
         {

@@ -78,6 +78,13 @@ root@vmlab#torrus acledit --import=etc/torrus/acl.xml
 [24-Nov-2004 18:40:56 ] User added: t2
 [24-Nov-2004 18:40:56 ] Added t2 to group them
 
+
+root@swigva01-srv-01#rm /usr/local/etc/rc.d/rrfw.sh 
+root@swigva01-srv-01#cp init.d/torrus /usr/local/etc/rc.d/
+
+Apache:
+  Redirect /rrfw http://host.example.com/torrus
+
 =head1 Author
 
 Copyright (c) 2002-2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -53,7 +53,7 @@ dummyscript: dummyscript.in
 
 #####   Documentation files   #####
 docdir  = @docdir@
-dist_doc_DATA = dummydoc.txt dummydoc.pod 
+dist_doc_DATA = tp-dummy.txt tp-dummy.pod 
 SUFFIXES = .pod .txt
 .pod.txt:
 	pod2text $< $@ 

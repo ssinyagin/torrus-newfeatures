@@ -34,12 +34,19 @@ AC_ARG_ENABLE(pkgonly,
                         [Skip all checking])])
         
 if test "$enable_pkgonly" != yes; then        
-   AC_MSG_CHECKING([presence of LWP::UserAgent])
-   if ${PERL} -e 'use LWP::UserAgent' 2>/dev/null; then
-       AC_MSG_RESULT([Ok])
-   else
-       AC_MSG_ERROR([Perl cannot find LWP::UserAgent]);
-   fi
+  AC_MSG_CHECKING([environment variables])
+  if test -z "$pkghome" -o -z "$sitedir"; then
+    AC_MSG_ERROR([Missing mandatory environment variables]);
+  else
+    AC_MSG_RESULT([Ok])
+  fi
+
+  AC_MSG_CHECKING([presence of LWP::UserAgent])
+  if ${PERL} -e 'use LWP::UserAgent' 2>/dev/null; then
+    AC_MSG_RESULT([Ok])
+  else
+    AC_MSG_ERROR([Perl cannot find LWP::UserAgent]);
+  fi
 fi
 
 AC_ARG_VAR(pkghome,   [[PREFIX/torrus] Place for Torrus static files])

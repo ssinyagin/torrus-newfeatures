@@ -32,6 +32,14 @@ AC_ARG_ENABLE(pkgonly,
         [AC_HELP_STRING([--enable-pkgonly],
                         [Skip all checking])])
 
+if test "$enable_pkgonly" != yes; then
+  AC_MSG_CHECKING([environment variables])
+  if test -z "$pkghome" -o -z "$sitedir"; then
+    AC_MSG_ERROR([Missing mandatory environment variables]);
+  else
+    AC_MSG_RESULT([Ok])
+  fi
+fi
 
 AC_ARG_VAR(pkghome,   [[PREFIX/torrus] Place for Torrus static files])
 AC_ARG_VAR(pkgbindir,   [[PKGHOME/bin] Torrus executables])

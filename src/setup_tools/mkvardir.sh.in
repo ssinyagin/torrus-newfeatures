@@ -44,12 +44,13 @@ if test ! -d $dir; then
             test -z "$mode"  && mode=775
         fi
 
-        test -z "$mode" || chmod $mode  $dir || exit 1
-        test -z "$user"  || chown $user  $dir || exit 1
-        test -z "$group" || (chgrp $group $dir && chmod g+s $dir) || exit 1
+        test -z "$mode" || chmod $mode  $dir || (rmdir $dir; exit 1)
+        test -z "$user"  || chown $user  $dir || (rmdir $dir; exit 1)
+        test -z "$group" || (chgrp $group $dir && chmod g+s $dir) || \
+          (rmdir $dir; exit 1)
 
     fi
-
+    
 fi
 
 exit 0

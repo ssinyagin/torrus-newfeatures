@@ -56,7 +56,7 @@ dist_tmpl_DATA = genrandomcfg.xml
 
 #####   Documentation files   #####
 docdir  = @docdir@
-dist_doc_DATA = randomcollector.txt randomcollector.pod 
+dist_doc_DATA = tp-randomcollector.txt tp-randomcollector.pod 
 SUFFIXES = .pod .txt
 .pod.txt:
 	pod2text $< $@ 

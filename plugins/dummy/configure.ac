@@ -39,18 +39,18 @@ AC_ARG_ENABLE(pkgonly,
 # distribution anyway
 
 if test "$enable_pkgonly" != yes; then
-  AC_MSG_CHECKING([presence of AutoLoader])
-  if ${PERL} -e 'use AutoLoader' 2>/dev/null; then
-      AC_MSG_RESULT([Ok])
-  else
-      AC_MSG_ERROR([Perl cannot find AutoLoader]);
-  fi
-
   AC_MSG_CHECKING([environment variables])
   if test -z "$pkghome" -o -z "$sitedir"; then
     AC_MSG_ERROR([Missing mandatory environment variables]);
   else
     AC_MSG_RESULT([Ok])
+  fi
+
+  AC_MSG_CHECKING([presence of AutoLoader])
+  if ${PERL} -e 'use AutoLoader' 2>/dev/null; then
+      AC_MSG_RESULT([Ok])
+  else
+      AC_MSG_ERROR([Perl cannot find AutoLoader]);
   fi
 fi
 

@@ -1,0 +1,164 @@
+#!@PERL@ -w
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+BEGIN { require '@torrus_config_pl@'; }
+
+use Getopt::Long;
+use strict;
+
+use Torrus::ConfigTree::XMLCompiler;
+use Torrus::SiteConfig;
+use Torrus::Log;
+
+exit(1) if not Torrus::SiteConfig::verify();
+
+our @trees;
+our $all_trees;
+our $no_ds;
+our $no_validation;
+
+our $debug;
+our $verbose;
+our $help_needed;
+
+my $ok = GetOptions ('tree=s'   => \@trees,
+                     'all'      => \$all_trees,
+                     'nods'     => \$no_ds,
+                     'noval'    => \$no_validation,
+                     'debug'    => \$debug,
+                     'verbose'  => \$verbose,
+                     'help'     => \$help_needed);
+
+if( not $ok or not (scalar(@trees) or $all_trees) or
+    $help_needed or scalar(@ARGV) > 0 )
+{
+    print STDERR "Usage: $0 --tree=NAME [options...]\n",
+    "Options:\n",
+    "  --tree=NAME     tree name(s) to compile\n",
+    "  --all           compile all trees\n",
+    "  --nods          compile non-datasource configuration only\n",
+    "  --noval         disable parameter validation\n",
+    "  --debug         set the log level to debug\n",
+    "  --verbose       set the log level to info\n",
+    "  --help          this help message\n";
+    exit 1;
+}
+
+if( $all_trees )
+{
+    @trees = Torrus::SiteConfig::listTreeNames();
+}
+
+if( $debug )
+{
+    Torrus::Log::setLevel('debug');
+}
+elsif( $verbose )
+{
+    Torrus::Log::setLevel('verbose');
+}
+
+# This will ensure that all databases get closed correctly
+$SIG{'TERM'} = sub
+{
+    Warn('Compiler process terminated');
+    exit 1;
+};
+
+$SIG{'INT'} = sub
+{
+    Warn('Compiler process interrupted');
+    exit 1;
+};
+
+Verbose(sprintf('Torrus version %s', '@VERSION@'));
+
+our $global_ok = 1;
+
+foreach my $tree ( @trees )
+{
+    if( not Torrus::SiteConfig::treeExists( $tree ) )
+    {
+        Error("Tree named \"" . $tree . "\" does not exist");
+        exit(1);
+    }
+
+    Verbose("Compiling tree: $tree");
+
+    my $ok = 1;
+    my $compiler =
+        new Torrus::ConfigTree::XMLCompiler( -TreeName => $tree,
+                                             -NoDSRebuild => $no_ds );
+
+    my @xmlFiles = @Torrus::Global::xmlAlwaysIncludeFirst;
+    push( @xmlFiles, Torrus::SiteConfig::listXmlFiles( $tree ) );
+    push( @xmlFiles, @Torrus::Global::xmlAlwaysIncludeLast );
+
+    foreach my $xmlfile ( @xmlFiles )
+    {
+        if( not $compiler->compile( $xmlfile ) )
+        {
+            Error($xmlfile . ' compiled with errors'); $ok = 0;
+        }
+    }
+
+    if( not $ok )
+    {
+        Error("Errors found during XML compilation in the tree named \"" .
+              $tree . "\"");
+        $global_ok = 0;
+        last;
+    }
+
+    Verbose('Data post-processing...');
+    if( not $compiler->postProcess() )
+    {
+        Error('Errors found during post-processing');
+        $ok = 0;
+    }
+
+    if( $no_validation )
+    {
+        Verbose('Skipping data validation...');
+    }
+    else
+    {
+        Verbose('Data validation...');
+        if( not $compiler->validate() )
+        {
+            Error('Errors found during validation process');
+            $ok = 0;
+        }
+    }
+
+    $compiler->finalize( $ok );
+    undef $compiler;
+
+    $global_ok = $ok ? $global_ok:0;
+}
+
+exit($global_ok ? 0:1);
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:

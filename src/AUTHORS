@@ -1,0 +1,48 @@
+**************************************************
+Stanislav Sinyagin
+Senior System Engineer, CCIE #5478
+
+GPS-Technik AG
+Zuercherstrasse 139
+8952 Schlieren
+Switzerland
+
+Tel. +41 1 732 99 77
+Fax  +41 1 731 18 40
+
+ssinyagin@yahoo.com
+http://sinyagin.pp.ru
+**************************************************
+
+CREDITS:
+
+  Chris Amley
+    Xylan switches SNMP discovery
+
+  Scott Brooks <sbrooks@binary-solutions.net>
+    Atmel wireless devices SNMP discovery
+
+  Aaron Bush <abush@microcenter.com> 
+    APC and HP vendor templates.
+
+  Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
+    Many contributions in various parts.
+
+  Marc Haber <mh+torrus@zugschlus.de>
+    Lots of bug reports and architecture ideas.
+
+  Roman Hochuli <roman@hochu.li>
+    Bug reports and new feature ideas.
+    Vendor templates for Ascend and DOCSIS.
+
+  Ian Holsman http://holsman.net <ian@holsman.net>
+    Adapted the bluerobot.com HTML layout design for Torrus.
+
+  Gord Philpott <tech@gordphilpott.com>
+    Numerous bug reports.
+
+  Christian Schnidrig <christian.schnidrig@gmx.ch>
+    Architecture ideas, interface improvements, other contributions.
+
+  Jurij Smakov <jurij@wooyd.org>
+    Contributed in manpages creation.

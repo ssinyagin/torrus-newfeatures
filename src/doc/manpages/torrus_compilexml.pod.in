@@ -1,0 +1,79 @@
+#  Copyright (C) 2004  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 NAME
+
+@XFORM_compilexml@ - Torrus XML configuration (re)compiler.
+
+=head1 SYNOPSIS
+
+B<@XFORM_compilexml@> --tree=I<TREENAME> [I<options...>]
+
+=head1 DESCRIPTION
+
+This command (re)compiles the Torrus's XML configuration for the tree(s)
+I<TREENAME>. It does not require any other processes to be restarted
+after the configuration is changed. Renderer's cache is automatically
+flushed on on the next Renderer's run. Monitor automatically resets on
+the next monitoring cycle. All tokensets in the given tree are
+emptied.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--all>
+
+Instructs to (re)compile configuration for all trees.
+
+=item B<--nods>
+
+Instructs to (re)compile non-datasource configuration only.
+
+=item B<--noval>
+
+Disables all validation of the XML configuration. This speeds up the
+compilation up to 2 times, while adding a risk to end up with an
+unusable configuration. In addition, the first initialization cycle of
+Collector and Monitor in this case would be much longer.
+
+=item B<--debug>
+
+Sets the log level to debug.
+
+=item B<--verbose>
+
+Sets the debug level to info.
+
+=item B<--help>
+
+Displays a help message.
+
+=back
+
+=head1 NOTES
+
+See more documentation at Torrus home page: http://torrus.sf.net
+
+
+=head1 AUTHOR
+
+Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -1,0 +1,41 @@
+[% PROCESS 'html-incblocks.txt' %]
+[% INCLUDE htmlstart
+     title="Torrus Login: " _ companyName
+     contentClass="SingleColumnContent"
+     noTopMenu=1 %]
+
+[% IF authFailed %]
+<P>Incorrect username or password.</P>
+[% END %]
+
+<P>Please authenticate yourself</P>
+
+<FORM CLASS="LoginForm" METHOD="POST" ACTION="[%url%]">
+  [% IF urlPassParams.token.length > 0 %]
+    <INPUT TYPE="HIDDEN" NAME="token" VALUE="[%urlPassParams.token%]"/>
+  [% ELSE;
+      IF urlPassParams.path.length > 0 %]
+       <INPUT TYPE="HIDDEN" NAME="path" VALUE="[%urlPassParams.path%]"/>
+  [%  END;
+     END %]
+  [% IF urlPassParams.view.length > 0 %]
+    <INPUT TYPE="HIDDEN" NAME="view" VALUE="[% urlPassParams.view %]"/>
+  [% END %]
+  <DIV CLASS="LoginRow">
+    <SPAN CLASS="LoginTitle">Username:</SPAN>
+    <SPAN CLASS="LoginInput">
+      <INPUT CLASS="Username" TYPE="TEXT" NAME="uid"/>
+    </SPAN>
+  </DIV>
+  <DIV CLASS="LoginRow">
+    <SPAN CLASS="LoginTitle">Password:</SPAN>
+    <SPAN CLASS="LoginInput">
+      <INPUT CLASS="Password" TYPE="PASSWORD" NAME="password"/>
+    </SPAN>
+  </DIV>
+  <DIV CLASS="LoginRow">
+      <INPUT CLASS="Submit" TYPE="SUBMIT" VALUE="Login"/>
+  </DIV>
+</FORM>
+
+[% INCLUDE htmlend %]

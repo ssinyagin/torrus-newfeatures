@@ -1,0 +1,1007 @@
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+
+package Torrus::ConfigTree;
+
+use Torrus::DB;
+use Torrus::Log;
+use Torrus::TimeStamp;
+
+use strict;
+
+# Global list of parameters which need to be expanded
+# accorrding to $defs and %paramrefs%
+
+my @expand_params =
+    (qw(data-file data-dir rrd-ds rpn-expr rrd-create-max rrd-create-min
+        monitor-vars comment graph-title graph-legend descriptive-nickname
+        collector-timeoffset-hashstring collector-scale
+        lower-limit normal-level upper-limit transform-value));
+
+foreach my $param( @expand_params )
+{
+    $Torrus::ConfigTree::expand_params{$param} = 1;
+}
+
+
+sub new
+{
+    my $self = {};
+    my $class = shift;
+    my %options = @_;
+    bless $self, $class;
+
+    $self->{'treename'} = $options{'-TreeName'};
+    die('ERROR: TreeName is mandatory') if not $self->{'treename'};
+
+    $self->{'db_config_instances'} =
+        new Torrus::DB( 'config_instances', -WriteAccess => 1 );
+    defined( $self->{'db_config_instances'} ) or return( undef );
+
+    my $i = $self->{'db_config_instances'}->get('ds:' . $self->{'treename'});
+    $i = 0 unless defined( $i );
+
+    my $dsConfInstance = sprintf( '%d', $i );
+
+    $i = $self->{'db_config_instances'}->get('other:' . $self->{'treename'});
+    $i = 0 unless defined( $i );
+
+    my $otherConfInstance = sprintf( '%d', $i );
+
+    if( $options{'-WriteAccess'} )
+    {
+        if( not $options{'-NoDSRebuild'} )
+        {
+            $dsConfInstance = sprintf( '%d', ( $dsConfInstance + 1 ) % 2 );
+        }
+        $otherConfInstance = sprintf( '%d', ( $otherConfInstance + 1 ) % 2 );
+    }
+
+    $self->{'ds_config_instance'} = $dsConfInstance;
+    $self->{'other_config_instance'} = $otherConfInstance;
+
+    $self->{'db_readers'} = new Torrus::DB('config_readers',
+                                         -Subdir => $self->{'treename'},
+                                         -WriteAccess => 1 );
+    defined( $self->{'db_readers'} ) or return( undef );
+
+    if( $options{'-WriteAccess'} )
+    {
+        $self->{'is_writing'} = 1;
+    }
+
+    $self->{'db_dsconfig'} =
+        new Torrus::DB('ds_config_' . $dsConfInstance,
+                     -Subdir => $self->{'treename'},  -Btree => 1,
+                     -WriteAccess => $options{'-WriteAccess'});
+    defined( $self->{'db_dsconfig'} ) or return( undef );
+
+    $self->{'db_otherconfig'} =
+        new Torrus::DB('other_config_' . $otherConfInstance,
+                     -Subdir => $self->{'treename'}, -Btree => 1,
+                     -WriteAccess => $options{'-WriteAccess'});
+    defined( $self->{'db_otherconfig'} ) or return( undef );
+
+    $self->{'db_aliases'} =
+        new Torrus::DB('aliases_' . $dsConfInstance,
+                     -Subdir => $self->{'treename'},  -Btree => 1,
+                     -WriteAccess => $options{'-WriteAccess'});
+    defined( $self->{'db_aliases'} ) or return( undef );
+
+    if( $options{'-WriteAccess'} )
+    {
+        $self->setReady(0);
+        $self->waitReaders();
+
+        if( $options{'-Rebuild'} )
+        {
+            $self->{'db_otherconfig'}->trunc();
+            if( not $options{'-NoDSRebuild'} )
+            {
+                $self->{'db_dsconfig'}->trunc();
+                $self->{'db_aliases'}->trunc();
+            }
+        }
+    }
+    else
+    {
+        $self->setReader();
+
+        if( not $self->isReady() )
+        {
+            if( $options{'-Wait'} )
+            {
+                Warn('Configuration is not ready');
+
+                my $waitingTimeout =
+                    time() + $Torrus::Global::ConfigReadyTimeout;
+                my $success = 0;
+
+                while( not $success and time() < $waitingTimeout )
+                {
+                    $self->clearReader();
+
+                    Info('Sleeping ' . $Torrus::Global::ConfigReadyRetryPeriod .
+                          ' seconds');
+                    sleep $Torrus::Global::ConfigReadyRetryPeriod;
+
+                    $self->setReader();
+
+                    if( $self->isReady() )
+                    {
+                        $success = 1;
+                        Info('Now configuration is ready');
+                    }
+                    else
+                    {
+                        Info('Configuration is still not ready');
+                    }
+                }
+                if( not $success )
+                {
+                    Error('Configuration wait timed out');
+                    $self->clearReader();
+                    return undef;
+                }
+            }
+            else
+            {
+                Error('Configuration is not ready');
+                $self->clearReader();
+                return undef;
+            }
+        }
+    }
+
+    $self->{'db_sets'} =
+        new Torrus::DB('tokensets',
+                     -Subdir => $self->{'treename'}, -Btree => 0,
+                     -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
+    defined( $self->{'db_sets'} ) or return( undef );
+
+    $self->{'db_nodepcache'} =
+        new Torrus::DB('nodepcache_' . $dsConfInstance,
+                     -Subdir => $self->{'treename'}, -Btree => 1,
+                     -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
+    defined( $self->{'db_nodepcache'} ) or return( undef );
+
+    return $self;
+}
+
+
+sub DESTROY
+{
+    my $self = shift;
+
+    Debug('Destroying ConfigTree object');
+
+    $self->clearReader();
+
+    undef $self->{'db_dsconfig'};
+    undef $self->{'db_otherconfig'};
+    undef $self->{'db_aliases'};
+    undef $self->{'db_sets'};
+    undef $self->{'db_nodepcache'};
+    undef $self->{'db_readers'};
+}
+
+# Manage the readinness flag
+
+sub setReady
+{
+    my $self = shift;
+    my $ready = shift;
+    $self->{'db_otherconfig'}->put( 'ConfigurationReady', $ready ? 1:0 );
+}
+
+sub isReady
+{
+    my $self = shift;
+    return $self->{'db_otherconfig'}->get( 'ConfigurationReady' );
+}
+
+# Manage the readers database
+
+sub setReader
+{
+    my $self = shift;
+
+    my $readerId = 'pid=' . $$ . ',rand=' . sprintf('%.10d', rand(1e9));
+    Debug('Setting up reader: ' . $readerId);
+    $self->{'reader_id'} = $readerId;
+    $self->{'db_readers'}->put( $readerId,
+                                sprintf('%d:%d:%d',
+                                        time(),
+                                        $self->{'ds_config_instance'},
+                                        $self->{'other_config_instance'}) );
+}
+
+sub clearReader
+{
+    my $self = shift;
+
+    if( defined( $self->{'reader_id'} ) )
+    {
+        Debug('Clearing reader: ' . $self->{'reader_id'});
+        $self->{'db_readers'}->del( $self->{'reader_id'} );
+        delete $self->{'reader_id'};
+    }
+}
+
+
+sub waitReaders
+{
+    my $self = shift;
+
+    # Let the active readers finish their job
+    my $noReaders = 0;
+    while( not $noReaders )
+    {
+        my @readers = ();
+        my $cursor = $self->{'db_readers'}->cursor();
+        while( my ($key, $val) = $self->{'db_readers'}->next( $cursor ) )
+        {
+            my( $timestamp, $dsInst, $otherInst ) = split( ':', $val );
+            if( $dsInst == $self->{'ds_config_instance'} or
+                $otherInst == $self->{'other_config_instance'} )
+            {
+                push( @readers, {
+                    'reader' => $key,
+                    'timestamp' => $timestamp } );
+            }
+        }
+        undef $cursor;
+        if( @readers > 0 )
+        {
+            Info('Waiting for ' . scalar(@readers) . ' readers:');
+            my $recentTS = 0;
+            foreach my $reader ( @readers )
+            {
+                Info($reader->{'reader'} . ', timestamp: ' .
+                     localtime( $reader->{'timestamp'} ));
+                if( $reader->{'timestamp'} > $recentTS )
+                {
+                    $recentTS = $reader->{'timestamp'};
+                }
+            }
+            if( $recentTS + $Torrus::Global::ConfigReadersWaitTimeout >= time() )
+            {
+                Info('Sleeping ' . $Torrus::Global::ConfigReadersWaitPeriod  .
+                     ' seconds');
+                sleep( $Torrus::Global::ConfigReadersWaitPeriod );
+            }
+            else
+            {
+                # the readers are too long active. we ignore them now
+                Warn('Readers wait timed out. Flushing the readers list for ' .
+                     'DS config instance ' . $self->{'ds_config_instance'} .
+                     ' and Other config instance ' .
+                     $self->{'other_config_instance'});
+
+                my $cursor = $self->{'db_readers'}->cursor( -Write => 1 );
+                while( my ($key, $val) =
+                       $self->{'db_readers'}->next( $cursor ) )
+                {
+                    my( $timestamp, $dsInst, $otherInst ) = split( ':', $val );
+                    if( $dsInst == $self->{'ds_config_instance'} or
+                        $otherInst == $self->{'other_config_instance'} )
+                    {
+                        $self->{'db_readers'}->c_del( $cursor );
+                    }
+                }
+                undef $cursor;
+                $noReaders = 1;
+            }
+        }
+        else
+        {
+            $noReaders = 1;
+        }
+    }
+}
+
+
+
+# This should be called after Torrus::TimeStamp::init();
+
+sub getTimestamp
+{
+    my $self = shift;
+    return Torrus::TimeStamp::get($self->{'treename'} . ':configuration');
+}
+
+sub treeName
+{
+    my $self = shift;
+    return $self->{'treename'};
+}
+
+
+# Returns array with path components
+
+sub splitPath
+{
+    my $self = shift;
+    my $path = shift;
+    my @ret = ();
+    while( length($path) > 0 )
+    {
+        my $node;
+        $path =~ s/^([^\/]*\/?)//; $node = $1;
+        push(@ret, $node);
+    }
+    return @ret;
+}
+
+sub nodeName
+{
+    my $self = shift;
+    my $path = shift;
+    $path =~ s/.*\/([^\/]+)\/?$/$1/;
+    return $path;
+}
+
+sub token
+{
+    my $self = shift;
+    my $path = shift;
+
+    my $token = $self->{'db_dsconfig'}->get( 'pt:'.$path );
+    if( not defined( $token ) )
+    {
+        my $prefixLen = 1; # the leading slash is anyway there
+        my $pathLen = length( $path );
+        while( not defined( $token ) and $prefixLen < $pathLen )
+        {
+            my $result = $self->{'db_aliases'}->getBestMatch( $path );
+            if( not defined( $result ) )
+            {
+                $prefixLen = $pathLen; # exit the loop
+            }
+            else
+            {
+                # Found a partial match
+                $prefixLen = length( $result->{'key'} );
+                my $aliasTarget = $self->path( $result->{'value'} );
+                $path = $aliasTarget . substr( $path, $prefixLen );
+                $token = $self->{'db_dsconfig'}->get( 'pt:'.$path );
+            }
+        }
+    }
+    return $token;
+}
+
+sub path
+{
+    my $self = shift;
+    my $token = shift;
+    return $self->{'db_dsconfig'}->get( 'tp:'.$token );
+}
+
+sub nodeExists
+{
+    my $self = shift;
+    my $path = shift;
+
+    return defined( $self->{'db_dsconfig'}->get( 'pt:'.$path ) );
+}
+
+sub isLeaf
+{
+    my $self = shift;
+    my $token = shift;
+
+    return( $self->{'db_dsconfig'}->get( 'n:'.$token ) == 1 );
+}
+
+sub isSubtree
+{
+    my $self = shift;
+    my $token = shift;
+
+    return( $self->{'db_dsconfig'}->get( 'n:'.$token ) == 0 );
+}
+
+# Returns the real token or undef
+sub isAlias
+{
+    my $self = shift;
+    my $token = shift;
+
+    return( ( $self->{'db_dsconfig'}->get( 'n:'.$token ) == 2 ) ?
+            $self->{'db_dsconfig'}->get( 'a:'.$token ) : undef );
+}
+
+# Returns the list of tokens pointing to this one as an alias
+sub getAliases
+{
+    my $self = shift;
+    my $token = shift;
+
+    return split( ',', $self->{'db_dsconfig'}->get( 'ar:'.$token ) );
+}
+
+
+sub getParam
+{
+    my $self = shift;
+    my $name = shift;
+    my $param = shift;
+    my $fromDS = shift;
+
+    if( exists( $self->{'paramcache'}{$name}{$param} ) )
+    {
+        return $self->{'paramcache'}{$name}{$param};
+    }
+    else
+    {
+        my $db = $fromDS ? $self->{'db_dsconfig'} : $self->{'db_otherconfig'};
+        my $val = $db->get( 'P:'.$name.':'.$param );
+        $self->{'paramcache'}{$name}{$param} = $val;
+        return $val;
+    }
+}
+
+sub retrieveNodeParam
+{
+    my $self = shift;
+    my $token = shift;
+    my $param = shift;
+
+    my $value;
+    my $currtoken = $token;
+    while( not defined($value) and defined($currtoken) )
+    {
+        $value = $self->getParam( $currtoken, $param, 1 );
+        if( not defined $value )
+        {
+            # get the parent's token
+            $currtoken = $self->getParent($currtoken);
+        }
+    }
+    return $self->expandNodeParam( $token, $param, $value );
+}
+
+
+sub expandNodeParam
+{
+    my $self = shift;
+    my $token = shift;
+    my $param = shift;
+    my $value = shift;
+
+    # %parameter_substitutions% in ds-path-* in multigraph leaves
+    # are expanded by the Writer post-processing
+    if( defined $value and $Torrus::ConfigTree::expand_params{$param} )
+    {
+        $value = $self->expandSubstitutions( $token, $param, $value );
+    }
+    return $value;
+}
+
+
+sub expandSubstitutions
+{
+    my $self = shift;
+    my $token = shift;
+    my $param = shift;
+    my $value = shift;
+
+    my $ok = 1;
+    my $changed = 1;
+
+    while( $changed and $ok )
+    {
+        $changed = 0;
+
+        # Substitute definitions
+        if( index($value, "\$") >= 0 )
+        {
+            if( not $value =~ /\$(\w+)/o )
+            {
+                my $path = $self->path($token);
+                Error("Incorrect definition reference: $value in $path");
+                $ok = 0;
+            }
+            else
+            {
+                my $dname = $1;
+                my $dvalue = $self->getDefinition($dname);
+                if( not defined( $dvalue ) )
+                {
+                    my $path = $self->path($token);
+                    Error("Cannot find definition $dname in $path");
+                    $ok = 0;
+                }
+                else
+                {
+                    $value =~ s/\$$dname/$dvalue/g;
+                    $changed = 1;
+                }
+            }
+        }
+
+        # Substitute parameter references
+        if( index($value, '%') >= 0 and $ok )
+        {
+            if( not $value =~ /\%([a-zA-Z0-9\-_]+)\%/o )
+            {
+                Error("Incorrect parameter reference: $value");
+                $ok = 0;
+            }
+            else
+            {
+                my $pname = $1;
+                my $pval = $self->getNodeParam( $token, $pname );
+
+                if( not defined( $pval ) )
+                {
+                    my $path = $self->path($token);
+                    Error("Cannot expand parameter reference %".
+                          $pname."% in ".$path);
+                    $ok = 0;
+                }
+                else
+                {
+                    $value =~ s/\%$pname\%/$pval/g;
+                    $changed = 1;
+                }
+            }
+        }
+    }
+
+    if( ref( $Torrus::ConfigTree::nodeParamHook ) )
+    {
+        $value = &{$Torrus::ConfigTree::nodeParamHook}( $self, $token,
+                                                      $param, $value );
+    }
+
+    return $value;
+}
+
+
+sub getNodeParam
+{
+    my $self = shift;
+    my $token = shift;
+    my $param = shift;
+    my $noclimb = shift;
+
+    my $value;
+    if( $noclimb )
+    {
+        $value = $self->getParam( $token, $param, 1 );
+        return $self->expandNodeParam( $token, $param, $value );
+    }
+
+    if( $self->{'is_writing'} )
+    {
+        return $self->retrieveNodeParam( $token, $param );
+    }
+
+    my $cachekey = $token.':'.$param;
+    my $cacheval = $self->{'db_nodepcache'}->get( $cachekey );
+    if( defined( $cacheval ) )
+    {
+        my $status = substr( $cacheval, 0, 1 );
+        if( $status eq 'U' )
+        {
+            return undef;
+        }
+        else
+        {
+            return substr( $cacheval, 1 );
+        }
+    }
+
+    $value = $self->retrieveNodeParam( $token, $param );
+
+    if( defined( $value ) )
+    {
+        $self->{'db_nodepcache'}->put( $cachekey, 'D'.$value );
+    }
+    else
+    {
+        $self->{'db_nodepcache'}->put( $cachekey, 'U' );
+    }
+
+    return $value;
+}
+
+sub getParamNames
+{
+    my $self = shift;
+    my $name = shift;
+    my $fromDS = shift;
+
+    my $db = $fromDS ? $self->{'db_dsconfig'} : $self->{'db_otherconfig'};
+
+    return split( ',', $db->get( 'Pl:'.$name ) );
+}
+
+sub getParams
+{
+    my $self = shift;
+    my $name = shift;
+    my $fromDS = shift;
+
+    my %ret = ();
+    foreach my $param ( $self->getParamNames( $name, $fromDS ) )
+    {
+        $ret{$param} = $self->getParam( $name, $param, $fromDS );
+    }
+    return \%ret;
+}
+
+sub getParent
+{
+    my $self = shift;
+    my $token = shift;
+    if( exists( $self->{'parentcache'}{$token} ) )
+    {
+        return $self->{'parentcache'}{$token};
+    }
+    else
+    {
+        my $parent = $self->{'db_dsconfig'}->get( 'p:'.$token );
+        $self->{'parentcache'}{$token} = $parent;
+        return $parent;
+    }
+}
+
+
+sub getChildren
+{
+    my $self = shift;
+    my $token = shift;
+
+    if( (my $alias = $self->isAlias($token)) )
+    {
+        return $self->getChildren($alias);
+    }
+    else
+    {
+        my $children = $self->{'db_dsconfig'}->get( 'c:'.$token );
+
+        if( defined $children )
+        {
+            my @clist = split(',', $children);
+            map { $self->{'parentcache'}{$_} = $token; } @clist;
+            return @clist;
+        }
+        else
+        {
+            return ();
+        }
+    }
+}
+
+# Recognize the regexp patterns within a path,
+# like /Netflow/Exporters/.*/.*/bps.
+# Each pattern is applied against direct child names only.
+#
+sub getNodesByPattern
+{
+    my $self = shift;
+    my $pattern = shift;
+
+    if( $pattern !~ /^\// )
+    {
+        Error("Incorrect pattern: $pattern");
+        return undef;
+    }
+
+    my @retlist = ();
+    foreach my $nodepattern ( $self->splitPath($pattern) )
+    {
+        my @next_retlist = ();
+
+        # Cut the trailing slash, if any
+        my $patternname = $nodepattern;
+        $patternname =~ s/\/$//;
+
+        if( $patternname =~ /\W/ )
+        {
+            foreach my $candidate ( @retlist )
+            {
+                # This is a pattern, let's get all matching children
+                foreach my $child ( $self->getChildren( $candidate ) )
+                {
+                    # Cut the trailing slash and leading path
+                    my $childname = $self->path($child);
+                    $childname =~ s/\/$//;
+                    $childname =~ s/.*\/([^\/]+)$/$1/;
+                    if( $childname =~ $patternname )
+                    {
+                        push( @next_retlist, $child );
+                    }
+                }
+            }
+
+        }
+        elsif( length($patternname) == 0 )
+        {
+            @next_retlist = ( $self->token('/') );
+        }
+        else
+        {
+            foreach my $candidate ( @retlist )
+            {
+                my $proposal = $self->path($candidate).$nodepattern;
+                if( defined( my $proptoken = $self->token($proposal) ) )
+                {
+                    push( @next_retlist, $proptoken );
+                }
+            }
+        }
+        @retlist = @next_retlist;
+    }
+    return @retlist;
+}
+
+#
+# Recognizes absolute or relative path, '..' as the parent subtree
+#
+sub getRelative
+{
+    my $self = shift;
+    my $token = shift;
+    my $relPath = shift;
+
+    if( $relPath =~ /^\// )
+    {
+        return $self->token( $relPath );
+    }
+    else
+    {
+        if( length( $relPath ) > 0 )
+        {
+            $token = $self->getParent( $token );
+        }
+
+        while( length( $relPath ) > 0 )
+        {
+            if( $relPath =~ /^\.\.\// )
+            {
+                $relPath =~ s/^\.\.\///;
+                if( $token ne $self->token('/') )
+                {
+                    $token = $self->getParent( $token );
+                }
+            }
+            else
+            {
+                my $childName;
+                $relPath =~ s/^([^\/]*\/?)//; $childName = $1;
+                my $path = $self->path( $token );
+                $token = $self->token( $path . $childName );
+                if( not defined $token )
+                {
+                    return undef;
+                }
+            }
+        }
+        return $token;
+    }
+}
+
+
+sub getDefaultView
+{
+    my $self = shift;
+    my $token = shift;
+
+    my $view;
+    if( $self->isTset($token) )
+    {
+        if( $token eq 'SS' )
+        {
+            $view = $self->getParam('SS', 'default-tsetlist-view');
+        }
+        else
+        {
+            $view = $self->getParam($token, 'default-tset-view');
+            if( not defined( $view ) )
+            {
+                $view = $self->getParam('SS', 'default-tset-view');
+            }
+        }
+    }
+    elsif( $self->isSubtree($token) )
+    {
+        $view = $self->getNodeParam($token, 'default-subtree-view');
+    }
+    else
+    {
+        # This must be leaf
+        $view = $self->getNodeParam($token, 'default-leaf-view');
+    }
+
+    if( not defined( $view ) )
+    {
+        Error("Cannot find default view for $token");
+    }
+    return $view;
+}
+
+
+sub getInstanceParam
+{
+    my $self = shift;
+    my $type = shift;
+    my $name = shift;
+    my $param = shift;
+
+    if( $type eq 'node' )
+    {
+        return $self->getNodeParam($name, $param);
+    }
+    else
+    {
+        return $self->getParam($name, $param);
+    }
+}
+
+
+sub getViewNames
+{
+    my $self = shift;
+    my $vlist = $self->{'db_otherconfig'}->get( 'V:' );
+
+    return defined($vlist) ? split(',', $vlist) : ();
+}
+
+
+sub viewExists
+{
+    my $self = shift;
+    my $vname = shift;
+    return $self->searchOtherList('V:', $vname);
+}
+
+
+sub getMonitorNames
+{
+    my $self = shift;
+    my $mlist = $self->{'db_otherconfig'}->get( 'M:' );
+
+    return defined($mlist) ? split(',', $mlist) : ();
+}
+
+sub monitorExists
+{
+    my $self = shift;
+    my $mname = shift;
+    return $self->searchOtherList('M:', $mname);
+}
+
+
+sub getActionNames
+{
+    my $self = shift;
+    my $alist = $self->{'db_otherconfig'}->get( 'A:' );
+
+    return defined($alist) ? split(',', $alist) : ();
+}
+
+
+sub actionExists
+{
+    my $self = shift;
+    my $mname = shift;
+    return $self->searchOtherList('A:', $mname);
+}
+
+
+# Search for a value in comma-separated list
+sub searchOtherList
+{
+    my $self = shift;
+    my $key = shift;
+    my $name = shift;
+
+    return $self->{'db_otherconfig'}->searchList($key, $name);
+}
+
+# Token sets manipulation
+
+sub isTset
+{
+    my $self = shift;
+    my $token = shift;
+    return substr($token, 0, 1) eq 'S';
+}
+
+sub addTset
+{
+    my $self = shift;
+    my $tset = shift;
+    $self->{'db_sets'}->addToList('S:', $tset);
+}
+
+
+sub tsetExists
+{
+    my $self = shift;
+    my $tset = shift;
+    return $self->{'db_sets'}->searchList('S:', $tset);
+}
+
+sub getTsets
+{
+    my $self = shift;
+    my $list = $self->{'db_sets'}->get('S:');
+    return defined($list) ? split(',', $list) : ();
+}
+
+sub tsetMembers
+{
+    my $self = shift;
+    my $tset = shift;
+
+    my $list = $self->{'db_sets'}->get('s:'.$tset);
+    return defined($list) ? split(',', $list) : ();
+}
+
+sub tsetAddMember
+{
+    my $self = shift;
+    my $tset = shift;
+    my $token = shift;
+
+    $self->{'db_sets'}->addToList('s:'.$tset, $token);
+}
+
+
+sub tsetDelMember
+{
+    my $self = shift;
+    my $tset = shift;
+    my $token = shift;
+
+    $self->{'db_sets'}->delFromList('s:'.$tset, $token);
+}
+
+# Definitions manipulation
+
+sub getDefinition
+{
+    my $self = shift;
+    my $name = shift;
+    return $self->{'db_dsconfig'}->get( 'd:'.$name );
+}
+
+sub getDefinitionNames
+{
+    my $self = shift;
+    my $dlist = $self->{'db_dsconfig'}->get( 'D:' );
+
+    return defined($dlist) ? split(',', $dlist) : ();
+}
+
+
+1;
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:

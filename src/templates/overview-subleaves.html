@@ -1,0 +1,40 @@
+[% PROCESS 'html-incblocks.txt' %]
+[% thepath=path(token) %]
+[% INCLUDE htmlstart title=thepath printpath=1 %]
+
+<H1>[% nodeParam(token,'overview-page-title',1) %]</H1>
+
+[% INCLUDE variables %]
+
+[% INCLUDE legend %]
+
+[%
+  FOREACH child = sortTokens(children(token));
+    childpath = path(child);
+    ovwpath = childpath _ nodeParam(token,'overview-subleave-name',1);
+    IF nodeExists(ovwpath);
+      ovwtoken = pathToken(ovwpath);
+
+      urltoken = ovwtoken;
+      IF nodeParam(token,'overview-direct-link',1) == 'yes';
+        urltoken = child;
+        urlview = nodeParam(token,'overview-direct-link-view',1);
+      END;
+
+      INCLUDE shortgraph
+        token=ovwtoken
+        urltoken=urltoken
+        urlview=urlview
+        nodename=nodeName(path(child))
+        comment=nodeParam(child,'comment',1);
+    END;
+  END
+%]
+
+<DIV CLASS="BottomShortcuts">
+[% INCLUDE shortcut url=url(token) text="Default view"
+                    title="Restore default subtree view" %]
+</DIV>
+
+[% INCLUDE bottomline %]
+[% INCLUDE htmlend %]

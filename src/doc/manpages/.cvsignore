@@ -1,0 +1,9 @@
+Makefile
+Makefile.in
+pod2htmi.tmp
+pod2htmd.tmp
+*.1
+*.5
+*.7
+*.pod
+xformstrings.sed

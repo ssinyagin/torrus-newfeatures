@@ -1,0 +1,12 @@
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+Makefile
+Makefile.in
+configure
+configure.lineno
+init.torrus
+*.swp
+torrus-*.tar.gz
+DIST_REVISION

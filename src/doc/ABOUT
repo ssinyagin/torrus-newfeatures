@@ -1,0 +1,24 @@
+Round Robin Database Framework will be the universal
+framework, or a frontend for Round-Robin Database (RRDtool).
+Unlike the other frontends, it will prioritize the following
+features:
+
+-- Have flexible hierarchical configuration (like Cricket)
+-- Wildcards in configuration for grouping the databases
+   (or regexp'ed filenames?)
+-- Arbitrary DS naming (Cricket understands only ds0, ds1...)
+-- Monitor the RRDs according to specified rules, and automatically 
+   create the summary page with the graphs of the RRDs showing 
+   troubles (like Cricket's threshold monitoring. But it only creates 
+   a list of DSes, and you have to go and see them by yourself).
+-- Browse the available RRDs in a hierarchical manner (like Cricket, 
+   but able to handle newly-created databases, like RRGrapher) 
+-- no data collection at all. just monitoring and displaying the data 
+   collected by someone else.
+
+In more details, the first requirements draft is available at:
+http://carrierin.sourceforge.net/rrframework.html
+
+
+
+

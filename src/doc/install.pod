@@ -1,0 +1,469 @@
+#  install.pod - Torrus installation instructions
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 Torrus Installation Instructions
+
+These are the Round Robin Database Framework installation instructions.
+
+=head2 Required Software
+
+=over 4
+
+=item * Operating System
+
+Any UNIX-like operation system where the required components are working.
+The author's primary development platform is Cygwin
+E<lt>http://www.cygwin.comE<gt>,
+and the primary testing environments are Sun Solaris/SPARC and FreeBSD.
+
+Note to B<VmWare> users: as recommended by Gord Philpott, Linux kernel for
+guest machine needs to be compiled with the following feature enabled:
+C<Character devices ---E<gt> Enhanced Real Time Clock Support>.
+For other guest operating systems (e.g. FreeBSD), in order to let the
+Torrus collector and monitor run properly, you need to add the following
+lines to your F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl>:
+
+  $Torrus::Scheduler::maxSleepTime = 15;
+  $Torrus::Scheduler::ignoreClockSkew = 1;
+
+B<Debian> package is maintained by Jurij Smakov and is available at
+E<lt>http://pkg-torrus.alioth.debian.orgE<gt>.
+
+=item * Perl
+
+Perl version C<5.8.0> or higher is required. Version C<5.8.0> is not
+recommended because of memory access bugs and unpredictable behaviour.
+Perl interpreter must be in PATH environment variable when
+running C<./configure>.
+
+=item * RRDtool
+
+Round Robin Database Tool is available at:
+E<lt>http://ee-staff.ethz.ch/~oetiker/webtools/rrdtool/E<gt>.
+Both stable version C<1.0.x> and the development version C<1.1.x>
+are supported.
+
+As of this writing, rrdtool version C<1.1.x> is still in its development
+stage, but it is ready to use in production. There's a small glitch
+in legend text alignment, and it will hopefully be fixed.
+
+=item * libxml2
+
+libxml2 is the XML parser library from Gnome
+project E<lt>http://www.gnome.orgE<gt>,
+available as a standalone package.
+Versions C<2.4.23> and above were tested.
+
+=item * Berkeley DB version 4.2.52 or later
+
+The Berkeley DB from Sleepycat Software E<lt>http://www.sleepycat.comE<gt>
+is used for all data storage. Versions C<4.2.52> and above are recommended.
+Older versions of Berkeley DB had problems with database integrity
+in concurrent usage. By default, it installs
+into F</usr/local/BerkeleyDB.4.2/>.
+Unfortunately, Perl module C<BerkeleyDB> cannot find the include and
+library files in that directory. So, it either needs C<--prefix=/usr/local>
+configure option, or you need to edit F<config.in> in C<BerkeleyDB>
+distribution.
+
+=item * HTTP Server
+
+This software requires Apache HTTP server (E<lt>http://httpd.apache.orgE<gt>)
+and mod_perl (E<lt>http://perl.apache.orgE<gt>).
+
+Apache version 1.3 and mod_perl version 1.0 are supported by ApacheHandler.
+
+Apache version 2.0 and mod_perl 2.0 are supported by Apache2Handler.
+Minimum supported mod_perl 2.0 version is B<1.99_15>. The handler also requires
+C<libapreq2> library, see the note below.
+
+Plain CGI interface is no longer supported since Torrus version 0.1.1.
+See I<Torrus Web Interface Reference> for details on mod_perl configuration.
+
+=item * Perl Modules
+
+The Perl modules required are listed below. They are all available at
+CPAN E<lt>http://www.cpan.orgE<gt>.
+Some of them require other modules to be installed.
+You can install all required modules with the following command,
+executed from within the distribution directory:
+
+  perl -I `pwd`/lib -MCPAN -e 'install Bundle::Torrus'
+
+=over 8
+
+=item * XML::LibXML
+
+This is a Perl interface for libxml2, providing DOM standards compliant
+interface. It is recommended that you use version C<1.54_3> or higher.
+
+=item * BerkeleyDB
+
+Perl interface to the database software.
+Version C<0.19> or higher is required.
+
+=item * Template-Toolkit
+
+This is a powerful set of tools for text template processing.
+Torrus uses it for HTML files output.
+See also the project homepage: E<lt>http://www.template-toolkit.orgE<gt>
+
+=item * Proc::Daemon
+
+Daemon invocation routines.
+
+=item * Net::SNMP
+
+SNMP queries and traps interface. Version C<4.0.3> is required.
+
+=item * URI::Escape
+
+Escape and unescape unsafe characters
+
+=item * Apache (mod_perl version 1.0)
+
+Mod_perl is a Perl runtime environment integrated into Apache HTTP server.
+
+=item * Apache::Session
+
+User session tracking helper
+
+=back
+
+=item * C<libapreq2> Perl library
+
+Apache 2.0 handler requires an additional Perl library, C<libapreq2>.
+It is available from CPAN E<lt>http://search.cpan.org/E<gt>, and only in
+development version. You need to download and install it manually in order
+for Apache2Handler to work.
+
+=item * HTTP Browser requirements
+
+The HTTP browser must be compatible with I<HTML 4.01 Strict> and I<CSS2>
+specifications. The tests were made with: IE 5.5, Opera 6.12B1/Solaris,
+Opera 7.03/Win2K, Netscape 7.02.
+
+=back
+
+=head2 Recommended Software
+
+=over 4
+
+=item * C<XML::XUpdate::LibXML> by Petr Pajas
+
+This Perl module implements XUpdate specification
+E<lt>http://www.xmldb.org/xupdate/E<gt>. See Torrus User Guide for details.
+
+=item * XSH by Petr Pajas
+
+Available at E<lt>http://xsh.sourceforge.netE<gt>.
+This is a shell wrapper for a set of utilities for XML extraction, browsing,
+and editing.
+
+=item * libxslt from Gnome project
+
+C<libxslt> is the XSLT stranslation library from Gnome
+project E<lt>http://www.gnome.orgE<gt>, available as a standalone package.
+It includes a binary executable, C<xsltproc>. See Torrus User Guide for
+examples of its usage.
+
+=back
+
+=head2 Installation Procedure
+
+Create the group C<torrus> and a user C<torrus> belonging to that group.
+Add your Apache daemon user to the group C<torrus>.
+Other users that will run any of Torrus processes must be included in
+this group.
+
+For example, in Solaris (you may need to specify the GID and UID numbers
+according to your local administration policy):
+
+  groupadd torrus
+  useradd -c 'Torrus Daemon' -d /usr/local/torrus-0.0 -g torrus torrus
+  usermod -G www,torrus www
+
+Further installation process is mostly as usual:
+
+  ./configure
+  make
+  make install
+
+The package is installed by default in the directory
+F</usr/local/torrus-X.Y> where X.Y.Z is the release version.
+Further on, we reference this directory as
+F<$Torrus_HOME>.
+
+Prerequisite Perl modules are checked at the time of C<./configure>. You
+can disable this by giving I<--disable-modcheck> option.
+
+The only files that are not overwritten during C<make install> are
+F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl> and
+F<$Torrus_HOME/share/torrus/xmlconfig/site-global.xml>.
+
+The following directories and their contents must be writable by your Torrus
+processes, including the HTTP server (usually Apache web server):
+
+=over 4
+
+=item * F<$Torrus_HOME/var/cache/>
+
+The placeholder directory for Renderer cache files. These are PNG and HTML
+files ready for display by Apache handler.
+
+=item * F<$Torrus_HOME/var/db/>
+
+The home directory for Berkeley DB environment. Here all the databases are
+stored.
+
+=item * F</var/snmpcollector/>
+
+This is the default directory for SNMP collector RRD files.
+It may be changed with the I<--datadir> option of C<devdiscover>.
+
+=back
+
+You can control these directories' access rights by setting the following
+environment variables: I<var_user>, I<var_group>, I<var_mode>, like follows:
+
+  ./configure var_group=wwwrun
+
+Default values for a non-Cygwin OS are: I<var_user=torrus>,
+I<var_group=torrus>, I<var_mode=775>. Setgid bit is set by default for these
+directories.
+
+If available, you may place these directories onto a faster media, by
+changing the I<--localstatedir=DIR> option of C<./configure>.
+
+Additional third-party components (plugins) may be included
+in your installation. These components must be designed for this use.
+Before running C<./configure>, unpack the plugin distribution archives into
+some directory:
+
+  gzip -dc torrus-plugin-ABC-0.0.1.tar.gz | tar xvf -
+  gzip -dc torrus-plugin-XYZ-0.0.1.tar.gz | tar xvf -
+
+Then, specify the plugin distribution paths separated by colon (:) in the
+option I<--with-plugins> of C<./configure>:
+
+  ./configure [VARIABLE=VALUE...] \
+    --with-plugins=../torrus-plugin-ABC-0.0.1:../torrus-plugin-XYZ-0.0.1 \
+    [other options...]
+
+After that, C<make install> will install Torrus together with the specified
+plugins.
+
+From the Torrus home page, you may download an example plugin called
+I<torrus-plugin-dummy>, and use it as a template for your own add-ons.
+
+=head2 Configuring Torrus
+
+The datasources are configured with C<%Torrus::Global::treeConfig>
+hash in F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl>.
+
+In this hash, the keys give the tree names. The values for each tree name
+are pointers to hashes, with the following keys and values:
+I<xmlfiles> points to an array
+of source XML files; I<run> points to a hash with the names of the daemons
+that would be automatically launched for the tree;
+I<desription> gives a short line describing the tree contents.
+
+Two additional arrays: C<@Torrus::Global::xmlAlwaysIncludeFirst> and
+C<@Torrus::Global::xmlAlwaysIncludeLast> give a list of source XML
+files that are included in every tree, in the beginning or in the end of
+the XML files list.
+
+Example:
+
+  @Torrus::Global::xmlAlwaysIncludeFirst =
+      ('defaults.xml', 'site-global.xml');
+
+  %Torrus::Global::treeConfig = (
+    'tree_A' => {
+      'description' => 'The First Tree',
+      'xmlfiles' => [qw(a1.xml a2.xml a3.xml)],
+      'run' => { 'collector' => 1, 'monitor' => 1 } },
+    'tree_B' => {
+      'description' => 'The Second Tree',
+      'xmlfiles' => ['b1.xml', 'b2.xml'],
+      'run' => {} }
+   );
+
+XML files are read additively within each tree, in the order
+as they are listed.
+
+By default, only F<defaults.xml> and F<site-global.xml> need to be
+included in compilation. The XML files with vendor and MIB definitions
+are automatically included by XML files produced with C<devdiscover>.
+
+=over 4
+
+=item * defaults.xml
+
+Default parameters for the root of the datasources tree.
+Default view definitions. B<Note:> this file is automatically
+overwritten by C<make install>.
+
+=item * site-global.xml
+
+Parameters that you want to change or define for your site.
+This file will be compiled for every tree after F<defaults.xml>,
+and this is the place to override the defaults. The file that is supplied
+with the Torrus distribution has some useful parameters that you may simply
+uncomment.
+B<Note:> this file is never overwritten by C<make install>.
+
+=item * snmp-defs.xml
+
+SNMP collector defaults. The file defines several templates
+used for collecting SNMP data.
+Do not change this file.
+You may redefine the needed parameters in your site-specific files
+and templates.
+
+=item * vendor/E<lt>vendorE<gt>.E<lt>productE<gt>[.E<lt>subsystemE<gt>].xml
+
+SNMP collector definitions and templates for various hardware vendors and
+products. C<devdiscover> includes some of these files automatically into
+configuration.
+
+=item * generic/*.xml
+
+SNMP collector definitions and templates for vendor-independent MIBs. Most
+files are named after corresponding RFC numbers.
+
+=back
+
+In addition, the directory F<$Torrus_HOME/share/torrus/xmlconfig/examples>
+contains several example files.
+
+For more details about XML configuration, see I<Torrus User Guide>
+and I<Torrus XML Configuration Guide>.
+
+=head2 Site configuration options
+
+In addition to I<%Torrus::Global::treeConfig>, you may wish to set
+some other parameters in your site configuration file
+(F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl>).
+
+See F<$Torrus_HOME/share/torrus/torrus-config.pl> for the complete list
+of varaibes that you may override in your site config. Among them,
+most interesting are:
+
+=over 4
+
+=item * C<$Torrus::Renderer::companyName>
+
+The text that you specify here will appear in the top left corner
+of all HTML pages.
+
+=item * C<$Torrus::Renderer::companyURL>
+
+The company name text will be clickable with the URL specified in
+this variable.
+
+=item * C<$Torrus::Renderer::stylingProfile>
+
+This variable should point to a file containing all default coloring
+and line styles for the graphs. The name of the file is the name
+of the profile with F<.pl> suffix. The file is normally resided in
+F<$Torrus_HOME/share/torrus/styling> directory.
+See F<$Torrus_HOME/share/torrus/styling/torrus-original.pl> for reference and
+examples.
+
+=back
+
+
+=head2 Apache HTTP server configuration
+
+Torrus web interface is designed to run under mod_perl environment
+(E<lt>http://perl.apache.orgE<gt>).
+
+See the I<Torrus Web Interface Reference> document for detailed instructions on
+Apache configuration.
+
+In short, typical Apache configuration would look like follows:
+
+  Alias /torrus "/usr/local/torrus-0.1/web"
+  PerlRequire "/usr/local/torrus-0.1/share/torrus/webmux.pl"
+  <Location /torrus>
+    SetHandler perl-script
+    PerlHandler Torrus::ApacheHandler
+  </Location>
+  <Location /torrus/plain/>
+    SetHandler default-handler
+    Options None
+  </Location>
+
+=head2 Access Control Lists
+
+By default, Torrus web interface requires user authentication.
+You can disable this by changing C<$Torrus::ApacheHandler::authorizeUsers>
+to zero in your F<$Torrus_HOME/share/torrus/torrus-siteconfig.pl>.
+
+ACLs are controlled by C<acledit> utility. See I<Torrus Manual pages>
+for detailed description. Example:
+
+  cd /usr/local/torrus-0.1
+  ./bin/acledit --addgroup=staff --permit=DisplayTree --for='*'
+  ./bin/acledit --adduser=jsmith --password=mysecretpassword \
+    --cn="John Smith" --addtogroup=staff
+  ./bin/acledit --addgroup=admin \
+    --permit=DisplayTree --permit=DisplayAdmInfo --for='*'
+
+=head2 Cron Job
+
+In order to clean old HTTP session data, it is recommended to run
+F<$Torrus_HOME/bin/cleanup> in a cron job, once per day:
+
+ #min hour mday month wday    who     command
+ 5    3    *    *     *       root    /usr/local/torrus-0.1/bin/cleanup
+
+
+=head2 Upgrade Procedure
+
+Follow these instructions when upgrading from previous Torrus release.
+
+In the previous distribution directory, look up the F<config.log> file.
+It contains the configure options that you used in previous installation.
+
+Unpack the new release distribution.
+
+Run C<./configure> with the same options you used before.
+
+Stop the collector and monitor processes (usually by C</etc/init.d/torrus stop>).
+
+Run C<make install>.
+
+Start the collector and monitor processes.
+
+If using mod_perl, stop and start the Apache HTTP server.
+
+Also it is recommended to re-compile your XML configuration.
+If you prefer not to do this, it's recommended that you clear the
+Web interface cache both in your browser and in Torrus:
+
+  /usr/local/torrus-0.0/bin/clearcache
+
+=head1 Author
+
+Copyright (c) 2002-2003 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

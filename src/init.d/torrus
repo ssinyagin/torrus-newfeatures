@@ -1,0 +1,157 @@
+#!/bin/bash
+#
+# init.d script for Torrus
+# Install it as /etc/init.d/torrus (most UNIXes),
+# or as /usr/local/etc/rc.d/torrus.sh (FreeBSD), or probably somewhere else.
+#
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+### chkconfig info
+# chkconfig: 2345 90 90
+# description: Starts/Stops Torrus collectors and monitors
+###
+#
+### BEGIN INIT INFO
+# Provides: collector monitor
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 3 5
+# Default-Stop: 0 1 2 6
+# Short-Description: Torrus collectors and monitors
+# Description: Start/stop Torrus collectors and monitors
+### END INIT INFO
+
+if test "${USER:-root}" = root -a "/usr/bin/su" != "no"; then
+  user=torrus
+  su="/usr/bin/su ${user} -c"
+else
+  su="/bin/bash -c"
+fi
+
+prefix=/usr/local
+exec_prefix=${prefix}
+cmddir=${exec_prefix}/bin
+piddir=${prefix}/var/run
+torrus_config_pl=@perlcfgdir@/torrus-config.pl
+
+# you may want to change this, currently we will wait up to
+# 90s for stubborn processes to exit before forcibly killing them.
+killcount=9
+killsleep=10
+
+# You may need to change this
+cmdopts=""
+# cmdopts="--debug"
+# cmdopts="--verbose"
+
+# Second argument can be the daemon name
+if test x"$2" = x; then
+  daemons="collector monitor"
+else
+  daemons=$2
+    # Third argument may be the tree name
+  if test x"$3" != x; then
+    eval trees_${daemons}=$3
+    read_treenames=no
+      # Fourth argument may be cmdopts
+    if test x"$4" != x; then
+      cmdopts=$4
+    fi
+  fi
+fi
+
+if test x${read_treenames} != xno; then
+  # Get the names of the trees for each daemon
+  for d in ${daemons}; do
+    eval trees_${d}=\"`/usr/bin/perl -e 'require "'$torrus_config_pl'";
+    while((my $key, $val) = each %Torrus::Global::treeConfig) {
+      print "$key " if $val->{run}{'${d}'};
+    };'`\"
+  done
+fi
+
+start_daemons () {
+  for d in ${daemons}; do
+    eval trees=\"\$\{trees_${d}\}\"
+      for t in ${trees}; do
+        echo "starting Torrus ${d} for tree ${t}"
+        ${su} "${cmddir}/${d} --tree=${t} ${cmdopts}"
+      done
+  done
+}
+
+stop_daemons () {
+  tokill=""
+  for d in ${daemons}; do
+    eval trees=\"\$\{trees_${d}\}\"
+      for t in ${trees}; do
+        pidfile="${piddir}/${d}.${t}.pid"
+        if test -r ${pidfile}; then
+          tokill=${tokill}' t='${t}';d='${d}
+          echo "stopping Torrus ${d} for tree ${t}"
+          pid=`cat ${pidfile}`
+          /usr/bin/kill ${pid} || echo "Error: Cannot kill ${d} for tree ${t}"
+        fi
+      done
+  done
+
+  killed=`echo $tokill | wc -w`
+  notdead=1
+  kc=$killcount
+  while test $killed -gt 0 -a $kc -gt 0; do
+    echo "Sleeping for $killsleep seconds to allow processes to exit"
+    /usr/bin/sleep $killsleep
+    echo "Checking for kill resistant processes [$kc/$killcount]"
+    kc=`expr $kc - 1`
+    for tuple in $tokill; do
+      eval $tuple
+      pidfile="${piddir}/${d}.${t}.pid"
+      if test -r ${pidfile}; then
+        echo "  Sending kill signal to Torrus ${d} for tree ${t}"
+        pid=`cat ${pidfile}`
+        /usr/bin/kill ${pid} || echo "Error: Cannot kill ${d} for tree ${t}"
+      else
+        echo "${d} for ${t} has stopped"
+        killed=`expr $killed - 1`
+      fi
+    done
+  done
+
+  if test \( $killed -gt 0 \); then
+    echo "  Killing Remaining Processes"
+   for tuple in $tokill; do
+     eval $tuple
+     pidfile="${piddir}/${d}.${t}.pid"
+     if test -r ${pidfile}; then
+       echo "  Sending final kill -9 to Torrus ${d} for tree ${t}"
+       pid=`cat ${pidfile}`
+       /usr/bin/kill -9 ${pid} || echo "Error: Cannot kill ${d} for tree ${t}"
+       /usr/bin/rm -f $pidfile
+     else
+       echo "${d} for ${t} has stopped"
+     fi
+   done
+  fi
+}
+
+case "$1" in
+  'start')    start_daemons
+  ;;
+
+  'stop')     stop_daemons
+  ;;
+  'restart')  stop_daemons; start_daemons
+  ;;
+
+  *)  echo "Usage: $0 [start|stop|restart] [collector|monitor] [tree]"
+  ;;
+  esac
+
+# Local Variables:
+# mode: shell-script
+# sh-shell: sh
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# End:

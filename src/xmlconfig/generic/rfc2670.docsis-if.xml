@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2003  Roman Hochuli, Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+  $Id$
+  Roman Hochuli <roman@hochu.li>
+  Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+-->
+
+<configuration>
+
+<definitions>
+  <!-- DOCS-IF-MIB::docsIfSignalQualityTable -->
+  <def name="docsIfSigQUnerroreds"      value="1.3.6.1.2.1.10.127.1.1.4.1.2"/>
+  <def name="docsIfSigQCorrecteds"      value="1.3.6.1.2.1.10.127.1.1.4.1.3"/>
+  <def name="docsIfSigQUncorrectables"  value="1.3.6.1.2.1.10.127.1.1.4.1.4"/>
+  <def name="docsIfSigQSignalNoise"     value="1.3.6.1.2.1.10.127.1.1.4.1.5"/>
+</definitions>
+
+<datasources>
+
+  <template name="docsis-signal-quality-subtree">
+    <param name="comment"        value="DOCSIS cable signal quality" />
+    <param name="data-file">
+       %system-id%_%interface-nick%_docs_sigq.rrd
+    </param>
+    <param name="collector-timeoffset-hashstring"
+                                       value="%system-id%:%interface-nick%" />
+    <param name="precedence"           value="-500" />
+    <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
+    <param name="graph-title"          value="%descriptive-nickname%" />
+
+    <param name="has-overview-subleaves" value="yes"/>
+    <param name="overview-subleave-name" value="SNR"/>
+    <param name="overview-direct-link"      value="yes"/>
+    <param name="overview-direct-link-view" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text"
+           value="Show Signal/Noise ratio for all interfaces"/>
+    <param name="overview-shortcut-title"
+           value="Show all cable interfaces signal quality in one page"/>
+    <param name="overview-page-title"
+           value="SNR Graphs"/>
+    <param name="rrd-hwpredict"     value="disabled" />
+  </template>
+
+  <template name="docsis-signal-quality-codewords">
+    <param name="rrd-create-dstype"   value="COUNTER" />
+    <param name="vertical-label"      value="Codewords/s" />
+    <param name="graph-lower-limit"   value="0" />
+  </template>
+
+  <template name="docsis-interface-signal-quality">
+    <leaf name="SNR">
+      <param name="snmp-object"  value="$docsIfSigQSignalNoise.%ifindex-map%"/>
+
+      <param name="rrd-create-dstype"   value="GAUGE" />
+      <param name="rrd-ds"              value="SNR" />
+      <param name="collector-scale"     value="10,/" />
+
+      <param name="comment"             value="Signal/Noise Ratio" />
+      <param name="graph-legend"        value="Signal/Noise Ratio" />
+      <param name="vertical-label"      value="dB" />
+
+      <param name="normal-level"        value="25" />
+      <param name="lower-limit"         value="18" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="graph-upper-limit"   value="35" />
+
+      <param name="precedence"          value="1000" />
+
+      <param name="monitor"             value="docsis-snr-lower-20db" />
+      <param name="tokenset-member"     value="docsis-snr" />
+    </leaf>
+
+    <leaf name="FEC_Summary">
+      <param name="ds-type"           value="rrd-multigraph" />
+      <param name="ds-names"          value="corr,uncorr" />
+      <param name="graph-lower-limit" value="0" />
+
+      <param name="precedence"        value="950" />
+      <param name="comment"
+              value="Reed-Solomon forward error correction (FEC) summary" />
+      <param name="vertical-label"    value="Percent" />
+
+      <param name="ds-expr-corr">
+      {Correctable},{Error-Free},{Correctable},{Uncorrectable},+,+,/,100,*
+      </param>
+      <param name="graph-legend-corr"  value="Correctable Codewords" />
+      <param name="line-style-corr"      value="##SingleGraph" />
+      <param name="line-color-corr"      value="##green" />
+      <param name="line-order-corr"      value="1" />
+
+      <param name="ds-expr-uncorr">
+      {Uncorrectable},{Error-Free},{Correctable},{Uncorrectable},+,+,/,100,*
+      </param>
+      <param name="graph-legend-uncorr"  value="Uncorrectable Codewords" />
+      <param name="line-style-uncorr"    value="##SingleGraph" />
+      <param name="line-color-uncorr"    value="##red" />
+      <param name="line-order-uncorr"    value="2" />
+    </leaf>
+
+    <leaf name="Error-Free">
+      <apply-template name="docsis-signal-quality-codewords"/>
+      <param name="snmp-object"  value="$docsIfSigQUnerroreds.%ifindex-map%"/>
+      <param name="rrd-ds"       value="Unerroreds" />
+      <param name="comment"
+          value="FEC codewords received on this channel without error"/>
+      <param name="graph-legend" value="Error-free Codewords" />
+      <param name="precedence"   value="900" />
+    </leaf>
+
+    <leaf name="Correctable">
+      <apply-template name="docsis-signal-quality-codewords"/>
+      <param name="snmp-object"  value="$docsIfSigQCorrecteds.%ifindex-map%"/>
+      <param name="rrd-ds"       value="Correcteds" />
+      <param name="comment"
+          value="FEC codewords received on this channel correctable errors"/>
+      <param name="graph-legend" value="Correctable Codewords" />
+      <param name="precedence"   value="800" />
+    </leaf>
+
+    <leaf name="Uncorrectable">
+      <apply-template name="docsis-signal-quality-codewords"/>
+      <param name="snmp-object"
+                        value="$docsIfSigQUncorrectables.%ifindex-map%"/>
+      <param name="rrd-ds"       value="Uncorrectables" />
+      <param name="comment"
+          value="FEC codewords received on this channel uncorrectable errors"/>
+      <param name="graph-legend" value="Uncorrectable Codewords" />
+      <param name="precedence"   value="700" />
+    </leaf>
+  </template>
+
+</datasources>
+
+<monitors>
+
+    <monitor name="docsis-snr-lower-20db">
+      <param name="monitor-type"  value="expression" />
+      <param name="rpn-expr"      value="20,LT" />
+      <param name="action"        value="docsis-snr-lower-20" />
+      <param name="expires"       value="3600" />
+      <param name="comment">
+        Signal/Noise-Ratio was lower than 20dB
+      </param>
+    </monitor>
+
+    <action name="docsis-snr-lower-20">
+      <param name="action-type"     value="tset" />
+      <param name="tset-name"       value="docsis-snr-lower-20" />
+    </action>
+
+</monitors>
+
+<token-sets>
+    <token-set name="docsis-snr">
+      <param name="comment" value="S/N Ratio for all interfaces" />
+    </token-set>
+
+    <token-set name="docsis-snr-lower-20">
+      <param name="comment" value="S/N Ratio less than 20dB" />
+    </token-set>
+</token-sets>
+
+</configuration>

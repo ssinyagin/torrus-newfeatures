@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2003  Shawn Ferry
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+  $Id$
+
+  Smokeping filre
+
+-->
+
+<configuration>
+<definitions>
+</definitions>
+<datasources>
+
+  <template name="SmokePing">
+    <!-- Apply filepattern in non template xml -->
+    <!-- <filepattern type="subtree" name="$1" filere="(.*)\.rrd"> -->
+      <leaf name="median">
+        <param name="ds-type" value="rrd-file"/>
+        <param name="comment" value="Median RTT"/>
+        <param name="leaf-type" value="rrd-def"/>
+        <param name="rrd-ds" value="median"/>
+        <param name="rrd-cf" value="AVERAGE" />
+        <param name="vertical-label" value="Seconds"/>
+        <param name="graph-legend" value="MedianRTT"/>
+      </leaf>
+      <leaf name="loss">
+        <param name="ds-type" value="rrd-file"/>
+        <param name="comment" value="Packets Loss"/>
+        <param name="leaf-type" value="rrd-def"/>
+        <param name="rrd-ds" value="loss"/>
+        <param name="rrd-cf" value="AVERAGE" />
+        <param name="vertical-label" value="Packets Lost"/>
+        <param name="graph-legend" value="Lost"/>
+      </leaf>
+   <!-- </filepattern> -->
+  </template>
+
+  <template name="SmokePing-subtree">
+      <param name="comment" value="Per-Host Median RTT"/>
+      <param name="precedence" value="-400"/>
+      <param name="has-overview-subleaves" value="yes"/>
+      <param name="overview-subleave-name" value="median"/>
+      <param name="overview-shortcut-text"
+             value="Show Per-Host Median RTT"/>
+      <param name="overview-shortcut-title"
+             value="Per-Host Median RTT"/>
+      <param name="overview-page-title" value="Per-Host Median RTT"/>
+  </template>
+
+</datasources>
+</configuration>

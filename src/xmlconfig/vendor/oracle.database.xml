@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (C) 2003 Shawn Ferry
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+   Shawn Ferry <sferry at sevenspace dot com > <lalartu at obscure dot org>
+
+  Authors: Shawn Ferry
+
+  $Id$
+-->
+<configuration>
+  <definitions>
+    <!-- Oracle Database MIB oraDbSysTable -->
+    <def name="oraDbSysConsistentChanges" value="1.3.6.1.4.1.111.4.1.1.1.1"/>
+    <def name="oraDbSysConsistentGets" value="1.3.6.1.4.1.111.4.1.1.1.2"/>
+    <def name="oraDbSysDbBlockChanges" value="1.3.6.1.4.1.111.4.1.1.1.3"/>
+    <def name="oraDbSysDbBlockGets" value="1.3.6.1.4.1.111.4.1.1.1.4"/>
+    <def name="oraDbSysFreeBufferInspected" value="1.3.6.1.4.1.111.4.1.1.1.5"/>
+    <def name="oraDbSysFreeBufferRequested" value="1.3.6.1.4.1.111.4.1.1.1.6"/>
+    <def name="oraDbSysParseCount" value="1.3.6.1.4.1.111.4.1.1.1.7"/>
+    <def name="oraDbSysPhysReads" value="1.3.6.1.4.1.111.4.1.1.1.8"/>
+    <def name="oraDbSysPhysWrites" value="1.3.6.1.4.1.111.4.1.1.1.9"/>
+    <def name="oraDbSysRedoEntries" value="1.3.6.1.4.1.111.4.1.1.1.10"/>
+    <def name="oraDbSysRedoLogSpaceRequests"
+        value="1.3.6.1.4.1.111.4.1.1.1.11"/>
+    <def name="oraDbSysRedoSyncWrites" value="1.3.6.1.4.1.111.4.1.1.1.12"/>
+    <def name="oraDbSysSortsDisk" value="1.3.6.1.4.1.111.4.1.1.1.13"/>
+    <def name="oraDbSysSortsMemory" value="1.3.6.1.4.1.111.4.1.1.1.14"/>
+    <def name="oraDbSysSortsRows" value="1.3.6.1.4.1.111.4.1.1.1.15"/>
+    <def name="oraDbSysTableFetchRowid" value="1.3.6.1.4.1.111.4.1.1.1.16"/>
+    <def name="oraDbSysTableFetchContinuedRow"
+        value="1.3.6.1.4.1.111.4.1.1.1.17"/>
+    <def name="oraDbSysTableScanBlocks" value="1.3.6.1.4.1.111.4.1.1.1.18"/>
+    <def name="oraDbSysTableScanRows" value="1.3.6.1.4.1.111.4.1.1.1.19"/>
+    <def name="oraDbSysTableScansLong" value="1.3.6.1.4.1.111.4.1.1.1.20"/>
+    <def name="oraDbSysTableScansShort" value="1.3.6.1.4.1.111.4.1.1.1.21"/>
+    <def name="oraDbSysUserCalls" value="1.3.6.1.4.1.111.4.1.1.1.22"/>
+    <def name="oraDbSysUserCommits" value="1.3.6.1.4.1.111.4.1.1.1.23"/>
+    <def name="oraDbSysUserRollbacks" value="1.3.6.1.4.1.111.4.1.1.1.24"/>
+    <def name="oraDbSysWriteRequests" value="1.3.6.1.4.1.111.4.1.1.1.25"/>
+
+    <!-- Oracle Database MIB oraDbTablespaceTable (Enumerate) -->
+    <def name="oraDbTablespaceName" value="1.3.6.1.4.1.111.4.1.2.1.2"/>
+    <def name="oraDbTablespaceSizeAllocated" value="1.3.6.1.4.1.111.4.1.2.1.3"/>
+    <def name="oraDbTablespaceSizeUsed" value="1.3.6.1.4.1.111.4.1.2.1.4"/>
+    <def name="oraDbTablespaceLargestAvailableChunk"
+        value="1.3.6.1.4.1.111.4.1.2.1.6"/>
+    <def name="ORA_TS_IDX"
+         value="M($oraDbTablespaceName,%table-space-name%)"/>
+
+    <!-- Oracle Database MIB oraDbDataFileTable (Enumerate) -->
+    <def name="oraDbDataFileName" value="1.3.6.1.4.1.111.4.1.3.1.2"/>
+    <def name="oraDbDataFileSizeAllocated" value="1.3.6.1.4.1.111.4.1.3.1.3"/>
+    <def name="oraDbDataFileDiskReads" value="1.3.6.1.4.1.111.4.1.3.1.4"/>
+    <def name="oraDbDataFileDiskWrites" value="1.3.6.1.4.1.111.4.1.3.1.5"/>
+    <def name="oraDbDataFileDiskReadBlocks" value="1.3.6.1.4.1.111.4.1.3.1.6"/>
+    <def name="oraDbDataFileDiskWrittenBlocks"
+        value="1.3.6.1.4.1.111.4.1.3.1.7"/>
+    <def name="oraDbDataFileDiskReadTimeTicks"
+        value="1.3.6.1.4.1.111.4.1.3.1.8"/>
+    <def name="oraDbDataFileDiskWriteTimeTicks"
+        value="1.3.6.1.4.1.111.4.1.3.1.9"/>
+    <def name="ORA_DF_IDX"
+         value="M($oraDbDataFileName,%data-file-name%)"/>
+
+    <!-- Oracle Database MIB oraDbLibraryCacheTable (Enumerate) -->
+    <def name="oraDbLibraryCacheNameSpace" value="1.3.6.1.4.1.111.4.1.4.1.2"/>
+    <def name="oraDbLibraryCacheGets" value="1.3.6.1.4.1.111.4.1.4.1.3"/>
+    <def name="oraDbLibraryCacheGetHits" value="1.3.6.1.4.1.111.4.1.4.1.4"/>
+    <def name="oraDbLibraryCachePins" value="1.3.6.1.4.1.111.4.1.4.1.5"/>
+    <def name="oraDbLibraryCachePinHits" value="1.3.6.1.4.1.111.4.1.4.1.6"/>
+    <def name="oraDbLibraryCacheReloads" value="1.3.6.1.4.1.111.4.1.4.1.7"/>
+    <def name="oraDbLibraryCacheInvalidations"
+        value="1.3.6.1.4.1.111.4.1.4.1.8"/>
+    <def name="ORA_LC_IDX"
+         value="M($oraDbLibraryCacheNameSpace,%library-cache-name%)"/>
+
+    <!-- Oracle Database MIB oraDbLibraryCacheSumTable (DB Totals) -->
+    <def name="oraDbLibraryCacheSumGets" value="1.3.6.1.4.1.111.4.1.5.1.1"/>
+    <def name="oraDbLibraryCacheSumGetHits" value="1.3.6.1.4.1.111.4.1.5.1.2"/>
+    <def name="oraDbLibraryCacheSumPins" value="1.3.6.1.4.1.111.4.1.5.1.3"/>
+    <def name="oraDbLibraryCacheSumPinHits" value="1.3.6.1.4.1.111.4.1.5.1.4"/>
+    <def name="oraDbLibraryCacheSumReloads" value="1.3.6.1.4.1.111.4.1.5.1.5"/>
+    <def name="oraDbLibraryCacheSumInvalidations"
+        value="1.3.6.1.4.1.111.4.1.5.1.6"/>
+
+    <!-- Oracle Database MIB oraDbSGATable (DB Totals in K) -->
+    <def name="oraDbSGAFixedSize" value="1.3.6.1.4.1.111.4.1.6.1.1"/>
+    <def name="oraDbSGAVariableSize" value="1.3.6.1.4.1.111.4.1.6.1.2"/>
+    <def name="oraDbSGADatabaseBuffers" value="1.3.6.1.4.1.111.4.1.6.1.3"/>
+    <def name="oraDbSGARedoBuffers" value="1.3.6.1.4.1.111.4.1.6.1.4"/>
+
+
+    <def name="ORA_DB_IDX"
+         value="M($rdbmsDbName,%dbName%)"/>
+  </definitions>
+
+  <datasources>
+    <template name="oracle-database-sys">
+    <!--
+      <leaf name="Block_Changes_Per_Transaction">
+        <param name="data-file"
+            value="%system-id%_%vendor%_%dbNick%_SYS_Ratios.rrd"/>
+        <param name="comment" value="Block Changes Per Transaction"/>
+        <param name="leaf-type" value="rrd-cdef" />
+        <param name="rpn-expr"
+            value="{DbBlock_Changes},{User_Call_Rate},/" />
+        <param name="rrd-ds" value="BlkChangesPerTrans"/>
+        <param name="graph-legend"      value="Block Changes"/>
+      </leaf>
+      -->
+      <subtree name="Sys_Stats">
+        <param name="precedence" value="900"/>
+        <param name="data-file" value="%system-id%_%vendor%_%dbNick%_SYS.rrd"/>
+        <leaf name="Consistent_Changes">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysConsistentChanges.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="ConsistentChanges"/>
+          <param name="comment"           value="ConsistentChanges"/>
+          <param name="graph-legend"      value="ConsistentChanges"/>
+          <param name="vertical-label"    value="ConsistentChanges"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% ConsistentChanges"/>
+        </leaf>
+        <leaf name="Consistent_Gets">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysConsistentGets.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="ConsistentGets"/>
+          <param name="comment"           value="ConsistentGets"/>
+          <param name="graph-legend"      value="ConsistentGets"/>
+          <param name="vertical-label"    value="ConsistentGets"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% ConsistentGets"/>
+        </leaf>
+        <leaf name="DbBlock_Changes">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysDbBlockChanges.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="DbBlockChanges"/>
+          <param name="comment"           value="DbBlockChanges"/>
+          <param name="graph-legend"      value="DbBlockChanges"/>
+          <param name="vertical-label"    value="DbBlockChanges"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% DbBlockChanges"/>
+        </leaf>
+        <leaf name="DbBlock_Gets">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysDbBlockGets.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="DbBlockGets"/>
+          <param name="comment"           value="DbBlockGets"/>
+          <param name="graph-legend"      value="DbBlockGets"/>
+          <param name="vertical-label"    value="DbBlockGets"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% DbBlockGets"/>
+        </leaf>
+        <leaf name="FreeBufferInspected">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysFreeBufferInspected.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="FreeBufferInspected"/>
+          <param name="comment"           value="FreeBufferInspected"/>
+          <param name="graph-legend"      value="FreeBufferInspected"/>
+          <param name="vertical-label"    value="FreeBufferInspected"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% FreeBufferInspected"/>
+        </leaf>
+        <leaf name="FreeBufferRequested">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysFreeBufferRequested.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="FreeBufferRequested"/>
+          <param name="comment"           value="FreeBufferRequested"/>
+          <param name="graph-legend"      value="FreeBufferRequested"/>
+          <param name="vertical-label"    value="FreeBufferRequested"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% FreeBufferRequested"/>
+        </leaf>
+    <!-- Not working in 8.1.7.4.0 
+        <leaf name="ParseCount">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysParseCount.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="ParseCount"/>
+          <param name="comment"           value="ParseCount"/>
+          <param name="graph-legend"      value="ParseCount"/>
+          <param name="vertical-label"    value="ParseCount"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% ParseCount"/>
+        </leaf>
+     -->
+        <leaf name="PhysReads">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysPhysReads.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="PhysReads"/>
+          <param name="comment"           value="PhysReads"/>
+          <param name="graph-legend"      value="PhysReads"/>
+          <param name="vertical-label"    value="PhysReads"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% PhysReads"/>
+        </leaf>
+        <leaf name="PhysWrites">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysPhysWrites.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="PhysWrites"/>
+          <param name="comment"           value="PhysWrites"/>
+          <param name="graph-legend"      value="PhysWrites"/>
+          <param name="vertical-label"    value="PhysWrites"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% PhysWrites"/>
+        </leaf>
+        <leaf name="RedoEntries">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysRedoEntries.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="RedoEntries"/>
+          <param name="comment"           value="RedoEntries"/>
+          <param name="graph-legend"      value="RedoEntries"/>
+          <param name="vertical-label"    value="RedoEntries"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% RedoEntries"/>
+        </leaf>
+        <leaf name="RedoLogSpaceRequests">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysRedoLogSpaceRequests.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="RedoLogSpcaeReq"/>
+          <param name="comment"           value="RedoLogSpaceRequests"/>
+          <param name="graph-legend"      value="RedoLogSpaceRequests"/>
+          <param name="vertical-label"    value="RedoLogSpaceRequests"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% RedoLogSpaceRequests"/>
+        </leaf>
+        <leaf name="RedoSyncWrites">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysRedoSyncWrites.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="RedoSyncWrites"/>
+          <param name="comment"           value="RedoSyncWrites"/>
+          <param name="graph-legend"      value="RedoSyncWrites"/>
+          <param name="vertical-label"    value="RedoSyncWrites"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% RedoSyncWrites"/>
+        </leaf>
+        <leaf name="SortsDisk">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysSortsDisk.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="SortsDisk"/>
+          <param name="comment"           value="SortsDisk"/>
+          <param name="graph-legend"      value="SortsDisk"/>
+          <param name="vertical-label"    value="SortsDisk"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% SortsDisk"/>
+        </leaf>
+        <leaf name="SortsMemory">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysSortsMemory.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="SortsMemory"/>
+          <param name="comment"           value="SortsMemory"/>
+          <param name="graph-legend"      value="SortsMemory"/>
+          <param name="vertical-label"    value="SortsMemory"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% SortsMemory"/>
+        </leaf>
+        <leaf name="SortsRows">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysSortsRows.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="SortsRows"/>
+          <param name="comment"           value="SortsRows"/>
+          <param name="graph-legend"      value="SortsRows"/>
+          <param name="vertical-label"    value="SortsRows"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% SortsRows"/>
+        </leaf>
+        <leaf name="TableFetchRowid">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysTableFetchRowid.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="TableFetchRowid"/>
+          <param name="comment"           value="TableFetchRowid"/>
+          <param name="graph-legend"      value="TableFetchRowid"/>
+          <param name="vertical-label"    value="TableFetchRowid"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% TableFetchRowid"/>
+        </leaf>
+        <leaf name="TableFetchContRow">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysTableFetchContinuedRow.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="TableFetchContRow"/>
+          <param name="comment"           value="TableFetchContinuedRow"/>
+          <param name="graph-legend"      value="TableFetchContinuedRow"/>
+          <param name="vertical-label"    value="TableFetchContinuedRow"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% TableFetchContinuedRow"/>
+        </leaf>
+        <leaf name="TableScanBlocks">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysTableScanBlocks.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="TableScanBlocks"/>
+          <param name="comment"           value="TableScanBlocks"/>
+          <param name="graph-legend"      value="TableScanBlocks"/>
+          <param name="vertical-label"    value="TableScanBlocks"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% TableScanBlocks"/>
+        </leaf>
+        <leaf name="TableScanRows">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysTableScanRows.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="TableScanRows"/>
+          <param name="comment"           value="TableScanRows"/>
+          <param name="graph-legend"      value="TableScanRows"/>
+          <param name="vertical-label"    value="TableScanRows"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% TableScanRows"/>
+        </leaf>
+        <leaf name="TableScansLong">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysTableScansLong.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="TableScansLong"/>
+          <param name="comment"           value="TableScansLong"/>
+          <param name="graph-legend"      value="TableScansLong"/>
+          <param name="vertical-label"    value="TableScansLong"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% TableScansLong"/>
+        </leaf>
+        <leaf name="TableScansShort">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysTableScansShort.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="TableScansShort"/>
+          <param name="comment"           value="TableScansShort"/>
+          <param name="graph-legend"      value="TableScansShort"/>
+          <param name="vertical-label"    value="TableScansShort"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% TableScansShort"/>
+        </leaf>
+        <leaf name="User_Call_Rate">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysUserCalls.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="UserCalls"/>
+          <param name="comment"           value="User Call Rate"/>
+          <param name="graph-legend"      value="User Calls/s"/>
+          <param name="vertical-label"    value="User Calls/s"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% User Calls/s"/>
+        </leaf>
+        <leaf name="UserCommits">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysUserCommits.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="UserCommits"/>
+          <param name="comment"           value="UserCommits"/>
+          <param name="graph-legend"      value="UserCommits"/>
+          <param name="vertical-label"    value="UserCommits"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% UserCommits"/>
+        </leaf>
+        <leaf name="UserRollbacks">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysUserRollbacks.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="UserRollbacks"/>
+          <param name="comment"           value="UserRollbacks"/>
+          <param name="graph-legend"      value="UserRollbacks"/>
+          <param name="vertical-label"    value="UserRollbacks"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% UserRollbacks"/>
+        </leaf>
+        <leaf name="WriteRequests">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbSysWriteRequests.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="WriteRequests"/>
+          <param name="comment"           value="WriteRequests"/>
+          <param name="graph-legend"      value="WriteRequests"/>
+          <param name="vertical-label"    value="WriteRequests"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% WriteRequests"/>
+        </leaf>
+      </subtree>
+    </template>
+    <template name="oracle-cache-sum">
+      <subtree name="Library_Cache_Summary">
+        <param name="precedence" value="800"/>
+        <param name="data-file"
+          value="%system-id%_%vendor%_%dbNick%_CACHESUM.rrd"/>
+        <leaf name="Lib_CacheSumGets">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbLibraryCacheSumGets.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="CacheSumGets"/>
+          <param name="comment"           value="CacheSumGets"/>
+          <param name="graph-legend"      value="CacheSumGets"/>
+          <param name="vertical-label"    value="CacheSumGets"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% CacheSumGets"/>
+        </leaf>
+        <leaf name="Lib_CacheSumGetHits">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbLibraryCacheSumGetHits.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="CacheSumGetHits"/>
+          <param name="comment"           value="CacheSumGetHits"/>
+          <param name="graph-legend"      value="CacheSumGetHits"/>
+          <param name="vertical-label"    value="CacheSumGetHits"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% CacheSumGetHits"/>
+        </leaf>
+        <leaf name="Lib_CacheSumPins">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbLibraryCacheSumPins.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="CacheSumPins"/>
+          <param name="comment"           value="CacheSumPins"/>
+          <param name="graph-legend"      value="CacheSumPins"/>
+          <param name="vertical-label"    value="CacheSumPins"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% CacheSumPins"/>
+        </leaf>
+        <leaf name="Lib_CacheSumPinHits">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbLibraryCacheSumPinHits.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="CacheSumPinHits"/>
+          <param name="comment"           value="CacheSumPinHits"/>
+          <param name="graph-legend"      value="CacheSumPinHits"/>
+          <param name="vertical-label"    value="CacheSumPinHits"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% CacheSumPinHits"/>
+        </leaf>
+        <leaf name="Lib_CacheSumReloads">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbLibraryCacheSumReloads.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="CacheSumReloads"/>
+          <param name="comment"           value="CacheSumReloads"/>
+          <param name="graph-legend"      value="CacheSumReloads"/>
+          <param name="vertical-label"    value="CacheSumReloads"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% CacheSumReloads"/>
+        </leaf>
+        <leaf name="Lib_CacheSumInvalidations">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" value="$oraDbLibraryCacheSumInvalidations.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="CacheSumInvalid"/>
+          <param name="comment"           value="CacheSumInvalidations"/>
+          <param name="graph-legend"      value="CacheSumInvalidations"/>
+          <param name="vertical-label"    value="CacheSumInvalidations"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% CacheSumInvalidations"/>
+        </leaf>
+      </subtree>
+    </template>
+    <template name="oracle-sga">
+      <subtree name="SGA_Stats">
+        <param name="precedence" value="700"/>
+        <param name="data-file" value="%system-id%_%vendor%_%dbNick%_SGA.rrd"/>
+        <leaf name="SGA_FixedSize">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="GAUGE"/>
+          <param name="collector-scale" value="1024,*"/>
+          <param name="snmp-object" value="$oraDbSGAFixedSize.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="FixedSize"/>
+          <param name="comment"           value="SGA Fixed Size"/>
+          <param name="graph-legend"      value="FixedSize"/>
+          <param name="vertical-label"    value="Bytes"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% FixedSize"/>
+        </leaf>
+        <leaf name="SGA_VariableSize">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="GAUGE"/>
+          <param name="collector-scale" value="1024,*"/>
+          <param name="snmp-object" value="$oraDbSGAVariableSize.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="VariableSize"/>
+          <param name="comment"           value="SGA Variable Size"/>
+          <param name="graph-legend"      value="VariableSize"/>
+          <param name="vertical-label"    value="Bytes"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% VariableSize"/>
+        </leaf>
+        <leaf name="SGA_DatabaseBuffers">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="GAUGE"/>
+          <param name="snmp-object" value="$oraDbSGADatabaseBuffers.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="DatabaseBuffers"/>
+          <param name="comment"           value="DatabaseBuffers"/>
+          <param name="graph-legend"      value="DatabaseBuffers"/>
+          <param name="vertical-label"    value="DatabaseBuffers"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% DatabaseBuffers"/>
+        </leaf>
+        <leaf name="SGA_RedoBuffers">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="GAUGE"/>
+          <param name="snmp-object" value="$oraDbSGARedoBuffers.$ORA_DB_IDX"/>
+          <param name="rrd-ds"      value="RedoBuffers"/>
+          <param name="comment"           value="RedoBuffers"/>
+          <param name="graph-legend"      value="RedoBuffers"/>
+          <param name="vertical-label"    value="RedoBuffers"/>
+          <param name="descriptive-nickname"
+              value="%system-id% %dbName% RedoBuffers"/>
+        </leaf>
+      </subtree>
+    </template>
+    <template name="oracle-table-space">
+       <param name="data-file"
+         value="%system-id%_%vendor%_%dbNick%_TS_%table-space-nick%.rrd"/>
+       <leaf name="Size_Allocated">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="GAUGE"/>
+            <param name="collector-scale" value="1024,*"/>
+            <param name="rrd-ds" value="SizeAllocated"/>
+            <param name="snmp-object"
+                value="$oraDbTablespaceSizeAllocated.$ORA_DB_IDX.$ORA_TS_IDX"/>
+            <param name="vertical-label" value="Bytes"/>
+            <param name="graph-legend" value="Allocated"/>
+        </leaf>
+       <leaf name="Size_Used">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="GAUGE"/> 
+            <param name="collector-scale" value="1024,*"/>
+            <param name="rrd-ds" value="SizeUsed"/>
+            <param name="snmp-object"
+                value="$oraDbTablespaceSizeUsed.$ORA_DB_IDX.$ORA_TS_IDX"/>
+            <param name="vertical-label" value="Bytes"/>
+            <param name="graph-legend" value="Used"/>
+        </leaf>
+       <leaf name="Largest_Chunk">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="GAUGE"/> 
+            <param name="collector-scale" value="1024,*"/>
+            <param name="rrd-ds" value="LargestChunk"/>
+            <param name="snmp-object"
+                value="$oraDbTablespaceLargestAvailableChunk.$ORA_DB_IDX.$ORA_TS_IDX"/>
+            <param name="vertical-label" value="Bytes"/>
+            <param name="graph-legend" value="LargestChunk"/>
+        </leaf>
+    </template>
+    <template name="oracle-data-file">
+       <param name="data-file"
+         value="%system-id%_%vendor%_%dbNick%_DF_%data-file-nick%.rrd"/>
+       <leaf name="Size_Allocated">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="GAUGE"/> 
+            <param name="collector-scale" value="1024,*"/>
+            <param name="rrd-ds" value="SizeAllocated"/>
+            <param name="snmp-object"
+                value="$oraDbDataFileSizeAllocated.$ORA_DB_IDX.$ORA_DF_IDX"/>
+            <param name="vertical-label" value="Bytes"/>
+            <param name="graph-legend" value="Allocated"/>
+        </leaf>
+       <leaf name="Disk_Reads">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="COUNTER"/> 
+            <param name="snmp-object"
+                value="$oraDbDataFileDiskReads.$ORA_DB_IDX.$ORA_DF_IDX"/>
+            <param name="rrd-ds" value="DiskReads"/>
+            <param name="vertical-label" value="Reads/s"/>
+            <param name="graph-legend" value="Reads/s"/>
+        </leaf>
+       <leaf name="Disk_Writes">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="COUNTER"/> 
+            <param name="collector-scale" value="%dbBlockSize%,*"/>
+            <param name="snmp-object"
+                value="$oraDbDataFileDiskWrites.$ORA_DB_IDX.$ORA_DF_IDX"/>
+            <param name="rrd-ds" value="DiskWrites"/>
+            <param name="vertical-label" value="Writes/s"/>
+            <param name="graph-legend" value="Writes/s"/>
+        </leaf>
+       <leaf name="Disk_ReadSize">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="COUNTER"/> 
+            <param name="collector-scale" value="%dbBlockSize%,*"/>
+            <param name="snmp-object"
+                value="$oraDbDataFileDiskReadBlocks.$ORA_DB_IDX.$ORA_DF_IDX"/>
+            <param name="rrd-ds" value="DiskReadSize"/>
+            <param name="vertical-label" value="Bytes Read/s"/>
+            <param name="graph-legend" value="Bytes Read/s"/>
+        </leaf>
+       <leaf name="Disk_WriteSize">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="COUNTER"/> 
+            <param name="snmp-object"
+                value="$oraDbDataFileDiskWrittenBlocks.$ORA_DB_IDX.$ORA_DF_IDX"/>
+            <param name="rrd-ds" value="DiskWriteSize"/>
+            <param name="vertical-label" value="Bytes/s"/>
+            <param name="graph-legend" value="Bytes Written"/>
+        </leaf>
+       <leaf name="Disk_ReadTime">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="COUNTER"/> 
+            <param name="collector-scale" value="10,*"/>
+            <param name="snmp-object"
+                value="$oraDbDataFileDiskReadTimeTicks.$ORA_DB_IDX.$ORA_DF_IDX"/>
+            <param name="rrd-ds" value="DiskReadTime"/>
+            <param name="vertical-label" value="ms"/>
+            <param name="graph-legend" value="Read Time/ms"/>
+        </leaf>
+       <leaf name="Disk_WriteTime">
+            <param name="rrd-cf"      value="AVERAGE"/>
+            <param name="rrd-create-dstype" value="COUNTER"/> 
+            <param name="collector-scale" value="10,*"/>
+            <param name="snmp-object"
+                value="$oraDbDataFileDiskWriteTimeTicks.$ORA_DB_IDX.$ORA_DF_IDX"/>
+            <param name="rrd-ds" value="DiskWriteTime"/>
+            <param name="vertical-label" value="ms"/>
+            <param name="graph-legend" value="Write Time/ms"/>
+        </leaf>
+    </template>
+    <template name="oracle-library-cache">
+       <param name="data-file"
+         value="%system-id%_%vendor%_%dbNick%_DF_%library-cache-nick%.rrd"/>
+        <leaf name="Cache_Gets">
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object"
+          value="$oraDbLibraryCacheGets.$ORA_DB_IDX.$ORA_LC_IDX"/>
+          <param name="rrd-ds"      value="CacheGets"/>
+          <param name="comment"           value="Cache Gets/s"/>
+          <param name="graph-legend"      value="Gets/s"/>
+          <param name="vertical-label"    value="Gets/s"/>
+        </leaf>
+        <leaf name="Cache_Get_Hits">
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object"
+          value="$oraDbLibraryCacheGetHits.$ORA_DB_IDX.$ORA_LC_IDX"/>
+          <param name="rrd-ds"      value="CacheGetHits"/>
+          <param name="comment"           value="Cache Get Hits/s"/>
+          <param name="graph-legend"      value="Hits/s"/>
+          <param name="vertical-label"    value="Get Hits/s"/>
+        </leaf>
+        <leaf name="Cache_Pins">
+          <param name="leaf-type"   value="rrd-def"/>
+          <param name="hidden"      value="no"/>
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object"
+          value="$oraDbLibraryCachePins.$ORA_DB_IDX.$ORA_LC_IDX"/>
+          <param name="rrd-ds"      value="CachePins"/>
+          <param name="comment"           value="Cache Pins/s"/>
+          <param name="graph-legend"      value="Pins/s"/>
+          <param name="vertical-label"    value="Cache Pins/s"/>
+        </leaf>
+        <leaf name="Cache_Pin_Hits">
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object"
+          value="$oraDbLibraryCacheSumPinHits.$ORA_DB_IDX.$ORA_LC_IDX"/>
+          <param name="rrd-ds"      value="CachePinHits"/>
+          <param name="comment"           value="Cache Pin Hits/s"/>
+          <param name="graph-legend"      value="Hits/s"/>
+          <param name="vertical-label"    value="Cache Pin Hits/s"/>
+        </leaf>
+        <leaf name="Cache_Reloads">
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object"
+          value="$oraDbLibraryCacheReloads.$ORA_DB_IDX.$ORA_LC_IDX"/>
+          <param name="rrd-ds"      value="CacheReloads"/>
+          <param name="comment"           value="Cache Reloads/s"/>
+          <param name="graph-legend"      value="Reloads/s"/>
+          <param name="vertical-label"    value="Cache Reloads/s"/>
+        </leaf>
+        <leaf name="Cache_Invalidations">
+          <param name="rrd-cf"      value="AVERAGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
+          <param name="snmp-object" 
+            value="$oraDbLibraryCacheInvalidations.$ORA_DB_IDX.$ORA_LC_IDX"/>
+          <param name="rrd-ds"      value="CacheInvalid"/>
+          <param name="comment"           value="Cache Invalidations/s"/>
+          <param name="graph-legend"      value="Invalidations/s"/>
+          <param name="vertical-label"    value="Cache Invalidations/s"/>
+        </leaf>
+    </template>
+  </datasources>
+</configuration>

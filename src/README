@@ -1,0 +1,39 @@
+Round Robin Database Framework
+
+    http://sourceforge.net/projects/torrus
+    http://torrus.sourceforge.net
+
+For installation instructions, see doc/install.txt or convert doc/install.pod
+into a format of your preference.
+
+Upgrade notes for all releases:
+
+  After running "make install", the database and grapher cache should be
+  cleaned manually. After that, XML recompilation is required:
+
+    rm -f /usr/local/torrus-0.0/var/db/*
+    rm -f /usr/local/torrus-0.0/var/cache/*
+    /usr/local/torrus-0.0/bin/compilexml
+
+
+Upgrade notes from previous releases to 0.0.9:
+
+  XML configuration files are changed:
+    datasources-def.xml and views.xml are deleted,
+    and replaced with defaults.xml.
+
+    defaults.xml is the file which is overwritten by "make install".
+    The width-hint and height-hint are automatically calculated
+    during the installation, by means of bin/rrd_getdim and bin/prepviews.
+
+    Thus, when upgrading from previous release,
+    you need to edit your torrus-siteconfig.pl, and manually remove
+    datasources-def.xml and views.xml.
+
+    Also the tokenset default views are moved from monitors.xml
+    into defaults.xml. You need to manually update monitors.xml too.
+
+    
+
+
+(C) 2002, Stanislav Sinyagin <ssinyagin@yahoo.com>

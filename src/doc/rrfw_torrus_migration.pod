@@ -1,0 +1,83 @@
+#  webintf.pod - Torrus web interface reference
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+
+root@vmlab#cd /usr/local/etc/
+apache2           pam.d             torrus            xsltConf.sh
+lynx.cfg          rc.d              wgetrc            
+lynx.cfg.default  snmp              xml2Conf.sh       
+root@vmlab#cd /usr/local/etc/torrus/
+root@vmlab#ls -l 
+total 6
+drwxr-xr-x  2 root  wheel  512 Nov 24 16:24 conf
+drwxr-xr-x  2 root  wheel  512 Nov 24 16:24 discovery
+drwxr-xr-x  2 root  wheel  512 Nov 24 16:24 xmlconfig
+root@vmlab#cd xmlconfig/
+root@vmlab#ls
+site-global.xml
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/site-global.xml .
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/                 
+defaults.xml     monrandom.xml    routers.xml      snmp-defs.xml
+examples         old              site-global.xml  vendor
+generic          random.xml       snapshot.xml     
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/monrandom.xml .
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/random.xml .   
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/xmlconfig/routers.xml .
+root@vmlab#ls -l 
+total 82
+-rw-r--r--  1 root  wheel   1488 Nov 24 16:25 monrandom.xml
+-rw-r--r--  1 root  wheel  72217 Nov 24 16:25 random.xml
+-rw-r--r--  1 root  wheel   4960 Nov 24 16:26 routers.xml
+-rw-r--r--  1 root  wheel    639 Nov 24 16:25 site-global.xml
+root@vmlab#cd ..
+root@vmlab#ls
+conf            discovery       xmlconfig
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/discovery/             
+172.16.16.16.xml           access-1.swissline.ch.ddx
+JTI-SAA.ddx                localhost.ddx
+JTI-routers.xml            usrSureConnect.xml
+README                     vmhost.ddx
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/discovery/* discovery/
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/rrfw-siteconfig.pl conf/
+devdiscover-siteconfig.pl  snmptrap-siteconfig.pl
+email-siteconfig.pl        torrus-siteconfig.pl
+root@vmlab#cp /usr/local/rrfw-0.1/share/rrfw/rrfw-siteconfig.pl conf/torrus-siteconfig.pl
+
+/opt/sources/torrus-1.0.0d/setup_tools/replace_rrfw.sh conf/torrus-siteconfig.pl
+
+root@vmlab#./rrfw-0.1/bin/acledit --export=etc/torrus/acl.xml
+[24-Nov-2004 18:40:41 ] Wrote etc/torrus/acl.xml
+root@vmlab#torrus acledit --import=etc/torrus/acl.xml
+[24-Nov-2004 18:40:56 ] Group added: thegroup
+[24-Nov-2004 18:40:56 ] Privilege DisplayAdmInfo for object * set for group thegroup
+[24-Nov-2004 18:40:56 ] Privilege DisplayTree for object random set for group thegroup
+[24-Nov-2004 18:40:56 ] Privilege DisplayTree for object routers set for group thegroup
+[24-Nov-2004 18:40:56 ] Group added: them
+[24-Nov-2004 18:40:56 ] Privilege DisplayTree for object * set for group them
+[24-Nov-2004 18:40:56 ] User added: test
+[24-Nov-2004 18:40:56 ] Added test to group thegroup
+[24-Nov-2004 18:40:56 ] User added: t2
+[24-Nov-2004 18:40:56 ] Added t2 to group them
+
+=head1 Author
+
+Copyright (c) 2002-2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

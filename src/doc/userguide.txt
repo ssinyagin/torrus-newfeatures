@@ -1,0 +1,672 @@
+Torrus User Guide
+  Quick start guide
+    The steps below will explain you how to make the thing running.
+
+    Install Torrus. Follow the *Torrus Installation Instructions* document, all
+    prerequisits and necessary steps are described there. By default, the
+    software will be installed in /usr/local/torrus-0.1 (as long as the major
+    release version is 0.1). Further in this document, we reference this
+    path as a hypothetical variable $Torrus_HOME.
+
+    What is where. The executables may be surprisingly found in
+    $Torrus_HOME/bin/. All site-specific behaviour is controlled by
+    $Torrus_HOME/share/torrus/torrus-siteconfig.pl. In this file, you must list
+    your XML configuration sources. All the configuration is read out of XML
+    files resided in $Torrus_HOME/share/torrus/xmlconfig/. Site-specific global
+    XML configuration parameters may be defined in
+    $Torrus_HOME/share/torrus/xmlconfig/site-global.xml. XML configuration is
+    compiled into internal database representation by
+    $Torrus_HOME/bin/compilexml. The database itself is resided in
+    $Torrus_HOME/var/db/, and must be writable by your Apache server (normally
+    the installer takes care of it). It is safe to re-compile the
+    configuration while the other daemons are running.
+
+    The datasource trees. Torrus configuration consists of a number of
+    *trees*. Each tree is independent from the others. Each of them may or
+    may not run a separate Collector or Monitor process. Web interface
+    access control lists differentiate the user rights by datasource trees.
+
+    Inside the tree. A tree defines the hierarchy of Torrus datasources. The
+    structure of the tree is solely defined by XML configuration files. The
+    tree consists of *nodes*, each being either a *subtree* or a *leaf*.
+    Subtree contains child subtrees and/or leaves. Leaf represents a
+    datasource: normally this is a numerical value that changes over time.
+    The leaf is the entity that may be presented as a graph. There are
+    leaves of special type: *multigraph*. They are not numerical values, and
+    are designed for drawing several values in one graph. Each node has
+    *path*, a string that consists of slashes and node names, and uniquely
+    identifies this node. The path of a subtree always ends with slash, and
+    the root of the tree has the path consisting of a single slash.
+
+    Trees configuration. The trees are defined in
+    $Torrus_HOME/share/torrus/torrus-siteconfig.pl. See *Torrus Installation
+    Instructions* for a basic example of tree configuration.
+
+    Round-robin databases. Currently only one type of data storage is
+    supported: Round-robin database (RRD) files. See *RRDtool* manuals for
+    more details. Each leaf represents a datasource stored in an RRD file.
+    Of course, several leaves may refer to different datasources within the
+    same RRD file. Even more, more than one leaf may refer to the same
+    datasource within an RRD file. RRD files are created and updated either
+    by "$Torrus_HOME/bin/collector", or by some other external programs.
+
+    Define the targets. If you only want to collect SNMP counters from some
+    network devices' interfaces, there's a copule of tools called
+    "$Torrus_HOME/bin/genddx" and "$Torrus_HOME/bin/devdisover". The first one
+    creates a basic discovery instructions file, and the second one uses the
+    discovery instructions to explore the device capabilities and
+    information: interface names, input/output counters, CPU and memory
+    usage, temperature sensors (Cisco devices).
+
+    Torrus is much more than just an SNMP collector. So, when you decide to
+    use it in a more advanced way, you will have to read the whole bit of
+    this guide, and also *Torrus XML Configuration Guide* and probably some
+    other documents too.
+
+    Build the hierarchy. By default, "genddx" will put all your devices into
+    one hierarchy: "/Routers/<hostname>/...". The subtree name, "Routers",
+    may be changed with a command line option of "genddx". This program may
+    also read the device names (or IP addresses in case if you don't use
+    DNS) from space-delimited text files.
+
+      cd /usr/local/torrus-0.1
+      ./bin/genddx \
+        --hostfile=share/torrus/myrouters.txt \
+        --domain=example.net \
+        --community=MySecretSNMPCommunity \
+        --out=share/torrus/discovery/myrouters.ddx \
+        --discout=share/torrus/xmlconfig/myrouters.xml \
+        --subtree=/My_Routers \
+        --datadir=/data1/snmpcollector
+
+      ./bin/genddx \
+        --hostfile=share/torrus/myswitches.txt \
+        --domain=example.net \
+        --community=MySecretSNMPCommunity \
+        --out=share/torrus/discovery/myswitches.ddx \
+        --discout=share/torrus/xmlconfig/myswitches.xml \
+        --subtree=/My_Switches \
+        --datadir=/data1/snmpcollector
+
+      ./bin/devdiscover  --in=share/torrus/discovery/myrouters.ddx
+
+      ./bin/devdiscover  --in=share/torrus/discovery/myswitches.ddx
+
+    In the example above, the routers' and switches' names are read from
+    myrouters.txt and myswitches.txt. They form a hierarchy with two
+    subtrees: "/My_Routers/" and "/My_Switches/". "genddx" creates the
+    discovery instruction XML files into myrouters.ddx and myswitches.ddx
+    accordingly. The result of "devdiscover" is the Torrus configuration
+    files: myrouters.xml and myswitches.xml. The "collector" will place the
+    RRD files into /data1/snmpcollector. Make sure that this directory
+    exists and has enough free space.
+
+    Add your XML files to the tree configuration. Next step would be to add
+    myrouters.xml and myswitches.xml into "xmlfiles" array in the tree
+    configuration in your $Torrus_HOME/share/torrus/torrus-siteconfig.pl.
+
+    See *Torrus SNMP Discovery User Guide* for more details on how "genddx"
+    and "devdisover" interact and how you can customize the discovery
+    process.
+
+    Tip: in most cases, your hierarchy division will be different. This
+    might be arranged by geographical locations, or by customer names. There
+    is a configuration statement that allows you to include other XML files
+    into configuration, thus giving you a big flexibility in building the
+    data hierarchies.
+
+    Compile the configuration. Now that your configuration is ready, you
+    need to execute the compiler:
+
+      ./bin/compilexml --tree=treename --verbose
+
+    For most of the processes that you run within Torrus, you need to specify
+    the tree name with "--tree" option. Some prorams accept "--all" option,
+    which causes them to pocess all existing trees. With "--verbose" option,
+    the compiler tells you about the files being processed, and about some
+    other actions that may take quite a long time. It will also tell you if
+    there's any error in your configuration.
+
+    Launch the collector. Assuming that compilation went smoothly, you may
+    now launch the data collector:
+
+      ./bin/collector --tree=treename
+
+    Without additional options, the collector will fork as a daemon process,
+    and write only error messages in its log file,
+    $Torrus_HOME/var/log/collector.treename.log.
+
+    There is a file that is created by "make install", init.torrus. You may
+    place it into a directory where your system looks for startup scripts
+    (/etc/init.d/ on Solaris and some Linuxes, /usr/local/etc/rc.d/ on
+    FreeBSD). Most probably, you need to rename and edit the script before
+    using. Note that it also executes another daemon, "monitor". You will
+    read later about it in more details.
+
+    Define the ACLs. By default, user authentication is enabled in the web
+    interface. You can change this by setting
+    "$Torrus::ApacheHandler::authorizeUsers = 0" in your torrus-siteconfig.pl.
+    In order to get use of user authentication, you need to create *groups*
+    and *user* accounts. Each user belongs to one or more groups, and each
+    group has access to a set of datasource trees. See *Torrus Installation
+    Instructions* for a basic example.
+
+    Browse with your browser. Provided that you followed the installation
+    guide to the end, and your HTTP server is running, your Torrus hierarchy
+    must be visible with your favorite web browser.
+
+  Configuration guidelines
+    In complete detail, the XML configuration is described in *Torrus XML
+    Configuration Guide*. The guidelines below will help you to read that
+    document.
+
+    Tree structure. The tree structure is defined by the structure of
+    "<subtree>" and "<leaf>" XML elements. The rule is simple: chid XML
+    elements of a "<subtree>" element define the child nodes in the
+    configuration tree.
+
+    Parameters. Each node has a number of parameters. They are defined by
+    "<param>" XML element. Parameters are inherited: the child node has all
+    its parent's parameters, some of which may be overridden.
+
+    Additive configuration. The whole XML configuration is additive. It
+    means that you may define your subtree several times across your XML
+    configuration, and the new parameters and child nodes will be added to
+    previously defined ones.
+
+    Templates. Some pieces of configuration may be written as templates, and
+    then re-used in multiple places.
+
+  Tips and tricks
+   Comments, descriptions, and legends
+    "devdiscover" will extract some useful information from your SNMP
+    devices, and place it in the XML configuration:
+
+    * Interface descriptions
+        The value of the SNMP variable "ifAlias" (1.3.6.1.2.1.31.1.1.1.18)
+        will be used as interface comment. In Cisco IOS, this is controlled
+        by "description" interface configuration command.
+
+    * Location and contact
+        Two other SNMP values: "sysLocation" (1.3.6.1.2.1.1.6.0) and
+        "sysContact" (1.3.6.1.2.1.1.4.0) will be used in the legend text for
+        each device. In Cisco IOS, their values are controlled by
+        "snmp-server location" and "snmp-server contact" global
+        configuration commands.
+
+   Grouping the datasources alternatively
+    In most cases, you would want to have several different groupings of
+    your datasources.
+
+    For instance, the default "devdiscover" gives only one level of freedom:
+    the subtree name above the host level. It's reasonable to use this name
+    for grouping by geographical location . Thus, the hierarchy would be
+    characterised as "/[location]/[hostname]/[interface]/[counter]".
+
+    Let's say you would like to have alternative grouping, such as:
+
+    * by customer connection:
+        Each customer is identified by name, and you'd like to see
+        statistics for all interfaces connected to a given customer;
+
+    * by service:
+        Your network is designed to provide various services, and you'd like
+        to group your devices or interfaces by service;
+
+    * by customer and location:
+        For each customer, group the connection by geographical location.
+
+    Torrus provides three different ways for organising your datasources:
+
+    * Aliases.
+        With "<alias>" statement, you can add symbolic names to your nodes.
+        If the new alias is defined as a reference to non-existing subtree,
+        the new subtrees are created. Alias is only a symbolic link: when
+        you click to the alias name in your browser, Torrus redirects it to
+        the real datasource in its normal subtree.
+
+    * ds-type=rrd-file
+        You can create a leaf in some arbitrary place of your hierarchy that
+        points to an existing RRD file. This RRD file may be updated by
+        other datasource in your hierarchy. The advantage of such approach
+        is that this leaf may have its own *legend* and *comment*
+        parameters, alternative view parameters, etc.
+
+            <leaf name="FoobarIn">
+              <param name="ds-type"           value="rrd-file" />
+              <param name="leaf-type"         value="rrd-def" />
+              <param name="data-file"         value="rtr01_Fa0_1.rrd" />
+              <param name="rrd-cf"            value="AVERAGE" />
+              <param name="rrd-ds"            value="locIfInBitsSec" />
+              <param name="comment"
+                     value="Foobar input traffic"/>
+              <param name="graph-legend"      value="Bits in" />
+              <param name="legend">
+                 Switch name: rtr01; Interface: Fa0/1;
+              </param>
+            </leaf>
+
+        In the example above, this leaf is defined somewhere in the
+        hierarchy. It refers to the RRD file updated by Torrus SNMP collector.
+        For more examples, see the template *read-cisco-interface-counters*
+        in vendor/cisco.ios.xml.
+
+    * Tokensets
+        Tokenset is an arbitrary collection of datasource leaves. It is
+        characterised by its name and description. There are two ways to add
+        a leaf to a tokenset: by the parameter *tokenset-member*, or by
+        defining a monitor action. A tokenset is normally displayed in
+        compact form: by default, 6-hour graphs are put by two in a row.
+
+   Amending autogenerated XML files with XUpdate
+    Sometimes there is a need to modify the configuration generated by
+    "devdiscover". Modifying the generated XML files by hand would not be a
+    good option: it would need some manual work every time you update your
+    hardware setup. A better approach would be to have the tools that would
+    automate such configuration update.
+
+    One of the possibilities for such automation would be XSLT
+    <http://www.w3.org/TR/xslt>. But it's rather complicated task to use
+    XSLT for slight changes in XML files.
+
+    A good approach has been made by XUpdate Working Group
+    <http://www.xmldb.org/xupdate/>. Their Working Draft document describes
+    a language for XML editing commands. It allows to perform small updates
+    to an existing XML document, like insertion of elements, updating of
+    existing elements, or deleting. The only drawback is that the
+    specification hasn't been updated since September 2000, and it contains
+    some unclear statements, which make it difficult to implement compatible
+    applications. In addition, there has been not enough efforts to adopt
+    XUpdate as a W3C standard. However, this is the only kind-of-a-standard
+    language for such tasks as XML editing commands.
+
+    Thanks to Petr Pajas, there is an XUpdate implementaytion in Perl.
+    "XML::XUpdate::LibXML" module is available at CPAN, and it installs a
+    small commandline utility, "xupdate". In addition, Petr has created a
+    set of utilities integrated into a single shell wrapper:
+    <http://xsh.sourceforge.net>. It is very useful for many different
+    things, such as XPath expressions testing, and many others.
+
+    A typical XUpdate instructions file would looke like follows:
+
+     <?xml version="1.0"?>
+     <xupdate:modifications version="1.0"
+                            xmlns:xupdate="http://www.xmldb.org/xupdate">
+
+     <!-- Insert additional creator-info after the last one -->
+     <xupdate:insert-after
+       select="/configuration/creator-info[not(following-sibling::creator-info)]">
+       <creator-info>
+         This file was modified with XUpdate script setmonitor.xupdate.xml
+       </creator-info>
+     </xupdate:insert-after>
+
+     <!-- For every ifError leaf, set the monitor -->
+     <xupdate:append select="//subtree[apply-template[@name='iftable-errors']]">
+       <xupdate:element name="subtree">
+        <xupdate:attribute name="name">ifErrors</xupdate:attribute>
+         <param name="monitor" value="check-iferrors"/>
+       </xupdate:element>
+     </xupdate:append>
+
+     </xupdate:modifications>
+
+    This example is part of Torrus distribution, and the file is named
+    examples/setmonitor.xupdate.xml. Your commands to apply these XUpdate
+    instructions would be like
+
+      ./bin/devdiscover \
+         --in=share/torrus/discovery/routers.ddx \
+         --out=share/torrus/xmlconfig/routers.xml
+
+      xupdate -j share/torrus/examples/xupdate/setmonitor.xup \
+        share/torrus/xmlconfig/routers.xml > share/torrus/xmlconfig/routers1.xml
+
+    More XUpdate examples will be included in the future.
+
+   Extracting the configuration skeleton
+    Another aproach to amending the autogenerated confguration is as
+    follows.
+
+    Torrus distribution has a special-purpose XSLT template,
+    extract-skeleton.xsl, designed to strip all parameters and template
+    applications from a given XML configuration, and leave the tree
+    structure only. Given that share/torrus/xmlconfig/routers.xml is some
+    autogenerated configuration, you may run
+
+      xsltproc share/torrus/sup/extract-skeleton.xsl \
+        share/torrus/xmlconfig/routers.xml  | \
+      xmllint --format --output routers-skeleton.xml -
+
+    You can add your changes to the new file, routers-skeleton.xml, and add
+    it to your Torrus configuration. These changes may be performed manually
+    or by means of XUpdate technique described above.
+
+   Automating XML generation
+    It is quite common task that you want Torrus to monitor certain set of
+    devices, and "devdiscover" does not (yet) support them. Of course, it's
+    quite a pain to maintain a manually written XML file, especially if the
+    number of homogenious devices is more than one.
+
+    In such case you may benefit from the approach suggested by Christian
+    Schnidrig:
+
+    Imagine you have 50 *gizmos* which are able to speak SNMP and which you
+    would like to put into some Torrus tree structure. A good designer's
+    approach would be to keep the data and the presentation separately. In
+    addition, changing the presentation once would produce 50 changes
+    accordingly. To do that, let's create two files: gizmos.data and
+    gizmos.tmpl. The first one would contain data about our devices:
+
+        [%
+          gizmos = [
+            {
+              name => 'atwork'
+              color => 'blue',
+              location => 'Javastrasse 2, 8604 Hegnau'
+              description => 'My gizmo @ Sun'
+              community => 'blabla',
+              hands => [
+                  {name => 'Left'}
+                  {name => 'Right'}
+                ],
+            }
+            {
+              name => 'athome'
+              color => 'gray',
+              location => 'Riedstrasse 120, 8604 Hegnau'
+              description => 'My gizmo @ Home'
+              community => 'blabla',
+              hands => [
+                  {name => 'Upper'}
+                  {name => 'Lower'}
+                ],
+            }
+          ]
+
+        %]
+
+    Then gizmos.tmpl would contain the XML template that would produce the
+    TorrusQ configuration file:
+
+        [% PROCESS $data %]
+        <?xml version="1.0"?>
+        <configuration>
+          <datasources>
+            <subtree name="SNMP">
+              <subtree name="Gizmos">
+              [% FOREACH g = gizmos %]
+              <!-- ******************************************************* -->
+              <!-- [% g.name %] -->
+              <subtree name="[% g.color %]">
+                  <alias>/ByName/[% g.name %]/</alias>
+
+                  <param name="snmp-community"  value="[% g.community %]" />
+                  <param name="comment"         value="[% g.description %]" />
+                  <param name="snmp-host"       value="[% g.name %]" />
+                  <param name="legend">
+                    Description: [% g.description %]
+                    Location:    [% g.location %]
+                  </param>
+
+                  [% FOREACH h=$g.hands %]
+                  <leaf name="[% h.name %]Hand">
+                    <!-- do something, my fantasy exhausted here -->
+                  </leaf>
+              </subtree>
+              [% END %]
+            </subtree>
+          </subtree>
+        </datasources>
+        </configuration>
+
+    See xmlconfig/examples/servers.data and xmlconfig/examples/servers.tmpl
+    for a more useful example of the described approach.
+
+    At the end, you will generate the Torrus config with the "tpage" utility,
+    which is the standard part of Template-Toolkit package:
+
+      tpage --define data=gizmos.data gizmos.tmpl > gizmos.xml
+
+   Several Torrus instances on one server
+    Sometimes it is necessary to have a separate instance of Torrus for
+    testing purposes on the same server as the production installation. In
+    the example below, a completely autonomous installation of Torrus is
+    installed in /usr/testtorrus directory on a FreeBSD system.
+
+    * Directory structure
+        All files are located in subdirectories of /usr/testtorrus. No other
+        directories are affected. This ensures that deinstallation would be
+        easy and safe.
+
+        Four subdirectories are created:
+
+        * /usr/testtorrus/apache
+                This directory contains Apache HTTP daemon configuration and
+                logs. Create 3 subdirectories here: etc, htdocs, and var.
+
+        * /usr/testtorrus/home
+                This is the installation directory of Torrus. All other
+                manuals refer it as $Torrus_HOME.
+
+        * /usr/testtorrus/snmpcollector
+                Collector will store RRD files here.
+
+        * /usr/testtorrus/src
+                Distribution files will be stored and unpacked here.
+
+    * Installation procedure
+          cd /usr/testtorrus/src
+          gzip -dc torrus-0.1.5.tar.gz | tar xvf -
+          cd torrus-0.1.5
+          ./configure --prefix=/usr/testtorrus/home
+          make install
+
+    * Devdiscover configuration
+        Use devdiscover as usual. Place your discovery instruction files in
+        /usr/testtorrus/home/share/torrus/discovery/, and make sure that the
+        "output-file" points inside
+        /usr/testtorrus/home/share/torrus/xmlconfig/, and "data-dir" is set to
+        /usr/testtorrus/snmpcollector.
+
+    * Apache configuration
+        We reuse the same binaries and libraries as the main installation of
+        Apache, but the daemon is launched with our special configuration.
+        We assume that Apache is pre-configured for mod_perl. SSL support is
+        not included in this example, but it's quite straightforward to
+        implement if you need it.
+
+        Create a copy of httpd.conf and place it in
+        /usr/testtorrus/apache/etc. With a text editor, replace the
+        configutration options with the values given below:
+
+          # Leave server root as it was in the original config. Apache uses
+          # it for modules loading
+          ServerRoot "/usr/local"
+
+          # make sure that everything that apache writes
+          # goes into our directories
+          PidFile /usr/testtorrus/apache/var/httpd.pid
+          ScoreBoardFile /usr/testtorrus/apache/var/httpd.scoreboard
+
+          # Optional: limit the memory and CPU impact
+          MinSpareServers 2
+          MaxSpareServers 5
+          StartServers 3
+          MaxClients 10
+
+          # We open our HTTP service on TCP port 8123. Choose other
+          # port if this one is occupied
+          Port 8123
+
+          # Not really necessary, but you might want to use it someday
+          DocumentRoot "/usr/testtorrus/apache/htdocs"
+
+          # Find the Directory options for the old htdocs, and
+          # replace the path if you changed DocumentRoot above
+          <Directory "/usr/testtorrus/apache/htdocs">
+          ... some default stuff here ...
+          </Directory>
+
+          # Make sure the logs are written where we expect them to.
+          ErrorLog /usr/testtorrus/apache/var/httpd-error.log
+          CustomLog /usr/testtorrus/apache/var/httpd-access.log combined
+
+          # TCP port number as above
+          NameVirtualHost *:8123
+
+          # Quite standard virtual server configuration. Replace fake
+          # domain names with your real ones.
+          <VirtualHost *:8123>
+            ServerAdmin root@myserver.com
+            DocumentRoot /usr/testtorrus/home/web
+            ServerName torrus.myserver.com
+            CustomLog /usr/testtorrus/apache/var/torrus.myserver.com.log "combined"
+            PerlModule Apache::PerlRun
+            PerlRequire "/usr/testtorrus/home/share/torrus/webmux.pl"
+            <Location />
+              SetHandler perl-script
+              PerlHandler Torrus::ApacheHandler
+            </Location>
+            <Location /plain/>
+              SetHandler default-handler
+              Options None
+            </Location>
+          </VirtualHost>
+
+    * Apache startup script
+        Save the following script as /usr/testtorrus/apache/testtorrus.sh:
+
+          #!/bin/sh
+          case "$1" in
+          start)
+            /usr/local/sbin/httpd -f /usr/testtorrus/apache/etc/httpd.conf && \
+            echo 'apache started'
+            ;;
+          stop)
+            [ -r  /usr/testtorrus/apache/var/httpd.pid  ] && \
+            kill `cat /usr/testtorrus/apache/var/httpd.pid` && \
+            echo 'apache stopped'
+            ;;
+          *)
+            echo "Usage: `basename $0` {start|stop}" >&2
+            ;;
+          esac
+          exit 0
+
+   Changing the default short graph
+    The default small graph in overviews and tokenset listings shows last 6
+    hours of data. It might be more convenient for you to graph last 24
+    hours, or even longer. To do so, you only need to change one parameter,
+    "rrgraph-views". You may change it on the top of the datasource tree, or
+    even only for some parts of the tree.
+
+    In defaults.xml, there's a view defiition called "last24h-small". It is
+    exactly the same size as the 6-hours' "short" view, but it shows 24-hour
+    graph. Somewhere in Torrus configuration, you may have:
+
+      <datasources>
+        <param name="rrgraph-views">
+          last24h-small,last24h,lastweek,lastmonth,lastyear
+        </param>
+      </datasources>
+
+    The best place for this would be
+    $Torrus_HOME/share/torrus/xmlconfig/site-global.xml.
+
+   Watching the collector failures
+    There is a script in Torrus distribution in examples/rrdup_notify.sh,
+    which provides a simple way of telling if the collector runs right: it
+    checks the modification time of RRD files, and if any file is older than
+    given threshold, it sends an e-mail warning.
+
+    Copy the script file to some place in your system and edit it so that it
+    fits your requirements: you might want to change the maximum age
+    parameter (default is 1 hour), the notification e-mail address, and the
+    directory paths where to look for RRD files. Then *chmod* it so that
+    it's executable, and add it to *crontab*. Depending on your operation
+    requirements, it might run every hour, or few times a day, or even at
+    business hours only.
+
+    The script writes the number of aged files in the e-mail subject, and
+    lists the file names in the body. In case of relatively large
+    installation, you might want to amend the script, in order to avoid too
+    large email messages.
+
+  Torrus usage scenarios
+   Scenario 1. Netflow Traffic Analyser
+    Cisco routers are capable of exporting the traffic statistics data in
+    *Netflow* UDP packets.
+
+    A *cflowd* or *flow-tools* daemon collects Netflow packets into flow
+    files.
+
+    *FlowScan* software analyses the flow files and stores the statistics
+    into numerous RRD files.
+
+    Torrus is used to monitor the thresholds and diplay the graphs in
+    convenient form.
+
+   Scenario 2. Backbone Traffic Statistics
+    *CiscoWorks2000* or *NMSTOOLS* software is used to provide the list of
+    all devices in the network.
+
+    Torrus's "devdiscover" buids the XML configuration to monitor the router
+    interfaces, CPU and memory usage, and temperature sensors.
+
+    Data importing scripts generate configuration for alternative grouping
+    of the datasources: by location; by customer connection; by device type;
+    by service type; etc...
+
+  Troubleshooting guidelines
+   SNMP Error: Received tooBig(1)
+    For some devices, the collector may issue the following error messages:
+
+     [27-May-2004 10:15:17*] SNMP Error for XX.XX.XX.XX:161:public: Received 
+     tooBig(1) error-status at error-index 0
+
+    For better performance, SNMP collector sends several SNMP requests in
+    one UDP datagram. The SNMP agent then tries to send the reply to all
+    requests in a single datagram, and this error indicates the failure. In
+    most cases, this is caused by the agent software limitations or bugs.
+
+    The number of requests per datagram is controlled by the parameter
+    "snmp-oids-per-pdu", and it may be set in the discovery input XML or in
+    Torrus configuration XML. The default value is 40, and setting it to 10
+    generally works.
+
+   Database lock troubleshooting
+    It may happen sometimes, that a process accessing Torrus database
+    terminates incorrectly, and the database becomes blocked. A typical
+    symptom of this is that the command "./bin/compilexml --all --verbose"
+    does not print anything and stays running forever, occupying zero
+    percent of CPU.
+
+    The nice, and the preferred way to solve the problem is to use
+    "db_recover" utility from BerkeleyDB package. The brutal way is just to
+    remove the databases and re-compile all the configuration. *Note:* The
+    ACL database is not automatically backed up, and you need to take care
+    of its backup before deleting the contents of the database.
+
+      ## The nice way uses BerkeleyDB db_recover
+      ## (might be located in /usr/local/BerkeleyDB.4.1/bin/)
+      /etc/init.d/apache stop
+      /etc/init.d/torrus stop
+      cd /usr/local/torrus-0.1
+      db_recover -h var/db/
+      ./bin/compilexml --verbose --all
+      /etc/init.d/torrus start
+      /etc/init.d/apache start
+
+      ## The brutal way
+      /etc/init.d/apache stop
+      /etc/init.d/torrus stop
+      cd /usr/local/torrus-0.1
+      rm -r var/db/*
+      ./bin/compilexml --verbose
+      /etc/init.d/torrus start
+      /etc/init.d/apache start
+
+Author
+    Copyright (c) 2002-2003 Stanislav Sinyagin <ssinyagin@yahoo.com>
+

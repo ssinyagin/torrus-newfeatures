@@ -1,0 +1,163 @@
+#!@PERL@
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+BEGIN { require '@torrus_config_pl@'; }
+
+use strict;
+use Proc::Daemon;
+use Getopt::Long;
+
+use Torrus::Log;
+use Torrus::ConfigTree;
+use Torrus::Collector;
+use Torrus::SiteConfig;
+
+exit(1) if not Torrus::SiteConfig::verify();
+
+our $tree;
+our $nodaemon;
+our $runonce;
+our $debug;
+our $verbose;
+our $help_needed;
+
+# Derive the process name from the command line
+our $process_name = $0;
+$process_name =~ s/^.*\/([^\/]+)$/$1/;
+$process_name .= ' ' . join(' ', @ARGV);
+                            
+my $ok = GetOptions ('tree=s'   => \$tree,
+                     'nodaemon' => \$nodaemon,
+                     'runonce'  => \$runonce,
+                     'debug'    => \$debug,
+                     'verbose'  => \$verbose,
+                     'help'     => \$help_needed);
+
+if( not $ok or not $tree or $help_needed or scalar(@ARGV) > 0 )
+{
+    print STDERR "Usage: $0 --tree=NAME [options...]\n",
+    "Options:\n",
+    "  --tree=NAME     tree name\n",
+    "  --nodaemon      do not fork daemon and log to STDERR\n",
+    "  --runonce       run one time and exit. Implies --nodaemon\n",
+    "  --debug         set the log level to debug\n",
+    "  --verbose       set the log level to info\n",
+    "  --help          this help message\n";
+    exit 1;
+}
+
+if( not Torrus::SiteConfig::mayRunCollector( $tree ) )
+{
+    Error('Tree ' . $tree . ' is not configured to run collector');
+    exit 1;
+}
+
+if( $debug )
+{
+    Torrus::Log::setLevel('debug');
+}
+elsif( $verbose )
+{
+    Torrus::Log::setLevel('verbose');
+}
+
+my $logfile = $Torrus::Global::logDir . '/collector.' . $tree . '.log';
+my $pidfile = $Torrus::Global::pidDir . '/collector.' . $tree . '.pid';
+
+my $rotateLogs = sub
+{
+    Info('Caught SIGHUP. Reopening log file');
+    close( STDERR );
+    open( STDERR, ">>$logfile" );
+};
+
+# This will ensure that all databases get closed correctly
+$SIG{'TERM'} = sub
+{
+    Warn('Collector process terminated');
+    unlink $pidfile;
+    exit 1;
+};
+
+$SIG{'INT'} = sub
+{
+    Warn('Collector process interrupted');
+    exit 1;
+};
+
+if( not $nodaemon and not $runonce )
+{
+    if( -r $pidfile )
+    {
+        Error("Another collector daemon is running, pid=",
+              `cat $pidfile`);
+        exit 1;
+    }
+
+    &Proc::Daemon::Init();
+    umask 0017; # Proc::Daemon::Init sets the mask to all-writable
+    
+    $SIG{'HUP'} = $rotateLogs;
+
+    # At this point, we cannot tell anyone if "open" fails
+    open(STDERR, ">>$logfile");
+
+    if( open( PID, ">$pidfile" ) )
+    {
+        printf PID ( "%d", $$ );
+        close PID;
+    }
+    else
+    {
+        Error("Cannot open $pidfile for writing: $!");
+    }
+}
+
+Info(sprintf("Torrus version %s", '@VERSION@'));
+Info(sprintf("%s started for tree %s", $0, $tree));
+Debug(sprintf("Process ID %d", $$));
+
+my %options =
+    (
+     '-ProcessName' => $process_name,
+     '-Tree'      => $tree
+     );
+if( $runonce )
+{
+    $options{'-RunOnce'} = 1;
+}
+
+my $scheduler = new Torrus::CollectorScheduler( %options );
+$scheduler->run();
+
+if( not $options{'-RunOnce'} )
+{
+    Error("Collector process exited: nothing to collect");
+    unlink $pidfile;
+}
+
+exit;
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:

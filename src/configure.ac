@@ -1,0 +1,265 @@
+#  Copyright (C) 2002-2003  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+
+
+AC_INIT([torrus],[1.0.0d],[ssinyagin@users.sourceforge.net])
+AC_CONFIG_AUX_DIR(conftools)
+AC_CANONICAL_HOST
+AM_INIT_AUTOMAKE(1.6)
+
+AC_PATH_PROG(PERL, perl, no)
+
+# Need this for init.torrus
+AC_PATH_PROG(SU, su, no)
+AC_PATH_PROG(KILL, kill, no)
+AC_PATH_PROG(SED, sed, no)
+AC_PATH_PROG(FIND, find, no)
+AC_PATH_PROG(RM, rm, no)
+AC_PATH_PROG(SLEEP, sleep, no)
+
+# This will generate man pages from POD
+AC_PATH_PROG(POD2MAN, pod2man, no)
+AM_CONDITIONAL([POD2MAN_PRESENT], [test "$POD2MAN" != no])
+
+
+AC_ARG_ENABLE(modcheck,
+        [AC_HELP_STRING(--disable-modcheck,Disable Perl modules checking)],
+        [],
+        [enable_modcheck="yes"])
+
+perllibdirs="\'\${perllibdir}\'"
+
+find_rrdtool () {
+    if ${PERL} -e 'use RRDs' 2>/dev/null; then :; else
+        if test $enable_modcheck = yes; then
+            AC_MSG_NOTICE([RRDs.pm is not in default Perl search paths.])
+            AC_MSG_CHECKING([RRDtool in /usr/local/rrdtool*])
+            with_rrdtool=`ls -1dr /usr/local/rrdtool* | head -1`
+            if test -d $with_rrdtool; then
+               AC_MSG_RESULT([${with_rrdtool}])
+            else
+               AC_MSG_ERROR([Cannot find RRDtool])
+            fi
+            test_rrdtool
+        else
+            with_rrdtool="/usr/local/rrdtool"
+        fi
+    fi
+}
+
+test_rrdtool () {
+    if test $enable_modcheck = yes; then
+        if test ! -r ${with_rrdtool}/lib/perl/RRDs.pm; then
+            AC_MSG_ERROR([There is no lib/perl/RRDs.pm in ${with_rrdtool}])
+        fi
+    fi
+    perllibdirs=${perllibdirs}"\,\'"${with_rrdtool}"/lib/perl/\'"
+}
+
+AC_ARG_WITH(rrdtool,
+        [AC_HELP_STRING(--with-rrdtool=DIR,RRDTool location)],
+        test_rrdtool, find_rrdtool)
+
+AC_SUBST(perllibdirs, [${perllibdirs}])
+
+
+# Check the necessary Perl modules
+
+if test $enable_modcheck = yes; then
+
+   for module in 'BerkeleyDB' 'XML::LibXML' 'Template' \
+                 'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session'
+   do
+     AC_MSG_CHECKING([presence of $module])
+     if ${PERL} -e 'use '$module 2>/dev/null; then
+         AC_MSG_RESULT([Ok])
+     else
+         AC_MSG_ERROR([Perl cannot find $module]);
+     fi
+   done
+fi
+
+AC_ARG_VAR(torrus_user,  [[torrus] UID to run the daemons])
+if test -z "$torrus_user"; then
+   torrus_user=torrus; fi
+
+# Set the var/db and var/cache ownership
+
+AC_ARG_VAR(var_user,  [[TORRUS_USER] Owner of db and cache directories])
+AC_ARG_VAR(var_group, [[torrus] Group of db and cache directories])
+AC_ARG_VAR(var_mode,  [[775] Mode of db and cache directories])
+
+AC_ARG_ENABLE(varperm,
+        [AC_HELP_STRING(--disable-varperm,
+        Disable db and cache access rights tuning)],
+        [],
+        [enable_varperm="yes"])
+AC_SUBST(enable_varperm)
+
+
+AC_ARG_VAR(pkghome,   [[PREFIX/torrus] Place for Torrus static files])
+if test -z "$pkghome"; then
+   pkghome='${prefix}/torrus'; fi
+
+AC_ARG_VAR(pkgbindir,   [[PKGHOME/bin] Torrus executables])
+if test -z "$pkgbindir"; then
+   pkgbindir='${pkghome}/bin'; fi
+
+AC_ARG_VAR(cfgdefdir,   [[PKGHOME/conf_defaults] torrus-config.pl and others])
+if test -z "$cfgdefdir"; then
+   cfgdefdir='${pkghome}/conf_defaults'; fi
+
+AC_ARG_VAR(docdir, [[PKGHOME/doc] Documentation files])
+if test -z "$docdir"; then
+   docdir='${pkghome}/doc'; fi
+
+AC_ARG_VAR(exmpdir, [[PKGHOME/examples] Examples])
+if test -z "$exmpdir"; then
+   exmpdir='${pkghome}/examples'; fi
+
+AC_ARG_VAR(perllibdir,  [[PKGHOME/perllib] Torrus Perl libraries])
+if test -z "$perllibdir"; then
+   perllibdir='${pkghome}/perllib'; fi
+
+AC_ARG_VAR(scriptsdir, [[PKGHOME/scripts] Script files])
+if test -z "$scriptsdir"; then
+   scriptsdir='${pkghome}/scripts'; fi
+
+AC_ARG_VAR(supdir, [[PKGHOME/sup] Supplementary files])
+if test -z "$supdir"; then
+   supdir='${pkghome}/sup'; fi
+
+AC_ARG_VAR(webplaindir, [[SUPDIR/webplain] Web interface plain files path])
+if test -z "$webplaindir"; then
+   webplaindir='${supdir}/webplain'; fi
+
+AC_ARG_VAR(tmpldir, [[PKGHOME/templates] Template files])
+if test -z "$tmpldir"; then
+   tmpldir='${pkghome}/templates'; fi
+
+AC_ARG_VAR(distxmldir, [[PKGHOME/xmlconfig] Distribution XML config files])
+if test -z "$distxmldir"; then
+   distxmldir='${pkghome}/xmlconfig'; fi
+
+AC_ARG_VAR(sitedir, [[SYSCONFDIR/torrus] Site configuration files])
+if test -z "$sitedir"; then
+   sitedir='${sysconfdir}/torrus'; fi
+
+AC_ARG_VAR(siteconfdir, [[SITEDIR/conf] Site configuration files])
+if test -z "$siteconfdir"; then
+   siteconfdir='${sitedir}/conf'; fi
+
+AC_ARG_VAR(sitexmldir, [[SITEDIR/xmlconfig] Site XML configs])
+if test -z "$sitexmldir"; then
+   sitexmldir='${sitedir}/xmlconfig'; fi
+
+AC_ARG_VAR(logdir, [[/var/log/torrus] Log files])
+if test -z "$logdir"; then
+   logdir='/var/log/torrus'; fi
+
+AC_ARG_VAR(piddir, [[/var/run/torrus] PID files])
+if test -z "$piddir"; then
+   piddir='/var/run/torrus'; fi
+
+AC_ARG_VAR(varprefix, [[/var/torrus] Common prefix for runtime data])
+if test -z "$varprefix"; then
+   varprefix='/var/torrus'; fi
+   
+AC_ARG_VAR(cachedir, [[VARPREFIX/cache] Renderer cache])
+if test -z "$cachedir"; then
+   cachedir='${varprefix}/cache'; fi
+
+AC_ARG_VAR(dbhome, [[VARPREFIX/db] Berkeley DB files])
+if test -z "$dbhome"; then
+   dbhome='${varprefix}/db'; fi
+
+AC_ARG_VAR(seslockdir, [[VARPREFIX/session_data/lock] Web session locks])
+if test -z "$seslockdir"; then
+   seslockdir='${varprefix}/session_data/lock'; fi
+
+AC_ARG_VAR(sesstordir, [[VARPREFIX/session_data/store] Web session storage])
+if test -z "$sesstordir"; then
+   sesstordir='${varprefix}/session_data/store'; fi
+
+AC_ARG_VAR(wrapperdir, [[BINDIR] CLI wrapper])
+if test -z "$wrapperdir"; then
+   wrapperdir='${bindir}'; fi
+
+# Process plugins
+
+AC_ARG_WITH(plugins,
+        [AC_HELP_STRING(--with-plugins=DIR:DIR...,Torrus plugin directories)])
+
+if test x"$with_plugins" != x && test "$with_plugins" != "no"; then
+   torrus_plugins=`echo $with_plugins | sed -e 's/:/ /g'`
+   for plugdir in $torrus_plugins; do
+      if test ! -d $plugdir; then
+         AC_MSG_ERROR([No such plugin directory: $plugdir]);
+      fi
+      if test ! -x $plugdir/configure; then
+         AC_MSG_ERROR([Missing configure in plugin directory: $plugdir]);
+      fi
+   done
+fi
+
+AC_SUBST(torrus_plugins)
+
+AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
+AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])
+AC_CONFIG_FILES([examples/Makefile perllib/Makefile])
+AC_CONFIG_FILES([sup/Makefile xmlconfig/Makefile])
+                                    
+AC_CONFIG_FILES([setup_tools/substvars.sh],[chmod +x setup_tools/substvars.sh])
+AC_CONFIG_FILES([setup_tools/mkvardir.sh], [chmod +x setup_tools/mkvardir.sh])
+AC_CONFIG_FILES([init.d/torrus], [chmod +x init.d/torrus])
+
+AC_SUBST(VERSION)
+
+AC_OUTPUT
+
+if test x"$torrus_plugins" != x; then
+   export torrus_user pkghome cfgdefdir docdir exmpdir perllibdir \
+          scriptsdir supdir tmpldir distxmldir sitedir siteconfdir logdir \
+          piddir varprefix cachedir dbhome sesstordir seslockdir webplaindir 
+   torrus_src_dir=${ac_abs_top_srcdir}
+   torrus_disable_modcheck=
+   if test $enable_modcheck != yes; then
+     torrus_disable_modcheck='--disable-modcheck'
+   fi
+   for plugdir in $torrus_plugins; do
+      AC_MSG_NOTICE([Configuring plugin in $plugdir ...])
+      cd $plugdir
+      if ./configure \
+          --with-substvars=${torrus_src_dir}/setup_tools/substvars.sh \
+          --with-mkvardir=${torrus_src_dir}/setup_tools/mkvardir.sh \
+          --prefix=$prefix \
+          --exec-prefix=$exec_prefix \
+          --bindir=$bindir \
+          --datadir=$datadir \
+          --localstatedir=$localstatedir \
+          --libdir=$libdir \
+          $torrus_disable_modcheck
+        then :; else
+          AC_MSG_ERROR([Error executing $plugdir/configure]);
+      fi
+      cd ${torrus_src_dir}
+   done
+fi
+

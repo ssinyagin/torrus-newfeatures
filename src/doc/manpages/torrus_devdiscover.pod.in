@@ -1,0 +1,92 @@
+#  Copyright (C) 2004  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 NAME
+
+@XFORM_devdiscover@ - Performs SNMP discovery and generates Torrus XML
+configuration file.
+
+=head1 SYNOPSIS
+
+B<@XFORM_devdiscover@> --in=I<XMLFILE> [I<options...>]
+
+=head1 DESCRIPTION
+
+B<@XFORM_devdiscover@> performs SNMP discovery using the I<XMLFILE>
+for the discovery instructions. It generates a corresponding
+Torrus XML configuration file. See B<Torrus SNMP Discovery User Guide> for
+details.
+
+The generic input file, or device discovery XML (DDX), may be generated 
+by the B<@XFORM_genddx@> utility, and then edited and maintained manually.
+
+Input file name is searched in the current directory, and then in
+F<@sitedir@/discovery/>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--mkdir>
+
+Creates C<data-dir> directories.
+
+=item B<--limit>=I<REGEXP>
+
+Limits the discovery to the output files matching the regular expression
+I<REGEXP>.
+
+=item B<--verbose>
+
+Prints extra information.
+
+=item B<--debug>
+
+Prints debugging information.
+
+=item B<--snmpdebug>
+
+Prints SNMP protocol details
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F<@perlcfgdir@/devdiscover-siteconfig.pl>
+
+B<@XFORM_devdiscover@> site configuration file.
+
+=back
+
+=head1 SEE ALSO
+
+B<@XFORM_genddx@>(1)
+
+=head1 NOTES
+
+See I<Torrus SNMP Discovery User Guide> for more details at Torrus home
+page: http://torrus.sf.net
+
+=head1 AUTHOR
+
+Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

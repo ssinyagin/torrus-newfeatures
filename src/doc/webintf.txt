@@ -1,0 +1,153 @@
+Torrus Web Interface Reference
+  Directory structure
+    By default, the directory /usr/local/torrus/sup/webplain/ is the place
+    for static HTML, CSS stylesheets and images.
+
+    The default CSS stylesheet files are installed in this directory. This
+    directory must be configured with *SetHandler default-handler*
+    directive.
+
+  CSS Stylesheets
+    Additional user-defined stylesheet files may be added in webplain
+    directory. The default HTML templates that come with the Torrus
+    distribution use the global configuration variable
+    $Torrus::Renderer::stylesheet, which is set in torrus-config.pl and may
+    be overwritten in torrus-siteconfig.pl.
+
+  Cache files
+    All generated HTML and graphical images are cached twice: first on the
+    server, and then in your browser. Thus, if you change somehow the HTML
+    appearance of your Torrus installation, you need to clean both caches:
+
+       torrus clearcache
+
+    This will clear the cache on the server. Then you may use your browser's
+    "reload" button, or clear the whole browser cache.
+
+  Site configuration options
+    The following variables may need to be set in your
+    /usr/local/etc/torrus/conf/torrus-siteconfig.pl file:
+
+    * $Torrus::Renderer::companyName
+        The text that you specify here will appear in the top left corner of
+        all HTML pages.
+
+    * $Torrus::Renderer::companyURL
+        The company name text will be clickable with the URL specified in
+        this variable.
+
+    * $Torrus::Renderer::rendererURL
+        Default: '/torrus'. A URL that points to Torrus renderer.
+
+    * $Torrus::Renderer::plainURL
+        Default: '/torrus/plain'. A URL that points to Torrus plain files
+        directory. Normally CSS stylesheet files are resided there..
+
+    * $Torrus::ApacheHandler::authorizeUsers
+        Default: 1. When true, the web interface users are required to log
+        in.
+
+  mod_perl 1.0 handler: Torrus::ApacheHandler
+    For more documentation, see <http://perl.apache.org/>.
+
+    The whole output generation is performed by the "Torrus::ApacheHandler"
+    class. However, you still need access to the plain directory where your
+    CSS resides. Typical Apache configuration would look like follows. Make
+    sure your configuration does not contain tab characters:
+
+      Alias /torrus/plain "/usr/local/torrus/sup/webplain"
+      PerlRequire "/usr/local/torrus/conf_defaults/webmux.pl"
+      <Location /torrus>
+        SetHandler perl-script
+        PerlHandler Torrus::ApacheHandler
+      </Location>
+      <Location /torrus/plain/>
+        SetHandler default-handler
+        Options None
+      </Location>
+
+    The base URL would be in this case:
+
+      http://yourhost/torrus/
+
+  mod_perl 2.0 handler: Torrus::Apache2Handler
+    *Note:* Apache 2.0 support in Torrus is currently in its early
+    development stage.
+
+    *Note:* As of now, "libapreq2" library is not released yet, and only the
+    development version is available. You have to download and install it
+    manually.
+
+    mod_perl version 1.99_15 or later is supported. To the moment,
+    "libapreq2" version "2.04_03-dev" is tested.
+
+    Make sure you use "webmux2.pl" and "Torrus::Apache2Handler" in your
+    configuration.
+
+    "SetHandler modperl" directive should give better performance than
+    "SetHandler perl-script". Both Perl handlers work the same way with
+    Torrus.
+
+    Typical Apache 2.0 configuration follows:
+
+      Alias /torrus/plain "/usr/local/torrus/sup/webplain"
+      PerlRequire "/usr/local/torrus/conf_defaults/webmux2.pl"
+      <Location /torrus>
+        SetHandler modperl
+        PerlResponseHandler Torrus::Apache2Handler
+      </Location>
+      <Location /torrus/plain/>
+        SetHandler default-handler
+        Options None
+      </Location>
+
+    The base URL would be in this case:
+
+      http://yourhost/torrus/
+
+  Known CGI parameters
+    The following CGI parameters are recognized by mod_perl handler:
+
+    token
+        Optional. Each configuration tree element is referenced by a
+        *token*, a short unique identifier. If not given, the root of the
+        tree ("/") is displayed.
+
+    path
+        Optional. Alternatively to token reference, the full path of the
+        tree element may be referenced.
+
+    view
+        Optional. Specifies the "view" name for displaying the tree element.
+        If not specified, the defaul view is used.
+
+    TZ  Optional. If given, specifies the timezone that you want the graphs
+        to be displayed for. This must be the URL-encoded zone name which is
+        understood by your server system. You may use zdump(8) for testing.
+
+    NOW Optional. If given, presents the output for the given moment,
+        instead of the current time. Must be of the form understood by
+        "rrdtool" (see RRDTool manuals).
+
+    DEBUG
+        Optional. If true, turns on the debug level of logging. The debug
+        messages are sent to HTTP server's error log.
+
+    SHOWHIDDEN
+        Optional. If true, makes the grapher display those subtree and
+        leaves which have "hidden" parameter set to "yes".
+
+    NOHW
+        Optional. If true, disables the displaying of Holt-Winters
+        boundaries and failures.
+
+    LOGOUT
+        Optional. When user authorization is enabled, causes the current
+        user session to log out.
+
+    All other parameters whose name starts with capital letter, are passed
+    to the HTML template as-is, and may be used for your custom purposes.
+
+Author
+    Copyright (c) 2002-2004 Stanislav Sinyagin <ssinyagin@yahoo.com>
+

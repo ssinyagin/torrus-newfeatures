@@ -1,0 +1,89 @@
+
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+
+EXTRA_DIST = \
+	site-global.xml
+
+xmldir         = $(distxmldir)
+dist_xml_DATA  = defaults.xml snmp-defs.xml 
+
+vendordir      = $(distxmldir)/vendor
+dist_vendor_DATA = \
+	vendor/apc.ups.xml  \
+	vendor/ascend.max.xml \
+	vendor/atmel.xml \
+	vendor/cisco.firewall.xml \
+	vendor/cisco.generic.xml \
+	vendor/cisco.ios.xml \
+	vendor/cisco.ios.mac-accounting.xml \
+	vendor/compaq.cim.xml \
+	vendor/empire.systemedge.xml \
+	vendor/empire.systemedge.ntregperf.xml \
+	vendor/f5.bigip.xml \
+	vendor/hp.hpux.xml \
+	vendor/microsoft.windows.xml \
+	vendor/netapp.filer.xml \
+	vendor/netscreen.xml \
+	vendor/paradyne.xdsl.xml \
+	vendor/smokeping.xml \
+	vendor/ucd.ucd-snmp.xml
+
+genericdir    =  $(distxmldir)/generic
+dist_generic_DATA = \
+	generic/collector-periods.xml \
+	generic/monitors.xml \
+	generic/rfc2662.adsl-line.xml \
+	generic/rfc2670.docsis-if.xml \
+	generic/rfc2790.host-resources.xml \
+	generic/rfc2863.if-mib.xml
+
+examplesdir   =  $(distxmldir)/examples
+dist_examples_DATA = \
+	examples/apc-ups.xml \
+	examples/ascend.max.xml \
+	examples/cisco-mac-accounting.xml \
+	examples/flowscan.xml \
+	examples/generic-netsnmp.xml \
+	examples/hpux.xml \
+	examples/monitors.xml \
+	examples/multigraph.xml \
+	examples/rainbow-schema.xml \
+	examples/servers.data \
+	examples/servers.tmpl
+
+olddir        =  $(distxmldir)/old
+dist_old_DATA = \
+	old/cisco.generic.old-0.1.4.xml \
+	old/rfc1213.xml \
+	old/rfc2670.docsis-if.old.0.1.5d-20040224.xml \
+	old/rfc2863.if-mib.old-0.1.4.xml \
+	old/rfc2863.if-mib.old-0.1.7.xml \
+	old/snmp-defs.old-0.1.2.xml
+
+
+install-data-local:
+	$(mkinstalldirs) $(DESTDIR)$(sitexmldir)
+	if test ! -r $(DESTDIR)$(sitexmldir)/site-global.xml; then \
+	  $(INSTALL_DATA) site-global.xml \
+		$(DESTDIR)$(sitexmldir)/site-global.xml; \
+	fi
+
+

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2003 Shawn Ferry
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+Shawn Ferry <sferry at sevenspace dot com > <lalartu at obscure dot org>
+
+Author: Shawn Ferry
+Vendor: UCD-DISKIO-MIB
+Tested Versions: Untested
+
+$Id$
+@(#) 10/18/03 ucd-diskio.xml 1.6 (10/16/03 23:44:26) sferry
+
+-->
+<!--
+This File is not complete and has not been tested
+Generic definitions and templates for:
+    UCD-DISKIO-MIB
+-->
+<configuration>
+  <definitions>
+    <def name="ucd_diskIODevice" value="1.3.6.1.4.1.2021.13.15.1.1.2"/>
+    <def name="ucd_diskIONRead" value="1.3.6.1.4.1.2021.13.15.1.1.3"/>
+    <def name="ucd_diskIONWritten" value="1.3.6.1.4.1.2021.13.15.1.1.4"/>
+    <def name="ucd_diskIOReads" value="1.3.6.1.4.1.2021.13.15.1.1.5"/>
+    <def name="ucd_diskIOWrites" value="1.3.6.1.4.1.2021.13.15.1.1.6"/>
+  </definitions>
+  <datasources>
+    <template name="ucd-diskio">
+      <leaf name="DiskReads">
+        <param name="snmp-object" value="$ucd_diskIOReads"/>
+        <param name="rrd-ds" value="ucd_diskIOReads"/>
+        <param name="rrd-create-dstype" value="COUNTER"/>
+        <param name="comment" value="Reads per second from the device"/>
+        <param name="graph-legend" value="Reads"/>
+      </leaf>
+      <leaf name="DiskRead">
+        <param name="snmp-object" value="$ucd_diskIORead"/>
+        <param name="rrd-ds" value="ucd_diskIORead"/>
+        <param name="rrd-create-dstype" value="COUNTER"/>
+        <param name="comment" value="Read from the device"/>
+        <param name="graph-legend" value="Read"/>
+      </leaf>
+      <leaf name="DiskWrites">
+        <param name="snmp-object" value="$ucd_diskIOWrites"/>
+        <param name="rrd-ds" value="ucd_diskIOWrites"/>
+        <param name="rrd-create-dstype" value="COUNTER"/>
+        <param name="comment" value="Writes per second to the device"/>
+        <param name="graph-legend" value="Write/s"/>
+      </leaf>
+      <leaf name="DiskWritten">
+        <param name="snmp-object" value="$ucd_diskIOWritten"/>
+        <param name="rrd-ds" value="ucd_diskIOWritten"/>
+        <param name="rrd-create-dstype" value="COUNTER"/>
+        <param name="comment" value="Writes to the device"/>
+        <param name="graph-legend" value="Written"/>
+      </leaf>
+    </template>
+  </datasources>
+</configuration>

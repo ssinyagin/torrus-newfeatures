@@ -1,0 +1,59 @@
+#include "$(ROOT)/.wml/template.inc" section=rrdworld subsection=torrus
+
+
+<!--
+  Project abstract for RRDtool website, section "RRD World"
+  $Id$
+-->
+
+<H1>Torrus</H1>
+<H3>Data Series Processing Framework</H3>
+<P>by Stanislav Sinyagin</P>
+
+<P>
+Torrus is a new marketing name of RRFW, or Round-Robin Database Framework.
+Torrus is designed to be the universal data-oriented frontend. Its scalable
+hierarchical design, application-independent core, and highly customizable
+architecture make Torrus an attractive choice both for small installations
+and for big enterprise or carrier networks. Although most of our users
+deploy Torrus for SNMP monitoring, it might be useful for data series of any
+nature.
+</P>
+
+<P>
+See the <STRONG><A HREF="http://rrfwdemo.tbw.ch">Torrus demo
+server</A></STRONG>, provided by
+<A HREF="http://www.bluewin.ch/">Bluewin AG</A>.
+</P>
+
+<P>
+Major features of Torrus are:
+
+<UL>
+
+<LI>modular data collector with flexible scheduling</LI>
+
+<LI>modular SNMP device discovery tool with support for many generic and
+vendor-specific MIBs</LI>
+
+<LI>hierarchical configuration in XML format</LI>
+
+<LI>customizable web interface with user authentication and
+authorization</LI>
+
+<LI>full support for aberrant behaviour detection based on Holt-Winters
+prediction</LI>
+
+<LI>data threshold monitoring</LI>
+
+<LI><A HREF="http://torrus.org/plugins/cisco-cbqos.pod.html">
+<CODE>cbqos</CODE> plugin</A>, a complete automated solution for
+CISCO-CLASS-BASED-QOS-MIB monitoring</LI>
+
+</UL>
+</P>
+
+<P>Torrus is available at
+<A HREF="http://torrus.org">http://torrus.org</A>.
+</P>
+

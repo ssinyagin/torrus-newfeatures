@@ -1,0 +1,1234 @@
+2004-11-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree/Validator.pm:
+	New parameters:  'monitor-period', 'monitor-timeoffset'
+
+	* lib/Torrus/Monitor.pm: Now monitor runs under standard Scheduler
+
+2004-10-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Collector.pm:
+	Moved collector specific code from bin/collector.in.
+
+2004-10-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/acledit.in: New privilege added: DisplayAdmInfo
+
+	* lib/Torrus/Renderer/AdmInfo.pm, templates/adminfo.html:
+	First step to display administratove information.
+
+2004-10-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/collector.in, bin/monitor.in:
+	Process name reflecting the commandline and status
+
+2004-10-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm (rrd_make_multigraph):
+	New multigraph parameter: disable-gprint-X
+
+2004-09-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/collector-periods.xml:
+	Changed rrd-create-rra
+
+2004-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/NetScreen.pm:
+	Changed the interface mapping from ifDescr to MAC address
+
+2004-09-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* examples/rrdup_notify.sh: collector failure notification script
+
+2004-09-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Apache2Handler.pm: mod_perl 1.99_15 compatibility.
+	Replaced Apache::ParseFormData with libapreq2.
+
+	* templates/html-incblocks.txt: Added "Up" navigation tab
+
+2004-09-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm: New parameter: graph-disable-gprint
+
+2004-08-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/default-rrd.html:
+	Added link to web/plain/explain-rrdgraph.html
+
+	* templates/html-incblocks.txt: Moved Top and Help menu to the top
+	of the page
+
+2004-08-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/CiscoIOS.pm (discover):
+	New discovery parameter: CiscoIOS::disable-ipsec-stats
+
+2004-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/default-helptext.html: First draft of help window
+
+	* bin/devdiscover.in: --snmpdebug option is no more hidden
+
+2004-08-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/vendor/cisco.ios.xml: reorganized leaves
+
+	* xmlconfig/generic/rfc2863.if-mib.xml:
+	Replaced the leaf names with user friendly ones.
+	The old template is in old/rfc2863.if-mib.old-0.1.7.xml
+
+2004-08-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.1.7
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	New discovery parameter: RFC2863_IF_MIB::copy-params
+
+	* lib/Torrus/DevDiscover.pm: new discovery parameter: host-copy-params
+
+2004-07-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/ATMEL.pm: New discocery module from Scott Brooks
+
+2004-07-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm (rrd_make_holtwinters):
+	New global variable: $Torrus::Renderer::hwGraphLegend
+
+	* Disabled Holt-Winters in system performance and interface errors
+
+2004-07-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Torrus Demo server opened: http://torrusdemo.tbw.ch
+
+2004-07-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Collector.pm (setValue): DOLLAR and MOD in transform-value
+
+2004-07-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/acledit.in: Added --force option
+
+	* bin/monitor.in, bin/collector.in: umask changed to 0017
+
+2004-07-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* doc/scalability.pod: Document finished
+
+	* doc/vendorsupport.pod: Vendor and MIBs support document
+
+2004-07-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/site-global.xml: New place for global parameters.
+	In existing installations, you need to change the line in
+	torrus-siteconfig.pl:
+	@Torrus::Global::xmlAlwaysIncludeFirst =
+	                                ( 'defaults.xml', 'site-global.xml' );
+
+2004-07-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/NetApp.pm: new discovery module (Shawn)
+
+2004-07-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/CiscoIOS.pm: Added CISCO-IPSEC-FLOW-MONITOR-MIB
+
+2004-07-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Monitor.pm (run_event_exec):
+	New environment variable: Torrus_VALUE
+
+	* xmlconfig/defaults.xml: New view parameter: description
+
+2004-07-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/default-login.html,
+	lib/Torrus/Renderer/Frontpage.pm (renderUserLogin),
+	lib/Torrus/Apache2Handler.pm (handler),
+	lib/Torrus/ApacheHandler.pm (handler): URL parameters
+	(token, path, and view) are remembered during login
+
+2004-06-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ACL.pm (hasPrivilege): Wildcard ACL object (*) implemented
+
+2004-06-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Log levels updated. Now info is always printed, and verbose means
+	verbose.
+
+2004-06-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/defaults.xml: New view name: last24h-small
+
+2004-06-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	New discovery parameter: RFC2863_IF_MIB::errors-monitor
+
+2004-06-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	New discovery parameter: RFC2863_IF_MIB::exclude-interfaces
+	New discovery parameter: RFC2863_IF_MIB::tokenset-members
+
+2004-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/CiscoCatOS.pm (discover): New discovery
+	parameter: CiscoCatOS::suppress-noname-ports
+
+2004-06-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* configure.ac: For backward compatibility with autoconf 2.57,
+	AS_HELP_STRING is replaced with obsoleted AC_HELP_STRING.
+	Don't forget to change it back when 2.59 or later becomes mainstream.
+
+2004-06-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm (rrd_make_gprint): GPRINT implemented
+
+	* bin/prepviews.in, bin/rrd_getdim.in: removed because no longer needed
+
+	* doc/manpages/Makefile.am: commandref.pod to be replaced by manpages
+	(contrib from Jurij Smakov)
+
+2004-05-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Collector.pm (setValue): transform-value parameter
+	is now expandable
+
+	* doc/devdoc/wd.distributed.pod: New working draft document
+
+2004-05-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* webmux2.pl: Added support for mod_perl 1.99_12 (before it was 1.99_13
+	only)
+
+2004-05-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover.pm: New parameter: custom-host-templates
+
+2004-05-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Collector/SNMP.pm: New parameter: 'snmp-check-sysuptime'
+
+	* bin/Makefile.am: rrd_hwreapply is moved to a separate
+	package (RRDman)
+
+2004-05-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Makefile.am, bin/Makefile.am: removed mkroutercfg
+
+	* templates/html-incblocks.txt: Removed image width hinting
+
+2004-05-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/SiteConfig.pm (verify): Minus sign allowed in tree names
+
+2004-05-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.1.6
+
+	* ../plugins/cbqos: first release of Cisco QoS monitoring plugin 
+
+	* bin/rrd_getdim.in: RRDtool 1.1.x compatibility improved
+
+2004-04-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* examples/onmsInterfaces.sh: Gustavo Torres' contribution for
+	OpenNMS integration
+
+2004-04-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree/XMLCompiler.pm:
+	New XML statements: setvar, iftrue, iffalse
+
+2004-04-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/RPN.pm (translate): New RPN function: MOD
+
+	* xmlconfig/generic/rfc2790.host-resources.xml: More sophysticated
+	Uptime graph (Shawn)
+
+2004-04-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/html-incblocks.txt: New items in HTML page top: siteInfo
+	and treeInfo.
+
+	* lib/Torrus/Apache2Handler.pm: First alpha release of
+	mod_perl 2.0 handler.
+
+	* doc/webintf.pod: It is recommended to Alias /torrus/plain
+	instead of just /torrus.
+
+2004-04-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/schedulerinfo.in: New option: --clear
+
+	* lib/Torrus/SchedulerInfo.pm, lib/Torrus/Scheduler.pm: reorganized
+	statistics collection
+
+	* bin/schedulerinfo.in: Only nonzero statistics are shown in runtime
+	report
+
+	* lib/Torrus/Scheduler.pm: reorganized statistics: late start increments
+	only when that happens. Runtime longer than period is also recorded
+	(sferry).
+
+	* bin/collector.in: more verbosity in non-verbose mode (sferry)
+
+	* init.torrus.in: gracefully waits for daemons to shut down (sferry)
+
+2004-04-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/RFC1697_RDBMS.pm, 
+	 lib/Torrus/DevDiscover/OracleDatabase.pm: New discovery modules (sferry)
+
+	* NEWS: Bugfix release 0.1.5bf2
+
+2004-03-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DB.pm (cursor): Bugfix for write access cursors
+
+2004-03-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm (rrd_make_cdef):
+	New @-functions in RPN references: AVERAGE MIN MAX LAST
+	
+	(rrd_make_multigraph): New multigraph parameter: ignore-views-X
+
+	* lib/Torrus/DevDiscover/CiscoGeneric.pm (buildConfig):
+	New discovery parameter: CiscoGeneric::file-per-sensor
+
+2004-03-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/compilexml.in: New commandline option: --noval
+
+	* NEWS: Bugfix release 0.1.5bf1
+
+2004-03-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/RPN.pm: now Math::BigFloat is always used for numbers
+	Perl 5.8.0 or higher is required: BigFloat implementation in 5.6.1
+	is untested and hardly compatible
+
+	* lib/Torrus/Collector.pm (run): $Torrus::Collector::needsConfigTree:
+	a new registry for those collectors needing access to configuration.
+
+2004-03-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Implemented Cisco class-based QoS monitoring plugin
+
+2004-03-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm: More parameters to be expanded:
+	lower-limit normal-level upper-limit
+
+2004-03-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/devdiscover.in: New option: --limit=regexp
+
+2004-03-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.1.5
+
+	* lib/Torrus/DB.pm (new): Unique DB environment log file per PID. 
+
+2004-03-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/devdiscover.in: new parameter: output-bundle
+
+2004-03-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/overview-subleaves.html: New parameters:
+	overview-direct-link, overview-direct-link-view
+
+2004-03-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/UcdSnmp.pm, 
+	lib/Torrus/DevDiscover/RFC2790_HOST_RESOURCES.pm,
+	xmlconfig/vendor/ucd.ucd-snmp.xml,
+	xmlconfig/generic/rfc2790.host-resources.xml:
+	Rearranged the host performance templates.
+	Fixed bug in Interrupts RRD. You need to
+	rm /var/snmpcollector/*ucd-context_interrupts.rrd		
+
+2004-03-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm (render_rrgraph):
+	New configuration option: $Torrus::Renderer::ignoreDecorations
+
+2004-03-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2670.docsis-if.xml: Modified DOCSIS template
+	to include codewords statistics (data-file changed).
+
+	* bin/monitor.in, bin/collector.in: Log rotation on SIGHUP
+
+2004-02-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/monitors.xml: New standard monitors and actions
+
+	* xmlconfig/vendor/smokeping.xml:
+	(Shawn) Smokeping RRD files access templates
+
+	* lib/Torrus/DevDiscover/NetScreen.pm: (Shawn) new discovery module
+
+	* lib/Torrus/DevDiscover/CompaqCIM.pm: (Shawn) new discovery module
+
+	* lib/Torrus/DevDiscover/MicrosoftWindows.pm:
+	(Shawn) added support for IIS HTTP and FTP stats
+
+2004-02-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree/Writer.pm (postProcessNodes):
+	Dispersed collector offset
+
+2004-02-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm (new),
+	lib/Torrus/ConfigTree/Writer.pm (finalize):
+	Dual configuration database implemented
+
+	* lib/Torrus/ConfigTree.pm (setReady): ConfigurationReady
+	flag moved to other_config.db.
+
+2004-02-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm: view parameter "title" removed.
+	New node parameter: "graph-title"
+
+2004-02-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm (rrd_make_decorations):
+	Implemented back- and foreground decorations (Christian's Change 7,
+	modified)
+
+2004-02-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm (getNodeParam): Optimized nodepcache
+	structure
+
+	* lib/Torrus/ConfigTree/Writer.pm (newToken): Next free token is
+	no longer stored in database
+
+2004-02-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover.pm (buildConfig): New parameter: host-aliases
+
+	* lib/Torrus/Collector.pm (setValue): New parameter: transform-value
+
+2004-02-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml, xmlconfig/*/*.xml: data-file refers now
+	to system-id, instead of snmp-host.
+
+	* lib/Torrus/DevDiscover.pm (buildConfig): symbolic-name is no longer
+	mandatory. New parameter: system-id.
+
+2004-02-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DB.pm (new): DB internal errors are stored in
+	var/log/dbenv_errlog
+
+2004-02-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm (expandNodeParam):
+	$Torrus::ConfigTree::nodeParamHook: hook for custom parameter processing 
+
+2004-02-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer/RRDtool.pm: Restructured the whole grapher.
+
+2004-02-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm: Split one big module into 4 smaller ones:
+	Torrus::Renderer, Torrus::Renderer::HTML, Torrus::Renderer::RRDtool,
+	Torrus::Renderer::Frontpage
+
+	* lib/Torrus/DevDiscover.pm (discover):
+	New discovery parameter: only-devtypes
+
+2004-01-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover.pm (discover):
+	New discovery parameter: disable-devtypes
+	
+	* lib/Torrus/DevDiscover.pm (discover):
+	Better treatment for agents without "system" OIDs.
+
+2004-01-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover.pm (discover): Now snmp-oids-per-pdu may
+	be defined from discovery parameters.
+
+	* bin/schedulerinfo.in: Scheduler runtime statistics report
+
+2004-01-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Scheduler.pm: runtime statistics stored in a database
+
+2004-01-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover.pm (discover):
+	'collector-period' and 'collector-timeoffset' can be specified in
+	devdiscover input
+
+	* Makefile.am: Now DIST_REVISION file in the distribution
+	package tells the distribution revision date
+
+	* lib/Torrus/Collector.pm: listTargets() is replaced with
+	listCollectorTargets() with collector type as argument
+
+2004-01-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	Split iftable-errors template into input and output
+	(some Cisco ATM aal5 interfaces dont have both in and out error
+	counters)
+
+	* doc/devdoc/wd.gprint-and-cf-plot.pod:
+	New design draft from Christian Schnidrig
+
+	* lib/Torrus/RPN.pm: Slight reorganisation and better fault control
+
+	* doc/userguide.pod: New in Tips: Several Torrus instances on one server
+
+2004-01-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm (token),
+	lib/Torrus/ConfigTree/Writer.pm (setAlias),
+	lib/Torrus/DB.pm (getBestMatch):
+	Recursive alias expansion. New database: aliases.db.
+	configsnapshot is no more compatible with previous releases' database.
+
+2004-01-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm (getAliases): Improved logics for aliases.
+	Needs database recompilation.
+
+2004-01-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/schedulerinfo.in: New utility for scheduler analysis
+
+2004-01-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/old/rfc1213.xml: Moved from xmlconfig/generic/rfc1213.xml
+
+	* templates/html-incblocks.txt: cssoverlay property
+
+	* bin/configsnapshot.in: Ready for tests
+
+	* lib/Torrus/DevDiscover/RFC2737_ENTITY_MIB.pm (discover):
+	Chassis desription is put into host-level comment
+
+2004-01-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/configsnapshot.in: first step towards a snapshot utility
+
+	* xmlconfig/vendor/cisco.generic.xml:
+	New template: cisco-temperature-sensor-fahrenheit
+
+	* xmlconfig/generic/collector-periods.xml: Changed XFF the same way
+	as in snmp-defs.xml.
+	Added Holt-Winters parameters to 1-minute interval.
+
+	* xmlconfig/snmp-defs.xml: Changed XFF in default RRAs: 1 missing
+	sample is allowed in half-hour average, and 1 missing hour
+	is allowed in daily average.
+
+	* lib/Torrus/Collector/SNMP.pm (initTargetAttributes):
+	New parameter: snmp-object-type
+
+2004-01-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2662.adsl-line.xml: Reduced number of RRD files
+
+	* xmlconfig/vendor/cisco.generic.xml: Moved buffer statistics into
+	a single RRD file
+
+	* xmlconfig/generic/rfc2863.if-mib.xml:
+	Reorganized RRD data structure. Significantly reduced number of files.
+
+2004-01-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/genlist.in: New utility for data listing
+
+2003-12-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/RFC2737_ENTITY_MIB.pm: New discovery module
+
+	* lib/Torrus/DevDiscover/CiscoGeneric.pm: CPU enties mapped against
+	ENTITY-MIB names
+
+2003-12-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/devdiscover.in: $XMLCONFIG substitution
+
+2003-12-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2863.if-mib.xml: Moved ifindex-map to host level
+
+2003-12-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/CiscoGeneric.pm,
+	xmlconfig/vendor/cisco.generic.xml: Reorganized CPU and Memory
+	pool statistics.
+
+	* lib/Torrus/DevDiscover/CiscoFirewall.pm: New discovery module
+
+	* lib/Torrus/DevDiscover/F5BigIp.pm: New discovery module for
+	F5 BigIp Load Balancer
+
+2003-12-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/old/snmp-defs.old-0.1.2.xml: Moved from generic/ to old/
+
+	* xmlconfig/old/rfc2863.if-mib.old-0.1.4.xml: Saved the file from
+	previous version.
+
+2003-12-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/Xylan.pm: New discovery module for
+	Alcatel (Xylan) OmniSwitch
+
+	* lib/Torrus/DevDiscover/AscendMax.pm: New discovery module for
+	Ascend (Lucent) MAX
+
+2003-12-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/CiscoIOS.pm (checkdevtype):
+	Use CISCO-IMAGE-MIB::ciscoImageTable for more strict IOS-based
+	product detection
+
+2003-12-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	Vendor templates for interface counters taken from
+	@{$interface->{'vendor_templates'}}
+
+	* lib/Torrus/DB.pm (new): Berkeley db-4.2 compatibility
+
+2003-12-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/vendor/empire.systemedge.xml: Data structure and templates
+	changed for better flexibility and system support
+
+	* bin/devdiscover.in, bin/genddx.in:
+	Output file is now controlled from DDX parameter 'output-file'.
+
+2003-12-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/MicrosoftWindows.pm:
+	Moved MicrosoftWindowsServer.pm to MicrosoftWindows
+
+2003-12-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/MicrosoftWindowsServer.pm: New discovery module
+	for Windows2000/XP SNMP agent
+
+2003-12-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2863.if-mib.xml:
+	Replaced $IFIDX with %ifindex-map%
+	
+	Split template iftable-discards into iftable-discards-in and
+	iftable-discards-out. For some devices,
+	/var/snmpcollector/*_discards.rrd need to be deleted, and
+	devdiscover re-launched
+
+2003-12-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/default-tset.html, xmlconfig/generic/rfc2863.if-mib.xml:
+	New parameter: descriptive-nickname
+
+2003-12-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.1.4
+
+	* devdiscover-config.pl: Commented out "RFC2662_ADSL_LINE" and
+	"Paradyne" (need more testing)
+
+2003-12-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/*, web/plain/*.css: more flexible CSS layout
+
+2003-12-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm (do_render_rrdgraph):
+	New parameter: graph-rigid-boundaries
+
+2003-12-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):
+	New discovery option: RFC2863_IF_MIB::suppress-hc-counters
+	
+2003-11-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/devdiscover.in: now it accepts XML input only
+
+	* bin/genddx.in: New utility for next-generation devdiscover
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	interface counters moved to a separate subtree
+
+2003-11-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm (do_render_rrdgraph):
+	New parameter: graph-logarithmic
+
+2003-11-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/EmpireSystemedge.pm: new discovery module
+
+2003-11-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover.pm (clearCap): capability clearing needed for
+	Empire Sysedge
+
+2003-11-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2863.if-mib.xml: templates interface-counters
+	and hc-interface-counters removed
+	New templates: read-iftable-octets, read-ifxtable-hcoctets
+
+2003-11-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* web/plain/torrus.css: Increased maximum node name length to 25 symbols
+
+	* lib/Torrus/DevDiscover/CiscoGeneric.pm: moved memory, cpu, and
+	temperature statistics to a common module, shared by IOS and CatOS
+
+	* lib/Torrus/DevDiscover/CiscoCatOS.pm (discover): interface comments
+	are now derived from CISCO-STACK-MIB::portName
+
+2003-11-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlsup/extract-skeleton.xsl: XSLT template for tree structure
+	extraction
+
+	* bin/configinfo.in: New utility
+
+	* bin/devdiscover.in: New options: --retries and --timeout
+
+	* lib/Torrus/DevDiscover/CiscoCatOS.pm: Interface filters for CatOS
+
+2003-11-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigBuilder.pm (addStatistics): congfiguration statistics
+
+	* lib/Torrus/DevDiscover/CiscoIOS.pm: Interface filters for IOS devices
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover): Implemented
+	generic interface filtering
+
+2003-11-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2863.if-mib.xml: rrd-create-max=1e15 for HC
+	packet and octets counters
+
+	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	New interface counters: iftable-discards
+
+2003-11-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* New devdiscover modules: "RFC2662_ADSL_LINE" and "Paradyne"
+
+2003-11-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Collector/SNMP.pm (initTarget):
+	New parameter: snmp-oids-per-pdu
+
+2003-11-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.1.3
+
+	* doc/, doc/devdoc/: Documentation is reorganized. Developer
+	documentation is separated from User docs.
+
+2003-10-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/overview-subleaves.html: Replacement for InOutBps.
+	New parameters: has-overview-subleaves, overview-subleave-name,
+	overview-shortcut-text, overview-shortcut-title, overview-page-title
+
+2003-10-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/CiscoIOS_SAA.pm: New discovery module
+
+2003-10-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm (do_render_rrdgraph): New parameter:
+	rrd-scaling-base
+	(new): cache initialization optimized
+
+2003-10-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* doc/devdiscover_devguide.pod: new Device Discovery Developer's Guide
+
+2003-10-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover/RFC2790_HOST_RESOURCES.pm:
+	New Host resources MIB discovery module
+
+2003-10-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* examples/setmonitor.xupdate.xml: XUpdate technique to update
+	autogenerated files. Described in userguide.pod.
+
+2003-10-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2863.if-mib.xml: New names for interace
+	counter RRD files: host_intf_octets.rrd, host_intf_packets.rrd, etc.
+
+	* xmlconfig/snmp-defs.xml: data-file and data-dir are no longer
+	defined in snmp-defaults.
+
+	* xmlconfig/generic/rfc2863.if-mib.xml: Broke interface counter
+	templates into smaller parts. New counters template: "iftable-errors".
+
+	* xmlconfig/snmp-defs.xml: Moved interface counters to
+	generic/rfc2863.if-mib.xml
+
+2003-10-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* New ACL user and group attribute: "modified"
+
+2003-10-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/DevDiscover.pm (genDataDir): data-dir hash implemented
+
+	* bin/devdiscover.in: Default subtree is now /Routers.
+	Alternative device names may be given as host:devname
+
+	* xmlconfig/: Vendor and generic templates from Shawn Ferry
+
+2003-10-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Shawn Ferry's contribution on styling profiles, with recursive
+	color references
+
+2003-10-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree/XMLCompiler.pm (compile): <include> directives
+	are now processed recursively, before any other processing.
+
+2003-10-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml: Replaced subtree /SNMP with template
+	Moved old version to generic/snmp-defs.old-0.1.2.xml
+
+2003-10-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/devdiscover.in: First proof of concept version of
+	a new modular device discovery tool
+
+2003-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.1.2
+
+	* lib/Torrus/ConfigTree/Writer.pm (addChild): Nodes longer than 20
+	characters are reported with warning.
+
+2003-10-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig: New vendor files:
+	vendor/ascend.max.xml, examples/ascend.max.xml,
+	generic/rfc2670.docsis-if.xml
+
+	* doc/userguide.pod,
+	xmlconfig/examples/servers.data, xmlconfig/examples/servers.tmpl:
+	New approach in automatic config generation.
+
+2003-10-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/mkroutercfg.in (retrieveSnmpData): VLAN interfaces are excluded
+	from the list of discovered interfaces.
+
+2003-10-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree/Writer.pm (propagateViewParams): Moved view
+	parameter inheritance from XML compiler to Writer post-processing
+
+2003-10-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm (do_render_rrdgraph): New view parameters:
+	ignore-limits, ignore-lower-limit, ignore-upper-limit
+
+	* bin/cleanup.in: Cronjob for cleaning up diskspace.
+
+	* lib/Torrus/Renderer.pm (do_render_rrdgraph): New parameters:
+	graph-lower-limit, graph-upper-limit
+
+2003-10-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* styling/torrus-original.pl: Styling profiles implemented
+
+2003-10-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm: New parameter: vertical-label
+
+2003-09-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm (do_render_rrdgraph): Added HRULE handling
+
+2003-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm (render_html): Added current time in HTML output
+
+2003-09-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Scheduler.pm: VmWare clock support
+
+2003-09-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Monitor.pm (setAlarm): New parameter: monitor-action-target
+
+2003-09-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.1.1
+
+2003-09-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm:
+	%Torrus::ConfigTree::expand_params now contains parameters for
+	expansion
+
+	* lib/Torrus/ConfigTree/Writer.pm:
+	%Torrus::ConfigTree::Writer::remove_space now contains parameters
+	for space removal
+
+	* lib/Torrus/Collector.pm (addTarget): New parameter: value-map
+
+	* configure.ac: New configure variable: torrus_user.
+	torrus_var default value changed from root to torrus
+
+2003-09-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* init.torrus.in: New launcher for multi-tree support.
+	FreeBSD 5.1 gives weird error without "&" in launching command.
+	Needs testing on other systems.
+
+2003-09-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Monitor event "throw" changed to "set"
+
+2003-09-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ACL/Import.pm, lib/Torrus/ACL/Export.pm: ACL import/export
+	utilities
+
+	* bin/aclfixup.in: Temporary utility to convert ACL database to
+	the new format.
+
+	* lib/Torrus/ACL/Edit.pm: ACL Database structure changed:
+	added "uA:" lists
+
+2003-09-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/RPN.pm: Got use of use Math::BigFloat, as suggested by
+	Christian.
+
+	* xmlconfig/snmp-defs.xml: Changed xff to 0.5, as recommended by
+	rodrigo.cunha at corp.vodafone.pt
+
+	* lib/Torrus/DB.pm: Database handles are held in a pool and reused
+
+2003-09-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Added user authentication: lib/Torrus/ACL*, bin/acledit, Apache handler
+	* Multiple trees support as described in Requirements 0.1
+
+2003-08-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Collector/SNMP.pm: Moved the validator parameters to
+	a separate module
+
+2003-08-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/defaults.xml: Tokenset views expiry time
+	changed from 300 to 60
+
+	* lib/Torrus/Renderer.pm (checkAndClearCache): Renderer cache is
+	cleared at least once a day
+
+	* webmux.pl: New Apache init script. DB environment is now
+	correctly destroyed
+
+2003-08-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* mibs/Torrus-MIB.txt: Added DS tree name to Monitor action exec
+	and helper programs
+
+	* web/plain/torrus.css: Replaced <BR> with display:block in current path
+
+	* height-hint parameter is removed.
+
+	* templates/routercfg.xml: Fixed the subtree deepness bug for
+	temperature sensors.
+
+	* First steps towards version 0.1: Multiple trees and database
+	split are implemented.
+
+2003-08-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.0.20
+
+2003-07-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm: added $Torrus::Renderer::rendererURL
+	and $Torrus::Renderer::plainURL
+
+2003-07-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/html-incblocks.txt: Absolute URL for CSS stylesheet
+
+	* lib/Torrus/Collector/SNMP.pm: multiple ports and SNMP communities
+	per IP address.
+
+2003-07-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/routercfg.xml: moved snmp-community and other parameters
+	to a host-level subtree
+
+2003-07-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* SNMP Agent reload and unavailable handling
+
+2003-07-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/mkroutercfg.in, templates/*, lib/Torrus/Renderer.pm:
+	Bugs item #747893 resolved.
+
+2003-07-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/mkroutercfg.in (reportResults), templates/routercfg.xml:
+	Legend is now XML-escaped
+
+2003-07-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.0.19
+
+2003-06-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml, lib/Torrus/Collector/RRDStorage.pm,
+	lib/Torrus/ConfigTree/Validator.pm:
+	typo fixed: rrd-create-heartbit changed to rrd-create-heartbeat
+
+	* xmlconfig/snmp-defs.xml: as proposed by Christian Schnidrig,
+	rrd-create-heartbeat changed from 1800 to 500
+
+2003-06-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/mkroutercfg.in (reportResults), templates/routercfg.xml:
+	SNMP version bugfix
+
+	* configure.ac: Now most of the directory names are configurable
+
+2003-05-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm (render):
+	Bug #735753 (Christian Schnidrig) fixed
+
+	* bin/mkroutercfg.in, templates/routercfg.xml:
+	Marc Haber's patch for deeper subtrees
+
+	* torrus-config.pl: added @Torrus::ConfigTree::XMLCompiler::listparams
+
+2003-05-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Collector/SNMP.pm: SNMP-specific config validator is
+	now within the module.
+
+	* lib/Torrus/ConfigTree/Validator.pm: Additional validation
+	parameters are read from @Torrus::Validator::loadLeafValidators
+
+	* lib/Torrus/Collector.pm: Collector modules
+	are loaded from @Torrus::Collector::loadModules
+
+2003-04-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.0.18
+
+2003-03-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/defaults.xml: New parameter: rrgraph-views
+
+2003-03-30    <ssinyagin@HOME>
+
+	* xmlconfig/Makefile.am: Added Cisco MAC accounting
+
+2003-03-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm and temlates: reorganized Holt-Winters views
+
+2003-03-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* torrus-config.pl: Moved monitor parameters from siteconfig to
+	default config.
+
+2003-03-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.0.17
+
+	* web/plain/torrus-printer.css: Finalized the printer-friendly layout
+
+2003-03-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* init.torrus.in: now running under user "torrus"
+
+2003-03-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* configure.ac: Changed the group to "torrus"; init.torrus is
+	more universal
+
+2003-03-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm, lib/Torrus/ApacheHandler.pm:
+	optimized Renderer to reuse Template processor in mod_perl
+
+2003-03-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* web/plain/torrus.css: New HTML layout
+
+2003-03-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/Makefile.am (dist_examples_DATA): Moved
+	apcups-example.xml to apc-ups.xml. Added hpux.xml
+
+	* bin/rrd_getdim.in, bin/prepviews.in, xmlconfig/Makefile.am:
+	"make install prefix=/some/path" now works correctly.
+
+	* lib/Bundle/Torrus.pm: Perl bundle for easy installation
+
+2003-03-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.0.16
+
+	* lib/Torrus/Renderer.pm (do_render_rrdgraph): Fixed TICK bug
+
+	* xmlconfig/vendor/hp.hpux.xml: New definitions file from Aaron Bush
+
+	* xmlconfig/vendor/apc.ups.xml:
+	* xmlconfig/examples/apcups-example.xml: Merged the several
+	templates into one.
+
+2003-03-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Makefile.am: added torrus-config.dtd to distribution
+
+	* xmlsup/torrus-config.dtd: The configuration DTD first cut
+
+2003-03-02    <ssinyagin@HOME>
+
+	* Makefile.am (dist_mibs_DATA): Moved mibs from lib to share
+
+2003-03-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/mkroutercfg.in (reportResults): Added vendor/cisco.ios.xml
+	chekup
+
+	* xmlconfig/examples/apcups-defs.xml: moved to
+	xmlconfig/vendor/apc.ups.xml
+
+	* xmlconfig/examples/snmp-view.xml: moved contents into
+	xmlconfig/vendor/cisco.ios.xml
+
+	* xmlconfig/snmp-defs.xml: Moved Cisco specifics to
+	xmlconfig/vendor/cisco.ios.xml
+
+	* xmlconfig/Makefile.am: snmp-defs.xml is not any more preserved
+
+	* configure.ac, Makefile.am: added plugin functionality
+
+2003-02-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/Renderer.pm (render_html),
+	lib/Torrus/ApacheHandler.pm (handler), web/grapher.cgi.in:
+	Fixed the non-ASCII display problem.
+	Also XML-LibXML-1.54_3 is required.
+
+2003-02-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.0.15
+
+	* xmlconfig/examples/apcups-defs.xml:
+	* xmlconfig/examples/apcups-example.xml: Added APC UPS example
+	configurations
+
+	* lib/Torrus/Collector/RRDStorage.pm (updateRRD): Reverted to
+	a more promiscious code, because the memory problem persists with
+	perl 5.8.
+
+2003-02-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.0.14
+
+2003-02-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree/Writer.pm: fixed bug with parameter cache
+
+2003-01-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/mkroutercfg.in: fixed the exit code bug
+
+2003-01-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/Makefile.am: added xmlconfig/examples/snmp-view.xml
+
+	* lib/Torrus/ConfigTree/XMLCompiler.pm, bin/compilexml.in:
+	added <include> XML statement
+
+2003-01-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 0.0.13
+
+	* bin/compilexml.in, bin/collector.in, bin/monitor.in:
+	Added signal handlers for more graceful	database closing.
+
+2003-01-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm: Now compiler waits for readers to finish.
+
+2003-01-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* lib/Torrus/ConfigTree.pm: implemented ConfigurationReady checkup
+	* lib/Torrus/ApacheHandler.pm, web/grapher.cgi.in:
+	   more user friendly error reporting
+
+2003-01-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml: Added InOutBps leaf to the templates.
+	Affected files:  xmlconfig/defaults.xml, templates/routercfg.xml,
+	templates/default-dir.html, templates/inout-leaves.html
+
+2003-01-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml: Added graph-legend parameters
+
+2003-01-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/Makefile.am: moved XML examples to a separate directory
+
+	* implemented 'rrd-multigraph'
+
+	* changed ds-type RRDfile to rrd-file
+
+2002-09-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Release 0.0.5 published. Everything except SNMP data collector
+	  is ready to run.
+
+2002-08-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Reorganized a lot of things. First cut of monitor is runnable.
+
+2002-07-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Implemented Holt-Winters support
+
+2002-07-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Reorganized ConfigTree and implemented tokens

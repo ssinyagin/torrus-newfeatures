@@ -1,0 +1,452 @@
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 Torrus SNMP Discovery User Guide
+
+=head2 Introduction
+
+In many (but not only) cases Torrus is used for SNMP monitoring.
+It provides powerful tools which automate the process of devices' MIB
+discovery.
+
+The discovery tools consist of two programs: C<devdiscover> performs
+the SNMP discovery, based on the discovery instructions XML file.
+The result of its work is a new Torrus datasource configuration file.
+Another utility, C<genddx>, is a program that generates the basic discovery
+instructions file based on a set of commandline options.
+
+
+=head2 C<genddx>: Discovery instructions generator
+
+  Usage: $Torrus_HOME/bin/genddx options...
+  Options:
+     --host=hostname         router hostname
+     --hostfile=filename     space-separated router hostnames file
+     --out=outfile           output file.         [discover-routers.xml]
+     --discout=filename      discovery output file
+            [/usr/local/torrus-0.1/share/torrus/xmlconfig/routers.xml]
+     --domain=domain         optional DNS domain name
+     --version=v             SNMP version         [2c]
+     --community=string      SNMP read community  [public]
+     --port=number           SNMP port            [161]
+     --retries=number        SNMP retries         [2]
+     --timeout=number        SNMP timeout         [10]
+     --subtree=string        Subtree name         [/Routers]
+     --datadir=path          data-dir parameter   [/var/snmpcollector]
+     --holtwinters           Enable Holt-Winters analysis
+
+This utility generates C<devdiscover> instructions XML file based on
+commandline options and a plain list of SNMP agents' hostnames.
+Hostnames are apecified with one or many C<--host=hostname> options,
+or a plain text file with space-separated hostnames.
+
+Each host may have a symbolic name. This symbolic name is used as
+the host-level subtree name. Symbolic name follows the hostname with
+a semicolon.
+
+By default, the devices are placed into C</Routers/> subtree hierarchy.
+You may change the subtree name with the I<--subtree> option.
+Single slash as subtree name would cause host-level subtrees placed at the top
+of the datasources tree.
+
+By default, C<genddx> specifies the Torrus configuration output file
+with absolute path pointing to C<xmlconfig> subdirectory of the installation,
+with the file name <routers.xml>. You most probably will change this by
+using the C<--discout> option.
+
+Examples:
+
+  ./bin/genddx --out=share/torrus/discovery/ch-langenthal.ddx \
+    --discout=share/torrus/xmlconfig/ch-langenthal.xml
+    --host=192.168.34.35:Langenthal_PE1 \
+    --host=192.168.34.36:Langenthal_PE2 \
+    --host=192.168.34.37:Langenthal_CE_Stadtverwaltung \
+    --community=blahBlah \
+    --subtree=/MPLS/CH/Bern/Langenthal
+
+  ./bin/devdiscover --in=share/torrus/discovery/ch-langenthal.ddx
+
+
+
+=head2 C<devdiscover>: SNMP discovery tool
+
+  Usage: $Torrus_HOME/bin/devdiscover --in=filename.xml options...
+  Options:
+   --in=infile             discovery instructions XML file
+   --mkdir                 create data-dir directories
+   --limit=regexp          limit the discovery by output files
+   --verbose               print extra information
+   --debug                 print debugging information
+
+This utility performs the SNMP discovery of devices listed in the input
+XML file. The output XML file is the Torrus datasources configuration.
+Output file name is taken from C<output-file> parameter in the instructions
+XML file.
+
+C<devdiscover> is accompanied by a number of MIB- or vendor-specific
+modules, each responsible for finding specific SNMP variables in
+the SNMP device, and for generating a piece of Torrus configuration XML
+file responsible for that specific MIB. The list of supported generic MIBs and
+vendors is constantly growing. It is quite easy to create new discovery
+modules, and the internals are documented in
+I<Torrus SNMP Device Discovery Developer's Guide>.
+
+The output file automatically includes all required prerequisite
+generic and vendor template definition files.
+
+Behaviour of C<devdiscover> is controlled by variables in
+F<$Torrus_HOME/share/torrus/devdiscover-siteconfig.pl> file. Default values for
+those variables reside in F<$Torrus_HOME/share/torrus/devdiscover-config.pl>.
+
+For large installations, it is recommended to place RRD files into
+a hashed directory structure. You can enable this feature by setting
+
+  $Torrus::DevDiscover::hashDataDirEnabled = 1;
+
+in your F<devdiscover-siteconfig.pl> file.
+Then launching C<devdiscover> with C<--mkdir> option would automatically
+create the subdirectories inside C<data-dir>.
+
+The XML files produced by C<devdiscover> may be automatically changed
+with some local site-specific scripts. See XUpdate usage example in
+I<Torrus User Guide>.
+
+
+=head2 Discovery Instructions File
+
+The input file for C<devdiscover> is an XML file. Its DTD is available
+in Torrus distribution in F<snmp-discovery.dtd>.
+
+A typical place to store the discovery XML is F<share/torrus/discovery/>
+directory under the Torrus installation path.
+
+Example:
+
+    <?xml version="1.0" encoding="UTF8"?>
+    <snmp-discovery>
+      <file-info>
+        <format-version>
+    1.0
+        </format-version>
+      </file-info>
+      <creator-info>
+    Torrus version 0.1.4d
+    This file was generated by command:
+    /usr/local/torrus-0.1/bin/genddx \
+     --discout=share/torrus/xmlconfig/myrouters.xml \
+     --community=blahblah  --host=10.0.0.1  --host=10.0.1.1
+    On Tue Dec  2 17:43:30 2003
+      </creator-info>
+      <param name="data-dir" value="/var/snmpcollector"/>
+      <param name="domain-name" value=""/>
+      <param name="host-subtree" value="/Routers"/>
+      <param name="output-file" value="share/torrus/xmlconfig/myrouters.xml"/>
+      <param name="rrd-hwpredict" value="no"/>
+      <param name="snmp-community" value="blahblah"/>
+      <param name="snmp-port" value="161"/>
+      <param name="snmp-retries" value="2"/>
+      <param name="snmp-timeout" value="10"/>
+      <param name="snmp-version" value="2c"/>
+      <host>
+        <param name="snmp-host" value="10.0.0.1"/>
+        <param name="symbolic-name" value="10.0.0.1"/>
+      </host>
+      <host>
+        <param name="snmp-host" value="10.0.1.1"/>
+        <param name="symbolic-name" value="10.0.1.1"/>
+      </host>
+    </snmp-discovery>
+
+=head3 XML elements
+
+=over 4
+
+=item * C<snmp-discovery>
+
+Mandatory. The top-level element.
+
+=item * C<file-info>
+
+Mandatory. It must contain the element C<format-version>.
+
+=item * C<format-version>
+
+Mandatory. It must contain a format version currently
+supported by devdiscover. Currently supported version is C<1.0>.
+
+=item * C<creator-info>
+
+Optional. May contain the information about the file creator: a human author
+name, or a program.
+
+=item * C<param>
+
+Some parameters are mandatory. This element defines a global or host-specific
+parameter. Mandatory attribute C<name> identifies the parameter,
+and the value is taken eother from C<value> attribute, or from the
+textual content of the element.
+
+C<param> element should be the child element of C<snmp-discovery> for global
+parameters or C<host> for host-level parameters. Host-level parameters
+override the values of global parameters.
+
+These parameters are for C<devdiscover> only. They are not Torrus configuration
+parameters, although some of them are directly copied into the generated
+configuration file.
+
+=item * C<host>
+
+Mandatory. Defines a host to run SNMP discovery.
+
+=back
+
+
+=head3 Common parameters
+
+=over 4
+
+=item * C<collector-period>, C<collector-timeoffset>,
+C<collector-dispersed-timeoffset>, C<collector-timeoffset-min>,
+C<collector-timeoffset-max>, C<collector-timeoffset-step>
+
+Optional. When defined, these parameters override those from C<snmp-defaults>
+template in F<snmp-defs.xml>.
+
+=item * C<output-file>
+
+Mandatory. Specifies the output filename for generated Torrus configuration.
+In the parameter value, C<$XMLCONFIG> is replaced with the default Torrus XML
+configuration directory name.
+
+=item * C<output-bundle>
+
+Optional. Specifies a comma-separated list of XML file names for bundle
+output. Each bundle file will contain E<lt>includeE<gt> statement for each
+corresponding C<output-file>.
+In the parameter value, C<$XMLCONFIG> is replaced with the default Torrus XML
+configuration directory name.
+
+=item * C<snmp-port>, C<snmp-community>,  C<snmp-version>, C<snmp-timeout>,
+        C<snmp-retries>, C<snmp-host>
+
+Mandatory. These parameters define the SNMP agent properties and are
+copied one-to-one to the output configuration.
+
+=item * C<domain-name>
+
+Optional. Defines a DNS domain name to be appended to C<snmp-host>.
+
+
+=item * C<data-dir>
+
+Mandatory. Defines the directory path where RRD files for this host
+are stored. In case if hashed directories are enabled, C<data-dir> specifies
+the base path under which the hashed subdirectories are created.
+
+=item * C<symbolic-name>
+
+Optional. Determines the host-specific subtree name. If not specified,
+the subtree is named by C<system-id>, or by C<snmp-host> if system ID is
+not defined.
+
+=item * C<system-id>
+
+Optional. If defined, it overrides the default value of system ID, which
+is equal to the value of C<snmp-host>.
+
+=item * C<snmp-oids-per-pdu>
+
+Optional. When defined, these parameters overwrites the value from the
+template and vendor-specific discovery modules.
+
+=item * C<snmp-check-sysuptime>
+
+Optional. Default: C<yes>. Devdiscover sets this parameter to C<no> when it
+finds SNMPv2-MIB::sysUpTime variable unavailable in the device.
+
+=item * C<host-subtree>
+
+Optional. Defines the datasourse tree path under which the host-specific
+subtree is created.
+
+=item * C<rrd-hwpredict>
+
+Optional. Valid values: C<yes>, C<no>. Determines if Holt-Winters forecasting
+should be enabled for the given host.
+
+=item * C<disable-devtypes>
+
+Optional. Comma-separated list of discovery device types that need to be
+excluded from discovery process. For example, ATMEL appliances conflict with
+Empire SystemEdge MIBs, and you need to disable C<EmpireSystemedge> module
+in order to run the discovery on those appliances.
+
+=item * C<only-devtypes>
+
+Optional comma-separated list of device types. If defined, only the specified
+types will be used for device probing.
+
+=item * C<host-aliases>
+
+Optional comma-separated list of alias paths for a given host. Aliases
+must be unique for each host.
+
+=item * C<custom-host-templates>
+
+Optional comma-separated list of template names that will be applied
+to the resulting XML configuration at the host level.
+
+=item * C<host-copy-params>
+
+Optional comma-separated list of parameter names that should be copied
+from the discovery configuration file to the generated Torrus configuration
+at the host level.
+
+=back
+
+
+=head3 Parameters for C<RFC2863_IF_MIB>
+
+This discovery module is responsible for agent's interfaces table and
+interface counters. Recognized optional parameters are:
+
+=over 4
+
+=item * C<RFC2863_IF_MIB::suppress-hc-counters>
+
+Some agents do not implement 64-bit counters correctly. When this parameter
+is set to C<yes>, 64-bit interface counters are not used for the host.
+For Cisco IOS devices, the C<CiscoIOS> discovery module tries to detect
+such situation automatically.
+
+=item * C<RFC2863_IF_MIB::subtree-name>
+
+Defines the child subtree name within host-level subtree where interface
+counters are located. Default: C<Interface_Counters>.
+
+=item * C<RFC2863_IF_MIB::exclude-interfaces>
+
+Comma-separated list of interface names which should be excluded from
+configuration. Spaces are allowed between the names and commas.
+The names should be the ones that are used for interface subtrees.
+
+=item * C<RFC2863_IF_MIB::tokenset-members>
+
+This parameter defines which interfaces' C<InOut_bps> leaves to add to
+which tokensets. The value is a semicolon-separated (;) list of
+entries of form I<tset:interface,interface>, where I<tset> is a name of the
+tokenset, and the I<interface> is the subtree name of the corresponding
+interface. The token sets must be defined elsewhere in Torrus configuration.
+Example:
+
+  <host>
+    <param name="snmp-host" value="192.168.49.131"/>
+    <param name="RFC2863_IF_MIB::tokenset-members">
+     clusters: 10_1, 10_2;
+     uplinks: 1_1, 1_2
+    </param>
+  </host>
+
+=item * C<RFC2863_IF_MIB::errors-monitor>
+
+When set to C<yes>, all interface error and discard counters are assigned to
+a monitor called C<RFC2863_IF_MIB-errors>. It is up to you to define the
+monitor somewhere in the configuration.
+
+=item * C<RFC2863_IF_MIB::copy-params>
+
+Optional comma-separated list of parameter names that would be copied
+to the output Torrus configuration at interface level.
+For each parameter I<param>, the value for a particular interface I<intf>
+will be taken from parameter C<RFC2863_IF_MIB::I<param>::I<intf>> in
+the discovery configuration file. Example:
+
+  <host>
+    <param name="snmp-host" value="192.168.49.131"/>
+    <param name="RFC2863_IF_MIB::copy-params" value="intf-error-threshold"/>
+    <param name="RFC2863_IF_MIB::intf-error-threshold::10_1" value="300"/>
+    <param name="RFC2863_IF_MIB::intf-error-threshold::2_1" value="900"/>
+  </host>
+
+
+
+=back
+
+=head3 Other generic MIB parameters
+
+=over 4
+
+=item * C<RFC2790_HOST_RESOURCES::sysperf-subtree-name>
+
+Defines the child subtree name within host-level subtree where system CPU
+and memory statistics are located. Default: C<System_Performance>.
+
+=back
+
+=head3 Vendor parameters
+
+=over 4
+
+=item * C<CiscoGeneric::disable-cpu-stats>
+
+When set to C<yes>, Cisco CPU usage statistics are excluded from discovery.
+
+=item * C<CiscoGeneric::disable-memory-pools>
+
+When set to C<yes>, Cisco memory pool usage statistics are excluded from
+discovery.
+
+=item * C<CiscoGeneric::disable-sensors>
+
+When set to C<yes>, Cisco temperature sensors are excluded from discovery.
+
+=item * C<CiscoGeneric::use-fahrenheit>
+
+When set to C<yes>, Cisco temperature sensors are recorded and displayed
+in degrees Fahrenheit.
+
+=item * C<CiscoGeneric::file-per-sensor>
+
+When set to C<yes>, Cisco temperature sensor values are stored in
+a separate RRD file per sensor ID. This is useful for modular big routers
+like Cisco GSR.
+
+=item * C<CiscoIOS::disable-membuf-stats>
+
+When set to C<yes>, Cisco memory buffer statistics are excluded from
+discovery.
+
+=item * C<CiscoIOS::disable-ipsec-stats>
+
+When set to C<yes>, IPSec statistics are excluded from discovery.
+
+=item * C<CiscoCatOS::suppress-noname-ports>
+
+When set to C<yes>, only those Catalyst ports are included in configuration
+which have a port name (set up by C<set port name> command).
+
+=back
+
+
+
+=head1 Author
+
+Copyright (c) 2002-2003 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

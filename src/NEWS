@@ -1,0 +1,644 @@
+04-AUG-2004: Release 0.1.7
+
+In this release:
+  1. mkroutercfg is removed from the distribution
+
+  2. rrd_hwreapply is moved to a separate package:
+     http://torrus.sourceforge.net/rrdman/
+
+  3. New Torrus configuration parameters: snmp-check-sysuptime, transform-value
+
+  4. New discovery parameters: custom-host-templates, host-copy-params,
+     CiscoCatOS::suppress-noname-ports, RFC2863_IF_MIB::tokenset-members,
+     RFC2863_IF_MIB::exclude-interfaces, RFC2863_IF_MIB::errors-monitor,
+     RFC2863_IF_MIB::copy-params
+
+  5. Implemented GPRINT: now the minimum, maximum, average and last values
+     are printed at the graph bottom.
+
+  6. Optionally the small graphs may show 24 hours instead of 6.
+     See the User guide for details.
+
+  7. Better logging levels organisation.
+
+  8. ACLs may contain the wildcard (*) object that applies the permissions
+     to all existing objects.
+
+  9. URL parameters are preserved over the login phase.
+
+  10. Cisco IPSec statistics added
+
+  11. New vendors supported by devdiscover: NetApp and Atmel
+
+  12. Now the site-global parameters may be specified in a special XML
+      file: xmlconfig/site-global.xml. It will not be overwritten by
+      "make install". In existing installations, you need to change the
+      line in torrus-siteconfig.pl:
+	@Torrus::Global::xmlAlwaysIncludeFirst =
+	                         ( 'defaults.xml', 'site-global.xml' );
+
+  13. New documentation: Torrus Scalability Guide. It describes the details
+      of planning and installation of Torrus in large setups.
+
+  14. Collector and monitor logs have a more secure mask now.
+
+  15. New option in acledit: --force. It allows you to change permissions
+      for non-existing objects.
+
+  16. Holt-Winters prediction is now disabled for system performance and
+      interface error counters.
+
+
+03-MAY-2004: Release 0.1.6
+
+In this release:
+  1. New option in devdiscover: --limit=regexp. It sets the limits of
+     discovery by output file name.
+
+  2. Perl 5.6.1 is no longer supported. Version 5.8.0 or higher is the
+     requirement.
+
+  3. New option in compilexml: --noval. It disables datasource parameters
+     validation. This speeds up the compilation up to 2 times, but it adds
+     the risk of getting unusable configuration. In addition, the first
+     initialisation cycle of collector and monitor would be much longer.
+
+  4. New multigraph parameter: ignore-views-X. It allows you to hide certain
+     lines in some views. For example, you might not want to show
+     too many details in a short 6-hours graph.
+
+  5. New @-functions in RPN references: AVERAGE MIN MAX LAST. They allow you
+     to draw maximums and minimums in multigraphs.
+
+  6. New SNMP discovery modules: RFC1697_RDBMS, OracleDatabase.
+
+  7. The daemon startup script (init.torrus) now waits for the daemons
+     to finish. This allows a nicer host reboot process.
+
+  8. Apache 2.0 compatiblity. See webintf.pod for more details.
+
+  9. On the top of the HTML page, two new elements may be displayed:
+     site info and tree info. This improves the visibility and usability in
+     large-scale installations.
+
+  10. New XML configuration elements: setvar, iftrue, iffalse. They allow
+     conditional compilation of some parts of templates.
+
+  11. First official release of Cisco Class-based QoS monitoring plugin.
+
+06-APR-2004: Bugfix release 0.1.5bf2
+
+Fixed the bug in database cusror operation. It might cause Apache server
+hangup and database corruption.
+
+25-MAR-2004: Bugfix release 0.1.5bf1
+
+Bugfix in BerkeleyDB environment cleanup, and few other minor bugs fixed.
+
+17-MAR-2004: Release 0.1.5
+
+Lots of changes. See ChangeLog for a complete list. Most important changes
+and features are:
+  1. RRD file structure has changed for IF-MIB counters. For the sake of
+     performance optimization in large installations, the number of files
+     has been minimized. If keeping the old RRD data files is critical,
+     "configsnapshot" is the right utility for you. See 0.1.4bf2 release
+     notes for compatibility information. In short, you would need first
+     to upgrade to 0.1.4bf3, use configsnapshot, and then upgrade to 0.1.5.
+     Some old versions of important XML template files are stored in
+     xmlconfig/old.
+
+  2. In devdiscover, output file, as well as most other activities, are
+     controlled only from the input XML file. The number of commandline
+     options is very minimalistic. See snmpdiscovery.pod for details.
+     The most important new parameters are: 'output-file', 'output-bundle'.
+     The devdiscover input file is now referred to as "DDX", or
+     device-discovery XML.
+
+  3. New discovery modules: AscendMax, CiscoFirewall, CompaqCIM, F5BigIp,
+     NetScreen, MicrosoftWindows, RFC2737_ENTITY_MIB, Xylan; other modules
+     improved.
+
+  4. Torrus is now compatible with BerkeleyDB 4.2. It is highly recommended
+     to upgrade your installations of BerkeleyDB, because of some bugs
+     confirmed.
+
+  5. For site management purposes, a new utility "genlist" might be useful.
+
+  6. Dual configuration database. Now there are two instances of configuration
+     database: active and passive. Collector and other programs always work
+     with the active instance. XML compiler first operates with passive
+     instance, and then makes it active. Thus collector interruption due to
+     compilation and errors is minimized.
+
+  7. Collectors record runtime statistics which are available at any moment.
+     Those include running time and late start stats. The "schedulerinfo"
+     utility is used to generate the statistics reports.
+
+  8. Aliases are expanded recursively. This gives you extra means of
+     organizing your data structures.
+
+  9. userguide.pod has a description how to set up several instances
+     of Torrus on one host.
+
+  10. For large installations, dispersed collector offset might be a useful
+      feature.
+
+  11. Collector and monitor logfiles are reopened at SIGHUP. This helps
+      you to set up log rotation if needed.
+
+14-JAN-2004: Release 0.1.4bf3
+
+Bugfix release.
+Better device-specific support for devdiscover. Cisco ATM virtual interfaces
+are now correctly discovered.
+
+13-JAN-2004: Release 0.1.4bf2
+
+This release introduces a new utility: bin/configsnapshot. It would be needed
+for those who migrate a large existing Torrus installation to release 0.1.5.
+The utility saves your configuration database in a XML file.
+Configsnapshot utility from release 0.1.5 is not compatible with
+database format from previous releases.
+Configsnapshot utility from release 0.1.4bf2 does not preserve aliases.
+See doc/commandref.pod for more information.
+
+04-JAN-2004: Release 0.1.4bf1
+
+Bugfix-only release. Fixed an important bug in DB.pm, and few other fixups.
+
+10-DEC-2003: Release 0.1.4
+
+In this release:
+  1. Bug fixes in devdiscover.
+
+  2. New datasource parameter: snmp-oids-per-pdu. Before this parameter
+     was controlled globally for all collectors.
+
+  3. Smart interface filtering for Cisco devices. Useless pseudo-interfaces are
+     excluded from discovered configuration.
+
+  4. New utility: configinfo. It prints statistical information about
+     all trees configured.
+
+  5. New XSLT template: sup/extract-skeleton.xsl. It extract the tree
+     structure out of the configuration XML. See User Guide for details.
+
+  6. For CatOS devices, interface comments are derived from interface
+     descriptions. Memory, CPU, and temperature statistics are now available
+     for CatOS too.
+
+  7. With the new CSS layout, the node name is not limited.
+
+  8. New discovery module: EmpireSystemedge by Shawn Ferry.
+
+  9. New graph parameters: graph-logarithmic and graph-rigid-boundaries
+
+ 10. Interface counters are no longer resided in the host-level subtree.
+     They are moved to a subtree named "Interface_Counters".
+
+ 11. Devdiscover CLI options have changed. It accepts XML input only.
+     New utility added: genddx. See Torrus SNMP Discovery User Guide for details.
+     
+
+03-NOV-2003: Release 0.1.3
+
+In this release:
+  1. New SNMP discovery tool. Mkroutercfg is now replaced with a new,
+     modular, flexible, and expandable tool: "devdiscover". New device types
+     and MIBS are easily added as independent Perl modules. Detalis
+     for those who intend to create their new discovery modules are in
+     doc/devdoc/devdiscover.pod. The constantly growing list of supported
+     MIBs and devices currently contains:
+        RFC2670
+          DOCSIS headend statistics  (needs more testing)
+        RFC2790
+          HOST_RESOURCES MIB.
+          Tested with net-snmp and Empire SystemEdge agents 
+        RFC2863
+          IF-MIB, the generic MIB for interfaces status and statistics
+        Cisco CatOS
+          Catalyst workgroup switches
+        Cisco IOS
+          Cisco routers. The following features are currently supported:
+            Memory pools status
+            CPU load
+            Temperature sensors
+            SAA probes
+
+     Mkroutercfg will be around for a while, and will disappear from
+     future releases.
+
+     Default subtree name for SNMP devices is now "/Routers". Hostnames
+     may be supplied with symbolic names which will be used as per-host
+     subtree names.
+
+     For large installations, RRD files may be placed in a hashed directory
+     structure. This will increase the overall system performance.
+
+     Cisco proprietary counters (locIfInBitsSec, locIfOutBitsSec, locIfLoad)
+     are no longer used by default. There is configuration option
+     that changes this behaviour. See below the migration notes.
+
+  2. Lots of changes in xmlconfig/snmp-defs.xml. For backwards compatibility,
+     the old version is saved as "generic/snmp-defs.old-0.1.2.xml".
+     There is no longer a subtree "/SNMP". Your SNMP-collected data may reside
+     at any level of the configuration tree, even from the tree top.
+
+     Generic interface counters are moved to a separate file,
+     "generic/rfc2863.if-mib.xml". Large templates are now split into smaller
+     ones. Default filenames for interface-specific RRD files have changed.
+     See below the migration notes.
+
+  3. In most cases, you don't need to include the template definition files
+     any more. Devdiscover will generate all necessary "<include>" statements
+     in the output files. These statements are now processed recursively
+     before the rest of the file contents.
+     You only need to list one file in addition to your XML configuration
+     files: defaults.xml.
+
+  4. Thanks to Shawn Ferry, the styling profiles may now have symbolic color
+     references out of more than 100 predefined colors.
+
+  5. You may need some post-processing of autogenerated XML files for your
+     specific needs. See the guidelines on usage of XUpdate in Torrus User Guide.
+
+  6. With the new parameters, "has-overview-subleaves" and its companions,
+     you may easily construct overview shortcuts, the same as "Show InOutBps
+     for all interfaces".
+
+  MIGRATION NOTES
+
+  With the introduction of devdiscover, the default interface counter RRD files
+  have changed in structure and filenames. This means that the old RRD files
+  have to be discontinued, and new statistics will be collected into new
+  files. You may choose one of the several possible approaches in migrating to
+  the new data structure.
+
+  -- The easy way. Abandon the old data and start collecting from scratch.
+     This may not be acceptable for many production installations.
+
+  -- Compose separate subtree(s) from your old XML configuration files.
+     Then let two collector instances run simultaneousely for the same set
+     of devices. At some defined point in time, stop the old collector
+     and never run it again. You will still be able to graph the data from
+     the old RRD files. Later the old files may be deleted when you no longer
+     need them.
+
+  -- The complex way. Convert the old RRD files to the new data structure.
+     This requires quite a lot of scripting efforts. There are no existing
+     and ready-to-run solutions for this task. 
+
+
+14-OCT-2003: Release 0.1.2
+
+In this release:
+  1. New parameter: monitor-action-target. It allows you to redirect the
+     monitor action to another leaf, such as miltigraph.
+
+  2. Collector works now more precisely on a VmWare guest system (see
+     Installation Guide).
+
+  3. HTML pages have a timestamp in the corner. Now your printouts are dated.
+
+  4. Graphs can have now horizontal rules. See XML Configuration guide
+     for details. defaults.xml defines 3 default HRULEs for each graph.
+
+  5. New parameter: vertical-label prints some text along Y axis.
+
+  6. Styling profiles. Now all default colors and lines are defined in
+     a separate file, which you can easily substitute. Your contributions
+     with new color profiles are absolutely welcome. The best profile
+     will become the official Torrus style.
+
+  7. New parameters: graph-lower-limit, graph-upper-limit
+     Now all SNMP counter graphs have the lower graph edge at zero.
+     New view parameters: ignore-limits, ignore-lower-limit,
+     ignore-upper-limit.
+
+  8. bin/cleanup: Cronjob for cleaning up diskspace. See Installation
+     Instructions for details.
+
+  9. VLAN interfaces are excluded from mkroutercfg-generated configurations.
+
+  10. New approach in automatic config generation proposed by Christian
+      Schnidrig. See the User Guide, section "Tips and Tricks".
+
+  11. New vendor and generic templates and definitions:
+      vendor/ascend.max.xml, examples/ascend.max.xml,
+      generic/rfc2670.docsis-if.xml
+
+14-SEP-2003: Release 0.1.1
+
+The new release is made to meet the requirements described in
+doc/requirements.0.1.txt.
+
+In this release:
+  1) Torrus now supports multiple independent datasource trees.
+     Each tree is compiled separately, and runs a separate instance of
+     monitor and collector. torrus-siteconfig.pl has changed dramatically.
+     See the documentation for details.
+
+  2) grapher.cgi is no longer supported. Currently only mod_perl is the
+     possible option.
+
+  3) Apache configuration has changed. For the whole system consistency,
+     please update it according to doc/webintf.txt documentation.
+
+  4) height-hint parameter is no longer used. Graphs may have arbitrary
+     height. GPRINT will be supported in future releases.
+
+  5) BerkeleyDB stability problem is resolved. It is highly recommended that
+     you upgrade to version 4.1.25.
+
+  6) User authentication and authorization. See "acledit" command description
+     and the example in installation instructions.
+
+  7) xmlconfig/snmp-defs.xml: default xff value has changed from 0 to 0.5,
+     as recommended by Rodrigo Cunha. This affects newly created RRD files
+     only. There is a script from Rodrigo to convert the existing files.
+     See torrus-devel mailing list archives.
+
+  8) Monitor event type "throw" has changed to "set".
+
+  9) New init.torrus. It no longer uses "nice" for launching the daemons.
+     There is a problem found in freebsd5.1: "init.torrus start" suspends with
+     the error message "tty out". The workaround for freebsd5.1 is in the
+     release distribution.
+     Please report if you see a similar problem on other OSes.
+
+  10) New collector parameter: "value-map". It allows you to map some
+     textual SNMP variables into numbers.
+
+
+04-AUG-2003: Release 0.0.20
+
+In this release:
+  1) Bugfixes in renderer and SNMP collector.
+
+  2) Now it is possible to have several community strings
+     and port numbers per host.
+
+  2) Web interface changes: CSS stylesheet is now referenced by absolute URL,
+     and two new config variables added: $Torrus::Renderer::rendererURL
+     and $Torrus::Renderer::plainURL.
+
+  3) grapher.cgi will not be supported in version 0.1.X and higher.
+       
+
+01-JUL-2003: Release 0.0.19
+
+In this release:
+  1) Few important bugfixes in renderer.
+
+  2) It is now possible to create collector plugins.
+     torrus-plugin-randomcollector is created as an example. It generates random
+     value datasources.
+
+  3) mkroutercfg can now generate deeper hierarchies (thanks to Marc Haber).
+
+  4) Most directory paths that Torrus uses are now configurable through
+     ./configure variables. Thus Torrus is now easy to integrate in any
+     filesystem naming standard.
+
+  5) Typo fix: the right name for rrd-create-heartbit parameter is
+     rrd-create-heartbeat. In addition, its default value is now 500 instead
+     of 1800.
+
+02-APR-2003: Release 0.0.18
+
+In this release:
+  1) Few important bugfixes.
+
+  2) Default monitor parameters are moved from torrus-siteconfig.pl to
+     torrus-config.pl.
+
+  3) Default views are reorganized. New mandatory parameter is introduced:
+     "rrgraph-views".
+
+  4) Added a new template and an example for Cisco MAC accounting statistics.
+
+  5) I started working in a new place: GPS-Technik AG. The company will
+     provide commercial support for Torrus.  
+
+21-MAR-2003: Release 0.0.17
+
+In this release:
+  1) Default user and group permissions have changed. Now Torrus relies
+     on its group and user. When upgrading from previous release,
+     perform the following steps, according to your local system specifics:
+
+     Add group "torrus"
+     Add user "torrus" with its primary group "torrus"
+     Add your Apache server user (usually "www" or "nobody") to group "torrus"
+     Stop collector and monitor:
+          /etc/init.d/torrus stop
+     Stop Apache server:
+          /etc/init.d/httpd stop
+     Remove the old stus and cache directories
+          rm -rf /usr/local/torrus-0.0/var
+     Install Torrus 0.0.17:
+          ./configure
+          make install
+          cp init.torrus /etc/init.d/torrus
+     Apply new user rights to your SNMP collector files:
+           chown -R torrus:torrus /var/snmpcollector
+     Recompile your configuration:
+               /usr/local/torrus-0.0/bin/compilexml
+     Start Apache server:
+          /etc/init.d/httpd start
+     Start collector and monitor:
+          /etc/init.d/torrus start
+
+  2) Torrus is now looking cool. Thanks to bluerobot.com and Ian Holsman,
+     the HTML output is using the full power of CSS styling.
+     In addition, there's a new printer-friendly layout.
+     Most testing was done with IE5.5 and Opera 7.03/6.12B1, with some
+     tests with Netscape 7.02.
+     Please report any inconsistencies, especially in browser support,
+     or in sizes and distances. Input from artistically talented people
+     is highly appreciated (due to the author's lack of those talents).
+
+  3) mkroutercfg is now not changing any output files when some
+     of the routers are unreacheable. This allows you to run it periodically,
+     without the risk that the config is screwed due to network outage.
+
+  4) HTML renderer is now more optimized for mod_perl, and the navigation
+     is much faster.
+
+  5) XML DTD for the configuration files is now available.
+     You may use it for extra validation of your configuration files.
+     
+  6) Installer enchancements: Perl bundle module allows quick installation
+     of required modules; "make install prefix=/some/path" now works
+     correctly, so people can create Torrus distribution packages.
+
+04-MAR-2003: Release 0.0.16
+
+In this release:
+  1) Non-ASCII characters are now displayed correctly. You may use
+     UTF-8 (Unicode), or any of the encodings supported by libxml2.
+     Currently only ISO-8859-1 (Latin1) is tested. See the XML Configuration
+     Reference for more details.
+
+  2) Third-party add-ons, or plugins, may be now easily integrated into
+     Torrus installation. See the Installation guide and torrus-plugin-dummy
+     in the SF.net downloads.
+
+  3) Now all XML configuration files that come with Torrus distribution
+     are overwritten by "make install".
+
+  4) Vendor-specific definitions are now placed into "vendor" subdirectory
+     of xmlconfig. Cisco IOS specifics are moved from "snmp-defs.xml"
+     into "vendor/cisco.ios.xml". Note when upgrading from previous release:
+     you may need to add this file to your "torrus-siteconfig.pl".
+
+  5) Thanks to Aaron Bush, two additional vendors are supported: APC and their
+     UPS monitors, and HP's HPUX SNMP agent. 
+
+  6) SNMP mibs are relocated from "lib" into "share/torrus/sup/" directory.
+     If upgrading from previous release, you have to delete "lib/mibs"
+     manually.
+
+  7) The XML configuration DTD is added. You may find it installed into
+     "share/torrus/sup/".
+
+26-FEB-2003: Release 0.0.15
+
+In this release:
+  1) Memory allocation bug persists in Perl 5.8
+     (Datasource being updated does not exist: ciscoMemoryPoolFree),
+     so more relaxed checkups are made on RRD structure.
+
+  2) Thanks to Aaron S. Bush, new example files added for APC UPS
+     battery SNMP monitoring.
+
+20-FEB-2003: Release 0.0.14
+
+In this release: 
+  1) New XML configuration statement: <include filename="thefile.xml"/>
+
+  2) New file for read-only views of SNMP collector results:
+     xmlconfig/examples/snmp-view.xml
+
+  3) Few minor bugfixes.
+
+20-JAN-2003: Release 0.0.13
+
+In this release: 
+  1) Configuration locking has improved. Now the compiler waits for the
+     readers to finish, and the readers won't start when the configuration
+     is not ready.
+
+  2) Added some signal handlers. Before that, Ctrl-C could lead to
+     unusable database which made the tools hang.
+
+06-JAN-2003: Release 0.0.12
+
+In this release:
+  1) New action parameters: setenv-params, setenv-dataexpr.
+     New template variable in action_printemail: "env".
+
+  2) Native mod_perl handler (see web interface documentation)
+
+  3) HTML templates reorganized: 
+       deleted templates/inc-*,
+       added templates/html-incblocks.txt
+
+  4) CSS stylesheet is now defined in torrus-config.pl
+
+  5) Default var_group (the group name for var/ directory) changed
+     from "nogroup" to "www"
+
+  6) DS type "RRDfile" is changed to "rrd-file". The old one is still
+     supported.
+
+  7) Now multiple values may be displayed in one graph.
+     See rrd-multigraph in XML configuration reference.
+
+  8) XML configuration examples are moved to a separate directory
+
+  9) New leaf parameter: graph-legend. It puts the legend string
+     into the RRD graph.
+
+  10) snmp-defs.xml now has InOutBps in templates, and mkroutercfg
+     produces views that allow to see in/out traffic for all interfaces
+     of the given device in one page.
+
+Upgrade notes:
+
+  See "Upgrade Procedure" paragraph in the Installation guide.
+
+  xmlconfig/snmp-defs.xml is updated in this release, so
+  it is recommended to update your local copy.
+
+  templates/routercfg.xml is updated with use of InOutBps graphs,
+  so it is recommended that you re-generate your output of "mkroutercfg".
+
+  HTML templates have changed too, so it is recommended to clean the web cache
+  in your browser and Torrus (after XML compilation, the cache of Torrus grapher
+  is cleaned automatically).
+
+
+16-DEC-2002: Bugfix release 0.0.11
+
+30-OCT-2002: Release 0.0.10 is out.
+
+In this release:
+  1) New node parameter: "hidden", allows to hide pieces of the
+     datasources tree from normal viewing.
+
+  2) Renderer now supports variables which are preserved during the
+     browsing. Variables supported are: TZ, NOW, DEBUG, and SHOWHIDDEN
+
+  3) New RRD manipulation utility: bin/rrd_hwreapply. It allows
+     re-applying the Holt-Winters parameters to existing data, thus
+     providing a broad field to play.
+
+  4) grapher.cgi is now compatible with mod_perl Apache::Registry.
+     This speeds up the browsing amazingly!
+     Also a native mod_perl handler is under development. It will
+     give even more speed.
+
+  5) Some performance tests were made: compared to version 0.0.7,
+     compilexml runs 50% longer, and collector initializes 25% faster.
+     XML compiler is slower because of additional checkups performed, and
+     because it builds the big cache database which is used by
+     other components afterwards. 
+
+
+17-OCT-2002: Release 0.0.9 is out
+
+In this release:
+
+  1) New parameter introduced: tokenset-member
+
+  2) View temlates are seriousely updated, with better
+     look and feel.
+
+  4) New view is introduced: expanded view of all leaf children
+     of the given subtree.
+
+  5) width-hint and height-hint are calculated at installation time.
+
+  6) Upgrade notes from previous releases to 0.0.9:
+
+      XML configuration files are changed:
+        datasources-def.xml and views.xml are deleted,
+        and replaced with defaults.xml.
+
+        defaults.xml is the file which is overwritten by "make install".
+        The width-hint and height-hint are automatically calculated
+        during the installation, by means of bin/rrd_getdim and bin/prepviews.
+
+        Thus, when upgrading from previous release,
+        you need to edit your torrus-siteconfig.pl, and manually remove
+        datasources-def.xml and views.xml.
+
+        Also the tokenset default views are moved from monitors.xml
+        into defaults.xml. You need to manually update monitors.xml too.
+
+  7) Few minor bugs are fixed
+
+    
+

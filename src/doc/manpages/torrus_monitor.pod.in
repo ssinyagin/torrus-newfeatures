@@ -1,0 +1,102 @@
+#  Copyright (C) 2004  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 NAME
+
+@XFORM_monitor@ - Torrus Monitor.
+
+=head1 SYNOPSIS
+
+B<@XFORM_monitor@> --tree=I<TREENAME> [I<options...>]
+
+=head1 DESCRIPTION
+
+This command starts the Monitor process for the tree I<TREENAME>. By
+default it forks into a daemon, sets the log output file to
+F<@logdir@/monitor.TREENAME.log>, performs one monitoring cycle, and
+sleeps until the next cycle is scheduled. In daemon mode the log file
+can be reopened by sending it a SIGHUP signal.
+
+Monitoring cycle scheduling is controlled by two variables whose values 
+may be set in F<torrus-siteconfig.pl>:
+
+=over 4
+
+=item $Torrus::Global::monitorPeriod
+
+Sets the period of the monitor run to a specified number of seconds. Default
+value is 300.
+
+=item $Torrus::Global::monitorStartShift
+
+Controls the shift of the start of monitoring cycle. Monitor will run at
+C<time() mod Period + Shift>, thus allowing the data to be updated during the
+shift period. Default value is 15.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--nodaemon>
+
+Prevents the process from becoming a daemon and sets the log to STDERR.
+
+=item B<--runonce>
+
+Instructs the script to run once and exit. Implies B<--nodaemon>.
+
+=item B<--debug>
+
+Sets the log level to debug.
+
+=item B<--verbose>
+
+Sets the debug level to info.
+
+=item B<--help>
+
+Displays a help message.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F<@perlcfgdir@/torrus-siteconfig.pl>
+
+Torrus site configuration script.
+
+=item F<@logdir@/monitor.TREENAME.log>
+
+Monitor's log for the tree I<TREENAME>.
+
+=back
+
+=head1 NOTES
+
+See more documentation at Torrus home page: http://torrus.sf.net
+
+=head1 AUTHOR
+
+Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

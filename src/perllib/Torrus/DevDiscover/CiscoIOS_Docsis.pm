@@ -18,28 +18,23 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # DOCSIS interface, Cisco specific
-# MIBs to do:
+# MIB used:
 # CISCO-DOCS-EXT-MIB:cdxCmtsMacExtTable
 # CISCO-DOCS-EXT-MIB:cdxIfUpstreamChannelExtTable
 
-package Torrus::DevDiscover::CiscoDocsis;
+package Torrus::DevDiscover::CiscoIOS_Docsis;
 
 use strict;
 use Torrus::Log;
 
 # Sequence number is 600 - we depend on RFC2670_DOCS_IF and CiscoIOS
 
-$Torrus::DevDiscover::registry{'CiscoDocsis'} = {
+$Torrus::DevDiscover::registry{'CiscoIOS_Docsis'} = {
     'sequence'     => 600,
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig
     };
-
-
-our %oiddef =
-    (
-     );
 
 
 
@@ -48,11 +43,13 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    my $session = $dd->session();
-    my $data = $devdetails->data();
+    if( $devdetails->isDevType('CiscoIOS') and
+        $devdetails->isDevType('RFC2670_DOCS_IF') )
+    {
+        return 1;
+    }
 
-
-    return 1;
+    return 0;
 }
 
 
@@ -60,9 +57,6 @@ sub discover
 {
     my $dd = shift;
     my $devdetails = shift;
-
-    my $data = $devdetails->data();
-
 
     return 1;
 }
@@ -76,6 +70,12 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
+    # Build Docsis_Utilization subtree
+
+    my $subtreeNode =
+        $cb->addSubtree( $devNode, 'Docsis_Utilization', {},
+                         ['CiscoIOS_Docsis::docsis-utilization-subtree'] );
+    
 }
 
 

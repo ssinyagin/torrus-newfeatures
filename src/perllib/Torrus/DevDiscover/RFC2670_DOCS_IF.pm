@@ -35,8 +35,8 @@ $Torrus::DevDiscover::registry{'RFC2670_DOCS_IF'} = {
 
 our %oiddef =
     (
-     # DOCS-IF-MIB::docsIfSignalQualityTable
-     'docsIfSigQSignalNoise' => '1.3.6.1.2.1.10.127.1.1.4.1.5'
+     # DOCS-IF-MIB::docsIfDownstreamChannelTable
+     'docsIfDownstreamChannelTable' => '1.3.6.1.2.1.10.127.1.1.1',
      );
 
 
@@ -49,16 +49,12 @@ sub checkdevtype
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    my $snrTable =
-        $session->get_table( -baseoid =>
-                             $dd->oiddef('docsIfSigQSignalNoise') );
-    if( not defined $snrTable )
+    if( $dd->checkSnmpTable( 'docsIfDownstreamChannelTable' ) )
     {
-        return 0;
+        return 1;
     }
-    $devdetails->storeSnmpVars( $snrTable );
 
-    return 1;
+    return 0;
 }
 
 
@@ -69,14 +65,24 @@ sub discover
 
     my $data = $devdetails->data();
 
-    $data->{'docsIfSignalQuality'} = [];
+    $data->{'docsCableMaclayer'} = [];
+    $data->{'docsCableDownstream'} = [];
+    $data->{'docsCableUpstream'} = [];
 
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
-        if( $devdetails->hasOID( $dd->oiddef('docsIfSigQSignalNoise') .
-                                 '.' . $ifIndex ) )
+        my $ifType = $interface->{'ifType'};
+        if( $ifType == 127 )
         {
-            push( @{$data->{'docsIfSignalQuality'}}, $ifIndex );
+            push( @{$data->{'docsCableMaclayer'}}, $ifIndex );
+        }
+        elsif(  $ifType == 128 )
+        {
+            push( @{$data->{'docsCableDownstream'}}, $ifIndex );
+        }
+        elsif(  $ifType == 129 )
+        {
+            push( @{$data->{'docsCableUpstream'}}, $ifIndex );
         }
     }
 
@@ -98,7 +104,7 @@ sub buildConfig
         $cb->addSubtree( $devNode, 'Docsis_Signal_Quality', {},
                          ['RFC2670_DOCS_IF::docsis-signal-quality-subtree'] );
 
-    foreach my $ifIndex ( sort {$a<=>$b} @{$data->{'docsIfSignalQuality'}} )
+    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 

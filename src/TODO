@@ -18,6 +18,8 @@ webintf.pod
 -- Move mailing lists
 -- Update website
 
+-- Discovery support for HP ProCurve 2524 (Marc Haber provided snmpwalks)
+-- Better Networks sensors discovery (Marc Haber)
 -- Minus sign in tree name (ApacheHadler.pm line 75)
 -- Optionally show Admin info when authentication disabled
 -- RRD Renderer to take CF from the view definition

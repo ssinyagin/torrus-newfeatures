@@ -27,12 +27,6 @@
 #
 # Cisco ONS 15305
 
-# TODO:
-# Interface descriptions
-# axxEdgePortDescription
-# axxEdgeWanPortDescription
-# axxEdgeEthPortDescription
-    
     
 
 package Torrus::DevDiscover::AxxessIT;
@@ -53,15 +47,21 @@ our %oiddef =
     (
      # AXXEDGE-MIB
      'axxEdgeTypes'                  => '1.3.6.1.4.1.7546.1.4.1.1',
-     'axxEdgeDcnIpOverDccMapTable'   => '1.3.6.1.4.1.7546.1.4.1.2.3.1.2',
-     'axxEdgeDcnIpOverDccMapIfIndex' => '1.3.6.1.4.1.7546.1.4.1.2.3.1.2.1.1',
-     'axxEdgeDcnIpOverDccMapSlot'    => '1.3.6.1.4.1.7546.1.4.1.2.3.1.2.1.2',
-     'axxEdgeDcnIpOverDccMapSdhPort' => '1.3.6.1.4.1.7546.1.4.1.2.3.1.2.1.3',
-     'axxEdgeDcnIpOverDccMapDccChannel' =>
-                                        '1.3.6.1.4.1.7546.1.4.1.2.3.1.2.1.4',
-     'axxEdgeWanPortMapTable'      => '1.3.6.1.4.1.7546.1.4.1.2.5.1.2',
-     'axxEdgeWanPortMapSlotNumber' => '1.3.6.1.4.1.7546.1.4.1.2.5.1.2.1.1',
-     'axxEdgeWanPortMapPortNumber' => '1.3.6.1.4.1.7546.1.4.1.2.5.1.2.1.2'
+     
+     'axxEdgeWanPortMapTable'         => '1.3.6.1.4.1.7546.1.4.1.2.5.1.2',
+     'axxEdgeWanPortMapSlotNumber'    => '1.3.6.1.4.1.7546.1.4.1.2.5.1.2.1.1',
+     'axxEdgeWanPortMapPortNumber'    => '1.3.6.1.4.1.7546.1.4.1.2.5.1.2.1.2',
+
+     'axxEdgeWanPortDescription'      => '1.3.6.1.4.1.7546.1.4.1.2.5.1.3.1.4',
+
+     'axxEdgeEthPortMapTable'         => '1.3.6.1.4.1.7546.1.4.1.2.6.1.2',
+     'axxEdgeEthPortMapSlotNumber'    => '1.3.6.1.4.1.7546.1.4.1.2.6.1.2.1.1',
+     'axxEdgeEthPortMapPortNumber'    => '1.3.6.1.4.1.7546.1.4.1.2.6.1.2.1.2',
+     
+     'axxEdgeEthPortDescription'      => '1.3.6.1.4.1.7546.1.4.1.2.6.1.3.1.4',
+     
+     'axxEdgeDcnManagementPortMode'    => '1.3.6.1.4.1.7546.1.4.1.2.3.2.1.0',
+     'axxEdgeDcnManagementPortIfIndex' => '1.3.6.1.4.1.7546.1.4.1.2.3.2.2.0',
      );
 
 # Not all interfaces are normally needed to monitor.
@@ -132,50 +132,25 @@ sub discover
 
     if( $devdetails->hasCap('axxEdge') )
     {
-        my $dccTable =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('axxEdgeDcnIpOverDccMapTable') );
-        $devdetails->storeSnmpVars( $dccTable );
-
         my $wanTable =
             $session->get_table( -baseoid =>
                                  $dd->oiddef('axxEdgeWanPortMapTable') );
         $devdetails->storeSnmpVars( $wanTable );
 
-        foreach my $ifIndex
-            ( $devdetails->
-              getSnmpIndices($dd->oiddef('axxEdgeDcnIpOverDccMapSlot')) )
-        {
-            my $interface = $data->{'interfaces'}{$ifIndex};
-            next if not defined( $interface );
-            
-            my $slot =
-                $devdetails->snmpVar
-                ($dd->oiddef('axxEdgeDcnIpOverDccMapSlot') .'.'. $ifIndex);
-            my $port =
-                $devdetails->snmpVar
-                ($dd->oiddef('axxEdgeDcnIpOverDccMapSdhPort') .'.'. $ifIndex);
-            my $channel =
-                $devdetails->snmpVar
-                ($dd->oiddef('axxEdgeDcnIpOverDccMapDccChannel') .'.'.
-                 $ifIndex);
-            
-            my $channel_nick = 'dcc' . ($channel == 1 ? 'R':'M');
-            my $channel_name = 'DCC-' . ($channel == 1 ? 'R':'M');
-            
-            $interface->{'param'}{'interface-index'} = $ifIndex;
+        my $wanDesc =
+            $session->get_table( -baseoid =>
+                                 $dd->oiddef('axxEdgeWanPortDescription') );
+        $devdetails->storeSnmpVars( $wanDesc );
+        
+        my $ethTable =
+            $session->get_table( -baseoid =>
+                                 $dd->oiddef('axxEdgeEthPortMapTable') );
+        $devdetails->storeSnmpVars( $ethTable );
 
-            $interface->{'axxInterfaceNick'} =
-                sprintf( 'Dcn_%d_%d_%s', $slot, $port, $channel_nick );
-
-            $interface->{'axxInterfaceHumanName'} =
-                sprintf( 'DCN %d/%d %s', $slot, $port, $channel_name );
-
-            $interface->{'axxInterfaceComment'} =
-                sprintf( 'DCN slot %d, port %d, channel %s',
-                         $slot, $port, $channel_name );
-        }
-
+        my $ethDesc =
+            $session->get_table( -baseoid =>
+                                 $dd->oiddef('axxEdgeEthPortDescription') );
+        $devdetails->storeSnmpVars( $ethDesc );
         
         foreach my $ifIndex
             ( $devdetails->
@@ -191,6 +166,10 @@ sub discover
                 $devdetails->snmpVar
                 ($dd->oiddef('axxEdgeWanPortMapPortNumber') .'.'. $ifIndex);
             
+            my $desc =
+                $devdetails->snmpVar
+                ($dd->oiddef('axxEdgeWanPortDescription') .'.'.
+                 $slot .'.'. $port);
             
             $interface->{'param'}{'interface-index'} = $ifIndex;
 
@@ -202,19 +181,75 @@ sub discover
 
             $interface->{'axxInterfaceComment'} =
                 sprintf( 'WAN slot %d, port %d', $slot, $port );
+            if( length( $desc ) > 0 )
+            {
+                $interface->{'axxInterfaceComment'} .= ' (' . $desc . ')';
+            }
+        }
+        
+        foreach my $ifIndex
+            ( $devdetails->
+              getSnmpIndices($dd->oiddef('axxEdgeEthPortMapSlotNumber')) )
+        {
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            next if not defined( $interface );
+
+            my $slot =
+                $devdetails->snmpVar
+                ($dd->oiddef('axxEdgeEthPortMapSlotNumber') .'.'. $ifIndex);
+            my $port =
+                $devdetails->snmpVar
+                ($dd->oiddef('axxEdgeEthPortMapPortNumber') .'.'. $ifIndex);
+
+            my $desc =
+                $devdetails->snmpVar
+                ($dd->oiddef('axxEdgeEthPortDescription') .'.'.
+                 $slot .'.'. $port);
+            
+            $interface->{'param'}{'interface-index'} = $ifIndex;
+
+            $interface->{'axxInterfaceNick'} =
+                sprintf( 'Eth_%d_%d', $slot, $port );
+
+            $interface->{'axxInterfaceHumanName'} =
+                sprintf( 'Ethernet %d/%d', $slot, $port );
+
+            $interface->{'axxInterfaceComment'} =
+                sprintf( 'Ethernet interface: slot %d, port %d',
+                         $slot, $port );
+            if( length( $desc ) > 0 )
+            {
+                $interface->{'axxInterfaceComment'} .= ' (' . $desc . ')';
+            }
         }
 
         # Management interface
         {
-            my $interface = $data->{'interfaces'}{1000};
+            my $result = $dd->retrieveSnmpOIDs
+                ( 'axxEdgeDcnManagementPortMode',
+                  'axxEdgeDcnManagementPortIfIndex');
+
+            if( defined( $result ) )
+            {
+                if( $result->{'axxEdgeDcnManagementPortMode'} != 2 )
+                {
+                    Warning('Non-IP mode of Management port is not supported');
+                }
+                else
+                {
+                    my $ifIndex = $result->{'axxEdgeDcnManagementPortIfIndex'};
+                    
+                    my $interface = $data->{'interfaces'}{$ifIndex};
             
-            $interface->{'param'}{'interface-index'} = 1000;
+                    $interface->{'param'}{'interface-index'} = $ifIndex;
 
-            $interface->{'axxInterfaceNick'} = 'Mgmt';
+                    $interface->{'axxInterfaceNick'} = 'Management';
 
-            $interface->{'axxInterfaceHumanName'} = 'Management';
+                    $interface->{'axxInterfaceHumanName'} = 'Management';
 
-            $interface->{'axxInterfaceComment'} = 'Management port';
+                    $interface->{'axxInterfaceComment'} = 'Management port';
+                }
+            }
         }
         
         foreach my $ifIndex ( keys %{$data->{'interfaces'}} )

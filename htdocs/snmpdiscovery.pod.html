@@ -379,6 +379,26 @@ the discovery configuration file. Example:
     &lt;param name=&quot;RFC2863_IF_MIB::intf-error-threshold::10_1&quot; value=&quot;300&quot;/&gt;
     &lt;param name=&quot;RFC2863_IF_MIB::intf-error-threshold::2_1&quot; value=&quot;900&quot;/&gt;
   &lt;/host&gt;</pre>
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3aifindex_2dmap_2dhint"><code>RFC2863_IF_MIB::ifindex-map-hint</code></a></strong><br />
+</li>
+Optional. For a device that doesn't have a corresponding vendor-specific
+discovery module, this parameter would advice <code>devdiscover</code> how to build
+<code>ifTable</code> index mapping. By default, the interfaces are mapped by
+<code>ifDescr</code> variables. For many vendors, this would not give reliable
+mapping. Valid values are: <code>ifName</code>, <code>ifPhysAddress</code>, and <code>ifIndex</code>.
+The first two suggest the mapping by corresponding SNMP variables, and
+the third one should be used for devices with fixed <code>ifIndex</code> layout: in
+this case, the <code>ifIndex</code> values are recorded as they are at the moment of
+discovery. This option is ignored if the device is supported by a vendor
+specific discovery module.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dname_2dhint"><code>RFC2863_IF_MIB::subtree-name-hint</code></a></strong><br />
+</li>
+Optional. By default, per-interface subtrees are named after the values of
+<code>ifDescr</code> SNMP variables. If this option is set to <code>ifName</code>, this
+SNMP variable would be used for subtree naming. This option is ignored if
+the device is supported by a vendor specific discovery module.
 <p></p></ul>
 <p>
 </p>

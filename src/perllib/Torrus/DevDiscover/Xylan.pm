@@ -103,15 +103,6 @@ sub checkdevtype
             ($devdetails, $interfaceFilterOverlay);
     }
 
-    my $data = $devdetails->data();
-
-    $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
-
-    $data->{'nameref'}{'ifNick'}        = 'xylanInterfaceNick';
-    $data->{'nameref'}{'ifSubtreeName'} = 'xylanInterfaceNick';
-    $data->{'nameref'}{'ifComment'}     = 'xylanInterfaceComment';
-    $data->{'nameref'}{'ifReferenceName'}   = 'xylanInterfaceHumanName';
-
     $devdetails->setCap('interfaceIndexingManaged');
 
     return 1;
@@ -126,6 +117,13 @@ sub discover
     my $data = $devdetails->data();
     my $session = $dd->session();
 
+    $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
+
+    $data->{'nameref'}{'ifNick'}        = 'xylanInterfaceNick';
+    $data->{'nameref'}{'ifSubtreeName'} = 'xylanInterfaceNick';
+    $data->{'nameref'}{'ifComment'}     = 'xylanInterfaceComment';
+    $data->{'nameref'}{'ifReferenceName'}   = 'xylanInterfaceHumanName';
+    
     my $phyPortTable =
         $session->get_table( -baseoid => $dd->oiddef('xylanPhyPortTable') );
 

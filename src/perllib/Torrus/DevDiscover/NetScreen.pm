@@ -53,8 +53,6 @@ sub checkdevtype
     }
 
     my $data = $devdetails->data();
-    $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
-    $data->{'nameref'}{'ifDescr'} = '';
 
     $devdetails->setCap('interfaceIndexingManaged');
     
@@ -70,8 +68,10 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
+    $data->{'nameref'}{'ifDescr'} = '';
+    $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
     Torrus::DevDiscover::RFC2863_IF_MIB::retrieveMacAddresses( $dd,
-                                                             $devdetails );
+                                                               $devdetails );
 
     # TODO: do something about these tables in buildConfig
 

@@ -80,14 +80,7 @@ sub checkdevtype
     # Leave room for AXX155 devices, maybe someone needs them in the future
     $devdetails->setCap('axxEdge');
 
-    my $data = $devdetails->data();
-
-    $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
-
-    $data->{'nameref'}{'ifNick'}        = 'axxInterfaceNick';
-    $data->{'nameref'}{'ifSubtreeName'} = 'axxInterfaceNick';
-    $data->{'nameref'}{'ifComment'}     = 'axxInterfaceComment';
-    $data->{'nameref'}{'ifReferenceName'}  = 'axxInterfaceHumanName';
+    $devdetails->setCap('interfaceIndexingManaged');
 
     return 1;
 }
@@ -100,6 +93,13 @@ sub discover
 
     my $data = $devdetails->data();
     my $session = $dd->session();
+
+    $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
+    
+    $data->{'nameref'}{'ifNick'}        = 'axxInterfaceNick';
+    $data->{'nameref'}{'ifSubtreeName'} = 'axxInterfaceNick';
+    $data->{'nameref'}{'ifComment'}     = 'axxInterfaceComment';
+    $data->{'nameref'}{'ifReferenceName'}  = 'axxInterfaceHumanName';
 
     if( $devdetails->hasCap('axxEdge') )
     {

@@ -75,20 +75,7 @@ sub checkdevtype
         return 0;
     }
 
-    my $data = $devdetails->data();
-
-    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
-    $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
-    $data->{'param'}{'ifindex-table'} = '$ifName';
-
-    $data->{'nameref'}{'ifComment'} = 'ifDescr';
-
     $devdetails->setCap('interfaceIndexingManaged');
-
-    if( not defined( $data->{'param'}{'snmp-oids-per-pdu'} ) )
-    {
-        $data->{'param'}{'snmp-oids-per-pdu'} = '10';
-    }
 
     return 1;
 }
@@ -101,6 +88,17 @@ sub discover
 
     my $data = $devdetails->data();
     my $session = $dd->session();
+
+    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
+    $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+    $data->{'param'}{'ifindex-table'} = '$ifName';
+
+    $data->{'nameref'}{'ifComment'} = 'ifDescr';
+
+    if( not defined( $data->{'param'}{'snmp-oids-per-pdu'} ) )
+    {
+        $data->{'param'}{'snmp-oids-per-pdu'} = '10';
+    }
 
     my $xdslOID = $dd->oiddef('xdslDevIfStatsElapsedTimeLinkUp');
 

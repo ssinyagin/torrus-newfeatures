@@ -86,14 +86,6 @@ sub checkdevtype
         return 0;
     }
 
-    my $data = $devdetails->data();
-
-    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
-    $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
-    $data->{'param'}{'ifindex-table'} = '$ifName';
-
-    $data->{'nameref'}{'ifComment'} = 'portName';
-
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
 
@@ -117,6 +109,12 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
+    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
+    $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+    $data->{'param'}{'ifindex-table'} = '$ifName';
+
+    $data->{'nameref'}{'ifComment'} = 'portName';
+    
     # Retrieve port descriptions from CISCO-STACK-MIB
 
     my $portIfIndexOID = $dd->oiddef('CISCO-STACK-MIB::portIfIndex');

@@ -87,13 +87,6 @@ sub checkdevtype
 
     my $data = $devdetails->data();
 
-    $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
-
-    # In Windows SNMP agent, ifDescr is not unique per interface.
-    # We use MAC address as a unique interface identifier.
-
-    $data->{'nameref'}{'ifComment'} = ''; # suggest?
-
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
 
@@ -117,8 +110,14 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
+    # In Windows SNMP agent, ifDescr is not unique per interface.
+    # We use MAC address as a unique interface identifier.
+
+    $data->{'nameref'}{'ifComment'} = ''; # suggest?
+
+    $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
     Torrus::DevDiscover::RFC2863_IF_MIB::retrieveMacAddresses( $dd,
-                                                             $devdetails );
+                                                               $devdetails );
 
     # FTP and HTTP servers, if present
     if( $dd->checkSnmpTable( 'ms_ftpStatistics' ) )

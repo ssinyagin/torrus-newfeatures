@@ -111,99 +111,17 @@ if( $report_config )
     }
     printf("\n");
 
-    ###
-    # caluclate and print the schedule
-
-    # calculate the common period length (least common multiple)
-    my $lcm = 0;
-    foreach my $period ( keys %{$stats->{'schedule'}} )
+    if( $stats->{'collectorLeaves'} > 0 )
     {
-        my $a = $period;
-        my $b = $lcm;
-        my $c;
-        if( $b == 0 )
-        {
-            $lcm = $a;
-        }
-        else
-        {
-            if( $a < $b )
-            {
-                my $tmp = $b;
-                $b = $a;
-                $a = $tmp;
-            }
-            while( $b != 0 )
-            {
-                $c = $a % $b;
-                $a = $b;
-                $b = $c;
-            }
-            $lcm = $lcm * $period / $a;
-        }
+        printf("Collectors execution timeline:\n");
+        reportTimeline( $stats->{'collectorSchedule'} );
     }
 
-    printf("Least common period: %d seconds\n\n", $lcm);
-
-    # populate the common period
-    my %cp;
-    foreach my $period ( keys %{$stats->{'schedule'}} )
+    if( $stats->{'monitorLeaves'} > 0 )
     {
-        foreach my $offset ( keys %{$stats->{'schedule'}{$period}} )
-        {
-            foreach my $type ( keys %{$stats->{'schedule'}{$period}{$offset}} )
-            {
-                for( my $i = 0; $i < ($lcm / $period); $i++ )
-                {
-                    $cp{$i * $period + $offset}{'col'}{$type} +=
-                        $stats->{'schedule'}{$period}{$offset}{$type};
-                }
-            }
-        }
+        printf("Monitors execution timeline:\n");
+        reportTimeline( $stats->{'monitorSchedule'} );
     }
-
-    # calculate interval lengths
-
-    my $previous;
-    my $first;
-    foreach my $time ( sort { $a <=> $b } keys %cp )
-    {
-        if( not defined($first) )
-        {
-            $first = $time;
-        }
-        else
-        {
-            $cp{$previous}{'endtime'} = $time;
-        }
-        $previous = $time;
-    }
-    $cp{$previous}{'endtime'} = $lcm + $first;
-
-    # print results
-
-    printf("Tasks execution timeline:\n");
-
-    thinLine();
-    printf("%-10s%-10s%-20s%-10s\n",
-           'Offset', 'Interval', 'Type', 'Data');
-    printf("%-10s%-10s%-20s%-10s\n",
-           '(sec)', '(sec)', '', 'sources');
-    thinLine();
-
-    foreach my $time ( sort { $a <=> $b } keys %cp )
-    {
-        foreach my $type ( keys %{$cp{$time}{'col'}} )
-        {
-            printf("%-10d%-10d%-20s%-10d\n",
-                   $time,
-                   $cp{$time}{'endtime'} - $time,
-                   $type,
-                   $cp{$time}{'col'}{$type} );
-        }
-    }
-    thinLine();
-    printf("\n");
 }
 
 if( $report_runtime )
@@ -346,7 +264,7 @@ sub collectStats
                 $offset = int($offset) % $period;
 
                 $stats->{'leavesPerType'}{$type}++;
-                $stats->{'schedule'}{$period}{$offset}{$type}++;
+                $stats->{'collectorSchedule'}{$period}{$offset}{$type}++;
             }
             
             if( defined( $config_tree->getNodeParam( $ctoken, 'monitor' ) ) )
@@ -363,10 +281,106 @@ sub collectStats
                 $offset = int($offset) % $period;
 
                 $stats->{'leavesPerType'}{$type}++;
-                $stats->{'schedule'}{$period}{$offset}{$type}++;
+                $stats->{'monitorSchedule'}{$period}{$offset}{$type}++;
             }
         }
     }
+}
+
+
+# caluclate and print the schedule
+sub reportTimeline
+{
+    my $schedule = shift;
+    
+    # calculate the common period length (least common multiple)
+    my $lcm = 0;
+    foreach my $period ( keys %{$schedule} )
+    {
+        my $a = $period;
+        my $b = $lcm;
+        my $c;
+        if( $b == 0 )
+        {
+            $lcm = $a;
+        }
+        else
+        {
+            if( $a < $b )
+            {
+                my $tmp = $b;
+                $b = $a;
+                $a = $tmp;
+            }
+            while( $b != 0 )
+            {
+                $c = $a % $b;
+                $a = $b;
+                $b = $c;
+            }
+            $lcm = $lcm * $period / $a;
+        }
+    }
+
+    printf("Least common period: %d seconds\n\n", $lcm);
+
+    # populate the common period
+    my %cp;
+    foreach my $period ( keys %{$schedule} )
+    {
+        foreach my $offset ( keys %{$schedule->{$period}} )
+        {
+            foreach my $type ( keys %{$schedule->{$period}{$offset}} )
+            {
+                for( my $i = 0; $i < ($lcm / $period); $i++ )
+                {
+                    $cp{$i * $period + $offset}{'col'}{$type} +=
+                        $schedule->{$period}{$offset}{$type};
+                }
+            }
+        }
+    }
+
+    # calculate interval lengths
+
+    my $previous;
+    my $first;
+    foreach my $time ( sort { $a <=> $b } keys %cp )
+    {
+        if( not defined($first) )
+        {
+            $first = $time;
+        }
+        else
+        {
+            $cp{$previous}{'endtime'} = $time;
+        }
+        $previous = $time;
+    }
+    $cp{$previous}{'endtime'} = $lcm + $first;
+
+    # print results
+
+    thinLine();
+    printf("%-10s%-10s%-20s%-10s\n",
+           'Offset', 'Interval', 'Type', 'Data');
+    printf("%-10s%-10s%-20s%-10s\n",
+           '(sec)', '(sec)', '', 'sources');
+    thinLine();
+
+    foreach my $time ( sort { $a <=> $b } keys %cp )
+    {
+        foreach my $type ( keys %{$cp{$time}{'col'}} )
+        {
+            printf("%-10d%-10d%-20s%-10d\n",
+                   $time,
+                   $cp{$time}{'endtime'} - $time,
+                   $type,
+                   $cp{$time}{'col'}{$type} );
+        }
+    }
+    thinLine();
+    printf("\n");
 }
 
 

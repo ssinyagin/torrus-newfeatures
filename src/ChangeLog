@@ -1,3 +1,8 @@
+2005-04-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/schedulerinfo.in: Timeline reports separate for monitors
+	and collectors
+
 2005-03-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/Paradyne.pm:

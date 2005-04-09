@@ -37,6 +37,7 @@ dist_tmpl_DATA = \
 	templates/default-dir.html \
 	templates/default-helptext.html \
 	templates/default-login.html \
+	templates/default-recursivedir.html \
 	templates/default-rrd.html \
 	templates/default-tset.html \
 	templates/expanded-dir.html \

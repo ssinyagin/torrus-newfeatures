@@ -265,6 +265,16 @@ DIV.Listing *.NodeDescr, DIV.Listing *.TokensetDescr  {
   padding-left : 30px;
 }
 
+*.RecursiveListRow {
+  clear : both;
+  margin-top : 3px;
+  margin-left : 20px;
+  margin-right : 2px;
+  padding-bottom: 2px;
+  border: 1px solid #eee;
+}
+
+
 DIV.ShortGraph *.NodeDescr {
   font-weight : 600;
   padding-left : 10px;

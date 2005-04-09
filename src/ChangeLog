@@ -1,3 +1,7 @@
+2005-04-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/default-recursivedir.html: Recursive directory view
+
 2005-04-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/schedulerinfo.in: Timeline reports separate for monitors

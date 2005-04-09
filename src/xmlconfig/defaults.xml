@@ -193,6 +193,13 @@
     <param name="html-template" value="overview-subleaves.html" />
   </view>
 
+  <!-- This all subtrees and leaves recureively -->
+  <view name="recursive-dir-html">
+    <param name="view-type"     value="html" />
+    <param name="expires"       value="3600" />
+    <param name="html-template" value="default-recursivedir.html" />
+  </view>
+  
   <view name="rrd-print-daily">
     <param name="view-type"     value="rrprint" />
     <param name="expires"       value="300" />

@@ -51,13 +51,18 @@
   [% END %]
 </DIV>
 
-[% IF hasLeaves %]
 <DIV CLASS="BottomShortcuts">
-[% INCLUDE shortcut url=url(token, 'expanded-dir-html')
-                    text="Expand leaves"
-                    title="Show all leaf graphs in one page" %]
+[% IF hasLeaves;
+    INCLUDE shortcut url=url(token, 'expanded-dir-html')
+                     text="Expand leaves"
+                     title="Show all leaf graphs in one page";
+   ELSE;
+    INCLUDE shortcut url=url(token, 'recursive-dir-html')
+                     text="Recursive view"
+                     title="Show all subtrees and leaves in one page";
+   
+ END %]
 </DIV>
-[% END %]
 
 [% IF nodeParam(token, 'has-overview-subleaves', 1) == 'yes' %]
 <DIV CLASS="BottomShortcuts">

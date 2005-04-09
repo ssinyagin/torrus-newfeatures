@@ -4,7 +4,6 @@ To do now:
 
 -- Document ./setup_tools/configure_fhs
 -- Change the implementation of hrule-legend-X view parameter
--- Tokenset members sorting
 -- Option to expand directory view by default
 -- Traceroute plugin (Gustavo Torres)
 -- CDef Collector plugin (Christian Schnidrig)

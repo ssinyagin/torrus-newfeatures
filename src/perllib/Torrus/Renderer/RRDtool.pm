@@ -477,7 +477,7 @@ sub rrd_make_hrules
                 $color = $self->mkcolor( $color );
 
                 my $legend =
-                    $config_tree->getParam($view, 'hrule-legend-'.$hruleName);
+                    $config_tree->getParam($token, 'hrule-legend-'.$hruleName);
 
                 my $arg = sprintf( 'HRULE:%e%s', $value, $color );
                 if( defined( $legend ) and $legend =~ /\S/ )

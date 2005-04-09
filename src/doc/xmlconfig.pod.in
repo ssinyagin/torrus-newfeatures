@@ -588,7 +588,13 @@ Optional. When set to C<yes>, the view C<decorations> are ignored.
 Optional. When set to C<yes>, the view parameter C<gprint-values> and other
 GPRINT-related parameters are ignored.
 
+=item * C<hrule-legend-I<name>>
+
+Optional. If a horizontal rule with the given name is defined, this parameter
+specifies the legend to be printed.
+
 =back
+
 
 =head3 RRD-related parameters
 
@@ -1141,8 +1147,7 @@ Holt-Winters boundaries.
 Optional parameter, defaults to C<#FFFFA0>. Specifies the color for
 Holt-Winters failure ticks.
 
-=item * C<hrules>, C<hrule-value-I<name>>, C<hrule-color-I<name>>,
-C<hrule-legend-I<name>>
+=item * C<hrules>, C<hrule-value-I<name>>, C<hrule-color-I<name>>
 
 Optional parameter C<hrules> contains a comma-separated list of
 horizontal rule names. For each name, mandatory parameter

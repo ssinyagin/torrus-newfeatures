@@ -1,5 +1,8 @@
 2005-04-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_hrules):
+	hrule-legend-X is now a leaf parameter, not view
+
 	* templates/default-recursivedir.html: Recursive directory view
 
 2005-04-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

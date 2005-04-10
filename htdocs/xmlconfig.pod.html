@@ -581,6 +581,11 @@ Optional. When set to <code>yes</code>, the view <a href="#item_decorations"><co
 </li>
 Optional. When set to <code>yes</code>, the view parameter <code>gprint-values</code> and other
 GPRINT-related parameters are ignored.
+<p></p>
+<li><strong><a name="item_hrule_2dlegend_2dname"><code>hrule-legend-name</code></a></strong><br />
+</li>
+Optional. If a horizontal rule with the given name is defined, this parameter
+specifies the legend to be printed.
 <p></p></ul>
 <p>
 </p>
@@ -1095,8 +1100,7 @@ Holt-Winters boundaries.
 Optional parameter, defaults to <code>#FFFFA0</code>. Specifies the color for
 Holt-Winters failure ticks.
 <p></p>
-<li><strong><a name="item_hrules_2c_hrule_2dvalue_2dname_2c_hrule_2dcolor_2d"><code>hrules</code>, <code>hrule-value-name</code>, <code>hrule-color-name</code>,
-<code>hrule-legend-name</code></a></strong><br />
+<li><strong><a name="item_hrules_2c_hrule_2dvalue_2dname_2c_hrule_2dcolor_2d"><code>hrules</code>, <code>hrule-value-name</code>, <code>hrule-color-name</code></a></strong><br />
 </li>
 Optional parameter <code>hrules</code> contains a comma-separated list of
 horizontal rule names. For each name, mandatory parameter
@@ -1106,7 +1110,7 @@ is not defined for the leaf. Mandatory parameter <code>hrule-color-name</code>
 defines the color for the rule, of the form <code>#DDDDDD</code>, where <code>D</code> corresponds
 to a hexademical digit. Two hashes in the beginning and a name refer to
 the color from the styling profile, e.g. <code>##HruleMin</code>.
-Optional parameter <code>hrule-legend-name</code>
+Optional parameter <a href="#item_hrule_2dlegend_2dname"><code>hrule-legend-name</code></a>
 defines the legend text to be displayed on the graph. The following horizontal
 rules are defined in <em>defaults.xml</em> for all rrgraph views:
 <pre>

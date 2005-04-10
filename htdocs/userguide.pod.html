@@ -130,7 +130,7 @@ of <code>torrus genddx</code>. This program may also read the device names
     --out=myrouters.ddx \
     --discout=myrouters.xml \
     --subtree=/My_Routers \
-    --datadir=/data1/snmpcollector</pre>
+    --datadir=/data1/torrus/collector_rrd</pre>
 <pre>
   torrus genddx \
     --hostfile=myswitches.txt \
@@ -139,7 +139,7 @@ of <code>torrus genddx</code>. This program may also read the device names
     --out=myswitches.ddx \
     --discout=myswitches.xml \
     --subtree=/My_Switches \
-    --datadir=/data1/snmpcollector</pre>
+    --datadir=/data1/torrus/collector_rrd</pre>
 <pre>
   torrus devdiscover  --in=myrouters.ddx</pre>
 <pre>
@@ -153,7 +153,7 @@ you would find them in <em>/usr/local/etc/torrus/discovery/</em>.
 The result of <code>devdiscover</code> is the Torrus configuration files:
 <em>myrouters.xml</em> and <em>myswitches.xml</em>, placed into
 <em>/usr/local/etc/torrus/xmlconfig/</em>. The <code>collector</code> will place the
-RRD files into <em>/data1/snmpcollector</em>. Make sure that this directory
+RRD files into <em>/data1/torrus/collector_rrd</em>. Make sure that this directory
 exists, has enough free space, and is writable by <code>torrus</code> user. <strong>Note:</strong>
 the <code>genddx</code> utility is designed as a one-time helper, so that you create
 your basic discovery instructions files from scratch. Further on, the discovery

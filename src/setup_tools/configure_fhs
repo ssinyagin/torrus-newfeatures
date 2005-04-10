@@ -6,7 +6,7 @@
 
 if test ! -x ./configure; then
   echo "$0: cannot find ./configure" 2>&1
-  echo "Usage: setup_tools/configure_fhs [configure options]..." 2>&1
+  echo "Usage: ./setup_tools/configure_fhs [configure options]..." 2>&1
   exit 1
 fi
 

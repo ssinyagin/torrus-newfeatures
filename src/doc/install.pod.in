@@ -222,9 +222,16 @@ Further installation process is mostly as usual:
 
 The default directory layout is described below. Should you need to change it,
 there is a number of variables and configuration options that you may use
-as C<./configure> arguments. See C<./configure --help> for details. Example:
+as C<./configure> arguments. See C<./configure --help> for details.
+Alternatively you can utilize the script C<./setup_tools/configure_fhs>,
+which is designed to provide an FHS compliant setup. The script is equivalent
+to executing
 
-  ./configure pkghome=/opt/torrus
+  ./configure \
+   --prefix=/opt \
+   --mandir=/opt/share/man \
+   pkghome=/opt/torrus \
+   sitedir=/etc/opt/torrus
 
 Do not try to change any paths by supplying them as C<make> variables,
 this would most probably break the installation. The only C<make> variable

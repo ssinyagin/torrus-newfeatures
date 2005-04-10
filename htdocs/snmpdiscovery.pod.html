@@ -163,7 +163,7 @@ in Torrus distribution in <em>snmp-discovery.dtd</em>.</p>
      --community=blahblah  --host=10.0.0.1  --host=10.0.1.1
     On Tue Dec  2 17:43:30 2003
       &lt;/creator-info&gt;
-      &lt;param name=&quot;data-dir&quot; value=&quot;/var/snmpcollector&quot;/&gt;
+      &lt;param name=&quot;data-dir&quot; value=&quot;/srv/torrus/collector_rrd&quot;/&gt;
       &lt;param name=&quot;domain-name&quot; value=&quot;&quot;/&gt;
       &lt;param name=&quot;host-subtree&quot; value=&quot;/Routers&quot;/&gt;
       &lt;param name=&quot;output-file&quot; value=&quot;myrouters.xml&quot;/&gt;
@@ -450,6 +450,11 @@ When set to <code>yes</code>, IPSec statistics are excluded from discovery.
 </li>
 When set to <code>yes</code>, only those Catalyst ports are included in configuration
 which have a port name (set up by <code>set port name</code> command).
+<p></p>
+<li><strong><a name="item_paradyne_3a_3aslot_2dname"><code>Paradyne::slot-name</code></a></strong><br />
+</li>
+Mandatory for Paradyne DSLAM devices. It should uniquely identify
+the slot within the device. Any sequence of word characters is allowed.
 <p></p></ul>
 <p>See also: <em>Torrus Vendor Support List</em> for the list of supported MIBs and
 vendors.</p>

@@ -112,7 +112,7 @@ sub runCollector {
         my $object = $collector->param( $token, 'http-object' );
 
         # extract the values from the web page
-        while ($object =~ /[,\s]*([\d*]+):\/(.*)\/\s*(?=,|$)/) {
+        while ($object =~ /[,\s]*([\d*]+):\/([^,]*)\/\s*(?=,|$)/) {
           my $line = $1; my $pattern = $2;
           Debug ("Pattern: $line", $pattern);
 

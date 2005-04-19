@@ -130,7 +130,7 @@ sub runCollector {
                      "Pattern: /$pattern/",
                      "No-Result!");
             };
-            $object =~ s/[,\s]*[\d*]+:\/.*\/\s*(?=,|$)/$value/;
+            $object =~ s/[,\s]*[\d*]+:\/[^,]*\/\s*(?=,|$)/$value/;
           } else {
             my $value = 'UNKN';
             if ($content =~ $pattern) {
@@ -141,7 +141,7 @@ sub runCollector {
               Error ("Pattern: /$pattern/",
                      "No-Result!");
             };
-            $object =~ s/[,\s]*[\d*]+:\/.*\/\s*(?=,|$)/$value/;
+            $object =~ s/[,\s]*[\d*]+:\/[^,]*\/\s*(?=,|$)/$value/;
           };
         };
 

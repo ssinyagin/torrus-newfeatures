@@ -65,7 +65,7 @@ $Torrus::Global::RRDTimestampTolerance = 15;
 #
 # On Solaris, the maximum buffer size is 256k, and it is configurable
 # via "/usr/sbin/ndd /dev/udp udp_max_buf <value>",
-# and the statistics are shown in udpInOverflows of "netstat -s" output.
+# and the statistics are shown in udpInOverflows of "netstat -s -P ip" output.
 #
 # On FreeBSD, the statistics can be obtained via "netstat -s -p udp".
 # The maximum socket buffer can be changed via

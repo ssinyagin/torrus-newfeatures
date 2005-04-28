@@ -58,6 +58,26 @@ $Torrus::Global::ConfigReadersWaitPeriod = 5;
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;
 
+# SO_RCVBUF, the receiving buffer size of the SNMP collector socket.
+# Should be large enough to sustain the traffic bursts, and should be
+# within limits incurred by local OS and kernel settings.
+# Check your system manuals and the results of network statistics.
+#
+# On Solaris, the maximum buffer size is 256k, and it is configurable
+# via "/usr/sbin/ndd /dev/udp udp_max_buf <value>",
+# and the statistics are shown in udpInOverflows of "netstat -s" output.
+#
+# On FreeBSD, the statistics can be obtained via "netstat -s -p udp".
+# The maximum socket buffer can be changed via
+# "sysctl kern.ipc.maxsockbuf=<value>", and default is 256k.
+# On startup, the OS reads these settings from /etc/sysctl.conf
+#
+# On Linux (FC2), the default limit is 131071, and it can be changed
+# by "sysctl -w net.core.rmem_max=<value>". On startup, the OS reads these
+# settings from /etc/sysctl.conf
+#
+$Torrus::Collector::SNMP::RxBuffer = 131071;
+
 # The time period when we retry to reach an unreachable host
 $Torrus::Collector::SNMP::unreachableTimeout = 900;
 

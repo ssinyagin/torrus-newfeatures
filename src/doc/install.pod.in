@@ -573,7 +573,20 @@ and several gigabytes for RRD storage would be sufficient. Larger systems
 require a thorough design and staging work. See I<Torrus Scalability Guide>
 for more details.
 
+=head2 Network performance tuning
+
+In large installations, the SNMP collector experiences quite intensive
+input traffic bursts. Thus the UDP socket receive buffers should
+be adapted to sustain the load. By default, Torus sets the UDP receiving
+buffer size, SO_RCVBUF, to 131071 bytes. This should fit most of
+installations. However, it's useful to check the network statistics
+if there are any UDP buffer overflows. On most systems, the commands
+C<netstat -s -p udp> or C<netstat -s> should show you these counters.
+The maximum buffer size is usually limited by a system kernel variable,
+and can be increased if needed. See C<$Torrus::Collector::SNMP::RxBuffer>
+and its comments in F<torrus-config.pl> for more details.
+
 
 =head1 Author
 
-Copyright (c) 2002-2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -1,3 +1,8 @@
+2005-04-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm (runCollector):
+	SO_RCVBUF is set explicitly
+
 2005-04-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_hrules):

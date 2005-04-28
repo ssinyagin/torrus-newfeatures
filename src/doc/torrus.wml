@@ -46,7 +46,7 @@ prediction</LI>
 
 <LI>data threshold monitoring</LI>
 
-<LI><A HREF="http://torrus.org/plugins/cisco-cbqos.pod.html">
+<LI><A HREF="http://torrus.org/plugins/tp-cisco-cbqos.pod.html">
 <CODE>cbqos</CODE> plugin</A>, a complete automated solution for
 CISCO-CLASS-BASED-QOS-MIB monitoring</LI>
 

@@ -1,3 +1,9 @@
+2005-04-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoGeneric.pm:
+	New discovery parameters: CiscoGeneric::sensor-monitor,
+	CiscoGeneric::sensor-monitor-regexp
+
 2005-04-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/SNMP.pm (runCollector):

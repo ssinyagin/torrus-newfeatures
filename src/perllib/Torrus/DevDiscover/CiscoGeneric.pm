@@ -232,6 +232,18 @@ sub buildConfig
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, $templates );
 
+        my $monitor = $devdetails->param('CiscoGeneric::sensor-monitor');
+        my $monregexp;        
+        if( defined( $monitor ) )
+        {
+           $monregexp =
+               $devdetails->param('CiscoGeneric::sensor-monitor-regexp');
+           if( length( $monregexp ) == 0 )
+           {
+               $monregexp = '.*';
+           }
+        }
+        
         foreach my $sIndex ( sort {$a<=>$b} keys
                              %{$data->{'ciscoTemperatureSensors'}} )
         {
@@ -256,6 +268,16 @@ sub buildConfig
             my $templates = ['CiscoGeneric::cisco-temperature-sensor' .
                              ($fahrenheit ? '-fahrenheit':'')];
 
+            if( defined( $monitor ) )
+            {
+                if( $desc =~ $monregexp )
+                {
+                    $param->{'monitor'} = $monitor;
+                    Debug('Setting monitor ' . $monitor .
+                          ' for sensor: ' . $desc);
+                }
+            }
+            
             $cb->addLeaf( $subtreeNode, $leafName, $param, $templates );
         }
     }

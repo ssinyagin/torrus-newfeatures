@@ -451,6 +451,16 @@ When set to C<yes>, Cisco temperature sensor values are stored in
 a separate RRD file per sensor ID. This is useful for modular big routers
 like Cisco GSR.
 
+=item * C<CiscoGeneric::sensor-monitor>
+
+Comma-separated list of monitor names to be applied to the sensor
+datasource.
+
+=item *C<CiscoGeneric::sensor-monitor-regexp>
+
+Regular expression that should match the sensor descriptions
+that would have the C<CiscoGeneric::sensor-monitor> applied. Default: C<.*>.
+
 =item * C<CiscoIOS::disable-membuf-stats>
 
 When set to C<yes>, Cisco memory buffer statistics are excluded from

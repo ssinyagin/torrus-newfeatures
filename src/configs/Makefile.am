@@ -29,6 +29,8 @@ EXTRA_DIST = \
 	webmux.pl \
 	webmux2.pl
 
+DISTCLEANFILES = instvars
+
 instvarsdir = $(cfgdefdir)
 nodist_instvars_DATA = instvars
 

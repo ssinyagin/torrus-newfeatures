@@ -310,15 +310,17 @@ sub discover
         $ok = &{$reg->{$devtype}{'discover'}}($self, $devdetails) ? $ok:0;
     }
 
+    delete $self->{'session'};
+    $session->close();
+
+    $devdetails->applySelectors();
+        
     my $subtree = $devdetails->param('host-subtree');
     if( not defined( $self->{'devdetails'}{$subtree} ) )
     {
         $self->{'devdetails'}{$subtree} = [];
     }
     push( @{$self->{'devdetails'}{$subtree}}, $devdetails );
-
-    delete $self->{'session'};
-    $session->close();
 
     return $ok;
 }
@@ -583,6 +585,7 @@ sub screenSpecialChars
 package Torrus::DevDiscover::DevDetails;
 
 use strict;
+use Torrus::RPN;
 use Torrus::Log;
 
 sub new
@@ -783,6 +786,79 @@ sub data
     return $self->{'data'};
 }
 
+
+sub applySelectors
+{
+    my $self = shift;
+
+    my $selList = $self->param('selectors');
+    return if not defined( $selList );
+
+    my $reg = \%Torrus::DevDiscover::selectorsRegistry;
+    
+    foreach my $sel ( split(',', $selList) )
+    {
+        my $type = $self->param( $sel . '-selector-type' );
+        if( not defined( $type ) )
+        {
+            Error('Parameter ' . $sel . '-selector-type must be defined ' .
+                  'for ' . $self->param('snmp-host'));
+        }
+        elsif( not exists( $reg->{$type} ) )
+        {
+            Error('Unknown selector type: ' . $type .
+                  ' for ' . $self->param('snmp-host'));
+        }
+        else
+        {
+            Debug('Initializing selector: ' . $sel);
+            
+            $reg = $reg->{$type};
+            my @objects = &{$reg->{'getObjects'}}( $self );
+
+            foreach my $object ( @objects )
+            {
+                Debug('Checking object: ' .
+                      &{$reg->{'getObjectName'}}( $self, $object ));
+
+                my $expr = $self->param( $sel . '-selector-expr' );
+                $expr = '1' if length( $expr ) == 0;
+
+                my $callback = sub
+                {
+                    my $attr = shift;
+                    my $checkval = $self->param( $sel . '-' . $attr );
+                    
+                    Debug('Checking attribute: ' . $attr .
+                          ' and value: ' . $checkval);
+                    my $ret = &{$reg->{'checkAttribute'}}( $self, $object,
+                                                           $attr, $checkval );
+                    Debug(sprintf('Returned value: %d', $ret));
+                    return $ret;                    
+                };
+                
+                my $rpn = new Torrus::RPN;
+                my $result = $rpn->run( $expr, $callback );
+                Debug('Result: ' . $result);
+                if( $result )
+                {
+                    my $actions = $self->param( $sel . '-selector-actions' );
+                    foreach my $action ( split(',', $actions) )
+                    {
+                        my $arg =
+                            $self->param( $sel . '-' . $action . '-arg' );
+                        $arg = 1 if not defined( $arg );
+                        
+                        Debug('Applying action: ' . $action .
+                              ' with argument: ' . $arg);
+                        &{$reg->{'applyAction'}}( $self, $object,
+                                                  $action, $arg );
+                    }
+                }
+            }
+        }
+    }
+}    
 
 1;
 

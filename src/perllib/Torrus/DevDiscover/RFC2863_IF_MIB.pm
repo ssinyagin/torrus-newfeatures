@@ -679,6 +679,97 @@ sub storeIfIndexParams
     }
 }
 
+#######################################
+# Selectors interface
+#
+
+$Torrus::DevDiscover::selectorsRegistry{'RFC2863_IF_MIB'} = {
+    'getObjects'      => \&getSelectorObjects,
+    'getObjectName'   => \&getSelectorObjectName,
+    'checkAttribute'  => \&checkSelectorAttribute,
+    'applyAction'     => \&applySelectorAction,
+};
+
+
+## Objects are interface indexes
+
+sub getSelectorObjects
+{
+    my $devdetails = shift;
+    return sort {$a<=>$b} keys ( %{$devdetails->data()->{'interfaces'}} );
+}
+
+
+sub checkSelectorAttribute
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $attr = shift;
+    my $checkval = shift;
+
+    my $data = $devdetails->data();
+    my $interface = $data->{'interfaces'}{$object};
+
+    my $value;
+    my $operator = '=~';
+    
+    if( $attr eq 'ifSubtreeName' )
+    {
+        $value = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+    }
+    elsif( $attr eq 'ifComment' )
+    {
+        $value = $interface->{$data->{'nameref'}{'ifComment'}};
+    }
+    elsif( $attr eq 'ifType' )
+    {
+        $value = $interface->{'ifType'};
+        $operator = 'eq';
+    }
+
+    return eval( "'$value'" . ' ' . $operator . ' /' . $checkval . '/' ) ? 1:0;
+}
+
+
+sub getSelectorObjectName
+{
+    my $devdetails = shift;
+    my $object = shift;
+    
+    my $data = $devdetails->data();
+    my $interface = $data->{'interfaces'}{$object};
+    return $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+}
+
+
+my %knownSelectorActions =
+    ( 'InBytesMonitor' => 1,
+      'OutBytesMonitor' => 1,
+      'HoltWinters' => 1,
+      'Parameters' => 1 );
+
+                            
+sub applySelectorAction
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $action = shift;
+    my $arg = shift;
+
+    my $data = $devdetails->data();
+    my $interface = $data->{'interfaces'}{$object};
+
+    if( $knownSelectorActions{$action} )
+    {
+        $interface->{'selectorActions'}{$action} = $arg;
+        return 1;
+    }
+    else
+    {
+        return undef;
+    }
+}   
+   
 
 1;
 

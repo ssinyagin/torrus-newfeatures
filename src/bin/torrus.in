@@ -29,7 +29,7 @@ commands="acl=acledit acledit=acledit cleanup=cleanup \
           compile=compilexml compilexml=compilexml \
           configinfo=configinfo ci=configinfo \
           snapshot=configsnapshot configsnapshot=configsnapshot \
-          discover=devdiscover devdiscover=devdiscover \
+          dd=devdiscover discover=devdiscover devdiscover=devdiscover \
           genddx=genddx \
           genlist=genlist \
           install_plugin=install_plugin \

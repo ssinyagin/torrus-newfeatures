@@ -65,7 +65,7 @@ find_rrdtool () {
 
 test_rrdtool () {
     if test "$enable_pkgonly" != yes; then
-        if ${PERL} -I${with_rrdtool}/lib/perl -e 'use RRDs'; then; else
+        if ${PERL} -I${with_rrdtool}/lib/perl -e 'use RRDs'; then :; else
             AC_MSG_ERROR([Could not find RRDs perl module in ${with_rrdtool}])
         fi
     fi

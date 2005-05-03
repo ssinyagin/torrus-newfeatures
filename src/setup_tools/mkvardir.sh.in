@@ -24,15 +24,9 @@ user=@var_user@
 group=@var_group@
 mode=@var_mode@
 
-parent=`echo $dir | sed -e 's/\/$//' -e 's/\/[^\/]*$//'`
-
-if test ! -d $parent; then
-  @mkdir_p@ ${parent}
-fi
-
 if test ! -d $dir; then
 
-    mkdir $dir || exit 1
+    @install_sh@ -d $dir || exit 1
 
     if test "@enable_varperm@" = "yes"; then
 

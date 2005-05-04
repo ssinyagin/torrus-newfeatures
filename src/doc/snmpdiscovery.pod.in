@@ -324,6 +324,11 @@ Optional comma-separated list of parameter names that should be copied
 from the discovery configuration file to the generated Torrus configuration
 at the host level.
 
+=item * C<selectors>
+
+Optional comma-separated list of object selectors. They are explained in more
+detail below.
+
 =back
 
 
@@ -484,6 +489,182 @@ the slot within the device. Any sequence of word characters is allowed.
 
 See also: I<Torrus Vendor Support List> for the list of supported MIBs and
 vendors.
+
+=head2 Object selectors
+
+Selectors are a common mechanism for applying customizations to
+some discovery objects. For example, you may want to apply a monitor
+to byte counters of interfaces that have a special word in the description.
+Or apply Holt-Winters prediction to a certain subset of interfaces.
+
+Selectors are defined in a DDX file as regular parameters.
+The parameter C<selectors> defines a list of selector names.
+Each selector is identifed by its name and type. The type of selector
+defines which objects will be searched: IF-MIB interfaces, or Cisco
+temperature sensors, or something else. The parameters are described
+below.
+
+=over 4
+
+=item * C<selectors>
+
+Comma-separated list of selector names. Further below we use C<S> as
+selector name, C<A> as attribute name, and C<T> as action name.
+
+=item * C<S-selector-type>
+
+Type of objects to be selected. Supported values are: C<RFC2863_IF_MIB>,
+C<CiscoSensor>.
+
+=item * C<S-selector-expr>
+
+An RPN (reverse Polish notation) expression that defines the
+object attributes to be checked and relation between them. Attribute names
+should be specified in curly braces ({}). The rest of the syntax is described
+in I<RPN expressions in Torrus> guide. The attribute names are specific to the
+selector type and are described below.
+
+=item * C<S-A>
+
+For a given selector name C<S> and attribute name C<A>,
+this parameter defines the attribute value that should be compared
+to the object's properties. In most cases it defines a regular
+expression that should match the value of a corresponding object's
+property.
+
+=item * C<S-selector-actions>
+
+For a given selector name C<S>, this parameter defines a comma-separated
+list of actions to be applied for objects where C<S-selector-expr> returns
+true. The action names are specific to the selector type and are
+described below.
+
+=item * C<S-T-arg>
+
+For a given selector C<S> and action C<T>, this parameter defines
+an argument that should be passed to the action. Each action
+defines its own meaning of the argument.
+
+=back
+
+
+
+=head3 RFC2863_IF_MIB selector
+
+This type of selector selects the network interfaces on a SNMP device.
+The following attribute names are supported:
+
+=over 4
+
+=item * C<ifSubtreeName>
+
+Interface-level subtree name as you see it in the discovery results.
+
+=item * C<ifComment>
+
+Comment string that is defined in C<comment> parameter. It is
+usually derived from an interface description.
+
+=item * C<ifType>
+
+Numeric IANA interface type, as returned by C<ifType> SNMP variable.
+
+=back
+
+C<ifType> is compared numerically.
+C<ifSubtreeName> and C<ifComment> are regular expressions.
+
+The following actions are supported:
+
+=over 4
+
+=item * C<InBytesMonitor>, C<OutBytesMonitor>
+
+The argument defines the monitor name to be applied to the input
+or output bytes counter.
+
+=item * C<ErrorsMonitor>
+
+The argument defines the monitor name to be applied to all error and discard
+counters that are discovered for a given interface.
+
+=item * C<HoltWinters>
+
+No argument needed. This action enables Holt-Winters prediction
+for given interface's counters.
+
+=item * C<NoPacketCounters>, C<NoErrorCounters>
+
+No argument needed. The action disables the packet or error counters
+for a given interface to be collected.
+
+=item * C<Parameters>
+
+The argument defines additional configuration parameters to be
+placed at the interface level. The value should be one
+or several C<param=value> pairs separated by semicolon (;).
+Parameters defined in C<RFC2863_IF_MIB::copy-params> may override
+the ones defined in this action.
+
+=back
+
+
+
+=head3 CiscoSensor selector
+
+A selector of this type selects temperature sensors on a Cisco router or
+switch.
+
+The only attribute supported is C<SensorDescr>, and its value is a regular
+expression that should match the sensor description, as discovered
+by C<devdiscover>.
+
+The only action supported is C<Monitor>, and its argument specifies
+the monitor name to be applied to the sensor.
+
+
+
+
+=head3 Examples
+
+The following example applies a monitor called C<temp60degrees> to all
+inlet sensors on a Cisco device:
+
+  <host>
+    <param name="snmp-host" value="router1"/>
+    <param name="output-file" value="router1.xml"/>
+    <param name="selectors" value="inlet"/>
+    <param name="inlet-selector-type" value="CiscoSensor"/>
+    <param name="inlet-selector-expr"  value="{SensorDescr}"/>
+    <param name="inlet-SensorDescr" value="Inlet"/>
+    <param name="inlet-selector-actions"  value="Monitor"/>
+    <param name="inlet-Monitor-arg" value="temp60degrees"/>
+  </host>
+
+The following example enables Holt-Winters prediction and specifies some
+parameters to all FastEthernet interfaces which have the string "SRV-ID"
+in their descriptions:
+
+  <host>
+    <param name="snmp-host" value="router2"/>
+
+    <param name="selectors"  value="FastEthHW"/>
+    <param name="FastEthHW-selector-type"     value="RFC2863_IF_MIB"/>
+
+    <param name="FastEthHW-selector-expr"    
+           value="{ifSubtreeName},{ifComment},AND"/>
+    <param name="FastEthHW-ifSubtreeName"     value="^FastEthernet"/>
+    <param name="FastEthHW-ifComment"         value="SRV-ID"/>
+
+    <param name="FastEthHW-selector-actions"
+           value="HoltWinters,Parameters"/>
+
+    <param name="FastEthHW-Parameters-arg"
+       value="rrd-create-hw-alpha=0.2; rrd-create-hw-beta=0.01"/>
+  </host>
+
+
+
 
 =head1 Author
 

@@ -174,9 +174,6 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="790" />
-      <iftrue var="RFC2863_IF_MIB::errors-monitor">
-        <param name="monitor" value="RFC2863_IF_MIB-errors" />
-      </iftrue>
       <param name="help-text">
       Input discards may occur when the packets arrive from the interface
       media, and the router is not able to process them. This can possibly
@@ -196,9 +193,6 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="780" />
-      <iftrue var="RFC2863_IF_MIB::errors-monitor">
-        <param name="monitor" value="RFC2863_IF_MIB-errors" />
-      </iftrue>
       <param name="help-text">
       Output discards may occur when the router has prepared packets for
       transmission, but the interface is not able to send them. This
@@ -219,9 +213,6 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="690" />
-      <iftrue var="RFC2863_IF_MIB::errors-monitor">
-        <param name="monitor" value="RFC2863_IF_MIB-errors" />
-      </iftrue>
       <param name="help-text">
       Input errors usually mean that the interface receives broken packets
       from the media. This migh be caused by problems with the physical
@@ -241,9 +232,6 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="680" />
-      <iftrue var="RFC2863_IF_MIB::errors-monitor">
-        <param name="monitor" value="RFC2863_IF_MIB-errors" />
-      </iftrue>
       <param name="help-text">
       Output errors occur when the interface is not able to send packets
       to the media for some reasons.

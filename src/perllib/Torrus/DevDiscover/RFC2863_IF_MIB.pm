@@ -465,11 +465,6 @@ sub buildConfig
     my $countersNode =
         $cb->addSubtree( $devNode, $subtreeName, undef,
                          ['RFC2863_IF_MIB::rfc2863-ifmib-subtree'] );
-
-    if( $devdetails->param('RFC2863_IF_MIB::errors-monitor') eq 'yes' )
-    {
-        $cb->setVar( $countersNode, 'RFC2863_IF_MIB::errors-monitor', 'true' );
-    }
     
     foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
@@ -487,7 +482,7 @@ sub buildConfig
             next;
         }
         
-        my @templates;
+        my @templates = ();
 
         if( $interface->{'hasHCOctets'} )
         {
@@ -498,33 +493,97 @@ sub buildConfig
             push( @templates, 'RFC2863_IF_MIB::iftable-octets' );
         }
 
-        if( $interface->{'hasHCUcastPkts'} )
+        foreach my $dir ( 'In', 'Out' )
         {
-            push( @templates, 'RFC2863_IF_MIB::ifxtable-hcucast-packets' );
-        }
-        elsif( $interface->{'hasUcastPkts'} )
-        {
-            push( @templates, 'RFC2863_IF_MIB::iftable-ucast-packets' );
-        }
-
-        if( $interface->{'hasInDiscards'} )
-        {
-            push( @templates, 'RFC2863_IF_MIB::iftable-discards-in' );
-        }
-
-        if( $interface->{'hasOutDiscards'} )
-        {
-            push( @templates, 'RFC2863_IF_MIB::iftable-discards-out' );
+            if( defined( $interface->{'selectorActions'}->
+                         {$dir . 'BytesMonitor'} ) )
+            {
+                {
+                    $interface->{'childCustomizations'}->{
+                        'Bytes_' . $dir}->{'monitor'} =
+                            $interface->{'selectorActions'}->{
+                                $dir . 'BytesMonitor'};
+                }
+            }
         }
 
-        if( $interface->{'hasInErrors'} )
+        if( not $interface->{'selectorActions'}{'NoPacketCounters'} )
         {
-            push( @templates, 'RFC2863_IF_MIB::iftable-errors-in' );
+            if( $interface->{'hasHCUcastPkts'} )
+            {
+                push( @templates, 'RFC2863_IF_MIB::ifxtable-hcucast-packets' );
+            }
+            elsif( $interface->{'hasUcastPkts'} )
+            {
+                push( @templates, 'RFC2863_IF_MIB::iftable-ucast-packets' );
+            }
         }
 
-        if( $interface->{'hasOutErrors'} )
+        if( not $interface->{'selectorActions'}{'NoErrorCounters'} )
         {
-            push( @templates, 'RFC2863_IF_MIB::iftable-errors-out' );
+            if( $interface->{'hasInDiscards'} )
+            {
+                push( @templates, 'RFC2863_IF_MIB::iftable-discards-in' );
+                if( defined( $interface->{'selectorActions'}->{
+                    'ErrorsMonitor'} ) )
+                {
+                    $interface->{'childCustomizations'}->{
+                        'Discards_In'}->{'monitor'} =
+                            $interface->{'selectorActions'}{'ErrorsMonitor'};
+                }
+            }
+
+            if( $interface->{'hasOutDiscards'} )
+            {
+                push( @templates, 'RFC2863_IF_MIB::iftable-discards-out' );
+                if( defined( $interface->{'selectorActions'}->{
+                    'ErrorsMonitor'} ) )
+                {
+                    $interface->{'childCustomizations'}->{
+                        'Discards_Out'}->{'monitor'} =
+                            $interface->{'selectorActions'}{'ErrorsMonitor'};
+                }
+            }
+
+            if( $interface->{'hasInErrors'} )
+            {
+                push( @templates, 'RFC2863_IF_MIB::iftable-errors-in' );
+                if( defined( $interface->{'selectorActions'}->{
+                    'ErrorsMonitor'} ) )
+                {
+                    $interface->{'childCustomizations'}->{
+                        'Errors_In'}->{'monitor'} =
+                            $interface->{'selectorActions'}{'ErrorsMonitor'};
+                }
+            }
+
+            if( $interface->{'hasOutErrors'} )
+            {
+                push( @templates, 'RFC2863_IF_MIB::iftable-errors-out' );
+                if( defined( $interface->{'selectorActions'}->{
+                    'ErrorsMonitor'} ) )
+                {
+                    $interface->{'childCustomizations'}->{
+                        'Errors_Out'}->{'monitor'} =
+                            $interface->{'selectorActions'}{'ErrorsMonitor'};
+                }
+            }
+        }
+
+        if( defined( $interface->{'selectorActions'}{'HoltWinters'} ) )
+        {
+            push( @templates, '::holt-winters-defaults' );
+        }
+
+        if( defined( $interface->{'selectorActions'}{'Parameters'} ) )
+        {
+            my @pairs = split('\s*;\s*',
+                              $interface->{'selectorActions'}{'Parameters'});
+            foreach my $pair( @pairs )
+            {
+                my ($param, $val) = split('\s*=\s*', $pair);
+                $interface->{'param'}{$param} = $val;
+            }
         }
 
         if( ref( $interface->{'templates'} ) )
@@ -550,18 +609,29 @@ sub buildConfig
                     $interface->{'param'}{$param} = $val;
                 }
             }
-            
-            my $intfNode =
-                $cb->addSubtree( $countersNode, $subtreeName,
-                                 $interface->{'param'}, \@templates );
 
             if( defined( $tsetMember{$subtreeName} ) )
             {
                 my $tsetList =
                     join( ',', sort keys %{$tsetMember{$subtreeName}} );
+                
+                $interface->{'childCustomizations'}->{'InOut_bps'}->{
+                    'tokenset-member'} = $tsetList;
+            }            
+            
+            my $intfNode =
+                $cb->addSubtree( $countersNode, $subtreeName,
+                                 $interface->{'param'}, \@templates );
 
-                $cb->addLeaf( $intfNode, 'InOut_bps',
-                              { 'tokenset-member' => $tsetList } );
+            if( defined( $interface->{'childCustomizations'} ) )
+            {
+                foreach my $childName
+                    ( sort keys %{$interface->{'childCustomizations'}} )
+                {
+                    $cb->addLeaf
+                        ( $intfNode, $childName,
+                          $interface->{'childCustomizations'}->{$childName} );
+                }
             }            
         }
     }
@@ -724,10 +794,15 @@ sub checkSelectorAttribute
     elsif( $attr eq 'ifType' )
     {
         $value = $interface->{'ifType'};
-        $operator = 'eq';
+        $operator = '==';
+    }
+    else
+    {
+        Error('Unknown RFC2863_IF_MIB selector attribute: ' . $attr);
+        $value = '';
     }
 
-    return eval( "'$value'" . ' ' . $operator . ' /' . $checkval . '/' ) ? 1:0;
+    return eval( '$value' . ' ' . $operator . '$checkval' ) ? 1:0;
 }
 
 
@@ -745,7 +820,10 @@ sub getSelectorObjectName
 my %knownSelectorActions =
     ( 'InBytesMonitor' => 1,
       'OutBytesMonitor' => 1,
+      'ErrorsMonitor' => 1,
       'HoltWinters' => 1,
+      'NoPacketCounters' => 1,
+      'NoErrorCounters' => 1,
       'Parameters' => 1 );
 
                             
@@ -762,13 +840,12 @@ sub applySelectorAction
     if( $knownSelectorActions{$action} )
     {
         $interface->{'selectorActions'}{$action} = $arg;
-        return 1;
     }
     else
     {
-        return undef;
+        Error('Unknown CiscoSensor selector action: ' . $action);
     }
-}   
+}
    
 
 1;

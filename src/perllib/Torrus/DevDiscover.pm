@@ -839,7 +839,7 @@ sub applySelectors
                 
                 my $rpn = new Torrus::RPN;
                 my $result = $rpn->run( $expr, $callback );
-                Debug('Result: ' . $result);
+                Debug('Selector result: ' . $result);
                 if( $result )
                 {
                     my $actions = $self->param( $sel . '-selector-actions' );

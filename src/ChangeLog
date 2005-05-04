@@ -1,3 +1,18 @@
+2005-05-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoGeneric.pm:
+	replaced CiscoGeneric::sensor-monitor and
+	CiscoGeneric::sensor-monitor-regexp with CiscoSensor selector
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	RFC2863_IF_MIB::errors-monitor is no longer supported.
+	Replaced with appropriate selector action
+	
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	Implemented IF-MIB selector actions - 
+	InBytesMonitor, OutBytesMonitor, ErrorsMonitor, HoltWinters,
+	NoPacketCounters, NoErrorCounters, Parameters
+
 2005-05-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm (applySelectors):

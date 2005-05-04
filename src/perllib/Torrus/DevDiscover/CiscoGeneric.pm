@@ -231,18 +231,6 @@ sub buildConfig
 
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, $templates );
-
-        my $monitor = $devdetails->param('CiscoGeneric::sensor-monitor');
-        my $monregexp;        
-        if( defined( $monitor ) )
-        {
-           $monregexp =
-               $devdetails->param('CiscoGeneric::sensor-monitor-regexp');
-           if( length( $monregexp ) == 0 )
-           {
-               $monregexp = '.*';
-           }
-        }
         
         foreach my $sIndex ( sort {$a<=>$b} keys
                              %{$data->{'ciscoTemperatureSensors'}} )
@@ -268,14 +256,11 @@ sub buildConfig
             my $templates = ['CiscoGeneric::cisco-temperature-sensor' .
                              ($fahrenheit ? '-fahrenheit':'')];
 
+            my $monitor = $data->{'ciscoTemperatureSensors'}{$sIndex}->{
+                'selectorActions'}{'Monitor'};
             if( defined( $monitor ) )
             {
-                if( $desc =~ $monregexp )
-                {
-                    $param->{'monitor'} = $monitor;
-                    Debug('Setting monitor ' . $monitor .
-                          ' for sensor: ' . $desc);
-                }
+                $param->{'monitor'} = $monitor;
             }
             
             $cb->addLeaf( $subtreeNode, $leafName, $param, $templates );
@@ -373,6 +358,93 @@ sub buildConfig
         }
     }
 }
+
+
+
+#######################################
+# Selectors interface
+#
+
+$Torrus::DevDiscover::selectorsRegistry{'CiscoSensor'} = {
+    'getObjects'      => \&getSelectorObjects,
+    'getObjectName'   => \&getSelectorObjectName,
+    'checkAttribute'  => \&checkSelectorAttribute,
+    'applyAction'     => \&applySelectorAction,
+};
+
+
+## Objects are interface indexes
+
+sub getSelectorObjects
+{
+    my $devdetails = shift;
+    return sort {$a<=>$b} keys
+        ( %{$devdetails->data()->{'ciscoTemperatureSensors'}} );
+}
+
+
+sub checkSelectorAttribute
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $attr = shift;
+    my $checkval = shift;
+
+    my $data = $devdetails->data();
+    my $sensor = $data->{'ciscoTemperatureSensors'}{$object};
+    
+    my $value;
+    my $operator = '=~';
+    
+    if( $attr eq 'SensorDescr' )
+    {
+        $value = $sensor->{'description'};
+    }
+    else
+    {
+        Error('Unknown CiscoSensor selector attribute: ' . $attr);
+        $value = '';
+    }
+    
+    return eval( '$value' . ' ' . $operator . '$checkval' ) ? 1:0;
+}
+
+
+sub getSelectorObjectName
+{
+    my $devdetails = shift;
+    my $object = shift;
+    
+    my $data = $devdetails->data();
+    my $sensor = $data->{'ciscoTemperatureSensors'}{$object};
+    return $sensor->{'description'};
+}
+
+
+my %knownSelectorActions =
+    ( 'Monitor' => 1 );
+
+                            
+sub applySelectorAction
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $action = shift;
+    my $arg = shift;
+
+    my $data = $devdetails->data();
+    my $sensor = $data->{'ciscoTemperatureSensors'}{$object};
+
+    if( $knownSelectorActions{$action} )
+    {
+        $sensor->{'selectorActions'}{$action} = $arg;
+    }
+    else
+    {
+        Error('Unknown CiscoSensor selector action: ' . $action);
+    }
+}   
+
 
 
 1;

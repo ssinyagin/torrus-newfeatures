@@ -138,8 +138,9 @@ sub new
                 {
                     $self->clearReader();
 
-                    Info('Sleeping ' . $Torrus::Global::ConfigReadyRetryPeriod .
-                          ' seconds');
+                    Info('Sleeping ' .
+                         $Torrus::Global::ConfigReadyRetryPeriod .
+                         ' seconds');
                     sleep $Torrus::Global::ConfigReadyRetryPeriod;
 
                     $self->setReader();
@@ -281,7 +282,8 @@ sub waitReaders
                     $recentTS = $reader->{'timestamp'};
                 }
             }
-            if( $recentTS + $Torrus::Global::ConfigReadersWaitTimeout >= time() )
+            if( $recentTS + $Torrus::Global::ConfigReadersWaitTimeout >=
+                time() )
             {
                 Info('Sleeping ' . $Torrus::Global::ConfigReadersWaitPeriod  .
                      ' seconds');

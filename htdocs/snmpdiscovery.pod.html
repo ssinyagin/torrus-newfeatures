@@ -29,6 +29,14 @@
 			<li><a href="#vendor_parameters">Vendor parameters</a></li>
 		</ul>
 
+		<li><a href="#object_selectors">Object selectors</a></li>
+		<ul>
+
+			<li><a href="#rfc2863_if_mib_selector">RFC2863_IF_MIB selector</a></li>
+			<li><a href="#ciscosensor_selector">CiscoSensor selector</a></li>
+			<li><a href="#examples">Examples</a></li>
+		</ul>
+
 	</ul>
 
 	<li><a href="#author">Author</a></li>
@@ -317,6 +325,11 @@ to the resulting XML configuration at the host level.
 Optional comma-separated list of parameter names that should be copied
 from the discovery configuration file to the generated Torrus configuration
 at the host level.
+<p></p>
+<li><strong><a name="item_selectors"><code>selectors</code></a></strong><br />
+</li>
+Optional comma-separated list of object selectors. They are explained in more
+detail below.
 <p></p></ul>
 <p>
 </p>
@@ -437,6 +450,15 @@ When set to <code>yes</code>, Cisco temperature sensor values are stored in
 a separate RRD file per sensor ID. This is useful for modular big routers
 like Cisco GSR.
 <p></p>
+<li><strong><a name="item_ciscogeneric_3a_3asensor_2dmonitor"><code>CiscoGeneric::sensor-monitor</code></a></strong><br />
+</li>
+Comma-separated list of monitor names to be applied to the sensor
+datasource.
+<p></p>
+<li></li>
+Regular expression that should match the sensor descriptions
+that would have the <a href="#item_ciscogeneric_3a_3asensor_2dmonitor"><code>CiscoGeneric::sensor-monitor</code></a> applied. Default: <code>.*</code>.
+<p></p>
 <li><strong><a name="item_ciscoios_3a_3adisable_2dmembuf_2dstats"><code>CiscoIOS::disable-membuf-stats</code></a></strong><br />
 </li>
 When set to <code>yes</code>, Cisco memory buffer statistics are excluded from
@@ -458,6 +480,157 @@ the slot within the device. Any sequence of word characters is allowed.
 <p></p></ul>
 <p>See also: <em>Torrus Vendor Support List</em> for the list of supported MIBs and
 vendors.</p>
+<p>
+</p>
+<h2><a name="object_selectors">Object selectors</a></h2>
+<p>Selectors are a common mechanism for applying customizations to
+some discovery objects. For example, you may want to apply a monitor
+to byte counters of interfaces that have a special word in the description.
+Or apply Holt-Winters prediction to a certain subset of interfaces.</p>
+<p>Selectors are defined in a DDX file as regular parameters.
+The parameter <a href="#item_selectors"><code>selectors</code></a> defines a list of selector names.
+Each selector is identifed by its name and type. The type of selector
+defines which objects will be searched: IF-MIB interfaces, or Cisco
+temperature sensors, or something else. The parameters are described
+below.</p>
+<ul>
+<li><strong><code>selectors</code></strong><br />
+</li>
+Comma-separated list of selector names. Further below we use <code>S</code> as
+selector name, <code>A</code> as attribute name, and <code>T</code> as action name.
+<p></p>
+<li><strong><a name="item_s_2dselector_2dtype"><code>S-selector-type</code></a></strong><br />
+</li>
+Type of objects to be selected. Supported values are: <code>RFC2863_IF_MIB</code>,
+<code>CiscoSensor</code>.
+<p></p>
+<li><strong><a name="item_s_2dselector_2dexpr"><code>S-selector-expr</code></a></strong><br />
+</li>
+An RPN (reverse Polish notation) expression that defines the
+object attributes to be checked and relation between them. Attribute names
+should be specified in curly braces ({}). The rest of the syntax is described
+in <em>RPN expressions in Torrus</em> guide. The attribute names are specific to the
+selector type and are described below.
+<p></p>
+<li><strong><a name="item_s_2da"><code>S-A</code></a></strong><br />
+</li>
+For a given selector name <code>S</code> and attribute name <code>A</code>,
+this parameter defines the attribute value that should be compared
+to the object's properties. In most cases it defines a regular
+expression that should match the value of a corresponding object's
+property.
+<p></p>
+<li><strong><a name="item_s_2dselector_2dactions"><code>S-selector-actions</code></a></strong><br />
+</li>
+For a given selector name <code>S</code>, this parameter defines a comma-separated
+list of actions to be applied for objects where <a href="#item_s_2dselector_2dexpr"><code>S-selector-expr</code></a> returns
+true. The action names are specific to the selector type and are
+described below.
+<p></p>
+<li><strong><a name="item_s_2dt_2darg"><code>S-T-arg</code></a></strong><br />
+</li>
+For a given selector <code>S</code> and action <code>T</code>, this parameter defines
+an argument that should be passed to the action. Each action
+defines its own meaning of the argument.
+<p></p></ul>
+<p>
+</p>
+<h3><a name="rfc2863_if_mib_selector">RFC2863_IF_MIB selector</a></h3>
+<p>This type of selector selects the network interfaces on a SNMP device.
+The following attribute names are supported:</p>
+<ul>
+<li><strong><a name="item_ifsubtreename"><code>ifSubtreeName</code></a></strong><br />
+</li>
+Interface-level subtree name as you see it in the discovery results.
+<p></p>
+<li><strong><a name="item_ifcomment"><code>ifComment</code></a></strong><br />
+</li>
+Comment string that is defined in <code>comment</code> parameter. It is
+usually derived from an interface description.
+<p></p>
+<li><strong><a name="item_iftype"><code>ifType</code></a></strong><br />
+</li>
+Numeric IANA interface type, as returned by <a href="#item_iftype"><code>ifType</code></a> SNMP variable.
+<p></p></ul>
+<p><a href="#item_iftype"><code>ifType</code></a> is compared numerically.
+<a href="#item_ifsubtreename"><code>ifSubtreeName</code></a> and <a href="#item_ifcomment"><code>ifComment</code></a> are regular expressions.</p>
+<p>The following actions are supported:</p>
+<ul>
+<li><strong><a name="item_inbytesmonitor_2c_outbytesmonitor"><code>InBytesMonitor</code>, <code>OutBytesMonitor</code></a></strong><br />
+</li>
+The argument defines the monitor name to be applied to the input
+or output bytes counter.
+<p></p>
+<li><strong><a name="item_errorsmonitor"><code>ErrorsMonitor</code></a></strong><br />
+</li>
+The argument defines the monitor name to be applied to all error and discard
+counters that are discovered for a given interface.
+<p></p>
+<li><strong><a name="item_holtwinters"><code>HoltWinters</code></a></strong><br />
+</li>
+No argument needed. This action enables Holt-Winters prediction
+for given interface's counters.
+<p></p>
+<li><strong><a name="item_nopacketcounters_2c_noerrorcounters"><code>NoPacketCounters</code>, <code>NoErrorCounters</code></a></strong><br />
+</li>
+No argument needed. The action disables the packet or error counters
+for a given interface to be collected.
+<p></p>
+<li><strong><a name="item_parameters"><code>Parameters</code></a></strong><br />
+</li>
+The argument defines additional configuration parameters to be
+placed at the interface level. The value should be one
+or several <code>param=value</code> pairs separated by semicolon (;).
+Parameters defined in <a href="#item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a> may override
+the ones defined in this action.
+<p></p></ul>
+<p>
+</p>
+<h3><a name="ciscosensor_selector">CiscoSensor selector</a></h3>
+<p>A selector of this type selects temperature sensors on a Cisco router or
+switch.</p>
+<p>The only attribute supported is <code>SensorDescr</code>, and its value is a regular
+expression that should match the sensor description, as discovered
+by <code>devdiscover</code>.</p>
+<p>The only action supported is <code>Monitor</code>, and its argument specifies
+the monitor name to be applied to the sensor.</p>
+<p>
+</p>
+<h3><a name="examples">Examples</a></h3>
+<p>The following example applies a monitor called <code>temp60degrees</code> to all
+inlet sensors on a Cisco device:</p>
+<pre>
+  &lt;host&gt;
+    &lt;param name=&quot;snmp-host&quot; value=&quot;router1&quot;/&gt;
+    &lt;param name=&quot;output-file&quot; value=&quot;router1.xml&quot;/&gt;
+    &lt;param name=&quot;selectors&quot; value=&quot;inlet&quot;/&gt;
+    &lt;param name=&quot;inlet-selector-type&quot; value=&quot;CiscoSensor&quot;/&gt;
+    &lt;param name=&quot;inlet-selector-expr&quot;  value=&quot;{SensorDescr}&quot;/&gt;
+    &lt;param name=&quot;inlet-SensorDescr&quot; value=&quot;Inlet&quot;/&gt;
+    &lt;param name=&quot;inlet-selector-actions&quot;  value=&quot;Monitor&quot;/&gt;
+    &lt;param name=&quot;inlet-Monitor-arg&quot; value=&quot;temp60degrees&quot;/&gt;
+  &lt;/host&gt;</pre>
+<p>The following example enables Holt-Winters prediction and specifies some
+parameters to all FastEthernet interfaces which have the string ``SRV-ID''
+in their descriptions:</p>
+<pre>
+  &lt;host&gt;
+    &lt;param name=&quot;snmp-host&quot; value=&quot;router2&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;selectors&quot;  value=&quot;FastEthHW&quot;/&gt;
+    &lt;param name=&quot;FastEthHW-selector-type&quot;     value=&quot;RFC2863_IF_MIB&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;FastEthHW-selector-expr&quot;    
+           value=&quot;{ifSubtreeName},{ifComment},AND&quot;/&gt;
+    &lt;param name=&quot;FastEthHW-ifSubtreeName&quot;     value=&quot;^FastEthernet&quot;/&gt;
+    &lt;param name=&quot;FastEthHW-ifComment&quot;         value=&quot;SRV-ID&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;FastEthHW-selector-actions&quot;
+           value=&quot;HoltWinters,Parameters&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;FastEthHW-Parameters-arg&quot;
+       value=&quot;rrd-create-hw-alpha=0.2; rrd-create-hw-beta=0.01&quot;/&gt;
+  &lt;/host&gt;</pre>
 <p>
 </p>
 <hr />

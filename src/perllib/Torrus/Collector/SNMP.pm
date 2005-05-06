@@ -531,6 +531,31 @@ sub runCollector
                     push( @sessions, $session );
                     Debug("Created SNMP session for " .
                           "$ipaddr:$port:$community");
+                    # We set SO_RCVBUF only once, because Net::SNMP shares
+                    # one UDP socket for all sessions.
+                    if( scalar( @sessions ) == 1 )
+                    {
+                        my $oldBuffer =
+                            $session->transport()->socket()->
+                            sockopt( SO_RCVBUF );
+                        
+                        my $ok = $session->transport()->socket()->
+                            sockopt( SO_RCVBUF,
+                                     int($Torrus::Collector::SNMP::RxBuffer) );
+                        if( not $ok )
+                        {
+                            Error('Could not set SO_RCVBUF to ' .
+                                  $Torrus::Collector::SNMP::RxBuffer .
+                                  ': ' . $! . '. Old value: ' .
+                                  $oldBuffer);
+                        }
+                        else
+                        {
+                            Debug('Set SO_RCVBUF to ' .
+                                  $Torrus::Collector::SNMP::RxBuffer .
+                                  '. Old value: ' . $oldBuffer);
+                        }
+                    }
                 }
 
                 my $oids_per_pdu =
@@ -595,7 +620,16 @@ sub runCollector
     }
 
     snmp_dispatcher();
-    map {$_->close()} @sessions;
+
+    foreach my $idx ( 0 .. $#sessions )
+    {
+        if( $idx == 0 )
+        {
+            $sessions[0]->transport()->socket()->close();
+        }
+        $sessions[$idx]->close();
+        delete $sessions[$idx];
+    }
 }
 
 

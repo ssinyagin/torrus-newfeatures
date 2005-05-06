@@ -796,7 +796,7 @@ sub applySelectors
 
     my $reg = \%Torrus::DevDiscover::selectorsRegistry;
     
-    foreach my $sel ( split(',', $selList) )
+    foreach my $sel ( split('\s*,\s*', $selList) )
     {
         my $type = $self->param( $sel . '-selector-type' );
         if( not defined( $type ) )
@@ -843,7 +843,7 @@ sub applySelectors
                 if( $result )
                 {
                     my $actions = $self->param( $sel . '-selector-actions' );
-                    foreach my $action ( split(',', $actions) )
+                    foreach my $action ( split('\s*,\s*', $actions) )
                     {
                         my $arg =
                             $self->param( $sel . '-' . $action . '-arg' );

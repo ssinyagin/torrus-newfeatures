@@ -36,10 +36,11 @@ my $selectType = 'all';
 
 my $help_needed;
 
-my %listingsSupported = ( 'rrdfiles' => {
-    'collector'  => 1,
-    'readonly'   => 1,
-    'all'        => 1} );
+my %listingsSupported =
+    ( 'rrdfiles' => {
+        'collector'  => 1,
+        'readonly'   => 1,
+        'all'        => 1} );
 
 my $ok = GetOptions ('tree=s'   => \$tree,
                      'path=s'   => \$initPath,

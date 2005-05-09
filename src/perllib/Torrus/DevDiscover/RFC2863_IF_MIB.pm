@@ -817,14 +817,15 @@ sub getSelectorObjectName
 }
 
 
-my %knownSelectorActions =
-    ( 'InBytesMonitor' => 1,
-      'OutBytesMonitor' => 1,
-      'ErrorsMonitor' => 1,
-      'HoltWinters' => 1,
-      'NoPacketCounters' => 1,
-      'NoErrorCounters' => 1,
-      'Parameters' => 1 );
+# Other discovery modules can add their interface actions here
+our %knownSelectorActions =
+    ( 'InBytesMonitor'    => 'RFC2863_IF_MIB',
+      'OutBytesMonitor'   => 'RFC2863_IF_MIB',
+      'ErrorsMonitor'     => 'RFC2863_IF_MIB',
+      'HoltWinters'       => 'RFC2863_IF_MIB',
+      'NoPacketCounters'  => 'RFC2863_IF_MIB',
+      'NoErrorCounters'   => 'RFC2863_IF_MIB',
+      'Parameters'        => 'RFC2863_IF_MIB' );
 
                             
 sub applySelectorAction
@@ -837,8 +838,13 @@ sub applySelectorAction
     my $data = $devdetails->data();
     my $interface = $data->{'interfaces'}{$object};
 
-    if( $knownSelectorActions{$action} )
+    if( defined( $knownSelectorActions{$action} ) )
     {
+        if( not $devdetails->isDevType( $knownSelectorActions{$action} ) )
+        {
+            Error('Action ' . $action . ' is applied to a device that is ' .
+                  'not of type ' . $knownSelectorActions{$action});
+        }
         $interface->{'selectorActions'}{$action} = $arg;
     }
     else

@@ -230,6 +230,20 @@ P.Variables SPAN.VariableName {
   font-weight : bold;
 }
 
+DIV.Monitors {
+  clear : both;
+  float : none;
+  font-size : 10px;
+  margin-bottom : 10px;
+  position : relative;
+  width : 90%;
+}
+
+SPAN.MonitorName {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 
 DIV.Listing {
   clear : both;

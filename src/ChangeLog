@@ -1,3 +1,8 @@
+2005-05-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/default-rrd.html: Monitor names and comments displayed
+	on the leaf HTML
+
 2005-05-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoGeneric.pm:

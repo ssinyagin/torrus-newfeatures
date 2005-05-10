@@ -10,6 +10,24 @@
 
 [% INCLUDE legend %]
 
+[% monitors = nodeParam(token,'monitor');
+   IF monitors != '';
+   moncount = monitors.split(',').size %]
+<DIV CLASS="Monitors">
+<DIV CLASS="MonitorsTitle">
+<STRONG>Monitor[% (moncount > 1) ? 's' : '' %]:</STRONG>
+[% (moncount > 1) ? moncount : '' %]
+[% FOREACH monitor = monitors.split(',');
+     mondesc = param(monitor, 'comment') %]
+     <DIV CLASS="MonitorLine">
+     <SPAN CLASS="MonitorName">[% monitor %]</SPAN>
+     [% IF mondesc; %]<SPAN CLASS="MonitorDesc">([% mondesc %])</SPAN>[% END %]
+     </DIV>
+[% END %]
+</DIV>
+</DIV>
+[% END %]
+
 [% IF nodeParam(token, 'ds-type') != 'rrd-multigraph' %]
   [% dayValues = rrprint(token, 'rrd-print-daily') %]
   [% lastValue = rrprint(token, 'rrd-print-last') %]

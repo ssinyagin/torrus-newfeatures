@@ -188,7 +188,8 @@
     <leaf name="Utilization">
       <param name="ds-type"           value="rrd-multigraph" />
       <param name="ds-names"          value="util" />
-      <param name="graph-lower-limit" value="0" />
+      <param name="graph-lower-limit"  value="0" />
+      <param name="graph-upper-limit"  value="100" />
 
       <param name="precedence"        value="950" />
       <param name="comment"
@@ -200,7 +201,7 @@
       </param>
       <param name="graph-legend-util"  value="Utilization" />
       <param name="line-style-util"      value="##SingleGraph" />
-      <param name="line-color-util"      value="##green" />
+      <param name="line-color-util"      value="##red" />
       <param name="line-order-util"      value="1" />
     </leaf>
     

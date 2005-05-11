@@ -170,6 +170,28 @@ sub addChildElement
 }
 
 
+sub getChildSubtree
+{
+    my $self = shift;
+    my $parentNode = shift;
+    my $childName = shift;
+
+    if( not ref( $parentNode ) )
+    {
+        $parentNode = $self->{'datasources'};
+    }
+    
+    my @subtrees =
+        $parentNode->findnodes( 'subtree[@name="' . $childName . '"]' );
+    if( not @subtrees )
+    {
+        Error('Cannot find subtree named ' . $childName);
+        return undef;
+    }
+    return $subtrees[0];
+}
+    
+
 sub addTemplateApplication
 {
     my $self = shift;
@@ -357,7 +379,8 @@ sub requiredFiles
     my %files;
     foreach my $template ( keys %{$self->{'required_templates'}} )
     {
-        my $file = $Torrus::ConfigBuilder::templateRegistry{$template}{'source'};
+        my $file =
+            $Torrus::ConfigBuilder::templateRegistry{$template}{'source'};
         if( defined( $file ) )
         {
             $files{$file} = 1;

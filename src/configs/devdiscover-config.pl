@@ -127,12 +127,20 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
      
      #### DOCSIS MIB
 
-     'RFC2670_DOCS_IF::docsis-signal-quality-subtree' => {
-         'name'   => 'docsis-signal-quality-subtree',
+     'RFC2670_DOCS_IF::docsis-downstream-subtree' => {
+         'name'   => 'docsis-downstream-subtree',
          'source' => 'generic/rfc2670.docsis-if.xml'
          },
-     'RFC2670_DOCS_IF::docsis-interface-signal-quality' => {
-         'name'   => 'docsis-interface-signal-quality',
+     'RFC2670_DOCS_IF::docsis-downstream-util' => {
+         'name'   => 'docsis-downstream-util',
+         'source' => 'generic/rfc2670.docsis-if.xml'
+         },
+     'RFC2670_DOCS_IF::docsis-upstream-subtree' => {
+         'name'   => 'docsis-upstream-subtree',
+         'source' => 'generic/rfc2670.docsis-if.xml'
+         },
+     'RFC2670_DOCS_IF::docsis-upstream-signal-quality' => {
+         'name'   => 'docsis-upstream-signal-quality',
          'source' => 'generic/rfc2670.docsis-if.xml'
          },
 
@@ -248,20 +256,16 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
          'name'   => 'cisco-ipsec-flow-globals',
          'source' => 'vendor/cisco.ios.xml'
          },
-     'CiscoIOS_Docsis::cisco-docsis-util-mac-subtree' => {
-         'name'   => 'cisco-docsis-util-mac-subtree',
+     'CiscoIOS_Docsis::cisco-docsis-mac-subtree' => {
+         'name'   => 'cisco-docsis-mac-subtree',
          'source' => 'vendor/cisco.ios.docsis.xml'
          },
-     'CiscoIOS_Docsis::cisco-docsis-util-mac-intf' => {
-         'name'   => 'cisco-docsis-util-mac-intf',
+     'CiscoIOS_Docsis::cisco-docsis-mac-util' => {
+         'name'   => 'cisco-docsis-mac-util',
          'source' => 'vendor/cisco.ios.docsis.xml'
          },
-     'CiscoIOS_Docsis::cisco-docsis-util-up-subtree' => {
-         'name'   => 'cisco-docsis-util-up-subtree',
-         'source' => 'vendor/cisco.ios.docsis.xml'
-         },
-     'CiscoIOS_Docsis::cisco-docsis-util-up-intf' => {
-         'name'   => 'cisco-docsis-util-up-intf',
+     'CiscoIOS_Docsis::cisco-docsis-upstream-util' => {
+         'name'   => 'cisco-docsis-upstream-util',
          'source' => 'vendor/cisco.ios.docsis.xml'
          },
      'CiscoIOS_SAA::cisco-saa-subtree' => {

@@ -30,18 +30,24 @@
   <def name="docsIfSigQCorrecteds"      value="1.3.6.1.2.1.10.127.1.1.4.1.3"/>
   <def name="docsIfSigQUncorrectables"  value="1.3.6.1.2.1.10.127.1.1.4.1.4"/>
   <def name="docsIfSigQSignalNoise"     value="1.3.6.1.2.1.10.127.1.1.4.1.5"/>
+  
+  <!-- DOCS-IF-MIB::docsIfCmtsDownChannelCounterTable -->
+  <def name="docsIfCmtsDownChnlCtrExtTotalBytes"
+                                value="1.3.6.1.2.1.10.127.1.3.10.1.4"/>
+  <def name="docsIfCmtsDownChnlCtrExtUsedBytes"
+                                value="1.3.6.1.2.1.10.127.1.3.10.1.5"/>
 </definitions>
 
 <datasources>
 
-  <template name="docsis-signal-quality-subtree">
-    <param name="comment"        value="DOCSIS cable signal quality" />
+  <template name="docsis-upstream-subtree">
+    <param name="precedence"           value="-500" />
+    <param name="comment"        value="DOCSIS upstream channel statistics" />
     <param name="data-file">
-       %system-id%_%interface-nick%_docs_sigq.rrd
+       %system-id%_%interface-nick%_docsis_upstream.rrd
     </param>
     <param name="collector-timeoffset-hashstring"
                                        value="%system-id%:%interface-nick%" />
-    <param name="precedence"           value="-500" />
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
     <param name="graph-title"          value="%descriptive-nickname%" />
 
@@ -50,21 +56,21 @@
     <param name="overview-direct-link"      value="yes"/>
     <param name="overview-direct-link-view" value="expanded-dir-html"/>
     <param name="overview-shortcut-text"
-           value="Show Signal/Noise ratio for all interfaces"/>
+           value="Show Signal/Noise ratio for all downstream channels"/>
     <param name="overview-shortcut-title"
-           value="Show all cable interfaces signal quality in one page"/>
+           value="Show signal quality graphs in one page"/>
     <param name="overview-page-title"
            value="SNR Graphs"/>
     <param name="rrd-hwpredict"     value="disabled" />
   </template>
-
+  
   <template name="docsis-signal-quality-codewords">
     <param name="rrd-create-dstype"   value="COUNTER" />
     <param name="vertical-label"      value="Codewords/s" />
     <param name="graph-lower-limit"   value="0" />
   </template>
 
-  <template name="docsis-interface-signal-quality">
+  <template name="docsis-upstream-signal-quality">
     <leaf name="SNR">
       <param name="snmp-object"  value="$docsIfSigQSignalNoise.%ifindex-map%"/>
 
@@ -120,6 +126,7 @@
       <apply-template name="docsis-signal-quality-codewords"/>
       <param name="snmp-object"  value="$docsIfSigQUnerroreds.%ifindex-map%"/>
       <param name="rrd-ds"       value="Unerroreds" />
+      <param name="hidden"       value="yes"/>
       <param name="comment"
           value="FEC codewords received on this channel without error"/>
       <param name="graph-legend" value="Error-free Codewords" />
@@ -130,6 +137,7 @@
       <apply-template name="docsis-signal-quality-codewords"/>
       <param name="snmp-object"  value="$docsIfSigQCorrecteds.%ifindex-map%"/>
       <param name="rrd-ds"       value="Correcteds" />
+      <param name="hidden"       value="yes"/>
       <param name="comment"
           value="FEC codewords received on this channel correctable errors"/>
       <param name="graph-legend" value="Correctable Codewords" />
@@ -141,6 +149,7 @@
       <param name="snmp-object"
                         value="$docsIfSigQUncorrectables.%ifindex-map%"/>
       <param name="rrd-ds"       value="Uncorrectables" />
+      <param name="hidden"       value="yes"/>
       <param name="comment"
           value="FEC codewords received on this channel uncorrectable errors"/>
       <param name="graph-legend" value="Uncorrectable Codewords" />
@@ -148,6 +157,87 @@
     </leaf>
   </template>
 
+
+
+  <template name="docsis-downstream-subtree">
+    <param name="precedence"           value="-500" />
+    <param name="comment"        value="DOCSIS downstream statistics" />
+    <param name="data-file">
+       %system-id%_%interface-nick%_docsis_downstream.rrd
+    </param>
+    <param name="collector-timeoffset-hashstring"
+                                       value="%system-id%:%interface-nick%" />
+    <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
+    <param name="graph-title"          value="%descriptive-nickname%" />
+
+    <param name="has-overview-subleaves" value="yes"/>
+    <param name="overview-subleave-name" value="Utilization"/>
+    <param name="overview-direct-link"      value="yes"/>
+    <param name="overview-direct-link-view" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text"
+           value="Show Utilization for all downstream channels"/>
+    <param name="overview-shortcut-title"
+           value="Show utilization graphs in one page"/>
+    <param name="overview-page-title"
+           value="Downstream Utilization Graphs"/>
+    <param name="rrd-hwpredict"     value="disabled" />
+  </template>
+
+  
+  <template name="docsis-downstream-util">  
+    <leaf name="Utilization">
+      <param name="ds-type"           value="rrd-multigraph" />
+      <param name="ds-names"          value="util" />
+      <param name="graph-lower-limit" value="0" />
+
+      <param name="precedence"        value="950" />
+      <param name="comment"
+              value="Downstream channel utilization" />
+      <param name="vertical-label"    value="Percent" />
+
+      <param name="ds-expr-util">
+        {UsedBytes},{TotalBytes},/,100,*
+      </param>
+      <param name="graph-legend-util"  value="Utilization" />
+      <param name="line-style-util"      value="##SingleGraph" />
+      <param name="line-color-util"      value="##green" />
+      <param name="line-order-util"      value="1" />
+    </leaf>
+    
+    <leaf name="TotalBytes">
+      <param name="rrd-create-dstype"   value="COUNTER" />
+      <param name="snmp-object-type"    value="COUNTER64" />
+      <param name="vertical-label"      value="Bytes/s" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="snmp-object"
+               value="$docsIfCmtsDownChnlCtrExtTotalBytes.%ifindex-map%"/>
+      <param name="rrd-ds"       value="TotalBytes" />
+      <param name="hidden"       value="yes"/>
+      <param name="comment">
+        The total number of bytes in the Payload portion
+      </param>
+      <param name="graph-legend" value="Total Bytes" />
+      <param name="precedence"   value="800" />
+    </leaf>
+    
+    <leaf name="UsedBytes">
+      <param name="rrd-create-dstype"   value="COUNTER" />
+      <param name="snmp-object-type"    value="COUNTER64" />
+      <param name="vertical-label"      value="Bytes/s" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="snmp-object"
+               value="$docsIfCmtsDownChnlCtrExtUsedBytes.%ifindex-map%"/>
+      <param name="rrd-ds"       value="UsedBytes" />
+      <param name="hidden"       value="yes"/>
+      <param name="comment">
+       The total number of DOCSIS data bytes transported by this downstream
+       channel
+      </param>
+      <param name="graph-legend" value="Used Bytes" />
+      <param name="precedence"   value="800" />
+    </leaf>  
+  </template>  
+  
 </datasources>
 
 <monitors>

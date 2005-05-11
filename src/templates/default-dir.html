@@ -8,7 +8,7 @@
 
 <P>Directories you can jump to:</P>
 <DIV CLASS="Listing">
-[%   hasLeaves = 0;
+[%   hasLeaves = 0; hasSubtrees = 0;
      childCounter = 0;
      evenRow = 0;
      FOREACH child = sortTokens(children(token));
@@ -24,6 +24,7 @@
            thisIsAlias = 1;
            urlTitle = ' TITLE="Symbolic link to ' _ path(isAlias(child)) _'"';
          ELSE;
+           hasSubtrees = 1;
            urlTitle = '';
          END;
        END;
@@ -56,12 +57,13 @@
     INCLUDE shortcut url=url(token, 'expanded-dir-html')
                      text="Expand leaves"
                      title="Show all leaf graphs in one page";
-   ELSE;
+   END;
+   IF hasSubtrees;
     INCLUDE shortcut url=url(token, 'recursive-dir-html')
                      text="Recursive view"
                      title="Show all subtrees and leaves in one page";
    
- END %]
+   END %]
 </DIV>
 
 [% IF nodeParam(token, 'has-overview-subleaves', 1) == 'yes' %]

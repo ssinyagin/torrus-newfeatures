@@ -74,6 +74,9 @@ sub discover
         my $interface = $data->{'interfaces'}{$ifIndex};
         my $ifType = $interface->{'ifType'};
 
+        $interface->{'docsTemplates'} = [];
+        $interface->{'docsParams'} = {};
+        
         if( $ifType == 127 )
         {
             push( @{$data->{'docsCableMaclayer'}}, $ifIndex );
@@ -81,13 +84,32 @@ sub discover
         elsif(  $ifType == 128 )
         {
             push( @{$data->{'docsCableDownstream'}}, $ifIndex );
+            push( @{$interface->{'docsTemplates'}},
+                  'RFC2670_DOCS_IF::docsis-downstream-util' );
         }
-        elsif(  $ifType == 129 )
+        elsif( $ifType == 129 or $ifType == 205 )
         {
             push( @{$data->{'docsCableUpstream'}}, $ifIndex );
+            push( @{$interface->{'docsTemplates'}},
+                  'RFC2670_DOCS_IF::docsis-upstream-signal-quality' );
         }
     }
 
+    $data->{'docsConfig'} = {
+        'docsCableMaclayer' => {
+            'subtreeName' => 'Docsis_MAC_Layer',
+            'templates' => [],
+        },
+        'docsCableDownstream' => {
+            'subtreeName' => 'Docsis_Downstream',
+            'templates' => ['RFC2670_DOCS_IF::docsis-downstream-subtree'],
+        },
+        'docsCableUpstream' => {
+            'subtreeName' => 'Docsis_Upstream',
+            'templates' => ['RFC2670_DOCS_IF::docsis-upstream-subtree'],
+        },
+    };
+    
     return 1;
 }
 
@@ -100,25 +122,37 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    # Build Docsis_Signal_Quality subtree
-
-    my $subtreeNode =
-        $cb->addSubtree( $devNode, 'Docsis_Signal_Quality', {},
-                         ['RFC2670_DOCS_IF::docsis-signal-quality-subtree'] );
-
-    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+    foreach my $category ( sort keys %{$data->{'docsConfig'}} )
     {
-        my $interface = $data->{'interfaces'}{$ifIndex};
+        if( scalar( @{$data->{'docsConfig'}{$category}{'templates'}} ) > 0 )
+        {
+            my $subtreeNode =
+                $cb->addSubtree( $devNode,
+                                 $data->{'docsConfig'}{$category}{
+                                     'subtreeName'},
+                                 {},
+                                 $data->{'docsConfig'}{$category}{
+                                     'templates'});
 
-        my $param = {
-            'interface-name' => $interface->{'param'}{'interface-name'},
-            'interface-nick' => $interface->{'param'}{'interface-nick'},
-            'comment'        => $interface->{'param'}{'comment'}
-        };
+            foreach my $ifIndex ( @{$data->{$category}} )
+            {
+                my $interface = $data->{'interfaces'}{$ifIndex};
 
-        $cb->addSubtree
-            ( $subtreeNode, $interface->{$data->{'nameref'}{'ifSubtreeName'}},
-              $param, ['RFC2670_DOCS_IF::docsis-interface-signal-quality'] );
+                my $param = $interface->{'docsParams'};
+                $param->{'interface-name'} =
+                    $interface->{'param'}{'interface-name'};            
+                $param->{'interface-nick'} =
+                    $interface->{'param'}{'interface-nick'};            
+                $param->{'comment'} =
+                    $interface->{'param'}{'comment'};        
+        
+                $cb->addSubtree
+                    ( $subtreeNode,
+                      $interface->{$data->{'nameref'}{'ifSubtreeName'}},
+                      $param, 
+                      $interface->{'docsTemplates'} );
+            }
+        }
     }
 }
 

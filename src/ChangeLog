@@ -1,3 +1,8 @@
+2005-05-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2670_DOCS_IF.pm:
+	Downstream utilization added, and the subtrees rearranged.
+
 2005-05-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* templates/default-rrd.html: Monitor names and comments displayed

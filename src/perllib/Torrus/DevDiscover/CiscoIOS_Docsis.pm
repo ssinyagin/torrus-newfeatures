@@ -61,11 +61,32 @@ sub discover
     my $dd = shift;
     my $devdetails = shift;
 
+    my $data = $devdetails->data();
+    
     if( $dd->checkSnmpTable( 'cdxIfUpChannelNumActiveUGS' ) )
     {
         $devdetails->setCap('cdxIfUpChannelNumActiveUGS');
     }
 
+    push( @{$data->{'docsConfig'}{'docsCableMaclayer'}{'templates'}},
+          'CiscoIOS_Docsis::cisco-docsis-mac-subtree' );
+
+    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+
+        push( @{$interface->{'docsTemplates'}},
+              'CiscoIOS_Docsis::cisco-docsis-mac-util' );
+    }
+
+    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+
+        push( @{$interface->{'docsTemplates'}},
+              'CiscoIOS_Docsis::cisco-docsis-upstream-util' );
+    }
+    
     return 1;
 }
 
@@ -78,60 +99,9 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    # Build Docsis_Utilization subtree
-
-    my $utilNode =
-        $cb->addSubtree( $devNode, 'Docsis_Utilization',
-                         {'precedence' => '-450',
-                          'comment' => 'DOCSIS resources utilization'},
-                         [] );
-
-    my $macNode =
-        $cb->addSubtree( $utilNode, 'MAC_Layer', {},
-                         ['CiscoIOS_Docsis::cisco-docsis-util-mac-subtree'] );
-
-    my @macLayerInterfaces = ();
-    
-    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
-    {
-        my $interface = $data->{'interfaces'}{$ifIndex};
-        
-        my $param = {
-            'interface-name' => $interface->{'param'}{'interface-name'},
-            'interface-nick' => $interface->{'param'}{'interface-nick'},
-            'comment'        => $interface->{'param'}{'comment'}
-        };
-
-        my $ifSubtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-        $cb->addSubtree
-            ( $macNode, $ifSubtreeName,
-              $param, ['CiscoIOS_Docsis::cisco-docsis-util-mac-intf'] );
-
-        push( @macLayerInterfaces, $ifSubtreeName );
-    }
-
-    my $upsNode =
-        $cb->addSubtree( $utilNode, 'Upstream_Channels', {},
-                         ['CiscoIOS_Docsis::cisco-docsis-util-up-subtree'] );
-
     if( $devdetails->hasCap('cdxIfUpChannelNumActiveUGS') )
     {
-        $cb->setVar( $upsNode, 'CiscoIOS_Docsis::ugs-supported', 'true' );
-    }
-    
-    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
-    {
-        my $interface = $data->{'interfaces'}{$ifIndex};
-        
-        my $param = {
-            'interface-name' => $interface->{'param'}{'interface-name'},
-            'interface-nick' => $interface->{'param'}{'interface-nick'},
-            'comment'        => $interface->{'param'}{'comment'}
-        };
-
-        $cb->addSubtree
-            ( $upsNode, $interface->{$data->{'nameref'}{'ifSubtreeName'}},
-              $param, ['CiscoIOS_Docsis::cisco-docsis-util-up-intf'] );
+        $cb->setVar( $devNode, 'CiscoIOS_Docsis::ugs-supported', 'true' );
     }
 
     # Build All_Modems summary graph
@@ -139,8 +109,8 @@ sub buildConfig
       'ds-type'              => 'rrd-multigraph',
       'ds-names'             => 'total,active',
       'graph-lower-limit'    => '0',
-      'precedence'           => '-1000',
-      'comment'              => 'Active and Total modems on all interfaces',
+      'precedence'           => '1000',
+      'comment'              => 'Active and Total modems on CMTS',
       'vertical-label'       => 'Modems',
 
       'graph-legend-total'   => 'Total',
@@ -155,26 +125,40 @@ sub buildConfig
       };
 
     my $first = 1;
-    foreach my $intf ( @macLayerInterfaces )
+    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
     {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+        
         if( $first )
         {
             $param->{'ds-expr-total'} =
-                '{MAC_Layer/' . $intf . '/Modems_Total}';
+                '{' . $intf . '/Modems_Total}';
             $param->{'ds-expr-active'} =
-                '{MAC_Layer/' . $intf . '/Modems_Active}';
+                '{' . $intf . '/Modems_Active}';
             $first = 0;
         }
         else
         {
             $param->{'ds-expr-total'} .=
-                ',{MAC_Layer/' . $intf . '/Modems_Total},+';
+                ',{' . $intf . '/Modems_Total},+';
             $param->{'ds-expr-active'} .=
-                ',{MAC_Layer/' . $intf . '/Modems_Active},+';
+                ',{' . $intf . '/Modems_Active},+';
         }
     }
 
-    $cb->addLeaf( $utilNode, 'All_Modems', $param, [] );
+    my $macNode =
+        $cb->getChildSubtree( $devNode,
+                              $data->{'docsConfig'}{'docsCableMaclayer'}{
+                                  'subtreeName'} );
+    if( defined( $macNode ) )
+    {
+        $cb->addLeaf( $macNode, 'All_Modems', $param, [] );
+    }
+    else
+    {
+        Error('Could not find the MAC layer subtree');
+    }
 }
 
 

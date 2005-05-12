@@ -282,7 +282,7 @@ sub updateRRD
     {
         if( not $ds_updating{$ds} )
         {
-            Warn('Datasource exists in RRD file, but is not updated: ' .
+            Warn('Datasource exists in RRD file, but it is not updated: ' .
                  $ds . ' in ' . $filename);
             $ds_conflict = 1;
         }

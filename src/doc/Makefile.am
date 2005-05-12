@@ -52,6 +52,8 @@ POD_FILES = \
 
 
 docdir  = @docdir@
+
+if POD2TEXT_PRESENT
 nodist_doc_DATA = \
 		install.txt \
 		rpnexpr.txt \
@@ -63,6 +65,7 @@ nodist_doc_DATA = \
 		vendorsupport.txt \
 		webintf.txt \
 		xmlconfig.txt
+endif
 
 devdocdir  = $(docdir)/devdoc
 
@@ -85,9 +88,10 @@ SUFFIXES = .pod.in .pod .txt
 .pod.in.pod:
 	$(SUBST) $<  > $@
 
+if POD2TEXT_PRESENT
 .pod.txt:
-	pod2text $< $@ 
-
+	$(POD2TEXT) $< $@ 
+endif
 
 htdocs: $(POD_FILES)
 	HTMLDIR=@abs_top_builddir@/../htdocs $(SHELL) mkhtdocs.sh

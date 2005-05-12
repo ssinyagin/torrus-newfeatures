@@ -34,7 +34,10 @@ AC_PATH_PROG(FIND, find, no)
 AC_PATH_PROG(RM, rm, no)
 AC_PATH_PROG(SLEEP, sleep, no)
 
-# This will generate man pages from POD
+
+# This will generate doc pages from POD sources
+AC_PATH_PROG(POD2TEXT, pod2text, no)
+AM_CONDITIONAL([POD2TEXT_PRESENT], [test "$POD2TEXT" != no])
 AC_PATH_PROG(POD2MAN, pod2man, no)
 AM_CONDITIONAL([POD2MAN_PRESENT], [test "$POD2MAN" != no])
 

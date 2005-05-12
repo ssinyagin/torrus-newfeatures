@@ -89,6 +89,8 @@
 
       <param name="precedence"          value="1000" />
 
+      <!-- This monitor may be redefined by
+           DocsisUpSNRMonitor selector action -->
       <param name="monitor"             value="docsis-snr-lower-20db" />
       <param name="monitor-period"      value="900" />
       <param name="monitor-timeoffset"  value="0" />
@@ -200,8 +202,8 @@
         {UsedBytes},{TotalBytes},/,100,*
       </param>
       <param name="graph-legend-util"  value="Utilization" />
-      <param name="line-style-util"      value="##SingleGraph" />
-      <param name="line-color-util"      value="##red" />
+      <param name="line-style-util"      value="##resourceusage" />
+      <param name="line-color-util"      value="##resourceusage" />
       <param name="line-order-util"      value="1" />
     </leaf>
     

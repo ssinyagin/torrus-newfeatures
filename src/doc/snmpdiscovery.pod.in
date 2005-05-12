@@ -606,6 +606,11 @@ or several C<param=value> pairs separated by semicolon (;).
 Parameters defined in C<RFC2863_IF_MIB::copy-params> may override
 the ones defined in this action.
 
+=item * C<DocsisUpSNRMonitor>
+
+For a DOCSIS device, this action assigns a new  monitor to the Signal/Noise
+ratio gauge, instead of the default monitor.
+
 =back
 
 

@@ -33,10 +33,16 @@ $Torrus::DevDiscover::registry{'RFC2670_DOCS_IF'} = {
     };
 
 
+$Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
+    'DocsisUpSNRMonitor'} ='RFC2670_DOCS_IF';
+
+
 our %oiddef =
     (
      # DOCS-IF-MIB::docsIfDownstreamChannelTable
      'docsIfDownstreamChannelTable' => '1.3.6.1.2.1.10.127.1.1.1',
+     # DOCS-IF-MIB::docsIfCmtsDownChannelCounterTable
+     'docsIfCmtsDownChannelCounterTable' => '1.3.6.1.2.1.10.127.1.3.10'
      );
 
 
@@ -65,6 +71,11 @@ sub discover
 
     my $data = $devdetails->data();
 
+    if( $dd->checkSnmpTable( 'docsIfCmtsDownChannelCounterTable' ) )
+    {
+        $devdetails->setCap('docsDownstreamUtil');
+    }
+    
     $data->{'docsCableMaclayer'} = [];
     $data->{'docsCableDownstream'} = [];
     $data->{'docsCableUpstream'} = [];
@@ -84,8 +95,11 @@ sub discover
         elsif(  $ifType == 128 )
         {
             push( @{$data->{'docsCableDownstream'}}, $ifIndex );
-            push( @{$interface->{'docsTemplates'}},
-                  'RFC2670_DOCS_IF::docsis-downstream-util' );
+            if( $devdetails->hasCap('docsDownstreamUtil') )
+            {
+                push( @{$interface->{'docsTemplates'}},
+                      'RFC2670_DOCS_IF::docsis-downstream-util' );
+            }
         }
         elsif( $ifType == 129 or $ifType == 205 )
         {
@@ -102,13 +116,19 @@ sub discover
         },
         'docsCableDownstream' => {
             'subtreeName' => 'Docsis_Downstream',
-            'templates' => ['RFC2670_DOCS_IF::docsis-downstream-subtree'],
+            'templates' => [],
         },
         'docsCableUpstream' => {
             'subtreeName' => 'Docsis_Upstream',
             'templates' => ['RFC2670_DOCS_IF::docsis-upstream-subtree'],
         },
     };
+
+    if( $devdetails->hasCap('docsDownstreamUtil') )
+    {
+        push( @{$data->{'docsConfig'}{'docsCableDownstream'}{'templates'}},
+              'RFC2670_DOCS_IF::docsis-downstream-subtree' );        
+    }
     
     return 1;
 }
@@ -146,11 +166,24 @@ sub buildConfig
                 $param->{'comment'} =
                     $interface->{'param'}{'comment'};        
         
-                $cb->addSubtree
+                my $intfNode = $cb->addSubtree
                     ( $subtreeNode,
                       $interface->{$data->{'nameref'}{'ifSubtreeName'}},
                       $param, 
                       $interface->{'docsTemplates'} );
+
+                # Apply selector actions
+                if( $category eq 'docsCableUpstream' )
+                {
+                    my $snrMon =
+                        $interface->{'selectorActions'}{'DocsisUpSNRMonitor'};
+                    
+                    if( defined( $snrMon ) )
+                    {
+                        $cb->addLeaf( $intfNode, 'SNR',
+                                      {'monitor' => $snrMon } );
+                    }
+                }
             }
         }
     }

@@ -270,6 +270,7 @@ sub updateRRD
 
     # First we compare the sets of datasources in our memory and in RRD file
     my %ds_updating = ();
+    my $ds_conflict = 0;
 
     foreach my $token ( keys %{$tokens} )
     {
@@ -283,6 +284,7 @@ sub updateRRD
         {
             Warn('Datasource exists in RRD file, but is not updated: ' .
                  $ds . ' in ' . $filename);
+            $ds_conflict = 1;
         }
     }
 
@@ -293,9 +295,32 @@ sub updateRRD
         {
             Error("Datasource being updated does not exist: $ds in $filename");
             delete $ds_updating{$ds};
+            $ds_conflict = 1;
         }
     }
 
+    if( $ds_conflict and $Torrus::Collector::RRDStorage::moveConflictRRD )
+    {
+        my( $sec, $min, $hour, $mday, $mon, $year) = localtime( time() );
+        my $destfile = sprintf('%s_%04d%02d%02d%02d%02d',
+                               $filename,
+                               $year + 1900, $mon, $mday, $hour, $min);
+        
+        my $destdir = $Torrus::Collector::RRDStorage::conflictRRDPath;
+        if( defined( $destdir ) and -d $destdir )
+        {
+            my @fpath = split('/', $destfile);
+            my $fname = pop( @fpath );
+            $destfile = $destdir . '/' . $fname;
+        }
+        Warn('Moving the conflicted RRD file ' . $filename .
+             ' to ' . $destfile);
+        rename( $filename, $destfile ) or
+            Error("Cannot rename $filename to $destfile: $!");
+        
+        delete $sref->{'rrdinfo_ds'}{$filename};
+    }
+        
     if( scalar( keys %ds_updating ) == 0 )
     {
         Error("No datasources to update in $filename");
@@ -362,7 +387,11 @@ sub updateRRD
     Debug("Updating $filename: " . join(' ', @cmd));
     RRDs::update( $filename, @cmd );
     my $err = RRDs::error();
-    Error("ERROR updating $filename: $err") if $err;
+    if( $err )
+    {
+        Error("ERROR updating $filename: $err");
+        delete $sref->{'rrdinfo_ds'}{$filename};
+    }
 }
 
 

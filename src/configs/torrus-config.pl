@@ -84,6 +84,22 @@ $Torrus::Collector::SNMP::unreachableTimeout = 900;
 # For unreachable host, we retry SNMP query not earlier than this
 $Torrus::Collector::SNMP::unreachableRetryDelay = 60;
 
+# The following errors are caused by changes in the device configurations,
+# when the collector tries to store data in a RRD file, but the
+# structure of the file is no longer suitable:
+#     Datasource exists in RRD file, but is not updated
+#     Datasource being updated does not exist
+# Set this variable to true if you want these RRD files automatically moved.
+# The current date is appended to the filename, and the file
+# is moved to another directory or renamed.
+$Torrus::Collector::RRDStorage::moveConflictRRD = 0;
+
+
+# The path where conflicted RRD files would be moved. This directory
+# should exist, be writable by Torrus daemon user, and in most OSes
+# it must reside in the same filesystem as the original files.
+# When undefined, the files are renamed within their original directory.
+$Torrus::Collector::RRDStorage::conflictRRDPath = undef;
 
 # Sleep interval when scheduler initialization failed (i.e. configuration
 # reading timeout)

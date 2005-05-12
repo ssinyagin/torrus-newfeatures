@@ -1,3 +1,9 @@
+2005-05-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/RRDStorage.pm (updateRRD):
+	$Torrus::Collector::RRDStorage::moveConflictRRD -- moving RRD files
+	with conflicting structure
+
 2005-05-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2670_DOCS_IF.pm:

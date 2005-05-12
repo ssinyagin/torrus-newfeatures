@@ -58,7 +58,8 @@ sub new
     {
         if( not defined $Torrus::Global::dbHome )
         {
-            Error('$Torrus::Global::dbHome must be defined in @torrus_config_pl@');
+            Error('$Torrus::Global::dbHome must be defined ' .
+                  'in torrus_config.pl');
             return undef;
         }
         elsif( not -d $Torrus::Global::dbHome )
@@ -139,8 +140,8 @@ sub new
         }
 
         $Torrus::DB::dbPool{$filename} = { 'dbh'        => $dbh,
-                                         'accmethod'  => $accmethod,
-                                         'flags'      => $flags };
+                                           'accmethod'  => $accmethod,
+                                           'flags'      => $flags };
 
         $self->{'dbh'} = $dbh;
     }
@@ -275,7 +276,7 @@ sub c_del
     my $cnt = 0;
     $cursor->c_del( $cnt );
 }
-    
+
 
 
 # Btree best match. We assume that the searchKey is longer or equal

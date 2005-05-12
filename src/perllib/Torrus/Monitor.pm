@@ -65,28 +65,29 @@ sub addTarget
     push( @{$self->{'targets'}}, $token );
 }
 
-    
+
 
 
 sub run
 {
     my $self = shift;
 
-    my $config_tree = new Torrus::ConfigTree(-TreeName => $self->{'tree_name'},
-                                           -Wait => 1);
+    my $config_tree =
+        new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
+                                -Wait => 1 );
     if( not defined( $config_tree ) )
     {
         return;
     }
 
     $self->{'db_alarms'} = new Torrus::DB('monitor_alarms',
-                                        -Subdir => $self->{'tree_name'},
-                                        -WriteAccess => 1);
+                                          -Subdir => $self->{'tree_name'},
+                                          -WriteAccess => 1);
 
     foreach my $token ( @{$self->{'targets'}} )
     {
         my $mlist = $self->{'sched_data'}{'mlist'}{$token};
-    
+        
         foreach my $mname ( @{$mlist} )
         {
             my $obj = { 'token' => $token, 'mname' => $mname };
@@ -467,15 +468,22 @@ sub beforeRun
         $need_new_tasks = 1;
 
         $data->{'db_tokens'} = new Torrus::DB( 'monitor_tokens',
-                                             -Subdir => $tree,
-                                             -WriteAccess => 1,
-                                             -Truncate    => 1 );
+                                               -Subdir => $tree,
+                                               -WriteAccess => 1,
+                                               -Truncate    => 1 );
         $self->cacheMonitors( $config_tree, $config_tree->token('/') );
         # explicitly close, since we don't need it often, and sometimes
         # open it in read-only mode
         $data->{'db_tokens'}->closeNow();
         undef $data->{'db_tokens'};
 
+        # Remove the alarms state information
+        $self->{'db_alarms'} = new Torrus::DB('monitor_alarms',
+                                              -Subdir => $self->{'tree_name'},
+                                              -WriteAccess => 1);
+        $self->{'db_alarms'}->trunc();
+        
+        undef $self->{'db_alarms'};
         # Set the timestamp
         &Torrus::TimeStamp::setNow($tree . ':monitor_cache');
     }
@@ -486,7 +494,7 @@ sub beforeRun
         $need_new_tasks = 1;
 
         $data->{'db_tokens'} = new Torrus::DB('monitor_tokens',
-                                            -Subdir => $tree);
+                                              -Subdir => $tree);
         my $cursor = $data->{'db_tokens'}->cursor();
         while( my ($token, $schedule) = $data->{'db_tokens'}->next($cursor) )
         {
@@ -517,9 +525,9 @@ sub beforeRun
             foreach my $offset ( keys %{$data->{'targets'}{$period}} )
             {
                 my $monitor = new Torrus::Monitor( -Period => $period,
-                                                 -Offset => $offset,
-                                                 -TreeName => $tree,
-                                                 -SchedData => $data );
+                                                   -Offset => $offset,
+                                                   -TreeName => $tree,
+                                                   -SchedData => $data );
 
                 foreach my $token ( @{$data->{'targets'}{$period}{$offset}} )
                 {

@@ -17,20 +17,20 @@
          hidden = 1;
        END;
        comment = nodeParam(child,'comment',1);
-       IF isLeaf(child);
-         hasLeaves = 1;
-       ELSE;
-         IF isAlias(child);
-           thisIsAlias = 1;
-           urlTitle = ' TITLE="Symbolic link to ' _ path(isAlias(child)) _'"';
-         ELSE;
-           hasSubtrees = 1;
-           urlTitle = '';
-         END;
-       END;
        IF not hidden or variables.SHOWHIDDEN;
          childCounter = childCounter + 1;
          evenRow = childCounter % 2 == 0;
+         IF isLeaf(child);
+           hasLeaves = hasLeaves + 1;
+         ELSE;
+           IF isAlias(child);
+             thisIsAlias = 1;
+             urlTitle=' TITLE="Symbolic link to ' _ path(isAlias(child)) _'"';
+           ELSE;
+             hasSubtrees = 1;
+             urlTitle = '';
+           END;
+         END;
 %]
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
     <SPAN CLASS="NodeName">
@@ -53,7 +53,7 @@
 </DIV>
 
 <DIV CLASS="BottomShortcuts">
-[% IF hasLeaves;
+[% IF hasLeaves > 1;
     INCLUDE shortcut url=url(token, 'expanded-dir-html')
                      text="Expand leaves"
                      title="Show all leaf graphs in one page";

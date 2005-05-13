@@ -598,6 +598,12 @@ for given interface's counters.
 No argument needed. The action disables the packet or error counters
 for a given interface to be collected.
 
+=item * C<TokensetMember>
+
+The argument is a comma-separated list of tokenset names where C<InOutBbs>
+graphs would be added. This action complements
+C<RFC2863_IF_MIB::tokenset-members>.
+
 =item * C<Parameters>
 
 The argument defines additional configuration parameters to be
@@ -608,8 +614,28 @@ the ones defined in this action.
 
 =item * C<DocsisUpSNRMonitor>
 
-For a DOCSIS device, this action assigns a new  monitor to the Signal/Noise
-ratio gauge, instead of the default monitor.
+For a DOCSIS CMTS, this action assigns a new  monitor to the upstream
+Signal/Noise ratio gauge, instead of the default monitor.
+
+=item * C<DocsisUpFECCorMonitor>
+
+For a DOCSIS CMTS, this action assigns a monitor to the C<Correctable>
+counter of the upstream FEC statistics.
+
+=item * C<DocsisUpFECUcnorMonitor>
+
+For a DOCSIS CMTS, this action assigns a monitor to the C<Uncorrectable>
+counter of the upstream FEC statistics.
+
+=item * C<DocsisDownUtilMonitor>
+
+For a DOCSIS CMTS, this action assigns a monitor to the downstream
+C<UsedBytes> counter.
+
+=item * C<DocsisMacModemsMonitor>
+
+For Cisco uBR, this action assigns a monitor to the C<Modems_Active> gauge
+in the MAC layer stats.
 
 =back
 

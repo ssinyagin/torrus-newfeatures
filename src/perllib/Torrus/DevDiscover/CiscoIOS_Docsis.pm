@@ -33,6 +33,10 @@ $Torrus::DevDiscover::registry{'CiscoIOS_Docsis'} = {
     'buildConfig'  => \&buildConfig
     };
 
+$Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
+    'DocsisMacModemsMonitor'} ='RFC2670_DOCS_IF';
+
+
 
 our %oiddef =
     (
@@ -158,7 +162,24 @@ sub buildConfig
     else
     {
         Error('Could not find the MAC layer subtree');
+        exit 1;
     }
+
+    # Apply selector actions
+    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+
+        my $monitor =
+            $interface->{'selectorActions'}{'DocsisMacModemsMonitor'};
+        if( defined( $monitor ) )
+        {
+            my $intfNode = $cb->getChildSubtree( $macNode, $intf );
+            $cb->addLeaf( $intfNode, 'Modems_Active',
+                          {'monitor' => $monitor } );
+        }
+    }   
 }
 
 

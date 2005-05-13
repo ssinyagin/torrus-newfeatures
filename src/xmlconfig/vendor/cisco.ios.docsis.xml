@@ -118,6 +118,7 @@
       <param name="rrd-create-dstype"   value="GAUGE" />
       <param name="vertical-label"      value="Modems" />
       <param name="graph-lower-limit"   value="0" />
+      <param name="monitor-action-target"  value="Modems"/>
     </leaf>
   </template>
 

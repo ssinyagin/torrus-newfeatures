@@ -1,3 +1,10 @@
+2005-05-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2670.docsis-if.xml: DOCSIS monitoring examples
+
+	* perllib/Torrus/DevDiscover/RFC2670_DOCS_IF.pm:
+	Added DOCSIS-specific selector actions
+
 2005-05-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/RRDStorage.pm (updateRRD):

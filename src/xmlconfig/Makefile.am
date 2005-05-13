@@ -61,6 +61,7 @@ dist_examples_DATA = \
 	examples/apc-ups.xml \
 	examples/ascend.max.xml \
 	examples/cisco-mac-accounting.xml \
+	examples/docsis-monitors.xml \
 	examples/flowscan.xml \
 	examples/generic-netsnmp.xml \
 	examples/hpux.xml \

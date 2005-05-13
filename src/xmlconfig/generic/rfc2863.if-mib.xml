@@ -101,6 +101,7 @@
       <param name="vertical-label"    value="Bps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="990" />
+      <param name="monitor-action-target"  value="InOut_bps"/>
     </leaf>
 
     <leaf name="Bytes_Out">
@@ -112,6 +113,7 @@
       <param name="vertical-label"    value="Bps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="980" />
+      <param name="monitor-action-target"  value="InOut_bps"/>
     </leaf>
 
     <leaf name="InOut_bps">
@@ -252,6 +254,7 @@
       <param name="vertical-label"    value="Bps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="990" />
+      <param name="monitor-action-target"  value="InOut_bps"/>
     </leaf>
 
     <leaf name="Bytes_Out">
@@ -265,6 +268,7 @@
       <param name="vertical-label"    value="Bps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="980" />
+      <param name="monitor-action-target"  value="InOut_bps"/>
     </leaf>
 
     <leaf name="InOut_bps">

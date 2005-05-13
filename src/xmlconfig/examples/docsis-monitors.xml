@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2005  Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+  $Id$
+  Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+   Example monitors that may be applied to DOCSIS CMTS monitoring  
+  
+-->
+
+
+<configuration>
+
+<token-sets>
+
+  <token-set name="warnings">
+    <param name="comment" value="Warning events" />
+  </token-set>
+
+  <token-set name="minor">
+    <param name="comment" value="Minor failure events" />
+  </token-set>
+
+  <token-set name="major">
+    <param name="comment" value="Major failure events" />
+  </token-set>
+
+</token-sets>
+
+<monitors>
+
+  <!-- **********************************************************
+        Three levels of actions for different severityu levels
+       ********************************************************** -->
+  <action name="tset-warnings">
+    <param name="action-type" value="tset" />
+    <param name="tset-name" value="warnings" />
+  </action>
+
+  <action name="tset-minor">
+    <param name="action-type" value="tset" />
+    <param name="tset-name" value="minor" />
+  </action>
+
+  <action name="tset-major">
+    <param name="action-type" value="tset" />
+    <param name="tset-name" value="major" />
+  </action>
+  
+  <!-- **********************************************************
+        SNR monitors
+       ********************************************************** -->
+  <monitor name="docsis-snr-1">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr"      value="DUP,25,LT,EXC,22,GE,AND" />
+    <param name="action"        value="tset-warnings" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      Signal/Noise-Ratio lower than 30dB
+    </param>
+  </monitor>
+
+  <monitor name="docsis-snr-2">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr"      value="DUP,22,LT,EXC,18,GE,AND" />
+    <param name="action"        value="tset-minor" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      Signal/Noise-Ratio lower than 25dB
+    </param>
+  </monitor>
+
+  <monitor name="docsis-snr-3">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr"      value="18,LT" />
+    <param name="action"        value="tset-major" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      Signal/Noise-Ratio lower than 18dB
+    </param>
+  </monitor>
+
+
+  <!-- **********************************************************
+        Correctable FEC error rate monitors
+       ********************************************************** -->
+  <monitor name="docsis-feccor-1">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr">
+    DUP,
+    {Error-Free},{Uncorrectable},+,+,
+    /,100,*,DUP,
+    0.5,GT,EXC,1,LE,AND
+    </param>
+    <param name="action"        value="tset-warnings" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      FEC correctable error rate more than 0.5%
+    </param>
+  </monitor>
+
+  <monitor name="docsis-feccor-2">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr">
+    DUP,
+    {Error-Free},{Uncorrectable},+,+,
+    /,100,*,DUP,
+    1,GT,2,EXC,LE,AND
+    </param>
+    <param name="action"        value="tset-minor" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      FEC correctable error rate more than 1%
+    </param>
+  </monitor>
+
+  <monitor name="docsis-feccor-3">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr">
+    DUP,
+    {Error-Free},{Uncorrectable},+,+,
+    /,100,*,
+    2,GT
+    </param>
+    <param name="action"        value="tset-minor" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      FEC correctable error rate more than 2%
+    </param>
+  </monitor>
+    
+</monitors>
+
+</configuration>

@@ -20,6 +20,8 @@
   Roman Hochuli <roman@hochu.li>
   Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+  SEE ALSO: xmlconfig/examples/docsis-monitors.xml
+  
 -->
 
 <configuration>
@@ -84,8 +86,8 @@
 
       <param name="normal-level"        value="25" />
       <param name="lower-limit"         value="18" />
-      <param name="graph-lower-limit"   value="0" />
-      <param name="graph-upper-limit"   value="35" />
+      <param name="graph-lower-limit"   value="10" />
+      <param name="graph-upper-limit"   value="30" />
 
       <param name="precedence"          value="1000" />
 
@@ -144,6 +146,7 @@
           value="FEC codewords received on this channel correctable errors"/>
       <param name="graph-legend" value="Correctable Codewords" />
       <param name="precedence"   value="800" />
+      <param name="monitor-action-target"  value="FEC_Summary"/>
     </leaf>
 
     <leaf name="Uncorrectable">
@@ -156,6 +159,7 @@
           value="FEC codewords received on this channel uncorrectable errors"/>
       <param name="graph-legend" value="Uncorrectable Codewords" />
       <param name="precedence"   value="700" />
+      <param name="monitor-action-target"  value="FEC_Summary"/>
     </leaf>
   </template>
 
@@ -238,6 +242,7 @@
       </param>
       <param name="graph-legend" value="Used Bytes" />
       <param name="precedence"   value="800" />
+      <param name="monitor-action-target"  value="Utilization"/>
     </leaf>  
   </template>  
   

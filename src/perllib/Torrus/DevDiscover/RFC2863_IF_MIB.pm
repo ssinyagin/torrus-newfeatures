@@ -575,6 +575,16 @@ sub buildConfig
             push( @templates, '::holt-winters-defaults' );
         }
 
+        if( defined( $interface->{'selectorActions'}{'TokensetMember'} ) )
+        {
+            foreach my $tset
+                ( split('\s*,\s*',
+                        $interface->{'selectorActions'}{'TokensetMember'}) )
+            {
+                $tsetMember{$subtreeName}{$tset}
+            }
+        }
+        
         if( defined( $interface->{'selectorActions'}{'Parameters'} ) )
         {
             my @pairs = split('\s*;\s*',
@@ -825,6 +835,7 @@ our %knownSelectorActions =
       'HoltWinters'       => 'RFC2863_IF_MIB',
       'NoPacketCounters'  => 'RFC2863_IF_MIB',
       'NoErrorCounters'   => 'RFC2863_IF_MIB',
+      'TokensetMember'    => 'RFC2863_IF_MIB',
       'Parameters'        => 'RFC2863_IF_MIB' );
 
                             

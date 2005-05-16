@@ -25,6 +25,8 @@ To do now:
 -- Backup snapshot of dynamic data (monitor status etc.)
 -- Relative path in alias definition
 -- "Remember me" login screen option
+-- Graph colouring by monitor action
+-- Session history display
 -- Track changes of XML configurations (XML::Diff, cvs-alike?)
 -- Translate parameters in monitor comments
 

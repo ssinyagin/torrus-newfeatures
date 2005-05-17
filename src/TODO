@@ -2,7 +2,6 @@ Round Robin Database Framework
   
 To do now:
 
--- Optimize DataAccess.pm and use cache
 -- Option to expand directory view by default
 -- Traceroute plugin (Gustavo Torres)
 -- CDef Collector plugin (Christian Schnidrig)

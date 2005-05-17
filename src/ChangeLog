@@ -1,3 +1,7 @@
+2005-05-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DataAccess.pm: improved performance by caching
+
 2005-05-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* xmlconfig/generic/rfc2670.docsis-if.xml: DOCSIS monitoring examples

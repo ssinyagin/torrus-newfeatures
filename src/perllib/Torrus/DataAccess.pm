@@ -26,8 +26,10 @@ use Torrus::RPN;
 use strict;
 use RRDs;
 
-# I'm not sure if it's worth making the object, or just procedures are
-# enough. Perhaps, some cache values could e stored in the object data space.
+# The Torrus::DataAccess object contains cached values, and it does not
+# check the cache validity. We assume that a Torrus::DataAccess object
+# lifetime is within a short period of time, such as one monitor cycle.
+# $end_time and $start_time are not checked during cache retrieval either.
 
 sub new
 {
@@ -58,6 +60,11 @@ sub read
     my $t_end = shift;
     my $t_start = shift;
 
+    if( exists( $self->{'cache_read'}{$token} ) )
+    {
+        return @{$self->{'cache_read'}{$token}};
+    }
+    
     if( not $config_tree->isLeaf( $token ) )
     {
         my $path = $config_tree->path( $token );
@@ -65,6 +72,9 @@ sub read
         return undef;
     }
 
+    my $ret_val;
+    my $ret_time;
+    
     my $ds_type = $config_tree->getNodeParam( $token, 'ds-type' );
     if( $ds_type eq 'rrd-file' or
         $ds_type eq 'collector' )
@@ -77,15 +87,16 @@ sub read
             my $dir = $config_tree->getNodeParam( $token, 'data-dir' );
             my $ds = $config_tree->getNodeParam( $token, 'rrd-ds' );
             my $cf = $config_tree->getNodeParam( $token, 'rrd-cf' );
-            return $self->read_RRD_DS( $dir.'/'.$file,
-                                       $cf, $ds,
-                                       $t_end, $t_start );
+            ( $ret_val, $ret_time ) =
+                $self->read_RRD_DS( $dir.'/'.$file,
+                                    $cf, $ds, $t_end, $t_start );
         }
         elsif( $leaf_type eq 'rrd-cdef' )
         {
             my $expr = $config_tree->getNodeParam( $token, 'rpn-expr' );
-            return $self->read_RPN( $config_tree, $token, $expr,
-                                   $t_end, $t_start );
+            ( $ret_val, $ret_time ) =
+                $self->read_RPN( $config_tree, $token, $expr,
+                                 $t_end, $t_start );
 
         }
         else
@@ -93,8 +104,6 @@ sub read
             my $path = $config_tree->path( $token );
             Error("$path: leaf-type $leaf_type is not supported ".
                   "for data access");
-            return undef;
-
         }
     }
     else
@@ -102,8 +111,10 @@ sub read
         my $path = $config_tree->path( $token );
         Error("$path: ds-type $ds_type is not supported ".
               "for data access");
-        return undef;
     }
+    
+    $self->{'cache_read'}{$token} = [ $ret_val, $ret_time ];
+    return ( $ret_val, $ret_time );
 }
 
 
@@ -116,6 +127,11 @@ sub read_RRD_DS
     my $t_end = shift;
     my $t_start = shift;
 
+    if( exists( $self->{'cache_RRD'}{$filename}{$cf}{$ds} ) )
+    {
+        return @{$self->{'cache_RRD'}{$filename}{$cf}{$ds}};
+    }
+                                         
     my $rrdinfo = RRDs::info( $filename );
     my $ERR = RRDs::error;
     if( $ERR )
@@ -157,42 +173,46 @@ sub read_RRD_DS
 
     }
 
-    # Find the index of our DS in the data row
-    my $ds_index;
+    # Memorize the DS names in cache
+    
     for( my $i = 0; $i < @{$f_names}; $i++ )
     {
-        if( $f_names->[$i] eq $ds )
-        {
-            $ds_index = $i;
-        }
+        $self->{'cache_RRD'}{$filename}{$cf}{$f_names->[$i]} = [];
     }
-    if( not defined $ds_index )
+    
+    # Get the last available data and store in cache
+    
+    foreach my $f_line ( @{$f_data} )
+    {
+        for( my $i = 0; $i < @{$f_names}; $i++ )
+        {
+            if( defined $f_line->[$i] )
+            {
+                $self->{'cache_RRD'}{$filename}{$cf}{$f_names->[$i]} =
+                    [ $f_line->[$i], $f_start ];
+            }
+        }
+        $f_start += $f_step;
+    }
+    
+    if( not exists( $self->{'cache_RRD'}{$filename}{$cf}{$ds} ) )
     {
         Error("DS name $ds is not found in $filename");
         return undef;
     }
-
-    my $ret_val;
-    my $ret_time;
-
-    foreach my $f_line ( @{$f_data} )
+    else
     {
-        if( defined $f_line->[$ds_index] )
+        if( scalar( @{$self->{'cache_RRD'}{$filename}{$cf}{$ds}} ) == 0 )
         {
-            $ret_val = $f_line->[$ds_index];
-            $ret_time = $f_start;
+            Warn("Value undefined for ",
+                 "DS=$ds, CF=$cf, start=$t_start, end=$t_end in $filename");
+            return undef;
         }
-        $f_start += $f_step;
+        else
+        {
+            return @{$self->{'cache_RRD'}{$filename}{$cf}{$ds}};
+        }
     }
-
-    if( not defined $ret_val )
-    {
-        Warn("Value undefined for ",
-             "DS=$ds, CF=$cf, start=$t_start, end=$t_end in $filename");
-        return undef;
-    }
-
-    return ( $ret_val, $ret_time );
 }
 
 

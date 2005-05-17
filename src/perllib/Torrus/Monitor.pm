@@ -91,6 +91,8 @@ sub run
         foreach my $mname ( @{$mlist} )
         {
             my $obj = { 'token' => $token, 'mname' => $mname };
+
+            $obj->{'da'} = new Torrus::DataAccess;
             
             my $mtype = $config_tree->getParam($mname, 'monitor-type');
             $obj->{'mtype'} = $mtype;
@@ -123,9 +125,8 @@ sub check_failures
     my $dir = $config_tree->getNodeParam( $token, 'data-dir' );
     my $ds = $config_tree->getNodeParam( $token, 'rrd-ds' );
 
-    my $da = new Torrus::DataAccess;
-    my ($value, $timestamp) = $da->read_RRD_DS( $dir.'/'.$file,
-                                                'FAILURES', $ds );
+    my ($value, $timestamp) = $obj->{'da'}->read_RRD_DS( $dir.'/'.$file,
+                                                         'FAILURES', $ds );
     return( $value > 0 ? 1:0, $timestamp );
 
 }
@@ -140,9 +141,7 @@ sub check_expression
     my $token = $obj->{'token'};
     my $mname = $obj->{'mname'};
 
-    my $da = new Torrus::DataAccess;
-
-    my ($value, $timestamp) = $da->read( $config_tree, $token );
+    my ($value, $timestamp) = $obj->{'da'}->read( $config_tree, $token );
     $value = 'UNKN' unless defined($value);
     $obj->{'value'} = $value;
     
@@ -192,7 +191,7 @@ sub check_expression
         }
 
     }
-    return $da->read_RPN( $config_tree, $token, $expr, $timestamp );
+    return $obj->{'da'}->read_RPN( $config_tree, $token, $expr, $timestamp );
 }
 
 
@@ -400,9 +399,8 @@ sub run_event_exec
             {
                 my ($env, $param) = split( '=', $pair );
                 my $expr = $config_tree->getParam($aname, $param);
-                my $da = new Torrus::DataAccess;
                 my ($value, $timestamp) =
-                    $da->read_RPN( $config_tree, $token, $expr );
+                    $obj->{'da'}->read_RPN( $config_tree, $token, $expr );
                 my $envName = 'TORRUS_'.$env;
                 $ENV{$envName} = $value;
             }

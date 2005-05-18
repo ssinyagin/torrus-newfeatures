@@ -38,7 +38,8 @@ pkgbin_SCRIPTS = \
 	genlist			\
 	install_plugin		\
 	monitor      		\
-	schedulerinfo
+	schedulerinfo		\
+	ttproclist
 
 wrapperdir = @wrapperdir@
 wrapper_SCRIPTS = \
@@ -63,7 +64,8 @@ EXTRA_DIST = \
 	install_plugin.in	\
 	monitor.in      	\
 	schedulerinfo.in	\
-	torrus.in
+	torrus.in		\
+	ttproclist.in
 
 
 # Result of:
@@ -120,3 +122,6 @@ schedulerinfo: schedulerinfo.in
 
 torrus: torrus.in
 	$(SUBST) torrus.in > torrus
+
+ttproclist: ttproclist.in
+	$(SUBST) ttproclist.in > ttproclist

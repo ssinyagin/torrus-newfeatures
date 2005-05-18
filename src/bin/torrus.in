@@ -34,7 +34,8 @@ commands="acl=acledit acledit=acledit cleanup=cleanup \
           genlist=genlist \
           install_plugin=install_plugin \
           monitor=monitor \
-          schedulerinfo=schedulerinfo si=schedulerinfo"
+          schedulerinfo=schedulerinfo si=schedulerinfo \
+          ttproclist=ttproclist"
 
 for f in `ls -1 @plugwrapperdir@`; do
   . @plugwrapperdir@/${f}

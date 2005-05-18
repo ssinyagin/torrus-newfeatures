@@ -1,3 +1,7 @@
+2005-05-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/ttproclist.in: New utility for generating DDX files
+
 2005-05-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DataAccess.pm: improved performance by caching

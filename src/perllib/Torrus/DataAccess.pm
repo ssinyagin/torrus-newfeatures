@@ -29,7 +29,6 @@ use RRDs;
 # The Torrus::DataAccess object contains cached values, and it does not
 # check the cache validity. We assume that a Torrus::DataAccess object
 # lifetime is within a short period of time, such as one monitor cycle.
-# $end_time and $start_time are not checked during cache retrieval either.
 
 sub new
 {
@@ -60,9 +59,13 @@ sub read
     my $t_end = shift;
     my $t_start = shift;
 
-    if( exists( $self->{'cache_read'}{$token} ) )
+    my $cachekey = $token .
+        ':' . defined($t_end)?$t_end:'' .
+        ':' . defined($t_start)?$t_start:'';
+    
+    if( exists( $self->{'cache_read'}{$cachekey} ) )
     {
-        return @{$self->{'cache_read'}{$token}};
+        return @{$self->{'cache_read'}{$cachekey}};
     }
     
     if( not $config_tree->isLeaf( $token ) )
@@ -113,7 +116,7 @@ sub read
               "for data access");
     }
     
-    $self->{'cache_read'}{$token} = [ $ret_val, $ret_time ];
+    $self->{'cache_read'}{$cachekey} = [ $ret_val, $ret_time ];
     return ( $ret_val, $ret_time );
 }
 
@@ -127,9 +130,13 @@ sub read_RRD_DS
     my $t_end = shift;
     my $t_start = shift;
 
-    if( exists( $self->{'cache_RRD'}{$filename}{$cf}{$ds} ) )
+    my $cachekey = $filename . ':' . $cf .
+        ':' . defined($t_end)?$t_end:'' .
+        ':' . defined($t_start)?$t_start:'';
+
+    if( exists( $self->{'cache_RRD'}{$cachekey}{$ds} ) )
     {
-        return @{$self->{'cache_RRD'}{$filename}{$cf}{$ds}};
+        return @{$self->{'cache_RRD'}{$cachekey}{$ds}};
     }
                                          
     my $rrdinfo = RRDs::info( $filename );
@@ -177,7 +184,7 @@ sub read_RRD_DS
     
     for( my $i = 0; $i < @{$f_names}; $i++ )
     {
-        $self->{'cache_RRD'}{$filename}{$cf}{$f_names->[$i]} = [];
+        $self->{'cache_RRD'}{$cachekey}{$f_names->[$i]} = [];
     }
     
     # Get the last available data and store in cache
@@ -188,21 +195,21 @@ sub read_RRD_DS
         {
             if( defined $f_line->[$i] )
             {
-                $self->{'cache_RRD'}{$filename}{$cf}{$f_names->[$i]} =
+                $self->{'cache_RRD'}{$cachekey}{$f_names->[$i]} =
                     [ $f_line->[$i], $f_start ];
             }
         }
         $f_start += $f_step;
     }
     
-    if( not exists( $self->{'cache_RRD'}{$filename}{$cf}{$ds} ) )
+    if( not exists( $self->{'cache_RRD'}{$cachekey}{$ds} ) )
     {
         Error("DS name $ds is not found in $filename");
         return undef;
     }
     else
     {
-        if( scalar( @{$self->{'cache_RRD'}{$filename}{$cf}{$ds}} ) == 0 )
+        if( scalar( @{$self->{'cache_RRD'}{$cachekey}{$ds}} ) == 0 )
         {
             Warn("Value undefined for ",
                  "DS=$ds, CF=$cf, start=$t_start, end=$t_end in $filename");
@@ -210,7 +217,7 @@ sub read_RRD_DS
         }
         else
         {
-            return @{$self->{'cache_RRD'}{$filename}{$cf}{$ds}};
+            return @{$self->{'cache_RRD'}{$cachekey}{$ds}};
         }
     }
 }

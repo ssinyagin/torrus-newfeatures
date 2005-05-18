@@ -80,6 +80,8 @@ sub run
         return;
     }
 
+    my $da = new Torrus::DataAccess;
+    
     $self->{'db_alarms'} = new Torrus::DB('monitor_alarms',
                                           -Subdir => $self->{'tree_name'},
                                           -WriteAccess => 1);
@@ -92,7 +94,7 @@ sub run
         {
             my $obj = { 'token' => $token, 'mname' => $mname };
 
-            $obj->{'da'} = new Torrus::DataAccess;
+            $obj->{'da'} = $da;
             
             my $mtype = $config_tree->getParam($mname, 'monitor-type');
             $obj->{'mtype'} = $mtype;
@@ -109,7 +111,7 @@ sub run
             undef $obj;
         }
     }
-
+    
     undef $self->{'db_alarms'};
 }
 

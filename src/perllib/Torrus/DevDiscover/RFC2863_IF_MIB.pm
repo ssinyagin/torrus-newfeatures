@@ -525,11 +525,11 @@ sub buildConfig
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-discards-in' );
                 if( defined( $interface->{'selectorActions'}->{
-                    'ErrorsMonitor'} ) )
+                    'InErrorsMonitor'} ) )
                 {
                     $interface->{'childCustomizations'}->{
                         'Discards_In'}->{'monitor'} =
-                            $interface->{'selectorActions'}{'ErrorsMonitor'};
+                            $interface->{'selectorActions'}{'InErrorsMonitor'};
                 }
             }
 
@@ -537,11 +537,12 @@ sub buildConfig
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-discards-out' );
                 if( defined( $interface->{'selectorActions'}->{
-                    'ErrorsMonitor'} ) )
+                    'OutErrorsMonitor'} ) )
                 {
                     $interface->{'childCustomizations'}->{
                         'Discards_Out'}->{'monitor'} =
-                            $interface->{'selectorActions'}{'ErrorsMonitor'};
+                            $interface->{'selectorActions'}{
+                                'OutErrorsMonitor'};
                 }
             }
 
@@ -549,11 +550,11 @@ sub buildConfig
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-errors-in' );
                 if( defined( $interface->{'selectorActions'}->{
-                    'ErrorsMonitor'} ) )
+                    'InErrorsMonitor'} ) )
                 {
                     $interface->{'childCustomizations'}->{
                         'Errors_In'}->{'monitor'} =
-                            $interface->{'selectorActions'}{'ErrorsMonitor'};
+                            $interface->{'selectorActions'}{'InErrorsMonitor'};
                 }
             }
 
@@ -561,11 +562,12 @@ sub buildConfig
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-errors-out' );
                 if( defined( $interface->{'selectorActions'}->{
-                    'ErrorsMonitor'} ) )
+                    'OutErrorsMonitor'} ) )
                 {
                     $interface->{'childCustomizations'}->{
                         'Errors_Out'}->{'monitor'} =
-                            $interface->{'selectorActions'}{'ErrorsMonitor'};
+                            $interface->{'selectorActions'}{
+                                'OutErrorsMonitor'};
                 }
             }
         }
@@ -831,7 +833,8 @@ sub getSelectorObjectName
 our %knownSelectorActions =
     ( 'InBytesMonitor'    => 'RFC2863_IF_MIB',
       'OutBytesMonitor'   => 'RFC2863_IF_MIB',
-      'ErrorsMonitor'     => 'RFC2863_IF_MIB',
+      'InErrorsMonitor'   => 'RFC2863_IF_MIB',
+      'OutErrorsMonitor'  => 'RFC2863_IF_MIB',
       'HoltWinters'       => 'RFC2863_IF_MIB',
       'NoPacketCounters'  => 'RFC2863_IF_MIB',
       'NoErrorCounters'   => 'RFC2863_IF_MIB',
@@ -854,7 +857,8 @@ sub applySelectorAction
         if( not $devdetails->isDevType( $knownSelectorActions{$action} ) )
         {
             Error('Action ' . $action . ' is applied to a device that is ' .
-                  'not of type ' . $knownSelectorActions{$action});
+                  'not of type ' . $knownSelectorActions{$action} .
+                  ': ' . $devdetails->param('system-id'));
         }
         $interface->{'selectorActions'}{$action} = $arg;
     }

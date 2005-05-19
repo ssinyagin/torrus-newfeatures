@@ -34,14 +34,17 @@ $Torrus::DevDiscover::registry{'RFC2670_DOCS_IF'} = {
 
 
 $Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
-    'DocsisUpSNRMonitor'} ='RFC2670_DOCS_IF';
+    'DocsisUpSNRMonitor'} = 'RFC2670_DOCS_IF';
 $Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
-    'DocsisUpFECCorMonitor'} ='RFC2670_DOCS_IF';
-$Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
-    'DocsisUpFECUcnorMonitor'} ='RFC2670_DOCS_IF';
+    'DocsisUpSNRTokenset'} = 'RFC2670_DOCS_IF';
 
 $Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
-    'DocsisDownUtilMonitor'} ='RFC2670_DOCS_IF';
+    'DocsisUpFECCorMonitor'} = 'RFC2670_DOCS_IF';
+$Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
+    'DocsisUpFECUncorMonitor'} = 'RFC2670_DOCS_IF';
+
+$Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
+    'DocsisDownUtilMonitor'} = 'RFC2670_DOCS_IF';
 
 
 our %oiddef =
@@ -184,10 +187,20 @@ sub buildConfig
                 {
                     my $monitor =
                         $interface->{'selectorActions'}{'DocsisUpSNRMonitor'};
-                    if( defined( $monitor ) )
+                    my $tset =
+                        $interface->{'selectorActions'}{'DocsisUpSNRTokenset'};
+                    if( defined( $monitor ) or defined( $tset ) )
                     {
-                        $cb->addLeaf( $intfNode, 'SNR',
-                                      {'monitor' => $monitor } );
+                        my $param = {};
+                        if( defined( $monitor ) )
+                        {
+                            $param->{'monitor'} = $monitor;
+                        }
+                        if( defined( $tset ) )
+                        {
+                            $param->{'tokenset-member'} = $tset;
+                        }
+                        $cb->addLeaf( $intfNode, 'SNR', $param );
                     }
 
                     $monitor = $interface->{'selectorActions'}{
@@ -199,7 +212,7 @@ sub buildConfig
                     }
 
                     $monitor = $interface->{'selectorActions'}{
-                        'DocsisUpFECUcnorMonitor'};
+                        'DocsisUpFECUncorMonitor'};
                     if( defined( $monitor ) )
                     {
                         $cb->addLeaf( $intfNode, 'Uncorrectable',

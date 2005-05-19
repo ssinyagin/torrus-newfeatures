@@ -53,7 +53,7 @@ sub new
     }
 
     $self->{'stats'} = new Torrus::SchedulerInfo( -Tree => $options{'-Tree'},
-                                                -WriteAccess => 1 );    
+                                                  -WriteAccess => 1 );    
     return $self;
 }
 

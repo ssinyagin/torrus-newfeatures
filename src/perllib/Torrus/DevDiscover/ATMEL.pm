@@ -52,7 +52,7 @@ sub checkdevtype
 
     my $deviceInfo =
         $session->get_request( $dd->oiddef('sysDeviceInfo') );
-    if( $session->error_status() != 0)
+    if( $session->error_status() != 0 or scalar( %{$deviceInfo} ) == 0 )
     {
         return 0;
     }

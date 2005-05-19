@@ -34,8 +34,12 @@ $Torrus::DevDiscover::registry{'CiscoIOS_Docsis'} = {
     };
 
 $Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
-    'DocsisMacModemsMonitor'} ='RFC2670_DOCS_IF';
+    'DocsisMacModemsMonitor'} = 'CiscoIOS_Docsis';
 
+$Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
+    'DocsisUpUtilMonitor'} = 'CiscoIOS_Docsis';
+$Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
+    'DocsisUpSlotsMonitor'} = 'CiscoIOS_Docsis';
 
 
 our %oiddef =
@@ -180,6 +184,35 @@ sub buildConfig
                           {'monitor' => $monitor } );
         }
     }   
+
+    my $upstrNode =
+        $cb->getChildSubtree( $devNode,
+                              $data->{'docsConfig'}{'docsCableUpstream'}{
+                                  'subtreeName'} );
+
+    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+
+        my $monitor =
+            $interface->{'selectorActions'}{'DocsisUpUtilMonitor'};
+        if( defined( $monitor ) )
+        {
+            my $intfNode = $cb->getChildSubtree( $upstrNode, $intf );
+            $cb->addLeaf( $intfNode, 'Util',
+                          {'monitor' => $monitor } );
+        }
+
+        $monitor =
+            $interface->{'selectorActions'}{'DocsisUpSlotsMonitor'};
+        if( defined( $monitor ) )
+        {
+            my $intfNode = $cb->getChildSubtree( $upstrNode, $intf );
+            $cb->addLeaf( $intfNode, 'ContSlots',
+                          {'monitor' => $monitor } );
+        }
+    }
 }
 
 

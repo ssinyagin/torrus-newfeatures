@@ -96,7 +96,6 @@
       <param name="monitor"             value="docsis-snr-lower-20db" />
       <param name="monitor-period"      value="900" />
       <param name="monitor-timeoffset"  value="0" />
-      <param name="tokenset-member"     value="docsis-snr" />
     </leaf>
 
     <leaf name="FEC_Summary">
@@ -268,10 +267,6 @@
 </monitors>
 
 <token-sets>
-    <token-set name="docsis-snr">
-      <param name="comment" value="S/N Ratio for all interfaces" />
-    </token-set>
-
     <token-set name="docsis-snr-lower-20">
       <param name="comment" value="S/N Ratio less than 20dB" />
     </token-set>

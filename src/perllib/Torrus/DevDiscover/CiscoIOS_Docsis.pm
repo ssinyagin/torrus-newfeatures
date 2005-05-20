@@ -45,7 +45,7 @@ $Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
 our %oiddef =
     (
      # CISCO-DOCS-EXT-MIB:cdxIfUpstreamChannelExtTable
-     'cdxIfUpChannelNumActiveUGS' => '1.3.6.1.4.1.9.9.116.1.4.1.1.10'
+     'cdxIfUpChannelMaxUGSLastFiveMins' => '1.3.6.1.4.1.9.9.116.1.4.1.1.14'
      );
 
 
@@ -71,9 +71,9 @@ sub discover
 
     my $data = $devdetails->data();
     
-    if( $dd->checkSnmpTable( 'cdxIfUpChannelNumActiveUGS' ) )
+    if( $dd->checkSnmpTable( 'cdxIfUpChannelMaxUGSLastFiveMins' ) )
     {
-        $devdetails->setCap('cdxIfUpChannelNumActiveUGS');
+        $devdetails->setCap('cdxIfUpChannelMaxUGSLastFiveMins');
     }
 
     push( @{$data->{'docsConfig'}{'docsCableMaclayer'}{'templates'}},
@@ -107,7 +107,7 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    if( $devdetails->hasCap('cdxIfUpChannelNumActiveUGS') )
+    if( $devdetails->hasCap('cdxIfUpChannelMaxUGSLastFiveMins') )
     {
         $cb->setVar( $devNode, 'CiscoIOS_Docsis::ugs-supported', 'true' );
     }

@@ -70,14 +70,17 @@
   <!-- Parameters for interfaces parent subtree -->
   <template name="rfc2863-ifmib-subtree">
     <param name="comment" value="Interface traffic and error counters"/>
-    <param name="has-overview-subleaves" value="yes"/>
-    <param name="overview-subleave-name" value="InOut_bps"/>
-    <param name="overview-shortcut-text"
-           value="Show InOut_bps for all interfaces"/>
-    <param name="overview-shortcut-title"
-           value="Show all interfaces traffic on one page"/>
-    <param name="overview-page-title"
+    
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="traffic"/>
+    <param name="overview-subleave-name-traffic" value="InOut_bps"/>
+    <param name="overview-shortcut-text-traffic"
+           value="All traffic"/>
+    <param name="overview-shortcut-title-traffic"
+           value="Show traffic for all interfaces on one page"/>
+    <param name="overview-page-title-traffic"
            value="Input/Output Graphs"/>
+           
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
     <param name="data-file" value="%system-id%_%interface-nick%_if-mib.rrd" />
     <param name="graph-title" value="%descriptive-nickname%" />

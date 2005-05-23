@@ -42,14 +42,9 @@
 </DIV>
 
 <DIV CLASS="BottomShortcuts">
-[% IF nodeParam(token, 'has-overview-subleaves', 1) == 'yes';
-     INCLUDE shortcut url=url(token, 'overview-subleaves-html')
-                      text=nodeParam(token, 'overview-shortcut-text', 1)
-                      title=nodeParam(token, 'overview-shortcut-title', 1);
-   END;
-
-   INCLUDE shortcut url=url(token) text="Default view"
-                     title="Restore default subtree view"
+[% INCLUDE shortcut url=url(token) text="Default view"
+                     title="Restore default subtree view";
+   INCLUDE overviewShortcuts
 %]
 </DIV>
 

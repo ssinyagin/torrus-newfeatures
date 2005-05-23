@@ -56,16 +56,18 @@
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
     <param name="graph-title"          value="%descriptive-nickname%" />
 
-    <param name="has-overview-subleaves" value="yes"/>
-    <param name="overview-subleave-name" value="Modems"/>
-    <param name="overview-direct-link"      value="yes"/>
-    <param name="overview-direct-link-view" value="expanded-dir-html"/>
-    <param name="overview-shortcut-text"
-           value="Show Active and Total modem quantities for all interfaces"/>
-    <param name="overview-shortcut-title"
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="modems"/>
+    <param name="overview-subleave-name-modems" value="Modems"/>
+    <param name="overview-direct-link-modems"      value="yes"/>
+    <param name="overview-direct-link-view-modems" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-modems"
+           value="All modems"/>
+    <param name="overview-shortcut-title-modems"
            value="Show modem quantities in one page"/>
-    <param name="overview-page-title"
+    <param name="overview-page-title-modems"
            value="Modem quantities"/>
+           
     <param name="rrd-hwpredict"     value="disabled" />
   </template>
 

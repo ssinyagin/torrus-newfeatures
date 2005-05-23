@@ -68,14 +68,16 @@
     <param name="rrd-hwpredict" value="disabled" />
     <param name="graph-lower-limit" value="0" />
 
-    <param name="has-overview-subleaves" value="yes"/>
-    <param name="overview-subleave-name" value="Usage"/>
-    <param name="overview-shortcut-text"
-           value="Show usage for all memory pools"/>
-    <param name="overview-shortcut-title"
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="memuse"/>
+    <param name="overview-subleave-name-memuse" value="Usage"/>
+    <param name="overview-shortcut-text-memuse"
+           value="All pools usage"/>
+    <param name="overview-shortcut-title-memuse"
            value="Show all memory pools usage in one page"/>
-    <param name="overview-page-title"
+    <param name="overview-page-title-memuse"
            value="Memory Usage Graphs"/>
+          
     <param name="descriptive-nickname"
            value="%system-id%:%mempool-name% Memory"/>
   </template>
@@ -129,14 +131,16 @@
     <param name="upper-limit"        value="80" />
     <param name="vertical-label"     value="Percent"/>
 
-    <param name="has-overview-subleaves" value="yes"/>
-    <param name="overview-subleave-name" value="CPU_Total_5min"/>
-    <param name="overview-shortcut-text"
-           value="Show usage for all CPUs"/>
-    <param name="overview-shortcut-title"
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="cpu5"/>
+    <param name="overview-subleave-name-cpu5" value="CPU_Total_5min"/>
+    <param name="overview-shortcut-text-cpu5"
+           value="All CPUs usage"/>
+    <param name="overview-shortcut-title-cpu5"
            value="Show all CPUs 5 minute average usage in one page"/>
-    <param name="overview-page-title"
+    <param name="overview-page-title-cpu5"
            value="CPU Usage Graphs"/>
+           
     <param name="descriptive-nickname"
            value="%system-id%:CPU #%entity-phy-index%"/>
   </template>

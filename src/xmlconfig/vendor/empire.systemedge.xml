@@ -1365,11 +1365,15 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-cpu-subtree">
       <param name="comment" value="Per-CPU Usage"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="CpuPercentUsage"/>
-      <param name="overview-shortcut-text" value="Show Percent CPU usage for each cpu"/>
-      <param name="overview-shortcut-title" value="Show Percent CPU usage for each cpu"/>
-      <param name="overview-page-title" value="CPU Percent Usage Graphs"/>
+      
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="cpu"/>
+      <param name="overview-subleave-name-cpu" value="CpuPercentUsage"/>
+      <param name="overview-shortcut-text-cpu"
+          value="All CPUs"/>
+      <param name="overview-shortcut-title-cpu"
+          value="Show Percent CPU usage for each cpu"/>
+      <param name="overview-page-title-cpu" value="CPU Percent Usage Graphs"/>
     </template>
     <template name="empire-cpu-nt">
       <apply-template name="empire-cpu-common"/>
@@ -1717,11 +1721,14 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-device-subtree">
       <param name="comment" value="Per-Mount Usage"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="DiskSpace"/>
-      <param name="overview-shortcut-text" value="Show Disk Space usage for Each Mount"/>
-      <param name="overview-shortcut-title" value="Show Disk Space usage for Each Mount"/>
-      <param name="overview-page-title" value="Disk Space Usage Graphs"/>
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="disk"/>
+      <param name="overview-subleave-name-disk" value="DiskSpace"/>
+      <param name="overview-shortcut-text-disk"
+          value="All Disk Space"/>
+      <param name="overview-shortcut-title-disk"
+          value="Show Disk Space usage for Each Mount"/>
+      <param name="overview-page-title-disk" value="Disk Space Usage Graphs"/>
     </template>
     <template name="empire-device">
       <leaf name="DiskSpace">
@@ -1784,11 +1791,14 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-disk-stats-subtree">
       <param name="comment" value="Per-Disk Utilization"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="Utilization"/>
-      <param name="overview-shortcut-text" value="Show Stats for all Disks"/>
-      <param name="overview-shortcut-title" value="Show Stats for all Disks"/>
-      <param name="overview-page-title" value="Device for all Disks"/>
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="util"/>
+      <param name="overview-subleave-name-util" value="Utilization"/>
+      <param name="overview-shortcut-text-util"
+              value="All disks"/>
+      <param name="overview-shortcut-title-util"
+              value="Show Stats for all Disks"/>
+      <param name="overview-page-title-util" value="Device for all Disks"/>
     </template>
 
     <template name="empire-disk-stats-unix">

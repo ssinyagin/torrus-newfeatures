@@ -53,16 +53,18 @@
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
     <param name="graph-title"          value="%descriptive-nickname%" />
 
-    <param name="has-overview-subleaves" value="yes"/>
-    <param name="overview-subleave-name" value="SNR"/>
-    <param name="overview-direct-link"      value="yes"/>
-    <param name="overview-direct-link-view" value="expanded-dir-html"/>
-    <param name="overview-shortcut-text"
-           value="Show Signal/Noise ratio for all downstream channels"/>
-    <param name="overview-shortcut-title"
-           value="Show signal quality graphs in one page"/>
-    <param name="overview-page-title"
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="snr"/>
+    <param name="overview-subleave-name-snr" value="SNR"/>
+    <param name="overview-direct-link-snr"      value="yes"/>
+    <param name="overview-direct-link-view-snr" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-snr"
+           value="All SNR"/>
+    <param name="overview-shortcut-title-snr"
+           value="Show signal quality graphs for all upstreams in one page"/>
+    <param name="overview-page-title-snr"
            value="SNR Graphs"/>
+           
     <param name="rrd-hwpredict"     value="disabled" />
   </template>
   
@@ -175,15 +177,16 @@
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
     <param name="graph-title"          value="%descriptive-nickname%" />
 
-    <param name="has-overview-subleaves" value="yes"/>
-    <param name="overview-subleave-name" value="Utilization"/>
-    <param name="overview-direct-link"      value="yes"/>
-    <param name="overview-direct-link-view" value="expanded-dir-html"/>
-    <param name="overview-shortcut-text"
-           value="Show Utilization for all downstream channels"/>
-    <param name="overview-shortcut-title"
-           value="Show utilization graphs in one page"/>
-    <param name="overview-page-title"
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="util"/>
+    <param name="overview-subleave-name-util" value="Utilization"/>
+    <param name="overview-direct-link-util"      value="yes"/>
+    <param name="overview-direct-link-view-util" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-util"
+           value="All Utilization"/>
+    <param name="overview-shortcut-title-util"
+           value="Show utilization graphs for all downstreams in one page"/>
+    <param name="overview-page-title-util"
            value="Downstream Utilization Graphs"/>
     <param name="rrd-hwpredict"     value="disabled" />
   </template>

@@ -251,3 +251,18 @@ END %]
   [% END %]
 [% END %]
 
+
+[%# ########   Print the overview shortcuts   ####### %]
+[% BLOCK overviewShortcuts %]
+[%
+  IF nodeParam(token, 'has-overview-shortcuts', 1) == 'yes';
+    FOREACH ovs = nodeParam(token,'overview-shortcuts').split(',');
+     p1 = 'overview-shortcut-text-' _ ovs;
+     p2 = 'overview-shortcut-title-' _ ovs;
+     INCLUDE shortcut
+        url=url(token, 'overview-subleaves-html', 'OVS', ovs)
+        text=nodeParam(token, p1, 1)
+        title=nodeParam(token, p2, 1);
+    END;
+  END %]
+[% END %]

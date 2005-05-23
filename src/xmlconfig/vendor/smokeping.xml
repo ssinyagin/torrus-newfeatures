@@ -54,13 +54,14 @@
   <template name="SmokePing-subtree">
       <param name="comment" value="Per-Host Median RTT"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="median"/>
-      <param name="overview-shortcut-text"
-             value="Show Per-Host Median RTT"/>
-      <param name="overview-shortcut-title"
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="median"/>
+      <param name="overview-subleave-name-median" value="median"/>
+      <param name="overview-shortcut-text-median"
+             value="All Median RTT"/>
+      <param name="overview-shortcut-title-median"
              value="Per-Host Median RTT"/>
-      <param name="overview-page-title" value="Per-Host Median RTT"/>
+      <param name="overview-page-title-median" value="Per-Host Median RTT"/>
   </template>
 
 </datasources>

@@ -1,8 +1,8 @@
 [% PROCESS 'html-incblocks.txt' %]
-[% thepath=path(token) %]
+[% ovs=variables.OVS; clearVar('OVS'); thepath=path(token) %]
 [% INCLUDE htmlstart title=thepath printpath=1 %]
 
-<H1>[% nodeParam(token,'overview-page-title',1) %]</H1>
+<H1>[% p = 'overview-page-title' _ ovs; nodeParam(token, p, 1) %]</H1>
 
 [% INCLUDE variables %]
 
@@ -11,14 +11,17 @@
 [%
   FOREACH child = sortTokens(children(token));
     childpath = path(child);
-    ovwpath = childpath _ nodeParam(token,'overview-subleave-name',1);
+    p = 'overview-subleave-name-' _ ovs;
+    ovwpath = childpath _ nodeParam(token, p,1);
     IF nodeExists(ovwpath);
       ovwtoken = pathToken(ovwpath);
 
       urltoken = ovwtoken;
-      IF nodeParam(token,'overview-direct-link',1) == 'yes';
+      p = 'overview-direct-link-' _ ovs;
+      IF nodeParam(token, p, 1) == 'yes';
         urltoken = child;
-        urlview = nodeParam(token,'overview-direct-link-view',1);
+        p = 'overview-direct-link-view-' _ ovs;
+        urlview = nodeParam(token, p, 1);
       END;
 
       INCLUDE shortgraph

@@ -1,3 +1,9 @@
+2005-05-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/html-incblocks.txt:
+	has-overview-subleaves replaced with has-overview-shortcuts,
+	with multiple overviews per subtree
+
 2005-05-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* templates/tset-list.html: Tokensets list now displays their sizes

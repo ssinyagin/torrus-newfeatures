@@ -559,17 +559,19 @@ displayed in the subtree listing,
 unless C<SHOWHIDDEN> option is true. When C<SHOWHIDDEN> is enabled,
 the node name and comment are shown in italics.
 
-=item * C<has-overview-subleaves>, C<overview-subleave-name>,
-C<overview-shortcut-text>, C<overview-shortcut-title>,
-C<overview-page-title>, C<overview-direct-link>, C<overview-direct-link-view>
+=item * C<has-overview-shortcuts>, C<overview-shortcuts>,
+C<overview-subleave-name-X>, C<overview-shortcut-text-X>,
+C<overview-shortcut-title-X>, C<overview-page-title-X>,
+C<overview-direct-link-X>, C<overview-direct-link-view-X>
 
-When C<has-overview-subleaves> is set to C<yes> on a subtree level,
-default HTML templates expect the other four parameters to be set.
-C<overview-subleave-name> defines the current subtree's grandchild
-leaves name which would compose the overview page.
-When C<overview-direct-link> is set to C<yes>, the URL under the
+When C<has-overview-shortcuts> is set to C<yes> on a subtree level,
+default HTML templates expect the five parameters to be set.
+C<overview-shortcuts> is a comma-separated list of shortcut names,
+and for each name "X", C<overview-subleave-name-X> defines the
+current subtree's grandchild leaves name which would compose the overview page.
+When C<overview-direct-link-X> is set to C<yes>, the URL under the
 graph will point to the direct child subtree, and
-C<overview-direct-link-view> will define the view for that subtree.
+C<overview-direct-link-view-X> will define the view for that subtree.
 Usually this view would be C<expanded-dir-html>.
 
 =item * C<ignore-lower-limit>, C<ignore-upper-limit>, C<ignore-limits>

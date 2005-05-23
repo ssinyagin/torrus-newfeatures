@@ -78,13 +78,15 @@
     <!-- for future implementation of devices overview -->
     <template name="atmel-devlist-subtree">
       <param name="comment" value="Link stats and Network Stats"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="linkStats" />
-      <param name="overview-shortcut-text"
-             value="Show Link Stats for all devices" />
-      <param name="overview-shortcut-title"
+      
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="lstat"/>
+      <param name="overview-subleave-name-lstat" value="linkStats" />
+      <param name="overview-shortcut-text-lstat"
+             value="All Link Stats" />
+      <param name="overview-shortcut-title-lstat"
              value="Show all devices Link Quality on one page" />
-      <param name="overview-page-title"
+      <param name="overview-page-title-lstat"
              value="Link Stats" />
     </template>
 

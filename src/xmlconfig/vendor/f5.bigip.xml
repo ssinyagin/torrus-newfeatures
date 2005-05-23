@@ -233,13 +233,14 @@
   <template name="BigIp_4.x_pool-actvconn-overview">
       <param name="comment" value="Per Poo; Active Connections"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="ActiveConnections"/>
-      <param name="overview-shortcut-text"
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="active"/>
+      <param name="overview-subleave-name-active" value="ActiveConnections"/>
+      <param name="overview-shortcut-text-active"
+             value="All Active Connections"/>
+      <param name="overview-shortcut-title-active"
              value="Show Active Connections Per Pool"/>
-      <param name="overview-shortcut-title"
-             value="Show Active Connections Per Pool"/>
-      <param name="overview-page-title"
+      <param name="overview-page-title-active"
              value="Active Connections Per Pool"/>
   </template>
 
@@ -369,25 +370,27 @@
       <param name="comment"
              value="Per Virtual Server(VIP) Active Connections"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="ActiveConnections"/>
-      <param name="overview-shortcut-text"
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="active"/>
+      <param name="overview-subleave-name-active" value="ActiveConnections"/>
+      <param name="overview-shortcut-text-active"
+             value="All Active Connections"/>
+      <param name="overview-shortcut-title-active"
              value="Show Active Connections Per Virtual Server(VIP)"/>
-      <param name="overview-shortcut-title"
-             value="Show Active Connections Per Virtual Server(VIP)"/>
-      <param name="overview-page-title"
+      <param name="overview-page-title-active"
              value="Active Connections Per Virtual Server(VIP)"/>
   </template>
   <template name="BigIp_4.x_virtualServer-connrate-overview">
       <param name="comment" value="Per Virtual Server(VIP) Connections/s"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="ConnectionRate"/>
-      <param name="overview-shortcut-text"
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="rate"/>
+      <param name="overview-subleave-name-rate" value="ConnectionRate"/>
+      <param name="overview-shortcut-text-rate"
+             value="All Connection Rates"/>
+      <param name="overview-shortcut-title-rate"
              value="Show Connections/s Per Virtual Server(VIP)"/>
-      <param name="overview-shortcut-title"
-             value="Show Connections/s Per Virtual Server(VIP)"/>
-      <param name="overview-page-title"
+      <param name="overview-page-title-rate"
              value="Connections/s Per Virtual Server(VIP)"/>
   </template>
 
@@ -529,13 +532,14 @@
   <template name="BigIp_4.x_poolMember-actvconn-overview">
       <param name="comment" value="Per Pool Member Active Connections"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="ActiveConnections"/>
-      <param name="overview-shortcut-text"
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="active"/>
+      <param name="overview-subleave-name-active" value="ActiveConnections"/>
+      <param name="overview-shortcut-text-active"
+             value="All Active Connections"/>
+      <param name="overview-shortcut-title-active"
              value="Show Active Connections Per Pool Member"/>
-      <param name="overview-shortcut-title"
-             value="Show Active Connections Per Pool Member"/>
-      <param name="overview-page-title"
+      <param name="overview-page-title-active"
              value="Active Connections Per Pool Member"/>
   </template>
 
@@ -699,13 +703,14 @@
   <template name="BigIp_4.x_sslProxy-currconn-overview">
       <param name="comment" value="Per SSL Proxy Current Connections"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-subleaves" value="yes"/>
-      <param name="overview-subleave-name" value="CurrentConn"/>
-      <param name="overview-shortcut-text"
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="ssl"/>
+      <param name="overview-subleave-name-ssl" value="CurrentConn"/>
+      <param name="overview-shortcut-text-ssl"
+             value="All Current Connections"/>
+      <param name="overview-shortcut-title-ssl"
              value="Show Current Connections Per SSL Proxy"/>
-      <param name="overview-shortcut-title"
-             value="Show Current Connections Per SSL Proxy"/>
-      <param name="overview-page-title"
+      <param name="overview-page-title-ssl"
              value="Current Connections Per SSL Proxy"/>
   </template>
 

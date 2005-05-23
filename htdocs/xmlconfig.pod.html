@@ -553,17 +553,19 @@ displayed in the subtree listing,
 unless <code>SHOWHIDDEN</code> option is true. When <code>SHOWHIDDEN</code> is enabled,
 the node name and comment are shown in italics.
 <p></p>
-<li><strong><a name="item_has_2doverview_2dsubleaves_2c_overview_2dsubleave_"><code>has-overview-subleaves</code>, <code>overview-subleave-name</code>,
-<code>overview-shortcut-text</code>, <code>overview-shortcut-title</code>,
-<code>overview-page-title</code>, <code>overview-direct-link</code>, <code>overview-direct-link-view</code></a></strong><br />
+<li><strong><a name="item_has_2doverview_2dshortcuts_2c_overview_2dshortcuts"><code>has-overview-shortcuts</code>, <code>overview-shortcuts</code>,
+<code>overview-subleave-name-X</code>, <code>overview-shortcut-text-X</code>,
+<code>overview-shortcut-title-X</code>, <code>overview-page-title-X</code>,
+<code>overview-direct-link-X</code>, <code>overview-direct-link-view-X</code></a></strong><br />
 </li>
-When <code>has-overview-subleaves</code> is set to <code>yes</code> on a subtree level,
-default HTML templates expect the other four parameters to be set.
-<code>overview-subleave-name</code> defines the current subtree's grandchild
-leaves name which would compose the overview page.
-When <code>overview-direct-link</code> is set to <code>yes</code>, the URL under the
+When <code>has-overview-shortcuts</code> is set to <code>yes</code> on a subtree level,
+default HTML templates expect the five parameters to be set.
+<code>overview-shortcuts</code> is a comma-separated list of shortcut names,
+and for each name ``X'', <code>overview-subleave-name-X</code> defines the
+current subtree's grandchild leaves name which would compose the overview page.
+When <code>overview-direct-link-X</code> is set to <code>yes</code>, the URL under the
 graph will point to the direct child subtree, and
-<code>overview-direct-link-view</code> will define the view for that subtree.
+<code>overview-direct-link-view-X</code> will define the view for that subtree.
 Usually this view would be <code>expanded-dir-html</code>.
 <p></p>
 <li><strong><a name="item_ignore_2dlower_2dlimit_2c_ignore_2dupper_2dlimit_2"><code>ignore-lower-limit</code>, <code>ignore-upper-limit</code>, <code>ignore-limits</code></a></strong><br />

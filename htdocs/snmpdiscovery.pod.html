@@ -561,9 +561,9 @@ Numeric IANA interface type, as returned by <a href="#item_iftype"><code>ifType<
 The argument defines the monitor name to be applied to the input
 or output bytes counter.
 <p></p>
-<li><strong><a name="item_errorsmonitor"><code>ErrorsMonitor</code></a></strong><br />
+<li><strong><a name="item_inerrorsmonitor_2c_outerrorsmonitor"><code>InErrorsMonitor</code>, <code>OutErrorsMonitor</code></a></strong><br />
 </li>
-The argument defines the monitor name to be applied to all error and discard
+The argument defines the monitor name to be applied to error and discard
 counters that are discovered for a given interface.
 <p></p>
 <li><strong><a name="item_holtwinters"><code>HoltWinters</code></a></strong><br />
@@ -576,6 +576,12 @@ for given interface's counters.
 No argument needed. The action disables the packet or error counters
 for a given interface to be collected.
 <p></p>
+<li><strong><a name="item_tokensetmember"><code>TokensetMember</code></a></strong><br />
+</li>
+The argument is a comma-separated list of tokenset names where <code>InOutBbs</code>
+graphs would be added. This action complements
+<a href="#item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a>.
+<p></p>
 <li><strong><a name="item_parameters"><code>Parameters</code></a></strong><br />
 </li>
 The argument defines additional configuration parameters to be
@@ -583,6 +589,41 @@ placed at the interface level. The value should be one
 or several <code>param=value</code> pairs separated by semicolon (;).
 Parameters defined in <a href="#item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a> may override
 the ones defined in this action.
+<p></p>
+<li><strong><a name="item_docsisupsnrmonitor"><code>DocsisUpSNRMonitor</code></a></strong><br />
+</li>
+For a DOCSIS CMTS, this action assigns a new  monitor to the upstream
+Signal/Noise ratio gauge, instead of the default monitor.
+<p></p>
+<li><strong><a name="item_docsisupsnrtokenset"><code>DocsisUpSNRTokenset</code></a></strong><br />
+</li>
+For a DOCSIS CMTS, this action adds the Signal/Noise ratio graph to a
+specified tokenset.
+<p></p>
+<li><strong><a name="item_docsisupfeccormonitor"><code>DocsisUpFECCorMonitor</code></a></strong><br />
+</li>
+For a DOCSIS CMTS, this action assigns a monitor to the <code>Correctable</code>
+counter of the upstream FEC statistics.
+<p></p>
+<li><strong><a name="item_docsisupfecuncormonitor"><code>DocsisUpFECUncorMonitor</code></a></strong><br />
+</li>
+For a DOCSIS CMTS, this action assigns a monitor to the <code>Uncorrectable</code>
+counter of the upstream FEC statistics.
+<p></p>
+<li><strong><a name="item_docsisdownutilmonitor"><code>DocsisDownUtilMonitor</code></a></strong><br />
+</li>
+For a DOCSIS CMTS, this action assigns a monitor to the downstream
+<code>UsedBytes</code> counter.
+<p></p>
+<li><strong><a name="item_docsismacmodemsmonitor"><code>DocsisMacModemsMonitor</code></a></strong><br />
+</li>
+For Cisco uBR, this action assigns a monitor to the <code>Modems_Active</code> gauge
+in the MAC layer stats.
+<p></p>
+<li><strong><a name="item_docsisuputilmonitor_2c_docsisupslotsmonitor"><code>DocsisUpUtilMonitor</code>, <code>DocsisUpSlotsMonitor</code></a></strong><br />
+</li>
+For Cisco uBR, this action assigns a monitor to upstream utilization and
+free contention timeslots gauges correspondingly.
 <p></p></ul>
 <p>
 </p>

@@ -63,18 +63,14 @@
 [% IF hasSubNodes %]
 <DIV CLASS="BottomShortcuts">
 [% INCLUDE shortcut url=url(token, 'sub-nodes-dir-html')
-                    text="Expand leaves and leaves of sub-nodes"
-                    title="Show all graphs of leaves & of leaves of sub-nodes in one page" %]
+      text="Expand leaves and leaves of sub-nodes"
+      title="Show all graphs of leaves & of leaves of sub-nodes in one page" %]
 </DIV>                   
 [% END %]
 
-[% IF nodeParam(token, 'has-overview-subleaves', 1) == 'yes' %]
 <DIV CLASS="BottomShortcuts">
-[% INCLUDE shortcut url=url(token, 'overview-subleaves-html')
-                    text=nodeParam(token, 'overview-shortcut-text', 1)
-                    title=nodeParam(token, 'overview-shortcut-title', 1) %]
+[% INCLUDE overviewShortcuts %]
 </DIV>
-[% END %]
 
 
 [% INCLUDE bottomline %]

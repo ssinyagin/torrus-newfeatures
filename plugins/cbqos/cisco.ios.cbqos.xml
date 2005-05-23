@@ -140,16 +140,17 @@
   </template>
 
   <template name="cisco-cbqos-policymap-subtree">
-    <param name="has-overview-subleaves" value="yes"/>
-    <param name="overview-subleave-name" value="Summary"/>
-    <param name="overview-direct-link"      value="yes"/>
-    <param name="overview-direct-link-view" value="expanded-dir-html"/>
-    <param name="overview-shortcut-text"
-           value="Show traffic summary for all classes"/>
-    <param name="overview-shortcut-title">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="traffic"/>
+    <param name="overview-subleave-name-traffic" value="Summary"/>
+    <param name="overview-direct-link-traffic"      value="yes"/>
+    <param name="overview-direct-link-view-traffic" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-traffic"
+           value="All traffic"/>
+    <param name="overview-shortcut-title-traffic">
       Show pre-policy and dropped traffic for all classes in one page
     </param>
-    <param name="overview-page-title" value="Policymap Summary"/>
+    <param name="overview-page-title-traffic" value="Policymap Summary"/>
   </template>
 
 <!-- ===================================================================

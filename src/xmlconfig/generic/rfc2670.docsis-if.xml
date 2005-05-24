@@ -54,7 +54,8 @@
     <param name="graph-title"          value="%descriptive-nickname%" />
 
     <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="snr"/>
+    <param name="overview-shortcuts" value="snr,fec"/>
+    
     <param name="overview-subleave-name-snr" value="SNR"/>
     <param name="overview-direct-link-snr"      value="yes"/>
     <param name="overview-direct-link-view-snr" value="expanded-dir-html"/>
@@ -64,7 +65,17 @@
            value="Show signal quality graphs for all upstreams in one page"/>
     <param name="overview-page-title-snr"
            value="SNR Graphs"/>
-           
+
+    <param name="overview-subleave-name-fec" value="FEC_Summary"/>
+    <param name="overview-direct-link-fec"      value="yes"/>
+    <param name="overview-direct-link-view-fec" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-fec"
+           value="All FEC"/>
+    <param name="overview-shortcut-title-fec"
+           value="Show FEC statistics for all upstreams in one page"/>
+    <param name="overview-page-title-fec"
+           value="FEC Graphs"/>
+                      
     <param name="rrd-hwpredict"     value="disabled" />
   </template>
   
@@ -96,8 +107,6 @@
       <!-- This monitor may be redefined by
            DocsisUpSNRMonitor selector action -->
       <param name="monitor"             value="docsis-snr-lower-20db" />
-      <param name="monitor-period"      value="900" />
-      <param name="monitor-timeoffset"  value="0" />
     </leaf>
 
     <leaf name="FEC_Summary">

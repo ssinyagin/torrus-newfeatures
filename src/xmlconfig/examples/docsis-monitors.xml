@@ -73,7 +73,8 @@
        ********************************************************** -->
   <monitor name="docsis-snr-1">
     <param name="monitor-type"  value="expression" />
-    <param name="rpn-expr"      value="DUP,25,LT,EXC,22,GE,AND" />
+    <param name="rpn-expr"
+             value="DUP,0,GT,EXC,DUP,25,LT,EXC,22,GE,AND,AND" />
     <param name="action"        value="tset-warnings" />
     <param name="expires"       value="21600" />
     <param name="comment">
@@ -83,7 +84,8 @@
 
   <monitor name="docsis-snr-2">
     <param name="monitor-type"  value="expression" />
-    <param name="rpn-expr"      value="DUP,22,LT,EXC,18,GE,AND" />
+    <param name="rpn-expr"
+             value="DUP,0,GT,EXC,DUP,22,LT,EXC,18,GE,AND,AND" />
     <param name="action"        value="tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
@@ -93,7 +95,7 @@
 
   <monitor name="docsis-snr-3">
     <param name="monitor-type"  value="expression" />
-    <param name="rpn-expr"      value="18,LT" />
+    <param name="rpn-expr"      value="DUP,0,GT,EXC,18,LT,AND" />
     <param name="action"        value="tset-major" />
     <param name="expires"       value="21600" />
     <param name="comment">

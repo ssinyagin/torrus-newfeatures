@@ -213,6 +213,41 @@ sub buildConfig
                           {'monitor' => $monitor } );
         }
     }
+
+    # Override the overview shortcus defined in rfc2670.docsis-if.xml
+
+    my $shortcuts = 'snr,fec,modems,util';
+    if( $devdetails->hasCap('cdxIfUpChannelMaxUGSLastFiveMins') )
+    {
+        $shortcuts .= ',ugs';
+    }
+
+    my $param = {        
+        'overview-shortcuts' => $shortcuts,
+        
+        'overview-subleave-name-modems' => 'Modems',
+        'overview-direct-link-modems' => 'yes',
+        'overview-direct-link-view-modems' => 'expanded-dir-html',
+        'overview-shortcut-text-modems' => 'All modems',
+        'overview-shortcut-title-modems'=> 'Show modem quantities in one page',
+        'overview-page-title-modems' => 'Modem quantities',
+        
+        'overview-subleave-name-util' => 'Util_Summary',
+        'overview-direct-link-util' => 'yes',
+        'overview-direct-link-view-util' => 'expanded-dir-html',
+        'overview-shortcut-text-util' => 'All utilization',
+        'overview-shortcut-title-util' => 'All upstream utilization',
+        'overview-page-title-util' => 'Upstream utilization',
+            
+        'overview-subleave-name-ugs' => 'Active_UGS',
+        'overview-direct-link-ugs' => 'yes',
+        'overview-direct-link-view-ugs' => 'expanded-dir-html',
+        'overview-shortcut-text-ugs' => 'All UGS',
+        'overview-shortcut-title-ugs' => 'Show all UGS in one page',
+        'overview-page-title-ugs' => 'UGS Statistics'
+        };
+
+    $cb->addParams( $upstrNode, $param );
 }
 
 

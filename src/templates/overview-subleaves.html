@@ -2,7 +2,7 @@
 [% ovs=variables.OVS; clearVar('OVS'); thepath=path(token) %]
 [% INCLUDE htmlstart title=thepath printpath=1 %]
 
-<H1>[% p = 'overview-page-title' _ ovs; nodeParam(token, p, 1) %]</H1>
+<H1>[% p = 'overview-page-title-' _ ovs; nodeParam(token, p, 1) %]</H1>
 
 [% INCLUDE variables %]
 

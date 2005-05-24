@@ -70,7 +70,8 @@ sub render_html
         'param'      => sub { return $config_tree->getParam(@_); },
         'url'        => sub { return $self->makeURL($config_tree, 0, @_); },
         'pathUrl'    => sub { return $self->makeURL($config_tree, 1, @_); },
-        'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]}; },
+        'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
+                              return undef;},
         'plainURL'   => $Torrus::Renderer::plainURL,
         'splitUrls'  => sub { return $self->makeSplitURLs($config_tree,
                                                           $_[0], $_[1]); },

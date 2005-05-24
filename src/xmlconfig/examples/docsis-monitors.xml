@@ -74,9 +74,9 @@
   <monitor name="docsis-snr-1">
     <param name="monitor-type"  value="expression" />
     <param name="rpn-expr"
-             value="DUP,0,GT,EXC,DUP,25,LT,EXC,22,GE,AND,AND" />
+             value="DUP,0,GT,EXC,DUP,24.5,LT,EXC,22,GE,AND,AND" />
     <param name="action"        value="tset-warnings" />
-    <param name="expires"       value="21600" />
+    <param name="expires"       value="1800" />
     <param name="comment">
       Signal/Noise-Ratio lower than 30dB
     </param>
@@ -116,7 +116,7 @@
     10,GT,EXC,20,LE,AND
     </param>
     <param name="action"        value="tset-warnings" />
-    <param name="expires"       value="21600" />
+    <param name="expires"       value="1800" />
     <param name="comment">
       FEC correctable error rate more than 10%
     </param>
@@ -150,7 +150,7 @@
     0.5,GT,EXC,1,LE,AND
     </param>
     <param name="action"        value="tset-warnings" />
-    <param name="expires"       value="21600" />
+    <param name="expires"       value="1800" />
     <param name="comment">
       FEC uncorrectable error rate more than 0.5%
     </param>
@@ -198,7 +198,7 @@
     75,GT,EXC,80,LE,AND
     </param>
     <param name="action"        value="tset-warnings" />
-    <param name="expires"       value="21600" />
+    <param name="expires"       value="1800" />
     <param name="comment">
       DOCSIS downstream utilization more than 75%
     </param>
@@ -247,7 +247,7 @@
     75,GT,EXC,80,LE,AND
     </param>
     <param name="action"        value="tset-warnings" />
-    <param name="expires"       value="21600" />
+    <param name="expires"       value="1800" />
     <param name="comment">
       DOCSIS upstream utilization more than 75%
     </param>
@@ -290,7 +290,7 @@
     17,LT,EXC,12,GE,AND
     </param>
     <param name="action"        value="tset-warnings" />
-    <param name="expires"       value="21600" />
+    <param name="expires"       value="1800" />
     <param name="comment">
       free DOCSIS upstream minislots less than 17%
     </param>
@@ -338,7 +338,7 @@
     {Modems_Total},100,LT,AND
     </param>
     <param name="action"        value="tset-warnings" />
-    <param name="expires"       value="21600" />
+    <param name="expires"       value="1800" />
     <param name="comment">
       Less than 10% of DOCSIS modems online on a low-loaded interface
     </param>

@@ -112,8 +112,12 @@
     <leaf name="FEC_Summary">
       <param name="ds-type"           value="rrd-multigraph" />
       <param name="ds-names"          value="corr,uncorr" />
-      <param name="graph-lower-limit" value="0" />
 
+      <param name="graph-lower-limit"       value="0.01" />
+      <param name="graph-upper-limit"       value="100" />
+      <param name="graph-logarithmic"       value="yes" />
+      <param name="graph-rigid-boundaries"  value="yes" />
+      
       <param name="precedence"        value="950" />
       <param name="comment"
               value="Reed-Solomon forward error correction (FEC) summary" />
@@ -145,6 +149,10 @@
           value="FEC codewords received on this channel without error"/>
       <param name="graph-legend" value="Error-free Codewords" />
       <param name="precedence"   value="900" />
+      <param name="graph-lower-limit"       value="0.01" />
+      <param name="graph-upper-limit"       value="100" />
+      <param name="graph-logarithmic"       value="yes" />
+      <param name="graph-rigid-boundaries"  value="yes" />
     </leaf>
 
     <leaf name="Correctable">
@@ -157,6 +165,10 @@
       <param name="graph-legend" value="Correctable Codewords" />
       <param name="precedence"   value="800" />
       <param name="monitor-action-target"  value="FEC_Summary"/>
+      <param name="graph-lower-limit"       value="0.01" />
+      <param name="graph-upper-limit"       value="100" />
+      <param name="graph-logarithmic"       value="yes" />
+      <param name="graph-rigid-boundaries"  value="yes" />
     </leaf>
 
     <leaf name="Uncorrectable">
@@ -170,6 +182,10 @@
       <param name="graph-legend" value="Uncorrectable Codewords" />
       <param name="precedence"   value="700" />
       <param name="monitor-action-target"  value="FEC_Summary"/>
+      <param name="graph-lower-limit"       value="0.01" />
+      <param name="graph-upper-limit"       value="100" />
+      <param name="graph-logarithmic"       value="yes" />
+      <param name="graph-rigid-boundaries"  value="yes" />
     </leaf>
   </template>
 

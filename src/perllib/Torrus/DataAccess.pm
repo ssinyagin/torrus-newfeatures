@@ -60,8 +60,8 @@ sub read
     my $t_start = shift;
 
     my $cachekey = $token .
-        ':' . defined($t_end)?$t_end:'' .
-        ':' . defined($t_start)?$t_start:'';
+        ':' . (defined($t_end)?$t_end:'') .
+        ':' . (defined($t_start)?$t_start:'');
     
     if( exists( $self->{'cache_read'}{$cachekey} ) )
     {
@@ -131,8 +131,8 @@ sub read_RRD_DS
     my $t_start = shift;
 
     my $cachekey = $filename . ':' . $cf .
-        ':' . defined($t_end)?$t_end:'' .
-        ':' . defined($t_start)?$t_start:'';
+        ':' . (defined($t_end)?$t_end:'') .
+        ':' . (defined($t_start)?$t_start:'');
 
     if( exists( $self->{'cache_RRD'}{$cachekey}{$ds} ) )
     {

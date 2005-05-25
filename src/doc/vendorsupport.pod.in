@@ -97,8 +97,9 @@ limited to the ports with description only.
 
 Provides per-interface traffic statistics; CPU, memory, and
 temperature information; I/O buffer statistics; IPSec traffic information;
-SAA agents statistics; cbQoS monitoring (implemented in a separate plugin),
-DOCSIS uBR-specific variables (modem quantities and channel utilization).
+SAA agents statistics; cbQoS monitoring (implemented in a separate plugin);
+DOCSIS uBR-specific variables (modem quantities and channel utilization);
+CISCO-ENHANCED-MEMPOOL-MIB (linecards and VIP modules memory).
 
 =item * Cisco PIX Firewall
 

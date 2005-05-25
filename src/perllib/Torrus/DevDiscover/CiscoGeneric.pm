@@ -44,8 +44,10 @@ our %oiddef =
      'ciscoEnvMonTemperatureThreshold'   => '1.3.6.1.4.1.9.9.13.1.3.1.4',
      'ciscoEnvMonTemperatureStatusState' => '1.3.6.1.4.1.9.9.13.1.3.1.6',
 
+     # CISCO-ENHANCED-MEMPOOL-MIB
+     'cempMemPoolName'                   => '1.3.6.1.4.1.9.9.221.1.1.1.1.3',
+     
      # CISCO-MEMORY-POOL-MIB
-     'ciscoMemoryPoolTable'              => '1.3.6.1.4.1.9.9.48.1.1.1',
      'ciscoMemoryPoolName'               => '1.3.6.1.4.1.9.9.48.1.1.1.2',
 
      # CISCO-PROCESS-MIB
@@ -121,32 +123,73 @@ sub discover
 
     if( $devdetails->param('CiscoGeneric::disable-memory-pools') ne 'yes' )
     {
-        my $MemoryPool =
+        my $eMemPool =
             $session->get_table( -baseoid =>
-                                 $dd->oiddef('ciscoMemoryPoolTable') );
-
-        if( defined $MemoryPool )
+                                 $dd->oiddef('cempMemPoolName') );
+        if( defined $eMemPool and scalar( %{$eMemPool} ) > 0 and
+            $devdetails->isDevType('RFC2737_ENTITY_MIB') )
         {
-            $devdetails->storeSnmpVars( $MemoryPool );
-            $devdetails->setCap('ciscoMemoryPool');
+            $devdetails->storeSnmpVars( $eMemPool );
+            $devdetails->setCap('cempMemPool');
+            $data->{'cempMemPool'} = {};
 
-            $data->{'ciscoMemoryPool'} = {};
-
-            foreach my $memType
-                ( $devdetails->getSnmpIndices($dd->
-                                              oiddef('ciscoMemoryPoolName')) )
+            foreach my $INDEX
+                ( $devdetails->
+                  getSnmpIndices($dd->oiddef('cempMemPoolName') ) )
             {
-                # According to CISCO-MEMORY-POOL-MIB, only types 1 to 5
-                # are static, and the rest are dynamic
-                # (of which none ever seen)
-                if( $memType <= 5 )
-                {
-                    my $name =
-                        $devdetails->snmpVar($dd->
-                                             oiddef('ciscoMemoryPoolName') .
-                                             '.' . $memType );
+                # $INDEX is a pair entPhysicalIndex . cempMemPoolIndex
+                my ( $phyIndex, $poolIndex ) = split('\.', $INDEX);
 
-                    $data->{'ciscoMemoryPool'}{$memType} = $name;
+                my $poolName = $devdetails->
+                    snmpVar($dd->oiddef('cempMemPoolName') . '.' . $INDEX );
+
+                $poolName = 'Processor' unless $poolName;
+                
+                my $phyDescr = $data->{'entityPhysical'}{$phyIndex}{'descr'};
+                my $phyName = $data->{'entityPhysical'}{$phyIndex}{'name'};
+                
+                $phyDescr = 'Processor' unless $phyDescr;
+                $phyName = ('Chassis #' .
+                            $phyIndex) unless $phyName;
+               
+                $data->{'cempMemPool'}{$INDEX} = {
+                    'phyIndex'     => $phyIndex,
+                    'poolIndex'    => $poolIndex,
+                    'poolName'     => $poolName,                    
+                    'phyDescr' => $phyDescr,
+                    'phyName'  => $phyName
+                    };
+            }
+        }
+        else
+        {
+            my $MemoryPool =
+                $session->get_table( -baseoid =>
+                                     $dd->oiddef('ciscoMemoryPoolName') );
+
+            if( defined $MemoryPool and scalar( %{$MemoryPool} ) > 0 )
+            {
+                $devdetails->storeSnmpVars( $MemoryPool );
+                $devdetails->setCap('ciscoMemoryPool');
+                
+                $data->{'ciscoMemoryPool'} = {};
+                
+                foreach my $memType
+                    ( $devdetails->
+                      getSnmpIndices($dd->oiddef('ciscoMemoryPoolName')) )
+                {
+                    # According to CISCO-MEMORY-POOL-MIB, only types 1 to 5
+                    # are static, and the rest are dynamic
+                    # (of which none ever seen)
+                    if( $memType <= 5 )
+                    {
+                        my $name =
+                            $devdetails->
+                            snmpVar($dd->oiddef('ciscoMemoryPoolName') .
+                                    '.' . $memType );
+
+                        $data->{'ciscoMemoryPool'}{$memType} = $name;
+                    }
                 }
             }
         }
@@ -269,7 +312,8 @@ sub buildConfig
 
     # Memory Pools
 
-    if( $devdetails->hasCap('ciscoMemoryPool') )
+    if( $devdetails->hasCap('cempMemPool') or
+        $devdetails->hasCap('ciscoMemoryPool') )
     {
         my $subtreeName = 'Memory_Usage';
 
@@ -282,25 +326,80 @@ sub buildConfig
             $cb->addSubtree( $devNode, $subtreeName, $param,
                              ['CiscoGeneric::cisco-memusage-subtree']);
 
-        foreach my $memType
-            ( sort {$a<=>$b} keys %{$data->{'ciscoMemoryPool'}} )
+        if( $devdetails->hasCap('cempMemPool') )
         {
-            my $poolName = $data->{'ciscoMemoryPool'}{$memType};
+            foreach my $INDEX ( sort {
+                $data->{'cempMemPool'}{$a}{'phyIndex'} <=>
+                    $data->{'cempMemPool'}{$b}{'phyIndex'} or
+                    $data->{'cempMemPool'}{$a}{'poolIndex'} <=>
+                    $data->{'cempMemPool'}{$b}{'poolIndex'} }
+                                keys %{$data->{'cempMemPool'}} )
+            {
+                my $pool = $data->{'cempMemPool'}{$INDEX};
 
-            my $poolSubtreeName = $poolName;
-            $poolSubtreeName =~ s/^\///;
-            $poolSubtreeName =~ s/\W/_/g;
-            $poolSubtreeName =~ s/_+/_/g;
+                # Chop off the long chassis description, like
+                # uBR7246VXR chassis, Hw Serial#: XXXXX, Hw Revision: A
+                my $phyName = $pool->{'phyName'};                
+                if( $phyName =~ /chassis/ )
+                {
+                    $phyName =~ s/,.+//;
+                }
+                
+                my $poolSubtreeName =
+                    $phyName . '_' . $pool->{'poolName'};
+                $poolSubtreeName =~ s/^\///;
+                $poolSubtreeName =~ s/\W/_/g;
+                $poolSubtreeName =~ s/_+/_/g;
+                
+                my $param = {};
 
-            my $param = {
-                'comment'      => 'Memory Pool: ' . $poolName,
-                'mempool-type' => $memType,
-                'mempool-name' => $poolName,
-                'precedence'   => sprintf("%d", 1000 - $memType)
-            };
+                $param->{'comment'} =
+                    $pool->{'poolName'} . ' memory of ';
+                if( $pool->{'phyDescr'} eq $pool->{'phyName'} )
+                {
+                    $param->{'comment'} .= $phyName;
+                }
+                else
+                {
+                    $param->{'comment'} .= 
+                        $pool->{'phyDescr'} . ' in ' . $phyName;
+                }
+                
+                $param->{'mempool-index'} = $INDEX;
+                $param->{'mempool-phyindex'} = $pool->{'phyIndex'};
+                $param->{'mempool-poolindex'} = $pool->{'poolIndex'};
+                
+                $param->{'mempool-name'} =  $pool->{'poolName'};
+                $param->{'precedence'} =
+                    sprintf("%d", 1000 -
+                            $pool->{'phyIndex'} * 100 - $pool->{'poolIndex'});
+                
+                $cb->addSubtree( $subtreeNode, $poolSubtreeName, $param,
+                                 [ 'CiscoGeneric::cisco-enh-mempool' ]);
+            }
+        }
+        else
+        {
+            foreach my $memType
+                ( sort {$a<=>$b} keys %{$data->{'ciscoMemoryPool'}} )
+            {
+                my $poolName = $data->{'ciscoMemoryPool'}{$memType};
+                
+                my $poolSubtreeName = $poolName;
+                $poolSubtreeName =~ s/^\///;
+                $poolSubtreeName =~ s/\W/_/g;
+                $poolSubtreeName =~ s/_+/_/g;
+                
+                my $param = {
+                    'comment'      => 'Memory Pool: ' . $poolName,
+                    'mempool-type' => $memType,
+                    'mempool-name' => $poolName,
+                    'precedence'   => sprintf("%d", 1000 - $memType)
+                    };
 
-            $cb->addSubtree( $subtreeNode, $poolSubtreeName,
-                             $param, [ 'CiscoGeneric::cisco-mempool' ]);
+                $cb->addSubtree( $subtreeNode, $poolSubtreeName,
+                                 $param, [ 'CiscoGeneric::cisco-mempool' ]);
+            }
         }
     }
 

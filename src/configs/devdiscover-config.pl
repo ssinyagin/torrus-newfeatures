@@ -228,6 +228,10 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
          'name'   => 'cisco-mempool',
          'source' => 'vendor/cisco.generic.xml'
          },
+     'CiscoGeneric::cisco-enh-mempool' => {
+         'name'   => 'cisco-enh-mempool',
+         'source' => 'vendor/cisco.generic.xml'
+         },
      'CiscoGeneric::cisco-memusage-subtree' => {
          'name'   => 'cisco-memusage-subtree',
          'source' => 'vendor/cisco.generic.xml'

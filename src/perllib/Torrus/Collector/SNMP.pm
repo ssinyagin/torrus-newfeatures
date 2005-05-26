@@ -506,16 +506,13 @@ sub runCollector
             {
                 # Take one of the tokens for common parameters
                 my $token = (keys %{ (values %{$ref3})[0] })[0];
-                my $version = $collector->param($token,
-                                                'snmp-version');
-                $version = '1' if not defined( $version );
                 
                 my ($session, $error) = Net::SNMP->session
                     ( -hostname    => $ipaddr,
                       -port        => $port,
                       -nonblocking => 0x1,
                       -version     => $collector->param($token,
-                                                        'snmp-version'),
+                                                        'snmp-version');,
                       -community   => $community,
                       -timeout     => $collector->param($token,
                                                         'snmp-timeout'),

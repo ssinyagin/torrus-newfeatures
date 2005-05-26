@@ -2,6 +2,7 @@ Round Robin Database Framework
   
 To do now:
 
+-- Selector for Cisco CPU and memory buffer monitoring
 -- Option to expand directory view by default
 -- Traceroute plugin (Gustavo Torres)
 -- CDef Collector plugin (Christian Schnidrig)

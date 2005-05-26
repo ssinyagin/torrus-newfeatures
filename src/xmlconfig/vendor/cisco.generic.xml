@@ -175,6 +175,7 @@
     <param name="rrd-create-dstype"  value="GAUGE" />
     <param name="rrd-hwpredict"      value="disabled" />
     <param name="graph-lower-limit"  value="0" />
+    <param name="graph-upper-limit"  value="100" />
     <param name="upper-limit"        value="80" />
     <param name="vertical-label"     value="Percent"/>
 
@@ -229,6 +230,7 @@
       </param>
       <param name="graph-legend"       value="CPU usage" />
       <param name="graph-lower-limit"  value="0" />
+      <param name="graph-upper-limit"  value="100" />
       <param name="upper-limit"        value="80" />
       <param name="vertical-label"     value="Percent"/>
     </leaf>
@@ -262,6 +264,7 @@
       </param>
       <param name="graph-legend"       value="CPU usage" />
       <param name="graph-lower-limit"  value="0" />
+      <param name="graph-upper-limit"  value="100" />
       <param name="upper-limit"        value="80" />
       <param name="vertical-label"     value="Percent"/>
     </leaf>

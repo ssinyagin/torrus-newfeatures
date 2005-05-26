@@ -56,7 +56,8 @@ foreach my $tree ( @tree_names )
     else
     {
         my $stats = {};
-        foreach my $name ( 'leaves', 'collectorLeaves', 'subtrees',
+        foreach my $name ( 'leaves', 'collectorLeaves', 'monitorLeaves',
+                           'holtwintersLeaves', 'subtrees',
                            'maxSubtreePath', 'maxSubtreeSize', 'views',
                            'monitors', 'actions' )
         {
@@ -68,6 +69,8 @@ foreach my $tree ( @tree_names )
 
         printf("Leaves: %d\n",                $stats->{'leaves'} );
         printf("Collector leaves: %d\n",      $stats->{'collectorLeaves'} );
+        printf("Monitor leaves: %d\n",        $stats->{'monitorLeaves'} );
+        printf("Holt-Winters leaves: %d\n",   $stats->{'holtwintersLeaves'} );
         printf("Subtrees: %d\n",              $stats->{'subtrees'} );
         printf("Largest subtree: %s\n",       $stats->{'maxSubtreePath'} );
         printf("Largest subtree size: %d\n",  $stats->{'maxSubtreeSize'} );
@@ -115,6 +118,15 @@ sub collectStats
             {
                 $stats->{'collectorLeaves'}++;
             }
+            if( defined( $config_tree->getNodeParam( $ctoken, 'monitor' ) ) )
+            {
+                $stats->{'monitorLeaves'}++;
+            }
+            my $val = $config_tree->getNodeParam( $ctoken, 'rrd-hwpredict' );
+            if( defined( $val ) and $val eq 'enabled' )
+            {
+                $stats->{'holtwintersLeaves'}++;
+            }            
         }
     }
 }

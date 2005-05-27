@@ -115,6 +115,11 @@ sub initTargetAttributes
     # There can be several targets with the same host/port/community/oid set.
 
     $cref->{'targets'}{$ipaddr}{$port}{$community}{$oid}{$token} = 1;
+
+    # One representative for each host:port:community triple.
+    # I assume overridiing is faster than checking if it's already there
+    $cref->{'reptoken'}{$ipaddr}{$port}{$community} = $token;
+
     $tref->{'oid'} = $oid;
 
     $cref->{'oids_per_pdu'}{$ipaddr}{$port}{$community} =
@@ -143,13 +148,13 @@ sub getHostIpAddress
 
     my $hostname = $collector->param($token, 'snmp-host');
     my $domain = $collector->param($token, 'domain-name');
-    if( $hostname !~ /\./ and length( $domain ) > 0 )
+    if( $hostname !~ /\./o and length( $domain ) > 0 )
     {
         $hostname .= '.' . $domain;
     }
 
     my $ipaddr;
-    if( $hostname =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/ )
+    if( $hostname =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/o )
     {
         $ipaddr = $hostname;
     }
@@ -240,7 +245,7 @@ sub expandOidMappings
 
     while( index( $oid, 'M(' ) >= 0 )
     {
-        if( not $oid =~ /^(.*)M\(\s*([0-9\.]+)\s*,\s*([^\)]+)\)(.*)$/ )
+        if( not $oid =~ /^(.*)M\(\s*([0-9\.]+)\s*,\s*([^\)]+)\)(.*)$/o )
         {
             Error("Error in OID mapping syntax: $oid");
             return undef;
@@ -252,7 +257,7 @@ sub expandOidMappings
         my $tail = $4;
 
         # Remove trailing space from key
-        $key =~ s/\s+$//;
+        $key =~ s/\s+$//o;
 
         my $value =
             lookupMap( $collector, $token, $ipaddr, $port, $community,
@@ -272,7 +277,7 @@ sub expandOidMappings
 
     while( index( $oid, 'V(' ) >= 0 )
     {
-        if( not $oid =~ /^(.*)V\(\s*([0-9\.]+)\s*\)(.*)$/ )
+        if( not $oid =~ /^(.*)V\(\s*([0-9\.]+)\s*\)(.*)$/o )
         {
             Error("Error in OID value lookup syntax: $oid");
             return undef;
@@ -505,14 +510,14 @@ sub runCollector
             while( my ($community, $ref3) = each %{$ref2} )
             {
                 # Take one of the tokens for common parameters
-                my $token = (keys %{ (values %{$ref3})[0] })[0];
+                my $token = $cref->{'reptoken'}{$ipaddr}{$port}{$community};
                 
                 my ($session, $error) = Net::SNMP->session
                     ( -hostname    => $ipaddr,
                       -port        => $port,
                       -nonblocking => 0x1,
                       -version     => $collector->param($token,
-                                                        'snmp-version');,
+                                                        'snmp-version'),
                       -community   => $community,
                       -timeout     => $collector->param($token,
                                                         'snmp-timeout'),

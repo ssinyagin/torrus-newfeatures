@@ -733,6 +733,7 @@ sub retrieveMacAddresses
 
         if( defined( $macaddr ) and length( $macaddr ) > 0 )
         {
+            $interface->{'MAC'} = $macaddr;
             $interface->{'param'}{'interface-macaddr'} = $macaddr;
         }
         else

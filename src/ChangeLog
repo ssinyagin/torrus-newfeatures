@@ -1,3 +1,8 @@
+2005-05-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/MicrosoftWindows.pm:
+	per-interface RRD files named by MAC addresses, not interface name
+
 2005-05-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoGeneric.pm: enchanced memory

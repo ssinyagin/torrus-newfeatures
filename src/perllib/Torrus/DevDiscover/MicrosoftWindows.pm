@@ -119,6 +119,8 @@ sub discover
     Torrus::DevDiscover::RFC2863_IF_MIB::retrieveMacAddresses( $dd,
                                                                $devdetails );
 
+    $data->{'nameref'}{'ifNick'} = 'MAC';
+    
     # FTP and HTTP servers, if present
     if( $dd->checkSnmpTable( 'ms_ftpStatistics' ) )
     {

@@ -213,6 +213,31 @@ sub openBlockingSession
 }
 
 
+sub checkUnreachableRetry
+{
+    my $collector = shift;
+    my $ipaddr = shift;
+
+    my $cref = $collector->collectorData( 'snmp' );
+
+    my $ret = 1;
+    if( exists( $cref->{'lastUnreachableSeen'}{$ipaddr} ) )
+    {
+        if( time() < $cref->{'lastUnreachableSeen'}{$ipaddr} +
+            $Torrus::Collector::SNMP::unreachableRetryDelay )
+        {
+            $ret = 0;
+        }
+        else
+        {
+            delete $cref->{'lastUnreachableSeen'}{$ipaddr} ;
+        }
+    }
+
+    return $ret;
+}
+
+
 sub expandOidMappings
 {
     my $collector = shift;
@@ -223,21 +248,13 @@ sub expandOidMappings
     my $oid_in = shift;
 
 
+    if( not checkUnreachableRetry( $collector, $ipaddr ) )
+    {
+        return undef;
+    }
+        
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
-
-    if( exists( $cref->{'lastUnreachableSeen'}{$ipaddr} ) )
-    {
-        if( time() < $cref->{'lastUnreachableSeen'}{$ipaddr} +
-            $Torrus::Collector::SNMP::unreachableRetryDelay )
-        {
-            return undef;
-        }
-        else
-        {
-            delete $cref->{'lastUnreachableSeen'}{$ipaddr} ;
-        }
-    }
 
     my $oid = $oid_in;
 
@@ -503,15 +520,12 @@ sub runCollector
     # We assume that version, timeout and retries are the same
     # within one address
 
-    while( my ($ipaddr, $ref1) = each %{$cref->{'targets'}} )
+    while( my ($ipaddr, $ref1) = each %{$cref->{'reptoken'}} )
     {
         while( my ($port, $ref2) = each %{$ref1} )
         {
-            while( my ($community, $ref3) = each %{$ref2} )
+            while( my ($community, $token) = each %{$ref2} )
             {
-                # Take one of the tokens for common parameters
-                my $token = $cref->{'reptoken'}{$ipaddr}{$port}{$community};
-                
                 my ($session, $error) = Net::SNMP->session
                     ( -hostname    => $ipaddr,
                       -port        => $port,

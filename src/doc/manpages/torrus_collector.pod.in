@@ -56,7 +56,13 @@ Prevents the process from becoming a daemon and sets the log to STDERR.
 
 =item B<--runonce>
 
-Instructs the script to run once and exit. Implies B<--nodaemon>.
+Instructs the collector to run once and exit. Implies B<--nodaemon>.
+
+=item B<--runalways>
+
+Instructs the collector process to continue running even if no collector
+datasources are defined in the tree. In this case, the process will check
+once per hour if the configuration has changed.
 
 =item B<--debug>
 

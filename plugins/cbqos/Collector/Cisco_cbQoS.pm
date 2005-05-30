@@ -212,7 +212,8 @@ sub initTarget
 
     $collector->registerDeleteCallback( $token, \&deleteTarget );
 
-    my $ipaddr = Torrus::Collector::SNMP::getHostIpAddress( $collector, $token );
+    my $ipaddr =
+        Torrus::Collector::SNMP::getHostIpAddress( $collector, $token );
     if( not defined( $ipaddr ) )
     {
         $collector->deleteTarget($token);
@@ -231,8 +232,14 @@ sub initTargetAttributes
 
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'cisco-cbqos' );
-
     my $ipaddr = $tref->{'ipaddr'};
+
+    if( not Torrus::Collector::SNMP::checkUnreachableRetry( $collector,
+                                                            $ipaddr ) )
+    {
+        return 1;
+    }
+    
     my $port = $collector->param($token, 'snmp-port');
     my $community = $collector->param($token, 'snmp-community');
 
@@ -259,7 +266,8 @@ sub initTargetAttributes
         {
             Error("Error retrieving cbQosServicePolicyTable from $ipaddr: " .
                   $session->error());
-            return 0;
+            return Torrus::Collector::SNMP::probablyDead( $token,
+                                                          $collector );
         }
 
         while( my( $oid, $val ) = each %{$result} )
@@ -342,7 +350,8 @@ sub initTargetAttributes
         {
             Error("Error retrieving cbQosObjectsTable from $ipaddr: " .
                   $session->error());
-            return 0;
+            return Torrus::Collector::SNMP::probablyDead( $token,
+                                                          $collector );
         }
 
         my $confIndexOid = $oiddef{'cbQosConfigIndex'};

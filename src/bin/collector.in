@@ -34,6 +34,7 @@ exit(1) if not Torrus::SiteConfig::verify();
 our $tree;
 our $nodaemon;
 our $runonce;
+our $runalways;
 our $debug;
 our $verbose;
 our $help_needed;
@@ -46,6 +47,7 @@ $process_name .= ' ' . join(' ', @ARGV);
 my $ok = GetOptions ('tree=s'   => \$tree,
                      'nodaemon' => \$nodaemon,
                      'runonce'  => \$runonce,
+                     'runalways'=> \$runalways,
                      'debug'    => \$debug,
                      'verbose'  => \$verbose,
                      'help'     => \$help_needed);
@@ -57,6 +59,7 @@ if( not $ok or not $tree or $help_needed or scalar(@ARGV) > 0 )
     "  --tree=NAME     tree name\n",
     "  --nodaemon      do not fork daemon and log to STDERR\n",
     "  --runonce       run one time and exit. Implies --nodaemon\n",
+    "  --runalways     continue running if no collectors defined\n",
     "  --debug         set the log level to debug\n",
     "  --verbose       set the log level to info\n",
     "  --help          this help message\n";
@@ -143,6 +146,11 @@ if( $runonce )
 {
     $options{'-RunOnce'} = 1;
 }
+if( $runalways )
+{
+    $options{'-RunAlways'} = 1;
+}
+
 
 my $scheduler = new Torrus::CollectorScheduler( %options );
 $scheduler->run();

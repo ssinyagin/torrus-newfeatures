@@ -182,16 +182,22 @@ sub run
             }
         }
 
-        if( scalar( keys %{$self->{'tasks'}} ) == 0 or
-            $self->{'options'}{'-RunOnce'} )
+        if( $self->{'options'}{'-RunOnce'} or
+            ( scalar( keys %{$self->{'tasks'}} ) == 0 and
+              not $self->{'options'}{'-RunAlways'} ) )
         {
             $self->setProcessStatus('');
             $stop = 1;
         }
         else
         {
+            if( scalar( keys %{$self->{'tasks'}} ) == 0 )
+            {
+                Info('Tasks list is empty. Will sleep until ' .
+                     scalar(localtime($nextRun)));
+            }
             $self->setProcessStatus('sleeping');
-            Debug("We will sleep until " . scalar(localtime($nextRun)));
+            Debug('We will sleep until ' . scalar(localtime($nextRun)));
             if( $Torrus::Scheduler::maxSleepTime > 0 )
             {
                 Debug('This is a VmWare-like clock. We devide the sleep ' .

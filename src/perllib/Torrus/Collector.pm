@@ -474,8 +474,9 @@ sub setValue
     Debug('Value ' . $value . ' set for ' .
           $self->{'targets'}{$token}{'path'} . ' TS=' . $timestamp);
 
-    my $proc =
-        $Torrus::Collector::setValue{$self->{'targets'}{$token}{'storage-type'}};
+    my $proc = $Torrus::Collector::setValue{
+        $self->{'targets'}{$token}{'storage-type'}};
+    
     &{$proc}( $self, $token, $value, $timestamp, $uptime );
 }
 

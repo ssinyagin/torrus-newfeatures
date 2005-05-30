@@ -179,7 +179,7 @@ The following parameters identify the QoS Feature:
    "police" =>
      cbqos-police-rate
 
-SNMP objects are defined in reguar Torrus XML templates. Collector
+SNMP objects are defined in regular Torrus XML templates. Collector
 substitutes C<POL> and C<OBJ> strings in C<snmp-object> parameter with
 the current values of policy and object index correspondingly.
 

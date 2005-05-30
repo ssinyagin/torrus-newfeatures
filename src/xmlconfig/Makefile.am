@@ -30,6 +30,7 @@ dist_vendor_DATA = \
 	vendor/apc.ups.xml  \
 	vendor/ascend.max.xml \
 	vendor/atmel.xml \
+	vendor/betternetworks.xml \
 	vendor/cisco.firewall.xml \
 	vendor/cisco.generic.xml \
 	vendor/cisco.ios.xml \

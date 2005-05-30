@@ -205,12 +205,6 @@ sub discover
         push( @{$data->{'templates'}}, split( /\s*,\s*/, $customTmpl ) );
     }
     
-    if( not defined( $devdetails->snmpVar($self->oiddef('sysUpTime')) ) )
-    {
-        Debug('Agent does not support sysUpTime');
-        $data->{'param'}{'snmp-check-sysuptime'} = 'no';
-    }
-
     # Build host-level legend
     my %legendValues =
         (
@@ -252,6 +246,12 @@ sub discover
         {
             $data->{'param'}{$param} = $val;
         }
+    }
+
+    if( not defined( $devdetails->snmpVar($self->oiddef('sysUpTime')) ) )
+    {
+        Debug('Agent does not support sysUpTime');
+        $data->{'param'}{'snmp-check-sysuptime'} = 'no';
     }
 
     $data->{'param'}{'data-dir'} =

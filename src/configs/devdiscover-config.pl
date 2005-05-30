@@ -39,6 +39,7 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
      'Torrus::DevDiscover::AscendMax',
      'Torrus::DevDiscover::ATMEL',
      'Torrus::DevDiscover::AxxessIT',
+     'Torrus::DevDiscover::BetterNetworks',
      'Torrus::DevDiscover::CiscoCatOS',
      'Torrus::DevDiscover::CiscoFirewall',
      'Torrus::DevDiscover::CiscoGeneric',
@@ -203,6 +204,13 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
          'name'   => 'ascend-line-stats',
          'source' => 'vendor/ascend.max.xml'
          },
+
+     #### BetterNetworks
+     'BetterNetworks::betternetworks-sensor' => {
+         'name'   => 'betternetworks-sensor',
+         'source' => 'vendor/betternetworks.xml'
+         },
+     
      #### Cisco
      'CiscoGeneric::cisco-cpu' => {
          'name'   => 'cisco-cpu',

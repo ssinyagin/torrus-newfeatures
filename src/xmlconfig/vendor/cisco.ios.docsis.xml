@@ -150,14 +150,14 @@
 
       <param name="ds-expr-util"       value="{Util}"/>
       <param name="graph-legend-util"  value="Utilization" />
-      <param name="line-style-util"    value="##SingleGraph" />
-      <param name="line-color-util"    value="##one" />
+      <param name="line-style-util"    value="##resourceusage" />
+      <param name="line-color-util"    value="##resourceusage" />
       <param name="line-order-util"    value="1" />
 
       <param name="ds-expr-cont"       value="{ContSlots}"/>
       <param name="graph-legend-cont"  value="Free contention slots" />
       <param name="line-style-cont"    value="##SingleGraph" />
-      <param name="line-color-cont"    value="##two" />
+      <param name="line-color-cont"    value="##green" />
       <param name="line-order-cont"    value="2" />
     </leaf>
         

@@ -6,7 +6,6 @@ To do now:
 -- Option to expand directory view by default
 -- Traceroute plugin (Gustavo Torres)
 -- CDef Collector plugin (Christian Schnidrig)
--- Discovery support for HP ProCurve 2524 (Marc Haber provided snmpwalks)
 -- Optionally show Admin info when authentication disabled
 -- RRD Renderer to take CF from the view definition
 -- Do we need a separate directory for user-defined styling?

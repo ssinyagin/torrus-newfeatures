@@ -481,7 +481,13 @@ sub buildConfig
             $nExplExcluded++;
             next;
         }
-        
+        elsif( length( $subtreeName ) == 0 )
+        {
+            Warn('Excluding an interface with empty name: ifIndex=' .
+                 $ifIndex);
+            next;
+        }
+
         my @templates = ();
 
         if( $interface->{'hasHCOctets'} )

@@ -1,5 +1,6 @@
 [% PROCESS 'html-incblocks.txt' %]
-[% ovs=variables.OVS; clearVar('OVS'); thepath=path(token) %]
+[% ovs=variables.OVS; clearVar('OVS'); global.bookmarkVars=['OVS',ovs];
+   thepath=path(token) %]
 [% INCLUDE htmlstart title=thepath printpath=1 %]
 
 <H1>[% p = 'overview-page-title-' _ ovs; nodeParam(token, p, 1) %]</H1>

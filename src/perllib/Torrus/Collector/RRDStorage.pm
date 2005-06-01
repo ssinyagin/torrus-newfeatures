@@ -319,6 +319,8 @@ sub updateRRD
             Error("Cannot rename $filename to $destfile: $!");
         
         delete $sref->{'rrdinfo_ds'}{$filename};
+        
+        createRRD( $collector, $sref, $filename, $tokens );
     }
         
     if( scalar( keys %ds_updating ) == 0 )

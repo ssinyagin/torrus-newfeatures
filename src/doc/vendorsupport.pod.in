@@ -103,7 +103,13 @@ Provides per-interface traffic statistics; CPU, memory, and
 temperature information; I/O buffer statistics; IPSec traffic information;
 SAA agents statistics; cbQoS monitoring (implemented in a separate plugin);
 DOCSIS uBR-specific variables (modem quantities and channel utilization);
-CISCO-ENHANCED-MEMPOOL-MIB (linecards and VIP modules memory).
+CISCO-ENHANCED-MEMPOOL-MIB (linecards and VIP modules memory, see notes below).
+
+B<Note:> On Cisco 7500, IOS version 12.0(26)S2 or 12.0(26)S3,
+CISCO-ENHANCED-MEMPOOL-MIB polling causes memory leak and leads to the router
+crash (Bug ID CSCef53395). The problem is fixed in IOS versions
+12.0(26)S5, 12.0(27)S3, 12.0(28)S2, and 12.0(30)S.
+
 
 =item * Cisco PIX Firewall
 

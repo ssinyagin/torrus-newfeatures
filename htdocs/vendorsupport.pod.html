@@ -92,6 +92,10 @@ following parameter in the discovery instructions XML:
 The module arranges the Ethernet interface statistics with
 such information as slot/port mapping and interface descriptions.
 <p></p>
+<li><strong><a name="item_betternetworks_ethernetbox">BetterNetworks EthernetBox</a></strong><br />
+</li>
+The discovery module detects active sensors in an EthernetBox sensor module.
+<p></p>
 <li><strong><a name="item_cisco_catos">Cisco CatOS</a></strong><br />
 </li>
 Memory, CPU, and temperature information. Per-interface statistics may be
@@ -101,8 +105,13 @@ limited to the ports with description only.
 </li>
 Provides per-interface traffic statistics; CPU, memory, and
 temperature information; I/O buffer statistics; IPSec traffic information;
-SAA agents statistics; cbQoS monitoring (implemented in a separate plugin),
-DOCSIS uBR-specific variables (modem quantities and channel utilization).
+SAA agents statistics; cbQoS monitoring (implemented in a separate plugin);
+DOCSIS uBR-specific variables (modem quantities and channel utilization);
+CISCO-ENHANCED-MEMPOOL-MIB (linecards and VIP modules memory, see notes below).
+<p><strong>Note:</strong> On Cisco 7500, IOS version 12.0(26)S2 or 12.0(26)S3,
+CISCO-ENHANCED-MEMPOOL-MIB polling causes memory leak and leads to the router
+crash (Bug ID CSCef53395). The problem is fixed in IOS versions
+12.0(26)S5, 12.0(27)S3, 12.0(28)S2, and 12.0(30)S.</p>
 <p></p>
 <li><strong><a name="item_cisco_pix_firewall">Cisco PIX Firewall</a></strong><br />
 </li>

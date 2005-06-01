@@ -503,54 +503,62 @@ sub buildChildrenConfigs
                 my $ifIndex    = $policyRef->{'cbQosIfIndex'};
                 my $interface  = $data->{'interfaces'}{$ifIndex};
 
-                my $interfaceName = $interface->{'ifDescr'};
-                $param->{'cbqos-interface-name'} = $interfaceName;
-
-                my $policyNick = $interface->{$data->{'nameref'}{'ifNick'}};
-
-                $subtreeName =
-                    $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-                
-                $subtreeComment = $interfaceName;
-
-                my $ifType = $policyRef->{'cbQosIfType'};
-                $param->{'cbqos-interface-type'} = $ifType;
-
-                if( $ifType eq 'frDLCI' )
+                if( defined( $interface ) )
                 {
-                    my $dlci = $policyRef->{'cbQosFrDLCI'};
+                    my $interfaceName = $interface->{'ifDescr'};
+                    $param->{'cbqos-interface-name'} = $interfaceName;
                     
-                    $subtreeName .= '_' . $dlci;
-                    $subtreeComment .= ' DLCI ' . $dlci;
-                    $policyNick .= '_' . $dlci;
+                    my $policyNick =
+                        $interface->{$data->{'nameref'}{'ifNick'}};
+
+                    $subtreeName =
+                        $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+                
+                    $subtreeComment = $interfaceName;
                     
-                    $param->{'cbqos-fr-dlci'} = $dlci;
+                    my $ifType = $policyRef->{'cbQosIfType'};
+                    $param->{'cbqos-interface-type'} = $ifType;
+
+                    if( $ifType eq 'frDLCI' )
+                    {
+                        my $dlci = $policyRef->{'cbQosFrDLCI'};
+                        
+                        $subtreeName .= '_' . $dlci;
+                        $subtreeComment .= ' DLCI ' . $dlci;
+                        $policyNick .= '_' . $dlci;
+                        
+                        $param->{'cbqos-fr-dlci'} = $dlci;
+                    }
+                    elsif( $ifType eq 'atmPVC' )
+                    {
+                        my $vpi = $policyRef->{'cbQosAtmVPI'};
+                        my $vci = $policyRef->{'cbQosAtmVCI'};
+                        
+                        $subtreeName .= '_' . $vpi . '_' . $vci;
+                        $subtreeComment .= ' PVC ' . $vpi . '/' . $vci;
+                        $policyNick .= '_' . $vpi . '_' . $vci;
+                        
+                        $param->{'cbqos-atm-vpi'} = $vpi;
+                        $param->{'cbqos-atm-vci'} = $vci;
+                    }
+                    
+                    my $direction = $policyRef->{'cbQosPolicyDirection'};
+                    
+                    # input -> in, output -> out
+                    my $dir = $direction;
+                    $dir =~ s/put$//;
+                    
+                    $subtreeName .= '_' . $dir;
+                    $subtreeComment .= ' ' . $direction . ' policy';
+                    $param->{'cbqos-direction'} = $direction;
+                    $policyNick .=  '_' . $dir;
+                    
+                    $param->{'cbqos-policy-nick'} = $policyNick;
                 }
-                elsif( $ifType eq 'atmPVC' )
+                else
                 {
-                    my $vpi = $policyRef->{'cbQosAtmVPI'};
-                    my $vci = $policyRef->{'cbQosAtmVCI'};
-                    
-                    $subtreeName .= '_' . $vpi . '_' . $vci;
-                    $subtreeComment .= ' PVC ' . $vpi . '/' . $vci;
-                    $policyNick .= '_' . $vpi . '_' . $vci;
-                    
-                    $param->{'cbqos-atm-vpi'} = $vpi;
-                    $param->{'cbqos-atm-vci'} = $vci;
+                    $buildSubtree = 0;
                 }
-
-                my $direction = $policyRef->{'cbQosPolicyDirection'};
-
-                # input -> in, output -> out
-                my $dir = $direction;
-                $dir =~ s/put$//;
-                
-                $subtreeName .= '_' . $dir;
-                $subtreeComment .= ' ' . $direction . ' policy';
-                $param->{'cbqos-direction'} = $direction;
-                $policyNick .=  '_' . $dir;
-                
-                $param->{'cbqos-policy-nick'} = $policyNick;            
             }
             else
             {

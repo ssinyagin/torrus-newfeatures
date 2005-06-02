@@ -31,6 +31,8 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
 
 @Torrus::DevDiscover::loadModules =
     (
+     'Torrus::DevDiscover::RFC1657_BGP4_MIB',
+     'Torrus::DevDiscover::RFC2011_IP_MIB',
      'Torrus::DevDiscover::RFC2863_IF_MIB',
      'Torrus::DevDiscover::RFC2662_ADSL_LINE', # needs testing
      'Torrus::DevDiscover::RFC2670_DOCS_IF',
@@ -45,6 +47,7 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
      'Torrus::DevDiscover::CiscoGeneric',
      'Torrus::DevDiscover::CiscoIOS',
      'Torrus::DevDiscover::CiscoIOS_Docsis',
+     'Torrus::DevDiscover::CiscoIOS_MacAccounting',
      'Torrus::DevDiscover::CiscoIOS_SAA',
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::EmpireSystemedge',
@@ -279,6 +282,14 @@ $Torrus::Global::siteXmlDir     = '@sitexmldir@';
      'CiscoIOS_Docsis::cisco-docsis-upstream-util' => {
          'name'   => 'cisco-docsis-upstream-util',
          'source' => 'vendor/cisco.ios.docsis.xml'
+         },
+     'CiscoIOS_MacAccounting::cisco-macacc-subtree' => {
+         'name'   => 'cisco-macacc-subtree',
+         'source' => 'vendor/cisco.ios.mac-accounting.xml'
+         },
+     'CiscoIOS_MacAccounting::cisco-macacc' => {
+         'name'   => 'cisco-macacc',
+         'source' => 'vendor/cisco.ios.mac-accounting.xml'
          },
      'CiscoIOS_SAA::cisco-saa-subtree' => {
          'name'   => 'cisco-saa-subtree',

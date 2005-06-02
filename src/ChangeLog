@@ -1,3 +1,8 @@
+2005-06-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS_MacAccounting.pm:
+	New discovery module for Cisco MAC accounting
+
 2005-05-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/BetterNetworks.pm:

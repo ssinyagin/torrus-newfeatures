@@ -178,7 +178,7 @@ sub checkdevtype
         my $rttAdminTable =
             $session->get_table( -baseoid =>
                                  $dd->oiddef('rttMonCtrlAdminTable') );
-        if( defined $rttAdminTable )
+        if( defined $rttAdminTable and scalar( %{$rttAdminTable} ) > 0 )
         {
             $devdetails->storeSnmpVars( $rttAdminTable );
             return 1;

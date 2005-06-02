@@ -34,67 +34,55 @@
 <definitions>
 
   <!-- CISCO-IP-STAT-MIB:cipMacTable -->
-  <def name="cipMacHCSwitchedBytes" value="1.3.6.1.4.1.9.9.84.1.2.3.1.2" />
+  <def name="cipMacSwitchedBytes"   value="1.3.6.1.4.1.9.9.84.1.2.1.1.4" />
 
 </definitions>
 
 
 <datasources>
 
-  <template name="cisco-macacc-subtree">
+  <!-- Template for MAC accounting -->
+  <template name="cisco-mac-accounting">
+
     <param name="snmp-object">
-      $cipMacHCSwitchedBytes.%ifindex-map%.%direction%.%peer-macoid%
+      $cipMacSwitchedBytes.%ifindex-map%.%direction%.%mac%
     </param>
-    <param name="snmp-object-type"  value="COUNTER64" />
 
     <param name="data-file">
-      %system-id%_%interface-nick%_%peer-macaddr%_macacc.rrd"
+      %system-id%_%interface-nick%_%mac-nick%.rrd"
     </param>
 
-    <param name="rrd-ds" value="%direction%" />
+    <param name="rrd-ds" value="%mac-nick%_%direction%" />
+
     <param name="rrd-create-dstype" value="COUNTER" />
-    <param name="graph-title" value="%descriptive-nickname%" />
 
-    <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="traffic"/>
-    <param name="overview-subleave-name-traffic" value="InOut_bps"/>
-    <param name="overview-shortcut-text-traffic"
-           value="All traffic"/>
-    <param name="overview-shortcut-title-traffic"
-           value="Show traffic for all interfaces on one page"/>
-    <param name="overview-page-title-traffic"
-           value="Input/Output Graphs"/>    
-  </template>
-
-
-  <template name="cisco-macacc">
-    <leaf name="Bytes_In">
+    <leaf name="InOctets">
       <param name="comment"          value="Input bytes per second" />
       <param name="direction"        value="1" />
       <param name="hidden"           value="yes" />
       <param name="graph-legend"     value="Bytes in" />
     </leaf>
 
-    <leaf name="Bytes_Out">
+    <leaf name="OutOctets">
       <param name="comment"          value="Output bytes per second" />
       <param name="direction"        value="2" />
       <param name="hidden"           value="yes" />
       <param name="graph-legend"     value="Bytes out" />
     </leaf>
 
-    <leaf name="In_bps">
+    <leaf name="InBps">
       <param name="comment"          value="Input bits per second" />
       <param name="ds-type"          value="rrd-file" />
       <param name="leaf-type"        value="rrd-cdef" />
-      <param name="rpn-expr"         value="{Bytes_In},8,*" />
+      <param name="rpn-expr"         value="{InOctets},8,*" />
       <param name="graph-legend"     value="Bits in" />
     </leaf>
 
-    <leaf name="Out_bps">
+    <leaf name="OutBps">
       <param name="comment"          value="Output bits per second" />
       <param name="ds-type"          value="rrd-file" />
       <param name="leaf-type"        value="rrd-cdef" />
-      <param name="rpn-expr"         value="{Bytes_Out},8,*" />
+      <param name="rpn-expr"         value="{OutOctets},8,*" />
       <param name="graph-legend"     value="Bits out" />
     </leaf>
 
@@ -105,18 +93,19 @@
       <param name="ds-type"          value="rrd-multigraph" />
       <param name="ds-names"         value="in,out" />
 
-      <param name="ds-expr-in"       value="{Bytes_In},8,*" />
+      <param name="ds-expr-in"       value="{InOctets},8,*" />
       <param name="graph-legend-in"  value="Bits per second in" />
       <param name="line-style-in"    value="AREA" />
       <param name="line-color-in"    value="#00FF00" />
       <param name="line-order-in"    value="1" />
 
-      <param name="ds-expr-out"      value="{Bytes_Out},8,*" />
+      <param name="ds-expr-out"      value="{OutOctets},8,*" />
       <param name="graph-legend-out" value="Bits per second out" />
       <param name="line-style-out"   value="LINE2" />
       <param name="line-color-out"   value="#0000FF" />
       <param name="line-order-out"   value="2" />
     </leaf>
+
   </template>
 
 </datasources>

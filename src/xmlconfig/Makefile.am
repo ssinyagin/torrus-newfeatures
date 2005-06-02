@@ -61,7 +61,6 @@ examplesdir   =  $(distxmldir)/examples
 dist_examples_DATA = \
 	examples/apc-ups.xml \
 	examples/ascend.max.xml \
-	examples/cisco-mac-accounting.xml \
 	examples/docsis-monitors.xml \
 	examples/flowscan.xml \
 	examples/generic-netsnmp.xml \
@@ -75,6 +74,8 @@ dist_examples_DATA = \
 olddir        =  $(distxmldir)/old
 dist_old_DATA = \
 	old/cisco.generic.old-0.1.4.xml \
+	old/cisco.ios.mac-accounting-0.1.8.xml \
+	old/cisco-mac-accounting-example.xml \
 	old/rfc1213.xml \
 	old/rfc2670.docsis-if.old.0.1.5d-20040224.xml \
 	old/rfc2863.if-mib.old-0.1.4.xml \

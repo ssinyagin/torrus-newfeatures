@@ -198,7 +198,8 @@ my %objTypeAttributes =
 
 # This is first executed per target
 
-$Torrus::Collector::initTarget{'cisco-cbqos'} = \&initTarget;
+$Torrus::Collector::initTarget{'cisco-cbqos'} =
+    \&Torrus::Collector::Cisco_cbQoS::initTarget;
 
 # Derive 'snmp-object' from cbQoS maps and pass the control to SNMP collector
 

@@ -49,10 +49,8 @@ To do before Release 1.0.1:
 
 To do someday:
 
--- Discovery module for Cisco MAC accounting
 -- Finish and test "RFC2662_ADSL_LINE" and "Paradyne" devdiscover modules
 -- Backplane performance for Catalyst switches
--- BGP router statistics/MAC accounting/AS number lookup
 -- VoIP dial peer statistics
 -- Gradual highlighting for subtree listings
 -- Tools for RRD files manipulation (adding/deleting DSes etc.)

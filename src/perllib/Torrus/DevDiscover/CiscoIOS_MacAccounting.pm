@@ -109,14 +109,19 @@ sub discover
             next;
         }
 
-        # There are two entries per IP: in and out.
-        next if defined( $data->{'cipMac'}{$ifIndex . ':' . $phyAddr} );
+        # There should be two entries per IP: in and out.
+        if( defined( $data->{'cipMac'}{$ifIndex . ':' . $phyAddr} ) )
+        {
+            $data->{'cipMac'}{$ifIndex . ':' . $phyAddr}{'nEntries'}++;
+            next;
+        }
         
         my $peer = {
             'peerIP' => $peerIP,
             'phyAddr' => $phyAddr,
             'macAddrString' => $macAddrString,
-            'ifIndex' => $ifIndex
+            'ifIndex' => $ifIndex,
+            'nEntries' => 1
         };
 
         $peer->{'macAddrOID'} = join('.', @phyAddrOctets);
@@ -153,6 +158,11 @@ sub discover
                     $peer->{'description'} = $desc;
                 }
             }
+            elsif( $devdetails->
+                    param('CiscoIOS_MacAccounting::bgponly') eq 'yes' )
+            {
+                next;
+            }
         }
 
         $data->{'cipMac'}{$ifIndex . ':' . $phyAddr} = $peer;
@@ -160,12 +170,19 @@ sub discover
 
     my %asNumbers;    
     foreach my $INDEX ( keys %{$data->{'cipMac'}} )
-    {
+    {        
         my $peer = $data->{'cipMac'}{$INDEX};
 
-        if( defined( $peer->{'peerAS'} ) )
+        if( $peer->{'nEntries'} != 2 )
         {
-            $asNumbers{$peer->{'peerAS'}}++;
+            delete $data->{'cipMac'}{$INDEX};
+        }
+        else
+        {
+            if( defined( $peer->{'peerAS'} ) )
+            {
+                $asNumbers{$peer->{'peerAS'}}++;
+            }
         }
     }
     

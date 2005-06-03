@@ -474,6 +474,22 @@ When set to <code>yes</code>, IPSec statistics are excluded from discovery.
 When set to <code>yes</code>, only those Catalyst ports are included in configuration
 which have a port name (set up by <code>set port name</code> command).
 <p></p>
+<li><strong><a name="item_ciscoios_macaccounting_3a_3abgponly"><code>CiscoIOS_MacAccounting::bgponly</code></a></strong><br />
+</li>
+When set to <code>yes</code>, Cisco MAC accounting statistics will be enabled for
+those MACs which correspond to BGP peers only.
+<p></p>
+<li><strong><a name="item_bgp_2das_2ddescription_2dnnnn"><code>bgp-as-description-NNNN</code></a></strong><br />
+</li>
+Specifies a description for an autonomous system number. Currently it's used
+with Cisco MAC accounting only.
+<p></p>
+<li><strong><a name="item_peer_2dipaddr_2ddescription_2daaa_aaa_aaa_aaa"><code>peer-ipaddr-description-AAA_AAA_AAA_AAA</code></a></strong><br />
+</li>
+Specifies a description for a peer by its IP address. Dots in IP address should
+be replaced with underscores. Currently it's used with Cisco
+MAC accounting only.
+<p></p>
 <li><strong><a name="item_paradyne_3a_3aslot_2dname"><code>Paradyne::slot-name</code></a></strong><br />
 </li>
 Mandatory for Paradyne DSLAM devices. It should uniquely identify

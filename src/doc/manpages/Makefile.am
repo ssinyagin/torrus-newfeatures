@@ -39,7 +39,8 @@ SRCPOD = \
 	torrus_genddx.pod.in \
 	torrus_genlist.pod.in \
 	torrus_monitor.pod.in \
-	torrus_schedulerinfo.pod.in
+	torrus_schedulerinfo.pod.in \
+	torrus_ttproclist.pod.in
 
 POD_FILES = \
 	torrus.pod \
@@ -56,7 +57,8 @@ POD_FILES = \
 	torrus_genddx.pod \
 	torrus_genlist.pod \
 	torrus_monitor.pod \
-	torrus_schedulerinfo.pod
+	torrus_schedulerinfo.pod \
+	torrus_ttproclist.pod
 
 PODMAN = \
 	torrus.@mansec_usercmd@ \
@@ -73,7 +75,8 @@ PODMAN = \
 	torrus_genddx.@mansec_usercmd@ \
 	torrus_genlist.@mansec_usercmd@ \
 	torrus_monitor.@mansec_usercmd@ \
-	torrus_schedulerinfo.@mansec_usercmd@
+	torrus_schedulerinfo.@mansec_usercmd@ \
+	torrus_ttproclist.@mansec_usercmd@
 
 
 

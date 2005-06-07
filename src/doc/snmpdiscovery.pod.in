@@ -89,6 +89,10 @@ B<Note:> C<genddx> is designed as a one-time utility. You may run it to create
 a typical discovery file with basic set of options. Then the discovery
 configuration XML would be the primary source of information, and it should
 be maintained by manual editing, or by some other automated means.
+Alternatively you may use C<ttproclist> utility and generate highly customized
+discovery instruction files based on static templates and lists of SNMP nodes.
+See L<torrus_ttproclist(@mansec_usercmd@)> manpage for more details and
+examples.
 
 
 

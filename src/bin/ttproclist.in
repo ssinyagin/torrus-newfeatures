@@ -103,7 +103,8 @@ if( defined( $parameters ) )
     }
 }
 
-my $tt = new Template( ABSOLUTE => 1,
+my $tt = new Template( INCLUDE_PATH => '@tmpluserdir@',
+                       ABSOLUTE => 1,
                        RELATIVE => 1,
                        TRIM => 1 );
 

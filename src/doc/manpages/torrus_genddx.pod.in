@@ -45,6 +45,9 @@ the discovery XML canvas, for futher manual editing. It generates only
 basic set of parameters, and there are much more of those that you may
 use to customize the discovery process.
 
+See L<torrus_ttproclist(@mansec_usercmd@)> for a more flexible and
+complex DDX generator.
+
 More information is available in B<Torrus SNMP Discovery User Guide>.
 
 =head1 OPTIONS
@@ -121,7 +124,8 @@ genddx output file is processed with devdiscover utility.
 
 =head1 SEE ALSO
 
-L<torrus(@mansec_usercmd@)>, L<torrus_devdiscover(@mansec_usercmd@)>
+L<torrus(@mansec_usercmd@)>, L<torrus_devdiscover(@mansec_usercmd@)>,
+L<torrus_ttproclist(@mansec_usercmd@)>
 
 =head1 NOTES
 

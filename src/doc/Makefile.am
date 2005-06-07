@@ -94,5 +94,6 @@ if POD2TEXT_PRESENT
 endif
 
 htdocs: $(POD_FILES)
+	cd manpages; make pods
 	HTMLDIR=@abs_top_builddir@/../htdocs $(SHELL) mkhtdocs.sh
 

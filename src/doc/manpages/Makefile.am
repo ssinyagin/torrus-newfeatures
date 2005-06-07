@@ -104,4 +104,4 @@ SUFFIXES = .pod.in .pod
 .pod.in.pod:
 	$(SUBST) $<  > $@
 
-
+pods: $(POD_FILES)

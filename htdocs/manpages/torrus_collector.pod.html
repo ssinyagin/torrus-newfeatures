@@ -67,7 +67,15 @@ Prevents the process from becoming a daemon and sets the log to STDERR.
 <dt><strong><a name="item__2d_2drunonce"><strong>--runonce</strong></a></strong><br />
 </dt>
 <dd>
-Instructs the script to run once and exit. Implies <strong>--nodaemon</strong>.
+Instructs the collector to run once and exit. Implies <strong>--nodaemon</strong>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2drunalways"><strong>--runalways</strong></a></strong><br />
+</dt>
+<dd>
+Instructs the collector process to continue running even if no collector
+datasources are defined in the tree. In this case, the process will check
+once per hour if the configuration has changed.
 </dd>
 <p></p>
 <dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />

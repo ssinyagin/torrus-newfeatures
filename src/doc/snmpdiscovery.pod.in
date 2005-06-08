@@ -236,7 +236,8 @@ Mandatory. Defines a host to run SNMP discovery.
 
 =item * C<collector-period>, C<collector-timeoffset>,
 C<collector-dispersed-timeoffset>, C<collector-timeoffset-min>,
-C<collector-timeoffset-max>, C<collector-timeoffset-step>
+C<collector-timeoffset-max>, C<collector-timeoffset-step>,
+C<monitor-period>, C<monitor-timeoffset>
 
 Optional. When defined, these parameters override those from C<snmp-defaults>
 template in F<snmp-defs.xml>.

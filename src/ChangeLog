@@ -1,5 +1,10 @@
 2005-06-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/devdiscover.in: new CLI option: --forcebundle
+
+	* perllib/Torrus/DevDiscover.pm: monitor-period and monitor-timeoffset
+	are now copied from DDX
+
 	* bin/action_snmpv1trap.in, bin/action_snmptrap.in,
 	sup/mibs/TORRUS-MIB.txt: Added new SNMP variable: severity
 

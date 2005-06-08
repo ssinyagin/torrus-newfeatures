@@ -64,6 +64,8 @@ our @copyParams =
       'collector-timeoffset-max',
       'collector-timeoffset-step',
       'domain-name',
+      'monitor-period',
+      'monitor-timeoffset',
       'snmp-host',
       'snmp-port',
       'snmp-community',

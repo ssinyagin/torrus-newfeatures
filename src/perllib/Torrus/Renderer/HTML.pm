@@ -75,7 +75,8 @@ sub render_html
         'plainURL'   => $Torrus::Renderer::plainURL,
         'splitUrls'  => sub { return $self->makeSplitURLs($config_tree,
                                                           $_[0], $_[1]); },
-        'topURL'     => $Torrus::Renderer::rendererURL,
+        'topURL'     => ($Torrus::Renderer::rendererURL ne '' ?
+                         $Torrus::Renderer::rendererURL : '/'),
         'rrprint'    => sub { return $self->rrPrint($config_tree,
                                                     $_[0], $_[1]); },
         'scale'      => sub { return $self->scale($_[0], $_[1]); },

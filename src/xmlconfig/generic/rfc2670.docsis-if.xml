@@ -279,7 +279,7 @@
 
     <monitor name="docsis-snr-lower-20db">
       <param name="monitor-type"  value="expression" />
-      <param name="rpn-expr"      value="20,LT" />
+      <param name="rpn-expr"      value="DUP,0,GT,20,LT,AND" />
       <param name="action"        value="docsis-snr-lower-20" />
       <param name="expires"       value="3600" />
       <param name="comment">

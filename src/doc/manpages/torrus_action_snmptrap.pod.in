@@ -49,23 +49,27 @@ runs of C<make install> do not override this file.
 
 =over 4
 
-=item B<--host> I<HOSTNAME>
+=item B<--host>=I<HOSTNAME>
 
 Sets the hostname of the destination host.
 
-=item B<--community> I<COMMUNITY>
+=item B<--community>=I<COMMUNITY>
 
 Sets the community string to use when sending the trap.
 
-=item B<--port> I<PORT>
+=item B<--port>=I<PORT>
 
 Sets the destination UDP port.
 
-=item B<--enterprise> I<OID>
+=item B<--enterprise>=I<OID>
 
 Sets the C<enterprise> field of the SNMPv1 trap to a given OID (see
 RFC 1157 for more details). This option is only available for
 C<action_snmpv1trap> and will be ignored for C<action_snmptrap>.
+
+=item B<--severity>=I<SEVERITY>
+
+Sets the optional severity SNMP variable to some integer value.
 
 =back
 

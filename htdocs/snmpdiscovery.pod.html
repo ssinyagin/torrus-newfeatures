@@ -693,6 +693,49 @@ in their descriptions:</p>
     &lt;param name=&quot;FastEthHW-Parameters-arg&quot;
        value=&quot;rrd-create-hw-alpha=0.2; rrd-create-hw-beta=0.01&quot;/&gt;
   &lt;/host&gt;</pre>
+<p>The following example sets up the monitors defined in
+<em>examples/docsis-monitors.xml</em>:</p>
+<pre>
+    &lt;param name=&quot;selectors&quot; value=&quot;docs&quot;/&gt;
+    &lt;param name=&quot;docs-selector-type&quot; value=&quot;RFC2863_IF_MIB&quot;/&gt;
+    &lt;param name=&quot;docs-selector-expr&quot;  value=&quot;1&quot;/&gt;
+    &lt;param name=&quot;docs-selector-actions&quot;&gt; 
+          DocsisUpSNRMonitor,
+          DocsisUpFECCorMonitor,
+          DocsisUpFECUncorMonitor,
+          DocsisDownUtilMonitor,
+          DocsisMacModemsMonitor,
+          DocsisUpUtilMonitor,
+          DocsisUpSlotsMonitor,
+          InErrorsMonitor,
+          OutErrorsMonitor
+    &lt;/param&gt;
+    &lt;param name=&quot;docs-DocsisUpSNRMonitor-arg&quot; 
+           value=&quot;docsis-snr-1,docsis-snr-2,docsis-snr-3&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;docs-DocsisUpFECCorMonitor-arg&quot; 
+           value=&quot;docsis-feccor-1,docsis-feccor-2&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;docs-DocsisUpFECUncorMonitor-arg&quot; 
+           value=&quot;docsis-fecuncor-1,docsis-fecuncor-2,docsis-fecuncor-3&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;docs-DocsisDownUtilMonitor-arg&quot; 
+           value=&quot;docsis-downutl-1,docsis-downutl-2,docsis-downutl-3&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;docs-DocsisMacModemsMonitor-arg&quot; 
+           value=&quot;docsis-modems-1,docsis-modems-2&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;docs-DocsisUpUtilMonitor-arg&quot; 
+           value=&quot;docsis-uputil-1,docsis-uputil-2,docsis-uputil-3&quot;/&gt;
+    
+    &lt;param name=&quot;docs-DocsisUpSlotsMonitor-arg&quot; 
+           value=&quot;docsis-upslots-1,docsis-upslots-2,docsis-upslots-3&quot;/&gt;
+    
+    &lt;param name=&quot;docs-InErrorsMonitor-arg&quot; 
+           value=&quot;cc-inerrors-1,cc-inerrors-2,cc-inerrors-3&quot;/&gt;</pre>
+<pre>
+    &lt;param name=&quot;docs-OutErrorsMonitor-arg&quot; 
+           value=&quot;cc-outerrors-1,cc-outerrors-2,cc-outerrors-3&quot;/&gt;</pre>
 <p>
 </p>
 <hr />

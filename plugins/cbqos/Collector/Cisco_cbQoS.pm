@@ -547,11 +547,11 @@ sub postProcess
                     'ObjectsTable'}{$ipaddr}{$port}{$community};
                 delete $cref->{
                     'CfgTable'}{$ipaddr}{$port}{$community};
-            }
             
-            delete $scref->{'needsRemapping'}{$token};
-            Torrus::Collector::Cisco_cbQoS::initTargetAttributes
-                ( $collector, $token );
+                delete $scref->{'needsRemapping'}{$token};
+                Torrus::Collector::Cisco_cbQoS::initTargetAttributes
+                    ( $collector, $token );
+            }
         }
     }
     else

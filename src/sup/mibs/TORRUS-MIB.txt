@@ -10,7 +10,7 @@ IMPORTS
         FROM RRDTOOL-SMI;
 
 torrus MODULE-IDENTITY
-    LAST-UPDATED "200308060000Z"
+    LAST-UPDATED "200506080000Z"
     ORGANIZATION "Round Robin Database Framework project"
     CONTACT-INFO
         "Round Robin Database Framework project
@@ -72,7 +72,8 @@ MonitorEventsEntry ::= SEQUENCE {
     torrusMonitorName    OCTET STRING,
     torrusEventType      EventType,
     torrusPath           Path,
-    torrusTimestamp      DateAndTime
+    torrusTimestamp      DateAndTime,
+    torrusSeverity       Integer32
 }
     
 torrusMonitorEventsTable OBJECT-TYPE
@@ -153,6 +154,15 @@ torrusTreeName OBJECT-TYPE
         "Name of the datasource tree"
     ::= { torrusMonitorEventsEntry 7 }
 
+torrusSeverity OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Optional severity level"
+    ::= { torrusMonitorEventsEntry 8 }
+
+    
 torrusAlarm NOTIFICATION-TYPE
     OBJECTS  { torrusToken, torrusMonitorName, torrusEventType,
                torrusPath, torrusTimestamp }

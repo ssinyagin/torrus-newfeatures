@@ -1,3 +1,8 @@
+2005-06-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/action_snmpv1trap.in, bin/action_snmptrap.in,
+	sup/mibs/TORRUS-MIB.txt: Added new SNMP variable: severity
+
 2005-06-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS_MacAccounting.pm:

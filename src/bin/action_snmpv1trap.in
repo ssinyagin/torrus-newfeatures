@@ -41,11 +41,13 @@ if( not $ENV{'TORRUS_TOKEN'} )
 }
 
 my @hosts;
+my $severity;
 
 my $ok = GetOptions( 'host=s'     => \@hosts,
                      'community=s' => \$Torrus::Snmptrap::community,
                      'port=i'      => \$Torrus::Snmptrap::port,
-                     'enterprise'  => \$Torrus::Snmptrap::enterprise );
+                     'enterprise'  => \$Torrus::Snmptrap::enterprise,
+                     'severity=i'  => \$severity );
 
 if( not $ok )
 {
@@ -82,6 +84,13 @@ my @varbindlist = ( $Torrus::Snmptrap::enterprise . '.2',
                     $Torrus::Snmptrap::enterprise . '.7',
                     OCTET_STRING, $ENV{'TORRUS_TREE'}
                     );
+
+if( defined( $severity ) )
+{
+    push( @varbindlist,
+          $Torrus::Snmptrap::enterprise . '.8',
+          INTEGER32, $severity );
+}
 
 foreach my $host ( @Torrus::Snmptrap::hosts )
 {

@@ -76,7 +76,7 @@ sub initTarget
 
     $tref->{'ipaddr'} = $ipaddr;
 
-    return initTargetAttributes( $collector, $token );
+    return Torrus::Collector::SNMP::initTargetAttributes( $collector, $token );
 }
 
 
@@ -554,25 +554,17 @@ sub runCollector
                     # one UDP socket for all sessions.
                     if( scalar( @sessions ) == 1 )
                     {
-                        my $oldBuffer =
-                            $session->transport()->socket()->
-                            sockopt( SO_RCVBUF );
-                        
+                        my $buflen = int($Torrus::Collector::SNMP::RxBuffer);
                         my $ok = $session->transport()->socket()->
-                            sockopt( SO_RCVBUF,
-                                     int($Torrus::Collector::SNMP::RxBuffer) );
+                            sockopt( SO_RCVBUF, $buflen );
                         if( not $ok )
                         {
                             Error('Could not set SO_RCVBUF to ' .
-                                  $Torrus::Collector::SNMP::RxBuffer .
-                                  ': ' . $! . '. Old value: ' .
-                                  $oldBuffer);
+                                  $buflen . ': ' . $!);
                         }
                         else
                         {
-                            Debug('Set SO_RCVBUF to ' .
-                                  $Torrus::Collector::SNMP::RxBuffer .
-                                  '. Old value: ' . $oldBuffer);
+                            Debug('Set SO_RCVBUF to ' . $buflen);
                         }
                     }
                 }
@@ -767,7 +759,8 @@ sub postProcess
         foreach my $token ( keys %{$cref->{'needsRemapping'}} )
         {
             delete $cref->{'needsRemapping'}{$token};
-            initTargetAttributes( $collector, $token );
+            Torrus::Collector::SNMP::initTargetAttributes
+                ( $collector, $token );
         }
     }
     else

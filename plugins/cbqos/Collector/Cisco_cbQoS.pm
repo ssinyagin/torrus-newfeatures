@@ -222,7 +222,8 @@ sub initTarget
     }
     $tref->{'ipaddr'} = $ipaddr;
 
-    return initTargetAttributes( $collector, $token );
+    return Torrus::Collector::Cisco_cbQoS::initTargetAttributes
+        ( $collector, $token );
 }
 
 
@@ -509,7 +510,8 @@ $Torrus::Collector::runCollector{'cisco-cbqos'} =
 
 # Execute this after the collector has finished
 
-$Torrus::Collector::postProcess{'cisco-cbqos'} = \&postProcess;
+$Torrus::Collector::postProcess{'cisco-cbqos'} =
+    \&Torrus::Collector::Cisco_cbQoS::postProcess;
 
 sub postProcess
 {
@@ -540,7 +542,8 @@ sub postProcess
         foreach my $token ( keys %{$scref->{'needsRemapping'}} )
         {
             delete $scref->{'needsRemapping'}{$token};
-            initTargetAttributes( $collector, $token );
+            Torrus::Collector::Cisco_cbQoS::initTargetAttributes
+                ( $collector, $token );
         }
     }
     else

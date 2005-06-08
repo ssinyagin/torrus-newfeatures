@@ -211,8 +211,11 @@ sub initTarget
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'cisco-cbqos' );
 
-    $collector->registerDeleteCallback( $token, \&deleteTarget );
-
+    $cref->{'QosEnabled'}{$token} = 1;
+    
+    $collector->registerDeleteCallback
+        ( $token, \&Torrus::Collector::Cisco_cbQoS::deleteTarget );
+    
     my $ipaddr =
         Torrus::Collector::SNMP::getHostIpAddress( $collector, $token );
     if( not defined( $ipaddr ) )
@@ -529,18 +532,23 @@ sub postProcess
         # Flush all QoS object mapping
         foreach my $token ( keys %{$scref->{'needsRemapping'}} )
         {
-            my $tref = $collector->tokenData( $token );
-            my $ipaddr = $tref->{'ipaddr'};
-            my $port = $collector->param($token, 'snmp-port');
-            my $community = $collector->param($token, 'snmp-community');
-
-            delete $cref->{'ServicePolicyTable'}{$ipaddr}{$port}{$community};
-            delete $cref->{'ServicePolicyMapping'}{$ipaddr}{$port}{$community};
-            delete $cref->{'ObjectsTable'}{$ipaddr}{$port}{$community};
-            delete $cref->{'CfgTable'}{$ipaddr}{$port}{$community};
-        }
-        foreach my $token ( keys %{$scref->{'needsRemapping'}} )
-        {
+            if( $cref->{'QosEnabled'}{$token} )
+            {
+                my $tref = $collector->tokenData( $token );
+                my $ipaddr = $tref->{'ipaddr'};
+                my $port = $collector->param($token, 'snmp-port');
+                my $community = $collector->param($token, 'snmp-community');
+                
+                delete $cref->{
+                    'ServicePolicyTable'}{$ipaddr}{$port}{$community};
+                delete $cref->{
+                    'ServicePolicyMapping'}{$ipaddr}{$port}{$community};
+                delete $cref->{
+                    'ObjectsTable'}{$ipaddr}{$port}{$community};
+                delete $cref->{
+                    'CfgTable'}{$ipaddr}{$port}{$community};
+            }
+            
             delete $scref->{'needsRemapping'}{$token};
             Torrus::Collector::Cisco_cbQoS::initTargetAttributes
                 ( $collector, $token );
@@ -552,6 +560,21 @@ sub postProcess
     }
 }
 
+
+# Callback executed by Collector
+
+sub deleteTarget
+{
+    my $collector = shift;
+    my $token = shift;
+
+    my $cref = $collector->collectorData( 'cisco-cbqos' );
+
+    delete $cref->{'QosEnabled'}{$token};
+
+    Torrus::Collector::SNMP::deleteTarget( $collector, $token );
+}
+    
 
 1;
 

@@ -154,7 +154,8 @@ sub buildConfig
 
     foreach my $category ( sort keys %{$data->{'docsConfig'}} )
     {
-        if( scalar( @{$data->{'docsConfig'}{$category}{'templates'}} ) > 0 )
+        if( scalar( @{$data->{$category}} ) > 0 and
+            scalar( @{$data->{'docsConfig'}{$category}{'templates'}} ) > 0 )
         {
             my $subtreeNode =
                 $cb->addSubtree( $devNode,

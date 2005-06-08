@@ -112,142 +112,150 @@ sub buildConfig
         $cb->setVar( $devNode, 'CiscoIOS_Docsis::ugs-supported', 'true' );
     }
 
-    # Build All_Modems summary graph
-    my $param = {
-      'ds-type'              => 'rrd-multigraph',
-      'ds-names'             => 'total,active',
-      'graph-lower-limit'    => '0',
-      'precedence'           => '1000',
-      'comment'              => 'Active and Total modems on CMTS',
-      'vertical-label'       => 'Modems',
-
-      'graph-legend-total'   => 'Total',
-      'line-style-total'     => '##totalresource',
-      'line-color-total'     => '##totalresource',
-      'line-order-total'     => '1',
-
-      'graph-legend-active'  => 'Active',
-      'line-style-active'    => '##resourceusage',
-      'line-color-active'    => '##resourceusage',
-      'line-order-active'    => '2'
-      };
-
-    my $first = 1;
-    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+    if( scalar( @{$data->{'docsCableMaclayer'}} ) > 0 )
     {
-        my $interface = $data->{'interfaces'}{$ifIndex};
-        my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-        
-        if( $first )
+        # Build All_Modems summary graph
+        my $param = {
+            'ds-type'              => 'rrd-multigraph',
+            'ds-names'             => 'total,active',
+            'graph-lower-limit'    => '0',
+            'precedence'           => '1000',
+            'comment'              => 'Active and Total modems on CMTS',
+            'vertical-label'       => 'Modems',
+            
+            'graph-legend-total'   => 'Total',
+            'line-style-total'     => '##totalresource',
+            'line-color-total'     => '##totalresource',
+            'line-order-total'     => '1',
+            
+            'graph-legend-active'  => 'Active',
+            'line-style-active'    => '##resourceusage',
+            'line-color-active'    => '##resourceusage',
+            'line-order-active'    => '2'
+            };
+
+        my $first = 1;
+        foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
         {
-            $param->{'ds-expr-total'} =
-                '{' . $intf . '/Modems_Total}';
-            $param->{'ds-expr-active'} =
-                '{' . $intf . '/Modems_Active}';
-            $first = 0;
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+            
+            if( $first )
+            {
+                $param->{'ds-expr-total'} =
+                    '{' . $intf . '/Modems_Total}';
+                $param->{'ds-expr-active'} =
+                    '{' . $intf . '/Modems_Active}';
+                $first = 0;
+            }
+            else
+            {
+                $param->{'ds-expr-total'} .=
+                    ',{' . $intf . '/Modems_Total},+';
+                $param->{'ds-expr-active'} .=
+                    ',{' . $intf . '/Modems_Active},+';
+            }
+        }
+
+        my $macNode =
+            $cb->getChildSubtree( $devNode,
+                                  $data->{'docsConfig'}{'docsCableMaclayer'}{
+                                      'subtreeName'} );
+        if( defined( $macNode ) )
+        {
+            $cb->addLeaf( $macNode, 'All_Modems', $param, [] );
         }
         else
         {
-            $param->{'ds-expr-total'} .=
-                ',{' . $intf . '/Modems_Total},+';
-            $param->{'ds-expr-active'} .=
-                ',{' . $intf . '/Modems_Active},+';
+            Error('Could not find the MAC layer subtree');
+            exit 1;
         }
-    }
 
-    my $macNode =
-        $cb->getChildSubtree( $devNode,
-                              $data->{'docsConfig'}{'docsCableMaclayer'}{
-                                  'subtreeName'} );
-    if( defined( $macNode ) )
-    {
-        $cb->addLeaf( $macNode, 'All_Modems', $param, [] );
-    }
-    else
-    {
-        Error('Could not find the MAC layer subtree');
-        exit 1;
-    }
-
-    # Apply selector actions
-    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
-    {
-        my $interface = $data->{'interfaces'}{$ifIndex};
-        my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-
-        my $monitor =
-            $interface->{'selectorActions'}{'DocsisMacModemsMonitor'};
-        if( defined( $monitor ) )
+        # Apply selector actions
+        foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
         {
-            my $intfNode = $cb->getChildSubtree( $macNode, $intf );
-            $cb->addLeaf( $intfNode, 'Modems_Active',
-                          {'monitor' => $monitor } );
-        }
-    }   
-
-    my $upstrNode =
-        $cb->getChildSubtree( $devNode,
-                              $data->{'docsConfig'}{'docsCableUpstream'}{
-                                  'subtreeName'} );
-
-    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
-    {
-        my $interface = $data->{'interfaces'}{$ifIndex};
-        my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-
-        my $monitor =
-            $interface->{'selectorActions'}{'DocsisUpUtilMonitor'};
-        if( defined( $monitor ) )
-        {
-            my $intfNode = $cb->getChildSubtree( $upstrNode, $intf );
-            $cb->addLeaf( $intfNode, 'Util',
-                          {'monitor' => $monitor } );
-        }
-
-        $monitor =
-            $interface->{'selectorActions'}{'DocsisUpSlotsMonitor'};
-        if( defined( $monitor ) )
-        {
-            my $intfNode = $cb->getChildSubtree( $upstrNode, $intf );
-            $cb->addLeaf( $intfNode, 'ContSlots',
-                          {'monitor' => $monitor } );
-        }
-    }
-
-    # Override the overview shortcus defined in rfc2670.docsis-if.xml
-
-    my $shortcuts = 'snr,fec,modems,util';
-    if( $devdetails->hasCap('cdxIfUpChannelMaxUGSLastFiveMins') )
-    {
-        $shortcuts .= ',ugs';
-    }
-
-    my $param = {        
-        'overview-shortcuts' => $shortcuts,
-        
-        'overview-subleave-name-modems' => 'Modems',
-        'overview-direct-link-modems' => 'yes',
-        'overview-direct-link-view-modems' => 'expanded-dir-html',
-        'overview-shortcut-text-modems' => 'All modems',
-        'overview-shortcut-title-modems'=> 'Show modem quantities in one page',
-        'overview-page-title-modems' => 'Modem quantities',
-        
-        'overview-subleave-name-util' => 'Util_Summary',
-        'overview-direct-link-util' => 'yes',
-        'overview-direct-link-view-util' => 'expanded-dir-html',
-        'overview-shortcut-text-util' => 'All utilization',
-        'overview-shortcut-title-util' => 'All upstream utilization',
-        'overview-page-title-util' => 'Upstream utilization',
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
             
-        'overview-subleave-name-ugs' => 'Active_UGS',
-        'overview-direct-link-ugs' => 'yes',
-        'overview-direct-link-view-ugs' => 'expanded-dir-html',
-        'overview-shortcut-text-ugs' => 'All UGS',
-        'overview-shortcut-title-ugs' => 'Show all UGS in one page',
-        'overview-page-title-ugs' => 'UGS Statistics'
-        };
+            my $monitor =
+                $interface->{'selectorActions'}{'DocsisMacModemsMonitor'};
+            if( defined( $monitor ) )
+            {
+                my $intfNode = $cb->getChildSubtree( $macNode, $intf );
+                $cb->addLeaf( $intfNode, 'Modems_Active',
+                              {'monitor' => $monitor } );
+            }
+        }
+    }
 
-    $cb->addParams( $upstrNode, $param );
+    if( scalar( @{$data->{'docsCableUpstream'}} ) > 0 )
+    {
+        my $upstrNode =
+            $cb->getChildSubtree( $devNode,
+                                  $data->{'docsConfig'}{'docsCableUpstream'}{
+                                      'subtreeName'} );
+
+        foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+        {
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+            
+            my $monitor =
+                $interface->{'selectorActions'}{'DocsisUpUtilMonitor'};
+            if( defined( $monitor ) )
+            {
+                my $intfNode = $cb->getChildSubtree( $upstrNode, $intf );
+                $cb->addLeaf( $intfNode, 'Util',
+                              {'monitor' => $monitor } );
+            }
+
+            $monitor =
+                $interface->{'selectorActions'}{'DocsisUpSlotsMonitor'};
+            if( defined( $monitor ) )
+            {
+                my $intfNode = $cb->getChildSubtree( $upstrNode, $intf );
+                $cb->addLeaf( $intfNode, 'ContSlots',
+                              {'monitor' => $monitor } );
+            }
+        }
+
+        # Override the overview shortcus defined in rfc2670.docsis-if.xml
+        
+        my $shortcuts = 'snr,fec,modems,util';
+        if( $devdetails->hasCap('cdxIfUpChannelMaxUGSLastFiveMins') )
+        {
+            $shortcuts .= ',ugs';
+        }
+        
+        my $param = {        
+            'overview-shortcuts' =>
+                $shortcuts,
+                
+                'overview-subleave-name-modems' => 'Modems',
+                'overview-direct-link-modems' => 'yes',
+                'overview-direct-link-view-modems' => 'expanded-dir-html',
+                'overview-shortcut-text-modems' => 'All modems',
+                'overview-shortcut-title-modems'=>
+                'Show modem quantities in one page',
+                'overview-page-title-modems' => 'Modem quantities',
+                
+                'overview-subleave-name-util' => 'Util_Summary',
+                'overview-direct-link-util' => 'yes',
+                'overview-direct-link-view-util' => 'expanded-dir-html',
+                'overview-shortcut-text-util' => 'All utilization',
+                'overview-shortcut-title-util' => 'All upstream utilization',
+                'overview-page-title-util' => 'Upstream utilization',
+                
+                'overview-subleave-name-ugs' => 'Active_UGS',
+                'overview-direct-link-ugs' => 'yes',
+                'overview-direct-link-view-ugs' => 'expanded-dir-html',
+                'overview-shortcut-text-ugs' => 'All UGS',
+                'overview-shortcut-title-ugs' => 'Show all UGS in one page',
+                'overview-page-title-ugs' => 'UGS Statistics'
+            };
+
+        $cb->addParams( $upstrNode, $param );
+    }
 }
 
 

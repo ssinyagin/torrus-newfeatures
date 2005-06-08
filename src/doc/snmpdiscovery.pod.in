@@ -725,6 +725,49 @@ in their descriptions:
        value="rrd-create-hw-alpha=0.2; rrd-create-hw-beta=0.01"/>
   </host>
 
+The following example sets up the monitors defined in
+F<examples/docsis-monitors.xml>:
+
+    <param name="selectors" value="docs"/>
+    <param name="docs-selector-type" value="RFC2863_IF_MIB"/>
+    <param name="docs-selector-expr"  value="1"/>
+    <param name="docs-selector-actions"> 
+          DocsisUpSNRMonitor,
+          DocsisUpFECCorMonitor,
+          DocsisUpFECUncorMonitor,
+          DocsisDownUtilMonitor,
+          DocsisMacModemsMonitor,
+          DocsisUpUtilMonitor,
+          DocsisUpSlotsMonitor,
+          InErrorsMonitor,
+          OutErrorsMonitor
+    </param>
+    <param name="docs-DocsisUpSNRMonitor-arg" 
+           value="docsis-snr-1,docsis-snr-2,docsis-snr-3"/>
+
+    <param name="docs-DocsisUpFECCorMonitor-arg" 
+           value="docsis-feccor-1,docsis-feccor-2"/>
+
+    <param name="docs-DocsisUpFECUncorMonitor-arg" 
+           value="docsis-fecuncor-1,docsis-fecuncor-2,docsis-fecuncor-3"/>
+
+    <param name="docs-DocsisDownUtilMonitor-arg" 
+           value="docsis-downutl-1,docsis-downutl-2,docsis-downutl-3"/>
+
+    <param name="docs-DocsisMacModemsMonitor-arg" 
+           value="docsis-modems-1,docsis-modems-2"/>
+
+    <param name="docs-DocsisUpUtilMonitor-arg" 
+           value="docsis-uputil-1,docsis-uputil-2,docsis-uputil-3"/>
+    
+    <param name="docs-DocsisUpSlotsMonitor-arg" 
+           value="docsis-upslots-1,docsis-upslots-2,docsis-upslots-3"/>
+    
+    <param name="docs-InErrorsMonitor-arg" 
+           value="cc-inerrors-1,cc-inerrors-2,cc-inerrors-3"/>
+
+    <param name="docs-OutErrorsMonitor-arg" 
+           value="cc-outerrors-1,cc-outerrors-2,cc-outerrors-3"/>
 
 
 

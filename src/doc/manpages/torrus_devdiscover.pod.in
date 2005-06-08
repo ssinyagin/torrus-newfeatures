@@ -54,6 +54,11 @@ Creates C<data-dir> directories.
 Limits the discovery to the output files matching the regular expression
 I<REGEXP>.
 
+=item B<--forcebundle>
+
+With this option enabled, C<devdiscover> will write the bundle
+file even if some of the bundle members were not created because of errors.
+
 =item B<--verbose>
 
 Prints extra information.

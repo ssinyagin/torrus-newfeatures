@@ -33,6 +33,7 @@ use Torrus::ConfigBuilder;
 our $infile;
 our $makedirs;
 our $limitre;
+our $forcebundle;
 
 # Hidden parameter for debugging
 our $snmpdebug = 0;
@@ -62,6 +63,7 @@ my $ok = GetOptions(
                     'in=s'        => \$infile,
                     'mkdir'       => \$makedirs,
                     'limit=s'     => \$limitre,
+                    'forcebundle' => \$forcebundle,
                     'snmpdebug'   => \$snmpdebug,
                     'verbose'     => \$verbose,
                     'debug'       => \$debug
@@ -74,6 +76,7 @@ if( not $ok or not $infile or scalar( @ARGV ) > 0 )
     " --in=filename.ddx       discovery instructions XML file\n",
     " --mkdir                 create data-dir directories\n",
     " --limit=regexp          limit the discovery by output files\n",
+    " --forcebundle           always write the bundle file\n",
     " --verbose               print extra information\n",
     " --debug                 print debugging information\n",
     " --snmpdebug             print SNMP protocol details\n",
@@ -236,6 +239,16 @@ foreach my $outfile ( sort keys %{$perOutfileHostParams} )
             Error('Cannot write ' . $outfile . ': ' . $!);
             $everythingsOk = 0;
         }
+    }
+    elsif( $forcebundle )
+    {
+        foreach my $bundleName ( sort keys %outputBundles )
+        {
+            delete $outputBundles{$bundleName}{ relXmlFilename($outfile) };
+            Warn('Bundle ' . $bundleName . ' will not have ' .
+                 relXmlFilename($outfile) . ' included because of errors');
+        }
+        $everythingsOk = 1;
     }
 
     if( $makedirs )

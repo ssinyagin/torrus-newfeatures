@@ -499,17 +499,25 @@ sub buildConfig
             push( @templates, 'RFC2863_IF_MIB::iftable-octets' );
         }
 
-        foreach my $dir ( 'In', 'Out' )
+        if( $interface->{'hasOctets'} or $interface->{'hasHCOctets'} )
         {
-            if( defined( $interface->{'selectorActions'}->
-                         {$dir . 'BytesMonitor'} ) )
+            foreach my $dir ( 'In', 'Out' )
             {
+                if( defined( $interface->{'selectorActions'}->
+                             {$dir . 'BytesMonitor'} ) )
                 {
-                    $interface->{'childCustomizations'}->{
-                        'Bytes_' . $dir}->{'monitor'} =
-                            $interface->{'selectorActions'}->{
-                                $dir . 'BytesMonitor'};
+                    {
+                        $interface->{'childCustomizations'}->{
+                            'Bytes_' . $dir}->{'monitor'} =
+                                $interface->{'selectorActions'}->{
+                                    $dir . 'BytesMonitor'};
+                    }
                 }
+            }
+
+            if( defined( $interface->{'selectorActions'}{'HoltWinters'} ) )
+            {
+                push( @templates, '::holt-winters-defaults' );
             }
         }
 
@@ -577,12 +585,7 @@ sub buildConfig
                 }
             }
         }
-
-        if( defined( $interface->{'selectorActions'}{'HoltWinters'} ) )
-        {
-            push( @templates, '::holt-winters-defaults' );
-        }
-
+        
         if( defined( $interface->{'selectorActions'}{'TokensetMember'} ) )
         {
             foreach my $tset

@@ -23,6 +23,7 @@ EXTRA_DIST = \
 	devdiscover-config.pl \
 	devdiscover-siteconfig.pl \
 	email-siteconfig.pl \
+	initscript.conf \
 	snmptrap-siteconfig.pl \
 	torrus-config.pl \
 	torrus-siteconfig.pl \
@@ -36,7 +37,7 @@ nodist_instvars_DATA = instvars
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(cfgdefdir) $(DESTDIR)$(siteconfdir)
-	for f in devdiscover-config.pl torrus-config.pl \
+	for f in initscript.conf devdiscover-config.pl torrus-config.pl \
 		webmux.pl webmux2.pl; do \
 	  @abs_top_builddir@/setup_tools/substvars.sh $$f > \
 		$(DESTDIR)$(cfgdefdir)/$$f; \

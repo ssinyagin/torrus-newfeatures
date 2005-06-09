@@ -516,6 +516,19 @@ F<cleanup> script in a cron job, once per day:
  5    3    *    *     *       root    @pkgbindir@/cleanup
 
 
+=head2 Startup script
+
+The Torrus distriubution provides a startup script which you can install in
+the init scripts directory (/etc/init.d on most Unixes or /usr/local/etc/rc.d/
+on FreeBSD). The script C<torrus> is created during the installation
+process in the subdirectory <init.d> of the distribution directory.
+
+The init script reads some parameters from F<@cfgdefdir@/initscript.conf>,
+and F<@siteconfdir@/initscript.siteconf> if the latter exists.
+By default, it makes the monitor daemons sleep for 20 minutes when
+they are launched simultaneously with collector daemons.
+
+
 =head2 Upgrade Procedure
 
 Follow these instructions when upgrading from previous Torrus release.

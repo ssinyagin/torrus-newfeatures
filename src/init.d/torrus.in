@@ -23,32 +23,33 @@
 # Description: Start/stop Torrus collectors and monitors
 ### END INIT INFO
 
-if test "${USER:-root}" = root -a "@SU@" != "no"; then
+prefix=@prefix@
+pkghome=@pkghome@
+cmddir=@pkgbindir@
+piddir=@piddir@
+sitedir=@sitedir@
+sysconfdir=@sysconfdir@
+torrus_config_pl=@cfgdefdir@/torrus-config.pl
+
+. @cfgdefdir@/initscript.conf
+if test -f @siteconfdir@/initscript.siteconf; then
+  . @siteconfdir@/initscript.siteconf
+fi
+
+if test "$TORRUS_CHANGE_UID" = yes -a \
+        "${LOGNAME:-root}" = root -a \
+        "@SU@" != "no"; then
   user=@torrus_user@
   su="@SU@ ${user} -c"
 else
   su="@SHELL@ -c"
 fi
 
-prefix=@prefix@
-pkghome=@pkghome@
-cmddir=@pkgbindir@
-piddir=@piddir@
-torrus_config_pl=@cfgdefdir@/torrus-config.pl
-
-# you may want to change this, currently we will wait up to
-# 90s for stubborn processes to exit before forcibly killing them.
-killcount=9
-killsleep=10
-
-# You may need to change this
-cmdopts=""
-# cmdopts="--debug"
-# cmdopts="--verbose"
 
 # Second argument can be the daemon name
 if test x"$2" = x; then
   daemons="collector monitor"
+  monitor_cmdopts=$TORRUS_MONITOR_DELAY
 else
   daemons=$2
     # Third argument may be the tree name
@@ -57,7 +58,7 @@ else
     read_treenames=no
       # Fourth argument may be cmdopts
     if test x"$4" != x; then
-      cmdopts=$4
+      TORRUS_CMDOPTS=$4
     fi
   fi
 fi
@@ -75,10 +76,11 @@ fi
 start_daemons () {
   for d in ${daemons}; do
     eval trees=\"\$\{trees_${d}\}\"
-      for t in ${trees}; do
-        echo "starting Torrus ${d} for tree ${t}"
-        ${su} "${cmddir}/${d} --tree=${t} ${cmdopts}"
-      done
+    eval daemon_cmdopts=\"\$\{${d}_cmdopts\}\"
+    for t in ${trees}; do
+      echo "starting Torrus ${d} for tree ${t} ${daemon_cmdopts}"
+      ${su} "${cmddir}/${d} --tree=${t} ${TORRUS_CMDOPTS} ${daemon_cmdopts}"
+    done
   done
 }
 
@@ -99,11 +101,11 @@ stop_daemons () {
 
   killed=`echo $tokill | wc -w`
   notdead=1
-  kc=$killcount
+  kc=$TORRUS_KILL_COUNT
   while test $killed -gt 0 -a $kc -gt 0; do
-    echo "Sleeping for $killsleep seconds to allow processes to exit"
-    @SLEEP@ $killsleep
-    echo "Checking for kill resistant processes [$kc/$killcount]"
+    echo "Sleeping for $TORRUS_KILL_SLEEP seconds to allow processes to exit"
+    @SLEEP@ $TORRUS_KILL_SLEEP
+    echo "Checking for kill resistant processes [$kc/$TORRUS_KILL_COUNT]"
     kc=`expr $kc - 1`
     for tuple in $tokill; do
       eval $tuple

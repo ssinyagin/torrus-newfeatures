@@ -1,5 +1,7 @@
 2005-06-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* NEWS: Torrus release 1.0.0
+
 	* bin/monitor.in: New option: --delay
 
 	* init.d/torrus.in: The init script reads its options from
@@ -57,7 +59,7 @@
 
 2005-05-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* xmlconfig/generic/rfc2670.docsis-if.xml: DOCSIS monitoring examples
+	* xmlconfig/examples/docsis-monitors.xml: DOCSIS monitoring examples
 
 	* perllib/Torrus/DevDiscover/RFC2670_DOCS_IF.pm:
 	Added DOCSIS-specific selector actions

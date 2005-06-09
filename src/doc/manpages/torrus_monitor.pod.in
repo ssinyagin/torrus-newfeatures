@@ -65,6 +65,12 @@ Prevents the process from becoming a daemon and sets the log to STDERR.
 
 Instructs the script to run once and exit. Implies B<--nodaemon>.
 
+=item B<--delay=N>
+
+Makes the daemon sleep for N minutes before starting the first cycle.
+For example, when monitor and collector start simultaneously, the collector
+needs some time to retrieve the data being monitored.
+
 =item B<--debug>
 
 Sets the log level to debug.

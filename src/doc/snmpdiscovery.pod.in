@@ -731,7 +731,8 @@ F<examples/docsis-monitors.xml>:
 
     <param name="selectors" value="docs"/>
     <param name="docs-selector-type" value="RFC2863_IF_MIB"/>
-    <param name="docs-selector-expr"  value="1"/>
+    <param name="docs-selector-expr"  value="{ifSubtreeName}"/>
+    <param name="docs-ifSubtreeName"  value="^Cable"/>
     <param name="docs-selector-actions"> 
           DocsisUpSNRMonitor,
           DocsisUpFECCorMonitor,
@@ -765,10 +766,10 @@ F<examples/docsis-monitors.xml>:
            value="docsis-upslots-1,docsis-upslots-2,docsis-upslots-3"/>
     
     <param name="docs-InErrorsMonitor-arg" 
-           value="cc-inerrors-1,cc-inerrors-2,cc-inerrors-3"/>
+           value="docs-inerrors-1,docs-inerrors-2"/>
 
     <param name="docs-OutErrorsMonitor-arg" 
-           value="cc-outerrors-1,cc-outerrors-2,cc-outerrors-3"/>
+           value="docs-outerrors-1,docs-outerrors-2"/>
 
 
 

@@ -1,3 +1,10 @@
+2005-06-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/monitor.in: New option: --delay
+
+	* init.d/torrus.in: The init script reads its options from
+	initscript.conf and initscript.siteconf
+
 2005-06-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/devdiscover.in: new CLI option: --forcebundle

@@ -2,7 +2,6 @@ Round Robin Database Framework
   
 To do now:
 
--- delay Monitor when collector hasn't created all RRD files
 -- use Parallel::ForkManager in devdiscover
 -- Selector for Cisco CPU and memory buffer monitoring
 -- Option to expand directory view by default

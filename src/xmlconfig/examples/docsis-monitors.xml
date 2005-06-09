@@ -28,16 +28,16 @@
 
 <token-sets>
 
-  <token-set name="warnings">
-    <param name="comment" value="Warning events" />
+  <token-set name="docs-warnings">
+    <param name="comment" value="DOCSIS Warnings" />
   </token-set>
 
-  <token-set name="minor">
-    <param name="comment" value="Minor failure events" />
+  <token-set name="docs-minor">
+    <param name="comment" value="DOCSIS Minor failures" />
   </token-set>
 
-  <token-set name="major">
-    <param name="comment" value="Major failure events" />
+  <token-set name="docs-major">
+    <param name="comment" value="DOCSIS Major failures" />
   </token-set>
 
 </token-sets>
@@ -45,21 +45,21 @@
 <monitors>
 
   <!-- **********************************************************
-        Three levels of actions for different severityu levels
+        Three levels of actions for different severity levels
        ********************************************************** -->
-  <action name="tset-warnings">
+  <action name="docs-tset-warnings">
     <param name="action-type" value="tset" />
-    <param name="tset-name" value="warnings" />
+    <param name="tset-name" value="docs-warnings" />
   </action>
 
-  <action name="tset-minor">
+  <action name="docs-tset-minor">
     <param name="action-type" value="tset" />
-    <param name="tset-name" value="minor" />
+    <param name="tset-name" value="docs-minor" />
   </action>
 
-  <action name="tset-major">
+  <action name="docs-tset-major">
     <param name="action-type" value="tset" />
-    <param name="tset-name" value="major" />
+    <param name="tset-name" value="docs-major" />
   </action>
 
   
@@ -75,7 +75,7 @@
     <param name="monitor-type"  value="expression" />
     <param name="rpn-expr"
              value="DUP,0,GT,EXC,DUP,24.5,LT,EXC,22,GE,AND,AND" />
-    <param name="action"        value="tset-warnings" />
+    <param name="action"        value="docs-tset-warnings" />
     <param name="expires"       value="1800" />
     <param name="comment">
       Signal/Noise-Ratio lower than 30dB
@@ -86,7 +86,7 @@
     <param name="monitor-type"  value="expression" />
     <param name="rpn-expr"
              value="DUP,0,GT,EXC,DUP,22,LT,EXC,18,GE,AND,AND" />
-    <param name="action"        value="tset-minor" />
+    <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
       Signal/Noise-Ratio lower than 25dB
@@ -96,7 +96,7 @@
   <monitor name="docsis-snr-3">
     <param name="monitor-type"  value="expression" />
     <param name="rpn-expr"      value="DUP,0,GT,EXC,18,LT,AND" />
-    <param name="action"        value="tset-major" />
+    <param name="action"        value="docs-tset-major" />
     <param name="expires"       value="21600" />
     <param name="comment">
       Signal/Noise-Ratio lower than 18dB
@@ -115,7 +115,7 @@
     /,100,*,DUP,
     10,GT,EXC,20,LE,AND
     </param>
-    <param name="action"        value="tset-warnings" />
+    <param name="action"        value="docs-tset-warnings" />
     <param name="expires"       value="1800" />
     <param name="comment">
       FEC correctable error rate more than 10%
@@ -130,7 +130,7 @@
     /,100,*,
     20,GT
     </param>
-    <param name="action"        value="tset-minor" />
+    <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
       FEC correctable error rate more than 20%
@@ -149,7 +149,7 @@
     /,100,*,DUP,
     0.5,GT,EXC,1,LE,AND
     </param>
-    <param name="action"        value="tset-warnings" />
+    <param name="action"        value="docs-tset-warnings" />
     <param name="expires"       value="1800" />
     <param name="comment">
       FEC uncorrectable error rate more than 0.5%
@@ -164,7 +164,7 @@
     /,100,*,DUP,
     1,GT,2,EXC,LE,AND
     </param>
-    <param name="action"        value="tset-minor" />
+    <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
       FEC uncorrectable error rate more than 1%
@@ -179,7 +179,7 @@
     /,100,*,
     2,GT
     </param>
-    <param name="action"        value="tset-major" />
+    <param name="action"        value="docs-tset-major" />
     <param name="expires"       value="21600" />
     <param name="comment">
       FEC uncorrectable error rate more than 2%
@@ -197,7 +197,7 @@
     DUP,
     75,GT,EXC,80,LE,AND
     </param>
-    <param name="action"        value="tset-warnings" />
+    <param name="action"        value="docs-tset-warnings" />
     <param name="expires"       value="1800" />
     <param name="comment">
       DOCSIS downstream utilization more than 75%
@@ -211,7 +211,7 @@
     DUP,
     80,GT,EXC,85,LE,AND
     </param>
-    <param name="action"        value="tset-minor" />
+    <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
       DOCSIS downstream utilization more than 80%
@@ -224,7 +224,7 @@
     {TotalBytes},/,100,*,
     85,GT
     </param>
-    <param name="action"        value="tset-minor" />
+    <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
       DOCSIS downstream utilization more than 85%
@@ -246,7 +246,7 @@
     DUP,
     75,GT,EXC,80,LE,AND
     </param>
-    <param name="action"        value="tset-warnings" />
+    <param name="action"        value="docs-tset-warnings" />
     <param name="expires"       value="1800" />
     <param name="comment">
       DOCSIS upstream utilization more than 75%
@@ -259,7 +259,7 @@
     DUP,
     80,GT,EXC,85,LE,AND
     </param>
-    <param name="action"        value="tset-minor" />
+    <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
       DOCSIS upstream utilization more than 80%
@@ -271,7 +271,7 @@
     <param name="rpn-expr">
     85,GT
     </param>
-    <param name="action"        value="tset-major" />
+    <param name="action"        value="docs-tset-major" />
     <param name="expires"       value="21600" />
     <param name="comment">
       DOCSIS upstream utilization more than 85%
@@ -289,7 +289,7 @@
     DUP,
     17,LT,EXC,12,GE,AND
     </param>
-    <param name="action"        value="tset-warnings" />
+    <param name="action"        value="docs-tset-warnings" />
     <param name="expires"       value="1800" />
     <param name="comment">
       free DOCSIS upstream minislots less than 17%
@@ -302,7 +302,7 @@
     DUP,
     12,LT,EXC,7,GE,AND
     </param>
-    <param name="action"        value="tset-minor" />
+    <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
       free DOCSIS upstream minislots less than 12%
@@ -314,7 +314,7 @@
     <param name="rpn-expr">
     7,LT
     </param>
-    <param name="action"        value="tset-major" />
+    <param name="action"        value="docs-tset-major" />
     <param name="expires"       value="21600" />
     <param name="comment">
       free DOCSIS upstream minislots less than 7%
@@ -337,7 +337,7 @@
     {Modems_Total},/,100,*,10,LT,    
     {Modems_Total},100,LT,AND
     </param>
-    <param name="action"        value="tset-warnings" />
+    <param name="action"        value="docs-tset-warnings" />
     <param name="expires"       value="1800" />
     <param name="comment">
       Less than 10% of DOCSIS modems online on a low-loaded interface
@@ -352,7 +352,7 @@
     50,LT,EXC,10,GE,AND,
     {Modems_Total},100,GE,AND
     </param>
-    <param name="action"        value="tset-minor" />
+    <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
       Less than 50% of DOCSIS modems online
@@ -365,13 +365,69 @@
     {Modems_Total},/,100,*,10,LT,
     {Modems_Total},100,GE,AND
     </param>
-    <param name="action"        value="tset-major" />
+    <param name="action"        value="docs-tset-major" />
     <param name="expires"       value="21600" />
     <param name="comment">
       Less than 10% of DOCSIS modems online
     </param>
   </monitor>
-                    
+
+  <!-- ==========================================================
+       ==           IF-MIB monitors for cable interfaces       ==
+       ========================================================== -->
+
+  <monitor name="docs-inerrors-1">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr">
+    {Packets_In},/,100,*,DUP,
+    10,GT,EXC,50,LE,AND
+    </param>
+    <param name="action"        value="docs-tset-warnings" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      Input packet errors more than 10%
+    </param>
+  </monitor>
+
+  <monitor name="docs-inerrors-2">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr">
+    {Packets_In},/,100,*,DUP,
+    50,GT
+    </param>
+    <param name="action"        value="docs-tset-minor" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      Input packet errors more than 50%
+    </param>
+  </monitor>
+
+  <monitor name="docs-outerrors-1">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr">
+    {Packets_Out},/,100,*,DUP,
+    10,GT,EXC,50,LE,AND
+    </param>
+    <param name="action"        value="docs-tset-warnings" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      Output packet errors more than 10%
+    </param>
+  </monitor>
+
+  <monitor name="docs-outerrors-2">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr">
+    {Packets_Out},/,100,*,DUP,
+    50,GT
+    </param>
+    <param name="action"        value="docs-tset-minor" />
+    <param name="expires"       value="21600" />
+    <param name="comment">
+      Output packet errors more than 50%
+    </param>
+  </monitor>
+       
 </monitors>
 
 </configuration>

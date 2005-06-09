@@ -33,6 +33,7 @@ exit(1) if not Torrus::SiteConfig::verify();
 our $tree;
 our $nodaemon;
 our $runonce;
+our $delay = 0;
 our $debug;
 our $verbose;
 our $help_needed;
@@ -46,6 +47,7 @@ $process_name .= ' ' . join(' ', @ARGV);
 my $ok = GetOptions ('tree=s'   => \$tree,
                      'nodaemon' => \$nodaemon,
                      'runonce'  => \$runonce,
+                     'delay=i'  => \$delay,
                      'debug'    => \$debug,
                      'verbose'  => \$verbose,
                      'help'     => \$help_needed);
@@ -57,6 +59,7 @@ if( not $ok or not $tree or $help_needed or scalar(@ARGV) > 0 )
     "  --tree=NAME     tree name\n",
     "  --nodaemon      do not fork daemon and log to STDERR\n",
     "  --runonce       run one time and exit. Implies --nodaemon\n",
+    "  --delay         delay the start of the first cycle, minutes\n",
     "  --debug         set the log level to debug\n",
     "  --verbose       set the log level to info\n",
     "  --help          this help message\n";
@@ -134,6 +137,12 @@ if( not $nodaemon and not $runonce )
 Info(sprintf("Torrus version %s", '@VERSION@'));
 Info(sprintf("%s started for tree %s", $0, $tree));
 Debug(sprintf("Process ID %d", $$));
+
+if( $delay > 0 )
+{
+    Info(sprintf('Delaying for %d minutes', $delay));
+    sleep($delay * 60);
+}
 
 my %options =
     (

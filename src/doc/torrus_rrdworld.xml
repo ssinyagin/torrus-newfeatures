@@ -1,0 +1,13 @@
+<rrdworld type="application">
+<name>Torrus</name>
+<author>Stanislav Sinyagin</author>
+<description>
+A robust and flexible framework for data collection and processing.
+Includes a modular SNMP discovery engine, SNMP collector, threshold monitor,
+hierarchical web interface.
+</description>
+<homepage>http://torrus.org/</homepage> 
+<year>2005</year><month>6</month>
+<license>GPL</license>
+<email>ssinyagin@yahoo.com</email>
+</rrdworld>

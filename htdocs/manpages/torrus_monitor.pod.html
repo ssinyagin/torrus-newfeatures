@@ -79,6 +79,14 @@ Prevents the process from becoming a daemon and sets the log to STDERR.
 Instructs the script to run once and exit. Implies <strong>--nodaemon</strong>.
 </dd>
 <p></p>
+<dt><strong><a name="item__2d_2ddelay_3dn"><strong>--delay=N</strong></a></strong><br />
+</dt>
+<dd>
+Makes the daemon sleep for N minutes before starting the first cycle.
+For example, when monitor and collector start simultaneously, the collector
+needs some time to retrieve the data being monitored.
+</dd>
+<p></p>
 <dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
 </dt>
 <dd>

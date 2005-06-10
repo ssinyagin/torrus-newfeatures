@@ -239,7 +239,8 @@ Mandatory. Defines a host to run SNMP discovery.
 <ul>
 <li><strong><a name="item_collector_2dperiod_2c_collector_2dtimeoffset_2c_c_"><code>collector-period</code>, <code>collector-timeoffset</code>,
 <code>collector-dispersed-timeoffset</code>, <code>collector-timeoffset-min</code>,
-<code>collector-timeoffset-max</code>, <code>collector-timeoffset-step</code></a></strong><br />
+<code>collector-timeoffset-max</code>, <code>collector-timeoffset-step</code>,
+<code>monitor-period</code>, <code>monitor-timeoffset</code></a></strong><br />
 </li>
 Optional. When defined, these parameters override those from <code>snmp-defaults</code>
 template in <em>snmp-defs.xml</em>.
@@ -698,7 +699,8 @@ in their descriptions:</p>
 <pre>
     &lt;param name=&quot;selectors&quot; value=&quot;docs&quot;/&gt;
     &lt;param name=&quot;docs-selector-type&quot; value=&quot;RFC2863_IF_MIB&quot;/&gt;
-    &lt;param name=&quot;docs-selector-expr&quot;  value=&quot;1&quot;/&gt;
+    &lt;param name=&quot;docs-selector-expr&quot;  value=&quot;{ifSubtreeName}&quot;/&gt;
+    &lt;param name=&quot;docs-ifSubtreeName&quot;  value=&quot;^Cable&quot;/&gt;
     &lt;param name=&quot;docs-selector-actions&quot;&gt; 
           DocsisUpSNRMonitor,
           DocsisUpFECCorMonitor,
@@ -732,10 +734,10 @@ in their descriptions:</p>
            value=&quot;docsis-upslots-1,docsis-upslots-2,docsis-upslots-3&quot;/&gt;
     
     &lt;param name=&quot;docs-InErrorsMonitor-arg&quot; 
-           value=&quot;cc-inerrors-1,cc-inerrors-2,cc-inerrors-3&quot;/&gt;</pre>
+           value=&quot;docs-inerrors-1,docs-inerrors-2&quot;/&gt;</pre>
 <pre>
     &lt;param name=&quot;docs-OutErrorsMonitor-arg&quot; 
-           value=&quot;cc-outerrors-1,cc-outerrors-2,cc-outerrors-3&quot;/&gt;</pre>
+           value=&quot;docs-outerrors-1,docs-outerrors-2&quot;/&gt;</pre>
 <p>
 </p>
 <hr />

@@ -25,6 +25,7 @@
 		<li><a href="#apache_http_server_configuration">Apache HTTP server configuration</a></li>
 		<li><a href="#access_control_lists">Access Control Lists</a></li>
 		<li><a href="#cron_job">Cron Job</a></li>
+		<li><a href="#startup_script">Startup script</a></li>
 		<li><a href="#upgrade_procedure">Upgrade Procedure</a></li>
 		<li><a href="#planning_the_disk_space">Planning the disk space</a></li>
 		<li><a href="#network_performance_tuning">Network performance tuning</a></li>
@@ -479,6 +480,17 @@ for detailed description. Example:</p>
 <pre>
  #min hour mday month wday    who     command
  5    3    *    *     *       root    /usr/local/torrus/bin/cleanup</pre>
+<p>
+</p>
+<h2><a name="startup_script">Startup script</a></h2>
+<p>The Torrus distriubution provides a startup script which you can install in
+the init scripts directory (/etc/init.d on most Unixes or /usr/local/etc/rc.d/
+on FreeBSD). The script <code>torrus</code> is created during the installation
+process in the subdirectory &lt;init.d&gt; of the distribution directory.</p>
+<p>The init script reads some parameters from <em>/usr/local/torrus/conf_defaults/initscript.conf</em>,
+and <em>/usr/local/etc/torrus/conf/initscript.siteconf</em> if the latter exists.
+By default, it makes the monitor daemons sleep for 20 minutes when
+they are launched simultaneously with collector daemons.</p>
 <p>
 </p>
 <h2><a name="upgrade_procedure">Upgrade Procedure</a></h2>

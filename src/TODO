@@ -8,6 +8,7 @@ To do now:
    unreacheable and never retry when noSuchObject
 -- use Parallel::ForkManager in devdiscover
 -- Set the daemon's log level by signal
+-- SNMPv3 support
 -- Selector for Cisco CPU and memory buffer monitoring
 -- Option to expand directory view by default
 -- Traceroute plugin (Gustavo Torres)

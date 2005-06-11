@@ -93,6 +93,8 @@ UPLOADPATH = \
 upload: dist
 	scp $(distdir).tar.gz TODO $(UPLOADPATH)
 	  
+todoup:
+	scp TODO $(UPLOADPATH)
 
 dist-hook:
 	date >DIST_REVISION

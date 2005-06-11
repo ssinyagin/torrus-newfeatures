@@ -2,7 +2,12 @@ Round Robin Database Framework
   
 To do now:
 
+-- fix the bug in recursive $def expansion
+-- Move expandable parameters from ConfigTree.pm to XML config
+-- Analyse the SNMP error and block the whole host from collection when
+   unreacheable and never retry when noSuchObject
 -- use Parallel::ForkManager in devdiscover
+-- Set the daemon's log level by signal
 -- Selector for Cisco CPU and memory buffer monitoring
 -- Option to expand directory view by default
 -- Traceroute plugin (Gustavo Torres)

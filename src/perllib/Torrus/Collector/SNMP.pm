@@ -513,6 +513,22 @@ sub isHostDead
     return $cref->{'unreachableHostDeleted'}{$ipaddr}{$port}{$community};
 }
 
+
+sub hostReachableAgain
+{
+    my $collector = shift;
+    my $ipaddr = shift;
+    my $port = shift;
+    my $community = shift;
+
+    my $cref = $collector->collectorData( 'snmp' );
+    if( exists( $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} ) )
+    {
+        delete $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community};
+    }
+}
+
+
 # Callback executed by Collector
 
 sub deleteTarget
@@ -711,6 +727,10 @@ sub callback
 
         probablyDead( $collector, $ipaddr, $port, $community );        
         return;
+    }
+    else
+    {
+        hostReachableAgain( $collector, $ipaddr, $port, $community );
     }
 
     my $timestamp = time();

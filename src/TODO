@@ -4,8 +4,7 @@ To do now:
 
 -- fix the bug in recursive $def expansion
 -- Move expandable parameters from ConfigTree.pm to XML config
--- Analyse the SNMP error and block the whole host from collection when
-   unreacheable and never retry when noSuchObject
+-- dispersed timeoffsets for monitor
 -- use Parallel::ForkManager in devdiscover
 -- Set the daemon's log level by signal
 -- SNMPv3 support

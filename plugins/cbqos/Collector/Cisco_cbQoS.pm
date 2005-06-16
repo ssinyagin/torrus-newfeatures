@@ -237,17 +237,23 @@ sub initTargetAttributes
 
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'cisco-cbqos' );
-    my $ipaddr = $tref->{'ipaddr'};
 
-    if( not Torrus::Collector::SNMP::checkUnreachableRetry( $collector,
-                                                            $ipaddr ) )
+    my $ipaddr = $tref->{'ipaddr'};
+    my $port = $collector->param($token, 'snmp-port');
+    my $community = $collector->param($token, 'snmp-community');
+
+    if( Torrus::Collector::SNMP::isHostDead
+        ( $collector, $ipaddr, $port, $community ) )
+    {
+        return 0;
+    }
+
+    if( not Torrus::Collector::SNMP::checkUnreachableRetry
+        ( $collector, $ipaddr, $port, $community ) )
     {
         return 1;
     }
     
-    my $port = $collector->param($token, 'snmp-port');
-    my $community = $collector->param($token, 'snmp-community');
-
     my $session = Torrus::Collector::SNMP::openBlockingSession
         ( $collector, $token, $ipaddr, $port, $community );
     if( not defined($session) )
@@ -271,8 +277,18 @@ sub initTargetAttributes
         {
             Error("Error retrieving cbQosServicePolicyTable from $ipaddr: " .
                   $session->error());
-            return Torrus::Collector::SNMP::probablyDead( $token,
-                                                          $collector );
+            
+            # When the remote agent is reacheable, but system objecs are
+            # not implemented, we get a positive error_status
+            if( $session->error_status() == 0 )
+            {
+                return Torrus::Collector::SNMP::probablyDead
+                    ( $collector, $ipaddr, $port, $community );
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         while( my( $oid, $val ) = each %{$result} )
@@ -355,8 +371,18 @@ sub initTargetAttributes
         {
             Error("Error retrieving cbQosObjectsTable from $ipaddr: " .
                   $session->error());
-            return Torrus::Collector::SNMP::probablyDead( $token,
-                                                          $collector );
+
+            # When the remote agent is reacheable, but system objecs are
+            # not implemented, we get a positive error_status
+            if( $session->error_status() == 0 )
+            {
+                return Torrus::Collector::SNMP::probablyDead
+                    ( $collector, $ipaddr, $port, $community );
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         my $confIndexOid = $oiddef{'cbQosConfigIndex'};
@@ -549,8 +575,11 @@ sub postProcess
                     'CfgTable'}{$ipaddr}{$port}{$community};
             
                 delete $scref->{'needsRemapping'}{$token};
-                Torrus::Collector::Cisco_cbQoS::initTargetAttributes
-                    ( $collector, $token );
+                if( not Torrus::Collector::Cisco_cbQoS::initTargetAttributes
+                    ( $collector, $token ) )
+                {
+                    $collector->deleteTarget($token);
+                }
             }
         }
     }

@@ -145,6 +145,11 @@ sub addTarget
     {
         &{$Torrus::Collector::initTarget{$storage_string}}($self, $token);
     }
+
+    if( not $ok )
+    {
+        $self->deleteTarget( $token );
+    }
 }
 
 
@@ -189,8 +194,7 @@ sub fetchParams
                         else
                         {
                             Error("Parameter $param has unknown value: " .
-                                  $value . " in " .
-                                  $self->{'targets'}{$token}{'path'});
+                                  $value . " in " . $self->path($token));
                         }
                     }
                 }
@@ -258,7 +262,6 @@ sub path
 {
     my $self = shift;
     my $token = shift;
-    my $param = shift;
 
     return $self->{'targets'}{$token}{'path'};
 }
@@ -299,6 +302,8 @@ sub deleteTarget
     my $self = shift;
     my $token = shift;
 
+    Info('Deleting target: ' . $self->path($token));
+    
     if( ref( $self->{'targets'}{$token}{'deleteProc'} ) )
     {
         foreach my $proc ( @{$self->{'targets'}{$token}{'deleteProc'}} )
@@ -451,7 +456,7 @@ sub setValue
             else
             {
                 Warn('Could not find value mapping for ' . $value .
-                     'in ' . $self->{'targets'}{$token}{'path'});
+                     'in ' . $self->path($token));
             }
 
             if( defined( $newValue ) )
@@ -472,7 +477,7 @@ sub setValue
     }
 
     Debug('Value ' . $value . ' set for ' .
-          $self->{'targets'}{$token}{'path'} . ' TS=' . $timestamp);
+          $self->path($token) . ' TS=' . $timestamp);
 
     my $proc = $Torrus::Collector::setValue{
         $self->{'targets'}{$token}{'storage-type'}};

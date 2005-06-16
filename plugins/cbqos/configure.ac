@@ -20,7 +20,7 @@
 
 # Dummy Torrus plugin Autoconf script
 
-AC_INIT(tp-cisco-cbqos, 1.0, ssinyagin@users.sourceforge.net)
+AC_INIT(tp-cisco-cbqos, 1.1d, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)

@@ -95,19 +95,34 @@ sub initTargetAttributes
     # If the object is defined as a map, retrieve the whole map
     # and cache it.
 
+    if( isHostDead( $collector, $ipaddr, $port, $community ) )
+    {
+        return 0;
+    }
+        
+    if( not checkUnreachableRetry( $collector, $ipaddr, $port, $community ) )
+    {
+        $cref->{'needsRemapping'}{$token} = 1;
+        return 1;
+    }
+    
     my $oid = $collector->param($token, 'snmp-object');
     $oid = expandOidMappings( $collector, $token, $ipaddr, $port, $community,
                               $oid );
 
     if( not $oid )
     {
-        # we return OK status, to let the storage initiate
-        return probablyDead( $token,  $collector );
-    }
-
-    if( defined( $tref->{'lastUnreachableSeen'} ) )
-    {
-        delete $tref->{'lastUnreachableSeen'};
+        if( $cref->{'unreachableHostDeleted'}{$ipaddr}{$port}{$community} )
+        {
+            # we tried our best, but the target is dead
+            return 0;
+        }
+        else
+        {
+            # we return OK status, to let the storage initiate
+            $cref->{'needsRemapping'}{$token} = 1;
+            return 1;
+        }
     }
 
     # Collector should be able to find the target
@@ -213,31 +228,6 @@ sub openBlockingSession
 }
 
 
-sub checkUnreachableRetry
-{
-    my $collector = shift;
-    my $ipaddr = shift;
-
-    my $cref = $collector->collectorData( 'snmp' );
-
-    my $ret = 1;
-    if( exists( $cref->{'lastUnreachableSeen'}{$ipaddr} ) )
-    {
-        if( time() < $cref->{'lastUnreachableSeen'}{$ipaddr} +
-            $Torrus::Collector::SNMP::unreachableRetryDelay )
-        {
-            $ret = 0;
-        }
-        else
-        {
-            delete $cref->{'lastUnreachableSeen'}{$ipaddr} ;
-        }
-    }
-
-    return $ret;
-}
-
-
 sub expandOidMappings
 {
     my $collector = shift;
@@ -246,12 +236,6 @@ sub expandOidMappings
     my $port = shift;
     my $community = shift;
     my $oid_in = shift;
-
-
-    if( not checkUnreachableRetry( $collector, $ipaddr ) )
-    {
-        return undef;
-    }
         
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
@@ -319,6 +303,7 @@ sub expandOidMappings
             }
 
             my $result = $session->get_request( -varbindlist => [$key] );
+            $session->close();
             if( defined $result )
             {
                 $value = $result->{$key};
@@ -329,11 +314,9 @@ sub expandOidMappings
             {
                 Error("Error retrieving $key from $ipaddr: " .
                       $session->error());
-                $cref->{'lastUnreachableSeen'}{$ipaddr} = time();
-                $session->close();
+                probablyDead( $collector, $ipaddr, $port, $community );
                 return undef;
             }
-            $session->close();
         }
         else
         {
@@ -376,6 +359,7 @@ sub lookupMap
         # Retrieve the map table
 
         my $result = $session->get_table( -baseoid => $map );
+        $session->close();
         if( defined $result )
         {
             while( my( $val, $key ) = each %{$result} )
@@ -391,9 +375,9 @@ sub lookupMap
         {
             Error("Error retrieving table $map from $ipaddr: " .
                   $session->error());
-            $cref->{'lastUnreachableSeen'}{$ipaddr} = time();
+            probablyDead( $collector, $ipaddr, $port, $community );
+            return undef;
         }
-        $session->close();
     }
 
     if( exists( $cref->{'maps'}{$ipaddr}{$port}{$community}{$map} ) )
@@ -426,18 +410,20 @@ sub lookupMap
 
 sub probablyDead
 {
-    my $token = shift;
     my $collector = shift;
+    my $ipaddr = shift;
+    my $port = shift;
+    my $community = shift;
 
-    my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
 
     my $probablyAlive = 1;
 
-    if( defined( $tref->{'lastUnreachableSeen'} ) )
+    if( defined( $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} ) )
     {
         if( $Torrus::Collector::SNMP::unreachableTimeout > 0 and
-            time() - $tref->{'lastUnreachableSeen'} >
+            time() -
+            $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} >
             $Torrus::Collector::SNMP::unreachableTimeout )
         {
             $probablyAlive = 0;
@@ -445,25 +431,86 @@ sub probablyDead
     }
     else
     {
-        $tref->{'lastUnreachableSeen'} = time();
+        $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} = time();
     }
 
     if( $probablyAlive )
     {
-        Info('Target host or OID is unreachable. Will try again later:' .
-             $collector->path($token));
-        $cref->{'needsRemapping'}{$token} = 1;
+        Info('Target host is unreachable. Will try again later: ' .
+             "$ipaddr:$port:$community");
     }
     else
     {
-        # It is dead indeed.
-        Info('Target host or OID is unreachable during last ' .
+        # It is dead indeed. Delete all tokens associated with this host
+        Info('Target host is unreachable during last ' .
              $Torrus::Collector::SNMP::unreachableTimeout .
-             ' seconds. Giving it up:' . $collector->path($token));
-        $collector->deleteTarget($token);
-    }
+             " seconds. Giving it up: $ipaddr:$port:$community");
+        my @deleteTargets = ();
+        while( my ($ipaddr, $ref1) = each %{$cref->{'targets'}} )
+        {
+            while( my ($port, $ref2) = each %{$ref1} )
+            {
+                while( my ($community, $ref3) = each %{$ref2} )
+                {
+                    while( my ($oid, $ref4) = each %{$ref3} )
+                    {
+                        while( my ($token, $dummy) = each %{$ref4} )
+                        {
+                            push( @deleteTargets, $token );
+                        }
+                    }
+                }
+            }
+        }
 
+        Debug('Deleting ' . scalar( @deleteTargets ) . ' tokens');
+        foreach my $token ( @deleteTargets )
+        {
+            $collector->deleteTarget($token);
+        }
+        
+        delete $cref->{'reptoken'}{$ipaddr}{$port}{$community};
+        delete $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community};
+        $cref->{'unreachableHostDeleted'}{$ipaddr}{$port}{$community} = 1;
+    }
+    
     return $probablyAlive;
+}
+
+
+sub checkUnreachableRetry
+{
+    my $collector = shift;
+    my $ipaddr = shift;
+    my $port = shift;
+    my $community = shift;
+
+    my $cref = $collector->collectorData( 'snmp' );
+
+    my $ret = 1;
+    if( exists( $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} ) )
+    {
+        if( time() <
+            $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} +
+            $Torrus::Collector::SNMP::unreachableRetryDelay )
+        {
+            $ret = 0;
+        }
+    }
+    
+    return $ret;
+}
+
+
+sub isHostDead
+{
+    my $collector = shift;
+    my $ipaddr = shift;
+    my $port = shift;
+    my $community = shift;
+
+    my $cref = $collector->collectorData( 'snmp' );
+    return $cref->{'unreachableHostDeleted'}{$ipaddr}{$port}{$community};
 }
 
 # Callback executed by Collector
@@ -661,6 +708,8 @@ sub callback
     {
         Error("SNMP Error for $ipaddr:$port:$community: " . $session->error() .
               ' when retrieving ' . join(' ', sort keys %{$pdu_tokens}));
+
+        probablyDead( $collector, $ipaddr, $port, $community );        
         return;
     }
 
@@ -759,8 +808,11 @@ sub postProcess
         foreach my $token ( keys %{$cref->{'needsRemapping'}} )
         {
             delete $cref->{'needsRemapping'}{$token};
-            Torrus::Collector::SNMP::initTargetAttributes
-                ( $collector, $token );
+            if( not Torrus::Collector::SNMP::initTargetAttributes
+                ( $collector, $token ) )
+            {
+                $collector->deleteTarget($token);
+            }
         }
     }
     else

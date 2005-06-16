@@ -1,3 +1,16 @@
+2005-06-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Monitor.pm: sleep --delay minutes also after
+	recompiling
+
+	* configs/torrus-config.pl:
+	$Torrus::Collector::SNMP::unreachableTimeout increased to 1900
+	$Torrus::Collector::SNMP::unreachableRetryDelay increased to 600
+
+	* perllib/Torrus/Collector/SNMP.pm:
+	Better handling of SNMP errors. Delete all tokens for a host
+	if it is unreachable.
+
 2005-06-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Torrus release 1.0.0

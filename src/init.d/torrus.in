@@ -63,6 +63,10 @@ else
   fi
 fi
 
+if test x"$TORRUS_COLLECTOR_CMDOPTS" != x; then
+  collector_cmdopts=$TORRUS_COLLECTOR_CMDOPTS
+fi
+
 if test x${read_treenames} != xno; then
   # Get the names of the trees for each daemon
   for d in ${daemons}; do

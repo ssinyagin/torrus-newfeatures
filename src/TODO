@@ -5,6 +5,7 @@ To do now:
 -- fix the bug in recursive $def expansion
 -- Move expandable parameters from ConfigTree.pm to XML config
 -- dispersed timeoffsets for monitor
+-- fallback to old XML file if the host is unreachable during discovery (?)
 -- use Parallel::ForkManager in devdiscover
 -- Set the daemon's log level by signal
 -- SNMPv3 support

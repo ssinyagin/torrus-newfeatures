@@ -147,7 +147,8 @@ if( $delay > 0 )
 my %options =
     (
      '-ProcessName' => $process_name,
-     '-Tree'      => $tree
+     '-Tree'      => $tree,
+     '-Delay'     => $delay
      );
 if( $runonce )
 {

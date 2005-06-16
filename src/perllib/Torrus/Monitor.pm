@@ -47,6 +47,7 @@ sub new
 
     $self->{'tree_name'} = $options{'-TreeName'};
     $self->{'sched_data'} = $options{'-SchedData'};
+    $self->{'delay'} = $options{'-Delay'} * 60;
     
     return $self;
 }
@@ -461,6 +462,12 @@ sub beforeRun
     my $actual_ts = $config_tree->getTimestamp();
     if( $actual_ts >= $known_ts )
     {
+        if( $self->{'delay'} > 0 )
+        {
+            Info(sprintf('Delaying for %d seconds', $self->{'delay'}));
+            sleep( $self->{'delay'} );
+        }
+
         Info("Rebuilding monitor cache and clearing alarms");
         Debug("Config TS: $actual_ts, Monitor TS: $known_ts");
 

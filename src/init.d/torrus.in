@@ -24,11 +24,11 @@
 ### END INIT INFO
 
 prefix=@prefix@
+sysconfdir=@sysconfdir@
 pkghome=@pkghome@
 cmddir=@pkgbindir@
 piddir=@piddir@
 sitedir=@sitedir@
-sysconfdir=@sysconfdir@
 torrus_config_pl=@cfgdefdir@/torrus-config.pl
 
 . @cfgdefdir@/initscript.conf

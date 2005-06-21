@@ -124,6 +124,10 @@ sub initTargetAttributes
             return 1;
         }
     }
+    elsif( $oid eq 'notfound' )
+    {
+        return 0;
+    }
 
     # Collector should be able to find the target
     # by host, port, community, and oid.
@@ -266,7 +270,14 @@ sub expandOidMappings
 
         if( defined( $value ) )
         {
-            $oid = $head . $value . $tail;
+            if( $value eq 'notfound' )
+            {
+                return 'notfound';
+            }
+            else
+            {
+                $oid = $head . $value . $tail;
+            }
         }
         else
         {
@@ -323,7 +334,14 @@ sub expandOidMappings
             $value =
                 $cref->{'value-lookups'}{$ipaddr}{$port}{$community}{$key};
         }
-        $oid = $head . $value . $tail;
+        if( defined( $value ) )
+        {
+            $oid = $head . $value . $tail;
+        }
+        else
+        {
+            return 'notfound';
+        }
     }
 
     # Debug("OID expanded: $oid_in -> $oid");
@@ -380,29 +398,26 @@ sub lookupMap
         }
     }
 
-    if( exists( $cref->{'maps'}{$ipaddr}{$port}{$community}{$map} ) )
+    my $value = $cref->{'maps'}{$ipaddr}{$port}{$community}{$map}{$key};
+    if( not defined $value )
     {
-        my $value = $cref->{'maps'}{$ipaddr}{$port}{$community}{$map}{$key};
-        if( not defined $value )
+        Error("Cannot find value $key in map $map for $ipaddr in ".
+              $collector->path($token));
+        if( defined ( $cref->{'maps'}{$ipaddr}{$port}{$community}{$map} ) )
         {
-            Error("Cannot find value $key in map $map for $ipaddr in ".
-                  $collector->path($token) . ". Current map follows");
+            Error("Current map follows");
             while( my($key, $val) = each
                    %{$cref->{'maps'}{$ipaddr}{$port}{$community}{$map}} )
             {
                 Error("'$key' => '$val'");
             }
-            return undef;
         }
-        else
-        {
-            return $value;
-        }
+        return 'notfound';
     }
     else
     {
-        return undef;
-    }
+        return $value;
+    }    
 }
 
 # The target host is unreachable. We try to reach it few more times and

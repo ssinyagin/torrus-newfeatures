@@ -1,3 +1,8 @@
+2005-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm (initTargetAttributes):
+	Target is deleted when SNMP map expansion fails
+
 2005-06-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Monitor.pm: sleep --delay minutes also after

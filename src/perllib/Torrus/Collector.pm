@@ -607,8 +607,6 @@ sub beforeRun
                         time() - $init_start));
     }
 
-    Verbose("Collector initialized");
-
     return 1;
 }
 

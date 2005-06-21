@@ -139,7 +139,9 @@ $Torrus::Scheduler::statsExpDecayAlpha = 0.63;
       'printer' => {'stylesheet'   => 'torrus-printer.css'} );
 
 # Color schema for RRDtool graph. It can be extended by setting
-# $Torrus::Renderer::stylingProfileOverlay
+# $Torrus::Renderer::stylingProfileOverlay. The overlay should
+# be an absolute file name. You can use $Torrus::Global::cfgSiteDir
+# to refer to the site configs path.
 $Torrus::Renderer::stylingProfile = 'torrus-schema';
 
 # Top level URI

@@ -1,6 +1,7 @@
 # RRDtool graph Colors and Lines Profile.
 # You are encouraged to create your own copy and reference it
 # with $Torrus::Renderer::stylingProfile in your torrus-siteconfig.pl
+# or better define your amendments in Torrus::Renderer::stylingProfileOverlay
 
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
@@ -86,6 +87,10 @@
          },
      'resourceusage'  => {
          'color'   => '##blue',
+         'line'    => 'AREA'
+         },
+     'resourcepartusage'  => {
+         'color'   => '##crimson',
          'line'    => 'AREA'
          },
 

@@ -1,5 +1,11 @@
 2005-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/SiteConfig.pm (verify):
+	$Torrus::Renderer::stylingProfileOverlay is now an absolute file name
+
+	* xmlconfig/vendor/cisco.ios.docsis.xml:
+	Added Registered modems graph. WARNING: RRD structure changed
+
 	* bin/devdiscover.in: New option: --fallback
 
 	* perllib/Torrus/Collector/SNMP.pm (initTargetAttributes):

@@ -132,8 +132,7 @@ sub verify
 
         if( defined($Torrus::Renderer::stylingProfileOverlay) )
         {
-            my $overlay = $Torrus::Global::stylingDir . '/' .
-                $Torrus::Renderer::stylingProfileOverlay . '.pl';
+            my $overlay = $Torrus::Renderer::stylingProfileOverlay;
             if( -r $overlay )
             {
                 require $overlay;

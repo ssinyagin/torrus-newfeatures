@@ -1,5 +1,7 @@
 2005-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* configure.ac: 1.0.1 Patchlevel 1
+
 	* bin/action_snmpv1trap.in, bin/action_snmptrap.in:
 	added torrusMonitorDesc 
 

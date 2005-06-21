@@ -216,6 +216,47 @@ be added to previously defined ones.
 B<Templates>. Some pieces of configuration may be written as templates,
 and then re-used in multiple places.
 
+
+
+=head2 Handling SNMP errors
+
+During SNMP discovery process, some SNMP devices may not be reachable.
+By default, C<devdiscover> reports the error, and does not write the output
+XML file containing that device. It also skips writing the bundle files that
+contain the output file affected.
+
+When C<devdiscover> is executed with C<--forcebundle> option, the bundle
+files are written, and the output files related to the unreachable
+devices are skipped from the bundles. This ensures that we always get
+a configuration that may compile and run the collector.
+
+Another option, C<--fallback=DAYS>, if given together with C<--forcebundle>,
+tells the discovery engine to reuse old XML files if the related SNMP devices
+are not reachable and the files are not older than DAYS.
+
+If an SNMP device is unreachable by the moment of the collector initialization,
+the collector reports the error and waits for a period of time specified in
+C<$Torrus::Collector::SNMP::unreachableRetryDelay>, which is 10 minutes by
+default. It then tries to reach the device with the specified retry interval
+during some period of time, defined in
+C<$Torrus::Collector::SNMP::unreachableTimeout>, by default half an hour.
+If the device is not available within the specified timeout, it is excluded
+from collection. It would be tried again on collector initialization
+only (at the collector process start or after recompiling the configuration).
+
+If a device is not reachable during the normal collector running cycle,
+it is retried in every collector's cycle (usually every 5 minutes),
+during the period defined in C<$Torrus::Collector::SNMP::unreachableTimeout>.
+It will be then excluded from configuration after the timeout.
+
+If a device hardware configuration changes after the C<devdiscover>
+execution, the collector may not find some values in SNMP tables,
+such as interface names in ifTable. It then excludes such datasources from
+collection immediately.
+
+
+
+
 =head2 Tips and tricks
 
 

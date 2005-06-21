@@ -160,8 +160,8 @@ Other methods of adding to the hash of hashes are also acceptable.
 =item * Overriding Styles:
 
 To override specific styles in the existing schema, C<##in>, C<##out>,
-entries similar to the following should be created in a descriptive file
-located in the C<styling> directory.
+entries similar to the following should be created in a Perl file,
+preferably located in the local configuration directory.
 
 C<in_out-override-schema.pl>
 
@@ -178,7 +178,8 @@ Other methods of adding to the hash of hashes are also acceptable.
 
 In the torrus-siteconfig.pl file, add the variable
 
-  $Torrus::Renderer::stylingProfileOverlay = 'fish-schema';
+$Torrus::Renderer::stylingProfileOverlay = 
+    $Torrus::Global::cfgSiteDir . '/in_out-override-schema.pl';
 
 =item 2.
 

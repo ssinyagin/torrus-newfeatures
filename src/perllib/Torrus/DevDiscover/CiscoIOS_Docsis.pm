@@ -117,10 +117,11 @@ sub buildConfig
         # Build All_Modems summary graph
         my $param = {
             'ds-type'              => 'rrd-multigraph',
-            'ds-names'             => 'total,active',
+            'ds-names'             => 'total,active,registered',
             'graph-lower-limit'    => '0',
             'precedence'           => '1000',
-            'comment'              => 'Active and Total modems on CMTS',
+            'comment'              =>
+                'Registered, Active and Total modems on CMTS',
             'vertical-label'       => 'Modems',
             
             'graph-legend-total'   => 'Total',
@@ -129,9 +130,14 @@ sub buildConfig
             'line-order-total'     => '1',
             
             'graph-legend-active'  => 'Active',
-            'line-style-active'    => '##resourceusage',
-            'line-color-active'    => '##resourceusage',
-            'line-order-active'    => '2'
+            'line-style-active'    => '##resourcepartusage',
+            'line-color-active'    => '##resourcepartusage',
+            'line-order-active'    => '2',
+            
+            'graph-legend-registered'  => 'Registered',
+            'line-style-registered'    => '##resourceusage',
+            'line-color-registered'    => '##resourceusage',
+            'line-order-registered'    => '3'
             };
 
         my $first = 1;
@@ -146,6 +152,8 @@ sub buildConfig
                     '{' . $intf . '/Modems_Total}';
                 $param->{'ds-expr-active'} =
                     '{' . $intf . '/Modems_Active}';
+                $param->{'ds-expr-registered'} =
+                    '{' . $intf . '/Modems_Registered}';
                 $first = 0;
             }
             else
@@ -154,6 +162,8 @@ sub buildConfig
                     ',{' . $intf . '/Modems_Total},+';
                 $param->{'ds-expr-active'} .=
                     ',{' . $intf . '/Modems_Active},+';
+                $param->{'ds-expr-registered'} .=
+                    ',{' . $intf . '/Modems_Registered},+';
             }
         }
 
@@ -182,7 +192,7 @@ sub buildConfig
             if( defined( $monitor ) )
             {
                 my $intfNode = $cb->getChildSubtree( $macNode, $intf );
-                $cb->addLeaf( $intfNode, 'Modems_Active',
+                $cb->addLeaf( $intfNode, 'Modems_Registered',
                               {'monitor' => $monitor } );
             }
         }

@@ -661,7 +661,7 @@ C<UsedBytes> counter.
 
 =item * C<DocsisMacModemsMonitor>
 
-For Cisco uBR, this action assigns a monitor to the C<Modems_Active> gauge
+For Cisco uBR, this action assigns a monitor to the C<Modems_Registered> gauge
 in the MAC layer stats.
 
 =item * C<DocsisUpUtilMonitor>, C<DocsisUpSlotsMonitor>

@@ -1,5 +1,7 @@
 2005-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/devdiscover.in: New option: --fallback
+
 	* perllib/Torrus/Collector/SNMP.pm (initTargetAttributes):
 	Target is deleted when SNMP map expansion fails
 

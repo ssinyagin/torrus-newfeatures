@@ -1,3 +1,7 @@
+2005-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Plugin release 1.1
+
 2005-06-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Collector/Cisco_cbQoS.pm: Better handling of SNMP errors

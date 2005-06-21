@@ -29,6 +29,9 @@ $Torrus::Global::version        = '@VERSION@';
 $Torrus::Global::discoveryDir   = '@sitedir@/discovery/';
 $Torrus::Global::siteXmlDir     = '@sitexmldir@';
 
+$Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
+
+
 @Torrus::DevDiscover::loadModules =
     (
      'Torrus::DevDiscover::RFC1657_BGP4_MIB',

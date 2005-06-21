@@ -24,6 +24,7 @@ package Torrus::DevDiscover::DevDetails;
 package Torrus::DevDiscover;
 
 use strict;
+use POSIX qw(strftime);
 use Net::SNMP qw(:snmp :asn1);
 use Digest::MD5 qw(md5);
 
@@ -221,9 +222,24 @@ sub discover
          30 => {
              'name'  => 'System ID',
              'value' => $devdetails->param('system-id')
+             },
+         50 => {
+             'name'  => 'Description',
+             'value' => $devdetails->snmpVar($self->oiddef('sysDescr'))
              }
          );
 
+    if( defined( $devdetails->snmpVar($self->oiddef('sysUpTime')) ) )
+    {
+        $legendValues{40}{'name'} = 'Uptime';
+        $legendValues{40}{'value'} =
+            sprintf("%d days since %s",
+                    $devdetails->snmpVar($self->oiddef('sysUpTime')) /
+                    (100*3600*24),
+                    strftime($Torrus::DevDiscover::timeFormat,
+                             localtime(time())));
+    }
+     
     my $legend = '';
     foreach my $key ( sort keys %legendValues )
     {

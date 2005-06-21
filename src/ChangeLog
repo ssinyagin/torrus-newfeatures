@@ -1,5 +1,7 @@
 2005-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* NEWS: release 1.0.1
+
 	* perllib/Torrus/SiteConfig.pm (verify):
 	$Torrus::Renderer::stylingProfileOverlay is now an absolute file name
 

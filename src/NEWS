@@ -1,3 +1,25 @@
+21-JUN-2005: Torrus release 1.0.1
+
+In this release:
+
+-- SNMP errors are now handled better. See the User guide for more details.
+
+-- New command line option for monitor: --delay. The init script
+   launches the monitor with 20 minutes delay, to allow the collector
+   update RRD files before monitoring them.
+
+-- New devdiscover option: --fallback. It is useful in large production
+   environments when it's important to have a device in the web interface
+   even if it's turned off
+
+-- Cisco DOCSIS templates now include Total, Active, and Registered
+   modem quantities. RRD file structure has changed, so the graphs will
+   start anew.
+
+-- The meaning of $Torrus::Renderer::stylingProfileOverlay
+   has changed: now it refers to a file name.
+
+
 10-JUN-2005: Torrus release 1.0.0
 
 In this release, compared to RRFW release 0.1.8:

@@ -313,8 +313,7 @@ sub loadStyling
 
     if( defined($Torrus::Renderer::stylingProfileOverlay) )
     {
-        require $Torrus::Global::stylingDir . '/' .
-            $Torrus::Renderer::stylingProfileOverlay . '.pl';
+        require $Torrus::Renderer::stylingProfileOverlay;
     }
 }
 

@@ -83,6 +83,8 @@ Instructs the script to run once and exit. Implies <strong>--nodaemon</strong>.
 </dt>
 <dd>
 Makes the daemon sleep for N minutes before starting the first cycle.
+This would happen on the daemon startup and also after each configuration
+recompilation.
 For example, when monitor and collector start simultaneously, the collector
 needs some time to retrieve the data being monitored.
 </dd>

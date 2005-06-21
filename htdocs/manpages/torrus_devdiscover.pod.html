@@ -74,6 +74,14 @@ With this option enabled, <code>devdiscover</code> will write the bundle
 file even if some of the bundle members were not created because of errors.
 </dd>
 <p></p>
+<dt><strong><a name="item__2d_2dfallback_3dinteger"><strong>--fallback</strong>=<em>INTEGER</em></a></strong><br />
+</dt>
+<dd>
+Requires <strong>--forcebundle</strong>. In case if an SNMP device is not available,
+the bundle file will include an older version of the XML output file,
+provided that it exists and it is not older than the specified number of days.
+</dd>
+<p></p>
 <dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
 </dt>
 <dd>

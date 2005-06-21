@@ -163,8 +163,8 @@ in the <code>styling</code> directory.
 <li><strong><a name="item_overriding_styles_3a">Overriding Styles:</a></strong><br />
 </li>
 To override specific styles in the existing schema, <code>##in</code>, <code>##out</code>,
-entries similar to the following should be created in a descriptive file
-located in the <code>styling</code> directory.
+entries similar to the following should be created in a Perl file,
+preferably located in the local configuration directory.
 <p><code>in_out-override-schema.pl</code></p>
 <pre>
   $Torrus::Renderer::graphStyles{'in'}{'color'} = '##yellow';
@@ -176,8 +176,8 @@ located in the <code>styling</code> directory.
 <ol>
 <li></li>
 In the torrus-siteconfig.pl file, add the variable
-<pre>
-  $Torrus::Renderer::stylingProfileOverlay = 'fish-schema';</pre>
+<p>$Torrus::Renderer::stylingProfileOverlay = 
+    $Torrus::Global::cfgSiteDir . '/in_out-override-schema.pl';</p>
 <p></p>
 <li></li>
 Restart apache

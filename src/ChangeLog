@@ -1,5 +1,10 @@
 2005-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/action_snmpv1trap.in, bin/action_snmptrap.in:
+	added torrusMonitorDesc 
+
+	* sup/mibs/TORRUS-MIB.txt: new OID: torrusMonitorDesc
+
 	* NEWS: release 1.0.1
 
 	* perllib/Torrus/SiteConfig.pm (verify):

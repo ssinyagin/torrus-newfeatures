@@ -80,7 +80,10 @@ my @varbindlist = ( $oid_prefix . '.1',
                     OCTET_STRING, snmp_dateandtime( $ENV{'TORRUS_TSTAMP'} ),
 
                     $oid_prefix . '.7',
-                    OCTET_STRING, $ENV{'TORRUS_TREE'}
+                    OCTET_STRING, $ENV{'TORRUS_TREE'},
+                    
+                    $oid_prefix . '.9',
+                    OCTET_STRING, $ENV{'TORRUS_MCOMMENT'}
                     );
 
 if( defined( $severity ) )

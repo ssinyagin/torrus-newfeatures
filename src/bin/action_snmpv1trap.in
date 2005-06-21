@@ -82,7 +82,10 @@ my @varbindlist = ( $Torrus::Snmptrap::enterprise . '.2',
                     OCTET_STRING, scalar(localtime($ENV{'TORRUS_TSTAMP'})),
 
                     $Torrus::Snmptrap::enterprise . '.7',
-                    OCTET_STRING, $ENV{'TORRUS_TREE'}
+                    OCTET_STRING, $ENV{'TORRUS_TREE'},
+                    
+                    $Torrus::Snmptrap::enterprise . '.9',
+                    OCTET_STRING, $ENV{'TORRUS_MCOMMENT'}
                     );
 
 if( defined( $severity ) )

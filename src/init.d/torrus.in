@@ -49,7 +49,7 @@ fi
 # Second argument can be the daemon name
 if test x"$2" = x; then
   daemons="collector monitor"
-  monitor_cmdopts=$TORRUS_MONITOR_DELAY
+  monitor_cmdopts="$TORRUS_MONITOR_DELAY"
 else
   daemons=$2
     # Third argument may be the tree name
@@ -58,13 +58,13 @@ else
     read_treenames=no
       # Fourth argument may be cmdopts
     if test x"$4" != x; then
-      TORRUS_CMDOPTS=$4
+      TORRUS_CMDOPTS="$4"
     fi
   fi
 fi
 
 if test x"$TORRUS_COLLECTOR_CMDOPTS" != x; then
-  collector_cmdopts=$TORRUS_COLLECTOR_CMDOPTS
+  collector_cmdopts="$TORRUS_COLLECTOR_CMDOPTS"
 fi
 
 if test x${read_treenames} != xno; then

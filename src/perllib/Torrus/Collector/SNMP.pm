@@ -461,23 +461,15 @@ sub probablyDead
              $Torrus::Collector::SNMP::unreachableTimeout .
              " seconds. Giving it up: $ipaddr:$port:$community");
         my @deleteTargets = ();
-        while( my ($ipaddr, $ref1) = each %{$cref->{'targets'}} )
+        while( my ($oid, $ref1) =
+               each %{$cref->{'targets'}{$ipaddr}{$port}{$community}} )
         {
-            while( my ($port, $ref2) = each %{$ref1} )
+            while( my ($token, $dummy) = each %{$ref1} )
             {
-                while( my ($community, $ref3) = each %{$ref2} )
-                {
-                    while( my ($oid, $ref4) = each %{$ref3} )
-                    {
-                        while( my ($token, $dummy) = each %{$ref4} )
-                        {
-                            push( @deleteTargets, $token );
-                        }
-                    }
-                }
+                push( @deleteTargets, $token );
             }
         }
-
+        
         Debug('Deleting ' . scalar( @deleteTargets ) . ' tokens');
         foreach my $token ( @deleteTargets )
         {

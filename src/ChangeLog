@@ -1,3 +1,8 @@
+2005-06-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm: [1.0.1pl2] - fixed bug
+	with deleting unreachable targets
+
 2005-06-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* configure.ac: 1.0.1 Patchlevel 1

@@ -318,9 +318,9 @@ sub rrd_make_multigraph
         }
 
         push( @{$obj->{'args'}{'line'}},
-              sprintf( '%s:%s%s%s\l', $linestyle, $dname,
+              sprintf( '%s:%s%s%s', $linestyle, $dname,
                        $linecolor,
-                       length($legend) > 0 ? ':'.$legend : '' ) );
+                       length($legend) > 0 ? ':'.$legend.'\l' : '' ) );
 
     }
 }
@@ -445,8 +445,8 @@ sub rrd_make_graphline
     }
 
     push( @{$obj->{'args'}{'line'}},
-          sprintf( '%s:%s%s%s\l', $linestyle, $obj->{'dname'}, $linecolor,
-                   length($legend) > 0 ? ':'.$legend : '' ) );
+          sprintf( '%s:%s%s%s', $linestyle, $obj->{'dname'}, $linecolor,
+                   length($legend) > 0 ? ':'.$legend.'\l' : '' ) );
 }
 
 

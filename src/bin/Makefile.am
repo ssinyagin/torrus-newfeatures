@@ -38,6 +38,7 @@ pkgbin_SCRIPTS = \
 	genlist			\
 	install_plugin		\
 	monitor      		\
+	rrddir2xml		\
 	schedulerinfo		\
 	ttproclist
 
@@ -63,6 +64,7 @@ EXTRA_DIST = \
 	genlist.in		\
 	install_plugin.in	\
 	monitor.in      	\
+	rrddir2xml.in		\
 	schedulerinfo.in	\
 	torrus.in		\
 	ttproclist.in
@@ -116,6 +118,9 @@ install_plugin: install_plugin.in
 
 monitor: monitor.in
 	$(SUBST) monitor.in > monitor
+
+rrddir2xml: rrddir2xml.in
+	$(SUBST) rrddir2xml.in > rrddir2xml
 
 schedulerinfo: schedulerinfo.in
 	$(SUBST) schedulerinfo.in > schedulerinfo

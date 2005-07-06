@@ -60,6 +60,8 @@ Accepted commands:
 
 =item B<monitor>
 
+=item B<rrddir2xml>
+
 =item B<schedulerinfo>
 
 =back
@@ -81,6 +83,7 @@ L<torrus_configsnapshot(@mansec_usercmd@)>,
 L<torrus_devdiscover(@mansec_usercmd@)>,
 L<torrus_genddx(@mansec_usercmd@)>,
 L<torrus_monitor(@mansec_usercmd@)>,
+L<torrus_rrddir2xml(@mansec_usercmd@)>,
 L<torrus_schedulerinfo(@mansec_usercmd@)>
 
 =head1 NOTES

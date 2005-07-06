@@ -34,6 +34,7 @@ commands="acl=acledit acledit=acledit cleanup=cleanup \
           genlist=genlist \
           install_plugin=install_plugin \
           monitor=monitor \
+          rrddir=rrddir2xml rrddir2xml=rrddir2xml \
           schedulerinfo=schedulerinfo si=schedulerinfo \
           ttproclist=ttproclist"
 

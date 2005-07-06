@@ -261,7 +261,7 @@ sub updateRRD
 
         foreach my $prop ( keys %$rrdinfo )
         {
-            if( $prop =~ /^ds\[(\S+)\]\./ )
+            if( $prop =~ /^ds\[(\S+)\]\./o )
             {
                 $ref->{$1} = 1;
             }

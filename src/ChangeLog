@@ -1,3 +1,12 @@
+2005-07-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	New discovery parameter: RFC2863_IF_MIB::only-interfaces
+
+	* configure.ac: Now checking if user torrus exists
+
+	* perllib/Torrus/DevDiscover/AxxessIT.pm: support for WANX/LANX modules
+
 2005-07-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/rrddir2xml.in: New utility for generating XML from a directory

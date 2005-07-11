@@ -430,6 +430,21 @@ sub buildConfig
         }
     }
 
+    # explicitly listed interfaces
+    my %onlyName;
+    my $onlyNamesList =
+        $devdetails->param('RFC2863_IF_MIB::only-interfaces');
+    my $onlyNamesDefined = 0;
+    if( defined( $onlyNamesList ) and length( $onlyNamesList ) > 0 )
+    {
+        $onlyNamesDefined = 1;
+        foreach my $name ( split( /\s*,\s*/, $onlyNamesList ) )
+        {
+            $onlyName{$name} = 1;
+        }
+    }
+    
+
     # tokenset member interfaces of the form
     # Format: tset:intf,intf; tokenset:intf,intf;
     my %tsetMember;
@@ -476,6 +491,15 @@ sub buildConfig
         # Create a subtree for the interface
         my $subtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
 
+        if( $onlyNamesDefined )
+        {
+            if( not $onlyName{$subtreeName} )
+            {
+                $nExplExcluded++;
+                next;
+            }
+        }
+        
         if( $excludeName{$subtreeName} )
         {
             $nExplExcluded++;

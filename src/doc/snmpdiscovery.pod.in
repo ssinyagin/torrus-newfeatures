@@ -362,6 +362,13 @@ Comma-separated list of interface names which should be excluded from
 configuration. Spaces are allowed between the names and commas.
 The names should be the ones that are used for interface subtrees.
 
+=item * C<RFC2863_IF_MIB::only-interfaces>
+
+If defined, this parameter specifies the list of interfaces that will be
+included in the discovery results. The names should match the interface
+subtree names. Caution: if specified incorrectly, this parameter may
+disable discovery for all interfaces on a device.
+
 =item * C<RFC2863_IF_MIB::tokenset-members>
 
 This parameter defines which interfaces' C<InOut_bps> leaves to add to

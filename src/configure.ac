@@ -102,6 +102,24 @@ AC_ARG_VAR(torrus_user,  [[torrus] UID to run the daemons])
 if test -z "$torrus_user"; then
    torrus_user=torrus; fi
 
+if test "$enable_pkgonly" != yes; then
+    AC_MSG_CHECKING([if user ${torrus_user} exists])
+    torrus_check_file=torrus_usercheck_$$
+    torrus_check_error=no
+    if ! touch ${torrus_check_file}; then
+        AC_MSG_ERROR([Cannot create ${torrus_check_file}])
+    elif ! chown ${torrus_user} ${torrus_check_file}; then
+        torrus_check_error=yes
+    fi
+    rm -f ${torrus_check_file}
+    if test ${torrus_check_error} = yes; then
+        AC_MSG_ERROR([User ${torrus_user} does not exist])
+    else
+        AC_MSG_RESULT([Ok])
+    fi
+fi
+   
+
 # Set the var/db and var/cache ownership
 
 AC_ARG_VAR(var_user,  [[TORRUS_USER] Owner of db and cache directories])
@@ -114,7 +132,6 @@ AC_ARG_ENABLE(varperm,
         [],
         [enable_varperm="yes"])
 AC_SUBST(enable_varperm)
-
 
 AC_ARG_VAR(pkghome,   [[PREFIX/torrus] Place for Torrus static files])
 if test -z "$pkghome"; then

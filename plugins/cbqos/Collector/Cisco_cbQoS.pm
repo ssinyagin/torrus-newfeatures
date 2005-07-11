@@ -300,10 +300,12 @@ sub initTargetAttributes
             my $entryName = $oidrev{$prefixOid};
             if( not defined $entryName )
             {
-                die("Unknown OID: $prefixOid");
+                Warn("Unknown OID: $prefixOid");
             }
-
-            $ref->{$policyIndex}{$entryName} = $val;
+            else
+            {
+                $ref->{$policyIndex}{$entryName} = $val;
+            }
         }
 
         my $mapRef = {};
@@ -348,10 +350,12 @@ sub initTargetAttributes
                     my $entryName = $oidrev{$prefixOid};
                     if( not defined $entryName )
                     {
-                        die("Unknown OID: $prefixOid");
+                        Warn("Unknown OID: $prefixOid");
                     }
-
-                    $ref->{$cfgIndex}{$entryName} = $val;
+                    else
+                    {
+                        $ref->{$cfgIndex}{$entryName} = $val;
+                    }
                 }
             }
         }

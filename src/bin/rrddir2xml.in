@@ -177,14 +177,29 @@ foreach my $rrdfile ( sort keys %rrdinfos )
     $cb->addParam( $subtreeNode, 'legend', $legend );
 
     my %dsnames;
+    my $this_rrd_hwpredict = 0;
+
     foreach my $prop ( keys %{$info->{'rrdinfo'}} )
     {
         if( $prop =~ /^ds\[(\S+)\]\./o )
         {
             $dsnames{$1} = 1;
         }
+        else
+        {
+            if( $prop =~ /^rra\[\d+\]\.cf/o and
+                $info->{'rrdinfo'}->{$prop} eq 'FAILURES' )                
+            {
+                $this_rrd_hwpredict = 1;
+            }
+        }
     }
 
+    if( not $hwpredict )
+    {
+        $this_rrd_hwpredict = 0;
+    }
+    
     foreach my $dsname ( sort keys %dsnames )
     {
         my $dslegend = $legend . 'DS:' . $dsname . ';Type:' .
@@ -198,7 +213,7 @@ foreach my $rrdfile ( sort keys %rrdinfos )
             'data-file'     => $rrdfile,
             'data-dir'      => $info->{'dir'},
             'rrd-ds'        => $dsname,
-            'rrd-hwpredict' => ($hwpredict ? 'enabled':'disabled')
+            'rrd-hwpredict' => ($this_rrd_hwpredict ? 'enabled':'disabled')
             };
         
         $cb->addLeaf( $subtreeNode, $dsname, $params );

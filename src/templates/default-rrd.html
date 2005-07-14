@@ -1,4 +1,5 @@
 [% PROCESS 'html-incblocks.txt' %]
+[% INCLUDE setdate %]
 [% INCLUDE htmlstart title='Graphs for ' _ path(token) printpath=1 %]
 
 [% parentComment = nodeParam(parent(token),'comment') %]

@@ -458,3 +458,18 @@ SPAN.LoginInput INPUT {
   padding-right: 2em;
 }
 
+*.SetDateDialog {
+  font-size : 9px;
+  padding-bottom : 0;
+  padding-left : 2em;
+  padding-right : 2em;
+  padding-top : 0;
+}
+
+*.SetDateDialog FORM {
+   display : inline;
+}
+
+*.SetDateDialog INPUT {
+  font-size : 9px;
+}

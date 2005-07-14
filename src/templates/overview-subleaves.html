@@ -1,4 +1,5 @@
 [% PROCESS 'html-incblocks.txt' %]
+[% INCLUDE setdate %]
 [% ovs=variables.OVS; clearVar('OVS'); global.bookmarkVars=['OVS',ovs];
    thepath=path(token) %]
 [% INCLUDE htmlstart title=thepath printpath=1 %]

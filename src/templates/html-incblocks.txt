@@ -169,6 +169,7 @@ END %]
                     text="Printable view"
                     title="Prepare this page for printing"
                     newwindow=1%]
+[% IF global.setDateDialog; INCLUDE enterdate; END %]
 </DIV>
 [% END %]
 
@@ -266,3 +267,37 @@ END %]
     END;
   END %]
 [% END %]
+
+
+[%# ########   Set the date variable   ####### %]
+[% BLOCK setdate %]
+[% IF variables.SETDATE;
+     variables.NOW = variables.SETDATEV;
+   ELSE;
+     clearVar('NOW');
+     clearVar('SETDATE');
+     clearVar('SETDATEV');
+   END;
+   global.setDateDialog = 1;
+%]
+[% END %]
+
+
+[%# ########   Print the date selection elements   ####### %]
+[% BLOCK enterdate %]
+<SPAN CLASS="SetDateDialog">
+<FORM METHOD=GET ACTION="[%topUrl()%]">
+<INPUT TYPE="hidden" NAME="token" VALUE="[%token%]"/>
+<INPUT TYPE="hidden" NAME="view" VALUE="[%view%]"/>
+<LABEL>
+<INPUT TYPE="checkbox" NAME="SETDATE" VALUE="1"
+[%variables.SETDATE ? 'CHECKED':''%]/>
+Set date</LABEL>
+<INPUT TYPE="text" NAME="SETDATEV" SIZE="22" VALUE="[%variables.SETDATEV%]"/>
+<INPUT TYPE="submit" VALUE="&gt;"/>
+</FORM>
+</SPAN>
+[% END %]
+
+
+

@@ -289,6 +289,7 @@ END %]
 <FORM METHOD=GET ACTION="[%topUrl()%]">
 <INPUT TYPE="hidden" NAME="token" VALUE="[%token%]"/>
 <INPUT TYPE="hidden" NAME="view" VALUE="[%view%]"/>
+[% IF ovs %]<INPUT TYPE="hidden" NAME="OVS" VALUE="[%ovs%]"/>[% END %]
 <LABEL>
 <INPUT TYPE="checkbox" NAME="SETDATE" VALUE="1"
 [%variables.SETDATE ? 'CHECKED':''%]/>

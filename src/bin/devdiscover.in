@@ -294,14 +294,19 @@ foreach my $outfile ( sort keys %{$perOutfileHostParams} )
 
 if( scalar( keys %outputBundles ) > 0 )
 {
-    if( $everythingsOk )
+    if( defined( $limitre ) )
+    {
+        Warn('Cannot write bundles with --limit option specified. ' .
+             'Bundle files remain unchanged');
+    }
+    elsif( $everythingsOk )
     {
         foreach my $bundleName ( sort keys %outputBundles )
         {
             my $cb = new Torrus::ConfigBuilder;
 
             $cb->addCreatorInfo( $creator );
-
+            
             foreach my $bundleMember
                 ( sort keys %{$outputBundles{$bundleName}} )
             {

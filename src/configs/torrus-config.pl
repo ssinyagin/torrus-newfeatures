@@ -78,11 +78,11 @@ $Torrus::Global::RRDTimestampTolerance = 15;
 #
 $Torrus::Collector::SNMP::RxBuffer = 131071;
 
-# The time period when we retry to reach an unreachable host
-$Torrus::Collector::SNMP::unreachableTimeout = 1900;
+# The time period after which we give up to reach the host being unreachable
+$Torrus::Collector::SNMP::unreachableTimeout = 21600; # 6 hours
 
 # For unreachable host, we retry SNMP query not earlier than this
-$Torrus::Collector::SNMP::unreachableRetryDelay = 600;
+$Torrus::Collector::SNMP::unreachableRetryDelay = 600; # 10 min
 
 # The following errors are caused by changes in the device configurations,
 # when the collector tries to store data in a RRD file, but the

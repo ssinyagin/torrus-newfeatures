@@ -1,5 +1,11 @@
 2005-07-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/Collector/SNMP.pm (callback): mapping reset after
+	host unreachable
+
+	* configs/torrus-config.pl:
+	$Torrus::Collector::SNMP::unreachableTimeout set to 6 hours
+
 	* perllib/Torrus/Renderer/HTML.pm: entered Date/time verification
 	New CPAN module required:
 	perl -MCPAN -e 'install Date::Parse'

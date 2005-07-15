@@ -732,7 +732,17 @@ sub callback
         Error("SNMP Error for $ipaddr:$port:$community: " . $session->error() .
               ' when retrieving ' . join(' ', sort keys %{$pdu_tokens}));
 
-        probablyDead( $collector, $ipaddr, $port, $community );        
+        probablyDead( $collector, $ipaddr, $port, $community );
+        
+        # Clear the mapping
+        delete $cref->{'maps'}{$ipaddr}{$port}{$community};
+        foreach my $oid ( keys %{$pdu_tokens} )
+        {
+            foreach my $token ( keys %{$pdu_tokens->{$oid}} )
+            {
+                $cref->{'needsRemapping'}{$token} = 1;
+            }
+        }
         return;
     }
     else

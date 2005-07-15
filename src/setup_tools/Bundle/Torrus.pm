@@ -74,6 +74,8 @@ URI::Escape
 
 Apache::Session
 
+Date::Parse
+
 =head1 AUTHOR
 
 Stanislav Sinyagin E<lt>F<ssinyagin@yahoo.com>E<gt>

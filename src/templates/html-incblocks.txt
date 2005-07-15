@@ -3,6 +3,10 @@
   All BLOCK statements are defined here
 %]
 
+[%#  ###########    Initialize globals   ################ %]
+[% global.setDateDialog = 0; %]
+
+
 [%#  ###########    Print the starting HTML blahblah   ################ %]
 
 [% BLOCK htmlstart;
@@ -90,8 +94,11 @@ window.open('[%url(token) _ '&view=helptext-html'%]','helpwindow',
 </DIV>
 [% END %]
 <DIV CLASS="[%contentClass%]">
-[% global.contentFinished = 0;
-END %]
+[% global.contentFinished = 0 %]
+[% IF global.printError %]
+<DIV CLASS="ErrorMessage">[% global.printError %]</DIV>
+[% END %]
+[% END %]
 
 [%#  ###########    Print the legend   ################ %]
 
@@ -272,7 +279,12 @@ END %]
 [%# ########   Set the date variable   ####### %]
 [% BLOCK setdate %]
 [% IF variables.SETDATE;
-     variables.NOW = variables.SETDATEV;
+     thedate = verifyDate( variables.SETDATEV );
+     IF thedate.length == 0;
+         global.printError = 'Incorrect date format';
+     ELSE;
+         variables.NOW = thedate;
+     END;
    ELSE;
      clearVar('NOW');
      clearVar('SETDATE');

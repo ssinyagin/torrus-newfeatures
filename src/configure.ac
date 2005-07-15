@@ -87,7 +87,8 @@ AC_SUBST(perllibdirs, [${perllibdirs}])
 if test "$enable_pkgonly" != yes; then
 
    for module in 'BerkeleyDB' 'XML::LibXML' 'Template' \
-                 'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session'
+                 'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \
+                 'Date::Parse'
    do
      AC_MSG_CHECKING([presence of $module])
      if ${PERL} -e 'use '$module 2>/dev/null; then

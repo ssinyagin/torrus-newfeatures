@@ -1,3 +1,9 @@
+2005-07-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/HTML.pm: entered Date/time verification
+	New CPAN module required:
+	perl -MCPAN -e 'install Date::Parse'
+
 2005-07-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* templates/html-incblocks.txt: Added date setting dialog.

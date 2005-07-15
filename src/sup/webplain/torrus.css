@@ -377,14 +377,15 @@ SPAN.LoginInput INPUT {
   clear : both;
   float : none;
   font-size : 9px;
-  height : 15px;
+  /* height : 15px; */
   margin : 50px 0 0 0;
   padding-bottom : 0;
   padding-left : 1em;
   padding-right : 0;
   padding-top : 0;
-  width : 100%;
+  width : 100%;  
 }
+
 
 
 *.TopMenu A, *.TopMenu A:link, *.TopMenu A:visited,
@@ -467,9 +468,14 @@ SPAN.LoginInput INPUT {
 }
 
 *.SetDateDialog FORM {
-   display : inline;
+  display : inline;
 }
 
 *.SetDateDialog INPUT {
   font-size : 9px;
+}
+
+*.ErrorMessage {
+  color : red;
+  height : 15px;
 }

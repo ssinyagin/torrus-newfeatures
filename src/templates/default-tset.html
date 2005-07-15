@@ -1,4 +1,5 @@
 [% PROCESS 'html-incblocks.txt' %]
+[% INCLUDE setdate %]
 [% comment = xmlnorm(param(token, 'comment')) %]
 [% INCLUDE htmlstart title=comment contentClass="SingleColumnContent" %]
 

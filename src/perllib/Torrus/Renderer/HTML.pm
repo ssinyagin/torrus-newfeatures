@@ -25,8 +25,10 @@ use Torrus::ConfigTree;
 use Torrus::Log;
 
 use URI::Escape;
-use POSIX;
 use Template;
+use POSIX qw(pow);
+use Date::Parse;
+use Date::Format;
 
 Torrus::SiteConfig::loadStyling();
 
@@ -96,8 +98,9 @@ sub render_html
         'mayDisplayAdmInfo' => sub {
             return $self->may_display_adminfo( $config_tree, $_[0] ) },
         'adminfo' => $self->{'adminfo'},
-        'timestamp'  => sub { return strftime($Torrus::Renderer::timeFormat,
-                                              localtime(time())); },
+        'timestamp'  => sub { return time2str($Torrus::Renderer::timeFormat,
+                                              time()); },
+        'verifyDate'  => sub { return verifyDate($_[0]); },
         'markup'     => sub{ return $self->translateMarkup( @_ ); }
     };
     
@@ -403,6 +406,24 @@ sub translateMarkup
     undef $tt;
     
     return $ret;
+}
+
+
+sub verifyDate
+{
+    my $input = shift;
+
+    my $time = str2time( $input );
+    # rrdtool does not understand dates prior to 1980 (315529200)
+    if( defined( $time ) and $time > 315529200 )
+    {
+        # Present the time in format understood by rrdtool
+        return time2str('%H:%M %Y%m%d', $time);
+    }
+    else
+    {
+        return '';
+    }
 }
 
 1;

@@ -1,5 +1,8 @@
 2005-07-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover.pm (buildConfig):
+	New discovery parameter: disable-snmpcollector	
+
 	* bin/devdiscover.in: Preventing the bundle file update when
 	--limit is specified.
 

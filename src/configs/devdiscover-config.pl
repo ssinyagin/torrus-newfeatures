@@ -82,7 +82,11 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'snmp-defaults',
          'source' => 'snmp-defs.xml'
          },
-
+     '::viewonly-defaults' => {
+         'name'   => 'viewonly-defaults',
+         'source' => 'snmp-defs.xml'
+         },
+     
      #### IF-MIB
 
      'RFC2863_IF_MIB::rfc2863-ifmib-hostlevel' => {

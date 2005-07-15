@@ -125,6 +125,16 @@
     <param name="rrd-create-hw-rralen" value="4032" />
   </template>
 
+  <!-- Template for read-only access to RRD files -->
+  
+  <template name="viewonly-defaults">
+    <param name="ds-type" value="rrd-file" />
+    <param name="leaf-type" value="rrd-def" />
+    <param name="rrd-cf"    value="AVERAGE" />
+    <param name="system-id" value="%snmp-host%" />
+  </template>
+
+  
 </datasources>
 
 </configuration>

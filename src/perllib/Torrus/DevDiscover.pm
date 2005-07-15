@@ -372,7 +372,14 @@ sub buildConfig
 
             my $data = $devdetails->data();
 
-            push( @{$data->{'templates'}}, '::snmp-defaults' );
+            if( $devdetails->param('disable-snmpcollector' ) eq 'yes' )
+            {
+                push( @{$data->{'templates'}}, '::viewonly-defaults' );
+            }
+            else
+            {
+                push( @{$data->{'templates'}}, '::snmp-defaults' );
+            }
 
             if( $devdetails->param('rrd-hwpredict' ) eq 'yes' )
             {

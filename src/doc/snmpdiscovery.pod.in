@@ -334,6 +334,12 @@ at the host level.
 Optional comma-separated list of object selectors. They are explained in more
 detail below.
 
+=item * C<disable-snmpcollector>
+
+When set to C<yes>, this parameter disables SNMP collection for this
+host. It is useful for creating custom views, in conjunction with
+C<RFC2863_IF_MIB::only-interfaces> parameter.
+
 =back
 
 

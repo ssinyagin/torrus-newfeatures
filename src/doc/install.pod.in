@@ -155,6 +155,10 @@ Mod_perl is a Perl runtime environment integrated into Apache HTTP server.
 
 User session tracking helper
 
+=item * Date::Parse and Date::Format
+
+Module for parsing the user input for date and time.
+
 =back
 
 =item * C<libapreq2> Perl library

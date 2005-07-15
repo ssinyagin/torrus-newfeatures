@@ -26,7 +26,7 @@ use Torrus::Log;
 
 use URI::Escape;
 use Template;
-use POSIX qw(pow);
+use POSIX qw(abs log floor pow);
 use Date::Parse;
 use Date::Format;
 

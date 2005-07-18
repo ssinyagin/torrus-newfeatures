@@ -315,9 +315,14 @@ sub validateNode
         }
 
         # Verify type-specific parameters
+        my $dsType = $config_tree->getNodeParam( $token, 'ds-type' );
+        if( not defined( $dsType ) )
+        {
+            # Writer has already complained
+            return 0;
+        }
 
-        if( $config_tree->getNodeParam( $token, 'ds-type' ) eq
-            'rrd-multigraph' )
+        if( $dsType eq 'rrd-multigraph' )
         {
             my @dsNames =
                 split(',', $config_tree->getNodeParam( $token, 'ds-names' ) );
@@ -383,8 +388,7 @@ sub validateNode
             }
             # Otherwise already reported by  validateInstanceParams()
         }
-        elsif($config_tree->getNodeParam( $token, 'ds-type' ) eq 'collector'
-              and
+        elsif($dsType eq 'collector' and
               $config_tree->getNodeParam( $token, 'collector-type' ) eq 'snmp')
         {
             # Check the OID syntax

@@ -386,86 +386,99 @@ sub postProcessNodes
         }
 
         my $dsType = $self->getNodeParam( $token, 'ds-type' );
-        if( $dsType eq 'rrd-multigraph' )
+        if( defined( $dsType ) )
         {
-            # Expand parameter substitutions in multigraph leaves
-
-            my @dsNames =
-                split(',', $self->getNodeParam($token, 'ds-names') );
-
-            foreach my $dname ( @dsNames )
+            if( $dsType eq 'rrd-multigraph' )
             {
-                foreach my $param ( 'ds-expr-' )
+                # Expand parameter substitutions in multigraph leaves
+                
+                my @dsNames =
+                    split(',', $self->getNodeParam($token, 'ds-names') );
+                
+                foreach my $dname ( @dsNames )
                 {
-                    my $dsParam = $param . $dname;
-                    my $value = $self->getNodeParam( $token, $dsParam );
-                    my $newValue = $value;
-                    $newValue =~ s/\s+//g;
-                    $newValue =
-                        $self->expandSubstitutions( $token, $dsParam,
-                                                    $newValue );
-                    if( $newValue ne $value )
+                    foreach my $param ( 'ds-expr-' )
                     {
-                        $self->setNodeParam( $token, $dsParam, $newValue );
+                        my $dsParam = $param . $dname;
+                        my $value = $self->getNodeParam( $token, $dsParam );
+                        my $newValue = $value;
+                        $newValue =~ s/\s+//g;
+                        $newValue =
+                            $self->expandSubstitutions( $token, $dsParam,
+                                                        $newValue );
+                        if( $newValue ne $value )
+                        {
+                            $self->setNodeParam( $token, $dsParam, $newValue );
+                        }
+                    }
+                }
+            }
+            elsif( $dsType eq 'collector' )
+            {
+                my $dispersed =
+                    $self->getNodeParam($token,
+                                        'collector-dispersed-timeoffset');
+                if( defined( $dispersed ) and $dispersed eq 'yes' )
+                {
+                    # Process dispersed collector offsets
+                    
+                    my %p;
+                    foreach my $param ( 'collector-timeoffset-min',
+                                        'collector-timeoffset-max',
+                                        'collector-timeoffset-step',
+                                        'collector-timeoffset-hashstring' )
+                    {
+                        my $val = $self->getNodeParam( $token, $param );
+                        if( not defined( $val ) )
+                        {
+                            Error('Mandatory parameter ' . $param . ' is not '.
+                                  ' defined in ' . $self->path( $token ));
+                            $ok = 0;
+                        }
+                        else
+                        {
+                            $p{$param} = $val;
+                        }
+                    }
+
+                    if( $ok )
+                    {
+                        my $min = $p{'collector-timeoffset-min'};
+                        my $max = $p{'collector-timeoffset-max'};
+                        if( $max < $min )
+                        {
+                            Error('collector-timeoffset-max is less than ' .
+                                  'collector-timeoffset-min in ' .
+                                  $self->path( $token ));
+                            $ok = 0;
+                        }
+                        else
+                        {
+                            my $step = $p{'collector-timeoffset-step'};
+                            my $hashString =
+                                $p{'collector-timeoffset-hashstring'};
+
+                            my $bucketSize = int( ($max - $min) / $step );
+                            my $offset = $min +
+                                $step * ( unpack( 'N', md5( $hashString ) ) %
+                                          $bucketSize );
+                            
+                            Debug('Hashed offset ' . $offset . ' for ' .
+                                  $token);
+                            $self->setNodeParam( $token,
+                                                 'collector-timeoffset',
+                                                 $offset );
+                        }
                     }
                 }
             }
         }
-        elsif( $dsType eq 'collector' )
+        else
         {
-            my $dispersed =
-                $self->getNodeParam($token, 'collector-dispersed-timeoffset');
-            if( defined( $dispersed ) and $dispersed eq 'yes' )
-            {
-                # Process dispersed collector offsets
-
-                my %p;
-                foreach my $param ( 'collector-timeoffset-min',
-                                    'collector-timeoffset-max',
-                                    'collector-timeoffset-step',
-                                    'collector-timeoffset-hashstring' )
-                {
-                    my $val = $self->getNodeParam( $token, $param );
-                    if( not defined( $val ) )
-                    {
-                        Error('Mandatory parameter ' . $param . ' is not '.
-                              ' defined in ' . $self->path( $token ));
-                        $ok = 0;
-                    }
-                    else
-                    {
-                        $p{$param} = $val;
-                    }
-                }
-
-                if( $ok )
-                {
-                    my $min = $p{'collector-timeoffset-min'};
-                    my $max = $p{'collector-timeoffset-max'};
-                    if( $max < $min )
-                    {
-                        Error('collector-timeoffset-max is less than ' .
-                              'collector-timeoffset-min in ' .
-                              $self->path( $token ));
-                        $ok = 0;
-                    }
-                    else
-                    {
-                        my $step = $p{'collector-timeoffset-step'};
-                        my $hashString = $p{'collector-timeoffset-hashstring'};
-
-                        my $bucketSize = int( ($max - $min) / $step );
-                        my $offset = $min +
-                            $step * ( unpack( 'N', md5( $hashString ) ) %
-                                      $bucketSize );
-
-                        Debug('Hashed offset ' . $offset . ' for ' . $token);
-                        $self->setNodeParam( $token, 'collector-timeoffset',
-                                             $offset );
-                    }
-                }
-            }
-        }
+            my $path = $self->path( $token );
+            Error("Mandatory parameter 'ds-type' is not defined for $path");
+            $ok = 0;
+        }            
     }
     else
     {

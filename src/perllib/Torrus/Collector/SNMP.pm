@@ -478,12 +478,14 @@ sub probablyDead
         
         delete $cref->{'reptoken'}{$ipaddr}{$port}{$community};
         delete $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community};
+        delete $cref->{'hostUnreachableRetry'}{$ipaddr}{$port}{$community};
         $cref->{'unreachableHostDeleted'}{$ipaddr}{$port}{$community} = 1;
     }
     
     return $probablyAlive;
 }
 
+# Return false if the try is too early
 
 sub checkUnreachableRetry
 {
@@ -497,12 +499,25 @@ sub checkUnreachableRetry
     my $ret = 1;
     if( exists( $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} ) )
     {
-        if( time() <
-            $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} +
+        my $lastRetry = $cref->{'hostUnreachableRetry'}{
+            $ipaddr}{$port}{$community};
+
+        if( not defined( $lastRetry ) )
+        {
+            $lastRetry =
+                $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community};
+        }
+            
+        if( time() < $lastRetry +
             $Torrus::Collector::SNMP::unreachableRetryDelay )
         {
             $ret = 0;
         }
+        else
+        {
+            $cref->{'hostUnreachableRetry'}{
+                $ipaddr}{$port}{$community} = time();
+        }            
     }
     
     return $ret;

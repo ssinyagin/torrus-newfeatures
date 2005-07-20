@@ -118,21 +118,22 @@ sub render
     ($t_render, $t_expires, $filename, $mime_type) =
         $self->getCache( $cachekey );
 
-    if( defined( $filename ) )
-    {
-        if( $t_expires >= time() )
-        {
-            return ($Torrus::Global::cacheDir.'/'.$filename,
-                    $mime_type, $t_expires - time());
-        }
-        # Else reuse the old filename
-    }
-    else
+    my $not_in_cache = 0;
+    
+    if( not defined( $filename ) )
     {
         $filename = Torrus::Renderer::newCacheFileName( $cachekey );
+        $not_in_cache = 1;
     }
 
     my $cachefile = $Torrus::Global::cacheDir.'/'.$filename;
+
+    if( ( not $not_in_cache ) and
+        -f $cachefile and
+        $t_expires >= time() )
+    {
+        return ($cachefile, $mime_type, $t_expires - time());
+    }
 
     my $method = 'render_' . $config_tree->getParam($view, 'view-type');
 

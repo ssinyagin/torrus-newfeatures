@@ -21,9 +21,8 @@
 
 BEGIN { require '@torrus_config_pl@'; }
 
-use Apache2;
-use Apache::ServerUtil;
-use mod_perl;
+use Apache2::ServerUtil;
+use mod_perl2;
 
 use Torrus::Log;
 use Torrus::DB;
@@ -50,7 +49,7 @@ if( $Torrus::Renderer::globalDebug )
 }
 
 my $ok = 1;
-my $s = Apache->server();
+my $s = Apache2::ServerUtil->server();
 
 # Apache::Server::is_perl_option_enabled is implemented since
 # mod_perl2-1.99r13, but many installations still use mod_perl2-1.99r12

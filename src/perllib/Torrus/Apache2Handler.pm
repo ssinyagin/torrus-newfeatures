@@ -22,18 +22,17 @@
 package Torrus::Apache2Handler;
 
 use strict;
-use Apache2;
 
-use Apache::RequestRec;
-use Apache::RequestIO;
-use Apache::RequestUtil;
-use Apache::Const -compile => qw(:common);
+use Apache2::RequestRec;
+use Apache2::RequestIO;
+use Apache2::RequestUtil;
+use Apache2::Const -compile => qw(:common);
     
 # This is actually not a part of mod_perl
 use Apache::Session::File;
 
-# libapreq2
-use Apache::Request;
+# libapreq2-2.06 or higher
+use Apache2::Request;
 
 use Torrus::Log;
 use Torrus::Renderer;
@@ -49,7 +48,7 @@ sub handler : method
         print STDERR $r->as_string();
     }
     
-    my $apr = Apache::Request->new($r);
+    my $apr = Apache2::Request->new($r);
 
     my @paramNames = $apr->param();
 
@@ -75,7 +74,7 @@ sub handler : method
         $Torrus::ApacheHandler::renderer = new Torrus::Renderer();
         if( not defined( $Torrus::ApacheHandler::renderer ) )
         {
-            return Apache::SERVER_ERROR;
+            return Apache2::Const::SERVER_ERROR;
         }
     }
 
@@ -228,7 +227,7 @@ sub handler : method
         undef $options{'acl'};
     }
 
-    my $retval = Apache::OK;
+    my $retval = Apache2::Const::OK;
 
     if( defined($fname) )
     {
@@ -244,7 +243,7 @@ sub handler : method
     }
     else
     {
-        $retval = Apache::SERVER_ERROR;
+        $retval = Apache2::Const::SERVER_ERROR;
     }
     
     if( not $Torrus::Renderer::globalDebug )
@@ -264,7 +263,7 @@ sub report_error
     $r->no_cache(1);
     $r->content_type('text/plain');
     $r->print('Error: ' . $msg);
-    return Apache::OK;
+    return Apache2::Const::OK;
 }
 
 

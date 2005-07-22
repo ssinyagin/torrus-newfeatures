@@ -104,8 +104,9 @@ sub discover
         my $peerIP = $interface->{'mediaToIpNet'}{$phyAddr};
         if( not defined( $peerIP ) )
         {
-            Error('Cannot determine IP address for MAC accounting entry: ' .
-                  $macAddrString);
+            # high logging level, because who cares about staled entries?
+            Debug('Cannot determine IP address for MAC accounting ' .
+                  'entry: ' . $macAddrString);            
             next;
         }
 

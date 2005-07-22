@@ -448,6 +448,7 @@ sub buildConfig
     # tokenset member interfaces of the form
     # Format: tset:intf,intf; tokenset:intf,intf;
     my %tsetMember;
+    my %tsetMemberApplied;
     my $tsetMembership =
         $devdetails->param('RFC2863_IF_MIB::tokenset-members');
     if( defined( $tsetMembership ) and length( $tsetMembership ) > 0 )
@@ -662,6 +663,7 @@ sub buildConfig
                 
                 $interface->{'childCustomizations'}->{'InOut_bps'}->{
                     'tokenset-member'} = $tsetList;
+                $tsetMemberApplied{$subtreeName} = 1;
             }            
             
             my $intfNode =
@@ -686,6 +688,26 @@ sub buildConfig
         Debug('Explicitly excluded ' . $nExplExcluded .
               ' RFC2863_IF_MIB interfaces');
     }
+
+    if( scalar( %tsetMember ) > 0 )
+    {
+        my @failedIntf;
+        foreach my $intfName ( keys %tsetMember )
+        {
+            if( not $tsetMemberApplied{$intfName} )
+            {
+                push( @failedIntf, $intfName );
+            }
+        }
+
+        if( scalar( @failedIntf ) > 0 )
+        {
+            Warn('The following interfaces were not added to tokensets, ' .
+                 'probably because they do not exist or are explicitly ' .
+                 'excluded: ' .
+                 join(' ', sort @failedIntf));
+        }
+    }                 
     
     $cb->{'statistics'}{'interfaces'} += $nInterfaces;
     if( $cb->{'statistics'}{'max-interfaces-per-host'} < $nInterfaces )

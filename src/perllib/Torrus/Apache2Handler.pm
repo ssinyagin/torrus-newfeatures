@@ -231,6 +231,11 @@ sub handler : method
 
     if( defined($fname) )
     {
+        if( not -e $fname )
+        {
+            return report_error($r, 'No such file or directory: ' . $fname);
+        }
+        
         Debug("Render returned $fname $mimetype $expires");
 
         $r->headers_out->add( 'Expires', '+'.$expires.'s' );

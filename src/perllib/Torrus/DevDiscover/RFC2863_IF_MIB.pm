@@ -616,7 +616,7 @@ sub buildConfig
                 ( split('\s*,\s*',
                         $interface->{'selectorActions'}{'TokensetMember'}) )
             {
-                $tsetMember{$subtreeName}{$tset}
+                $tsetMember{$subtreeName}{$tset} = 1;
             }
         }
         

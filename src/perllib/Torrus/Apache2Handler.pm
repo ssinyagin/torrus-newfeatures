@@ -248,7 +248,10 @@ sub handler : method
     }
     else
     {
-        $retval = Apache2::Const::SERVER_ERROR;
+        return report_error($r, "Renderer returned error.\n" .
+                            "Probably wrong directory permissions or " .
+                            "directory missing:\n" .
+                            $Torrus::Global::cacheDir);            
     }
     
     if( not $Torrus::Renderer::globalDebug )

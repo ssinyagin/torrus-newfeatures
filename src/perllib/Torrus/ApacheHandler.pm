@@ -257,7 +257,10 @@ sub handler
     }
     else
     {
-        $retval = Apache::Constants::SERVER_ERROR;
+        return report_error($r, "Renderer returned error.\n" .
+                            "Probably wrong directory permissions or " .
+                            "directory missing:\n" .
+                            $Torrus::Global::cacheDir);            
     }
 
     &Torrus::Log::setLevel('warn');

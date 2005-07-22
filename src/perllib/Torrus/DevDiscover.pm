@@ -839,12 +839,12 @@ sub applySelectors
             Debug('Initializing selector: ' . $sel);
             
             my $treg = $reg->{$type};
-            my @objects = &{$treg->{'getObjects'}}( $self );
+            my @objects = &{$treg->{'getObjects'}}( $self, $type );
 
             foreach my $object ( @objects )
             {
                 Debug('Checking object: ' .
-                      &{$treg->{'getObjectName'}}( $self, $object ));
+                      &{$treg->{'getObjectName'}}( $self, $object, $type ));
 
                 my $expr = $self->param( $sel . '-selector-expr' );
                 $expr = '1' if length( $expr ) == 0;
@@ -856,8 +856,9 @@ sub applySelectors
                     
                     Debug('Checking attribute: ' . $attr .
                           ' and value: ' . $checkval);
-                    my $ret = &{$treg->{'checkAttribute'}}( $self, $object,
-                                                           $attr, $checkval );
+                    my $ret = &{$treg->{'checkAttribute'}}( $self,
+                                                            $object, $type,
+                                                            $attr, $checkval );
                     Debug(sprintf('Returned value: %d', $ret));
                     return $ret;                    
                 };
@@ -876,8 +877,8 @@ sub applySelectors
                         
                         Debug('Applying action: ' . $action .
                               ' with argument: ' . $arg);
-                        &{$treg->{'applyAction'}}( $self, $object,
-                                                  $action, $arg );
+                        &{$treg->{'applyAction'}}( $self, $object, $type,
+                                                   $action, $arg );
                     }
                 }
             }

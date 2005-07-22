@@ -2,6 +2,7 @@ Round Robin Database Framework
   
 To do now:
 
+-- document seletcors internals
 -- fix the bug in recursive $def expansion
 -- Move expandable parameters from ConfigTree.pm to XML config
 -- dispersed timeoffsets for monitor

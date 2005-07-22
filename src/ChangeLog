@@ -1,3 +1,8 @@
+2005-07-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm (applySelectors):
+	Selectors format slightly changed: the type is passed into the methods
+
 2005-07-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm (buildConfig):

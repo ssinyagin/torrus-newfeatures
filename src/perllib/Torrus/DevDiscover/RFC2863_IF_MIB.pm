@@ -834,6 +834,7 @@ $Torrus::DevDiscover::selectorsRegistry{'RFC2863_IF_MIB'} = {
 sub getSelectorObjects
 {
     my $devdetails = shift;
+    my $objType = shift;
     return sort {$a<=>$b} keys ( %{$devdetails->data()->{'interfaces'}} );
 }
 
@@ -842,6 +843,7 @@ sub checkSelectorAttribute
 {
     my $devdetails = shift;
     my $object = shift;
+    my $objType = shift;
     my $attr = shift;
     my $checkval = shift;
 
@@ -878,6 +880,7 @@ sub getSelectorObjectName
 {
     my $devdetails = shift;
     my $object = shift;
+    my $objType = shift;
     
     my $data = $devdetails->data();
     my $interface = $data->{'interfaces'}{$object};
@@ -902,6 +905,7 @@ sub applySelectorAction
 {
     my $devdetails = shift;
     my $object = shift;
+    my $objType = shift;
     my $action = shift;
     my $arg = shift;
 

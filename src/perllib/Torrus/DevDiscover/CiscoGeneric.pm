@@ -213,11 +213,34 @@ sub discover
             {
                 $data->{'ciscoCpuStats'}{$INDEX} = {};
 
-                $data->{'ciscoCpuStats'}{$INDEX}{'phy-index'} =
-                    $devdetails->
+                my $phyIndex = $devdetails->
                     snmpVar($dd->oiddef('cpmCPUTotalPhysicalIndex') .
                             '.' . $INDEX );
+                
+                my $phyDescr;
+                my $phyName;
+                
+                if( $phyIndex > 0 and
+                    $devdetails->isDevType('RFC2737_ENTITY_MIB') )
+                {
+                    $phyDescr = $data->{'entityPhysical'}{$phyIndex}{'descr'};
+                    $phyName = $data->{'entityPhysical'}{$phyIndex}{'name'};
+                }
+                
+                $phyDescr = 'Central Processor' unless $phyDescr;
+                $phyName = ('Chassis #' . $phyIndex) unless $phyName;
+                    ;
+                my $cpuNick = $phyName;
+                $cpuNick =~ s/^\///;
+                $cpuNick =~ s/\W/_/g;
+                $cpuNick =~ s/_+/_/g;
 
+                $data->{'ciscoCpuStats'}{$INDEX} = {
+                    'phy-index'  => $phyIndex,
+                    'phy-name'   => $phyName,
+                    'phy-descr'  => $phyDescr,
+                    'cpu-nick'   => $cpuNick };
+                
                 if( $devdetails->hasOID( $dd->oiddef('cpmCPUTotal1minRev') .
                                          '.' .  $INDEX ) )
                 {
@@ -249,8 +272,8 @@ sub buildConfig
     my $devdetails = shift;
     my $cb = shift;
     my $devNode = shift;
+    
     my $data = $devdetails->data();
-
 
     # Temperature Sensors
 
@@ -305,7 +328,14 @@ sub buildConfig
             {
                 $param->{'monitor'} = $monitor;
             }
-            
+
+            my $tset = $data->{'ciscoTemperatureSensors'}{$sIndex}->{
+                'selectorActions'}{'TokensetMember'};
+            if( defined( $tset ) )
+            {
+                $param->{'tokenset-member'} = $tset;
+            }
+
             $cb->addLeaf( $subtreeNode, $leafName, $param, $templates );
         }
     }
@@ -414,31 +444,19 @@ sub buildConfig
         my $subtreeNode =
             $cb->addSubtree( $devNode, $subtreeName, $param,
                              ['CiscoGeneric::cisco-cpu-usage-subtree']);
-
+        
         foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'ciscoCpuStats'}} )
         {
-            my $phyIndex = $data->{'ciscoCpuStats'}{$INDEX}{'phy-index'};
-            my $phyDescr;
-            my $phyName;
-
-            if( $phyIndex > 0 and
-                $devdetails->isDevType('RFC2737_ENTITY_MIB') )
-            {
-                $phyDescr = $data->{'entityPhysical'}{$phyIndex}{'descr'};
-                $phyName = $data->{'entityPhysical'}{$phyIndex}{'name'};
-            }
-
-            $phyDescr = 'Central Processor' unless $phyDescr;
-            $phyName = ('Chassis #' . $phyIndex) unless $phyName;
+            my $cpu = $data->{'ciscoCpuStats'}{$INDEX};
 
             my $param = {
-                'entity-phy-index' => $phyIndex,
-                'comment' => $phyDescr . ' in ' . $phyName
+                'entity-phy-index' => $cpu->{'phy-index'},
+                'comment' => $cpu->{'phy-descr'} . ' in ' . $cpu->{'phy-name'}
                 };
 
             my @templates;
 
-            if( $data->{'ciscoCpuStats'}{$INDEX}{'stats-type'} eq 'revised' )
+            if( $cpu->{'stats-type'} eq 'revised' )
             {
                 push( @templates, 'CiscoGeneric::cisco-cpu-revised' );
             }
@@ -446,14 +464,16 @@ sub buildConfig
             {
                 push( @templates, 'CiscoGeneric::cisco-cpu' );
             }
-
-            my $cpuSubtreeName = $phyName;
-            $cpuSubtreeName =~ s/^\///;
-            $cpuSubtreeName =~ s/\W/_/g;
-            $cpuSubtreeName =~ s/_+/_/g;
-
-            $cb->addSubtree( $subtreeNode, $cpuSubtreeName,
-                             $param, \@templates );
+            
+            my $cpuNode = $cb->addSubtree( $subtreeNode, $cpu->{'cpu-nick'},
+                                           $param, \@templates );
+            
+            my $tset = $cpu->{'selectorActions'}{'TokensetMember'};
+            if( defined( $tset ) )
+            {
+                $cb->addLeaf( $cpuNode, 'CPU_Total_1min',
+                              { 'tokenset-member' => $tset } );
+            }
         }
     }
 }
@@ -471,14 +491,33 @@ $Torrus::DevDiscover::selectorsRegistry{'CiscoSensor'} = {
     'applyAction'     => \&applySelectorAction,
 };
 
+$Torrus::DevDiscover::selectorsRegistry{'CiscoCPU'} = {
+    'getObjects'      => \&getSelectorObjects,
+    'getObjectName'   => \&getSelectorObjectName,
+    'checkAttribute'  => \&checkSelectorAttribute,
+    'applyAction'     => \&applySelectorAction,
+};
 
 ## Objects are interface indexes
 
 sub getSelectorObjects
 {
     my $devdetails = shift;
-    return sort {$a<=>$b} keys
-        ( %{$devdetails->data()->{'ciscoTemperatureSensors'}} );
+    my $objType = shift;
+
+    my $data = $devdetails->data();
+    my @ret;
+    
+    if( $objType eq 'CiscoSensor' )
+    {
+        @ret = keys( %{$data->{'ciscoTemperatureSensors'}} );
+    }
+    elsif( $objType eq 'CiscoCPU' )
+    {
+        @ret = keys( %{$data->{'ciscoCpuStats'}} );
+    }
+
+    return( sort {$a<=>$b} @ret );
 }
 
 
@@ -486,24 +525,45 @@ sub checkSelectorAttribute
 {
     my $devdetails = shift;
     my $object = shift;
+    my $objType = shift;
     my $attr = shift;
     my $checkval = shift;
 
     my $data = $devdetails->data();
-    my $sensor = $data->{'ciscoTemperatureSensors'}{$object};
     
     my $value;
     my $operator = '=~';
     
-    if( $attr eq 'SensorDescr' )
+    if( $objType eq 'CiscoSensor' )
     {
-        $value = $sensor->{'description'};
+        my $sensor = $data->{'ciscoTemperatureSensors'}{$object};
+        if( $attr eq 'SensorDescr' )
+        {
+            $value = $sensor->{'description'};
+        }
+        else
+        {
+            Error('Unknown CiscoSensor selector attribute: ' . $attr);
+            $value = '';
+        }
     }
-    else
+    elsif( $objType eq 'CiscoCPU' )
     {
-        Error('Unknown CiscoSensor selector attribute: ' . $attr);
-        $value = '';
-    }
+        my $cpu = $data->{'ciscoCpuStats'}{$object};
+        if( $attr eq 'CPUName' )
+        {
+            $value = $cpu->{'cpu-nick'};
+        }
+        elsif( $attr eq 'CPUDescr' )
+        {
+            $value = $cpu->{'cpu-descr'};
+        }
+        else
+        {
+            Error('Unknown CiscoCPU selector attribute: ' . $attr);
+            $value = '';
+        }        
+    }        
     
     return eval( '$value' . ' ' . $operator . '$checkval' ) ? 1:0;
 }
@@ -513,34 +573,59 @@ sub getSelectorObjectName
 {
     my $devdetails = shift;
     my $object = shift;
+    my $objType = shift;
     
     my $data = $devdetails->data();
-    my $sensor = $data->{'ciscoTemperatureSensors'}{$object};
-    return $sensor->{'description'};
+    my $name;
+
+    if( $objType eq 'CiscoSensor' )
+    {
+        $name = $data->{'ciscoTemperatureSensors'}{$object}{'description'};
+    }
+    elsif( $objType eq 'CiscoCPU' )
+    {
+        $name = $data->{'ciscoCpuStats'}{$object}{'cpu-nick'};
+    }
+    return $name;
 }
 
 
 my %knownSelectorActions =
-    ( 'Monitor' => 1 );
+    (
+     'CiscoSensor' => {
+         'Monitor' => 1,
+         'TokensetMember' => 1 },
+     'CiscoCPU' => {
+         'TokensetMember' => 1 }
+     );
 
                             
 sub applySelectorAction
 {
     my $devdetails = shift;
     my $object = shift;
+    my $objType = shift;
     my $action = shift;
     my $arg = shift;
 
     my $data = $devdetails->data();
-    my $sensor = $data->{'ciscoTemperatureSensors'}{$object};
-
-    if( $knownSelectorActions{$action} )
+    my $objref;
+    if( $objType eq 'CiscoSensor' )
     {
-        $sensor->{'selectorActions'}{$action} = $arg;
+        $objref = $data->{'ciscoTemperatureSensors'}{$object};
+    }
+    elsif( $objType eq 'CiscoCPU' )
+    {
+        $objref = $data->{'ciscoCpuStats'}{$object};
+    }
+    
+    if( $knownSelectorActions{$objType}{$action} )
+    {
+        $objref->{'selectorActions'}{$action} = $arg;
     }
     else
     {
-        Error('Unknown CiscoSensor selector action: ' . $action);
+        Error('Unknown Cisco selector action: ' . $action);
     }
 }   
 

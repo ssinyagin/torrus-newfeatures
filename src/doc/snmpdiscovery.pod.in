@@ -549,7 +549,7 @@ selector name, C<A> as attribute name, and C<T> as action name.
 =item * C<S-selector-type>
 
 Type of objects to be selected. Supported values are: C<RFC2863_IF_MIB>,
-C<CiscoSensor>.
+C<CiscoCPU>, C<CiscoSensor>.
 
 =item * C<S-selector-expr>
 
@@ -685,6 +685,18 @@ free contention timeslots gauges correspondingly.
 =back
 
 
+=head3 CiscoCPU selector
+
+A selector of this type selects CPU statistics Cisco router or
+switch.
+
+The attributes supported are: C<CPUName> and C<CPUDescr>, and their
+values are regular expressions that should match the CPU name or description,
+as discovered by C<devdiscover>.
+
+The action supported is C<TokensetMember>, and its argument specifies
+the tokenset where to place the CPU statistics graph.
+
 
 =head3 CiscoSensor selector
 
@@ -695,8 +707,7 @@ The only attribute supported is C<SensorDescr>, and its value is a regular
 expression that should match the sensor description, as discovered
 by C<devdiscover>.
 
-The only action supported is C<Monitor>, and its argument specifies
-the monitor name to be applied to the sensor.
+Actions supported: C<Monitor>, C<TokensetMember>.
 
 
 

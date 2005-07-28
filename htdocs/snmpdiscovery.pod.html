@@ -33,6 +33,7 @@
 		<ul>
 
 			<li><a href="#rfc2863_if_mib_selector">RFC2863_IF_MIB selector</a></li>
+			<li><a href="#ciscocpu_selector">CiscoCPU selector</a></li>
 			<li><a href="#ciscosensor_selector">CiscoSensor selector</a></li>
 			<li><a href="#examples">Examples</a></li>
 		</ul>
@@ -335,6 +336,12 @@ at the host level.
 </li>
 Optional comma-separated list of object selectors. They are explained in more
 detail below.
+<p></p>
+<li><strong><a name="item_disable_2dsnmpcollector"><code>disable-snmpcollector</code></a></strong><br />
+</li>
+When set to <code>yes</code>, this parameter disables SNMP collection for this
+host. It is useful for creating custom views, in conjunction with
+<a href="#item_rfc2863_if_mib_3a_3aonly_2dinterfaces"><code>RFC2863_IF_MIB::only-interfaces</code></a> parameter.
 <p></p></ul>
 <p>
 </p>
@@ -359,6 +366,13 @@ counters are located. Default: <code>Interface_Counters</code>.
 Comma-separated list of interface names which should be excluded from
 configuration. Spaces are allowed between the names and commas.
 The names should be the ones that are used for interface subtrees.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3aonly_2dinterfaces"><code>RFC2863_IF_MIB::only-interfaces</code></a></strong><br />
+</li>
+If defined, this parameter specifies the list of interfaces that will be
+included in the discovery results. The names should match the interface
+subtree names. Caution: if specified incorrectly, this parameter may
+disable discovery for all interfaces on a device.
 <p></p>
 <li><strong><a name="item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a></strong><br />
 </li>
@@ -524,7 +538,7 @@ selector name, <code>A</code> as attribute name, and <code>T</code> as action na
 <li><strong><a name="item_s_2dselector_2dtype"><code>S-selector-type</code></a></strong><br />
 </li>
 Type of objects to be selected. Supported values are: <code>RFC2863_IF_MIB</code>,
-<code>CiscoSensor</code>.
+<code>CiscoCPU</code>, <code>CiscoSensor</code>.
 <p></p>
 <li><strong><a name="item_s_2dselector_2dexpr"><code>S-selector-expr</code></a></strong><br />
 </li>
@@ -649,14 +663,23 @@ free contention timeslots gauges correspondingly.
 <p></p></ul>
 <p>
 </p>
+<h3><a name="ciscocpu_selector">CiscoCPU selector</a></h3>
+<p>A selector of this type selects CPU statistics Cisco router or
+switch.</p>
+<p>The attributes supported are: <code>CPUName</code> and <code>CPUDescr</code>, and their
+values are regular expressions that should match the CPU name or description,
+as discovered by <code>devdiscover</code>.</p>
+<p>The action supported is <a href="#item_tokensetmember"><code>TokensetMember</code></a>, and its argument specifies
+the tokenset where to place the CPU statistics graph.</p>
+<p>
+</p>
 <h3><a name="ciscosensor_selector">CiscoSensor selector</a></h3>
 <p>A selector of this type selects temperature sensors on a Cisco router or
 switch.</p>
 <p>The only attribute supported is <code>SensorDescr</code>, and its value is a regular
 expression that should match the sensor description, as discovered
 by <code>devdiscover</code>.</p>
-<p>The only action supported is <code>Monitor</code>, and its argument specifies
-the monitor name to be applied to the sensor.</p>
+<p>Actions supported: <code>Monitor</code>, <a href="#item_tokensetmember"><code>TokensetMember</code></a>.</p>
 <p>
 </p>
 <h3><a name="examples">Examples</a></h3>

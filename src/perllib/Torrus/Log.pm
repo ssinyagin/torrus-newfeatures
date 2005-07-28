@@ -60,6 +60,7 @@ sub Log
         printf STDERR ( "[%s%s] %s\n",
                         timeStr( time() ), $severity, join( '', @msg ) );
     }
+    return undef;
 }
 
 

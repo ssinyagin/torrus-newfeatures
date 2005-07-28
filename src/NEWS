@@ -1,3 +1,33 @@
+27-JUL-2005: Torrus release 1.0.2
+
+The new release requires one additional Perl module to be
+installed: Date::Parse. You can install it from CPAN by using the command:
+  perl -MCPAN -e 'install Date::Parse'
+
+In this release:
+
+-- Unreachable SNMP devices handling has significantly improved.
+   The default unreachable timeout is set to 6 hours.
+
+-- Support for the new mod_perl 2.0 layout.
+
+-- New OID in TORRUS-MIB: torrusMonitorDesc, for easier processing of
+   SNMP traps.
+
+-- ./configure checks if the user "torrus" exists in the system
+
+-- New SNMP discovery parameters:
+   RFC2863_IF_MIB::only-interfaces
+   disable-snmpcollector
+
+-- On the graph page, it is now possible to choose the date for displaying
+   old statistics.
+
+-- The Cisco CPUs are now managed by devdiscover's selectors.
+   This allows you to add monitors to specific CPU graphs, and also add them
+   to a tokenset.
+
+
 21-JUN-2005: Torrus release 1.0.1
 
 In this release:

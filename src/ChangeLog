@@ -1,3 +1,7 @@
+2005-07-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 1.0.2
+
 2005-07-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm (applySelectors):

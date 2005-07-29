@@ -377,7 +377,7 @@ sub lookupMap
         # Retrieve the map table
 
         my $result = $session->get_table( -baseoid => $map );
-        $session->close();
+        
         if( defined $result )
         {
             while( my( $val, $key ) = each %{$result} )
@@ -388,11 +388,13 @@ sub lookupMap
                     $val;
                 # Debug("Map $map discovered: '$key' -> '$val'");
             }
+            $session->close();
         }
         else
         {
             Error("Error retrieving table $map from $ipaddr: " .
                   $session->error());
+            $session->close();
             probablyDead( $collector, $ipaddr, $port, $community );
             return undef;
         }
@@ -431,6 +433,10 @@ sub probablyDead
     my $community = shift;
 
     my $cref = $collector->collectorData( 'snmp' );
+
+    # Stop all collection for this host, until next initTargetAttributes
+    # is successful
+    delete $cref->{'reptoken'}{$ipaddr}{$port}{$community};
 
     my $probablyAlive = 1;
 

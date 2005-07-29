@@ -19,7 +19,7 @@
 #
 
 
-AC_INIT([torrus],[1.0.2],[ssinyagin@users.sourceforge.net])
+AC_INIT([torrus],[1.0.2pl1],[ssinyagin@users.sourceforge.net])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)
@@ -47,6 +47,15 @@ AC_ARG_ENABLE(pkgonly,
 AC_SUBST(enable_pkgonly)
 
 perllibdirs="\'\${perllibdir}\'"
+
+PERLOPTS=
+AC_ARG_VAR(PERLINC,  [[] Additional space-separated Perl library paths])
+if test ! -z "$PERLINC"; then
+   for d in $PERLINC; do
+       PERLOPTS="${PERLOPTS} -I${d}"
+       perllibdirs=${perllibdirs}"\,\'"${d}"\'"
+   done
+fi
 
 find_rrdtool () {
     if ${PERL} -e 'use RRDs' 2>/dev/null; then :; else
@@ -91,7 +100,7 @@ if test "$enable_pkgonly" != yes; then
                  'Date::Parse'
    do
      AC_MSG_CHECKING([presence of $module])
-     if ${PERL} -e 'use '$module 2>/dev/null; then
+     if ${PERL} ${PERLOPTS} -e 'use '$module 2>/dev/null; then
          AC_MSG_RESULT([Ok])
      else
          AC_MSG_ERROR([Perl cannot find $module]);

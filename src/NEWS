@@ -1,3 +1,9 @@
+02-AUG-2005: Torrus release 1.0.3
+
+This is a minor bugfix release. Unreachable device handling is improved, and
+also there's a possibility to specify extra Perl library path in ./configure
+
+
 27-JUL-2005: Torrus release 1.0.2
 
 The new release requires one additional Perl module to be

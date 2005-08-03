@@ -210,19 +210,16 @@ DIV.Legend {
 DIV.LegendRow {
   clear : both;
   float : none;
-  height : 11px;
-  width : 100%;
+  margin-bottom: 2px;
 }
 
 DIV.LegendRow SPAN.LegendName {
-  float : left;
   font-weight : bold;
   text-align : left;
   padding-right : 5px;
 }
 
 DIV.LegendRow SPAN.LegendValue {
-  float : left;
   text-align : left;
 }
 

@@ -294,6 +294,9 @@ sub storeData
         }
         else
         {
+            $storageUnavailable = 0;
+            $storageLastTry = time();
+            
             if( exists( $sref->{'backlog'} ) )
             {
                 # Try to flush the backlog first
@@ -331,8 +334,6 @@ sub storeData
                     $toBacklog = 1;                    
                 }
             }
-
-            $storageLastTry = time();            
         }
         
         if( $toBacklog )

@@ -1,0 +1,50 @@
+#  webintf.pod - Torrus web interface reference
+#  Copyright (C) 2002  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 Torrus External Storage User Guide
+
+This is an example table, compatible with Mysql and Postgres syntax:
+
+ CREATE TABLE srvexport
+ (
+  srv_date DATE NOT NULL,            /* date and time of the data sample */
+  srv_time TIME NOT NULL,  
+  serviceid VARCHAR(64) NOT NULL,    /* unique service ID per counter */
+  value DOUBLE PRECISION NOT NULL,   /* collected rate or gauge value */
+  intvl INTEGER NOT NULL             /* collection interval -
+                                        for counter volume calculation */
+  );
+ CREATE INDEX srvexp_date ON srvexport (srv_date);
+ CREATE INDEX srvexp_srvid ON srvexport (serviceid);
+ 
+
+Devdiscover parameters
+
+ <param name="RFC2863_IF_MIB::external-serviceid">
+  UPSTREAM1_IN:FastEthernet0_0_0:In,
+  UPSTREAM1_OUT:FastEthernet0_0_0:Out,
+  UPSTREAM2_IN:GigabitEthernet0_1_1:In,
+  UPSTREAM2_OUT:GigabitEthernet0_1_1:Out,
+ </param>
+
+
+Copyright (c) 2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

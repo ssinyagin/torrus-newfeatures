@@ -26,7 +26,7 @@ use strict;
 use Math::BigInt lib => 'GMP';
 use Math::BigFloat;
 
-# Pluggable backend module implements all storage-speific tasks
+# Pluggable backend module implements all storage-specific tasks
 BEGIN
 {
     eval( 'require ' . $Torrus::Collector::ExternalStorage::backend );
@@ -49,9 +49,9 @@ $Torrus::Collector::params{'ext-storage'} = {
     'ext-dstype' => {
         'GAUGE' => undef,
         'COUNTER32' => {
-            'ext-counter-max' => undef },
+            'ext-counter-max' => undef},
         'COUNTER64' => {
-            'ext-counter-max' => undef }},
+            'ext-counter-max' => undef}},
     'ext-service-id' => undef
     };
 
@@ -128,10 +128,26 @@ sub setValue
 
     my $sref = $collector->storageData( 'ext' );
 
+    my $prevTimestamp = $sref->{'prevTimestamp'}{$token};
+    if( not defined( $prevTimestamp ) )
+    {
+        $prevTimestamp = $timestamp;
+    }
+        
     my $procvalue =
         &{$sref->{'tokens'}{$token}}( $collector, $token, $value, $timestamp );
+    if( defined( $procvalue ) )
+    {
+        if( ref( $procvalue ) )
+        {
+            # Convert a BigFloat into a scientific notation string
+            $procvalue = $procvalue->bsstr();
+        }
+        $sref->{'values'}{$token} =
+            [$procvalue, $timestamp, $timestamp - $prevTimestamp];
+    }
     
-    $sref->{'values'}{$token} = [$procvalue, $timestamp];
+    $sref->{'prevTimestamp'}{$token} = $timestamp;
 }
 
 
@@ -180,11 +196,24 @@ sub processCounter
     my $sref = $collector->storageData( 'ext' );
     my $ret;
 
+    if( isDebug() )
+    {
+        Debug('ExternalStorage::processCounter: token=' . $token .
+              ' value=' . $value . ' timestamp=' . $timestamp);
+    }
+        
     $value = Math::BigInt->new( $value );
     
-    if( exists( $sref->{'counters'}{$token} ) )
+    if( exists( $sref->{'prevCounter'}{$token} ) )
     {
-        my( $prevValue, $prevTimestamp ) = @{$sref->{'counters'}{$token}};
+        my $prevValue = $sref->{'prevCounter'}{$token};
+        my $prevTimestamp = $sref->{'prevTimestamp'}{$token};
+        if( isDebug() )
+        {
+            Debug('ExternalStorage::processCounter: prevValue=' . $prevValue .
+                  ' prevTimestamp=' . $prevTimestamp);
+        }
+        
         if( $prevValue->bcmp( $value ) > 0 ) # previous is bigger
         {
             $ret = Math::BigFloat->new($base==32 ? $base32:$base64);
@@ -201,13 +230,18 @@ sub processCounter
         {
             if( $ret->bcmp( $sref->{'max'}{$token} ) > 0 )
             {
+                Debug('Resulting counter rate is above the maximum');
                 $ret = undef;
             }
         }
     }
 
-    $sref->{'counters'}{$token} = [ $value, $timestamp ];
+    $sref->{'prevCounter'}{$token} = $value;
 
+    if( defined( $ret ) and isDebug() )
+    {
+        Debug('ExternalStorage::processCounter: Resulting value=' . $ret);
+    }
     return $ret;
 }
 
@@ -224,20 +258,30 @@ our $unavailableRetry;
 
 # maximum age for backlog in case of unavailable storage.
 # We stop recording new data when maxage is reached.
+our $backlogMaxAge;
 
 sub storeData
 {
     my $collector = shift;
     my $sref = shift;
-    
-    &{$backendOpenSession}();
 
-    while( my($token, $valuepair) = each( %{$sref->{'values'}{$token}} ) )
+    my $nTokens = scalar( keys %{$sref->{'values'}} );
+
+    if( $nTokens == 0 )
     {
-        my( $value, $timestamp ) = @{$valuepair};
+        return;
+    }
+    
+    Verbose('Exporting data to external storage for ' .
+            $nTokens . ' tokens');
+    &{$backendOpenSession}();
+    
+    while( my($token, $valuetriple) = each( %{$sref->{'values'}} ) )
+    {
+        my( $value, $timestamp, $interval ) = @{$valuetriple};
         my $serviceid =
             $collector->param($token, 'ext-service-id');
-
+        
         my $toBacklog = 0;
         
         if( $storageUnavailable > 0 and 
@@ -250,13 +294,18 @@ sub storeData
             if( exists( $sref->{'backlog'} ) )
             {
                 # Try to flush the backlog first
+                Verbose('Trying to flush the backlog');
+                    
                 my $ok = 1;
                 while( scalar(@{$sref->{'backlog'}}) > 0 and $ok )
                 {
-                    my $triple = shift @{$sref->{'backlog'}};
-                    if( not &{$backendStoreData}( @{$triple} ) )
+                    my $quarter = shift @{$sref->{'backlog'}};
+                    if( not &{$backendStoreData}( @{$quarter} ) )
                     {
-                        unshift( @{$sref->{'backlog'}}, $triple );
+                        Warn('Unable to flush the backlog, external ' .
+                             'storage is unavailable');
+                        
+                        unshift( @{$sref->{'backlog'}}, $quarter );
                         $ok = 0;
                         $toBacklog = 1;
                     }
@@ -264,15 +313,19 @@ sub storeData
                 if( $ok )
                 {
                     delete( $sref->{'backlog'} );
+                    Verbose('Backlog is successfully flushed');
                 }                    
             }
-
+            
             if( not $toBacklog )
             {
-                if( not
-                    &{$backendStoreData}( $timestamp, $serviceid, $value ) )
+                if( not &{$backendStoreData}( $timestamp, $serviceid,
+                                              $value, $interval ) )
                 {
-                    $toBacklog = 1;
+                    Warn('Unable to store data, external storage is ' .
+                         'unavailable. Saving data to backlog');
+                    
+                    $toBacklog = 1;                    
                 }
             }
         }
@@ -283,21 +336,26 @@ sub storeData
             {
                 $storageUnavailable = time();
             }
-
+            
             if( not exists( $sref->{'backlog'} ) )
             {
                 $sref->{'backlog'} = [];
                 $sref->{'backlogStart'} = time();
             }
             
-            if( time() < $sref->{'backlogStart'} + backlogMaxage )
+            if( time() < $sref->{'backlogStart'} + $backlogMaxAge )
             {
                 push( @{$sref->{'backlog'}},
-                      [ $timestamp, $serviceid, $value ] );                
+                      [ $timestamp, $serviceid, $value, $interval ] );
+            }
+            else
+            {
+                Error('Backlog has reached its maximum age, stopped storing ' .
+                      'any more data');
             }
         }
-    }
-                
+    }    
+    
     undef $sref->{'values'};
     &{$backendCloseSession}();
 }
@@ -319,9 +377,9 @@ sub deleteTarget
         $collector->param($token, 'ext-service-id');
     delete $sref->{'serviceid'}{$serviceid};
 
-    if( defined( $sref->{'counters'}{$token} ) )
+    if( defined( $sref->{'prevCounter'}{$token} ) )
     {
-        delete $sref->{'counters'}{$token};
+        delete $sref->{'prevCounter'}{$token};
     }
     
     delete $sref->{'tokens'}{$token};

@@ -463,6 +463,20 @@ sub buildConfig
         }
     }
 
+    # External storage serviceid assignment
+    my $extSrv =
+        $devdetails->param('RFC2863_IF_MIB::external-serviceid');
+    my %extStorage;
+    if( defined( $extSrv ) and length( $extSrv ) > 0 )
+    {
+        foreach my $srvDef ( split( /\s*,\s*/, $extSrv ) )
+        {
+            my ( $serviceid, $intfName, $direction ) =
+                split( /\s*:\s*/, $srvDef );
+            $extStorage{$intfName}{$direction} = $serviceid;
+        }
+    }
+    
     # interface-level parameters to copy
     my @intfCopyParams = ();
     my $copyParams = $devdetails->param('RFC2863_IF_MIB::copy-params');
@@ -664,7 +678,22 @@ sub buildConfig
                 $interface->{'childCustomizations'}->{'InOut_bps'}->{
                     'tokenset-member'} = $tsetList;
                 $tsetMemberApplied{$subtreeName} = 1;
-            }            
+            }
+
+            if( defined( $extStorage{$subtreeName} ) )
+            {
+                foreach my $dir ( 'In', 'Out' )
+                {
+                    if( defined( $extStorage{$subtreeName}{$dir} ) )
+                    {
+                        $interface->{'childCustomizations'}->{
+                            'Bytes_' . $dir}->{'storage-type'} = 'rrd,ext';
+                        $interface->{'childCustomizations'}->{
+                            'Bytes_' . $dir}->{'ext-service-id'} =
+                                $extStorage{$subtreeName}{$dir};
+                    }
+                }
+            }
             
             my $intfNode =
                 $cb->addSubtree( $countersNode, $subtreeName,

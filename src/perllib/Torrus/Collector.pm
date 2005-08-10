@@ -90,15 +90,24 @@ sub addTarget
 
     $self->{'targets'}{$token}{'type'} = $collector_type;
 
-    my $storage_type = $config_tree->getNodeParam($token, 'storage-type');
-    if( not $Torrus::Collector::storageTypes{$storage_type} )
+    my $storage_types = $config_tree->getNodeParam($token, 'storage-type');
+    foreach my $storage_type ( split( ',', $storage_types ) )
     {
-        Error('Unknown storage type: ' . $storage_type);
-        return;
-    }
+        if( not $Torrus::Collector::storageTypes{$storage_type} )
+        {
+            Error('Unknown storage type: ' . $storage_type);
+            return;
+        }
+        
+        my $storage_string = $storage_type . '-storage';
+        if( not exists( $self->{'targets'}{$token}{'storage-types'} ) )
+        {
+            $self->{'targets'}{$token}{'storage-types'} = [];
+        }
+        push( @{$self->{'targets'}{$token}{'storage-types'}}, $storage_type );
 
-    my $storage_string = $storage_type.'-storage';
-    $self->{'targets'}{$token}{'storage-type'} = $storage_type;
+        $self->fetchParams($config_tree, $token, $storage_string);
+    }
 
     # If specified, store the value transformation code
     my $code = $config_tree->getNodeParam($token, 'transform-value');
@@ -106,14 +115,14 @@ sub addTarget
     {
         $self->{'targets'}{$token}{'transform'} = $code;
     }
-
+    
     # If specified, store the scale RPN
     my $scalerpn = $config_tree->getNodeParam($token, 'collector-scale');
     if( defined $scalerpn )
     {
         $self->{'targets'}{$token}{'scalerpn'} = $scalerpn;
     }
-
+    
     # If specified, store the value map
     my $valueMap = $config_tree->getNodeParam($token, 'value-map');
     if( defined $valueMap and length($valueMap) > 0 )
@@ -133,19 +142,26 @@ sub addTarget
         $self->{'targets'}{$token}{'local'} = {};
     }
 
-    $self->fetchParams($config_tree, $token, $storage_string);
-
     if( ref( $Torrus::Collector::initTarget{$collector_type} ) )
     {
         $ok = &{$Torrus::Collector::initTarget{$collector_type}}($self,
                                                                  $token);
     }
 
-    if( $ok and ref( $Torrus::Collector::initTarget{$storage_string} ) )
+    if( $ok )
     {
-        &{$Torrus::Collector::initTarget{$storage_string}}($self, $token);
+        foreach my $storage_type
+            ( @{$self->{'targets'}{$token}{'storage-types'}} )
+        {
+            my $storage_string = $storage_type . '-storage';
+            if( ref( $Torrus::Collector::initTarget{$storage_string} ) )
+            {
+                &{$Torrus::Collector::initTarget{$storage_string}}($self,
+                                                                   $token);
+            }
+        }
     }
-
+    
     if( not $ok )
     {
         $self->deleteTarget( $token );
@@ -479,10 +495,13 @@ sub setValue
     Debug('Value ' . $value . ' set for ' .
           $self->path($token) . ' TS=' . $timestamp);
 
-    my $proc = $Torrus::Collector::setValue{
-        $self->{'targets'}{$token}{'storage-type'}};
-    
-    &{$proc}( $self, $token, $value, $timestamp, $uptime );
+    foreach my $storage_type
+        ( @{$self->{'targets'}{$token}{'storage-types'}} )
+    {
+        &{$Torrus::Collector::setValue{$storage_type}}( $self, $token,
+                                                        $value, $timestamp,
+                                                        $uptime );
+    }
 }
 
 

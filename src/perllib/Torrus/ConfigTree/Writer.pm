@@ -34,8 +34,9 @@ use Digest::MD5 qw(md5); # needed as hash function
 
 # Global list of parameters requiring space removal
 my @remspace =
-    (qw(monitor action launch-when rpn-expr tokenset-member setenv-params
-        setenv-dataexpr ds-names value-map rrgraph-views print-cf hrules));
+    (qw(storage-type monitor action launch-when rpn-expr tokenset-member
+        setenv-params setenv-dataexpr ds-names value-map rrgraph-views
+        print-cf hrules));
 
 foreach my $param ( @remspace )
 {

@@ -46,25 +46,33 @@ my %rrdmulti_params = ( 'ds-names' => undef );
 
 my %collector_params =
     (
-     'storage-type'   => {'rrd' => {
-         'data-file'              => undef,
-         'data-dir'               => undef,
-         'leaf-type'              => {
-             'rrd-def'  => {'rrd-ds' => undef,
-                            'rrd-cf' => {'AVERAGE' => undef,
-                                         'MIN'     => undef,
-                                         'MAX'     => undef,
-                                         'LAST'    => undef},
-                            'rrd-create-dstype' => {'GAUGE' => undef,
-                                                    'COUNTER' => undef,
-                                                    'DERIVE'  => undef,
-                                                    'ABSOLUTE' => undef },
-                            'rrd-create-rra'         => undef,
-                            'rrd-create-heartbeat'   => undef,
-                            '+rrd-hwpredict'         => {
-                                'enabled' => {'rrd-create-hw-rralen' => undef},
-                                'disabled' => undef
-                                }}}}},
+     '@storage-type'   => {
+         'rrd' => {
+             'data-file'              => undef,
+             'data-dir'               => undef,
+             'leaf-type'              => {
+                 'rrd-def'  => {'rrd-ds' => undef,
+                                'rrd-cf' => {'AVERAGE' => undef,
+                                             'MIN'     => undef,
+                                             'MAX'     => undef,
+                                             'LAST'    => undef},
+                                'rrd-create-dstype' => {'GAUGE' => undef,
+                                                        'COUNTER' => undef,
+                                                        'DERIVE'  => undef,
+                                                        'ABSOLUTE' => undef },
+                                'rrd-create-rra'         => undef,
+                                'rrd-create-heartbeat'   => undef,
+                                '+rrd-hwpredict'         => {
+                                    'enabled' => {
+                                        'rrd-create-hw-rralen' => undef},
+                                    'disabled' => undef,
+                                }}}},
+         'ext' => {
+             'ext-dstype' => {
+                 'GAUGE' => undef,
+                 'COUNTER32' => undef,
+                 'COUNTER64' => undef,
+             'ext-service-id' => undef }},
      'collector-period'      => undef,
      'collector-timeoffset'  => undef,
      '+collector-scale'      => undef,
@@ -264,7 +272,7 @@ sub validateNode
             {
                 foreach my $pair ( split( '\s*;\s*', $varstring ) )
                 {
-                    if( $pair !~ /^\w+\s*\=\s*[0-9\-+.eU]+$/ )
+                    if( $pair !~ /^\w+\s*\=\s*[0-9\-+.eU]+$/o )
                     {
                         Error("Syntax error in monitor variables: $pair");
                         $ok = 0;
@@ -393,7 +401,7 @@ sub validateNode
         {
             # Check the OID syntax
             my $oid = $config_tree->getNodeParam( $token, 'snmp-object' );
-            if( defined($oid) and $oid =~ /^\./ )
+            if( defined($oid) and $oid =~ /^\./o )
             {
                 my $path = $config_tree->path( $token );
                 Error("Invalid syntax for snmp-object in " .
@@ -467,7 +475,7 @@ sub validateRPN
         my ($noderef, $timeoffset) = @_;
 
         my $function;
-        if( $noderef =~ s/^(.+)\@// )
+        if( $noderef =~ s/^(.+)\@//o )
         {
             $function = $1;
         }
@@ -548,7 +556,7 @@ sub validateViews
                 {
                     my $valueParam =
                         $config_tree->getParam($view, 'hrule-value-' . $hrule);
-                    if( not defined( $valueParam ) or $valueParam !~ /^\S+$/ )
+                    if( not defined( $valueParam ) or $valueParam !~ /^\S+$/o )
                     {
                         Error('Mandatory parameter hrule-value-' . $hrule .
                               ' is not defined or incorrect for view ' .
@@ -630,9 +638,9 @@ sub validateColor
     my $color = shift;
     my $ok = 1;
 
-    if( $color !~ /^\#[0-9a-fA-F]{6}$/ )
+    if( $color !~ /^\#[0-9a-fA-F]{6}$/o )
     {
-        if( $color =~ /^\#\#(\S+)$/ )
+        if( $color =~ /^\#\#(\S+)$/o )
         {
             if( not $Torrus::Renderer::graphStyles{$1}{'color'} )
             {
@@ -656,7 +664,7 @@ sub validateLine
     my $line = shift;
     my $ok = 1;
 
-    if( $line =~ /^\#\#(\S+)$/ )
+    if( $line =~ /^\#\#(\S+)$/o )
     {
         if( not $Torrus::Renderer::graphStyles{$1}{'line'} )
         {
@@ -747,7 +755,7 @@ sub validateMonitors
                               $action . ": \"" . $pair . "\"");
                         $ok = 0;
                     }
-                    elsif( $env =~ /\W/ )
+                    elsif( $env =~ /\W/o )
                     {
                         Error("Illegal characters in environment variable ".
                               "name in setenv-dataexpr in action " . $action .
@@ -851,15 +859,32 @@ sub validateInstanceParams
 
                 my $pname = $paramkey;
                 my $mandatory = 1;
-                if( $pname =~ s/^\+// )
+                if( $pname =~ s/^\+//o )
                 {
                     $mandatory = 0;
                 }
 
-                my $pval = $config_tree->getInstanceParam($inst_type,
-                                                          $inst_name,
-                                                          $pname);
-                if( not defined( $pval ) )
+                my $listval = 0;
+                if( $pname =~ s/^\@//o )
+                {
+                    $listval = 1;
+                }
+                
+                my $pvalue =
+                    $config_tree->getInstanceParam($inst_type,
+                                                   $inst_name, $pname);
+
+                my @pvalues;
+                if( $listval )
+                {
+                    @pvalues = split(',', $pvalue);
+                }
+                else
+                {
+                    @pvalues = ( $pvalue );
+                }
+                
+                if( not defined( $pvalue ) )
                 {
                     if( $mandatory )
                     {
@@ -881,28 +906,31 @@ sub validateInstanceParams
                 {
                     if( ref( $namemap->{$paramkey} ) )
                     {
-                        if( exists $namemap->{$paramkey}->{$pval} )
+                        foreach my $pval ( @pvalues )
                         {
-                            if( defined $namemap->{$paramkey}->{$pval} )
+                            if( exists $namemap->{$paramkey}->{$pval} )
                             {
-                                push( @next_namemaps,
-                                      $namemap->{$paramkey}->{$pval} );
-                            }
-                        }
-                        else
-                        {
-                            my $msg;
-                            if( $inst_type eq 'node' )
-                            {
-                                $msg = $config_tree->path( $inst_name );
+                                if( defined $namemap->{$paramkey}->{$pval} )
+                                {
+                                    push( @next_namemaps,
+                                          $namemap->{$paramkey}->{$pval} );
+                                }
                             }
                             else
                             {
-                                $msg = "$inst_type $inst_name";
+                                my $msg;
+                                if( $inst_type eq 'node' )
+                                {
+                                    $msg = $config_tree->path( $inst_name );
+                                }
+                                else
+                                {
+                                    $msg = "$inst_type $inst_name";
+                                }
+                                Error("Parameter $pname has ".
+                                      "unknown value: $pval for $msg");
+                                $ok = 0;
                             }
-                            Error("Parameter $pname has ".
-                                  "unknown value: $pval for $msg");
-                            $ok = 0;
                         }
                     }
                 }

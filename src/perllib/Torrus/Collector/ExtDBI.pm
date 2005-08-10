@@ -24,7 +24,9 @@ package Torrus::Collector::ExtDBI;
 
 use strict;
 use DBI;
-use Math::BigFloat lib => 'GMP';
+use Date::Format;
+
+use Torrus::Log;
 
 $Torrus::Collector::ExternalStorage::backendInit =
     \&Torrus::Collector::ExtDBI::backendInit;
@@ -77,12 +79,24 @@ sub backendOpenSession
 
 sub backendStoreData
 {
-    # $timestamp, $serviceid, $value
-    my @triple = @_;
-
+    my $timestamp = shift;
+    my $serviceid = shift;
+    my $value = shift;
+    my $interval = shift;
+    
     if( defined( $dbh ) and defined( $sth ) )
     {
-        if( $sth->execute( @triple ) )
+        my $datestr = time2str('%Y-%m-%d', $timestamp);
+        my $timestr = time2str('%H:%M:%S', $timestamp);
+        if( isDebug() )
+        {
+            Debug('Updating SQL database: ' .
+                  join(', ', $datestr, $timestr,
+                       $serviceid, $value, $interval ));
+        }
+
+        if( $sth->execute( $datestr, $timestr,
+                           $serviceid, $value, $interval ) )
         {
             return 1;
         }

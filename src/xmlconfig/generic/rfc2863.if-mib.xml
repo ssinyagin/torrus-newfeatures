@@ -99,6 +99,7 @@
       <param name="snmp-object"       value="$ifInOctets.%ifindex-map%" />
       <param name="rrd-ds"            value="ifInOctets" />
       <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER32" />
       <param name="comment"  value="Input byte counter for the interface" />
       <param name="graph-legend"      value="Bytes in" />
       <param name="vertical-label"    value="Bps" />
@@ -110,6 +111,7 @@
       <param name="snmp-object"       value="$ifOutOctets.%ifindex-map%" />
       <param name="rrd-ds"            value="ifOutOctets" />
       <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER32" />
       <param name="comment" value="Output byte counter for the interface" />
       <param name="graph-legend"      value="Bytes out" />
       <param name="vertical-label"    value="Bps" />
@@ -250,7 +252,9 @@
       <param name="snmp-object-type"  value="COUNTER64" />
       <param name="rrd-ds"            value="ifHCInOctets" />
       <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER64" />
       <param name="rrd-create-max"    value="1e15"/>
+      <param name="ext-counter-max"   value="1e15"/>
       <param name="comment"  value="Input byte counter for the interface" />
       <param name="graph-legend"      value="Bytes in" />
       <param name="vertical-label"    value="Bps" />
@@ -263,7 +267,9 @@
       <param name="snmp-object-type"  value="COUNTER64" />
       <param name="rrd-ds"            value="ifHCOutOctets" />
       <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER64" />
       <param name="rrd-create-max"    value="1e15"/>
+      <param name="ext-counter-max"   value="1e15"/>
       <param name="comment" value="Output byte counter for the interface" />
       <param name="graph-legend"      value="Bytes out" />
       <param name="vertical-label"    value="Bps" />

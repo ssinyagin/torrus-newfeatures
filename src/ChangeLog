@@ -1,3 +1,24 @@
+2005-08-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* doc/extstorage.pod.in: Started documenting the External storage
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	New discovery parameter: RFC2863_IF_MIB::external-serviceid
+
+	* xmlconfig/generic/rfc2863.if-mib.xml: Byte counters adapted for
+	External storage
+
+	* perllib/Torrus/Collector.pm: Multiple storage types per token
+
+	* perllib/Torrus/ConfigTree/Validator.pm (validateInstanceParams):
+	Enabled validation of list values
+
+	* perllib/Torrus/Collector/ExtDBI.pm: Pluggable backend module for
+	External storage
+
+	* perllib/Torrus/Collector/ExternalStorage.pm:
+	New collector storage type
+
 2005-08-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Release 1.0.3

@@ -253,6 +253,9 @@ $Torrus::Collector::storeData{'ext'} =
 # timestamp of last unavailable storage
 my $storageUnavailable = 0;
 
+# Last time we tried to reach it
+my $storageLastTry = 0;
+
 # how often we retry - configurable in torrus-config.pl
 our $unavailableRetry;
 
@@ -285,7 +288,7 @@ sub storeData
         my $toBacklog = 0;
         
         if( $storageUnavailable > 0 and 
-            time() < $storageUnavailable + $unavailableRetry )
+            time() < $storageLastTry + $unavailableRetry )
         {
             $toBacklog = 1;
         }
@@ -328,6 +331,8 @@ sub storeData
                     $toBacklog = 1;                    
                 }
             }
+
+            $storageLastTry = time();            
         }
         
         if( $toBacklog )

@@ -96,17 +96,19 @@ sub addTarget
         if( not $Torrus::Collector::storageTypes{$storage_type} )
         {
             Error('Unknown storage type: ' . $storage_type);
-            return;
         }
-        
-        my $storage_string = $storage_type . '-storage';
-        if( not exists( $self->{'targets'}{$token}{'storage-types'} ) )
+        else
         {
-            $self->{'targets'}{$token}{'storage-types'} = [];
+            my $storage_string = $storage_type . '-storage';
+            if( not exists( $self->{'targets'}{$token}{'storage-types'} ) )
+            {
+                $self->{'targets'}{$token}{'storage-types'} = [];
+            }
+            push( @{$self->{'targets'}{$token}{'storage-types'}},
+                  $storage_type );
+            
+            $self->fetchParams($config_tree, $token, $storage_string);
         }
-        push( @{$self->{'targets'}{$token}{'storage-types'}}, $storage_type );
-
-        $self->fetchParams($config_tree, $token, $storage_string);
     }
 
     # If specified, store the value transformation code

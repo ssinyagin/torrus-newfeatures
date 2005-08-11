@@ -76,8 +76,10 @@ sub initTarget
 
     if( defined( $sref->{'serviceid'}{$serviceid} ) )
     {
-        Error('ext-service-id is not unique: ' . $serviceid);
-        exit 1;
+        Error('ext-service-id is not unique: "' . $serviceid .
+              '". External storage is not activated for ' .
+              $collector->path($token));
+        return;
     }
 
     $sref->{'serviceid'}{$serviceid} = 1;

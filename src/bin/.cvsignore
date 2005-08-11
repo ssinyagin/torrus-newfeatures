@@ -19,6 +19,7 @@ mkroutercfg
 monitor
 prepviews
 render
+rrddir2xml
 schedulerinfo
 torrus
 ttproclist

@@ -93,7 +93,7 @@ SUFFIXES = .pod.in .pod .txt
 
 if POD2TEXT_PRESENT
 .pod.txt:
-	$(POD2TEXT) $< $@ 
+	$(POD2TEXT) $< > $@ 
 endif
 
 htdocs: $(POD_FILES)

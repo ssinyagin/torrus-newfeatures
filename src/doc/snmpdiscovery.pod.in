@@ -364,7 +364,7 @@ counters are located. Default: C<Interface_Counters>.
 
 =item * C<RFC2863_IF_MIB::list-admindown-interfaces>
 
-If set to C<yes>, interfaces with ifAdminStatus set to down(2)
+If set to C<yes>, interfaces with ifAdminStatus set to other than up(1)
 are included in the discovery results.
 By default, such interfaces are not listed.
 

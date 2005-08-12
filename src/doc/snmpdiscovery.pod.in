@@ -362,6 +362,18 @@ such situation automatically.
 Defines the child subtree name within host-level subtree where interface
 counters are located. Default: C<Interface_Counters>.
 
+=item * C<RFC2863_IF_MIB::list-admindown-interfaces>
+
+If set to C<yes>, interfaces with ifAdminStatus set to down(2)
+are included in the discovery results.
+By default, such interfaces are not listed.
+
+=item * C<RFC2863_IF_MIB::list-notpresent-interfaces>
+
+If set to C<yes>, the interfaces with ifOperStatus status set to notPresent(6)
+are included in the discovery results. By default, such interfaces are
+not listed.
+
 =item * C<RFC2863_IF_MIB::exclude-interfaces>
 
 Comma-separated list of interface names which should be excluded from

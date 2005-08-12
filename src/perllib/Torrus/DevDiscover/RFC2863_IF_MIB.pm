@@ -139,10 +139,14 @@ sub discover
     foreach my $ifIndex
         ( $devdetails->getSnmpIndices( $dd->oiddef('ifDescr') ) )
     {
-        if( ( $Torrus::DevDiscover::listAdminDownInterfaces or
+        if( ( $devdetails->param('RFC2863_IF_MIB::list-admindown-interfaces')
+              eq 'yes'
+              or
               $devdetails->snmpVar($dd->oiddef('ifAdminStatus') .
                                    '.' . $ifIndex) == 1 ) and
-            ( $Torrus::DevDiscover::listNotPresentInterfaces or
+            ( $devdetails->param('RFC2863_IF_MIB::list-notpresent-interfaces')
+              eq 'yes'
+              or
               $devdetails->snmpVar($dd->oiddef('ifOperStatus') .
                                    '.' . $ifIndex) != 6 ) )
         {

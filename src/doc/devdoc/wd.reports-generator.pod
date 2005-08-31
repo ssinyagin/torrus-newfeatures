@@ -31,7 +31,7 @@ Date: Aug 12 2005; Last revised:
 =item * Service ID
 
 Service ID is a unique alphanumeric identifier corresponding to a
-single datasource, such as counter or a gauge. For a network interface, for
+single datasource, such as counter or gauge. For a network interface, for
 example, there are usually two service IDs: one for input, and the other
 for output traffic.
 

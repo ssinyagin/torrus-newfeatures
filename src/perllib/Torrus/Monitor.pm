@@ -258,15 +258,17 @@ sub setAlarm
         Debug("Event: $event, Monitor: $mname, Token: $token");
         $obj->{'event'} = $event;
         
+        my $action_token = $token;
+        
         my $action_target =
             $config_tree->getNodeParam($token, 'monitor-action-target');
         if( defined( $action_target ) )
         {
             Debug('Action target redirected to ' . $action_target);
-            $token = $config_tree->getRelative($token, $action_target);
-            $obj->{'token'} = $token;
-            Debug('Redirected to token ' . $token);
+            $action_token = $config_tree->getRelative($token, $action_target);
+            Debug('Redirected to token ' . $action_token);
         }
+        $obj->{'action_token'} = $token;
 
         foreach my $aname (split(',',
                                  $config_tree->getParam($mname, 'action')))
@@ -296,7 +298,7 @@ sub run_event_tset
     my $aname = shift;
     my $obj = shift;
 
-    my $token = $obj->{'token'};
+    my $token = $obj->{'action_token'};
     my $event = $obj->{'event'};
     
     if( $event eq 'set' or $event eq 'forget' )
@@ -322,7 +324,7 @@ sub run_event_exec
     my $aname = shift;
     my $obj = shift;
 
-    my $token = $obj->{'token'};
+    my $token = $obj->{'action_token'};
     my $event = $obj->{'event'};
     my $mname = $obj->{'mname'};
     my $timestamp = $obj->{'timestamp'};

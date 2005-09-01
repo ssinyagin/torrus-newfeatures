@@ -86,7 +86,7 @@ Maximum, average, minimum values can be retrieved.
 
 Let C<N> be the vector length, C<U> the number of undefined values, and C<L>
  - the maximum distance between two defined values. For a predefined parameter
-0E<LT>C<a>E<LT>1, the quality
+0E<LT>C<a>E<LT>1, the quality measure is:
 
   Q = 1 - (a * (U/N) + (1-a) * (L/N))
 
@@ -110,41 +110,38 @@ statements appear in this XML is important: the entities can refer to
 other entities only if they are previously defined.
 
 
- <report name="example.com-monthly-traffic">
+ <report name="monthly-traffic" return="95pc_max">
    <!-- retrieve data from two data storages and take the maximum of
         available values. Data is aligned into 5-minute intervals.
         The start and end of the report is defined in the program
         that launches the report. -->
 
-   <vector name="default-storage">
-     <param name="vector-type" value="template"/>
-     <param name="storage-names" value="DEFAULT,BACKUP"/>
-     <param name="consolidation-func" value="max"/>
-     <param name="step" value="300"/>
-   </vector>     
+   <report-arguments>
+     <arg name="SVCIDIN" type="vector"/>
+     <arg name="SVCIDOUT" type="vector"/>
+     <arg name="START" type="scalar"/>
+     <arg name="END" type="scalar"/>
+   <report-arguments>
 
-   <vector name="upstream-bytes">
-     <param name="vector-type" value="storage"/>
-     <param name="inherit" value="default-storage"/>
-     <param name="service-id" value="EXAMPLECOM01_IN"/>
-   </vector>
-
-   <vector name="downstream-bytes">
-     <param name="vector-type" value="storage"/>
-     <param name="inherit" value="default-storage"/>
-     <param name="service-id" value="EXAMPLECOM01_OUT"/>
-   </vector>
-
-   <!-- Take the maximum rate from input and output, and present it in
-        bit per second -->
-   <vector name="max_bps">
+   <vector name="in_bps">
      <param name="vector-type" value="expression"/>
      <param name="rpn-expr"/>
-       {upstream_bytes},{downstream_bytes},MAX,8,*
+       {SVCIDIN},8,*
      </param>     
    </vector>
 
-   <scalar name="
+   <vector name="out_bps">
+     <param name="vector-type" value="expression"/>
+     <param name="rpn-expr"/>
+       {SVCIDOUT},8,*
+     </param>     
+   </vector>
+
+   <scalar name="95pc_max">
+     <param name="rpn-expr"/>
+       {in_bps},95,PERCENTILE,{out_bps},95,PERCENTILE,MAX
+     </param>          
+   </scalar>
 
  </report>
 

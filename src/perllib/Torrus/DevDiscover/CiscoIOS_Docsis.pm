@@ -122,28 +122,30 @@ sub buildConfig
             'precedence'           => '1000',
             'comment'              =>
                 'Registered, Active and Total modems on CMTS',
-            'vertical-label'       => 'Modems',
-            
-            'graph-legend-total'   => 'Total',
-            'line-style-total'     => '##totalresource',
-            'line-color-total'     => '##totalresource',
-            'line-order-total'     => '1',
-            
-            'graph-legend-active'  => 'Active',
-            'line-style-active'    => '##resourcepartusage',
-            'line-color-active'    => '##resourcepartusage',
-            'line-order-active'    => '2',
-            
-            'graph-legend-registered'  => 'Registered',
-            'line-style-registered'    => '##resourceusage',
-            'line-color-registered'    => '##resourceusage',
-            'line-order-registered'    => '3'
+                
+                'vertical-label'       => 'Modems',
+                
+                'graph-legend-total'   => 'Total',
+                'line-style-total'     => '##totalresource',
+                'line-color-total'     => '##totalresource',
+                'line-order-total'     => '1',
+                
+                'graph-legend-active'  => 'Active',
+                'line-style-active'    => '##resourcepartusage',
+                'line-color-active'    => '##resourcepartusage',
+                'line-order-active'    => '2',
+                
+                'graph-legend-registered'  => 'Registered',
+                'line-style-registered'    => '##resourceusage',
+                'line-color-registered'    => '##resourceusage',
+                'line-order-registered'    => '3'
             };
-
+        
         my $first = 1;
         foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
+            
             my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
             
             if( $first )
@@ -169,8 +171,9 @@ sub buildConfig
 
         my $macNode =
             $cb->getChildSubtree( $devNode,
-                                  $data->{'docsConfig'}{'docsCableMaclayer'}{
-                                      'subtreeName'} );
+                                  $data->{'docsConfig'}{
+                                      'docsCableMaclayer'}{
+                                          'subtreeName'} );
         if( defined( $macNode ) )
         {
             $cb->addLeaf( $macNode, 'All_Modems', $param, [] );
@@ -180,11 +183,12 @@ sub buildConfig
             Error('Could not find the MAC layer subtree');
             exit 1;
         }
-
+        
         # Apply selector actions
         foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
+            
             my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
             
             my $monitor =
@@ -204,10 +208,11 @@ sub buildConfig
             $cb->getChildSubtree( $devNode,
                                   $data->{'docsConfig'}{'docsCableUpstream'}{
                                       'subtreeName'} );
-
+        
         foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
+            
             my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
             
             my $monitor =

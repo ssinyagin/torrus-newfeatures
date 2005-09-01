@@ -514,6 +514,7 @@ sub buildConfig
         {
             if( not $onlyName{$subtreeName} )
             {
+                $interface->{'excluded'} = 1;
                 $nExplExcluded++;
                 next;
             }
@@ -521,6 +522,7 @@ sub buildConfig
         
         if( $excludeName{$subtreeName} )
         {
+            $interface->{'excluded'} = 1;
             $nExplExcluded++;
             next;
         }

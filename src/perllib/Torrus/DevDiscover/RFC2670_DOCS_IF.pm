@@ -157,6 +157,18 @@ sub buildConfig
         if( scalar( @{$data->{$category}} ) > 0 and
             scalar( @{$data->{'docsConfig'}{$category}{'templates'}} ) > 0 )
         {
+            # Count non-excluded interfaces
+            my $updatedInterfaceList = [];
+            foreach my $ifIndex ( @{$data->{$category}} )
+            {
+                my $interface = $data->{'interfaces'}{$ifIndex};
+                next if $interface->{'excluded'};
+                push( @{$updatedInterfaceList}, $ifIndex );
+            }
+            $data->{$category} = $updatedInterfaceList;
+            
+            next if scalar( @{$data->{$category}} ) == 0;
+
             my $subtreeNode =
                 $cb->addSubtree( $devNode,
                                  $data->{'docsConfig'}{$category}{

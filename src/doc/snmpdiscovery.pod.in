@@ -340,6 +340,16 @@ When set to C<yes>, this parameter disables SNMP collection for this
 host. It is useful for creating custom views, in conjunction with
 C<RFC2863_IF_MIB::only-interfaces> parameter.
 
+=item * C<define-tokensets>
+
+Semicolon-separated (;) list of pairs of tokenset names and descriptions.
+Each tokenset name is followed by colon (:) and the description text:
+
+  <param name="define-tokensets">
+    important-graphs: Important Graphs;
+    unimportant-graphs: Unimportant Graphs
+  </param>
+
 =back
 
 

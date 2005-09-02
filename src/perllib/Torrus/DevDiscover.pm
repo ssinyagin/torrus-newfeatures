@@ -340,6 +340,28 @@ sub discover
     }
     push( @{$self->{'devdetails'}{$subtree}}, $devdetails );
 
+    my $define_tokensets = $devdetails->param('define-tokensets');
+    if( defined( $define_tokensets ) and length( $define_tokensets ) > 0 )
+    {
+        foreach my $pair ( split(/\s*;\s*/, $define_tokensets ) )
+        {
+            my( $tset, $description ) = split( /\s*:\s*/, $pair );
+            if( $tset !~ /^[a-z][a-z0-9-_]*$/ )
+            {
+                Error('Invalid name for tokenset: ' . $tset);
+                $ok = 0;
+            }
+            elsif( length( $description ) == 0 )
+            {
+                Error('Missing description for tokenset: ' . $tset);
+                $ok = 0;
+            }
+            else
+            {
+                $self->{'define-tokensets'}{$tset} = $description;
+            }
+        }
+    }
     return $ok;
 }
 
@@ -350,7 +372,7 @@ sub buildConfig
     my $cb = shift;
 
     my $reg = \%Torrus::DevDiscover::registry;
-
+        
     foreach my $subtree ( sort keys %{$self->{'devdetails'}} )
     {
         # Chop the first and last slashes
@@ -421,6 +443,16 @@ sub buildConfig
             }
 
             $cb->{'statistics'}{'hosts'}++;
+        }
+    }
+
+    if( defined( $self->{'define-tokensets'} ) )
+    {
+        my $tsetsNode = $cb->startTokensets();
+        foreach my $tset ( sort keys %{$self->{'define-tokensets'}} )
+        {
+            $cb->addTokenset( $tsetsNode, $tset, {
+                'comment' => $self->{'define-tokensets'}{$tset} } );
         }
     }
 }

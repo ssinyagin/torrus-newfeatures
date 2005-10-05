@@ -207,6 +207,18 @@ sub discover
 
             $data->{'ciscoCpuStats'} = {};
 
+            # Find multiple CPU entries pointing to the same Phy index
+            my %phyReferers = ();            
+            foreach my $INDEX
+                ( $devdetails->
+                  getSnmpIndices($dd->oiddef('cpmCPUTotalPhysicalIndex') ) )
+            {
+                my $phyIndex = $devdetails->
+                    snmpVar($dd->oiddef('cpmCPUTotalPhysicalIndex') .
+                            '.' . $INDEX );
+                $phyReferers{$phyIndex}++;
+            }
+                
             foreach my $INDEX
                 ( $devdetails->
                   getSnmpIndices($dd->oiddef('cpmCPUTotalPhysicalIndex') ) )
@@ -235,10 +247,16 @@ sub discover
                 $cpuNick =~ s/\W/_/g;
                 $cpuNick =~ s/_+/_/g;
 
+                if( $phyReferers{$phyIndex} > 1 )
+                {
+                    $phyDescr .= ' (' . $INDEX . ')';
+                }
+                
                 $data->{'ciscoCpuStats'}{$INDEX} = {
                     'phy-index'  => $phyIndex,
                     'phy-name'   => $phyName,
                     'phy-descr'  => $phyDescr,
+                    'phy-referers' => $phyReferers{$phyIndex},
                     'cpu-nick'   => $cpuNick };
                 
                 if( $devdetails->hasOID( $dd->oiddef('cpmCPUTotal1minRev') .
@@ -450,10 +468,21 @@ sub buildConfig
             my $cpu = $data->{'ciscoCpuStats'}{$INDEX};
 
             my $param = {
-                'entity-phy-index' => $cpu->{'phy-index'},
                 'comment' => $cpu->{'phy-descr'} . ' in ' . $cpu->{'phy-name'}
                 };
 
+            # On newer dual-CPU routers, several (two seen) CPU entries
+            # refer to the same physical entity. For such entries,
+            # we map them directly to cpmCPUTotalTable index.
+            if( $cpu->{'phy-referers'} > 1 )
+            {
+                $param->{'cisco-cpu-indexmap'} = $INDEX;
+            }
+            else
+            {
+                $param->{'entity-phy-index'} = $cpu->{'phy-index'};
+            }
+            
             my @templates;
 
             if( $cpu->{'stats-type'} eq 'revised' )

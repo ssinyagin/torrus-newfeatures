@@ -171,6 +171,7 @@
   </template>
 
   <template name="cisco-cpu-usage-subtree">
+    <param name="cisco-cpu-indexmap" value="$CISCO_CPU_IDX" />
     <param name="data-file"  value="%system-id%_cpu_%entity-phy-index%.rrd" />
     <param name="rrd-create-dstype"  value="GAUGE" />
     <param name="rrd-hwpredict"      value="disabled" />
@@ -197,7 +198,7 @@
     <leaf name="CPU_Total_1min">
       <param name="precedence"         value="-200" />
       <param name="snmp-object"
-             value="$cpmCPUTotal1min.$CISCO_CPU_IDX"/>
+             value="$cpmCPUTotal1min.%cisco-cpu-indexmap%"/>
       <param name="rrd-ds"             value="Total1min" />
       <param name="comment">
           The overall CPU busy percentage in the last 1 minute period
@@ -207,7 +208,7 @@
     <leaf name="CPU_Total_5min">
       <param name="precedence"         value="-200" />
       <param name="snmp-object"
-             value="$cpmCPUTotal5min.$CISCO_CPU_IDX"/>
+             value="$cpmCPUTotal5min.%cisco-cpu-indexmap%"/>
       <param name="rrd-ds"             value="Total5min" />
       <param name="comment">
           The overall CPU busy percentage in the last 5 minute period
@@ -223,7 +224,7 @@
              value="%system-id%_cpu_%entity-phy-index%.rrd" />
       <param name="precedence"         value="-200" />
       <param name="snmp-object"
-             value="$cpmCPUTotal1minRev.$CISCO_CPU_IDX"/>
+             value="$cpmCPUTotal1minRev.%cisco-cpu-indexmap%"/>
       <param name="rrd-ds"             value="Total1min" />
       <param name="comment">
           The overall CPU busy percentage in the last 1 minute period
@@ -240,7 +241,7 @@
              value="%system-id%_cpu_%entity-phy-index%.rrd" />
       <param name="precedence"         value="-200" />
       <param name="snmp-object"
-             value="$cpmCPUTotal5minRev.$CISCO_CPU_IDX"/>
+             value="$cpmCPUTotal5minRev.%cisco-cpu-indexmap%"/>
       <param name="rrd-ds"             value="Total5min" />
       <param name="comment">
           The overall CPU busy percentage in the last 5 minute period

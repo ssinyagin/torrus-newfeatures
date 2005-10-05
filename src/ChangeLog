@@ -1,3 +1,8 @@
+2005-10-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoGeneric.pm:
+	added support for dual-CPU cisco routers (7301)
+
 2005-09-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/AlliedTelesyn_PBC18.pm:

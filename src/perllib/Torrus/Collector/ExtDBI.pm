@@ -20,12 +20,16 @@
 ## Pluggable backend module for ExternalStorage
 ## Stores data in a generic SQL database
 
+# We use some internals of Torrus::SQL::SrvExport, but
+# handle the SQL by ourselves, for better efficiency.
+
 package Torrus::Collector::ExtDBI;
 
 use strict;
 use DBI;
 use Date::Format;
 
+use Torrus::SQL::SrvExport;
 use Torrus::Log;
 
 $Torrus::Collector::ExternalStorage::backendInit =
@@ -41,11 +45,8 @@ $Torrus::Collector::ExternalStorage::backendCloseSession =
     \&Torrus::Collector::ExtDBI::backendCloseSession;
 
 
-# Configurables from torrus-siteconfig.pl
-our $dsn;
-our $username;
-our $password;
-our $sqlStatement;
+# Optional SQL connection subtype, configurable from torrus-siteconfig.pl
+our $subtype;
 
 my $dbh;
 my $sth;
@@ -58,17 +59,11 @@ sub backendInit
 
 sub backendOpenSession
 {
-    $dbh = DBI->connect( $dsn, $username, $password,
-                         { 'PrintError' => 0,
-                           'AutoCommit' => 0 } );
-
-    if( not defined( $dbh ) )
+    $dbh = Torrus::SQL::SrvExport->dbh( $subtype );
+    
+    if( defined( $dbh ) )
     {
-        Error('Error connecting to DBI source: ' . $DBI::errstr);
-    }
-    else
-    {
-        $sth = $dbh->prepare( $sqlStatement );
+        $sth = $dbh->prepare( Torrus::SQL::SrvExport->sqlInsertStatement() );
         if( not defined( $sth ) )
         {
             Error('Error preparing the SQL statement: ' . $dbh->errstr);

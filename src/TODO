@@ -2,7 +2,7 @@ Round Robin Database Framework
   
 To do now:
 
--- CPU statistics for dual-CPU Cisco routers (7301)
+-- validate %Torrus::SQL::connections
 -- periodically refresh SNMP collector mappings
 -- Modular structure in Monitor, with pluggable actions
 -- in Monitor::run_event_exec, distinguish between monitor target and

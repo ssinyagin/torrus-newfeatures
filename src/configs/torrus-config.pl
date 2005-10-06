@@ -193,33 +193,6 @@ $Torrus::Renderer::hwGraphLegend = 0;
 @Torrus::Renderer::loadAdmInfo =
     ( 'Torrus::Collector::SNMP_Params' );
 
-####  ExternalStorage collector module initialization.
-# In order to enable External storage, add these lines to torrus-siteconfig.pl:
-# push(@Torrus::Collector::loadModules, 'Torrus::Collector::ExternalStorage');
-# 
-
-# Other configuration available:
-
-# Maximum age for backlog in case of unavailable storage.
-# We stop recording new data when maxage is reached. Default: 24h
-$Torrus::Collector::ExternalStorage::backlogMaxAge = 86400;
-
-# How often we retry to contact an unreachable external storage. Default: 10min
-$Torrus::Collector::ExternalStorage::unavailableRetry = 600;
-
-# Backend engine for External storage
-$Torrus::Collector::ExternalStorage::backend = 'Torrus::Collector::ExtDBI';
-
-## DBI SQL backend configuration
-$Torrus::Collector::ExtDBI::dsn = 'DBI:mysql:database=torrus;host=localhost';
-$Torrus::Collector::ExtDBI::username = 'torrus';
-$Torrus::Collector::ExtDBI::password = 'torrus';
-$Torrus::Collector::ExtDBI::sqlStatement =
-    'INSERT INTO srvexport (srv_date,srv_time,serviceid,value,intvl) ' .
-    'VALUES (?,?,?,?,?)';
-
-
-
 # Parameters that are comma-separated values
 @Torrus::ConfigTree::XMLCompiler::listparams = ();
 
@@ -242,6 +215,45 @@ $Torrus::ACL::minPasswordLength = 6;
 # The page that lets you choose the tree from the list
 $Torrus::Renderer::LoginScreen::mimeType = 'text/html; charset=UTF-8';
 $Torrus::Renderer::LoginScreen::template = 'default-login.html';
+
+####
+####  SQL connections configuration
+
+%Torrus::SQL::connections =
+    ('Default' => {'dsn' => 'DBI:mysql:database=torrus;host=localhost',
+                   'username' => 'torrus',
+                   'password' => 'torrus'}
+     );
+
+####
+####  ExternalStorage collector module initialization.
+# In order to enable External storage, add these lines to torrus-siteconfig.pl:
+# push(@Torrus::Collector::loadModules, 'Torrus::Collector::ExternalStorage');
+# 
+
+# Other configuration available:
+
+# Maximum age for backlog in case of unavailable storage.
+# We stop recording new data when maxage is reached. Default: 24h
+$Torrus::Collector::ExternalStorage::backlogMaxAge = 86400;
+
+# How often we retry to contact an unreachable external storage. Default: 10min
+$Torrus::Collector::ExternalStorage::unavailableRetry = 600;
+
+# Backend engine for External storage
+$Torrus::Collector::ExternalStorage::backend = 'Torrus::Collector::ExtDBI';
+
+# SQL table configuration for collector's external storage
+$Torrus::SQL::SrvExport::tableName = 'srvexport';
+%Torrus::SQL::SrvExport::columns =
+    ('srv_date'    => 'srv_date',
+     'srv_time'    => 'srv_time',
+     'serviceid'   => 'serviceid',
+     'value'       => 'value',
+     'intvl'       => 'intvl');
+
+
+
 
 # Read plugin configurations
 {

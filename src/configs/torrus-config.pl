@@ -218,7 +218,10 @@ $Torrus::Renderer::LoginScreen::template = 'default-login.html';
 
 ####
 ####  SQL connections configuration
-
+# The default attributes are defined in  'Default' key, then they may
+# be overwritten by 'Class' key for a given perl class, and then
+# overwritten by 'Class/subtype' for a given object subtype (optional).
+# The key attributes are: 'dsn', 'username', and 'password'.
 %Torrus::SQL::connections =
     ('Default' => {'dsn' => 'DBI:mysql:database=torrus;host=localhost',
                    'username' => 'torrus',

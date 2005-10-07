@@ -28,10 +28,10 @@ Configure external storage in torrus-siteconfig:
 
 # Enable external export
 push(@Torrus::Collector::loadModules, 'Torrus::Collector::ExternalStorage');
-$Torrus::Collector::ExtDBI::dsn = 
-  'DBI:mysql:database=torrus;host=dbhost.example.com';
-$Torrus::Collector::ExtDBI::username = 'torrus';
-$Torrus::Collector::ExtDBI::password = 'imiF1oih';
+$Torrus::SQL::connections{'Default'}{'dsn'} =
+    'DBI:mysql:database=torrus;host=dbhost.example.com';
+$Torrus::SQL::connections{'Default'}{'username'} = 'torrus';
+$Torrus::SQL::connections{'Default'}{'password'} = 'imiF1oih';
 
 
 

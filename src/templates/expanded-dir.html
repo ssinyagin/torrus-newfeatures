@@ -17,6 +17,14 @@
         token=child
         nodename=nodeName(path(child))
         comment=nodeParam(child,'comment',1);
+    ELSIF isAlias(child);
+      atoken=isAlias(child);
+      IF isLeaf(atoken);
+        INCLUDE shortgraph
+          token=atoken
+          nodename=nodeName(path(atoken))
+          comment=path(atoken);
+      END;
     END;
   END;
 %]

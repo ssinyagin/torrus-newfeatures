@@ -1,5 +1,8 @@
 2005-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* templates/default-dir.html, templates/expanded-dir.html:
+	Alex Ustyancev's patches for aliased leaf nodes
+
 	* perllib/Torrus/SQL.pm: New module dependency: DBIx::Sequence
 
 2005-10-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

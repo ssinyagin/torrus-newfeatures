@@ -1,3 +1,7 @@
+2005-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/SQL.pm: New module dependency: DBIx::Sequence
+
 2005-10-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/SQL.pm: new module dependencies:

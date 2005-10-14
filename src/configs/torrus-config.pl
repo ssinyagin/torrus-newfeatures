@@ -218,9 +218,12 @@ $Torrus::Renderer::LoginScreen::template = 'default-login.html';
 
 ####
 ####  SQL connections configuration
-# The default attributes are defined in  'Default' key, then they may
-# be overwritten by 'Class' key for a given perl class, and then
-# overwritten by 'Class/subtype' for a given object subtype (optional).
+# For a given Perl class and an optional subtype,
+# the connection attributes are derived in the following order:
+# 'Default', 'Default/[subtype]', '[Class]', '[Class]/[subtype]',
+# 'All/[subtype]'.
+# For a simple setup, the default attributes are usually defined for
+# 'Default' key.
 # The key attributes are: 'dsn', 'username', and 'password'.
 %Torrus::SQL::connections =
     ('Default' => {'dsn' => 'DBI:mysql:database=torrus;host=localhost',
@@ -254,6 +257,27 @@ $Torrus::SQL::SrvExport::tableName = 'srvexport';
      'serviceid'   => 'serviceid',
      'value'       => 'value',
      'intvl'       => 'intvl');
+
+# Optional SQL connection subtype for Collector export
+# $Torrus::Collector::ExtDBI::subtype
+
+
+# SQL table configuration for Reports
+$Torrus::SQL::Reports::tableName = 'reports';
+%Torrus::SQL::Reports::columns =
+    ('id'          => 'id',
+     'rep_date'    => 'rep_date',
+     'rep_time'    => 'rep_time',
+     'reportname'  => 'reportname');
+
+$Torrus::SQL::ReportFields::tableName = 'reportfields';
+%Torrus::SQL::ReportFields::columns =
+    ('id'         => 'id',
+     'rep_id'     => 'rep_id',
+     'name'       => 'name',
+     'serviceid'  => 'serviceid',
+     'value'      => 'value');
+
 
 
 

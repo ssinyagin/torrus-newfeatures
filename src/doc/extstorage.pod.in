@@ -62,21 +62,43 @@ Devdiscover parameters
 
 =head2 Reporting configuration
 
+SQL mostly compatible syntax:
+
+
+ CREATE TABLE dbix_sequence_state
+ (
+  dataset varchar(50), 
+  state_id INTEGER, 
+  CONSTRAINT pk_dbix_sequence PRIMARY KEY (dataset, state_id)
+  );
+
+ CREATE TABLE dbix_sequence_release
+ (
+  dataset varchar(50),    
+  released_id INTEGER, 
+  CONSTRAINT pk_dbi_release PRIMARY KEY (dataset, released_id)
+ );
+
  CREATE TABLE reports
  (
-  start_date DATE NOT NULL, 
-  start_time TIME NOT NULL,
-  end_date DATE NOT NULL, 
-  end_time TIME NOT NULL,  
-  serviceid VARCHAR(64) NOT NULL,
+  id INTEGER PRIMARY KEY,
+  rep_date DATE NOT NULL, 
+  rep_time TIME NOT NULL,
   reportname VARCHAR(64) NOT NULL,
-  value DOUBLE PRECISION NOT NULL
+  UNIQUE(rep_date, rep_time, reportname)
   );
- CREATE INDEX rep_startdate ON reports (start_date);
- CREATE INDEX rep_enddate ON reports (end_date);
- CREATE INDEX rep_srvid ON reports (serviceid);
- CREATE INDEX rep_repname ON reports (reportname);
+ CREATE INDEX rep_date_idx ON reports (rep_date);
 
+
+ CREATE TABLE reportfields
+ (
+  id INTEGER PRIMARY KEY,
+  rep_id INTEGER,
+  name VARCHAR(64) NOT NULL,
+  serviceid VARCHAR(64) NOT NULL,
+  value DOUBLE PRECISION NOT NULL,
+  UNIQUE (rep_id, name, serviceid)
+  );
 
 
 

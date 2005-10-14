@@ -414,12 +414,6 @@ Example:
     </param>
   </host>
 
-=item * C<RFC2863_IF_MIB::errors-monitor>
-
-When set to C<yes>, all interface error and discard counters are assigned to
-a monitor called C<RFC2863_IF_MIB-errors>. It is up to you to define the
-monitor somewhere in the configuration.
-
 =item * C<RFC2863_IF_MIB::copy-params>
 
 Optional comma-separated list of parameter names that would be copied
@@ -496,16 +490,6 @@ in degrees Fahrenheit.
 When set to C<yes>, Cisco temperature sensor values are stored in
 a separate RRD file per sensor ID. This is useful for modular big routers
 like Cisco GSR.
-
-=item * C<CiscoGeneric::sensor-monitor>
-
-Comma-separated list of monitor names to be applied to the sensor
-datasource.
-
-=item *C<CiscoGeneric::sensor-monitor-regexp>
-
-Regular expression that should match the sensor descriptions
-that would have the C<CiscoGeneric::sensor-monitor> applied. Default: C<.*>.
 
 =item * C<CiscoIOS::disable-membuf-stats>
 

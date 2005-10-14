@@ -342,6 +342,16 @@ detail below.
 When set to <code>yes</code>, this parameter disables SNMP collection for this
 host. It is useful for creating custom views, in conjunction with
 <a href="#item_rfc2863_if_mib_3a_3aonly_2dinterfaces"><code>RFC2863_IF_MIB::only-interfaces</code></a> parameter.
+<p></p>
+<li><strong><a name="item_define_2dtokensets"><code>define-tokensets</code></a></strong><br />
+</li>
+Semicolon-separated (;) list of pairs of tokenset names and descriptions.
+Each tokenset name is followed by colon (:) and the description text:
+<pre>
+  &lt;param name=&quot;define-tokensets&quot;&gt;
+    important-graphs: Important Graphs;
+    unimportant-graphs: Unimportant Graphs
+  &lt;/param&gt;</pre>
 <p></p></ul>
 <p>
 </p>
@@ -360,6 +370,18 @@ such situation automatically.
 </li>
 Defines the child subtree name within host-level subtree where interface
 counters are located. Default: <code>Interface_Counters</code>.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3alist_2dadmindown_2dinterfaces"><code>RFC2863_IF_MIB::list-admindown-interfaces</code></a></strong><br />
+</li>
+If set to <code>yes</code>, interfaces with ifAdminStatus set to other than <code>up(1)</code>
+are included in the discovery results.
+By default, such interfaces are not listed.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3alist_2dnotpresent_2dinterfaces"><code>RFC2863_IF_MIB::list-notpresent-interfaces</code></a></strong><br />
+</li>
+If set to <code>yes</code>, the interfaces with ifOperStatus status set to <code>notPresent(6)</code>
+are included in the discovery results. By default, such interfaces are
+not listed.
 <p></p>
 <li><strong><a name="item_rfc2863_if_mib_3a_3aexclude_2dinterfaces"><code>RFC2863_IF_MIB::exclude-interfaces</code></a></strong><br />
 </li>
@@ -390,12 +412,6 @@ Example:
      uplinks: 1_1, 1_2
     &lt;/param&gt;
   &lt;/host&gt;</pre>
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3aerrors_2dmonitor"><code>RFC2863_IF_MIB::errors-monitor</code></a></strong><br />
-</li>
-When set to <code>yes</code>, all interface error and discard counters are assigned to
-a monitor called <code>RFC2863_IF_MIB-errors</code>. It is up to you to define the
-monitor somewhere in the configuration.
 <p></p>
 <li><strong><a name="item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a></strong><br />
 </li>
@@ -469,15 +485,6 @@ in degrees Fahrenheit.
 When set to <code>yes</code>, Cisco temperature sensor values are stored in
 a separate RRD file per sensor ID. This is useful for modular big routers
 like Cisco GSR.
-<p></p>
-<li><strong><a name="item_ciscogeneric_3a_3asensor_2dmonitor"><code>CiscoGeneric::sensor-monitor</code></a></strong><br />
-</li>
-Comma-separated list of monitor names to be applied to the sensor
-datasource.
-<p></p>
-<li></li>
-Regular expression that should match the sensor descriptions
-that would have the <a href="#item_ciscogeneric_3a_3asensor_2dmonitor"><code>CiscoGeneric::sensor-monitor</code></a> applied. Default: <code>.*</code>.
 <p></p>
 <li><strong><a name="item_ciscoios_3a_3adisable_2dmembuf_2dstats"><code>CiscoIOS::disable-membuf-stats</code></a></strong><br />
 </li>

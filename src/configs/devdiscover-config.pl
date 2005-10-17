@@ -53,6 +53,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CiscoIOS_Docsis',
      'Torrus::DevDiscover::CiscoIOS_MacAccounting',
      'Torrus::DevDiscover::CiscoIOS_SAA',
+     'Torrus::DevDiscover::CiscoVDSL',
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
@@ -318,6 +319,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'CiscoFirewall::connections' => {
          'name'   => 'cisco-firewall-connections',
          'source' => 'vendor/cisco.firewall.xml',
+     },
+     'CiscoVDSL::cvdsl-subtree' => {
+         'name'   => 'cvdsl-subtree',
+         'source' => 'vendor/cisco.vdsl-line.xml',
+     },
+     'CiscoVDSL::cvdsl-interface' => {
+         'name'   => 'cvdsl-interface',
+         'source' => 'vendor/cisco.vdsl-line.xml',
      },
 
      ### Compaq Insite Manager

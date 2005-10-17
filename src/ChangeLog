@@ -1,3 +1,8 @@
+2005-10-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoVDSL.pm:
+	New discovery module for Cisco Catalyst LRE
+
 2005-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* templates/default-dir.html, templates/expanded-dir.html:

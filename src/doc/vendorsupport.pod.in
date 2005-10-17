@@ -70,6 +70,10 @@ Tested with many different vendors.
 
 =over 
 
+=item * Allied Telesyn PBC18 Media converter
+
+Reports the line status for the manageable modular media converter.
+
 =item * Ascend MAX
 
 Provides statistics for analog and ISDN interfaces, and the total number
@@ -104,7 +108,8 @@ temperature information; I/O buffer statistics; IPSec traffic information;
 SAA agents statistics; cbQoS monitoring (implemented in a separate plugin);
 DOCSIS uBR-specific variables (modem quantities and channel utilization);
 CISCO-ENHANCED-MEMPOOL-MIB (linecards and VIP modules memory, see notes below);
-MAC accounting statistics (associated with BGP AS numbers when applicable).
+MAC accounting statistics (associated with BGP AS numbers when applicable); LRE
+and VDSL line statistics.
 
 B<Note:> On Cisco 7500, IOS version 12.0(26)S2 or 12.0(26)S3,
 CISCO-ENHANCED-MEMPOOL-MIB polling causes memory leak and leads to the router

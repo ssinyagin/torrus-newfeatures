@@ -85,6 +85,7 @@ SQL mostly compatible syntax:
   rep_date DATE NOT NULL, 
   rep_time TIME NOT NULL,
   reportname VARCHAR(64) NOT NULL,
+  iscomplete INTEGER NOT NULL,
   UNIQUE(rep_date, rep_time, reportname)
   );
  CREATE INDEX rep_date_idx ON reports (rep_date);

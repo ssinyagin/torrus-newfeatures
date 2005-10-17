@@ -268,7 +268,8 @@ $Torrus::SQL::Reports::tableName = 'reports';
     ('id'          => 'id',
      'rep_date'    => 'rep_date',
      'rep_time'    => 'rep_time',
-     'reportname'  => 'reportname');
+     'reportname'  => 'reportname',
+     'iscomplete'  => 'iscomplete');
 
 $Torrus::SQL::ReportFields::tableName = 'reportfields';
 %Torrus::SQL::ReportFields::columns =
@@ -278,7 +279,8 @@ $Torrus::SQL::ReportFields::tableName = 'reportfields';
      'serviceid'  => 'serviceid',
      'value'      => 'value');
 
-
+@Torrus::ReportGenerator::modules =
+    ( 'Torrus::ReportGenerator::MonthlySrvUsage' );
 
 
 

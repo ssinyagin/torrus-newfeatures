@@ -45,30 +45,25 @@ sub sqlInsertStatement
 }
                    
 
-# Get numerical values for year and month, and return a reference to
-# the array of hashes for selected entries.
-
-sub getMonthlyData
+sub getServiceIDs
 {
     my $self = shift;
-    my $year = shift;
-    my $month = shift;
-    my $serviceid = shift;
+    
+    $self->{'sql'}->select({
+        'fields' => [ $columns{'serviceid'} ],
+        'table' => $tableName,
+        'group' => [ $columns{'serviceid'} ],
+        'order' => [ $columns{'serviceid'} ] });
 
-    my $startdate = sprintf('%.4d-%.2d-01', $year, $month);
-    my $endyear = $year;
-    my $endmonth = $month + 1;
-
-    if( $endmonth > 12 )
+    my $ret = [];
+    while( defined( my $row = $self->{'sql'}->fetchrow_arrayref() ) )
     {
-        $endmonth = 1;
-        $endyear++;
+        push( @{$ret}, $row->[0] );
     }
 
-    my $enddate = sprintf('%.4d-%.2d-01', $endyear, $endmonth);
+    return $ret;    
+}    
 
-    return $self->getIntervalData( $startdate, $enddate, $serviceid );
-}
 
 # YYYY-MM-DD for start and end date
 # returns the reference to the array of hashes for selected entries.

@@ -19,6 +19,7 @@
 
 # Class for Reporter data manipulation
 package Torrus::SQL::ReportFields;
+
 package Torrus::SQL::Reports;
 
 use strict;
@@ -78,7 +79,8 @@ sub reportId
             'fields' => { $columns{'id'} => $id,
                           $columns{'rep_date'}   => $repdate,
                           $columns{'rep_time'}   => $reptime,
-                          $columns{'reportname'} => $repname } });
+                          $columns{'reportname'} => $repname,
+                          $columns{'iscomplete'} => 0 } });
         
         return $id;
     }
@@ -94,7 +96,12 @@ sub addField
     my $self = shift;
     my $reportId = shift;
     my $field = shift;
-   
+
+    if( isDebug() )
+    {
+        Debug('Adding report field: ' . $field->{'name'} .
+              ':' . $field->{'serviceid'} . ' = ' . $field->{'value'});
+    }
     $self->{'fields'}->add( $reportId, $field );
 }
 
@@ -106,7 +113,60 @@ sub getFields
 
     return $self->{'fields'}->getAll( $reportId );
 }
+
+
+sub isComplete
+{
+    my $self = shift;
+    my $reportId = shift;
     
+    my $result = $self->{'sql'}->select_one_to_arrayref({
+        'fields' => [ $columns{'iscomplete'} ],
+        'table' => $tableName,
+        'where' => { $columns{'id'}   => $reportId } });
+    
+    if( defined( $result ) )
+    {
+        return $result->[0];
+    }
+    else
+    {
+        Error('Cannot find the report record for ID=' . $reportId);
+    }
+
+    return 0;
+}
+
+
+sub finalize
+{
+    my $self = shift;
+    my $reportId = shift;
+
+    my $result = $self->{'sql'}->update({
+        'table' => $tableName,
+        'where' => { $columns{'id'}   => $reportId },
+        'fields' => { $columns{'iscomplete'} => 1 } });
+}
+
+
+sub getAllLast
+{
+    my $self = shift;
+    my $reportId = shift;
+    my $lastDate = shift;
+       
+    $self->{'sql'}->select({
+        'table' => $tableName,
+        'where' => { $columns{'rep_date'} => ['>=', $lastDate],
+                     $columns{'iscomplete'} => 1 },
+        'fields' => [ $columns{'id'},
+                      $columns{'rep_date'},
+                      $columns{'rep_time'},
+                      $columns{'reportname'} ] });
+
+    return $self->fetchall([ 'id', 'rep_date', 'rep_time', 'reportname' ]);
+}
 
         
 ################################################

@@ -36,6 +36,7 @@ pkgbin_SCRIPTS = \
 	devdiscover		\
 	genddx			\
 	genlist			\
+	genreport		\
 	install_plugin		\
 	monitor      		\
 	rrddir2xml		\
@@ -62,6 +63,7 @@ EXTRA_DIST = \
 	devdiscover.in		\
 	genddx.in		\
 	genlist.in		\
+	genreport.in		\
 	install_plugin.in	\
 	monitor.in      	\
 	rrddir2xml.in		\
@@ -112,6 +114,9 @@ genddx: genddx.in
 
 genlist: genlist.in
 	$(SUBST) genlist.in > genlist
+
+genreport: genreport.in
+	$(SUBST) genreport.in > genreport
 
 install_plugin: install_plugin.in
 	$(SUBST) install_plugin.in > install_plugin

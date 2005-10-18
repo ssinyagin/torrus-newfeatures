@@ -32,6 +32,7 @@ commands="acl=acledit acledit=acledit cleanup=cleanup \
           dd=devdiscover discover=devdiscover devdiscover=devdiscover \
           genddx=genddx \
           genlist=genlist \
+          genreport=genreport report=genreport \
           install_plugin=install_plugin \
           monitor=monitor \
           rrddir=rrddir2xml rrddir2xml=rrddir2xml \

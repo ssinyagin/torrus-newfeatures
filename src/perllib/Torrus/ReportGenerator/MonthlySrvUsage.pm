@@ -63,12 +63,11 @@ sub generate
 
     foreach my $serviceid ( @{$srvIDs} )
     {
-        Debug('MonthlySrvUsage: Generating report for ' . $serviceid);
-
         my $data = $self->{'srvexport'}->getIntervalData
             ( $self->{'StartDate'}, $self->{'EndDate'}, $serviceid );
 
         next if scalar( @{$data} ) == 0;
+        Debug('MonthlySrvUsage: Generating report for ' . $serviceid);
         
         my @aligned = ();
         $#aligned= floor( $self->{'RangeSeconds'} / $step );
@@ -101,7 +100,7 @@ sub generate
 
         my $sum = 0;
         my $unavailCount = 0;
-        foreach my $pos ( 0 .. $#$aligned )
+        foreach my $pos ( 0 .. $#aligned )
         {
             if( not defined( $aligned[$pos] ) )
             {
@@ -133,17 +132,17 @@ sub generate
             'value'     => $avgVal });
                                       
         $self->{'backend'}->addField( $self->{'reportId'}, {
-            'name'      => sprintf('%s%s', $percentile, 'PERCENTILE'),
+            'name'      => sprintf('%s%s', $percentile, 'TH_PERCENTILE'),
             'serviceid' => $serviceid,
             'value'     => $pcVal });
         
         $self->{'backend'}->addField( $self->{'reportId'}, {
             'name'      => 'UNAVAIL',
             'serviceid' => $serviceid,
-            'value'     => $unavailCount });        
+            'value'     => ($unavailCount*100)/$nDatapoints });        
     }
 
-    $self->{'backend'}->finalize();
+    $self->{'backend'}->finalize( $self->{'reportId'} );
 }
 
 

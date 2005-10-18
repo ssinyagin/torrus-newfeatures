@@ -67,15 +67,15 @@ SQL mostly compatible syntax:
 
  CREATE TABLE dbix_sequence_state
  (
-  dataset varchar(50), 
-  state_id INTEGER, 
+  dataset varchar(50) NOT NULL, 
+  state_id INTEGER NOT NULL, 
   CONSTRAINT pk_dbix_sequence PRIMARY KEY (dataset, state_id)
   );
 
  CREATE TABLE dbix_sequence_release
  (
-  dataset varchar(50),    
-  released_id INTEGER, 
+  dataset varchar(50) NOT NULL,    
+  released_id INTEGER NOT NULL, 
   CONSTRAINT pk_dbi_release PRIMARY KEY (dataset, released_id)
  );
 

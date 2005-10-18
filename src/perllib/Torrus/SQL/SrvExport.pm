@@ -82,10 +82,12 @@ sub getIntervalData
               $columns{'value'},
               $columns{'intvl'} ],
             'table' => $tableName,
-            'where' => { $columns{'serviceid'} => $serviceid,
-                         $columns{'srv_date'} => ['>=', $startdate],
-                         $columns{'srv_date'} => ['<', $enddate] }
-    });
+            'where' => [ {$columns{'serviceid'} => $serviceid},
+                         'AND',
+                         {$columns{'srv_date'} => ['>=', $startdate]},
+                         'AND',
+                         {$columns{'srv_date'} => ['<', $enddate]}
+                         ]});
 
     return $self->fetchall([ 'srv_date', 'srv_time', 'value', 'intvl' ]);
 }

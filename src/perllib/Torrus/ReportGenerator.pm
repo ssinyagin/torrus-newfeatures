@@ -45,14 +45,15 @@ sub new
     
     my $self = {};
     bless ($self, $class);
-    return $self;    
 
     # For monthly reports, adjust date and time for the first day of the month
     if( $self->isMonthly() )
     {
-        $options->{'Time'} = 0;
+        $options->{'Time'} = '00:00';
         my ($ss,$mm,$hh,$day,$month,$year,$zone) =
             strptime( $options->{'Date'} );
+        $year += 1900;
+        $month++;
         $self->{'StartDate'} = sprintf('%.4d-%.2d-01', $year, $month);
         $self->{'StartUnixTime'} = str2time( $self->{'StartDate'} );
         $self->{'Year'} = $year;
@@ -107,7 +108,9 @@ sub new
     {
         Error('Report already exists');
         return undef;
-    }    
+    }
+    
+    return $self;    
 }
 
 

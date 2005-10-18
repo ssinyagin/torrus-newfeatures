@@ -28,7 +28,7 @@ use Torrus::SQL;
 use base 'Torrus::SQL';
 
 use Torrus::Log;
-use Torrus::SQL::ReportFields;
+# use Torrus::SQL::ReportFields;
 
 # The name of the table and columns 
 # defaults configured in torrus-config.pl
@@ -60,7 +60,7 @@ sub reportId
     my $repname = shift;
 
     my $result = $self->{'sql'}->select_one_to_arrayref({
-        'fields' => [ $columns{'id'} ],
+        'fields' => [ $columns{'id'}, $columns{'iscomplete'} ],
         'table' => $tableName,
         'where' => { $columns{'rep_date'}   => $repdate,
                      $columns{'rep_time'}   => $reptime,
@@ -68,6 +68,15 @@ sub reportId
     
     if( defined( $result ) )
     {
+        if( not $result->[1] ) 
+        {
+            # iscomplete is zero - the report is unfinished
+            Warn('Found unfinished report ' . $repname . ' for ' .
+                 $repdate . ' ' . $reptime .
+                 '. Deleting the previous report data');
+            $self->{'fields'}->removeAll( $result->[0] );
+        }
+            
         return $result->[0];
     }
     else
@@ -217,8 +226,17 @@ sub getAll
 
     return $self->fetchall([ 'name', 'serviceid', 'value' ]);
 }
-    
 
+
+sub removeAll
+{
+    my $self = shift;
+    my $reportId = shift;
+       
+    $self->{'sql'}->delete({
+        'table' => $tableName,
+        'where' => { $columns{'rep_id'} => $reportId }});
+}    
     
     
     

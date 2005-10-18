@@ -2,6 +2,8 @@ Round Robin Database Framework
   
 To do now:
 
+-- Display docsIfDownstreamChannelTable docsIfUpstreamChannelTable in
+   DOCSIS chanel legends
 -- validate %Torrus::SQL::connections
 -- periodically refresh SNMP collector mappings
 -- Modular structure in Monitor, with pluggable actions

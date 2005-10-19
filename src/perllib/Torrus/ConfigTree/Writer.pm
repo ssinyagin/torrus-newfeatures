@@ -28,7 +28,8 @@ our @ISA=qw(Torrus::ConfigTree);
 
 use Torrus::Log;
 use Torrus::TimeStamp;
-
+use Torrus::ServiceID;
+    
 use strict;
 use Digest::MD5 qw(md5); # needed as hash function
 
@@ -42,6 +43,9 @@ foreach my $param ( @remspace )
 {
     $Torrus::ConfigTree::Writer::remove_space{$param} = 1;
 }
+
+# instance of Torrus::ServiceID object, if needed
+my $srvIdParams;
 
 
 sub new
@@ -469,6 +473,42 @@ sub postProcessNodes
                             $self->setNodeParam( $token,
                                                  'collector-timeoffset',
                                                  $offset );
+                        }
+                    }
+                }
+
+                my $storagetypes =
+                    $self->getNodeParam( $token, 'storage-type' );
+                foreach my $stype ( split(',', $storagetypes) )
+                {
+                    if( $stype eq 'ext' )
+                    {
+                        my $tree = $self->treeName();
+                        if( not defined( $srvIdParams ) )
+                        {
+                            $srvIdParams =
+                                new Torrus::ServiceID( -WriteAccess => 1 );
+                            $srvIdParams->cleanAllForTree( $tree );
+                        }
+
+                        my $serviceid =
+                            $self->getNodeParam($token, 'ext-service-id');
+                        if( $srvIdParams->idExists( $serviceid ) )
+                        {
+                            Error('Duplicate ServiceID: ' . $serviceid);
+                            $ok = 0;
+                        }
+                        else
+                        {
+                            my $params = {
+                                'tree' => $tree,
+                                'token' => $token,
+                                'dstype' => $self->getNodeParam($token,
+                                                                'ext-dstype'),
+                                'units' => $self->getNodeParam
+                                    ($token, 'ext-service-units') };
+
+                            $srvIdParams->add( $serviceid, $params );
                         }
                     }
                 }

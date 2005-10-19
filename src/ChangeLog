@@ -1,3 +1,7 @@
+2005-10-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/genreport.in: Report generator utility
+
 2005-10-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoVDSL.pm:

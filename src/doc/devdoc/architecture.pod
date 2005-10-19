@@ -315,6 +315,7 @@ List of all groups
 
 =back
 
+
 B<acl.db> is a I<Hash> database containing group privileges information:
 
 =over 4
@@ -327,6 +328,38 @@ the object is the tree name.
 
 =back
 
+
+B<serviceid_params.db> is a I<Btree> database containing properties
+for each Service ID (exported collector information, usually stored in
+an SQL database):
+
+=item * a: E<lt>serviceidE<gt>,...
+
+Lists all known service IDs
+
+=item * t:E<lt>treeE<gt> -- E<lt>serviceidE<gt>,...
+
+Lists service IDs exported by a given datasource tree.
+
+=item * p:E<lt>serviceidE<gt>:E<lt>paramE<gt> -- E<lt>valueE<gt>
+
+Parameter value for a given service ID. Mandatory parameters are:
+C<tree>, C<token>, C<dstype>. Optional: C<units>.
+
+=item * P:E<lt>serviceidE<gt> -- E<lt>paramE<gt>, ...
+
+List of parameter names for a service ID.
+
+
+=over 4
+
+=item * u:E<lt>groupE<gt>:E<lt>objectE<gt>:E<lt>privilegeE<gt> -- 1
+
+The entry exists if and only if the group members have this privilege
+over the object given. Most common privilege is C<DisplayTree>, where
+the object is the tree name.
+
+=back
 
 
 =head2 Modular Structure

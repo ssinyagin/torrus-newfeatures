@@ -55,8 +55,7 @@ Devdiscover parameters
  <param name="RFC2863_IF_MIB::external-serviceid">
   UPSTREAM1_IN:FastEthernet0_0_0:In,
   UPSTREAM1_OUT:FastEthernet0_0_0:Out,
-  UPSTREAM2_IN:GigabitEthernet0_1_1:In,
-  UPSTREAM2_OUT:GigabitEthernet0_1_1:Out,
+  UPSTREAM2:GigabitEthernet0_1_1:Both,
  </param>
 
 
@@ -98,6 +97,7 @@ SQL mostly compatible syntax:
   name VARCHAR(64) NOT NULL,
   serviceid VARCHAR(64) NOT NULL,
   value DOUBLE PRECISION NOT NULL,
+  units VARCHAR(64) NOT NULL DEFAULT '',
   UNIQUE (rep_id, name, serviceid)
   );
 

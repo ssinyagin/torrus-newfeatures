@@ -277,7 +277,8 @@ $Torrus::SQL::ReportFields::tableName = 'reportfields';
      'rep_id'     => 'rep_id',
      'name'       => 'name',
      'serviceid'  => 'serviceid',
-     'value'      => 'value');
+     'value'      => 'value',
+     'units'      => 'units');
 
 %Torrus::ReportGenerator::modules =
     ( 'MonthlyUsage' => 'Torrus::ReportGenerator::MonthlySrvUsage' );

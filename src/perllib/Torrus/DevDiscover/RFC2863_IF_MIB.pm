@@ -477,7 +477,15 @@ sub buildConfig
         {
             my ( $serviceid, $intfName, $direction ) =
                 split( /\s*:\s*/, $srvDef );
-            $extStorage{$intfName}{$direction} = $serviceid;
+            if( $direction eq 'Both' )
+            {
+                $extStorage{$intfName}{'In'} = $serviceid . '_IN';
+                $extStorage{$intfName}{'Out'} = $serviceid . '_OUT';
+            }
+            else
+            {
+                $extStorage{$intfName}{$direction} = $serviceid;
+            }
         }
     }
     
@@ -697,6 +705,8 @@ sub buildConfig
                         $interface->{'childCustomizations'}->{
                             'Bytes_' . $dir}->{'ext-service-id'} =
                                 $extStorage{$subtreeName}{$dir};
+                        $interface->{'childCustomizations'}->{
+                            'Bytes_' . $dir}->{'ext-service-units'} = 'bytes';
                     }
                 }
             }

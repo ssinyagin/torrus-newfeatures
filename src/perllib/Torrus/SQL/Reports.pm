@@ -98,7 +98,7 @@ sub reportId
 
 
 # Add a new field to a report. The field is a hash array reference
-# with keys: 'name', 'serviceid', 'value'
+# with keys: 'name', 'serviceid', 'value', 'units'
 
 sub addField
 {
@@ -109,7 +109,8 @@ sub addField
     if( isDebug() )
     {
         Debug('Adding report field: ' . $field->{'name'} .
-              ':' . $field->{'serviceid'} . ' = ' . $field->{'value'});
+              ':' . $field->{'serviceid'} . ' = ' . $field->{'value'} .
+              ' ' . $field->{'units'});
     }
     $self->{'fields'}->add( $reportId, $field );
 }
@@ -208,7 +209,8 @@ sub add
                       $columns{'rep_id'}     => $reportId,
                       $columns{'name'}       => $attrs->{'name'},
                       $columns{'serviceid'}  => $attrs->{'serviceid'},
-                      $columns{'value'}      => $attrs->{'value'} } });
+                      $columns{'value'}      => $attrs->{'value'},
+                      $columns{'units'}      => $attrs->{'units'} } });
 }
 
 
@@ -222,9 +224,10 @@ sub getAll
         'where' => { $columns{'rep_id'} => $reportId },
         'fields' => [ $columns{'name'},
                       $columns{'serviceid'},
-                      $columns{'value'} ] });
+                      $columns{'value'},
+                      $columns{'units'}] });
 
-    return $self->fetchall([ 'name', 'serviceid', 'value' ]);
+    return $self->fetchall([ 'name', 'serviceid', 'value', 'units' ]);
 }
 
 

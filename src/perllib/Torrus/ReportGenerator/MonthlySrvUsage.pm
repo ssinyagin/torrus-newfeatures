@@ -26,9 +26,11 @@ package Torrus::ReportGenerator::MonthlySrvUsage;
 use strict;
 use POSIX qw(floor);
 use Date::Parse;
+use Math::BigFloat;
 
 use Torrus::Log;
 use Torrus::ReportGenerator;
+use Torrus::ServiceID;
 
 use base 'Torrus::ReportGenerator';
 
@@ -58,9 +60,10 @@ sub generate
     {
         $step = 300;
     }
+
+    my $srvIDParams = new Torrus::ServiceID();
     
     my $srvIDs = $self->{'srvexport'}->getServiceIDs();
-
     foreach my $serviceid ( @{$srvIDs} )
     {
         my $data = $self->{'srvexport'}->getIntervalData
@@ -68,6 +71,8 @@ sub generate
 
         next if scalar( @{$data} ) == 0;
         Debug('MonthlySrvUsage: Generating report for ' . $serviceid);
+
+        my $params = $srvIDParams->getParams( $serviceid );
         
         my @aligned = ();
         $#aligned= floor( $self->{'RangeSeconds'} / $step );
@@ -120,26 +125,68 @@ sub generate
         my @sorted = sort {$a <=> $b} @aligned;
         my $pcPos = floor( $nDatapoints * $percentile / 100 );
         my $pcVal = $sorted[$pcPos];
+
+        # Calculate the total volume, if it's a counter
+        my $volume = Math::BigFloat->new(0);
+        my $volumeDefined = 0;
+        if( $params->{'dstype'} =~ /^COUNTER/ )
+        {
+            $volumeDefined = 1;
+            foreach my $row ( @{$data} )
+            {
+                $volume += $row->{'value'} * $row->{'intvl'};
+            }
+        }
+
+        # Adjust units and scale
+
+        my $usageUnits = '';
+        my $volumeUnits = '';
+        if( $params->{'units'} eq 'bytes' )
+        {
+            # Adjust bytes into megabit per second
+            $usageUnits = 'Mbps';
+            $maxVal *= 8e-6;
+            $avgVal *= 8e-6;
+            $pcVal  *= 8e-6;
+
+            # Adjust volume bytes into megabytes
+            $volumeUnits = 'MB';
+            $volume /= 1048576;
+        }
         
         $self->{'backend'}->addField( $self->{'reportId'}, {
             'name'      => 'MAX',
             'serviceid' => $serviceid,
-            'value'     => $maxVal });
+            'value'     => $maxVal,
+            'units'     => $usageUnits });
         
         $self->{'backend'}->addField( $self->{'reportId'}, {
             'name'      => 'AVG',
             'serviceid' => $serviceid,
-            'value'     => $avgVal });
+            'value'     => $avgVal,
+            'units'     => $usageUnits });
                                       
         $self->{'backend'}->addField( $self->{'reportId'}, {
             'name'      => sprintf('%s%s', $percentile, 'TH_PERCENTILE'),
             'serviceid' => $serviceid,
-            'value'     => $pcVal });
+            'value'     => $pcVal,
+            'units'     => $usageUnits });
         
         $self->{'backend'}->addField( $self->{'reportId'}, {
             'name'      => 'UNAVAIL',
             'serviceid' => $serviceid,
-            'value'     => ($unavailCount*100)/$nDatapoints });        
+            'value'     => ($unavailCount*100)/$nDatapoints,
+            'units'     => 'percent' });
+
+        if( $volumeDefined )
+        {
+            $self->{'backend'}->addField( $self->{'reportId'}, {
+                'name'      => 'VOLUME',
+                'serviceid' => $serviceid,
+                'value'     => $volume,
+                'units'     => $volumeUnits });
+        }
     }
 
     $self->{'backend'}->finalize( $self->{'reportId'} );

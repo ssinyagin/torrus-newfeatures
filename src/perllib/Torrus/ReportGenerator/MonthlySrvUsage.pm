@@ -151,8 +151,8 @@ sub generate
             $pcVal  *= 8e-6;
 
             # Adjust volume bytes into megabytes
-            $volumeUnits = 'MB';
-            $volume /= 1048576;
+            $volumeUnits = 'GB';
+            $volume /= 1073741824;
         }
         
         $self->{'backend'}->addField( $self->{'reportId'}, {

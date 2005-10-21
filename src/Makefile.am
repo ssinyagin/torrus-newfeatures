@@ -67,6 +67,7 @@ install-data-local:
 	$(mkvardir) $(DESTDIR)$(dbhome)
 	$(mkvardir) $(DESTDIR)$(cachedir)
 	$(mkvardir) $(DESTDIR)$(piddir)
+	$(mkvardir) $(DESTDIR)$(reportsdir)
 	$(mkvardir) $(DESTDIR)$(logdir)
 	$(mkvardir) $(DESTDIR)$(sesstordir)
 	$(mkvardir) $(DESTDIR)$(seslockdir)	

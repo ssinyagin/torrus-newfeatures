@@ -1,0 +1,22 @@
+[% PROCESS 'html-incblocks.txt' %]
+[% INCLUDE htmlstart
+     title="Torrus Reports: [% year %]"
+     contentClass="SingleColumnContent" %]
+
+<H1>Torrus reports: [% year %]</H1>
+
+[% INCLUDE treename %]
+
+<DIV Class="ReporttableTitle">Monthly reports</DIV>
+<TABLE CLASS="ReportTable">
+<TR CLASS="ReportHeadrow">
+<TD CLASS="ReportHeadCell">Month</TD>
+</TR>
+[% FOREACH mth = data.months %]
+<TR CLASS="ReportRow">
+<TD CLASS="ReportCell"><A HREF="[% monthlyUrl(mth) %]">[% mth %]</A></TD>
+</TR>
+[% END %]
+</TABLE>
+
+[% INCLUDE htmlend %]

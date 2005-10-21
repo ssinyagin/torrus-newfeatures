@@ -160,23 +160,53 @@ sub finalize
 }
 
 
-sub getAllLast
+sub getAllReports
 {
     my $self = shift;
-    my $reportId = shift;
-    my $lastDate = shift;
-       
+    my $limitDate = shift;
+
+    my $where = { $columns{'iscomplete'} => 1 };
+    
+    if( defined( $limitDate ) )
+    {
+        $where->{$columns{'rep_date'}} = ['>=', $limitDate];
+    }
+    
     $self->{'sql'}->select({
         'table' => $tableName,
-        'where' => { $columns{'rep_date'} => ['>=', $lastDate],
-                     $columns{'iscomplete'} => 1 },
+        'where' => $where,
         'fields' => [ $columns{'id'},
                       $columns{'rep_date'},
                       $columns{'rep_time'},
                       $columns{'reportname'} ] });
+    
+    my $reports =
+        $self->fetchall([ 'id', 'rep_date', 'rep_time', 'reportname' ]);
 
-    return $self->fetchall([ 'id', 'rep_date', 'rep_time', 'reportname' ]);
+    my $ret = {};
+    foreach my $report ( @{$reports} )
+    {
+        my($year, month, $day) = split('-', $report->{'rep_date'});
+
+        my $fields = $self->getFields( $report->{'id'} );
+        my $fieldsref = {};
+        
+        foreach my $field ( @{$fields} )
+        {
+            $fieldsref->{$field->{'serviceid'}}->{$field->{'name'}} = {
+                'value' => $field->{'value'},
+                'units' => $field->{'units'} };            
+        }
+        
+        $ret->{$year}{$month}{$day}{$report->{'reportname'}} = $fieldsref;
+    }
+    return $ret;    
 }
+
+        
+        
+    
+    
 
         
 ################################################

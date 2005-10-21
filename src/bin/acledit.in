@@ -30,7 +30,8 @@ use Torrus::SiteConfig;
 exit(1) if not Torrus::SiteConfig::verify();
 
 our %knownPrivileges = ( 'DisplayTree' => 'tree',
-                         'DisplayAdmInfo' => 'tree' );
+                         'DisplayAdmInfo' => 'tree',
+                         'DisplayReports' => 'tree' );
 
 our @addgroups;
 our @delgroups;

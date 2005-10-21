@@ -69,6 +69,7 @@ devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
     -e "s,\@pluginsdir\@,@pluginsdir@,g" \
     -e "s,\@plugtorruscfgdir\@,@plugtorruscfgdir@,g" \
     -e "s,\@plugwrapperdir\@,@plugwrapperdir@,g" \
+    -e "s,\@reportsdir\@,@reportsdir@,g" \
     -e "s,\@scriptsdir\@,@scriptsdir@,g" \
     -e "s,\@seslockdir\@,@seslockdir@,g" \
     -e "s,\@sesstordir\@,@sesstordir@,g" \

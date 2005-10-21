@@ -35,6 +35,7 @@ $Torrus::Global::stylingDir     = '@styldir@';
 $Torrus::Global::cacheDir       = '@cachedir@';
 $Torrus::Global::pidDir         = '@piddir@';
 $Torrus::Global::logDir         = '@logdir@';
+$Torrus::Global::reportsDir     = '@reportsdir@';
 $Torrus::Global::sesStoreDir    = '@sesstordir@';
 $Torrus::Global::sesLockDir     = '@seslockdir@';
 
@@ -180,6 +181,9 @@ $Torrus::Renderer::globalDebug = 0;
 # graph legend
 $Torrus::Renderer::hwGraphLegend = 0;
 
+# When true, users may view service usage reports (requires SQL connection)
+$Torrus::Renderer::displayReports = 0;
+
 # Modules that Collector will use for collecting and storing data.
 @Torrus::Collector::loadModules =
     ( 'Torrus::Collector::SNMP',
@@ -284,6 +288,11 @@ $Torrus::SQL::ReportFields::tableName = 'reportfields';
     ( 'MonthlyUsage' => 'Torrus::ReportGenerator::MonthlySrvUsage' );
 
 
+%Torrus::ReportOutput::HTML::templates =
+    ( 'index'      => 'report-index.html',
+      'serviceid'  => 'report-serviceid.html',
+      'monthly'    => 'report-monthly.html',
+      'yearly'     => 'report-yearly.html');
 
 # Read plugin configurations
 {

@@ -245,6 +245,10 @@ AC_ARG_VAR(dbhome, [[VARPREFIX/db] Berkeley DB files])
 if test -z "$dbhome"; then
    dbhome='${varprefix}/db'; fi
 
+AC_ARG_VAR(reportsdir, [[VARPREFIX/reports] Reports output])
+if test -z "$reportsdir"; then
+   reportsdir='${varprefix}/reports'; fi
+
 AC_ARG_VAR(seslockdir, [[VARPREFIX/session_data/lock] Web session locks])
 if test -z "$seslockdir"; then
    seslockdir='${varprefix}/session_data/lock'; fi

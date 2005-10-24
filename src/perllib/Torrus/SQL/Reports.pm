@@ -163,6 +163,7 @@ sub finalize
 sub getAllReports
 {
     my $self = shift;
+    my $srvIdList = shift;
     my $limitDate = shift;
 
     my $where = { $columns{'iscomplete'} => 1 };
@@ -186,16 +187,20 @@ sub getAllReports
     my $ret = {};
     foreach my $report ( @{$reports} )
     {
-        my($year, month, $day) = split('-', $report->{'rep_date'});
+        my($year, $month, $day) = split('-', $report->{'rep_date'});
 
         my $fields = $self->getFields( $report->{'id'} );
         my $fieldsref = {};
         
         foreach my $field ( @{$fields} )
         {
-            $fieldsref->{$field->{'serviceid'}}->{$field->{'name'}} = {
-                'value' => $field->{'value'},
-                'units' => $field->{'units'} };            
+            if( not ref( $srvIdList ) or
+                grep {$field->{'serviceid'} eq $_} @{$srvIdList} )
+            {
+                $fieldsref->{$field->{'serviceid'}}->{$field->{'name'}} = {
+                    'value' => $field->{'value'},
+                    'units' => $field->{'units'} };
+            }
         }
         
         $ret->{$year}{$month}{$day}{$report->{'reportname'}} = $fieldsref;

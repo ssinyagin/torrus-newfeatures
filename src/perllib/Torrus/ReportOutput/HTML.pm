@@ -21,6 +21,7 @@ package Torrus::ReportOutput::HTML;
 
 use strict;
 use Template;
+use Date::Format;
 
 use Torrus::Log;
 use Torrus::ReportOutput;
@@ -28,16 +29,17 @@ use Torrus::SiteConfig;
 
 use base 'Torrus::ReportOutput';
 
-our @monthNames =
-    ('January'
+our @monthNames = qw
+    (January February March April May June
+     July August September October November December);
 
 sub init
 {
     my $self = shift;
 
     Torrus::SiteConfig::loadStyling();
-
-    my $htmldir = $Torrus::Global::reportsDir . '/html';
+    
+    my $htmldir = $self->{'outdir'} . '/html';
     if( not -d $htmldir )
     {
         Verbose('Creating directory: ' . $htmldir);
@@ -78,8 +80,10 @@ sub genSrvIdOutput
     my $year = shift;    
     my $fields = shift;
 
+    return 1;
+    
     my $ok = 1;
-    while( my( $serviced, $ref ) = each %{$fields} )
+    while( my( $serviceid, $ref ) = each %{$fields} )
     {
         $ok = $self->render({
             'filename' => $self->srvIdFilename($year, $serviceid),
@@ -202,16 +206,21 @@ sub render
                                                          $_[0]);},
         
         'monthlyUrl' => sub {return $self->monthlyFilename($opt->{'year'},
-                                                           $_[0]);}
+                                                           $_[0]);},
         'yearlyUrl' => sub {return $self->yearlyFilename($_[0]);},
-        'monthName' => sub {return $self->monthName($_[0]);}
+        'monthName' => sub {return $self->monthName($_[0]);},
+        'formatValue' => sub {return sprintf('%.2f %s',
+                                             $_[0]->{'value'},
+                                             $_[0]->{'units'})},
+        'timestamp'  => sub { return time2str($Torrus::Renderer::timeFormat,
+                                              time()); },
     };
     
     my $result = $self->{'tt'}->process( $tmplfile, $ttvars, $outfile );
 
     if( not $result )
     {
-        Error("Error while rendering HTML report: " .
+        Error("Error while rendering " . $outfile . ": " .
               $self->{'tt'}->error());
         return 0;
     }
@@ -238,6 +247,7 @@ sub monthName
     my $self = shift;
     my $month = shift;
 
+    return $monthNames[ $month - 1 ];
 }
 
 

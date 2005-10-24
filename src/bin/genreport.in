@@ -26,10 +26,14 @@ use strict;
 use Getopt::Long;
 
 use Torrus::Log;
+use Torrus::ReportOutput::HTML;
+use Torrus::SiteConfig;
 
 our $report;
 our $date;
 our $time = '00:00';
+our $genhtml;
+our @trees;
 
 our $debug = 0;
 our $verbose = 0;
@@ -38,6 +42,8 @@ my $ok = GetOptions(
                     'report=s'    => \$report,
                     'date=s'      => \$date,
                     'time=s'      => \$time,
+                    'genhtml'     => \$genhtml,
+                    'tree=s'      => \@trees,
                     'verbose'     => \$verbose,
                     'debug'       => \$debug
                     );
@@ -48,15 +54,18 @@ if( $report and not defined($Torrus::ReportGenerator::modules{$report}) )
     $ok = 0;
 }
                                             
-if( not $ok or not $report or not $date or scalar( @ARGV ) > 0 )
+if( not $ok or (not $report and not $genhtml) or
+    ($report and not $date) or scalar( @ARGV ) > 0 )
 {
     print STDERR
-        "Usage: $0 --report=ReportName --date=YYYY-MM-DD options...\n";
+        "Usage: $0 --report=ReportName --date=YYYY-MM-DD | ",
+        "--genhtml options...\n";
     print STDERR "Options:\n",
     " --report=ReportName Report name.\n",
     " --date=YYYY-MM-DD   Report start date. ",
     "For monthly reports, 1st day in a month.\n",
-    " --time=mm:ss        Report start time. Ignored for monthly reports",
+    " --time=mm:ss        Report start time. Ignored for monthly reports\n",
+    " --genhtml           Generate HTML output from the database\n",
     " --verbose           print extra information\n",
     " --debug             print debugging information\n",   
     "\n",
@@ -91,23 +100,62 @@ $SIG{'INT'} = sub
     exit 1;
 };
 
-
-my $class = $Torrus::ReportGenerator::modules{$report};
-eval( 'require ' . $class );
-die( $@ ) if $@;
-
-my $generator = $class->new({
-    'Name' => $report,
-    'Date' => $date,
-    'Time' => $time});
-
-if( defined( $generator ) )
+if( $report )
 {
-    $generator->generate();
+    my $class = $Torrus::ReportGenerator::modules{$report};
+    eval( 'require ' . $class );
+    die( $@ ) if $@;
+    
+    my $generator = $class->new({
+        'Name' => $report,
+        'Date' => $date,
+        'Time' => $time});
+    
+    if( defined( $generator ) )
+    {
+        $generator->generate();
+    }
+    else
+    {
+        $ok = 0;
+    }
 }
-else
+
+if( $genhtml )
 {
-    $ok = 0;
+    if( scalar( @trees ) == 0 )
+    {
+        @trees = Torrus::SiteConfig::listTreeNames();
+    }
+    else
+    {
+        foreach my $tree ( @trees )
+        {
+            if( not Torrus::SiteConfig::treeExists( $tree ) )
+            {
+                Error('Tree ' . $tree . ' does not exist');
+                $ok = 0;
+            }
+        }
+    }
+
+    if( $ok )
+    {
+        foreach my $tree ( @trees )
+        {
+            Verbose('Generating HTML report for tree ' . $tree);
+            my $out = new Torrus::ReportOutput::HTML({'Tree' => $tree});
+            
+            if( $out->init() )
+            {
+                $ok = $out->generate() ? $ok:0;
+            }
+            else
+            {
+                $ok = 0;
+            }
+        }
+    }
 }
 
 exit($ok ? 0:1);

@@ -43,6 +43,9 @@ dist_tmpl_DATA = \
 	templates/default-tset.html \
 	templates/expanded-dir.html \
 	templates/overview-subleaves.html \
+	templates/report-index.html \
+	templates/report-monthly.html \
+	templates/report-yearly.html \
 	templates/html-incblocks.txt \
 	templates/tset-list.html \
 	templates/email-alarm.txt

@@ -27,6 +27,7 @@ use strict;
 
 use Torrus::Log;
 use Torrus::SQL::Reports;
+use Torrus::ServiceID;
 
 
 sub new
@@ -38,7 +39,8 @@ sub new
     bless ($self, $class);
     
     $self->{'options'} = $options;
-
+    defined( $self->{'options'}->{'Tree'} ) or die;
+    
     my $sqlRep = Torrus::SQL::Reports->new( $options->{'ReportsSqlSubtype'} );
     if( not defined( $sqlRep ) )
     {
@@ -46,7 +48,20 @@ sub new
         return undef;
     }
     $self->{'backend'} = $sqlRep;
-    
+
+    my $outdir = $Torrus::Global::reportsDir . '/' .
+        $self->{'options'}->{'Tree'};
+    $self->{'outdir'} = $outdir;
+
+    if( not -d $outdir )
+    {
+        if( not mkdir( $outdir ) )
+        {
+            Error('Cannot create directory ' . $outdir . ': ' . $!);
+            return undef;
+        }
+    }
+
     return $self;    
 }
 
@@ -66,8 +81,11 @@ sub generate
     my $ok = 1;
     
     my %monthlyReportNames;
+
+    my $srvId = new Torrus::ServiceID;
+    my $srvIdList = $srvId->getAllForTree( $self->{'options'}->{'Tree'} );
     
-    my $allReports = $self->{'backend'}->getAllReports();
+    my $allReports = $self->{'backend'}->getAllReports( $srvIdList );
 
     # frontpage, title, list of years, etc.
     $self->genIntroduction( $allReports );

@@ -1,7 +1,8 @@
 [% PROCESS 'html-incblocks.txt' %]
 [% INCLUDE htmlstart
      title="Torrus Reports"
-     contentClass="SingleColumnContent" %]
+     contentClass="SingleColumnContent"
+     noTopMenu=1 %]
 
 <H1>Torrus reports</H1>
 
@@ -11,10 +12,11 @@
 <TR CLASS="ReportHeadrow">
 <TD CLASS="ReportHeadCell">Year</TD>
 </TR>
-[% FOREACH yr = daya.keys.sort %]
+[% FOREACH yr = data.keys.sort %]
 <TR CLASS="ReportRow">
 <TD CLASS="ReportCell"><A HREF="[% yearlyUrl(yr) %]">[% yr %]</A></TD>
 </TR>
+[% END %]
 </TABLE>
 
 [% INCLUDE htmlend %]

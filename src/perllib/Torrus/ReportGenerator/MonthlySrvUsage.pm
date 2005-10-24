@@ -177,7 +177,7 @@ sub generate
             'name'      => 'UNAVAIL',
             'serviceid' => $serviceid,
             'value'     => ($unavailCount*100)/$nDatapoints,
-            'units'     => 'percent' });
+            'units'     => '%' });
 
         if( $volumeDefined )
         {

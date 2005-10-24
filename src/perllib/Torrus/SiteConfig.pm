@@ -61,7 +61,7 @@ sub verify
 
     foreach my $tree ( keys %Torrus::Global::treeConfig )
     {
-        if( $tree !~ /^[a-zA-Z][a-zA-Z0-9_\-]*$/ )
+        if( $tree !~ /^[a-zA-Z][a-zA-Z0-9_\-]*$/o )
         {
             Error("Invalid tree name: " . $tree);
             $ok = 0;

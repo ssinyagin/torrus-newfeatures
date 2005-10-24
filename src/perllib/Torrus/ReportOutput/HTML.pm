@@ -193,6 +193,7 @@ sub render
     {
         'plainURL'   => $Torrus::Renderer::plainURL,
         'style'      => sub { return $self->style($_[0]); },
+        'treeName'   => $self->{'options'}->{'Tree'},
         'companyName'=> $Torrus::Renderer::companyName,
         'companyURL' => $Torrus::Renderer::companyURL,
         'siteInfo'   => $Torrus::Renderer::siteInfo,
@@ -202,13 +203,15 @@ sub render
         'year'       => $opt->{'year'},
         'month'      => $opt->{'month'},
         'indexUrl'   => $self->indexFilename(),
-        'srvIdUrl'   => sub {return $self->srvIdFilename($opt->{'year'},
-                                                         $_[0]);},
-        
-        'monthlyUrl' => sub {return $self->monthlyFilename($opt->{'year'},
-                                                           $_[0]);},
-        'yearlyUrl' => sub {return $self->yearlyFilename($_[0]);},
-        'monthName' => sub {return $self->monthName($_[0]);},
+        'srvIdUrl'   => sub {
+            return $self->reportUrl($self->srvIdFilename($opt->{'year'},
+                                                         $_[0]));},
+        'monthlyUrl' => sub {
+            return $self->reportUrl($self->monthlyFilename($opt->{'year'},
+                                                           $_[0]));},
+        'yearlyUrl' => sub {
+            return $self->reportUrl($self->yearlyFilename($_[0]));},
+        'monthName' => sub {$self->monthName($_[0]);},
         'formatValue' => sub {return sprintf('%.2f %s',
                                              $_[0]->{'value'},
                                              $_[0]->{'units'})},
@@ -250,6 +253,15 @@ sub monthName
     return $monthNames[ $month - 1 ];
 }
 
+
+sub reportUrl
+{
+    my $self = shift;
+    my $filename = shift;
+
+    return $Torrus::Renderer::rendererURL . '/' .
+        $self->{'options'}->{'Tree'} . '?htmlreport=' . $filename;
+}
 
 sub xmlnormalize
 {

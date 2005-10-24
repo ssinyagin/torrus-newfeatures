@@ -187,36 +187,60 @@ sub handler
                 return report_error($r, 'Permission denied');
             }
 
-            my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
-            if( not defined($config_tree) )
+            if( $Torrus::Renderer::displayReports and
+                defined( $args{'htmlreport'} ) )
             {
-                return report_error($r, 'Configuration is not ready');
-            }
+                if( $Torrus::ApacheHandler::authorizeUsers and
+                    not $options{'acl'}->hasPrivilege( $options{'uid'}, $tree,
+                                                       'DisplayReports' ) )
+                {
+                    return report_error($r, 'Permission denied');
+                }
 
-            my $token = $args{'token'};
-            if( not $token )
+                $fname = $Torrus::Global::reportsDir . '/' . $tree .
+                    '/html/' . $args{'htmlreport'};
+                if( not -f $fname )
+                {
+                    return report_error($r, 'No such file: ' .
+                                        $args{'htmlreport'});
+                }
+                
+                $mimetype = 'text/html';
+                $expires = '3600';
+            }
+            else
             {
-                my $path = $args{'path'};
-                $path = '/' unless $path;
-                $token = $config_tree->token($path);
+                my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
+                if( not defined($config_tree) )
+                {
+                    return report_error($r, 'Configuration is not ready');
+                }
+                
+                my $token = $args{'token'};
                 if( not $token )
                 {
-                    return report_error($r, 'Invalid path');
+                    my $path = $args{'path'};
+                    $path = '/' unless $path;
+                    $token = $config_tree->token($path);
+                    if( not $token )
+                    {
+                        return report_error($r, 'Invalid path');
+                    }
                 }
+                elsif( $token !~ /^S/ and
+                       not defined( $config_tree->path( $token ) ) )
+                {
+                    return report_error($r, 'Invalid token');
+                }
+                
+                my $view = $args{'view'};
+
+                ( $fname, $mimetype, $expires ) =
+                    $Torrus::ApacheHandler::renderer->
+                    render( $config_tree, $token, $view, %options );
+
+                undef $config_tree;
             }
-            elsif( $token !~ /^S/ and
-                   not defined( $config_tree->path( $token ) ) )
-            {
-                return report_error($r, 'Invalid token');
-            }
-
-            my $view = $args{'view'};
-
-            ( $fname, $mimetype, $expires ) =
-                $Torrus::ApacheHandler::renderer->
-                render( $config_tree, $token, $view, %options );
-
-            undef $config_tree;
         }
     }
 

@@ -33,6 +33,8 @@ $Torrus::SQL::connections{'Default'}{'dsn'} =
 $Torrus::SQL::connections{'Default'}{'username'} = 'torrus';
 $Torrus::SQL::connections{'Default'}{'password'} = 'imiF1oih';
 
+# Enable displaying of reports in web interface
+$Torrus::Renderer::displayReports = 1;
 
 
 This is an example table, compatible with Mysql and Postgres syntax:
@@ -100,6 +102,18 @@ SQL mostly compatible syntax:
   units VARCHAR(64) NOT NULL DEFAULT '',
   UNIQUE (rep_id, name, serviceid)
   );
+
+
+=head2 Generate reports
+
+ nice torrus report --report=MonthlyUsage --date=2005-09-01 --debug
+
+ torrus report --genhtml --debug --tree=mytree
+
+ torrus acl --modgroup=admin --permit=DisplayReports --for=*
+
+Now they should be visible in your browser
+
 
 
 

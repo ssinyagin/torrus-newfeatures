@@ -197,12 +197,15 @@ sub handler
                     return report_error($r, 'Permission denied');
                 }
 
+                my $reportfname = $args{'htmlreport'};
+                # strip off leading slashes for security
+                $reportfname =~ s/^.*\///o;
+                
                 $fname = $Torrus::Global::reportsDir . '/' . $tree .
-                    '/html/' . $args{'htmlreport'};
+                    '/html/' . $reportfname;
                 if( not -f $fname )
                 {
-                    return report_error($r, 'No such file: ' .
-                                        $args{'htmlreport'});
+                    return report_error($r, 'No such file: ' . $reportfname);
                 }
                 
                 $mimetype = 'text/html';

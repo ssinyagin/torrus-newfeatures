@@ -45,6 +45,7 @@ dist_tmpl_DATA = \
 	templates/overview-subleaves.html \
 	templates/report-index.html \
 	templates/report-monthly.html \
+	templates/report-serviceid.html \
 	templates/report-yearly.html \
 	templates/html-incblocks.txt \
 	templates/tset-list.html \

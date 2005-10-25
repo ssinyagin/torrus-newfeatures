@@ -80,8 +80,6 @@ sub genSrvIdOutput
     my $year = shift;    
     my $fields = shift;
 
-    return 1;
-    
     my $ok = 1;
     while( my( $serviceid, $ref ) = each %{$fields} )
     {
@@ -89,6 +87,7 @@ sub genSrvIdOutput
             'filename' => $self->srvIdFilename($year, $serviceid),
             'template' => 'serviceid',
             'data' => $ref,
+            'serviceid' => $serviceid,
             'year' => $year }) ? $ok:0; 
     }
     return $ok;
@@ -202,6 +201,7 @@ sub render
         'data'       => $opt->{'data'},
         'year'       => $opt->{'year'},
         'month'      => $opt->{'month'},
+        'serviceid'  => $opt->{'serviceid'},
         'indexUrl'   => $self->indexFilename(),
         'srvIdUrl'   => sub {
             return $self->reportUrl($self->srvIdFilename($opt->{'year'},

@@ -98,6 +98,10 @@ sub render_html
         'mayDisplayAdmInfo' => sub {
             return $self->may_display_adminfo( $config_tree, $_[0] ) },
         'adminfo' => $self->{'adminfo'},
+        'mayDisplayReports' => sub {
+            return $self->may_display_reports($config_tree) },
+        'reportsUrl' => sub {
+            return $self->reportsUrl($config_tree); },
         'timestamp'  => sub { return time2str($Torrus::Renderer::timeFormat,
                                               time()); },
         'verifyDate'  => sub { return verifyDate($_[0]); },
@@ -425,6 +429,36 @@ sub verifyDate
         return '';
     }
 }
+
+
+sub may_display_reports
+{
+    my $self = shift;
+    my $config_tree = shift;
+
+    if( $Torrus::Renderer::displayReports )
+    {
+        my $tree = $config_tree->treeName();
+        if( $self->hasPrivilege( $tree, 'DisplayReports' ) and
+            -r $Torrus::Global::reportsDir . '/' . $tree .
+            '/html/index.html' )
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+sub reportsUrl
+{
+    my $self = shift;
+    my $config_tree = shift;
+
+    return $Torrus::Renderer::rendererURL . '/' .
+        $config_tree->treeName() . '?htmlreport=index.html';
+}
+
 
 1;
 

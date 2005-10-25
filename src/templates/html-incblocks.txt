@@ -176,6 +176,12 @@ window.open('[%url(token) _ '&view=helptext-html'%]','helpwindow',
                     text="Printable view"
                     title="Prepare this page for printing"
                     newwindow=1%]
+[% IF mayDisplayReports();
+     INCLUDE shortcut url=reportsUrl
+                      text="Reports"
+                      title="Show reports page"
+                      newwindow=1;
+   END %]
 [% IF global.setDateDialog; INCLUDE enterdate; END %]
 </DIV>
 [% END %]

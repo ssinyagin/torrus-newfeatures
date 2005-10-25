@@ -37,7 +37,8 @@ webplaindir = @webplaindir@
 dist_webplain_DATA = \
 	webplain/explain-rrdgraph.html \
 	webplain/torrus.css \
-	webplain/torrus-printer.css
+	webplain/torrus-printer.css \
+	webplain/torrus-report.css
 
 
 install-data-local:

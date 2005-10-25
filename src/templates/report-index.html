@@ -9,12 +9,19 @@
 [% INCLUDE treename %]
 
 <TABLE CLASS="ReportTable">
+<CAPTION CLASS="ReportTable"></CAPTION>
 <TR CLASS="ReportHeadrow">
 <TD CLASS="ReportHeadCell">Year</TD>
 </TR>
-[% FOREACH yr = data.keys.sort %]
+[% rowCount = 0;
+   FOREACH yr = data.keys.sort;
+     rowCount = rowCount + 1;
+     IF rowCount % 2  %]
+<TR CLASS="ReportEvenRow">
+[%   ELSE %]
 <TR CLASS="ReportRow">
-<TD CLASS="ReportCell"><A HREF="[% yearlyUrl(yr) %]">[% yr %]</A></TD>
+[%   END %]          
+<TD CLASS="ReportFirstCell"><A HREF="[% yearlyUrl(yr) %]">[% yr %]</A></TD>
 </TR>
 [% END %]
 </TABLE>

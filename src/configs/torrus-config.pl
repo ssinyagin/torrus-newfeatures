@@ -137,7 +137,9 @@ $Torrus::Scheduler::statsExpDecayAlpha = 0.63;
 #
 %Torrus::Renderer::styling =
     ( 'default' => {'stylesheet'   => 'torrus.css'},
-      'printer' => {'stylesheet'   => 'torrus-printer.css'} );
+      'printer' => {'stylesheet'   => 'torrus-printer.css'},
+      'report'  => {'stylesheet'   => 'torrus-report.css'}
+      );
 
 # Color schema for RRDtool graph. It can be extended by setting
 # $Torrus::Renderer::stylingProfileOverlay. The overlay should

@@ -55,6 +55,7 @@ sub new
         $year += 1900;
         $month++;
         $self->{'StartDate'} = sprintf('%.4d-%.2d-01', $year, $month);
+        $options->{'Date'} = $self->{'StartDate'};
         $self->{'StartUnixTime'} = str2time( $self->{'StartDate'} );
         $self->{'Year'} = $year;
         $self->{'Month'} = $month;

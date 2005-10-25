@@ -46,6 +46,11 @@ A, A:link, A:visited {
   text-decoration : none;
 }
 
+A:hover {
+  background-color : #eee;
+  color : inherit;
+}
+
 *.Header {
   background-color : transparent;
   border-bottom : 0.5pt solid black;

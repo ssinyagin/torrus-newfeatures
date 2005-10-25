@@ -202,7 +202,8 @@ sub render
         'year'       => $opt->{'year'},
         'month'      => $opt->{'month'},
         'serviceid'  => $opt->{'serviceid'},
-        'indexUrl'   => $self->indexFilename(),
+        'indexUrl'   => sub {
+            return $self->reportUrl($self->indexFilename());},
         'srvIdUrl'   => sub {
             return $self->reportUrl($self->srvIdFilename($opt->{'year'},
                                                          $_[0]));},

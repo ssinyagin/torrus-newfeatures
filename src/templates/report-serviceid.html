@@ -4,7 +4,8 @@
      contentClass="SingleColumnContent"
      noTopMenu=1 %]
 
-<H1>Torrus report: [% year _ ', ' _ serviceid %]</H1>
+<H1>Torrus report: <A HREF="[% yearlyUrl(year) %]">[% year %]</A>,
+[% serviceid %]</H1>
 
 [% INCLUDE treename %]
 

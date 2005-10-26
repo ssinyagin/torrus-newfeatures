@@ -703,8 +703,10 @@ value is: C<snmp>. Other valid values may be added with plugins.
 
 =item * C<storage-type>
 
-Mandatory parameter for datasource type C<collector>. The only supported value
-is C<rrd>.
+Mandatory parameter for datasource type C<collector>. Comma-separated list
+of storage types. The collected value is duplicated on every storage listed.
+Supported values are: C<rrd>, C<ext>. For C<ext> (external storage),
+see the I<Reporting Setup Guide>.
 
 =item * C<collector-period>, C<collector-timeoffset>
 

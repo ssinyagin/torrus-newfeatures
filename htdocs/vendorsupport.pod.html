@@ -74,6 +74,10 @@ Tested with many different vendors.
 </p>
 <h2><a name="vendorspecific_snmp_monitoring">Vendor-specific SNMP monitoring</a></h2>
 <ul>
+<li><strong><a name="item_allied_telesyn_pbc18_media_converter">Allied Telesyn PBC18 Media converter</a></strong><br />
+</li>
+Reports the line status for the manageable modular media converter.
+<p></p>
 <li><strong><a name="item_ascend_max">Ascend MAX</a></strong><br />
 </li>
 Provides statistics for analog and ISDN interfaces, and the total number
@@ -108,7 +112,8 @@ temperature information; I/O buffer statistics; IPSec traffic information;
 SAA agents statistics; cbQoS monitoring (implemented in a separate plugin);
 DOCSIS uBR-specific variables (modem quantities and channel utilization);
 CISCO-ENHANCED-MEMPOOL-MIB (linecards and VIP modules memory, see notes below);
-MAC accounting statistics (associated with BGP AS numbers when applicable).
+MAC accounting statistics (associated with BGP AS numbers when applicable); LRE
+and VDSL line statistics.
 <p><strong>Note:</strong> On Cisco 7500, IOS version 12.0(26)S2 or 12.0(26)S3,
 CISCO-ENHANCED-MEMPOOL-MIB polling causes memory leak and leads to the router
 crash (Bug ID CSCef53395). The problem is fixed in IOS versions

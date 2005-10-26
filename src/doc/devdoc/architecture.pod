@@ -333,6 +333,8 @@ B<serviceid_params.db> is a I<Btree> database containing properties
 for each Service ID (exported collector information, usually stored in
 an SQL database):
 
+=over 4
+
 =item * a: E<lt>serviceidE<gt>,...
 
 Lists all known service IDs
@@ -350,16 +352,8 @@ C<tree>, C<token>, C<dstype>. Optional: C<units>.
 
 List of parameter names for a service ID.
 
-
-=over 4
-
-=item * u:E<lt>groupE<gt>:E<lt>objectE<gt>:E<lt>privilegeE<gt> -- 1
-
-The entry exists if and only if the group members have this privilege
-over the object given. Most common privilege is C<DisplayTree>, where
-the object is the tree name.
-
 =back
+
 
 
 =head2 Modular Structure

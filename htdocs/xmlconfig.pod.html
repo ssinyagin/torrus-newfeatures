@@ -688,8 +688,10 @@ value is: <code>snmp</code>. Other valid values may be added with plugins.
 <p></p>
 <li><strong><a name="item_storage_2dtype"><code>storage-type</code></a></strong><br />
 </li>
-Mandatory parameter for datasource type <a href="#item_collector"><code>collector</code></a>. The only supported value
-is <code>rrd</code>.
+Mandatory parameter for datasource type <a href="#item_collector"><code>collector</code></a>. Comma-separated list
+of storage types. The collected value is duplicated on every storage listed.
+Supported values are: <code>rrd</code>, <code>ext</code>. For <code>ext</code> (external storage),
+see the <em>Reporting Setup Guide</em>.
 <p></p>
 <li><strong><a name="item_collector_2dperiod_2c_collector_2dtimeoffset"><code>collector-period</code>, <code>collector-timeoffset</code></a></strong><br />
 </li>

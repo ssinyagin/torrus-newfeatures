@@ -275,6 +275,27 @@ The entry exists if and only if the group members have this privilege
 over the object given. Most common privilege is <code>DisplayTree</code>, where
 the object is the tree name.
 <p></p></ul>
+<p><strong>serviceid_params.db</strong> is a <em>Btree</em> database containing properties
+for each Service ID (exported collector information, usually stored in
+an SQL database):</p>
+<ul>
+<li><strong><a name="item_a_3a__3cserviceid_3e_2c_2e_2e_2e">a: &lt;serviceid&gt;,...</a></strong><br />
+</li>
+Lists all known service IDs
+<p></p>
+<li><strong><a name="item_t_3a_3ctree_3e__2d_2d__3cserviceid_3e_2c_2e_2e_2e">t:&lt;tree&gt; -- &lt;serviceid&gt;,...</a></strong><br />
+</li>
+Lists service IDs exported by a given datasource tree.
+<p></p>
+<li><strong><a name="item_p_3a_3cserviceid_3e_3a_3cparam_3e__2d_2d__3cvalue_">p:&lt;serviceid&gt;:&lt;param&gt; -- &lt;value&gt;</a></strong><br />
+</li>
+Parameter value for a given service ID. Mandatory parameters are:
+<code>tree</code>, <code>token</code>, <code>dstype</code>. Optional: <code>units</code>.
+<p></p>
+<li><strong><a name="item_p_3a_3cserviceid_3e__2d_2d__3cparam_3e_2c__2e_2e_2">P:&lt;serviceid&gt; -- &lt;param&gt;, ...</a></strong><br />
+</li>
+List of parameter names for a service ID.
+<p></p></ul>
 <p>
 </p>
 <h2><a name="modular_structure">Modular Structure</a></h2>

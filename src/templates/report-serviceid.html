@@ -22,6 +22,7 @@
 <TD CLASS="ReportHeadCell">Maximum</TD>
 <TD CLASS="ReportHeadCell">Unavailable<BR/>samples</TD>
 <TD CLASS="ReportHeadCell">Volume</TD>
+<TD CLASS="ReportHeadCell">Extrapolated<BR/>volume</TD>
 </TR>
 [%     rowCount = 0;
        FOREACH mth = fieldshash.keys.sort;
@@ -40,6 +41,12 @@
 [% formatValue( fieldshash.$mth.$varname ) %]
 </TD>
 [%       END %]
+<TD CLASS="ReportCell">
+[% extr.value = fieldshash.$mth.VOLUME.value * 100 /
+                 ( 100 - fieldshash.$mth.UNAVAIL.value );
+   extr.units = fieldshash.$mth.VOLUME.units;
+   formatValue( extr ) %]
+</TD>
 </TR>
 [%     END %]
 </TABLE>

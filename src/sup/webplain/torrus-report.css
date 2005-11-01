@@ -139,6 +139,17 @@ TD.ReportFirstCell {
 }
 
 
+DIV.ReportLegend {
+  margin-top: 60pt;
+  margin-left: 10pt;
+  font-size : 7pt;  
+}
+
+SPAN.ReportLegendTerm {
+  font-weight : 700;
+  padding-right : 2pt;
+}
+
 *.Footer {
   background-color : transparent;
   border-bottom : 0 solid black;

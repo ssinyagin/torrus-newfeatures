@@ -82,9 +82,66 @@
 [%       END;
        END %]
 </TABLE>
-
 [%   END;
    END %]
 
+<DIV CLASS="ReportLegend">
+
+<DIV CLASS="ReportLegendLine">
+<SPAN CLASS="ReportLegendTerm">
+Average:
+</SPAN>
+<SPAN CLASS="ReportLegendDef">
+the monthly average of 5-minute samples.
+</SPAN>
+</DIV>
+
+<DIV CLASS="ReportLegendLine">
+<SPAN CLASS="ReportLegendTerm">
+95th percentile:
+</SPAN>
+<SPAN CLASS="ReportLegendDef">
+95% of the time, the usage is at or below this amount.
+</SPAN>
+</DIV>
+
+<DIV CLASS="ReportLegendLine">
+<SPAN CLASS="ReportLegendTerm">
+Maximum:
+</SPAN>
+<SPAN CLASS="ReportLegendDef">
+the maximum value among 5-minute samples.
+</SPAN>
+</DIV>
+
+<DIV CLASS="ReportLegendLine">
+<SPAN CLASS="ReportLegendTerm">
+Unavailable samples:
+</SPAN>
+<SPAN CLASS="ReportLegendDef">
+how many 5-minute samples were missed from the measurements.
+</SPAN>
+</DIV>
+
+<DIV CLASS="ReportLegendLine">
+<SPAN CLASS="ReportLegendTerm">
+Volume:
+</SPAN>
+<SPAN CLASS="ReportLegendDef">
+for traffic usage, this is the absolut volume of data in avaiable 5-minute
+samples.
+</SPAN>
+</DIV>
+
+<DIV CLASS="ReportLegendLine">
+<SPAN CLASS="ReportLegendTerm">
+Extrapolated volume:
+</SPAN>
+<SPAN CLASS="ReportLegendDef">
+for traffic usage, this is the volume of data extrapolated to the whole
+time range.
+</SPAN>
+</DIV>
+</DIV>
 
 [% INCLUDE htmlend %]

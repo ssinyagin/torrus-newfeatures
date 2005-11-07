@@ -441,6 +441,7 @@ sub delFromList
             {
                 splice( @array, $index, 1 );
                 $found = 1;
+                last;
             }
         }
         if( $found )

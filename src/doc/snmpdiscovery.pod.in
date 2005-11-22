@@ -254,9 +254,13 @@ output. Each bundle file will contain E<lt>includeE<gt> statement for each
 corresponding C<output-file>.
 
 =item * C<snmp-port>, C<snmp-community>,  C<snmp-version>, C<snmp-timeout>,
-        C<snmp-retries>, C<snmp-host>
+        C<snmp-retries>, C<snmp-host>, C<snmp-username>, C<snmp-authkey>,
+        C<snmp-authpassword>, C<snmp-authprotocol>, C<snmp-privkey>,
+        C<snmp-privpassword>, C<snmp-privprotocol>
 
-Mandatory. These parameters define the SNMP agent properties and are
+Mandatory SNMP session parameters. Authentication parameters depend on the
+SNMP version used. See the I<XML Configuration Guide> for details.
+These parameters define the SNMP agent properties and are
 copied one-to-one to the output configuration.
 
 =item * C<domain-name>

@@ -42,7 +42,6 @@ BEGIN
 our @requiredParams =
     (
      'snmp-port',
-     'snmp-community',
      'snmp-version',
      'snmp-timeout',
      'snmp-retries',
@@ -71,6 +70,13 @@ our @copyParams =
       'snmp-port',
       'snmp-community',
       'snmp-version',
+      'snmp-username',
+      'snmp-authkey',
+      'snmp-authpassword',
+      'snmp-authprotocol',
+      'snmp-privkey',
+      'snmp-privpassword',
+      'snmp-privprotocol',
       'snmp-timeout',
       'snmp-retries',
       'snmp-oids-per-pdu',
@@ -144,9 +150,43 @@ sub discover
     }
 
     my %snmpargs;
-    foreach my $arg ( qw(-port -version -community -timeout -retries) )
+    my $community;
+    my $version = $devdetails->param( 'snmp-version' );
+    $snmpargs{'-version'} = $version;    
+
+    foreach my $arg ( qw(-port -timeout -retries) )
     {
         $snmpargs{$arg} = $devdetails->param( 'snmp' . $arg );
+    }
+    
+    if( $version eq '1' or $version eq '2c' )
+    {
+        $community = $devdetails->param( 'snmp-community' );
+        if( not defined( $community ) )
+        {
+            Error('Required parameter not defined: snmp-community');
+            return 0;
+        }
+        $snmpargs{'-community'} = $community;
+    }
+    elsif( $version eq '3' )        
+    {
+        foreach my $arg ( qw(-username -authkey -authpassword -authprotocol
+                             -privkey -privpassword -privprotocol) )
+        {
+            $snmpargs{$arg} = $devdetails->param( 'snmp' . $arg );
+        }
+        $community = $snmpargs{'-username'};
+        if( not defined( $community ) )
+        {
+            Error('Required parameter not defined: snmp-user');
+            return 0;
+        }        
+    }
+    else
+    {
+        Error('Illegal value for snmp-version parameter: ' . $version);
+        return 0;
     }
 
     my $hostname = $devdetails->param('snmp-host');
@@ -159,8 +199,6 @@ sub discover
     $snmpargs{'-hostname'} = $hostname;
 
     my $port = $snmpargs{'-port'};
-    my $community = $snmpargs{'-community'};
-
     Debug('Discovering host: ' . $hostname . ':' . $port . ':' . $community);
 
     my ($session, $error) =

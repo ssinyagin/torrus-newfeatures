@@ -1,3 +1,7 @@
+2005-11-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm: Added SNMPv3 support
+
 2005-10-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/genreport.in: Report generator utility

@@ -776,15 +776,52 @@ SNMP agent.
 Optional DNS domain name. If given, and if C<snmp-host> does not contain
 dot symbol (.), this domain name is appended to C<snmp-host>.
 
-=item * C<snmp-community>
-
-Mandatory when C<collector-type=snmp>. Specifies the SNMP community for
-the given device.
-
 =item * C<snmp-version>
 
 Mandatory when C<collector-type=snmp>. Specifies the SNMP version for the
-given device. Valid values are: C<1>, C<2c>.
+given device. Valid values are: C<1>, C<2c>, C<3>.
+
+=item * C<snmp-community>
+
+Mandatory when C<collector-type=snmp> and SNMP version is
+C<1> or C<2c>. Specifies the SNMP community for the given device.
+
+=item * C<snmp-username>
+
+Mandatory when C<collector-type=snmp> and SNMP version is C<3>.
+
+=item * C<snmp-authkey>
+
+Optional authentication key for SNMPv3. If not defined, the authentication
+level is set to C<noAuthNoPriv>. If only C<snmp-authkey> or
+C<snmp-authpassword> are specified, the security level is set to
+C<authNoPriv>. The security level is set to C<authPriv> if either
+of C<snmp-privkey> or C<snmp-privpassword> is defined.
+
+=item * C<snmp-authpassword>
+
+Optional authentication password for SNMPv3. See notes for C<snmp-authkey>
+parameter.
+
+=item * C<snmp-authprotocol>
+
+Optional authentication protocol for SNMPv3. Valid values: C<md5> or C<sha>.
+Default is C<md5>.
+
+=item * C<snmp-privkey>
+
+Optional privacy key for SNMPv3. If defined, C<snmp-authkey> or
+C<snmp-authpassword> must be defined too.
+
+=item * C<snmp-privpassword>
+
+Optional privacy password for SNMPv3. If defined, C<snmp-authkey> or
+C<snmp-authpassword> must be defined too.
+
+=item * C<snmp-privprotocol>
+
+Optional privacy protocol for SNMPv3. Valid values: C<des>, C<aes128cfb>,
+or C<3desede>. Default is C<des>.
 
 =item * C<snmp-timeout>
 

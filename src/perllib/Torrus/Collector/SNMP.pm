@@ -35,16 +35,23 @@ $Torrus::Collector::collectorTypes{'snmp'} = 1;
 # List of needed parameters and default values
 
 $Torrus::Collector::params{'snmp'} = {
-    'snmp-version'     => undef,
-    'snmp-port'        => undef,
-    'snmp-community'   => undef,
-    'snmp-timeout'     => undef,
-    'snmp-retries'     => undef,
-    'domain-name'      => undef,
-    'snmp-host'        => undef,
-    'snmp-object'      => undef,
+    'snmp-version'      => undef,
+    'snmp-port'         => undef,
+    'snmp-community'    => undef,
+    'snmp-username'     => undef,
+    'snmp-authkey'      => undef,
+    'snmp-authpassword' => undef,
+    'snmp-authprotocol' => 'md5',
+    'snmp-privkey'      => undef,
+    'snmp-privpassword' => undef,
+    'snmp-privprotocol' => 'des',
+    'snmp-timeout'      => undef,
+    'snmp-retries'      => undef,
+    'domain-name'       => undef,
+    'snmp-host'         => undef,
+    'snmp-object'       => undef,
     'snmp-oids-per-pdu' => undef,
-    'snmp-object-type' => 'OTHER',
+    'snmp-object-type'  => 'OTHER',
     'snmp-check-sysuptime' => 'yes'
     };
 
@@ -91,6 +98,13 @@ sub initTargetAttributes
     my $ipaddr = $tref->{'ipaddr'};
     my $port = $collector->param($token, 'snmp-port');
     my $community = $collector->param($token, 'snmp-community');
+
+    # We use community string to identify the agent.
+    # For SNMPv3, it's the user name
+    if( not defined( $community ) )
+    {
+        $community = $collector->param($token, 'snmp-username');
+    }
 
     # If the object is defined as a map, retrieve the whole map
     # and cache it.
@@ -205,6 +219,43 @@ sub getHostIpAddress
 }
 
 
+sub snmpSessionArgs
+{
+    my $collector = shift;
+    my $token = shift;
+    my $ipaddr = shift;
+    my $port = shift;
+    my $community = shift;
+
+    my $version = $collector->param($token, 'snmp-version');
+    my @ret = ( -hostname     => $ipaddr,
+                -port         => $port,
+                -timeout      => $collector->param($token, 'snmp-timeout'),
+                -retries      => $collector->param($token, 'snmp-retries'),
+                -version      => $version );
+
+    if( $version eq '1' or $version eq '2c' )
+    {
+        push( @ret, '-community', $community );
+    }
+    else
+    {
+        push( @ret,
+              -username     => $community,
+              -authkey      => $collector->param($token, 'snmp-authkey'),
+              -authpassword => $collector->param($token, 'snmp-authpassword'),
+              -authprotocol => $collector->param($token, 'snmp-authprotocol'),
+              -privkey      => $collector->param($token, 'snmp-privkey'),
+              -privpassword => $collector->param($token, 'snmp-privpassword'),
+              -privprotocol => $collector->param($token, 'snmp-privprotocol')
+              );
+    }
+
+    return @ret;
+}
+              
+
+
 sub openBlockingSession
 {
     my $collector = shift;
@@ -213,16 +264,32 @@ sub openBlockingSession
     my $port = shift;
     my $community = shift;
 
-    my ($session, $error) = Net::SNMP->session
-        ( -hostname    => $ipaddr,
-          -port        => $port,
-          -nonblocking => 0,
-          -translate   => ['-all', 0, '-octetstring', 1],
-          -version     => $collector->param($token, 'snmp-version'),
-          -community   => $community,
-          -timeout     => $collector->param($token, 'snmp-timeout'),
-          -retries     => $collector->param($token, 'snmp-retries')
-          );
+    my ($session, $error) =
+        Net::SNMP->session( snmpSessionArgs( $collector, $token,
+                                             $ipaddr, $port, $community ),
+                            -nonblocking  => 0,
+                            -translate    => ['-all', 0, '-octetstring', 1] );
+    if( not defined($session) )
+    {
+        Error('Cannot create SNMP session for ' . $ipaddr . ': ' . $error);
+    }
+
+    return $session;
+}
+
+sub openNonblockingSession
+{
+    my $collector = shift;
+    my $token = shift;
+    my $ipaddr = shift;
+    my $port = shift;
+    my $community = shift;
+
+    my ($session, $error) =
+        Net::SNMP->session( snmpSessionArgs( $collector, $token,
+                                             $ipaddr, $port, $community ),
+                            -nonblocking  => 0x1,
+                            -translate    => ['-timeticks' => 0] );
     if( not defined($session) )
     {
         Error('Cannot create SNMP session for ' . $ipaddr . ': ' . $error);
@@ -617,23 +684,11 @@ sub runCollector
         {
             while( my ($community, $token) = each %{$ref2} )
             {
-                my ($session, $error) = Net::SNMP->session
-                    ( -hostname    => $ipaddr,
-                      -port        => $port,
-                      -nonblocking => 0x1,
-                      -version     => $collector->param($token,
-                                                        'snmp-version'),
-                      -community   => $community,
-                      -timeout     => $collector->param($token,
-                                                        'snmp-timeout'),
-                      -retries     => $collector->param($token,
-                                                        'snmp-retries'),
-                      -translate   => ['-timeticks' => 0]
-                      );
+                my $session =
+                    openNonblockingSession( $collector, $token,
+                                            $ipaddr, $port, $community );
                 if( not defined($session) )
                 {
-                    Error('Cannot create SNMP session for ' . $ipaddr .
-                          ': ' . $error);
                     return 0;
                 }
                 else

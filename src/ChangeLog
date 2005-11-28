@@ -1,3 +1,7 @@
+2005-11-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/ttproclist.in: Two new functions: lc, uc	
+
 2005-11-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/SNMP.pm: Added SNMPv3 support

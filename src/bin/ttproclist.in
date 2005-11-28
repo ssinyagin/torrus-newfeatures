@@ -113,7 +113,9 @@ my $vars =
     'nodes'   => \%nodes,
     'param'   => \%params,
     'nodesfile' => $nodelist,
-    'creator' => $creator
+    'creator' => $creator,
+    'lc' => sub{ return lc $_[0] },
+    'uc' => sub{ return uc $_[0] }
 };
 
 my $result = $tt->process($template, $vars, $outfile);

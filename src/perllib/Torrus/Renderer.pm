@@ -84,6 +84,10 @@ sub render
     {
         $self->{'options'} = \%new_options;
     }
+    else
+    {
+        $self->{'options'} = {};
+    }
 
     $self->checkAndClearCache( $config_tree );
 
@@ -140,10 +144,7 @@ sub render
     ($t_expires, $mime_type) =
         $self->$method( $config_tree, $token, $view, $cachefile );
 
-    if( %new_options )
-    {
-        delete $self->{'options'};
-    }
+    delete $self->{'options'};
 
     my @ret;
     if( defined($t_expires) and defined($mime_type) )

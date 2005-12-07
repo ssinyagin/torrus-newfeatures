@@ -1,3 +1,7 @@
+2005-12-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/RPN.pm: New RPN function: NUM
+
 2005-11-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/ttproclist.in: Two new functions: lc, uc	

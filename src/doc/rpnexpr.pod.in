@@ -58,6 +58,11 @@ Pushes the current time, in seconds since Epoch.
 Equivalent of C<%>, the modulo operator. In Torrus parameter value,
 percent sign is reserved for parameter substitution.
 
+=item * NUM
+
+Returnd zero if the argument is undefined, and the argument's numeric value
+otherwise
+
 =back
 
 =head2 Data access

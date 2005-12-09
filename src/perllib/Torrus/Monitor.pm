@@ -488,7 +488,7 @@ sub beforeRun
 
         # Remove the alarms state information
         $self->{'db_alarms'} = new Torrus::DB('monitor_alarms',
-                                              -Subdir => $self->{'tree_name'},
+                                              -Subdir => $tree,
                                               -WriteAccess => 1);
         $self->{'db_alarms'}->trunc();
         

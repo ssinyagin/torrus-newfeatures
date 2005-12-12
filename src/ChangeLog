@@ -1,3 +1,7 @@
+2005-12-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/RPN.pm: DUP and EXC accept undefined arguments now
+
 2005-12-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/RPN.pm: New RPN function: NUM

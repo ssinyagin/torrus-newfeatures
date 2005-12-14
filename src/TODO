@@ -3,6 +3,7 @@ Round Robin Database Framework
 To do now:
 
 -- take the CF for graphing from view definition
+-- implement new RPN functions: SORT, REV, TREND
 -- Display docsIfDownstreamChannelTable docsIfUpstreamChannelTable in
    DOCSIS chanel legends
 -- validate %Torrus::SQL::connections

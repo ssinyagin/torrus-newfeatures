@@ -243,15 +243,23 @@ foreach my $outfile ( sort keys %{$perOutfileHostParams} )
             $everythingsOk = 0;
         }
     }
-    elsif( $forcebundle )
+    else
     {
-        if( defined( $fallback ) and
-            -e $outfile and -M $outfile <= $fallback )
-        {               
-            Warn('Falling back to the old version of ' .
-                 relXmlFilename($outfile));
+        my $removeFromBundle = 1;
+        
+        if( $forcebundle )
+        {
+            if( defined( $fallback ) and
+                -e $outfile and -M $outfile <= $fallback )
+            {               
+                Warn('Falling back to the old version of ' .
+                     relXmlFilename($outfile));
+                $removeFromBundle = 0;
+            }
+            $everythingsOk = 1;
         }
-        else
+
+        if( $removeFromBundle )
         {
             foreach my $bundleName ( sort keys %outputBundles )
             {
@@ -260,7 +268,6 @@ foreach my $outfile ( sort keys %{$perOutfileHostParams} )
                      relXmlFilename($outfile) . ' included because of errors');
             }
         }
-        $everythingsOk = 1;
     }
 
     if( $makedirs )

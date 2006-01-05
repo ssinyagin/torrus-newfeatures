@@ -289,7 +289,7 @@ foreach my $outfile ( sort keys %{$perOutfileHostParams} )
                     chmod( 02755, $dir ) or
                         die('Cannot chmod 02755 for ' . $dir . ': ' . $!);
                 }
-        }
+            }
         }
         else
         {

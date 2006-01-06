@@ -60,8 +60,12 @@ percent sign is reserved for parameter substitution.
 
 =item * NUM
 
-Returnd zero if the argument is undefined, and the argument's numeric value
+Returns zero if the argument is undefined, and the argument's numeric value
 otherwise
+
+=item * INF, NEGINF
+
+Returns the positive or negative infinity.
 
 =back
 

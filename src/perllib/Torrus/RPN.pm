@@ -66,8 +66,10 @@ my $operators = {
     'NOW' => [ 0, sub{ time(); } ],
     'DUP' => [ 1, sub{ ($_[0], $_[0]);}, 1 ],
     'EXC' => [ 2, sub{ ($_[1], $_[0]); }, 1 ],
-    'NUM' => [ 1, sub{ defined($_[0]) ? $_[0] : 0; }, 1 ]
-};
+    'NUM' => [ 1, sub{ defined($_[0]) ? $_[0] : 0; }, 1 ],
+    'INF' => [ 0, sub{ Math::BigFloat->binf(); } ],
+    'NEGINF' => [ 0, sub{ Math::BigFloat->binf('-'); } ]
+    };
 
 
 sub new

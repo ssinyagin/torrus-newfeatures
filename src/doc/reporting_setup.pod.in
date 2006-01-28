@@ -88,7 +88,7 @@ In F<torrus-siteconfig.pl>, add the following lines. The first one
 tells the collector to use the module for storing the collector results in
 SQL database. Next lines define the database connection. By default,
 it refers to the MySQL database named C<torrus> on C<localhost>,
-with username and password set to C<torrus>.
+with username and password set to C<imiF1oih>.
 
 
   push(@Torrus::Collector::loadModules, 'Torrus::Collector::ExternalStorage');

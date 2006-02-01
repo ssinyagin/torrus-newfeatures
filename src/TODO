@@ -42,6 +42,7 @@ To do now:
 -- Session history display
 -- Track changes of XML configurations (XML::Diff, cvs-alike?)
 -- Translate parameters in monitor comments
+-- Show maximum value in the graph image comments
 
 Design work to do:
 

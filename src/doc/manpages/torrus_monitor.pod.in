@@ -35,24 +35,6 @@ F<@logdir@/monitor.TREENAME.log>, performs one monitoring cycle, and
 sleeps until the next cycle is scheduled. In daemon mode the log file
 can be reopened by sending it a SIGHUP signal.
 
-Monitoring cycle scheduling is controlled by two variables whose values 
-may be set in F<torrus-siteconfig.pl>:
-
-=over 4
-
-=item $Torrus::Global::monitorPeriod
-
-Sets the period of the monitor run to a specified number of seconds. Default
-value is 300.
-
-=item $Torrus::Global::monitorStartShift
-
-Controls the shift of the start of monitoring cycle. Monitor will run at
-C<time() mod Period + Shift>, thus allowing the data to be updated during the
-shift period. Default value is 15.
-
-=back
-
 =head1 OPTIONS
 
 =over 4

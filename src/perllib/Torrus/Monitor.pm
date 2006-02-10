@@ -370,6 +370,12 @@ sub run_event_exec
         {
             $ENV{'TORRUS_VALUE'} = $obj->{'value'};
         }
+
+        my $severity = $config_tree->getParam($mname, 'severity');
+        if( defined( $severity ) )
+        {
+            $ENV{'TORRUS_SEVERITY'} = $severity;
+        }
         
         my $setenv_params =
             $config_tree->getParam($aname, 'setenv-params');

@@ -1499,6 +1499,10 @@ the time of memorizing the event in monitor status reports.
 Optional but recommended parameter, specifies the string identifying
 the event that this monitor watches.
 
+=item * C<severity>
+
+Optional severity level. Used for the action type C<exec>.
+
 =back
 
 
@@ -1553,47 +1557,52 @@ The following environment variables are passed to the child process:
 
 =over 8
 
-=item * C<$Torrus_HOME>
+=item * C<$TORRUS_HOME>
 
 C<prefix> where Torrus was installed.
 
-=item * C<$Torrus_BIN>
+=item * C<$TORRUS_BIN>
 
 Directory containing Torrus executables.
 
-=item * C<$Torrus_UPTIME>
+=item * C<$TORRUS_UPTIME>
 
 Number of seconds since Monitor has started.
 
-=item * C<$Torrus_TREE>, C<$Torrus_TOKEN>, C<$Torrus_NODEPATH>
+=item * C<$TORRUS_TREE>, C<$TORRUS_TOKEN>, C<$TORRUS_NODEPATH>
 
 Tree name, token and pathname of the leaf causing the alarm.
 
-=item * C<$Torrus_NCOMMENT>, C<$Torrus_NPCOMMENT>
+=item * C<$TORRUS_NCOMMENT>, C<$TORRUS_NPCOMMENT>
 
 C<comment> parameter of the node and its parent.
 Empty if the parameter is not defined for the given leaf.
 
-=item * C<$Torrus_EVENT>
+=item * C<$TORRUS_EVENT>
 
 Event type.
 
-=item * C<$Torrus_MONITOR>
+=item * C<$TORRUS_MONITOR>
 
 Monitor name
 
-=item * C<$Torrus_MCOMMENT>
+=item * C<$TORRUS_MCOMMENT>
 
 Monitor's C<comment> parameter value.
 
-=item * C<$Torrus_TSTAMP>
+=item * C<$TORRUS_TSTAMP>
 
 Timestamp (in seconds since Epoch) of the event.
 
-=item * C<Torrus_VALUE>
+=item * C<$TORRUS_VALUE>
 
 For expression monitor type, this returns the last read value of the
 datasource.
+
+=item * C<$TORRUS_SEVERITY>
+
+If the C<severity> parameter is defined in the monitor, its value
+is passed with this variable.
 
 =back
 
@@ -1607,7 +1616,7 @@ the event type C<set> is used by default.
 
 Optional for action type C<exec>. The comma-separated list of leaf parameters
 which would be passed as environment variables to the child process.
-The environment variables are of the form C<$Torrus_P_paramname>. Hyphens ('-')
+The environment variables are of the form C<$TORRUS_P_paramname>. Hyphens ('-')
 are replaced with underscores ('_') in the parameter names.
 
 =item * C<setenv-dataexpr>

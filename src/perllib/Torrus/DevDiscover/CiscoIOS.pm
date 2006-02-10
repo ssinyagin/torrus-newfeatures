@@ -123,6 +123,11 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 134,                    # atmSubInterface
          'ifDescr' => '^ATM[0-9\/]+\.[0-9]+\s+subif'
          },
+     
+     'BundleN' => {
+         'ifType'  => 127,                    # docsCableMaclayer
+         'ifDescr' => '^Bundle'
+         },
      );
 
 

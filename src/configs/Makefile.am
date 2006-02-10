@@ -24,6 +24,7 @@ EXTRA_DIST = \
 	devdiscover-siteconfig.pl \
 	email-siteconfig.pl \
 	initscript.conf \
+	notify-siteconfig.pl \
 	snmptrap-siteconfig.pl \
 	torrus-config.pl \
 	torrus-siteconfig.pl \
@@ -43,6 +44,7 @@ install-data-local:
 		$(DESTDIR)$(cfgdefdir)/$$f; \
 	done
 	for f in devdiscover-siteconfig.pl email-siteconfig.pl \
+		 notify-siteconfig.pl \
 	         snmptrap-siteconfig.pl torrus-siteconfig.pl; do \
 	  if test ! -r $(DESTDIR)$(siteconfdir)/$$f; then \
 	    $(INSTALL_DATA) $$f $(DESTDIR)$(siteconfdir)/$$f; \

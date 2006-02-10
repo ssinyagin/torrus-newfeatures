@@ -3,6 +3,7 @@ Makefile.in
 acledit
 aclfixup
 action_printemail
+action_notify
 action_snmptrap
 action_snmpv1trap
 cleanup

@@ -1,5 +1,7 @@
 2006-02-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/action_notify.in: New monitor action
+
 	* perllib/Torrus/Monitor.pm:
 	New monitor parameter: "severity"
 

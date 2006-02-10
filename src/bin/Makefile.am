@@ -24,6 +24,7 @@ SUBST = @abs_top_builddir@/setup_tools/substvars.sh
 pkgbindir = @pkgbindir@
 pkgbin_SCRIPTS = \
 	acledit                 \
+	action_notify    	\
 	action_printemail    	\
 	action_snmptrap      	\
 	action_snmpv1trap    	\
@@ -51,6 +52,7 @@ CLEANFILES = $(pkgbin_SCRIPTS) $(wrapper_SCRIPTS)
 
 EXTRA_DIST = \
 	acledit.in              \
+	action_notify.in	\
 	action_printemail.in    \
 	action_snmptrap.in      \
 	action_snmpv1trap.in    \
@@ -81,6 +83,9 @@ acledit: acledit.in
 
 action_printemail: action_printemail.in
 	$(SUBST) action_printemail.in > action_printemail
+
+action_notify: action_notify.in
+	$(SUBST) action_notify.in > action_notify
 
 action_snmptrap: action_snmptrap.in
 	$(SUBST) action_snmptrap.in > action_snmptrap

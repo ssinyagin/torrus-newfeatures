@@ -38,6 +38,7 @@ torrus_siteconfig_pl=@siteconfdir@/torrus-siteconfig.pl
 snmptrap_siteconfig_pl=@siteconfdir@/snmptrap-siteconfig.pl
 email_siteconfig_pl=@siteconfdir@/email-siteconfig.pl
 devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
+notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
 
 @SED@ \
     -e "s,\@FIND\@,@FIND@,g" \
@@ -60,6 +61,7 @@ devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
     -e "s,\@mandir\@,@mandir@,g" \
     -e "s,\@mansec_misc\@,@mansec_misc@,g" \
     -e "s,\@mansec_usercmd\@,@mansec_usercmd@,g" \
+    -e "s,\@notify_siteconfig_pl\@,$notify_siteconfig_pl,g" \
     -e "s,\@perllibdir\@,@perllibdir@,g" \
     -e "s,\@perllibdirs\@,@perllibdirs@,g" \
     -e "s,\@piddir\@,@piddir@,g" \

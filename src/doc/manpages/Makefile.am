@@ -27,6 +27,7 @@ CLEANFILES = $(PODMAN) $(POD_FILES)
 SRCPOD = \
 	torrus.pod.in \
 	torrus_acledit.pod.in \
+	torrus_action_notify.pod.in \
 	torrus_action_printemail.pod.in \
 	torrus_action_snmptrap.pod.in \
 	torrus_cleanup.pod.in \
@@ -46,6 +47,7 @@ SRCPOD = \
 POD_FILES = \
 	torrus.pod \
 	torrus_acledit.pod \
+	torrus_action_notify.pod \
 	torrus_action_printemail.pod \
 	torrus_action_snmptrap.pod \
 	torrus_cleanup.pod \
@@ -65,6 +67,7 @@ POD_FILES = \
 PODMAN = \
 	torrus.@mansec_usercmd@ \
 	torrus_acledit.@mansec_usercmd@ \
+	torrus_action_notify.@mansec_misc@ \
 	torrus_action_printemail.@mansec_misc@ \
 	torrus_action_snmptrap.@mansec_misc@ \
 	torrus_cleanup.@mansec_usercmd@ \

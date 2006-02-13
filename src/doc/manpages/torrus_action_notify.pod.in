@@ -70,7 +70,7 @@ that belong to this customer.
 Then, depending on the monitor severity, different notification
 paths are defined. For severity values higher or equal 3, aaa@domain.com and
 bbb@domain.com will receive the email notifications, and for severity
-higher than 5 all recipients will receive the notification.
+higher than or equal 5 all recipients will receive the notification.
 
 The C<match> argument is a Perl subroutine, and can depend on various
 parameters, such as time of day or day of the week, the tree name, and so on.

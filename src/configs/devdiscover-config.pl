@@ -268,6 +268,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-temperature-sensor-fahrenheit',
          'source' => 'vendor/cisco.generic.xml'
          },
+     'CiscoGeneric::cisco-power-supply' => {
+         'name'   => 'cisco-power-supply',
+         'source' => 'vendor/cisco.generic.xml'
+         },
      'CiscoIOS::cisco-interface-counters' => {
          'name'   => 'cisco-interface-counters',
          'source' => 'vendor/cisco.ios.xml'

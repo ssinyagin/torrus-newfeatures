@@ -60,7 +60,8 @@
                           value="1.3.6.1.4.1.9.9.13.1.3.1.3" />
   <def name="ciscoEnvMonTemperatureStatusState"
                           value="1.3.6.1.4.1.9.9.13.1.3.1.6" />
-
+  <def name="ciscoEnvMonSupplyState"
+                          value="1.3.6.1.4.1.9.9.13.1.5.1.3" />
 </definitions>
 
 <datasources>
@@ -318,6 +319,18 @@
     <param name="vertical-label"  value="degrees Fahrenheit"/>
   </template>
 
+  <template name="cisco-power-supply">
+    <param name="comment"            value="Power supply #%power-index%"/>
+    <param name="rrd-ds"             value="power_%power-index%"/>
+    <param name="rrd-create-dstype"  value="GAUGE"/>
+    <param name="snmp-object"
+           value="$ciscoEnvMonSupplyState.%power-index%"/>
+    <param name="graph-legend"       value="Power supply #%power-index%"/>
+    <param name="vertical-label"     value="1 = Normal"/>
+    <param name="rrd-hwpredict"      value="disabled" />
+  </template>
+  
+  
 </datasources>
 
 </configuration>

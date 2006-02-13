@@ -43,6 +43,7 @@ our %oiddef =
      'ciscoEnvMonTemperatureStatusValue' => '1.3.6.1.4.1.9.9.13.1.3.1.3',
      'ciscoEnvMonTemperatureThreshold'   => '1.3.6.1.4.1.9.9.13.1.3.1.4',
      'ciscoEnvMonTemperatureStatusState' => '1.3.6.1.4.1.9.9.13.1.3.1.6',
+     'ciscoEnvMonSupplyState'            => '1.3.6.1.4.1.9.9.13.1.5.1.3',
 
      # CISCO-ENHANCED-MEMPOOL-MIB
      'cempMemPoolName'                   => '1.3.6.1.4.1.9.9.221.1.1.1.1.3',
@@ -121,6 +122,33 @@ sub discover
         }
     }
 
+    if( $devdetails->param('CiscoGeneric::disable-psupplies') ne 'yes' )
+    {
+        # Check if power supply status is supported
+
+        my $oidSupply = $dd->oiddef('ciscoEnvMonSupplyState');
+
+        my $supplyTable = $session->get_table( -baseoid => $oidSupply );
+        if( defined( $supplyTable ) )
+        {
+            $devdetails->setCap('ciscoPowerSupplies');
+            $data->{'ciscoPowerSupplies'} = [];
+            
+            my $prefixLen = length( $oidSupply ) + 1;
+            while( my( $oid, $val ) = each %{$supplyTable} )
+            {
+                # Extract the supply index from OID
+                my $sIndex = substr( $oid, $prefixLen );
+                
+                #check if the value is not notPresent(5)
+                if( $val != 5 )
+                {
+                    push( @{$data->{'ciscoPowerSupplies'}}, $sIndex );
+                }
+            }
+        }
+    }
+    
     if( $devdetails->param('CiscoGeneric::disable-memory-pools') ne 'yes' )
     {
         my $eMemPool =
@@ -358,6 +386,43 @@ sub buildConfig
         }
     }
 
+    # Power supplies
+
+    if( $devdetails->hasCap('ciscoPowerSupplies') )
+    {
+        # Create a subtree for the power supplies
+        my $subtreeName = 'Power_Supplies';
+
+        my $param = {'comment' => 'Power supplies status',
+                     'precedence' => -600};
+        my $templates = [];
+                
+        $param->{'data-file'} = '%snmp-host%_power.rrd';
+
+        my $monitor = $devdetails->param('CiscoGeneric::power-monitor');
+        if( length( $monitor ) > 0 )
+        {
+            $param->{'monitor'} = $monitor;
+        }
+
+        my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
+                                           $param, $templates );
+        
+        foreach my $sIndex ( sort {$a<=>$b} @{$data->{'ciscoPowerSupplies'}} )
+        {
+            my $leafName = sprintf( 'power_%.2d', $sIndex );
+
+            my $param = {
+                'power-index'       => $sIndex
+                };
+
+            my $templates = ['CiscoGeneric::cisco-power-supply'];
+
+            $cb->addLeaf( $subtreeNode, $leafName, $param, $templates );
+        }
+    }
+
+    
     # Memory Pools
 
     if( $devdetails->hasCap('cempMemPool') or

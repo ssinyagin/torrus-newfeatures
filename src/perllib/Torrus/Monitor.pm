@@ -268,7 +268,7 @@ sub setAlarm
             $action_token = $config_tree->getRelative($token, $action_target);
             Debug('Redirected to token ' . $action_token);
         }
-        $obj->{'action_token'} = $token;
+        $obj->{'action_token'} = $action_token;
 
         foreach my $aname (split(',',
                                  $config_tree->getParam($mname, 'action')))

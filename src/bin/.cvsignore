@@ -15,6 +15,7 @@ configsnapshot
 devdiscover
 genddx
 genlist
+genreport
 install_plugin
 mkroutercfg
 monitor

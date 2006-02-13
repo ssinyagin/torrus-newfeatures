@@ -3,7 +3,7 @@
 <head>
 <title>Torrus SNMP Discovery User Guide</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gp@familiehaase.de" />
+<link rev="made" href="mailto:gerrit@familiehaase.de" />
 </head>
 
 <body>
@@ -258,9 +258,13 @@ output. Each bundle file will contain &lt;include&gt; statement for each
 corresponding <a href="#item_output_2dfile"><code>output-file</code></a>.
 <p></p>
 <li><strong><a name="item_snmp_2dport_2c_snmp_2dcommunity_2c_snmp_2dversion_"><code>snmp-port</code>, <code>snmp-community</code>,  <code>snmp-version</code>, <code>snmp-timeout</code>,
-        <code>snmp-retries</code>, <code>snmp-host</code></a></strong><br />
+        <code>snmp-retries</code>, <code>snmp-host</code>, <code>snmp-username</code>, <code>snmp-authkey</code>,
+        <code>snmp-authpassword</code>, <code>snmp-authprotocol</code>, <code>snmp-privkey</code>,
+        <code>snmp-privpassword</code>, <code>snmp-privprotocol</code></a></strong><br />
 </li>
-Mandatory. These parameters define the SNMP agent properties and are
+Mandatory SNMP session parameters. Authentication parameters depend on the
+SNMP version used. See the <em>XML Configuration Guide</em> for details.
+These parameters define the SNMP agent properties and are
 copied one-to-one to the output configuration.
 <p></p>
 <li><strong><a name="item_domain_2dname"><code>domain-name</code></a></strong><br />
@@ -486,6 +490,14 @@ When set to <code>yes</code>, Cisco temperature sensor values are stored in
 a separate RRD file per sensor ID. This is useful for modular big routers
 like Cisco GSR.
 <p></p>
+<li><strong><a name="item_ciscogeneric_3a_3adisable_2dpsupplies"><code>CiscoGeneric::disable-psupplies</code></a></strong><br />
+</li>
+if set to <code>yes</code>, Cisco power supply statistics are not collected.
+<p></p>
+<li><strong><a name="item_ciscogeneric_3a_3apower_2dmonitor"><code>CiscoGeneric::power-monitor</code></a></strong><br />
+</li>
+Name of the power supply monitor for Cisco devices.
+<p></p>
 <li><strong><a name="item_ciscoios_3a_3adisable_2dmembuf_2dstats"><code>CiscoIOS::disable-membuf-stats</code></a></strong><br />
 </li>
 When set to <code>yes</code>, Cisco memory buffer statistics are excluded from
@@ -582,9 +594,11 @@ defines its own meaning of the argument.
 <p>This type of selector selects the network interfaces on a SNMP device.
 The following attribute names are supported:</p>
 <ul>
-<li><strong><a name="item_ifsubtreename"><code>ifSubtreeName</code></a></strong><br />
+<li><strong><a name="item_ifsubtreename_2c_ifsubtreename1_2c__2e_2e_2e"><code>ifSubtreeName</code>, <code>ifSubtreeName1</code>, ...</a></strong><br />
 </li>
 Interface-level subtree name as you see it in the discovery results.
+You can compose a complex expression of subtree matches, by
+createing attributes with different numbers at the end.
 <p></p>
 <li><strong><a name="item_ifcomment"><code>ifComment</code></a></strong><br />
 </li>
@@ -596,7 +610,9 @@ usually derived from an interface description.
 Numeric IANA interface type, as returned by <a href="#item_iftype"><code>ifType</code></a> SNMP variable.
 <p></p></ul>
 <p><a href="#item_iftype"><code>ifType</code></a> is compared numerically.
-<a href="#item_ifsubtreename"><code>ifSubtreeName</code></a> and <a href="#item_ifcomment"><code>ifComment</code></a> are regular expressions.</p>
+<code>ifSubtreeName</code> and <a href="#item_ifcomment"><code>ifComment</code></a> are regular expressions.
+<code>ifSubtreeName</code> accepts multiple expressions separated by space,
+and the selector matches if any of these expressions matches the subtree name.</p>
 <p>The following actions are supported:</p>
 <ul>
 <li><strong><a name="item_inbytesmonitor_2c_outbytesmonitor"><code>InBytesMonitor</code>, <code>OutBytesMonitor</code></a></strong><br />

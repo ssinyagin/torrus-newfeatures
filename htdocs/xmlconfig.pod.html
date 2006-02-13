@@ -3,7 +3,7 @@
 <head>
 <title>Torrus XML Configuration Guide</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gp@familiehaase.de" />
+<link rev="made" href="mailto:gerrit@familiehaase.de" />
 </head>
 
 <body>
@@ -760,15 +760,52 @@ SNMP agent.
 Optional DNS domain name. If given, and if <a href="#item_snmp_2dhost"><code>snmp-host</code></a> does not contain
 dot symbol (.), this domain name is appended to <a href="#item_snmp_2dhost"><code>snmp-host</code></a>.
 <p></p>
-<li><strong><a name="item_snmp_2dcommunity"><code>snmp-community</code></a></strong><br />
-</li>
-Mandatory when <code>collector-type=snmp</code>. Specifies the SNMP community for
-the given device.
-<p></p>
 <li><strong><a name="item_snmp_2dversion"><code>snmp-version</code></a></strong><br />
 </li>
 Mandatory when <code>collector-type=snmp</code>. Specifies the SNMP version for the
-given device. Valid values are: <code>1</code>, <code>2c</code>.
+given device. Valid values are: <code>1</code>, <code>2c</code>, <code>3</code>.
+<p></p>
+<li><strong><a name="item_snmp_2dcommunity"><code>snmp-community</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=snmp</code> and SNMP version is
+<code>1</code> or <code>2c</code>. Specifies the SNMP community for the given device.
+<p></p>
+<li><strong><a name="item_snmp_2dusername"><code>snmp-username</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=snmp</code> and SNMP version is <code>3</code>.
+<p></p>
+<li><strong><a name="item_snmp_2dauthkey"><code>snmp-authkey</code></a></strong><br />
+</li>
+Optional authentication key for SNMPv3. If not defined, the authentication
+level is set to <code>noAuthNoPriv</code>. If only <a href="#item_snmp_2dauthkey"><code>snmp-authkey</code></a> or
+<a href="#item_snmp_2dauthpassword"><code>snmp-authpassword</code></a> are specified, the security level is set to
+<code>authNoPriv</code>. The security level is set to <code>authPriv</code> if either
+of <a href="#item_snmp_2dprivkey"><code>snmp-privkey</code></a> or <a href="#item_snmp_2dprivpassword"><code>snmp-privpassword</code></a> is defined.
+<p></p>
+<li><strong><a name="item_snmp_2dauthpassword"><code>snmp-authpassword</code></a></strong><br />
+</li>
+Optional authentication password for SNMPv3. See notes for <a href="#item_snmp_2dauthkey"><code>snmp-authkey</code></a>
+parameter.
+<p></p>
+<li><strong><a name="item_snmp_2dauthprotocol"><code>snmp-authprotocol</code></a></strong><br />
+</li>
+Optional authentication protocol for SNMPv3. Valid values: <code>md5</code> or <code>sha</code>.
+Default is <code>md5</code>.
+<p></p>
+<li><strong><a name="item_snmp_2dprivkey"><code>snmp-privkey</code></a></strong><br />
+</li>
+Optional privacy key for SNMPv3. If defined, <a href="#item_snmp_2dauthkey"><code>snmp-authkey</code></a> or
+<a href="#item_snmp_2dauthpassword"><code>snmp-authpassword</code></a> must be defined too.
+<p></p>
+<li><strong><a name="item_snmp_2dprivpassword"><code>snmp-privpassword</code></a></strong><br />
+</li>
+Optional privacy password for SNMPv3. If defined, <a href="#item_snmp_2dauthkey"><code>snmp-authkey</code></a> or
+<a href="#item_snmp_2dauthpassword"><code>snmp-authpassword</code></a> must be defined too.
+<p></p>
+<li><strong><a name="item_snmp_2dprivprotocol"><code>snmp-privprotocol</code></a></strong><br />
+</li>
+Optional privacy protocol for SNMPv3. Valid values: <code>des</code>, <code>aes128cfb</code>,
+or <code>3desede</code>. Default is <code>des</code>.
 <p></p>
 <li><strong><a name="item_snmp_2dtimeout"><code>snmp-timeout</code></a></strong><br />
 </li>
@@ -1386,6 +1423,10 @@ the time of memorizing the event in monitor status reports.
 </li>
 Optional but recommended parameter, specifies the string identifying
 the event that this monitor watches.
+<p></p>
+<li><strong><a name="item_severity"><code>severity</code></a></strong><br />
+</li>
+Optional severity level. Used for the action type <a href="#item_exec"><code>exec</code></a>.
 <p></p></ul>
 <p>
 </p>
@@ -1428,47 +1469,52 @@ Relaced with <code>&lt;</code>.
 <p></p></ul>
 <p>The following environment variables are passed to the child process:</p>
 <ul>
-<li><strong><a name="item__24torrus_home"><code>$Torrus_HOME</code></a></strong><br />
+<li><strong><a name="item__24torrus_home"><code>$TORRUS_HOME</code></a></strong><br />
 </li>
 <code>prefix</code> where Torrus was installed.
 <p></p>
-<li><strong><a name="item__24torrus_bin"><code>$Torrus_BIN</code></a></strong><br />
+<li><strong><a name="item__24torrus_bin"><code>$TORRUS_BIN</code></a></strong><br />
 </li>
 Directory containing Torrus executables.
 <p></p>
-<li><strong><a name="item__24torrus_uptime"><code>$Torrus_UPTIME</code></a></strong><br />
+<li><strong><a name="item__24torrus_uptime"><code>$TORRUS_UPTIME</code></a></strong><br />
 </li>
 Number of seconds since Monitor has started.
 <p></p>
-<li><strong><a name="item__24torrus_tree_2c__24torrus_token_2c__24torrus_nod"><code>$Torrus_TREE</code>, <code>$Torrus_TOKEN</code>, <code>$Torrus_NODEPATH</code></a></strong><br />
+<li><strong><a name="item__24torrus_tree_2c__24torrus_token_2c__24torrus_nod"><code>$TORRUS_TREE</code>, <code>$TORRUS_TOKEN</code>, <code>$TORRUS_NODEPATH</code></a></strong><br />
 </li>
 Tree name, token and pathname of the leaf causing the alarm.
 <p></p>
-<li><strong><a name="item__24torrus_ncomment_2c__24torrus_npcomment"><code>$Torrus_NCOMMENT</code>, <code>$Torrus_NPCOMMENT</code></a></strong><br />
+<li><strong><a name="item__24torrus_ncomment_2c__24torrus_npcomment"><code>$TORRUS_NCOMMENT</code>, <code>$TORRUS_NPCOMMENT</code></a></strong><br />
 </li>
 <a href="#item_comment"><code>comment</code></a> parameter of the node and its parent.
 Empty if the parameter is not defined for the given leaf.
 <p></p>
-<li><strong><a name="item__24torrus_event"><code>$Torrus_EVENT</code></a></strong><br />
+<li><strong><a name="item__24torrus_event"><code>$TORRUS_EVENT</code></a></strong><br />
 </li>
 Event type.
 <p></p>
-<li><strong><a name="item__24torrus_monitor"><code>$Torrus_MONITOR</code></a></strong><br />
+<li><strong><a name="item__24torrus_monitor"><code>$TORRUS_MONITOR</code></a></strong><br />
 </li>
 Monitor name
 <p></p>
-<li><strong><a name="item__24torrus_mcomment"><code>$Torrus_MCOMMENT</code></a></strong><br />
+<li><strong><a name="item__24torrus_mcomment"><code>$TORRUS_MCOMMENT</code></a></strong><br />
 </li>
 Monitor's <a href="#item_comment"><code>comment</code></a> parameter value.
 <p></p>
-<li><strong><a name="item__24torrus_tstamp"><code>$Torrus_TSTAMP</code></a></strong><br />
+<li><strong><a name="item__24torrus_tstamp"><code>$TORRUS_TSTAMP</code></a></strong><br />
 </li>
 Timestamp (in seconds since Epoch) of the event.
 <p></p>
-<li><strong><a name="item_torrus_value"><code>Torrus_VALUE</code></a></strong><br />
+<li><strong><a name="item__24torrus_value"><code>$TORRUS_VALUE</code></a></strong><br />
 </li>
 For expression monitor type, this returns the last read value of the
 datasource.
+<p></p>
+<li><strong><a name="item__24torrus_severity"><code>$TORRUS_SEVERITY</code></a></strong><br />
+</li>
+If the <a href="#item_severity"><code>severity</code></a> parameter is defined in the monitor, its value
+is passed with this variable.
 <p></p></ul>
 <li><strong><a name="item_launch_2dwhen"><code>launch-when</code></a></strong><br />
 </li>
@@ -1480,7 +1526,7 @@ the event type <a href="#item_set"><code>set</code></a> is used by default.
 </li>
 Optional for action type <a href="#item_exec"><code>exec</code></a>. The comma-separated list of leaf parameters
 which would be passed as environment variables to the child process.
-The environment variables are of the form <code>$Torrus_P_paramname</code>. Hyphens ('-')
+The environment variables are of the form <code>$TORRUS_P_paramname</code>. Hyphens ('-')
 are replaced with underscores ('_') in the parameter names.
 <p></p>
 <li><strong><a name="item_setenv_2ddataexpr"><code>setenv-dataexpr</code></a></strong><br />

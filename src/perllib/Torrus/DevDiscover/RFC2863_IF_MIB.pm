@@ -894,30 +894,42 @@ sub checkSelectorAttribute
 
     my $data = $devdetails->data();
     my $interface = $data->{'interfaces'}{$object};
-
-    my $value;
-    my $operator = '=~';
     
-    if( $attr eq 'ifSubtreeName' )
+    if( $attr =~ /^ifSubtreeName\d*$/ )
     {
-        $value = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-    }
-    elsif( $attr eq 'ifComment' )
-    {
-        $value = $interface->{$data->{'nameref'}{'ifComment'}};
-    }
-    elsif( $attr eq 'ifType' )
-    {
-        $value = $interface->{'ifType'};
-        $operator = '==';
+        my $value = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+        my $match = 0;
+        foreach my $chkexpr ( split( /\s+/, $checkval ) )
+        {
+            if( $value =~ $chkexpr )
+            {
+                $match = 1;
+                last;
+            }
+        }
+        return $match;        
     }
     else
     {
-        Error('Unknown RFC2863_IF_MIB selector attribute: ' . $attr);
-        $value = '';
-    }
+        my $value;
+        my $operator = '=~';
+        if( $attr eq 'ifComment' )
+        {
+            $value = $interface->{$data->{'nameref'}{'ifComment'}};
+        }
+        elsif( $attr eq 'ifType' )
+        {
+            $value = $interface->{'ifType'};
+            $operator = '==';
+        }
+        else
+        {
+            Error('Unknown RFC2863_IF_MIB selector attribute: ' . $attr);
+            $value = '';
+        }
 
-    return eval( '$value' . ' ' . $operator . '$checkval' ) ? 1:0;
+        return eval( '$value' . ' ' . $operator . '$checkval' ) ? 1:0;
+    }
 }
 
 

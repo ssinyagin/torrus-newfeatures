@@ -1,5 +1,8 @@
 2006-02-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	Complex matching expressions for subtree name selector 
+
 	* perllib/Torrus/DevDiscover/CiscoGeneric.pm (discover):
 	Cisco power supply monitoring
 

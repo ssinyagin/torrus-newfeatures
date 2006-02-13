@@ -609,9 +609,11 @@ The following attribute names are supported:
 
 =over 4
 
-=item * C<ifSubtreeName>
+=item * C<ifSubtreeName>, C<ifSubtreeName1>, ...
 
 Interface-level subtree name as you see it in the discovery results.
+You can compose a complex expression of subtree matches, by
+createing attributes with different numbers at the end.
 
 =item * C<ifComment>
 
@@ -626,6 +628,10 @@ Numeric IANA interface type, as returned by C<ifType> SNMP variable.
 
 C<ifType> is compared numerically.
 C<ifSubtreeName> and C<ifComment> are regular expressions.
+C<ifSubtreeName> accepts multiple expressions separated by space,
+and the selector matches if any of these expressions matches the subtree name.
+
+
 
 The following actions are supported:
 

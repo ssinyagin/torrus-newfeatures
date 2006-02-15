@@ -288,7 +288,11 @@ sub discover
             $legend .= $legendValues{$key}{'name'} . ':' . $text . ';';
         }
     }
-    $data->{'param'}{'legend'} = $legend;
+    
+    if( $devdetails->param('suppress-legend') ne 'yes' )
+    {
+        $data->{'param'}{'legend'} = $legend;
+    }
 
     # some parameters need just one-to-one copying
 

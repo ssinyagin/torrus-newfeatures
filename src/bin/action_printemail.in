@@ -62,6 +62,7 @@ my $vars =
     'severity'   => $ENV{'TORRUS_SEVERITY'},
     'timestamp'  => scalar(localtime($ENV{'TORRUS_TSTAMP'})),
     'value'      => $ENV{'TORRUS_VALUE'},
+    'dispvalue'  => $ENV{'TORRUS_DISPLAY_VALUE'},
     'env'        => sub  { return $ENV{$_[0]} }
 };
 

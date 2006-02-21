@@ -1503,6 +1503,17 @@ the event that this monitor watches.
 
 Optional severity level. Used for the action type C<exec>.
 
+=item * C<display-rpn-expr>
+
+Optional RPN expression for transforming the datasource value.
+If defined, it will be applied to the value before setting
+C<TORRUS_DISPLAY_VALUE> environment variable.
+
+=item * C<display-format>
+
+Optional I<sprintf> format for displaying the value in
+C<TORRUS_DISPLAY_VALUE> environment variable. Default is C<%.2f>.
+
 =back
 
 
@@ -1598,6 +1609,11 @@ Timestamp (in seconds since Epoch) of the event.
 
 For expression monitor type, this returns the last read value of the
 datasource.
+
+=item * C<$TORRUS_DISPLAY_VALUE>
+
+For expression monitor type, it contains a human-readable form
+of the value, possibly transformed by C<display-rpn-expr> expression.
 
 =item * C<$TORRUS_SEVERITY>
 

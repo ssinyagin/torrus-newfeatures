@@ -149,6 +149,36 @@ sub check_expression
     $obj->{'value'} = $value;
     
     my $expr = $value . ',' . $config_tree->getParam($mname,'rpn-expr');
+    $expr = $self->substitute_vars( $config_tree, $obj, $expr );
+
+    my $display_expr = $config_tree->getParam($mname,'display-rpn-expr');
+    if( defined( $display_expr ) )
+    {
+        $display_expr =
+            $self->substitute_vars( $config_tree, $obj,
+                                    $value . ',' . $display_expr );
+        $obj->{'display_value'} =
+            $obj->{'da'}->read_RPN( $config_tree, $token,
+                                    $display_expr, $timestamp );
+    }
+    else
+    {
+        $obj->{'display_value'} = $value;
+    }
+    
+    return $obj->{'da'}->read_RPN( $config_tree, $token, $expr, $timestamp );
+}
+
+
+sub substitute_vars
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $obj = shift;
+    my $expr = shift;
+    
+    my $token = $obj->{'token'};
+    my $mname = $obj->{'mname'};
 
     if( index( $expr, '#' ) >= 0 )
     {
@@ -194,8 +224,10 @@ sub check_expression
         }
 
     }
-    return $obj->{'da'}->read_RPN( $config_tree, $token, $expr, $timestamp );
+
+    return $expr;
 }
+    
 
 
 sub setAlarm
@@ -369,6 +401,15 @@ sub run_event_exec
         if( defined( $obj->{'value'} ) )
         {
             $ENV{'TORRUS_VALUE'} = $obj->{'value'};
+
+            my $format = $config_tree->getParam($mname, 'display-format');
+            if( not defined( $format ) )
+            {
+                $format = '%.2f';
+            }
+
+            $ENV{'TORRUS_DISPLAY_VALUE'} =
+                sprintf( $format, $obj->{'display_value'} );
         }
 
         my $severity = $config_tree->getParam($mname, 'severity');
@@ -384,12 +425,15 @@ sub run_event_exec
         {
             foreach my $param ( split( ',', $setenv_params ) )
             {
-                my $value = $config_tree->getNodeParam( $token, $param );
+                # We retrieve the param from the monitored token, not
+                # from action-token
+                my $value = $config_tree->getNodeParam( $obj->{'token'},
+                                                        $param );
                 if( not defined $value )
                 {
                     Warn('Parameter ' . $param . ' referenced in action '.
                          $aname . ', but not defined for ' .
-                         $ENV{'TORRUS_NODEPATH'});
+                         $config_tree->path($obj->{'token'}));
                     $value = '';
                 }
                 $param =~ s/\W/_/g;

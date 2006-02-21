@@ -1,3 +1,9 @@
+2006-02-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Monitor.pm: New monitor parameters:
+	display-rpn-expr display-format
+	(run_event_exec): New environment variable: TORRUS_DISPLAY_VALUE
+
 2006-02-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm (discover):

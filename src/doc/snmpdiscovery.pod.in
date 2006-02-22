@@ -359,6 +359,10 @@ Each tokenset name is followed by colon (:) and the description text:
 if set to C<yes>, the legend is not shown. It usually has uptime,
 software version, and contact information for the SNMP device.
 
+=item * C<comment>
+
+Sets the comment string for the host.
+
 =back
 
 

@@ -63,6 +63,7 @@ our @copyParams =
       'collector-timeoffset-min',
       'collector-timeoffset-max',
       'collector-timeoffset-step',
+      'comment',
       'domain-name',
       'monitor-period',
       'monitor-timeoffset',

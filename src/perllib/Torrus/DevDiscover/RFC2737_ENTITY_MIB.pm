@@ -125,7 +125,8 @@ sub discover
     {
         $data->{'entityChassisPhyIndex'} = $chassisIndex;
         my $chassisDescr = $data->{'entityPhysical'}{$chassisIndex}{'descr'};
-        if( length( $chassisDescr ) )
+        if( length( $chassisDescr ) > 0 and
+            not defined( $data->{'param'}{'comment'} ) )
         {
             Debug('ENTITY-MIB: found chassis description: ' . $chassisDescr);
             $data->{'param'}{'comment'} = $chassisDescr;

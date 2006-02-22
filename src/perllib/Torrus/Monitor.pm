@@ -146,7 +146,6 @@ sub check_expression
 
     my ($value, $timestamp) = $obj->{'da'}->read( $config_tree, $token );
     $value = 'UNKN' unless defined($value);
-    $obj->{'value'} = $value;
     
     my $expr = $value . ',' . $config_tree->getParam($mname,'rpn-expr');
     $expr = $self->substitute_vars( $config_tree, $obj, $expr );
@@ -400,7 +399,7 @@ sub run_event_exec
 
         if( defined( $obj->{'value'} ) )
         {
-            $ENV{'TORRUS_VALUE'} = $obj->{'value'};
+            $ENV{'TORRUS_VALUE'} = $obj->{'display_value'};
 
             my $format = $config_tree->getParam($mname, 'display-format');
             if( not defined( $format ) )

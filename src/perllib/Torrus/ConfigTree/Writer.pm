@@ -37,7 +37,7 @@ use Digest::MD5 qw(md5); # needed as hash function
 my @remspace =
     (qw(storage-type monitor action launch-when rpn-expr tokenset-member
         setenv-params setenv-dataexpr ds-names value-map rrgraph-views
-        print-cf hrules));
+        print-cf hrules display-rpn-expr));
 
 foreach my $param ( @remspace )
 {

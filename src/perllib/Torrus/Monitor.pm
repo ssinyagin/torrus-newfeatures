@@ -397,7 +397,7 @@ sub run_event_exec
         $ENV{'TORRUS_MCOMMENT'}  = $config_tree->getParam($mname, 'comment');
         $ENV{'TORRUS_TSTAMP'}    = $timestamp;
 
-        if( defined( $obj->{'value'} ) )
+        if( defined( $obj->{'display_value'} ) )
         {
             $ENV{'TORRUS_VALUE'} = $obj->{'display_value'};
 

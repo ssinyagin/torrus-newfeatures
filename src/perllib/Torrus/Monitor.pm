@@ -156,9 +156,9 @@ sub check_expression
         $display_expr =
             $self->substitute_vars( $config_tree, $obj,
                                     $value . ',' . $display_expr );
-        $obj->{'display_value'} =
-            $obj->{'da'}->read_RPN( $config_tree, $token,
-                                    $display_expr, $timestamp );
+        my ($dv, $dt) = $obj->{'da'}->read_RPN( $config_tree, $token,
+                                                $display_expr, $timestamp );
+        $obj->{'display_value'} = $dv;
     }
     else
     {

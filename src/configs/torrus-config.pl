@@ -159,6 +159,10 @@ $Torrus::Renderer::companyName = 'Your company name';
 # The URL to use for that piece of text
 $Torrus::Renderer::companyURL = 'http://torrus.sf.net';
 
+# The URL of your company logo which will be displayed instead of
+# companyName
+# $Torrus::Renderer::companyLogo = 'http://domain.com/logo.png';
+
 # Another piece of text on the right to the company name
 $Torrus::Renderer::siteInfo = undef;
     

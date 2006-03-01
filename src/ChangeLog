@@ -1,3 +1,9 @@
+2006-03-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/HTML.pm:
+	New config variable: $Torrus::Renderer::companyLogo
+	to display a logo instead of text
+
 2006-02-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm: 'comment' parameter is copied

@@ -39,7 +39,9 @@ window.open('[%url(token) _ '&view=helptext-html'%]','helpwindow',
 <DIV CLASS="Header">
 
 <SPAN CLASS="CompanyInfo">
-<A TITLE="company info" HREF="[%companyURL%]">[%companyName%]</A>
+<A TITLE="company info"
+HREF="[%companyURL%]">[% IF companyLogo %]<IMG SRC="[%companyLogo%]"
+ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
 </SPAN>
 
 [% IF siteInfo %]

@@ -86,6 +86,7 @@ sub render_html
         'tsetList'   => sub { $config_tree->getTsets(); },
         'style'      => sub { return $self->style($_[0]); },
         'companyName'=> $Torrus::Renderer::companyName,
+        'companyLogo'=> $Torrus::Renderer::companyLogo,
         'companyURL' => $Torrus::Renderer::companyURL,
         'siteInfo'   => $Torrus::Renderer::siteInfo,
         'treeInfo'   => sub { return $Torrus::Global::treeConfig{

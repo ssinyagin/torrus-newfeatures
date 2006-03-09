@@ -165,6 +165,10 @@ $Torrus::Renderer::companyURL = 'http://torrus.sf.net';
 
 # Another piece of text on the right to the company name
 $Torrus::Renderer::siteInfo = undef;
+
+# URL to be shown on the login page for lost password
+# You have to implement that yourself
+# $Torrus::Renderer::lostPasswordURL = 'http://domain.com/lostpw.cgi';
     
 # The time format to print in HTML
 $Torrus::Renderer::timeFormat = '%d-%m-%Y %H:%M';

@@ -83,6 +83,7 @@ sub renderUserLogin
         'companyName'=> $Torrus::Renderer::companyName,
         'companyLogo'=> $Torrus::Renderer::companyLogo,
         'companyURL' => $Torrus::Renderer::companyURL,
+        'lostPasswordURL' => $Torrus::Renderer::lostPasswordURL,
         'siteInfo'   => $Torrus::Renderer::siteInfo,
         'version'    => $Torrus::Global::version,
         'xmlnorm'    => \&Torrus::Renderer::xmlnormalize

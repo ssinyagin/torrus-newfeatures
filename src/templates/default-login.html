@@ -37,5 +37,10 @@
       <INPUT CLASS="Submit" TYPE="SUBMIT" VALUE="Login"/>
   </DIV>
 </FORM>
+[% IF lostPasswordURL %]
+  <DIV CLASS="LoginRow">
+    <A HREF="[% lostPasswordURL %]">Lost password?</A>
+  </DIV>
+[% END %]
 
 [% INCLUDE htmlend %]

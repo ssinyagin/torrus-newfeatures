@@ -504,8 +504,14 @@ sub buildConfig
     {
         $subtreeName = 'Interface_Counters';
     }
+    my $subtreeParams = {};
+    my $subtreeComment = $devdetails->param('RFC2863_IF_MIB::subtree-comment');
+    if( length( $subtreeComment ) > 0 )
+    {
+        $subtreeParams->{'comment'} = $subtreeComment;
+    }
     my $countersNode =
-        $cb->addSubtree( $devNode, $subtreeName, undef,
+        $cb->addSubtree( $devNode, $subtreeName, $subtreeParams,
                          ['RFC2863_IF_MIB::rfc2863-ifmib-subtree'] );
     
     foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )

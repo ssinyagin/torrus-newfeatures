@@ -1,5 +1,8 @@
 2006-03-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	New discovery parameter: RFC2863_IF_MIB::subtree-comment
+
 	* perllib/Torrus/Renderer/Frontpage.pm (renderUserLogin):
 	New config option: $Torrus::Renderer::lostPasswordURL
 

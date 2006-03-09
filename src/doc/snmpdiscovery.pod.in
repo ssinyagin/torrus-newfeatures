@@ -385,6 +385,11 @@ such situation automatically.
 Defines the child subtree name within host-level subtree where interface
 counters are located. Default: C<Interface_Counters>.
 
+=item * C<RFC2863_IF_MIB::subtree-comment>
+
+Defines the comment string for interface counters subtree.
+Default: I<Interface traffic and error counters>.
+
 =item * C<RFC2863_IF_MIB::list-admindown-interfaces>
 
 If set to C<yes>, interfaces with ifAdminStatus set to other than up(1)

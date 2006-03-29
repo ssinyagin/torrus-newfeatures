@@ -87,7 +87,7 @@
     <param name="collector-timeoffset-hashstring"
            value="%system-id%:%interface-nick%" />
     <param name="help-text">
-    The default view shows the devce's network interfaces for which
+    The default view shows the device's network interfaces for which
     the traffic statistics are available. Expanded view can be seen by
     clicking the [%em('Show InOut_bps for all interfaces')%] shortcut.
     It would show input/output graphs for all interfaces on a single page.

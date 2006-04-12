@@ -138,7 +138,8 @@ sub buildConfig
                 'graph-legend-registered'  => 'Registered',
                 'line-style-registered'    => '##resourceusage',
                 'line-color-registered'    => '##resourceusage',
-                'line-order-registered'    => '3'
+                'line-order-registered'    => '3',
+                'descriptive-nickname'     => '%system-id%: All modems'
             };
         
         my $first = 1;

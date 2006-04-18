@@ -99,6 +99,7 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
 [% global.contentFinished = 0 %]
 [% IF global.printError %]
 <DIV CLASS="ErrorMessage">[% global.printError %]</DIV>
+[% global.printError = '' %]
 [% END %]
 [% END %]
 
@@ -286,10 +287,11 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
 
 [%# ########   Set the date variable   ####### %]
 [% BLOCK setdate %]
-[% IF variables.SETDATE;
+[% IF variables.SETDATE == 1;
      thedate = verifyDate( variables.SETDATEV );
      IF thedate.length == 0;
          global.printError = 'Incorrect date format';
+         clearVar('SETDATE');
      ELSE;
          variables.NOW = thedate;
      END;

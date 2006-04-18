@@ -112,10 +112,7 @@ sub renderUserLogin
         @ret = ($outfile, $mime_type, $t_expires - time());
     }
 
-    if( %new_options )
-    {
-        delete( $self->{'options'} );
-    }
+    $self->{'options'} = undef;   
 
     return @ret;
 }
@@ -218,10 +215,7 @@ sub renderTreeChooser
         @ret = ($outfile, $mime_type, $t_expires - time());
     }
 
-    if( %new_options )
-    {
-        delete( $self->{'options'} );
-    }
+    $self->{'options'} = undef;   
 
     return @ret;
 }

@@ -144,7 +144,7 @@ sub render
     ($t_expires, $mime_type) =
         $self->$method( $config_tree, $token, $view, $cachefile );
 
-    delete $self->{'options'};
+    $self->{'options'} = undef;
 
     my @ret;
     if( defined($t_expires) and defined($mime_type) )

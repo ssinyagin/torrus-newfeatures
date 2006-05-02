@@ -22,6 +22,8 @@
 BEGIN { require '@torrus_config_pl@'; }
 
 use strict;
+use Date::Format;
+
 use Torrus::Log;
 
 require '@notify_siteconfig_pl@';
@@ -32,6 +34,10 @@ if( not $ENV{'TORRUS_TREE'} )
                   "must be run from Torrus Monitor\n");
     exit 1;
 }
+
+our $now = time();
+our $nowHour = time2str('%H', $now);
+our $nowWeekday = time2str('%w', $now);
 
 my $severity = $ENV{'TORRUS_SEVERITY'};
 my $ok = 1;

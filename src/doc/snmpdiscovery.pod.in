@@ -467,6 +467,12 @@ C<ifDescr> SNMP variables. If this option is set to C<ifName>, this
 SNMP variable would be used for subtree naming. This option is ignored if
 the device is supported by a vendor specific discovery module.
 
+=item * C<RFC2863_IF_MIB::noout>
+
+If set to C<yes>, all the interface statistics are skipped from
+the XML configuration output. Still the interface table is examined and
+the results may be used by other discovery modules.
+
 =back
 
 =head3 Other generic MIB parameters

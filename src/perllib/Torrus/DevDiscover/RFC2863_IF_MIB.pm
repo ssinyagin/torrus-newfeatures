@@ -381,6 +381,11 @@ sub buildConfig
     uniqueEntries( $devdetails, $data->{'nameref'}{'ifNick'} );
     uniqueEntries( $devdetails, $data->{'nameref'}{'ifSubtreeName'} );
 
+    if( $devdetails->param('RFC2863_IF_MIB::noout') eq 'yes' )
+    {
+        return;
+    }
+    
     # Build interface parameters
 
     my $nInterfaces = 0;

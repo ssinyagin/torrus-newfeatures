@@ -1,3 +1,9 @@
+2006-05-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	RFC2863_IF_MIB::tokenset-members now accepts host names
+	and can be defined at the global level.
+
 2006-05-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):

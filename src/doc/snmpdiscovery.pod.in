@@ -432,6 +432,15 @@ Example:
     </param>
   </host>
 
+Alternatively, this parameter can be defined at the global level,
+and then each interface should be pretended by the SNMP host name (the same as
+in C<snmp-host> parameter) and slash sign (/):
+
+    <param name="RFC2863_IF_MIB::tokenset-members">
+     clusters: RTR01/Ethernet0_0, RTR01/FastEthernet2_1;
+    </param>
+
+
 =item * C<RFC2863_IF_MIB::copy-params>
 
 Optional comma-separated list of parameter names that would be copied

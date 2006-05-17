@@ -456,6 +456,8 @@ sub buildConfig
 
     # tokenset member interfaces of the form
     # Format: tset:intf,intf; tokenset:intf,intf;
+    # Format for global parameter:
+    #     tset:host/intf,host/intf; tokenset:host/intf,host/intf;
     my %tsetMember;
     my %tsetMemberApplied;
     my $tsetMembership =
@@ -467,11 +469,23 @@ sub buildConfig
             my ($tset, $list) = split( /\s*:\s*/, $memList );
             foreach my $intfName ( split( /\s*,\s*/, $list ) )
             {
-                $tsetMember{$intfName}{$tset} = 1;
+                if( $intfName =~ /\// )
+                {
+                    my( $host, $intf ) = split( '/', $intfName );
+                    if( $host eq $devdetails->param('snmp-host') )
+                    {
+                        $tsetMember{$intf}{$tset} = 1;
+                    }
+                }
+                else
+                {
+                    $tsetMember{$intfName}{$tset} = 1;
+                }
             }
         }
     }
 
+        
     # External storage serviceid assignment
     my $extSrv =
         $devdetails->param('RFC2863_IF_MIB::external-serviceid');

@@ -30,6 +30,8 @@ use Torrus::Log;
 use Torrus::DevDiscover;
 use Torrus::ConfigBuilder;
 
+$| = 1;
+
 our $infile;
 our $makedirs;
 our $limitre;
@@ -74,7 +76,7 @@ my $ok = GetOptions(
                     );
 
 if( not $ok or not $infile or
-    ($workerThreads > 0 and not $Torrus::Global::threadsEnabled ) or
+    ($workerThreads > 1 and not $Torrus::Global::threadsEnabled ) or
     scalar( @ARGV ) > 0 )
 {
     print STDERR "Usage: $0 --in=filename.ddx options...\n",
@@ -204,17 +206,20 @@ undef $parser;
 # Start discovery
 our $jobQueue;
 our $bundleDeletionQueue;
+our $confBuildSemaphore;
 
-if( $workerThreads > 1 and $Torrus::Global::threadsEnabled )
+if( $workerThreads > 1 )
 {
     require threads;
     require threads::shared;
     require Thread::Queue;
+    require Thread::Semaphore;
 
     threads::shared::share( \$everythingsOk );
 
     $jobQueue = new Thread::Queue;
     $bundleDeletionQueue = new Thread::Queue;
+    $confBuildSemaphore = new Thread::Semaphore;
 
     # Enqueue the output filenames    
     foreach my $outfile ( sort keys %{$perOutfileHostParams} )
@@ -498,6 +503,13 @@ sub doDiscover
 
     if( $ok )
     {
+        # LibXML2 is not thread-safe, so we create the XML files
+        # one at a time
+        if( $workerThreads > 1 )
+        {
+            $confBuildSemaphore->down();
+        }
+        
         my $cb = new Torrus::ConfigBuilder;
 
         $cb->addCreatorInfo( $creator );
@@ -516,12 +528,23 @@ sub doDiscover
             Error('Cannot write ' . $outfile . ': ' . $!);
             $everythingsOk = 0;
         }
+
+        if( $workerThreads > 1 )
+        {
+            $confBuildSemaphore->up();
+        }
     }
 
     if( $makedirs )
     {
         if( $everythingsOk )
         {
+            # Not sure if these calls are reentrant
+            if( $workerThreads > 1 )
+            {
+                $confBuildSemaphore->down();
+            }
+            
             my ($login,$pass,$uid,$gid) = getpwnam('@torrus_user@')
                 or die "Cannot get user details for @torrus_user@";
             
@@ -541,6 +564,11 @@ sub doDiscover
                               $dir . ': ' . $!);
                 }
             }
+
+            if( $workerThreads > 1 )
+            {
+                $confBuildSemaphore->up();
+            }            
         }
         else
         {

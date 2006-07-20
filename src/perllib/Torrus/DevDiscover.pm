@@ -175,7 +175,10 @@ sub discover
         foreach my $arg ( qw(-username -authkey -authpassword -authprotocol
                              -privkey -privpassword -privprotocol) )
         {
-            $snmpargs{$arg} = $devdetails->param( 'snmp' . $arg );
+            if( defined $devdetails->param( 'snmp' . $arg ) )
+            {
+                $snmpargs{$arg} = $devdetails->param( 'snmp' . $arg );
+            }
         }
         $community = $snmpargs{'-username'};
         if( not defined( $community ) )

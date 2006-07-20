@@ -1,3 +1,24 @@
+20-JUL-2006: Torrus release 1.0.4
+
+This is a major release with many new features.
+
+In this release:
+
+-- SNMP Version 3 support in Devdiscover and SNMP collector.
+
+-- Usage reports for billing. Including 95% percentile reports.
+   More details at http://torrus.org/reporting_setup.pod.html
+
+-- Various improvements in SNMP discovery engine and new equipment
+   vendor support
+
+-- Improved monitor notifications. New parameter: "severity"
+   and new action "action_notify".
+
+-- New torrus-siteconfig.pl variables to improve WebUI customization
+
+
+
 02-AUG-2005: Torrus release 1.0.3
 
 This is a minor bugfix release. Unreachable device handling is improved, and

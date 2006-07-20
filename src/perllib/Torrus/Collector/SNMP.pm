@@ -97,12 +97,17 @@ sub initTargetAttributes
 
     my $ipaddr = $tref->{'ipaddr'};
     my $port = $collector->param($token, 'snmp-port');
-    my $community = $collector->param($token, 'snmp-community');
+    my $version = $collector->param($token, 'snmp-version');
 
-    # We use community string to identify the agent.
-    # For SNMPv3, it's the user name
-    if( not defined( $community ) )
+    my $community;
+    if( $version eq '1' or $version eq '2c' )
     {
+        $community = $collector->param($token, 'snmp-community');
+    }
+    else
+    {
+        # We use community string to identify the agent.
+        # For SNMPv3, it's the user name
         $community = $collector->param($token, 'snmp-username');
     }
 
@@ -240,15 +245,16 @@ sub snmpSessionArgs
     }
     else
     {
-        push( @ret,
-              -username     => $community,
-              -authkey      => $collector->param($token, 'snmp-authkey'),
-              -authpassword => $collector->param($token, 'snmp-authpassword'),
-              -authprotocol => $collector->param($token, 'snmp-authprotocol'),
-              -privkey      => $collector->param($token, 'snmp-privkey'),
-              -privpassword => $collector->param($token, 'snmp-privpassword'),
-              -privprotocol => $collector->param($token, 'snmp-privprotocol')
-              );
+        push( @ret, -username, $community);
+
+        foreach my $arg ( qw(-authkey -authpassword -authprotocol
+                             -privkey -privpassword -privprotocol) )
+        {
+            if( defined( $collector->param($token, 'snmp' . $arg) ) )
+            {
+                push( @ret, $arg, $collector->param($token, 'snmp' . $arg) );
+            }
+        }
     }
 
     return @ret;

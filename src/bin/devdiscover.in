@@ -235,9 +235,12 @@ if( $workerThreads > 1 and $Torrus::Global::threadsEnabled )
     }
 
     # Wait for workers to finish the jobs
-    foreach my $thr ( @workers )
+    while( my $thr = shift( @workers ) )
     {
+        my $tid = $thr->tid();
         $thr->join();
+        Debug('Cleaning up thread #' . $tid);
+        undef $thr;
     }
 
     # Process the files to be excluded from bundles

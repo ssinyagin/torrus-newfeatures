@@ -62,6 +62,7 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
     -e "s,\@mansec_misc\@,@mansec_misc@,g" \
     -e "s,\@mansec_usercmd\@,@mansec_usercmd@,g" \
     -e "s,\@notify_siteconfig_pl\@,$notify_siteconfig_pl,g" \
+    -e "s,\@perlithreads\@,@perlithreads@,g" \
     -e "s,\@perllibdir\@,@perllibdir@,g" \
     -e "s,\@perllibdirs\@,@perllibdirs@,g" \
     -e "s,\@piddir\@,@piddir@,g" \

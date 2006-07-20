@@ -84,9 +84,15 @@ sub Verbose
     Log( 'verbose', @_ );
 }
 
+our $TID = 0;
+sub setTID
+{
+    $TID = shift;
+}
+
 sub Debug
 {
-    Log( 'debug', $$ . ' ', join('|', @_) );
+    Log( 'debug', $$ . '.' . $TID . ' ', join('|', @_) );
 }
 
 

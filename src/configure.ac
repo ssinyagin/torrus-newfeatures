@@ -19,7 +19,7 @@
 #
 
 
-AC_INIT([torrus],[1.0.4],[ssinyagin@users.sourceforge.net])
+AC_INIT([torrus],[1.0.5d],[ssinyagin@users.sourceforge.net])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)
@@ -106,6 +106,17 @@ if test "$enable_pkgonly" != yes; then
          AC_MSG_ERROR([Perl cannot find $module]);
      fi
    done
+
+   AC_MSG_CHECKING([threading support in Perl])
+   if ${PERL} ${PERLOPTS} -e 'use threads' 2>/dev/null; then
+       AC_MSG_RESULT([Ok])
+       perlithreads=1
+   else
+       AC_MSG_RESULT([No. Multithreading features will not be used.])
+       perlithreads=0
+   fi
+   AC_SUBST(perlithreads, [${perlithreads}])
+   
 fi
 
 AC_ARG_VAR(torrus_user,  [[torrus] UID to run the daemons])

@@ -1,5 +1,9 @@
 2006-07-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/devdiscover.in: Added multithreading support
+
+	* configure.ac: Multithreading checkup
+
 	* NEWS: Torrus release 1.0.4
 
 2006-05-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

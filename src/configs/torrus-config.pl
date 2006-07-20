@@ -41,6 +41,7 @@ $Torrus::Global::sesLockDir     = '@seslockdir@';
 
 @Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
 
+$Torrus::Global::threadsEnabled  = '@perlithreads@';
 
 $Torrus::DB::dbSub              = 'sub';
 

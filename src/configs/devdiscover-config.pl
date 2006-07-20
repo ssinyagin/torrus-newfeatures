@@ -29,6 +29,8 @@ $Torrus::Global::version        = '@VERSION@';
 $Torrus::Global::discoveryDir   = '@sitedir@/discovery/';
 $Torrus::Global::siteXmlDir     = '@sitexmldir@';
 
+$Torrus::Global::threadsEnabled  = '@perlithreads@';
+
 $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
 
 

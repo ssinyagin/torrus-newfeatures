@@ -1427,6 +1427,17 @@ the event that this monitor watches.
 <li><strong><a name="item_severity"><code>severity</code></a></strong><br />
 </li>
 Optional severity level. Used for the action type <a href="#item_exec"><code>exec</code></a>.
+<p></p>
+<li><strong><a name="item_display_2drpn_2dexpr"><code>display-rpn-expr</code></a></strong><br />
+</li>
+Optional RPN expression for transforming the datasource value.
+If defined, it will be applied to the value before setting
+<code>TORRUS_VALUE</code> and <code>TORRUS_DISPLAY_VALUE</code> environment variables.
+<p></p>
+<li><strong><a name="item_display_2dformat"><code>display-format</code></a></strong><br />
+</li>
+Optional <em>sprintf</em> format for displaying the value in
+<code>TORRUS_DISPLAY_VALUE</code> environment variable. Default is <code>%.2f</code>.
 <p></p></ul>
 <p>
 </p>
@@ -1509,7 +1520,12 @@ Timestamp (in seconds since Epoch) of the event.
 <li><strong><a name="item__24torrus_value"><code>$TORRUS_VALUE</code></a></strong><br />
 </li>
 For expression monitor type, this returns the last read value of the
-datasource.
+datasource, possibly transformed by <a href="#item_display_2drpn_2dexpr"><code>display-rpn-expr</code></a> expression.
+<p></p>
+<li><strong><a name="item__24torrus_display_value"><code>$TORRUS_DISPLAY_VALUE</code></a></strong><br />
+</li>
+For expression monitor type, it contains a human-readable form
+of the value, possibly transformed by <a href="#item_display_2drpn_2dexpr"><code>display-rpn-expr</code></a> expression.
 <p></p>
 <li><strong><a name="item__24torrus_severity"><code>$TORRUS_SEVERITY</code></a></strong><br />
 </li>

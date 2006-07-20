@@ -356,6 +356,15 @@ Each tokenset name is followed by colon (:) and the description text:
     important-graphs: Important Graphs;
     unimportant-graphs: Unimportant Graphs
   &lt;/param&gt;</pre>
+<p></p>
+<li><strong><a name="item_suppress_2dlegend"><code>suppress-legend</code></a></strong><br />
+</li>
+if set to <code>yes</code>, the legend is not shown. It usually has uptime,
+software version, and contact information for the SNMP device.
+<p></p>
+<li><strong><a name="item_comment"><code>comment</code></a></strong><br />
+</li>
+Sets the comment string for the host.
 <p></p></ul>
 <p>
 </p>
@@ -374,6 +383,11 @@ such situation automatically.
 </li>
 Defines the child subtree name within host-level subtree where interface
 counters are located. Default: <code>Interface_Counters</code>.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dcomment"><code>RFC2863_IF_MIB::subtree-comment</code></a></strong><br />
+</li>
+Defines the comment string for interface counters subtree.
+Default: <em>Interface traffic and error counters</em>.
 <p></p>
 <li><strong><a name="item_rfc2863_if_mib_3a_3alist_2dadmindown_2dinterfaces"><code>RFC2863_IF_MIB::list-admindown-interfaces</code></a></strong><br />
 </li>
@@ -416,6 +430,13 @@ Example:
      uplinks: 1_1, 1_2
     &lt;/param&gt;
   &lt;/host&gt;</pre>
+<p>Alternatively, this parameter can be defined at the global level,
+and then each interface should be pretended by the SNMP host name (the same as
+in <code>snmp-host</code> parameter) and slash sign (/):</p>
+<pre>
+    &lt;param name=&quot;RFC2863_IF_MIB::tokenset-members&quot;&gt;
+     clusters: RTR01/Ethernet0_0, RTR01/FastEthernet2_1;
+    &lt;/param&gt;</pre>
 <p></p>
 <li><strong><a name="item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a></strong><br />
 </li>
@@ -451,6 +472,12 @@ Optional. By default, per-interface subtrees are named after the values of
 <code>ifDescr</code> SNMP variables. If this option is set to <code>ifName</code>, this
 SNMP variable would be used for subtree naming. This option is ignored if
 the device is supported by a vendor specific discovery module.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3anoout"><code>RFC2863_IF_MIB::noout</code></a></strong><br />
+</li>
+If set to <code>yes</code>, all the interface statistics are skipped from
+the XML configuration output. Still the interface table is examined and
+the results may be used by other discovery modules.
 <p></p></ul>
 <p>
 </p>
@@ -602,7 +629,7 @@ createing attributes with different numbers at the end.
 <p></p>
 <li><strong><a name="item_ifcomment"><code>ifComment</code></a></strong><br />
 </li>
-Comment string that is defined in <code>comment</code> parameter. It is
+Comment string that is defined in <a href="#item_comment"><code>comment</code></a> parameter. It is
 usually derived from an interface description.
 <p></p>
 <li><strong><a name="item_iftype"><code>ifType</code></a></strong><br />

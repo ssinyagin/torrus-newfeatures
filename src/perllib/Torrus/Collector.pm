@@ -62,6 +62,12 @@ sub new
     foreach my $storage_type ( keys %Torrus::Collector::storageTypes )
     {
         $self->{'storage'}{$storage_type} = {};
+        
+        my $storage_string = $storage_type . '-storage';
+        if( ref( $Torrus::Collector::initStorage{$storage_string} ) )
+        {
+            &{$Torrus::Collector::initStorage{$storage_string}}($self);
+        }
     }
 
     $self->{'tree_name'} = $options{'-TreeName'};

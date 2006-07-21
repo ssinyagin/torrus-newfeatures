@@ -25,6 +25,15 @@ use Torrus::Log;
 use strict;
 use RRDs;
 
+our $useThreads;
+our $thrQueueLimit;
+our $thrUpdateQueue;
+our $thrErrorsQueue;
+our $thrUpdateThread;
+
+our $moveConflictRRD;
+our $conflictRRDPath;
+
 # Register the storage type
 $Torrus::Collector::storageTypes{'rrd'} = 1;
 
@@ -51,6 +60,31 @@ $Torrus::Collector::params{'rrd-storage'} = {
     'rrd-create-dstype' => undef,
     'rrd-ds' => undef
     };
+
+
+$Torrus::Collector::initStorage{'rrd-storage'} =
+    \&Torrus::Collector::RRDStorage::initStorage;
+
+sub initStorage
+{
+    my $collector = shift;
+
+    if( $useThreads and not defined( $thrUpdateThread ) )
+    {
+        Verbose('RRD storage is configured for multithreading. Initializing ' .
+                'the background thread');
+        require threads;
+        require threads::shared;
+        require Thread::Queue;
+
+        $thrUpdateQueue = new Thread::Queue;
+        $thrErrorsQueue = new Thread::Queue;
+        
+        $thrUpdateThread = threads->create( \&rrdUpdateThread );
+        $thrUpdateThread->detach();
+    }
+}
+
 
 
 $Torrus::Collector::initTarget{'rrd-storage'} =
@@ -299,14 +333,14 @@ sub updateRRD
         }
     }
 
-    if( $ds_conflict and $Torrus::Collector::RRDStorage::moveConflictRRD )
+    if( $ds_conflict and $moveConflictRRD )
     {
         my( $sec, $min, $hour, $mday, $mon, $year) = localtime( time() );
         my $destfile = sprintf('%s_%04d%02d%02d%02d%02d',
                                $filename,
                                $year + 1900, $mon, $mday, $hour, $min);
         
-        my $destdir = $Torrus::Collector::RRDStorage::conflictRRDPath;
+        my $destdir = $conflictRRDPath;
         if( defined( $destdir ) and -d $destdir )
         {
             my @fpath = split('/', $destfile);
@@ -386,15 +420,68 @@ sub updateRRD
 
     my @cmd = ( "--template=" . $template,
                 sprintf("%d%s", $avg_ts, $values) );
-    Debug("Updating $filename: " . join(' ', @cmd));
-    RRDs::update( $filename, @cmd );
-    my $err = RRDs::error();
-    if( $err )
+
+    if( $useThreads )
     {
-        Error("ERROR updating $filename: $err");
-        delete $sref->{'rrdinfo_ds'}{$filename};
+        # Process errors from RRD update thread
+        my $errfilename;
+        while( defined( $errfilename = $thrErrorsQueue->dequeue_nb() ) )
+        {
+            delete $sref->{'rrdinfo_ds'}{$errfilename};
+        }
+
+        if( $thrUpdateQueue->pending() > $thrQueueLimit )
+        {
+            Error('Cannot enqueue $filename for updating: ' .
+                  'queue size is above limit');
+        }
+        else
+        {
+            Debug('Enqueueing update job for ' . $filename);
+            my $cmdlist = &threads::shared::share([]);
+            push( @{$cmdlist}, $filename, @cmd );        
+            $thrUpdateQueue->enqueue( $cmdlist );
+        }
+    }
+    else
+    {
+        if( isDebug )
+        {
+            Debug("Updating $filename: " . join(' ', @cmd));
+        }
+        RRDs::update( $filename, @cmd );
+        my $err = RRDs::error();
+        if( $err )
+        {
+            Error("ERROR updating $filename: $err");
+            delete $sref->{'rrdinfo_ds'}{$filename};
+        }
     }
 }
+
+
+# A background thread that updates RRD files
+sub rrdUpdateThread
+{
+    Torrus::Log::setTID( threads->tid() );
+    while(1)
+    {
+        my $cmdlist = $thrUpdateQueue->dequeue();
+        
+        if( isDebug )
+        {
+            Debug("Updating RRD: " . join(' ', @{$cmdlist}));
+        }
+        RRDs::update( @{$cmdlist} );
+        my $err = RRDs::error();
+        if( $err )
+        {
+            Error('ERROR updating' . $cmdlist->[0] . ': ' . $err);
+            $thrErrorsQueue->enqueue( $cmdlist->[0] );
+        }
+    }
+}
+
 
 
 # Callback executed by Collector

@@ -86,6 +86,14 @@ $Torrus::Collector::SNMP::unreachableTimeout = 21600; # 6 hours
 # For unreachable host, we retry SNMP query not earlier than this
 $Torrus::Collector::SNMP::unreachableRetryDelay = 600; # 10 min
 
+
+# When enabled, the collector starts a background thread that
+# writes to RRD files
+$Torrus::Collector::RRDStorage::useThreads = $Torrus::Global::threadsEnabled;
+
+# How many unwritten updates are allowed to stay in the queue
+$Torrus::Collector::RRDStorage::thrQueueLimit = 1000000;
+
 # The following errors are caused by changes in the device configurations,
 # when the collector tries to store data in a RRD file, but the
 # structure of the file is no longer suitable:

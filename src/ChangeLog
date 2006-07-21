@@ -1,3 +1,8 @@
+2006-07-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/RRDStorage.pm (updateRRD):
+	Added threading support: a background thread for RRD updates
+
 2006-07-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/devdiscover.in: Added multithreading support

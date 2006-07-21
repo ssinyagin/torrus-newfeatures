@@ -136,20 +136,33 @@ sub storeData
     my $collector = shift;
     my $sref = shift;
 
-    while( my ($filename, $tokens) = each %{$sref->{'byfile'}} )
+    if( $useThreads and $thrUpdateQueue->pending() > $thrQueueLimit )
     {
-        if( not -e $filename )
+        Error('Cannot enqueue RRD files for updating: ' .
+              'queue size is above limit');
+    }
+    else
+    {
+        while( my ($filename, $tokens) = each %{$sref->{'byfile'}} )
         {
-            createRRD( $collector, $sref, $filename, $tokens );
-        }
-
-        if( -e $filename )
-        {
-            updateRRD( $collector, $sref, $filename, $tokens );
+            if( not -e $filename )
+            {
+                createRRD( $collector, $sref, $filename, $tokens );
+            }
+            
+            if( -e $filename )
+            {
+                updateRRD( $collector, $sref, $filename, $tokens );
+            }
         }
     }
 
     undef $sref->{'values'};
+    
+    if( $useThreads )
+    {
+        $collector->setStatValue( 'RRDQueue', $thrUpdateQueue->pending() );
+    }
 }
 
 
@@ -430,18 +443,10 @@ sub updateRRD
             delete $sref->{'rrdinfo_ds'}{$errfilename};
         }
 
-        if( $thrUpdateQueue->pending() > $thrQueueLimit )
-        {
-            Error('Cannot enqueue $filename for updating: ' .
-                  'queue size is above limit');
-        }
-        else
-        {
-            Debug('Enqueueing update job for ' . $filename);
-            my $cmdlist = &threads::shared::share([]);
-            push( @{$cmdlist}, $filename, @cmd );        
-            $thrUpdateQueue->enqueue( $cmdlist );
-        }
+        Debug('Enqueueing update job for ' . $filename);
+        my $cmdlist = &threads::shared::share([]);
+        push( @{$cmdlist}, $filename, @cmd );        
+        $thrUpdateQueue->enqueue( $cmdlist );        
     }
     else
     {

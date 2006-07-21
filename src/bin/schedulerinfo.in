@@ -135,7 +135,10 @@ if( $report_runtime )
            'varname' => 'LateStart' },
          
          { 'label'   => 'Too Long',
-           'varname' => 'TooLong' }
+           'varname' => 'TooLong' },
+
+         { 'label'   => 'RRD Queue',
+           'varname' => 'RRDQueue' }
          );
 
     my @counterFormats =

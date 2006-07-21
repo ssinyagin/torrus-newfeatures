@@ -305,6 +305,9 @@ sub new
     $self->{'missedPeriods'} = 0;
 
     $self->{'options'}{'-Started'} = time();
+
+    # Array of (Name, Value) pairs for any kind of stats    
+    $self->{'statValues'} = [];
     
     Debug("New Periodic Task created: period=" .
           $self->{'options'}{'-Period'} .
@@ -394,6 +397,12 @@ sub afterRun
                                  $self->{'missedPeriods'} );
         $self->{'missedPeriods'} = 0;
     }
+
+    foreach my $pair( @{$self->{'statValues'}} )
+    {
+        $stats->setStatsValues( $self->id(), @{$pair} );
+    }
+    @{$self->{'statValues'}} = [];
 }
 
 
@@ -442,6 +451,15 @@ sub id
 {
     my $self = shift;
     return join(':', 'P', $self->name(), $self->period(), $self->offset());
+}
+
+sub setStatValue
+{
+    my $self = shift;
+    my $name = shift;
+    my $value = shift;
+
+    push( @{$self->{'statValues'}}, [$name, $value] );
 }
 
 1;

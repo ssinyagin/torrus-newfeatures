@@ -21,7 +21,7 @@ exit 0;
 
 sub child
 {
-    print "C> Child thread started. I will print 10 lines per second\n";
+    print "C> Child thread started. I will print 10 lines, one per second\n";
 
     foreach my $i (1..10)
     {

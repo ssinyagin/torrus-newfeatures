@@ -23,7 +23,8 @@ SUBDIRS = . bin configs doc examples perllib sup xmlconfig
 EXTRA_DIST = \
 	setup_tools/Bundle/Torrus.pm \
 	setup_tools/replace_rrfw.sh \
-	setup_tools/configure_fhs
+	setup_tools/configure_fhs \
+	setup_tools/check_perlthreading.pl
 
 noinst_SCRIPTS = \
 	setup_tools/substvars.sh \

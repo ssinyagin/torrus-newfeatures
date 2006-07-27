@@ -35,7 +35,7 @@
 	<param name="default-leaf-view"				value="tab-rrd-html" />
 
 	<param name="tab-views">
-	overview,hour,day,week,month,year
+	overview,hour,day,week,month,year,2years
 	</param>
 
 </datasources>
@@ -53,46 +53,63 @@
 		<param name="view-type"					value="rrgraph" />
 		<param name="start"						value="-36h" />
 		<param name="height"					value="305" />
-		<param name="width"						value="595" />
-		<param name="height-hint"				value="305" />
-		<param name="width-hint"				value="595" />
+		<param name="width"					    value="458" />
+		<!--param name="width"					value="576" /-->
+		<param name="height-hint"				value="0" />
+		<param name="width-hint"				value="0" />
 
 		<view name="hour">
+            <!-- 1 sample per 6 pixel -->
 			<param name="start"					value="-8h" />
 			<view name="hourAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 		<view name="day">
-			<param name="start"					value="-36h" />
+            <!-- 1 sample per 2 pixel -->
+			<param name="start"					value="-24h" />
 			<view name="dayAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 		<view name="week">
-			<param name="start"					value="-9days" />
+            <!-- 7 samples per 2 pixel -->
+			<param name="start"					value="-168h" />
 			<view name="weekAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 		<view name="month">
-			<param name="start"					value="-45days" />
+            <!-- 30 samples per 2 pixel -->
+			<param name="start"					value="-720h" />
 			<param name="rrd-hwpredict"			value="disabled" />
 			<view name="monthAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 		<view name="year">
-			<param name="start"					value="-15month" />
+            <!-- 2 days per 3 pixel -->
+			<param name="start"					value="-8784h" />
+            <!--param name="width"					value="549" /-->
 			<param name="rrd-hwpredict"			value="disabled" />
 			<view name="yearAuto">
 				<param name="ignore-limits"		value="yes" />
 			</view>
 		</view>
 
-		<view name="expand-views"> <!--used in expand leaves...-->
+        <view name="2years">
+            <!-- 4 days per 3 pixel -->
+            <param name="start"                 value="-17568h" />
+            <!--param name="width"					value="549" /-->
+			<param name="rrd-hwpredict"         value="disabled" />
+			<view name="yearAuto">
+                <param name="ignore-limits"             value="yes" />
+			</view>
+	    </view>
 
-			<param name="width"					value="595" />
+		<view name="expand-views"> <!--used in expand leaves...-->
+			<!--param name="width"					value="576" /-->
+			<param name="width"					value="458" />
 			<param name="height"				value="100" />
 			<param name="ignore-limits"			value="no" />
 			<view name="expHour">
@@ -102,26 +119,27 @@
 				</view>
 			</view>
 			<view name="expDay">
-				<param name="start"				value="-36hours" />
+				<param name="start"				value="-24h" />
 				<view name="expDayAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="expWeek">
-				<param name="start"				value="-9days" />
+				<param name="start"				value="-168h" />
 				<view name="expWeekAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="expMonth">
-				<param name="start"				value="-45days" />
+				<param name="start"				value="-720h" />
 				<param name="rrd-hwpredict"		value="disabled" />
 				<view name="expMonthAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="expYear">
-				<param name="start"				value="-15month" />
+				<param name="start"				value="-8784h" />
+                <!--param name="width"				value="549" /-->
 				<param name="rrd-hwpredict"		value="disabled" />
 				<view name="expYearAuto">
 					<param name="ignore-limits"	value="yes" />
@@ -135,7 +153,8 @@
 			<param name="gprint-format-last"    value="LAST:LAST\: %8.2lf%s"/>
 			<param name="gprint-format-max"     value="MAX:MAX\: %8.2lf%s"/>
 
-			<param name="width"					value="300" />
+			<!--param name="width"					value="288" /-->
+			<param name="width"					value="190" />
 			<param name="height"				value="30" />
 			<param name="width-hint"			value="400" />
 			<param name="ignore-limits"			value="no" />
@@ -146,26 +165,27 @@
 				</view>
 			</view>
 			<view name="tsDay">
-				<param name="start"				value="-36hours" />
+				<param name="start"				value="-24" />
 				<view name="tsDayAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="tsWeek">
-				<param name="start"				value="-9days" />
+				<param name="start"				value="-168h" />
 				<view name="tsWeekAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="tsMonth">
-			<param name="start"					value="-45days" />
+			<param name="start"					value="-720h" />
 				<param name="rrd-hwpredict"		value="disabled" />
 				<view name="tsMonthAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="tsYear">
-				<param name="start"				value="-15month" />
+				<param name="start"				value="-8784h" />
+			    <!--param name="width"				value="244" /-->
 				<param name="rrd-hwpredict"		value="disabled" />
 				<view name="tsYearAuto">
 					<param name="ignore-limits"	value="yes" />
@@ -179,7 +199,8 @@
 			<param name="gprint-format-last"    value="LAST:LAST\: %8.2lf%s"/>
 			<param name="gprint-format-max"     value="MAX:MAX\: %8.2lf%s"/>
 
-			<param name="width"					value="300" />
+			<!--param name="width"					value="288" /-->
+			<param name="width"					value="190" />
 			<param name="height"				value="70" />
 			<param name="ignore-limits"			value="no" />
 			<param name="rrd-hwpredict"			value="disabled" />
@@ -190,25 +211,26 @@
 				</view>
 			</view>
 			<view name="ovDay">
-				<param name="start"				value="-36hours" />
+				<param name="start"				value="-24h" />
 				<view name="ovDayAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="ovWeek">
-				<param name="start"				value="-9days" />
+				<param name="start"				value="-168h" />
 				<view name="ovWeekAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="ovMonth">
-				<param name="start"				value="-45days" />
+				<param name="start"				value="-720h" />
 				<view name="ovMonthAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>
 			</view>
 			<view name="ovYear">
-				<param name="start"				value="-15month" />
+				<param name="start"				value="-8784h" />
+			    <!--param name="width"				value="244" /-->
 				<view name="ovYearAuto">
 					<param name="ignore-limits"	value="yes" />
 				</view>

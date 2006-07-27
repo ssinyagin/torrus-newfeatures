@@ -217,7 +217,7 @@ END %]
 		SET view = view _ "Auto";
       END %]
 <DIV CLASS="GraphImage">
-<IMG SRC="[%url(token, view, vars)%]"
+<IMG SRC="[%graphUrl(token, view, vars)%]"
      ALT="[% alt %]">
 </DIV>
 [% END %]

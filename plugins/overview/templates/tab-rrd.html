@@ -18,6 +18,7 @@
   weekView = graphviews.3;
   monthView = graphviews.4;
   yearView = graphviews.5;
+  year2View = graphviews.6;
   IF   nodeParam(token, 'rrd-hwpredict') == 'enabled' and
        ( param(view, 'rrd-hwpredict') == 'disabled' or variables.NOHW );
     graphvars = ['NOHW', 1];
@@ -44,6 +45,10 @@
 	<div class="tab-page">
 		<h2 class="tab">Last year</h2>
 			[% INCLUDE rrgraph view=yearView alt="Last year graph" %]
+	</div>
+	<div class="tab-page">
+		<h2 class="tab">Last two years</h2>
+			[% INCLUDE rrgraph view=year2View alt="Last two years graph" %]
 	</div>
 </div>
 

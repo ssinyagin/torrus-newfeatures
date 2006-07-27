@@ -9,7 +9,7 @@ PerlModule Apache::ASP
 	PerlHandler Apache::ASP
 	PerlSetVar  Global @aspglobal@
 	PerlSetVar NoState 1
-	PerlSetVar XSLTParser XML::Sablotron
+	#PerlSetVar XSLTParser XML::Sablotron
 	PerlSetVar XSLTParser XML::LibXSLT
 	PerlSetVar XSLTMatch xml$
 	PerlSetVar XSLT @webscriptsdir@/tp-overview/menu.xsl
@@ -21,7 +21,7 @@ PerlModule Apache::ASP
 	PerlHandler Apache::ASP
 	PerlSetVar  Global @aspglobal@
 	PerlSetVar NoState 1
-	PerlSetVar XSLTParser XML::Sablotron
+	#PerlSetVar XSLTParser XML::Sablotron
 	PerlSetVar XSLTParser XML::LibXSLT
 	PerlSetVar XSLTMatch xml$
 	PerlSetVar XSLT @webscriptsdir@/tp-overview/overview.xsl

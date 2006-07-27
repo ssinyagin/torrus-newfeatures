@@ -82,9 +82,9 @@ not work.
 
 Apache::ASP http://www.apache-asp.org/
 
-XML::Sablotron http://www.cpan.org/
+either XML::Sablotron http://www.cpan.org/
 
-XML::LibXSLT http://www.cpan.org/
+or XML::LibXSLT http://www.cpan.org/
 
 =item * WebFx modules
 
@@ -94,7 +94,7 @@ Xtree (modified version is included in this plugin)
 
 =item * jscalendar
 
-Date Picker from http://sourceforge.net/projects/jscalendar/
+Date Picker from http://sourceforge.net/projects/jscalendar/. (Version 1.0)
 
 =back
 
@@ -132,7 +132,7 @@ if you are using apache2 simply copy the file apache2.conf to the
   PerlHandler Apache::ASP
   PerlSetVar  Global /var/torrus/asp
   PerlSetVar NoState 1
-  PerlSetVar XSLTParser XML::Sablotron
+  #PerlSetVar XSLTParser XML::Sablotron
   PerlSetVar XSLTParser XML::LibXSLT
   PerlSetVar XSLTMatch xml$
   PerlSetVar XSLT menu.xsl
@@ -145,7 +145,7 @@ if you are using apache2 simply copy the file apache2.conf to the
   PerlHandler Apache::ASP
   PerlSetVar  Global /var/torrus/asp
   PerlSetVar NoState 1
-  PerlSetVar XSLTParser XML::Sablotron
+  #PerlSetVar XSLTParser XML::Sablotron
   PerlSetVar XSLTParser XML::LibXSLT
   PerlSetVar XSLTMatch xml$
   PerlSetVar XSLT overview.xsl

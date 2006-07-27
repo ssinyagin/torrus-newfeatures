@@ -1,4 +1,4 @@
-[% PROCESS 'ov/ov-html-incblocks.txt' %]
+[% PROCESS 'ov/html-incblocks.txt' %]
 [% thepath=path(token) %]
 [% INCLUDE htmlstart title=thepath printpath=1 %]
 
@@ -16,6 +16,14 @@
         token=child
         nodename=nodeName(path(child))
         comment=nodeParam(child,'comment',1);
+    ELSIF isAlias(child);
+      atoken=isAlias(child);
+      IF isLeaf(atoken);
+        INCLUDE shortgraph
+          token=atoken
+          nodename=nodeName(path(atoken))
+          comment=path(atoken);
+      END;
     END;
   END;
 %]
@@ -37,7 +45,7 @@
 
 [% INCLUDE shortcut url=url(token) text="Default view"
                     title="Restore default subtree view" %]
-</DIV>                   
+</DIV>
 
 [% INCLUDE bottomline %]
 [% INCLUDE htmlend %]

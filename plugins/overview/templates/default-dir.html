@@ -1,4 +1,4 @@
-[% PROCESS 'ov/ov-html-incblocks.txt' %]
+[% PROCESS 'ov/html-incblocks.txt' %]
 [% thepath=path(token) %]
 [% INCLUDE htmlstart title=thepath printpath=1 %]
 
@@ -8,9 +8,8 @@
 
 <P>Directories you can jump to:</P>
 <DIV CLASS="Listing">
-[%   hasLeaves = 0;
+[%   hasLeaves = 0; hasSubtrees = 0;
      childCounter = 0;
-     hasSubNodes = 0;
      evenRow = 0;
      FOREACH child = sortTokens(children(token));
        hidden = 0;
@@ -18,20 +17,23 @@
          hidden = 1;
        END;
        comment = nodeParam(child,'comment',1);
-       IF isLeaf(child);
-         hasLeaves = 1;
-       ELSE;
-         hasSubNodes = 1;
-         IF isAlias(child);
-           thisIsAlias = 1;
-           urlTitle = ' TITLE="Symbolic link to ' _ path(isAlias(child)) _'"';
-         ELSE;
-           urlTitle = '';
-         END;
-       END;
        IF not hidden or variables.SHOWHIDDEN;
          childCounter = childCounter + 1;
          evenRow = childCounter % 2 == 0;
+         IF isLeaf(child);
+           hasLeaves = hasLeaves + 1;
+         ELSE;
+           IF isAlias(child);
+             thisIsAlias = 1;
+             urlTitle=' TITLE="Symbolic link to ' _ path(isAlias(child)) _'"';
+             IF isLeaf(isAlias(child));
+               hasLeaves = hasLeaves + 1;
+             END;
+           ELSE;
+             hasSubtrees = 1;
+             urlTitle = '';
+           END;
+         END;
 %]
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
     <SPAN CLASS="NodeName">
@@ -53,25 +55,22 @@
   [% END %]
 </DIV>
 
-[% IF hasLeaves %]
 <DIV CLASS="BottomShortcuts">
-[% INCLUDE shortcut url=url(token, 'expanded-dir-html')
-                    text="Expand leaves"
-                    title="Show all leaf graphs in one page" %]
+[% IF hasLeaves > 1;
+    INCLUDE shortcut url=url(token, 'expanded-dir-html')
+                     text="Expand leaves"
+                     title="Show all leaf graphs in one page";
+   END;
+   IF hasSubtrees;
+    INCLUDE shortcut url=url(token, 'recursive-dir-html')
+                     text="Recursive view"
+                     title="Show all subtrees and leaves in one page";
+    INCLUDE shortcut url=url(token, 'sub-nodes-dir-html')
+                     text="All (2-levels down)"
+                     title="Show all graphs and sub-node graphs in one page";
+   END;
+   INCLUDE overviewShortcuts %]
 </DIV>
-[% END %]
-[% IF hasSubNodes %]
-<DIV CLASS="BottomShortcuts">
-[% INCLUDE shortcut url=url(token, 'sub-nodes-dir-html')
-      text="Expand leaves and leaves of sub-nodes"
-      title="Show all graphs of leaves & of leaves of sub-nodes in one page" %]
-</DIV>                   
-[% END %]
-
-<DIV CLASS="BottomShortcuts">
-[% INCLUDE overviewShortcuts %]
-</DIV>
-
 
 [% INCLUDE bottomline %]
 [% INCLUDE htmlend %]

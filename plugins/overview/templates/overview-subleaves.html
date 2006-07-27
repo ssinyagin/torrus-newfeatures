@@ -1,8 +1,9 @@
-[% PROCESS 'ov/ov-html-incblocks.txt' %]
-[% thepath=path(token) %]
+[% PROCESS 'ov/html-incblocks.txt' %]
+[% ovs=variables.OVS; clearVar('OVS'); global.bookmarkVars=['OVS',ovs];
+   thepath=path(token) %]
 [% INCLUDE htmlstart title=thepath printpath=1 %]
 
-<H1>[% nodeParam(token,'overview-page-title',1) %]</H1>
+<H1>[% p = 'overview-page-title-' _ ovs; nodeParam(token, p, 1) %]</H1>
 
 [% INCLUDE variables %]
 
@@ -11,12 +12,23 @@
 [%
   FOREACH child = sortTokens(children(token));
     childpath = path(child);
-    ovwpath = childpath _ nodeParam(token,'overview-subleave-name',1);
+    p = 'overview-subleave-name-' _ ovs;
+    ovwpath = childpath _ nodeParam(token, p,1);
     IF nodeExists(ovwpath);
       ovwtoken = pathToken(ovwpath);
 
+      urltoken = ovwtoken;
+      p = 'overview-direct-link-' _ ovs;
+      IF nodeParam(token, p, 1) == 'yes';
+        urltoken = child;
+        p = 'overview-direct-link-view-' _ ovs;
+        urlview = nodeParam(token, p, 1);
+      END;
+
       INCLUDE overviewgraph
         token=ovwtoken
+        urltoken=urltoken
+        urlview=urlview
         nodename=nodeName(path(child))
         comment=nodeParam(child,'comment',1);
     END;

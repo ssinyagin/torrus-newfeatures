@@ -1,7 +1,7 @@
-[% PROCESS 'ov/ov-html-incblocks.txt' %]
+[% PROCESS 'ov/html-incblocks.txt' %]
 [% INCLUDE htmlstart
      title="Torrus Top: " _ companyName
-     contentClass="SingleColumnContent" 
+     contentClass="SingleColumnContent"
      noTopMenu=1 %]
 
 <P>Choose the datasource tree</P>
@@ -23,11 +23,19 @@
 %]
 
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
-    <SPAN CLASS="NodeName"><A HREF="[%url(tree)%]">[% tree %]</A></SPAN>
+    <SPAN CLASS="NodeName"><A NAME='treeLink' HREF="[%url(tree)%]">[% tree %]</A></SPAN>
     <SPAN CLASS="NodeDescr">[% xmlnorm(treeDescr(tree)) %]</SPAN>
   </DIV>
   [% END %]
 [% END %]
 </DIV>
+
+<script>
+        var search = window.location.search;
+	var anchors = document.getElementsByName('treeLink');
+	for (var i=0; i<anchors.length; i++) {
+	        anchors[i].search = search;
+        }
+</script>
 
 [% INCLUDE htmlend %]

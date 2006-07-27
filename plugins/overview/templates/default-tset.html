@@ -1,4 +1,4 @@
-[% PROCESS 'ov/ov-html-incblocks.txt' %]
+[% PROCESS 'ov/html-incblocks.txt' %]
 [% comment = xmlnorm(param(token, 'comment')) %]
 [% INCLUDE htmlstart title=comment contentClass="SingleColumnContent" %]
 
@@ -14,7 +14,7 @@
   [% IF pos == 1 %]
 <DIV CLASS="ShortLeft">
   [% ELSE %]
-<DIV CLASS="ShortRight"> 
+<DIV CLASS="ShortRight">
   [% END %]
   [% nodename=nodeParam(node,'descriptive-nickname');
      IF nodename=='';
@@ -24,7 +24,7 @@
         token=node
         nodename=nodename
         comment=nodeParam(parent(node),'comment',1)
-  %]
+   %]
 </DIV>
 </DIV>
   [% IF pos == 1 %]

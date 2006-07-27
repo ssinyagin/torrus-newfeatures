@@ -1,4 +1,4 @@
-[% PROCESS 'ov/ov-html-incblocks.txt' %]
+[% PROCESS 'ov/html-incblocks.txt' %]
 [% INCLUDE htmlstart
      title="Non-empty tokensets"
      contentClass="SingleColumnContent" %]
@@ -12,9 +12,10 @@
      evenRow = 0;
 
      FOREACH tset = tsetList();
+       sz = tsetMembers(tset).size;
 
-       IF tsetMembers(tset).size;
-
+       IF sz > 0;
+       
          counter = counter + 1;
 
          IF counter % 2 == 0;
@@ -26,6 +27,7 @@
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
     <SPAN CLASS="TokensetDescr">
       <A HREF="[%url(tset)%]">[% xmlnorm(param(tset, 'comment')) %]</A>
+      ([% sz %])
     </SPAN>
   </DIV>
        [% END %]

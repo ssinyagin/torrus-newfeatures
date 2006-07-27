@@ -125,13 +125,13 @@ dist_css_DATA = \
 mytmpldir = $(tmpldir)/ov
 dist_mytmpl_DATA = \
 	templates/item-rrd.html \
-	templates/ov-chooser.html \
-	templates/ov-dir.html \
-	templates/ov-expanded-dir.html \
-	templates/ov-html-incblocks.txt \
-	templates/ov-inout-leaves.html \
-	templates/ov-tset-list.html \
-	templates/ov-tset.html \
+	templates/default-chooser.html \
+	templates/default-dir.html \
+	templates/expanded-dir.html \
+	templates/html-incblocks.txt \
+	templates/tset-list.html \
+	templates/default-recursivedir.html \
+	templates/default-tset.html \
 	templates/sub-nodes-dir.html \
 	templates/overview-subleaves.html \
 	templates/tab-rrd.html

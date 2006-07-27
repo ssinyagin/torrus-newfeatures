@@ -256,14 +256,14 @@
 	<view name="ov-dir-html">
 		<param name="view-type"		value="html" />
 		<param name="expires"		value="3600" />
-		<param name="html-template"	value="ov/ov-dir.html" />
+		<param name="html-template"	value="ov/default-dir.html" />
 	</view>
 
 	<!-- This shows the leaves of the subtree -->
 	<view name="expanded-dir-html">
 		<param name="view-type"		value="html" />
 		<param name="expires"		value="300" />
-		<param name="html-template"	value="ov/ov-expanded-dir.html" />
+		<param name="html-template"	value="ov/expanded-dir.html" />
 	</view>
 
 	<!-- This shows all leaves of the subtree and it's subtrees -->
@@ -296,13 +296,17 @@
 	<view name="ov-tset-html">
 		<param name="view-type"		value="html" />
 		<param name="expires"		value="300" />
-		<param name="html-template"	value="ov/ov-tset.html" />
+		<param name="html-template"	value="ov/default-tset.html" />
 	</view>
 
 	<view name="ov-tset-list-html">
 		<param name="view-type"		value="html" />
 		<param name="expires"		value="300" />
-		<param name="html-template"	value="ov/ov-tset-list.html" />
+		<param name="html-template"	value="ov/tset-list.html" />
+	</view>
+
+	<view name="recursive-dir-html">
+	        <param name="html-template"     value="ov/default-recursivedir.html" />
 	</view>
 
 </views>

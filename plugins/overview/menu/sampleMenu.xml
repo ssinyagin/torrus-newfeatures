@@ -22,6 +22,7 @@
 -->
 <document>
 	<title>Torrus</title>
+	<welcome>/torrus/plain/menu/welcome.htm</welcome>
 	
 	<item legend='Browse' url='/torrus/' icon='torrus.ico'></item>
 	<item legend='Samples' url='/overviews/sampleOverview.xml' icon=''>

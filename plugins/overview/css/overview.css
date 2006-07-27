@@ -6,7 +6,6 @@
    */
    
 body { 
-	width:800px;
 	text-align:center;
 	font-family:times;
 	font-size:12px;
@@ -14,26 +13,29 @@ body {
 	margin:0;
 	padding:0;
 }
-.document {display:block; width:800px}
-.chapterLegend { display:block; background:red; color:white; width:100%; margin:20px,0px,10px,0px; font-size:25px; font-family:arial; font-weight:bold; }
-.sectionLegend { display:block; background:blue; color:white; width:100%; margin:0px,0px,0px,0px;  font-size:20px; font-family:arial; font-weight:bold; }
-.graphLegend   { display:block; width:100%; font-size:15px; font-family:arial;}
+.chapterLegend { display:block; background:red;  color:white; margin:20px,0px,10px,0px; font-size:25px; font-family:arial; font-weight:bold; }
+.sectionLegend { display:block; background:blue; color:white; margin:0px,0px,0px,0px;  font-size:20px; font-family:arial; font-weight:bold; }
+.graphLegend   { display:block; font-size:15px; font-family:arial;}
 
-.header       { display:block; padding:10px,0px,20px,0px}
-.chapterIntro { display:block; padding:10px,0px,0px,0px}
-.sectionIntro { display:block; padding:10px,0px,10px,0px}
-.footer       { display:block; padding:10px,0px,0px,0px}
+.header       { display:block; clear:both; padding:10px,0px,20px,0px}
+.chapterIntro { display:block; clear:both; padding:10px,0px,0px,0px}
+.sectionIntro { display:block; clear:both; padding:10px,0px,10px,0px}
+.footer       { display:block; clear:both; padding:10px,0px,0px,0px}
 
 
 .chapterLink {text-decoration: none;}
 .sectionLink {text-decoration: none;}
 .graphLink   {text-decoration: none;}
 
-.chapterIndex {line-height:30px; margin-left:5px; margin-right:5px;}
-.sectionIndex {line-height:30px; margin-left:5px; margin-right:5px;}
+.chapterIndex {line-height:30px; clear:right; margin-left:5px; margin-right:5px;}
+.sectionIndex {line-height:30px; clear:right; margin-left:5px; margin-right:5px;}
 
 
-.chapter { display:block; margin-top:20px; width:100%}
-.section { display:block; padding-top:20px;width:100%;}
-.graph   { display:inline-block;width:50%; vertical-align:text-top;}
+.page    { display:inline-block; }
+.chapterGroup { display:block; }
+.chapter { display:inline-block;  margin-top:20px; }
+.sectionGroup { display:block; }
+.section { display:inline-block;  padding-top:20px;  padding-left:1px; padding-right:1px; }
+.group   { display:inline-block; }
+.graph   { display:inline-block;  vertical-align:text-top;}
 .image   { border:0;}

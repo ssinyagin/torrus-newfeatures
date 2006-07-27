@@ -154,7 +154,7 @@ function WebFXTreeAbstractNode(sText, sAction) {
 			this.action = this.action + '?';
 		};
 		this.action = "javascript:frames['displayFrame'].location.href ='" + this.action + 
-			"' + 'NOW=' + document.getElementById('NOW').value + '&SHOWHIDDEN=' + (document.getElementById('showhidden').checked? 1:0) + '&AUTOSCALE=' + (document.getElementById('autoscale').checked? 1:0) + '&WINDOW=' + document.getElementById('window').options[document.getElementById('window').selectedIndex].value + '&CF=' + document.getElementById('cf').options[document.getElementById('cf').selectedIndex].value; void(0);";
+			"' + 'NOW=' + document.getElementById('NOW').value + '&STRETCH=' + (document.getElementById('width').options[document.getElementById('width').selectedIndex].value) + '&SHOWHIDDEN=' + (document.getElementById('showhidden').checked? 1:0) + '&AUTOSCALE=' + (document.getElementById('autoscale').checked? 1:0) + '&WINDOW=' + document.getElementById('window').options[document.getElementById('window').selectedIndex].value + '&CF=' + document.getElementById('cf').options[document.getElementById('cf').selectedIndex].value; void(0);";
 	};
 	this._last  = false;
 	webFXTreeHandler.all[this.id] = this;

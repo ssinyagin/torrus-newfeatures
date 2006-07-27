@@ -20,8 +20,9 @@ form 				{
 .datePickerField	{ display:block; float:left; padding-left:20px; }
 .showHiddenField	{ display:block; float:left; padding-left:20px; }
 .autoScaleField	    { display:block; float:left; padding-left:10px; }
+.widthField	        { display:block; float:left; padding-left:10px; }
 .paddingField	    { display:block; float:right; padding-left:10px;}
-.creditsField		{ display:block; position:absolute; bottom:15px; left:10px }
+.creditsField		{ display:block; position:absolute; bottom:15px; left:10px}
 a 					{ text-decoration:none;}
 a:hover				{ text-decoration:underline;}
 

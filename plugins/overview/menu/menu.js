@@ -26,27 +26,27 @@ function toggleMenu() {
 	}
 }
 
-	function showCalendar(id, format) {
-	  var el = document.getElementById(id);
-	  if (calendar != null) {
-	    // we already have some calendar created
-	    calendar.hide();                 // so we hide it first.
-	  } else {
-	    // first-time call, create the calendar.
-	    var cal = new Calendar(false, null, selected, closeHandler);
-	    // uncomment the following line to hide the week numbers
-	    // cal.weekNumbers = false;
-	    calendar = cal;                  // remember it in the global var
-	    cal.setRange(2003, 2005);        // min/max year allowed.
-	    cal.create();
-	  }
-	  calendar.setDateFormat(format);    // set the specified date format
-	  calendar.parseDate(el.value);      // try to parse the text in field
-	  calendar.sel = el;                 // inform it what input field we use
-	  calendar.showAtElement(el);        // show the calendar below it
-
-	  return false;
-	}
+// 	function showCalendar(id, format) {
+// 	  var el = document.getElementById(id);
+// 	  if (calendar != null) {
+// 	    // we already have some calendar created
+// 	    calendar.hide();                 // so we hide it first.
+// 	  } else {
+// 	    // first-time call, create the calendar.
+// 	    var cal = new Calendar(false, null, selected, closeHandler);
+// 	    // uncomment the following line to hide the week numbers
+// 	    // cal.weekNumbers = false;
+// 	    calendar = cal;                  // remember it in the global var
+// 	    cal.setRange(2003, 2005);        // min/max year allowed.
+// 	    cal.create();
+// 	  }
+// 	  calendar.setDateFormat(format);    // set the specified date format
+// 	  calendar.parseDate(el.value);      // try to parse the text in field
+// 	  calendar.sel = el;                 // inform it what input field we use
+// 	  calendar.showAtElement(el);        // show the calendar below it
+// 
+// 	  return false;
+// 	}
 
 	function selected(cal, date) {
 	  cal.sel.value = date; // just update the date in the input field.
@@ -77,7 +77,7 @@ function toggleMenu() {
 	function setDate() {
 		var url = cleanUrl('NOW');
 		if (url.indexOf('?') != (url.length-1)) { url = url + '&';};
-		document.getElementById('NOW').value = document.getElementById('timec').options[document.getElementById('timec').selectedIndex].value +  " " + document.getElementById('dc').value;
+		//document.getElementById('NOW').value = document.getElementById('timec').options[document.getElementById('timec').selectedIndex].value +  " " + document.getElementById('dc').value;
 		frames['displayFrame'].location.href = url + 'NOW=' + document.getElementById('NOW').value;
 	};
 
@@ -93,10 +93,17 @@ function toggleMenu() {
 		frames['displayFrame'].location.href = url + 'CF=' + cf;
 	};
 
+	function setWidth(width) {
+        var url = cleanUrl('STRETCH');
+		if (url.indexOf('?') != (url.length-1)) { url = url + '&';};
+		frames['displayFrame'].location.href = url + 'STRETCH=' + width;
+	};
+
 	function clearDate() {
 		var url = cleanUrl('NOW');
 		if (url.indexOf('?') != (url.length-1)) { url = url + '&';};
 		document.getElementById('NOW').value = 'now';
+		document.getElementById('datePicker').innerHTML = 'Date/Time';
 		frames['displayFrame'].location.href = url + 'NOW=' + document.getElementById('NOW').value;
 	};
 

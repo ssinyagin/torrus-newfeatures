@@ -33,20 +33,21 @@
 		<link type="text/css" rel="stylesheet" href="@plainUrl@/menu/menu.css"/>
 		<link type="text/css" rel="stylesheet" href="@plainUrl@/xtree/xtree.css"/>
 		<link type="text/css" rel="stylesheet" media="all" 
-			href="@plainUrl@/calendar/calendar-system.css" title="system" />
+			href="@plainUrl@/calendar/skins/aqua/theme.css" title="Aqua" />
 		<title><xsl:value-of select="/document/title"/></title>
 
 		<script src="@plainUrl@/xtree/xtree.js"></script>
 		<script type="text/javascript" src="@plainUrl@/calendar/calendar.js"></script>
 		<script type="text/javascript" src="@plainUrl@/calendar/lang/calendar-en.js"></script>
+		<script type="text/javascript" src="@plainUrl@/calendar/calendar-setup.js"></script>
 
 	</head>
 
 	<body background='@plainUrl@/menu/bg.jpg' scroll='no'>
 		<span class='doc'>
-		<form action="#" name="datePicker" method='get'>
 			<span class='topRow'>
 				<span class='windowPickerField'>
+		                  <form action="#" method='get'>
 					<select id='window' class='timebox'
 							onchange='setWindow(this.options[this.selectedIndex].value)'
 							>
@@ -55,9 +56,28 @@
 							<option value='Week' >Week</option>
 							<option value='Month'>Month</option>
 							<option value='Year' >Year</option>
+					</select>
+                                    </form>
+				</span>
+				<span class='widthField'>
+                                        <form action="#" method='get'>
+                        Width:
+						<select id='width' class='width'
+							onchange='setWidth(this.options[this.selectedIndex].value)'
+							>
+							<option value='0.50' >0.50</option>
+							<option value='0.75' >0.75</option>
+							<option value='1.00' >1.00</option>
+							<option value='1.25' >1.25</option>
+							<option value='1.50' selected='true' >1.50</option>
+							<option value='1.75' >1.75</option>
+							<option value='2.00' >2.00</option>
+							<option value='3.00' >3.00</option>
 						</select>
+                                        </form>
 				</span>
 				<span class='cfPickerField'>
+                                        <form action="#" method='get'>
 						<select id='cf' class='timebox'
 							onchange='setCf(this.options[this.selectedIndex].value)'
 							>
@@ -65,63 +85,37 @@
 							<option value='AVERAGE' selected='true' >AVERAGE</option>
 							<option value='MIN' >MIN</option>
 						</select>
-				</span>
-				<span class='autoScaleField'>
-						A-Scale: 
-						<input id="autoscale" value="0" type='checkbox' onclick='setAutoScale();' />
+                                        </form>
 				</span>
 				<span class='datePickerField'>
-						Date:
-						<input type='text' id="dc" name="dc" size="10" class="plain"/>
-						<input id="NOW" value="now" type='hidden' />
-						<input type="reset" value=" ... "
-							onclick="return showCalendar('dc', '%d.%m.%Y');"/>
-						<select id='timec' class='timebox'
-							onchange='this.form.NOW.value = this.options[this.selectedIndex].value + " " + this.form.dc.value'
-							>
-							<option value='00:00' >00:00</option>
-							<option value='01:00' >01:00</option>
-							<option value='02:00' >02:00</option>
-							<option value='03:00' >03:00</option>
-							<option value='04:00' >04:00</option>
-							<option value='05:00' >05:00</option>
-							<option value='06:00' >06:00</option>
-							<option value='07:00' >07:00</option>
-							<option value='08:00' >08:00</option>
-							<option value='09:00' >09:00</option>
-							<option value='10:00' >10:00</option>
-							<option value='11:00' >11:00</option>
-							<option value='12:00' >12:00</option>
-							<option value='13:00' >13:00</option>
-							<option value='14:00' >14:00</option>
-							<option value='15:00' >15:00</option>
-							<option value='16:00' >16:00</option>
-							<option value='17:00' >17:00</option>
-							<option value='18:00' >18:00</option>
-							<option value='19:00' >19:00</option>
-							<option value='20:00' >20:00</option>
-							<option value='21:00' >21:00</option>
-							<option value='22:00' >22:00</option>
-							<option value='23:00' >23:00</option>
-						</select>
-						<input type="button" value="Set" onclick="setDate();return void(0)"/>
-						<input type="button" value="Clear" onclick="clearDate();return void(0)"/>
+                                        <form action="#" method='get'>
+						<input id="NOW" value="now" size="15" class="plain" type="hidden"/>
+						<button id='datePicker'>Date/Time</button>
+						<input type="button" value="Now" onclick="clearDate();return void(0)"/>
+                                        </form>
+				</span>
+				<span class='autoScaleField'>
+                                        <form action="#" method='get'>
+						AutoScale: 
+						<input id="autoscale" value="0" type='checkbox' onclick='setAutoScale();' />
+                                        </form>
 				</span>
 				<span class='showHiddenField'>
-						Unhide: 
+                                        <form action="#" method='get'>
+						ShowAll: 
 						<input id="showhidden" value="0" type='checkbox' onclick='setShowHidden();' />
+                                        </form>
 				</span>
 				<span class='paddingField'>
 				</span>
 			</span>
-		</form>
 		</span>
 	
 		<iframe id='displayFrame' class='displayFrame' name='displayFrame'
 			frameborder='0'
 			ALLOWTRANSPARENCY="true"
-			src="@plainUrl@/menu/welcome.htm"
-		></iframe>
+		><xsl:attribute name="src"><xsl:value-of select='/document/welcome'/></xsl:attribute>
+		</iframe>
 	<script src='@plainUrl@/menu/menu.js'></script>
 
 	<div class="menuFrame">
@@ -150,6 +144,27 @@
 		<a href="javascript:frames['displayFrame'].location.href = '@plainUrl@/menu/credits.htm'; void(0);">Credits</a>
 	</span>
 
+        <script type="text/javascript">
+                    Calendar.setup({
+                        inputField     : "NOW",      // id of the input field
+                        ifFormat       : "%H:%M %d.%m.%Y",       // format of the input field
+                        displayArea    : "datePicker",
+                        daFormat       : "%d.%b.%y %Hh%M",
+                        showsTime      : true,            // will display a time selector
+                        button         : "datePicker",   // trigger for the calendar (button ID)
+                        singleClick    : false,           // double-click mode
+                        step           : 1,                // show all years in drop-down boxes (instead of every other year as default)
+                        firstDay       : 1,
+                        range          : [2003, 2010],
+                        onUpdate       : setDate,
+                        electric       : false,
+                        showOthers     : true
+                    });
+                    
+                    // get rid of that stupid hiding business
+                    Calendar.prototype.hideShowCovered = function () { return };
+
+        </script>
 
 	</body>
 

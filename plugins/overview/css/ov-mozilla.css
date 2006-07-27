@@ -4,6 +4,11 @@
 
    $Id$
    */
-.chapter { display:block; float:left; margin-top:20px; width:100%}
-.section { display:block; float:left; padding-top:20px;width:100%;}
-.graph   { display:block; float:left; width:50%; vertical-align:text-top;}
+.page    { display:block; float:left; }
+.chapterGroup { display:block; }
+.chapter { display:block; float:left; margin-top:20px; }
+.sectionGroup { display:block; }
+.section { display:block; float:left; padding-top:20px;  padding-left:1px; padding-right:1px; }
+.group   { display:block; float:left; }
+.graph   { display:block; float:left; }
+._graph:after { display:block; clear:both; content:'A';}

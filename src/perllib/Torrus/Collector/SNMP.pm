@@ -786,7 +786,7 @@ sub runCollector
 
     foreach my $idx ( 0 .. $#sessions )
     {
-        if( $idx == 0 )
+        if( $idx == 0 and defined( $sessions[0]->transport() ) )
         {
             $sessions[0]->transport()->socket()->close();
         }

@@ -664,6 +664,10 @@ sub cacheCollectors
                                  ( $ctoken, 'collector-timeoffset' ) );
 
             $data->{'db_tokens'}->put( $ctoken, $period.':'.$offset );
+            if( not exists( $data->{'targets'}{$period}{$offset} ) )
+            {
+                $data->{'targets'}{$period}{$offset} = [];
+            }
             push( @{$data->{'targets'}{$period}{$offset}}, $ctoken );
         }
     }

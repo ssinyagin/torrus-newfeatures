@@ -29,6 +29,8 @@ our $useThreads;
 our $thrQueueLimit;
 our $thrUpdateQueue;
 our $thrErrorsQueue;
+# RRDtool is not reentrant. use this semaphore for every call to RRDs::*
+our $rrdtoolSemaphore;
 our $thrUpdateThread;
 
 our $moveConflictRRD;
@@ -76,9 +78,11 @@ sub initStorage
         require threads;
         require threads::shared;
         require Thread::Queue;
+        require Thread::Semaphore;
 
         $thrUpdateQueue = new Thread::Queue;
         $thrErrorsQueue = new Thread::Queue;
+        $rrdtoolSemaphore = new Thread::Semaphore;
         
         $thrUpdateThread = threads->create( \&rrdUpdateThread );
         $thrUpdateThread->detach();
@@ -280,14 +284,26 @@ sub createRRD
                 sprintf( '--step=%d', $step ) );
 
     Debug("Creating RRD $filename: " . join(" ", @OPT, @DS, @RRA));
+
+    if( $useThreads )
+    {
+        $rrdtoolSemaphore->down();
+    }
+    
     RRDs::create($filename,
                  @OPT,
                  @DS,
                  @RRA);
 
     my $err = RRDs::error();
-    Error("ERROR creating $filename: $err") if $err;
 
+    if( $useThreads )
+    {
+        $rrdtoolSemaphore->up();
+    }
+
+    Error("ERROR creating $filename: $err") if $err;
+    
     delete $sref->{'rrdinfo_ds'}{$filename};
 }
 
@@ -304,7 +320,17 @@ sub updateRRD
         my $ref = {};
         $sref->{'rrdinfo_ds'}{$filename} = $ref;
 
+        if( $useThreads )
+        {
+            $rrdtoolSemaphore->down();
+        }
+
         my $rrdinfo = RRDs::info( $filename );
+
+        if( $useThreads )
+        {
+            $rrdtoolSemaphore->up();
+        }
 
         foreach my $prop ( keys %$rrdinfo )
         {
@@ -477,8 +503,14 @@ sub rrdUpdateThread
         {
             Debug("Updating RRD: " . join(' ', @{$cmdlist}));
         }
+
+        $rrdtoolSemaphore->down();
+
         RRDs::update( @{$cmdlist} );
         my $err = RRDs::error();
+
+        $rrdtoolSemaphore->up();
+
         if( $err )
         {
             Error('ERROR updating' . $cmdlist->[0] . ': ' . $err);

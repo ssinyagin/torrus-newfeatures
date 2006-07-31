@@ -52,17 +52,11 @@ sub checkdevtype
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    if( $devdetails->isDevType('CiscoGeneric') )
+    if( $devdetails->isDevType('CiscoGeneric') and
+        $dd->checkSnmpTable('ciscoFirewallMIB') )
     {
-        my $CiscoFirewall =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('ciscoFirewallMIB')  );
-
-        if( defined( $CiscoFirewall ) )
-        {
-            $devdetails->storeSnmpVars( $CiscoFirewall );
-            return 1;
-        }
+        $devdetails->setCap('interfaceIndexingManaged');
+        return 1;
     }
 
     return 0;
@@ -76,6 +70,10 @@ sub discover
 
     my $data = $devdetails->data();
     my $session = $dd->session();
+
+    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
+    $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+    $data->{'param'}{'ifindex-table'} = '$ifName';
 
     if( not defined( $data->{'param'}{'snmp-oids-per-pdu'} ) )
     {

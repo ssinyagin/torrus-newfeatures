@@ -50,8 +50,8 @@ F<@dbhome@/>, and must be writable by your Apache server
 configuration while the Torrus daemons are running.
 
 B<The datasource trees>. Torrus configuration consists of a number of I<trees>.
-Each tree is independent from the others. Each of them may or may not run
-a separate Collector or Monitor process. Web interface access control lists
+Each tree is independent from the others. A tree may run one Collector and
+one Monitor process. Also the web interface access control lists
 differentiate the user rights by datasource trees.
 
 B<Inside the tree>. A tree defines the hierarchy of Torrus datasources.
@@ -131,15 +131,26 @@ The result of C<devdiscover> is the Torrus configuration files:
 F<myrouters.xml> and F<myswitches.xml>, placed into
 F<@sitexmldir@/>. The C<collector> will place the
 RRD files into F</data1/torrus/collector_rrd>. Make sure that this directory
-exists, has enough free space, and is writable by C<torrus> user. B<Note:>
-the C<genddx> utility is designed as a one-time helper, so that you create
-your basic discovery instructions files from scratch. Further on, the discovery
-files should be maintained separately.
+exists, has enough free space, and is writable by C<torrus> user.
 
-B<Add your XML files to the tree configuration>.  Next step would be to
-add F<myrouters.xml> and F<myswitches.xml>
-into C<xmlfiles> array in the tree configuration in your
-F<@siteconfdir@/torrus-siteconfig.pl>.
+B<Note:> the C<genddx> utility is designed as a one-time helper, so
+that you create your basic discovery instructions files from scratch.
+Further on, the discovery files should be maintained separately.
+
+Another useful utility is called C<ttproclist>. It can be used to generate 
+a DDX file from a template and a list of SNMP hosts. It is very useful if
+you want to monitor many devices of similar type or function.
+
+You can also define a I<bundle> file in your DDX file. C<Genddx> will
+create it after all devices would discovered, and it will contain 
+E<lt>includeE<gt> statements for all XML files. This makes it practical to
+use one XML file per SNMP host, and use the bundle file for inclusion
+in the tree configuration.
+
+B<Add your XML files to the tree configuration>. For each tree,
+F<@siteconfdir@/torrus-siteconfig.pl> lists the XML files that have to be
+compiled for it. In the example above, you would add F<myrouters.xml> and
+F<myswitches.xml> into C<xmlfiles> array in the tree configuration.
 
 See I<Torrus SNMP Discovery User Guide> for more details on how
 C<genddx> and C<devdisover> interact and how you can customize
@@ -157,8 +168,8 @@ ready, you need to execute the compiler:
   torrus compilexml --tree=treename --verbose
 
 For most of the processes that you run within Torrus, you need to specify
-the tree name with C<--tree> option. Some prorams accept C<--all> option,
-which causes them to pocess all existing trees.
+the tree name with C<--tree> option. Some proramms accept C<--all> option,
+which causes them to process all existing trees.
 With C<--verbose> option, the compiler tells you about the files being
 processed, and about some other actions that may take quite a long time.
 It will also tell you if there's any error in your configuration.
@@ -176,8 +187,11 @@ There is a file that is created by C<./configure>, called F<init.d/torrus>.
 You may place it into a directory where your system looks for startup scripts
 (F</etc/init.d/> on Solaris and some Linuxes, F</usr/local/etc/rc.d/>
 on FreeBSD). Probably you need to rename and edit the script before using.
-Note that it also executes another daemon, C<monitor>. You will read
-later about it in more details.
+Note that it also executes another daemon, C<monitor>.
+
+The C<monitor> daemon is used for monitoring the thresholds in the
+data files. For more details, see the I<Torrus XML configuration guide>,
+in the section about monitor definitions.
 
 B<Define the ACLs>. By default, user authentication is enabled in the web
 interface. You can change this by setting
@@ -200,7 +214,7 @@ you to read that document.
 
 B<Tree structure>. The tree structure is defined by the structure of
 C<E<lt>subtreeE<gt>> and C<E<lt>leafE<gt>> XML elements. The rule is simple:
-chid XML elements of a C<E<lt>subtreeE<gt>> element define the child
+child XML elements of a C<E<lt>subtreeE<gt>> element define the child
 nodes in the configuration tree.
 
 B<Parameters>. Each node has a number of parameters. They are defined
@@ -216,7 +230,10 @@ be added to previously defined ones.
 B<Templates>. Some pieces of configuration may be written as templates,
 and then re-used in multiple places.
 
-
+The C<configsnapshot> utility generates one large XML file back from
+the compiled configuration. Its main purpose is backup of the configuration,
+but it can also be used for studying the relationships between templates
+and input files.
 
 =head2 Handling SNMP errors
 
@@ -239,7 +256,7 @@ the collector reports the error and waits for a period of time specified in
 C<$Torrus::Collector::SNMP::unreachableRetryDelay>, which is 10 minutes by
 default. It then tries to reach the device with the specified retry interval
 during some period of time, defined in
-C<$Torrus::Collector::SNMP::unreachableTimeout>, by default half an hour.
+C<$Torrus::Collector::SNMP::unreachableTimeout>, by default 6 hours.
 If the device is not available within the specified timeout, it is excluded
 from collection. It would be tried again on collector initialization
 only (at the collector process start or after recompiling the configuration).
@@ -325,7 +342,7 @@ With C<E<lt>aliasE<gt>> statement, you can add symbolic names to your
 nodes. If the new alias is defined as a reference to non-existing subtree,
 the new subtrees are created. Alias is only a symbolic link: when you click
 to the alias name in your browser, Torrus redirects it to the real datasource
-in its normal subtree.
+in its normal subtree. See the example in I<Torrus XML Configuration Guide>.
 
 =item * ds-type=rrd-file
 
@@ -735,6 +752,23 @@ The script writes the number of aged files in the e-mail subject, and lists
 the file names in the body. In case of relatively large installation,
 you might want to amend the script, in order to avoid too large email messages.
 
+
+=head3 Viewing external RRD files
+
+Some external program may create its own RRD files, and you
+may want to display and monitor them in Torrus. 
+
+Also some collector-generated RRDs may become outdated -- for example, after
+a module is removed from a router, and the interface counters not
+being updated any more.
+
+The easiest way to use such files would be to utilize the
+C<torrus rrddir2xml> command. It generates the XML configuration file
+that represents all RRD files found in a given directory. It can also
+scan the directory recursively.
+
+See also few examples in Torrus distribution. There are some
+templates for use with Smokeping, OpenNMS, and Flowscan.
 
 
 =head2 Torrus usage scenarios

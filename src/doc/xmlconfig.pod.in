@@ -58,7 +58,9 @@ sub-elements defining various sections, like datasources or views:
 
 Multiple XML files are interpreted in additive matter, i.e.
 C<E<lt>datasourcesE<gt>> section from one file is concatenated with
-the corresponding sections of previous files.
+the corresponding sections of previous files. If the same
+parameter is defined for the same subtree in several input files,
+the last processed value gets into the configuration.
 
 Additional XML files may be added to the compilation list by means of
 C<E<lt>includeE<gt>> statement. They will be processed recursively

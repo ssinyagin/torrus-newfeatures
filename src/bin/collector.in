@@ -133,6 +133,7 @@ if( not $nodaemon and not $runonce )
     {
         Error("Cannot open $pidfile for writing: $!");
     }
+    Torrus::Collector::initThreads();
 }
 
 Info(sprintf("Torrus version %s", '@VERSION@'));

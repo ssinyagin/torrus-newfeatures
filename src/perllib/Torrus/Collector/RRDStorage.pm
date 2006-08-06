@@ -26,6 +26,7 @@ use strict;
 use RRDs;
 
 our $useThreads;
+our $threadsInUse = 0;
 our $thrQueueLimit;
 our $thrUpdateQueue;
 our $thrErrorsQueue;
@@ -64,13 +65,11 @@ $Torrus::Collector::params{'rrd-storage'} = {
     };
 
 
-$Torrus::Collector::initStorage{'rrd-storage'} =
-    \&Torrus::Collector::RRDStorage::initStorage;
+$Torrus::Collector::initThreadsHandlers{'rrd-storage'} =
+    \&Torrus::Collector::RRDStorage::initThreads;
 
-sub initStorage
+sub initThreads
 {
-    my $collector = shift;
-
     if( $useThreads and not defined( $thrUpdateThread ) )
     {
         Verbose('RRD storage is configured for multithreading. Initializing ' .
@@ -86,6 +85,7 @@ sub initStorage
         
         $thrUpdateThread = threads->create( \&rrdUpdateThread );
         $thrUpdateThread->detach();
+        $threadsInUse = 1;
     }
 }
 
@@ -140,7 +140,7 @@ sub storeData
     my $collector = shift;
     my $sref = shift;
 
-    if( $useThreads and $thrUpdateQueue->pending() > $thrQueueLimit )
+    if( $threadsInUse and $thrUpdateQueue->pending() > $thrQueueLimit )
     {
         Error('Cannot enqueue RRD files for updating: ' .
               'queue size is above limit');
@@ -163,7 +163,7 @@ sub storeData
 
     undef $sref->{'values'};
     
-    if( $useThreads )
+    if( $threadsInUse )
     {
         $collector->setStatValue( 'RRDQueue', $thrUpdateQueue->pending() );
     }
@@ -285,7 +285,7 @@ sub createRRD
 
     Debug("Creating RRD $filename: " . join(" ", @OPT, @DS, @RRA));
 
-    if( $useThreads )
+    if( $threadsInUse )
     {
         $rrdtoolSemaphore->down();
     }
@@ -297,7 +297,7 @@ sub createRRD
 
     my $err = RRDs::error();
 
-    if( $useThreads )
+    if( $threadsInUse )
     {
         $rrdtoolSemaphore->up();
     }
@@ -320,14 +320,14 @@ sub updateRRD
         my $ref = {};
         $sref->{'rrdinfo_ds'}{$filename} = $ref;
 
-        if( $useThreads )
+        if( $threadsInUse )
         {
             $rrdtoolSemaphore->down();
         }
 
         my $rrdinfo = RRDs::info( $filename );
 
-        if( $useThreads )
+        if( $threadsInUse )
         {
             $rrdtoolSemaphore->up();
         }
@@ -460,7 +460,7 @@ sub updateRRD
     my @cmd = ( "--template=" . $template,
                 sprintf("%d%s", $avg_ts, $values) );
 
-    if( $useThreads )
+    if( $threadsInUse )
     {
         # Process errors from RRD update thread
         my $errfilename;

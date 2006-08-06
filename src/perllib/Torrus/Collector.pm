@@ -36,6 +36,18 @@ BEGIN
     }
 }
 
+# Executed once after the fork. Here modules can launch processing threads
+sub initThreads
+{
+    foreach my $key ( %Torrus::Collector::initThreadsHandlers )
+    {
+        if( ref( $Torrus::Collector::initThreadsHandlers{$key} ) )
+        {
+            &{$Torrus::Collector::initThreadsHandlers{$key}}();
+        }
+    }
+}
+
 
 ## One collector module instance holds all leaf tokens which
 ## must be collected at the same time.

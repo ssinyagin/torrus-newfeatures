@@ -1,3 +1,8 @@
+2006-08-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/ConfigBuilder.pm (new): encoding changed from
+	UTF8 to UTF-8
+
 2006-07-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoFirewall.pm (discover):

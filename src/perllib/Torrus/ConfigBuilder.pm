@@ -32,7 +32,7 @@ sub new
     my $class = shift;
     bless $self, $class;
 
-    my $doc = XML::LibXML->createDocument( "1.0", "UTF8" );
+    my $doc = XML::LibXML->createDocument( "1.0", "UTF-8" );
     my $root = $doc->createElement('configuration');
     $doc->setDocumentElement( $root );
     $self->{'doc'} = $doc;

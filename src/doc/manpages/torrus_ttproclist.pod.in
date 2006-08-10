@@ -51,7 +51,7 @@ names. If symbolic names are not defined, values are the same as keys.
 
 =item * C<param>
 
-Hash array of coommand-line parameters given in B<--param> option.
+Hash array of command-line parameters given in B<--param> option.
 
 =item * C<nodesfile>, C<creator>
 

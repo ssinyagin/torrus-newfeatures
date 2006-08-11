@@ -269,59 +269,80 @@ sub rrd_make_multigraph
 
     foreach my $dname ( sort {$dsOrder{$a} <=> $dsOrder{$b}} @dsNames )
     {
+        my $dograph = 1;
         my $ignoreViews =
             $config_tree->getNodeParam($token, 'ignore-views-'.$dname);
         if( defined( $ignoreViews ) and
             grep {$_ eq $view} split(',', $ignoreViews) )
         {
-            next;
-        }
-        
-        my $expr = $config_tree->getNodeParam($token, 'ds-expr-'.$dname);
-        push( @{$obj->{'args'}{'defs'}},
-              $self->rrd_make_cdef($config_tree, $token, $dname, $expr) );
-
-        my $linestyle =
-            $self->mkline( $config_tree->getNodeParam($token,
-                                                      'line-style-'.$dname) );
-
-        my $linecolor =
-            $self->mkcolor( $config_tree->getNodeParam($token,
-                                                       'line-color-'.$dname) );
-
-        my $legend =
-            $config_tree->getNodeParam($token, 'graph-legend-'.$dname);
-        if( defined( $legend ) )
-        {
-            $legend =~ s/:/\\:/g;
-        }
-        else
-        {
-            $legend = '';
+            $dograph = 0;
         }
 
+        my $gprint_this = $do_gprint;
         if( $do_gprint )
         {
             my $ds_nogprint =
                 $config_tree->getNodeParam($token, 'disable-gprint-'.$dname);
-            if( not defined( $ds_nogprint ) or $ds_nogprint ne 'yes' )
+            if( defined( $ds_nogprint ) and $ds_nogprint eq 'yes' )
             {
-                $self->rrd_make_gprint( $dname, $legend,
-                                        $config_tree, $token, $view, $obj );
-            }
-            else
-            {
-                # For datasource that disables gprint, there's no reason
-                # to print the label
-                $legend = '';
+                $gprint_this = 0;
             }
         }
 
-        push( @{$obj->{'args'}{'line'}},
-              sprintf( '%s:%s%s%s', $linestyle, $dname,
-                       $linecolor,
-                       length($legend) > 0 ? ':'.$legend.'\l' : '' ) );
+        my $legend;
+        
+        if( $dograph or $gprint_this )
+        {
+            my $expr = $config_tree->getNodeParam($token, 'ds-expr-'.$dname);
+            push( @{$obj->{'args'}{'defs'}},
+                  $self->rrd_make_cdef($config_tree, $token, $dname, $expr) );
 
+            
+            $legend =
+                $config_tree->getNodeParam($token, 'graph-legend-'.$dname);
+            if( defined( $legend ) )
+            {
+                $legend =~ s/:/\\:/g;
+            }
+            else
+            {
+                $legend = '';
+            }
+        }
+            
+        if( $gprint_this )
+        {
+            $self->rrd_make_gprint( $dname, $legend,
+                                    $config_tree, $token, $view, $obj );
+            if( not $dograph )
+            {
+                push( @{$obj->{'args'}{'line'}},
+                      'COMMENT:' . $legend . '\l');
+            }
+        }
+        else
+        {
+            # For datasource that disables gprint, there's no reason
+            # to print the label
+            $legend = '';
+        }
+        
+        if( $dograph )
+        {
+            my $linestyle =
+                $self->mkline( $config_tree->getNodeParam
+                               ($token, 'line-style-'.$dname) );
+            
+            my $linecolor =
+                $self->mkcolor( $config_tree->getNodeParam
+                                ($token, 'line-color-'.$dname) );
+            
+            push( @{$obj->{'args'}{'line'}},
+                  sprintf( '%s:%s%s%s', $linestyle, $dname,
+                           $linecolor,
+                           length($legend) > 0 ? ':'.$legend.'\l' : '' ) );
+            
+        }
     }
 }
 

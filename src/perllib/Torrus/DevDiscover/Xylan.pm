@@ -133,7 +133,7 @@ sub discover
         return 0;
     }
 
-    storeIfIndexParams( $devdetails );
+    Torrus::DevDiscover::RFC2863_IF_MIB::storeIfIndexParams( $devdetails );
 
     $devdetails->storeSnmpVars( $phyPortTable );
 

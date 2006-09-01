@@ -55,6 +55,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CiscoIOS_Docsis',
      'Torrus::DevDiscover::CiscoIOS_MacAccounting',
      'Torrus::DevDiscover::CiscoIOS_SAA',
+     'Torrus::DevDiscover::CiscoSCE',
      'Torrus::DevDiscover::CiscoVDSL',
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::EmpireSystemedge',
@@ -326,6 +327,20 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-firewall-connections',
          'source' => 'vendor/cisco.firewall.xml',
      },
+
+     'CiscoSCE::cisco-sce-common' => {
+         'name'   => 'cisco-sce-common',
+         'source' => 'vendor/cisco.sce.xml',
+     },
+     'CiscoSCE::cisco-sce-subscribers' => {
+         'name'   => 'cisco-sce-subscribers',
+         'source' => 'vendor/cisco.sce.xml',
+     },
+     'CiscoSCE::cisco-sce-tp' => {
+         'name'   => 'cisco-sce-tp',
+         'source' => 'vendor/cisco.sce.xml',
+     },
+     
      'CiscoVDSL::cvdsl-subtree' => {
          'name'   => 'cvdsl-subtree',
          'source' => 'vendor/cisco.vdsl-line.xml',

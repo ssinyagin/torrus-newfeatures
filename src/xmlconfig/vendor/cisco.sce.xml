@@ -130,14 +130,13 @@
       </param>
       <param name="data-file"         value="%scecommon-datafile%"/>
       <param name="rrd-create-dstype" value="GAUGE"/>
-      <param name="vertical-label"    value="Number"/>
+      <param name="vertical-label"    value="RDRs/s"/>
       <leaf name="Report_Rate_vs_Peak">
         <param name="comment"
                        value="The rate of RDR exports vs the peak recorded"/>
         <param name="precedence"          value="1000"/>
         <param name="ds-type"             value="rrd-multigraph"/>
         <param name="ds-names"            value="rate,peak"/>
-        <param name="vertical-label"      value="peak vs rate"/>
 
         <param name="ds-expr-peak"        value="{Report_RatePeak}"/>
         <param name="graph-legend-peak"   value="Reports per second Peak"/>
@@ -189,7 +188,7 @@
       </param>
       <param name="data-file"         value="%system-id%_SCE_subscribers.rrd"/>
       <param name="rrd-create-dstype" value="GAUGE"/>
-      <param name="vertical-label"    value="Number"/>
+      <param name="vertical-label"    value="Subscribers"/>
 
       <leaf name="Introduced">
         <param name="comment"
@@ -308,7 +307,8 @@
     <leaf name="Packets">
       <param name="comment"
                    value="Packet rate processed by TP"/>
-      <param name="graph-legend"    value="pps"/>
+      <param name="graph-legend"    value="Processed"/>
+      <param name="vertical-label"  value="pps"/>
       <param name="rrd-ds"          value="Packets_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpHandledPacketsRate.%sce-tp-index%"/>
@@ -317,7 +317,8 @@
     <leaf name="Packets_Discarded">
       <param name="comment"
                    value="Discarded packets due to BW limit"/>
-      <param name="graph-legend"    value="pps"/>
+      <param name="graph-legend"    value="Discarded"/>
+      <param name="vertical-label"  value="pps"/>
       <param name="rrd-ds"          value="PacketsDisc_%sce-tp-index%"/>
       <param name="snmp-object"
             value="$tpTotalNumDiscardedPacketsDueToBwLimit.%sce-tp-index%"/>
@@ -327,7 +328,8 @@
     <leaf name="Packets_WRED_Discarded">
       <param name="comment"
                    value="Discarded packets due to queue overflow"/>
-      <param name="graph-legend"    value="pps"/>
+      <param name="graph-legend"    value="WRED Discarded"/>
+      <param name="vertical-label"  value="pps"/>
       <param name="rrd-ds"          value="PacketsWred_%sce-tp-index%"/>
       <param name="snmp-object"
             value="$tpTotalNumWredDiscardedPackets.%sce-tp-index%"/>
@@ -337,7 +339,8 @@
     <leaf name="Flows_Rate">
       <param name="comment"
                    value="Flows rate processed by TP"/>
-      <param name="graph-legend"    value="flows/s"/>
+      <param name="graph-legend"    value="Processed"/>
+      <param name="vertical-label"  value="flows/s"/>
       <param name="rrd-ds"          value="FlowsRate_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpHandledFlowsRate.%sce-tp-index%"/>
@@ -346,7 +349,8 @@
     <leaf name="Flows_Active">
       <param name="comment"
                    value="Number of active flows"/>
-      <param name="graph-legend"    value="flows"/>
+      <param name="graph-legend"    value="Active"/>
+      <param name="vertical-label"  value="flows"/>
       <param name="rrd-ds"          value="FlowsActive_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpNumActiveFlows.%sce-tp-index%"/>
@@ -355,7 +359,8 @@
     <leaf name="Flows_Active_TCP">
       <param name="comment"
                    value="Number of active TCP flows"/>
-      <param name="graph-legend"    value="flows"/>
+      <param name="graph-legend"    value="TCP"/>
+      <param name="vertical-label"  value="flows"/>
       <param name="rrd-ds"          value="FlowsTCP_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpNumTcpActiveFlows.%sce-tp-index%"/>
@@ -364,7 +369,8 @@
     <leaf name="Flows_Active_UDP">
       <param name="comment"
                    value="Number of active UDP flows"/>
-      <param name="graph-legend"    value="flows"/>
+      <param name="graph-legend"    value="UDP"/>
+      <param name="vertical-label"  value="flows"/>
       <param name="rrd-ds"          value="FlowsUDP_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpNumUdpActiveFlows.%sce-tp-index%"/>
@@ -373,7 +379,8 @@
     <leaf name="CPU_Utilization">
       <param name="comment"
                    value="Utilization of TP"/>
-      <param name="graph-legend"    value="percent"/>
+      <param name="graph-legend"    value="Util"/>
+      <param name="vertical-label"  value="percent"/>
       <param name="rrd-ds"          value="Util_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpCpuUtilization.%sce-tp-index%"/>
@@ -382,7 +389,8 @@
     <leaf name="Flows_Utilization">
       <param name="comment"
                    value="Flows capacity utilization"/>
-      <param name="graph-legend"    value="percent"/>
+      <param name="graph-legend"    value="Flows Util"/>
+      <param name="vertical-label"  value="percent"/>
       <param name="rrd-ds"          value="FlowsUtil_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpFlowsCapacityUtilization.%sce-tp-index%"/>

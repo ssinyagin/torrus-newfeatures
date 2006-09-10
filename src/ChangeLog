@@ -1,3 +1,8 @@
+2006-09-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/RRDStorage.pm (storeData):
+	RRDQueue statistics are now set in the beginning of the cycle
+
 2006-08-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/ConfigBuilder.pm (new): encoding changed from

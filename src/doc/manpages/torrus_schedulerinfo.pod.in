@@ -124,6 +124,12 @@ How long the task start was delayed.
 
 How much time the too long run took.
 
+=item RRD Queue
+
+In a multithreaded environment, the RRD files are writen in a background
+thread. This value shows the length of the RRD update queue at the beginning
+of each update cycle.
+
 =back
 
 =item B<--help>

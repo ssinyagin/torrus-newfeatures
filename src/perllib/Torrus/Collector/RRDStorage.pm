@@ -140,6 +140,11 @@ sub storeData
     my $collector = shift;
     my $sref = shift;
 
+    if( $threadsInUse )
+    {
+        $collector->setStatValue( 'RRDQueue', $thrUpdateQueue->pending() );
+    }
+    
     if( $threadsInUse and $thrUpdateQueue->pending() > $thrQueueLimit )
     {
         Error('Cannot enqueue RRD files for updating: ' .
@@ -162,11 +167,6 @@ sub storeData
     }
 
     undef $sref->{'values'};
-    
-    if( $threadsInUse )
-    {
-        $collector->setStatValue( 'RRDQueue', $thrUpdateQueue->pending() );
-    }
 }
 
 

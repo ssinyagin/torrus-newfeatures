@@ -494,10 +494,13 @@ sub updateRRD
 # A background thread that updates RRD files
 sub rrdUpdateThread
 {
-    Torrus::Log::setTID( threads->tid() );
+    &Torrus::Log::setTID( threads->tid() );
+    my $cmdlist;
+    &threads::shared::share( \$cmdlist );
+    
     while(1)
     {
-        my $cmdlist = $thrUpdateQueue->dequeue();
+        $cmdlist = $thrUpdateQueue->dequeue();
         
         if( isDebug )
         {
@@ -516,6 +519,8 @@ sub rrdUpdateThread
             Error('ERROR updating' . $cmdlist->[0] . ': ' . $err);
             $thrErrorsQueue->enqueue( $cmdlist->[0] );
         }
+        
+        $cmdlist = undef;
     }
 }
 

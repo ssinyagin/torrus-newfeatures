@@ -314,7 +314,6 @@ sub expandOidMappings
     my $community = shift;
     my $oid_in = shift;
         
-    my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
 
     my $oid = $oid_in;

@@ -275,6 +275,34 @@ For each leaf token, period and time offset values are stored.
 =back
 
 
+
+B<snmp_lookup.db> is a I<Btree> database used by SNMP collector module.
+It serves as a persistent storage for such SNMP data as interface names etc.
+
+=over 4
+
+=item * M:E<lt>ipaddrE<gt>/E<lt>portE<gt>/E<lt>communityE<gt>
+\0E<lt>mapE<gt>\0E<lt>keyE<gt> -- E<lt>indexE<gt>
+
+Community may contain SNMPv3 user name. Each record stores a SNMP reverse
+lookup for a table given in E<lt>mapE<gt> parameter. E<lt>keyE<gt> contains
+the OID return value, and E<lt>indexE<gt> contains the index in the table.
+
+=item * V:E<lt>ipaddrE<gt>/E<lt>portE<gt>/E<lt>communityE<gt>
+\0E<lt>oidE<gt> -- E<lt>valueE<gt>
+
+These records contain the SNMP values for given OIDs.
+
+=item * B:E<lt>ipaddrE<gt>/E<lt>portE<gt>/E<lt>communityE<gt>
+-- E<lt>timestampE<gt>
+
+UNIX timestamp for the SNMP agent boot time.
+
+=back
+
+
+
+
 B<scheduler_stats.db> is a I<Btree> database which stores the runtime
 statistics of Scheduler tasks. Each key is of structure
 B<E<lt>tasknameE<gt>:E<lt>periodE<gt>:E<lt>offsetE<gt>:E<lt>variableE<gt>>,

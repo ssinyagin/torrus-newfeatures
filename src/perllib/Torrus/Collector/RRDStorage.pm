@@ -470,9 +470,13 @@ sub updateRRD
         }
 
         Debug('Enqueueing update job for ' . $filename);
-        my $cmdlist = &threads::shared::share([]);
-        push( @{$cmdlist}, $filename, @cmd );        
-        $thrUpdateQueue->enqueue( $cmdlist );        
+        
+        my $cmdlist;
+        &threads::shared::share( \$cmdlist );
+        $cmdlist = &threads::shared::share([]);
+        push( @{$cmdlist}, $filename, @cmd );
+        $thrUpdateQueue->enqueue( $cmdlist );
+        $cmdlist = undef;
     }
     else
     {

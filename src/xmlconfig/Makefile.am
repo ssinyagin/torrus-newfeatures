@@ -44,6 +44,7 @@ dist_vendor_DATA = \
 	vendor/f5.bigip.xml \
 	vendor/hp.hpux.xml \
 	vendor/microsoft.windows.xml \
+	vendor/motorola.bsr.xml \
 	vendor/netapp.filer.xml \
 	vendor/netscreen.xml \
 	vendor/paradyne.xdsl.xml \

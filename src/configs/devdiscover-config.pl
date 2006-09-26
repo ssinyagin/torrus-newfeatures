@@ -61,6 +61,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
      'Torrus::DevDiscover::MicrosoftWindows',
+     'Torrus::DevDiscover::MotorolaBSR',
      'Torrus::DevDiscover::NetApp',
      'Torrus::DevDiscover::NetScreen',
      'Torrus::DevDiscover::OracleDatabase',
@@ -619,6 +620,12 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source'   => 'vendor/microsoft.windows.xml',
      },
 
+     #### Motorola BSR
+     'MotorolaBSR::motorola-bsr-docsis-upstream-util' => {
+         'name'     => 'motorola-bsr-docsis-upstream-util',
+         'source'   => 'vendor/motorola.bsr.xml',
+     },     
+     
      #### F5 BigIp
      'F5BigIp::BigIp_4.x' => {
          'name'     => 'BigIp_4.x',

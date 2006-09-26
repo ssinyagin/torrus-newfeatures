@@ -97,7 +97,7 @@ sub checkdevtype
         return 0;
     }
             
-    $devdetails->setCap('interfaceIndexingManaged');
+    $devdetails->setCap('interfaceIndexingPersistent');
 
     return 1;
 }
@@ -110,9 +110,6 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
-    Torrus::DevDiscover::RFC2863_IF_MIB::storeIfIndexParams( $devdetails );
-    
     # Get the system info and display it in the comment
     my $result = $dd->retrieveSnmpOIDs
         ( 'pchassisSysType', 'pmoduleType', 'pmoduleSerialNumber',

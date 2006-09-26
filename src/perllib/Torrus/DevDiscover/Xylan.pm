@@ -103,7 +103,7 @@ sub checkdevtype
             ($devdetails, $interfaceFilterOverlay);
     }
 
-    $devdetails->setCap('interfaceIndexingManaged');
+    $devdetails->setCap('interfaceIndexingPersistent');
 
     return 1;
 }
@@ -116,8 +116,6 @@ sub discover
 
     my $data = $devdetails->data();
     my $session = $dd->session();
-
-    $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
 
     $data->{'nameref'}{'ifNick'}        = 'xylanInterfaceNick';
     $data->{'nameref'}{'ifSubtreeName'} = 'xylanInterfaceNick';
@@ -132,8 +130,6 @@ sub discover
         Error('Error retrieving PORT-MIB::phyPortTable from Xylan device');
         return 0;
     }
-
-    Torrus::DevDiscover::RFC2863_IF_MIB::storeIfIndexParams( $devdetails );
 
     $devdetails->storeSnmpVars( $phyPortTable );
 

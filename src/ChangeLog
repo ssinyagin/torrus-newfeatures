@@ -1,3 +1,11 @@
+2006-09-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	Improvements for persistent interface indexes
+
+	* perllib/Torrus/DevDiscover/MotorolaBSR.pm: New discovery module
+	for Motorola CMTS (Riverdelta)
+
 2006-09-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/RRDStorage.pm (storeData):

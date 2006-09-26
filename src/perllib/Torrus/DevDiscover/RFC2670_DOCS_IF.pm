@@ -49,10 +49,10 @@ $Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{
 
 our %oiddef =
     (
-     # DOCS-IF-MIB::docsIfDownstreamChannelTable
+     # DOCS-IF-MIB
      'docsIfDownstreamChannelTable' => '1.3.6.1.2.1.10.127.1.1.1',
-     # DOCS-IF-MIB::docsIfCmtsDownChannelCounterTable
-     'docsIfCmtsDownChannelCounterTable' => '1.3.6.1.2.1.10.127.1.3.10'
+     'docsIfCmtsDownChannelCounterTable' => '1.3.6.1.2.1.10.127.1.3.10',
+     'docsIfSigQSignalNoise' => '1.3.6.1.2.1.10.127.1.1.4.1.5',
      );
 
 
@@ -80,10 +80,19 @@ sub discover
     my $devdetails = shift;
 
     my $data = $devdetails->data();
+    my $session = $dd->session();
 
     if( $dd->checkSnmpTable( 'docsIfCmtsDownChannelCounterTable' ) )
     {
         $devdetails->setCap('docsDownstreamUtil');
+    }
+
+    my $snrTable =
+        $session->get_table( -baseoid =>
+                             $dd->oiddef('docsIfSigQSignalNoise') );
+    if( defined( $snrTable ) )
+    {
+        $devdetails->storeSnmpVars( $snrTable );
     }
     
     $data->{'docsCableMaclayer'} = [];
@@ -97,6 +106,11 @@ sub discover
 
         $interface->{'docsTemplates'} = [];
         $interface->{'docsParams'} = {};
+
+        if( $devdetails->hasCap('interfaceIndexingPersistent') )
+        {
+            $interface->{'docsParams'}{'interface-index'} = $ifIndex;
+        }
         
         if( $ifType == 127 )
         {
@@ -113,9 +127,14 @@ sub discover
         }
         elsif( $ifType == 129 or $ifType == 205 )
         {
-            push( @{$data->{'docsCableUpstream'}}, $ifIndex );
-            push( @{$interface->{'docsTemplates'}},
-                  'RFC2670_DOCS_IF::docsis-upstream-signal-quality' );
+            if( $devdetails->hasOID( $dd->oiddef('docsIfSigQSignalNoise') .
+                                     '.' . $ifIndex ) )
+            {
+                push( @{$data->{'docsCableUpstream'}}, $ifIndex );
+                push( @{$interface->{'docsTemplates'}},
+                      'RFC2670_DOCS_IF::docsis-upstream-signal-quality' );
+                
+            }
         }
     }
 

@@ -194,7 +194,8 @@ sub discover
     ## The capability 'interfaceIndexingManaged' disables the hints
     ## and lets the vendor discovery module to operate the indexing
     
-    if( not $devdetails->hasCap('interfaceIndexingManaged') )
+    if( not $devdetails->hasCap('interfaceIndexingManaged') and
+        not $devdetails->hasCap('interfaceIndexingPersistent') )
     {
         my $hint =
             $devdetails->param('RFC2863_IF_MIB::ifindex-map-hint');
@@ -221,8 +222,7 @@ sub discover
             }
             elsif( $hint eq 'ifIndex' )
             {
-                $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
-                storeIfIndexParams( $devdetails );
+                $devdetails->setCap('interfaceIndexingPersistent');
             }
             else
             {
@@ -231,6 +231,12 @@ sub discover
             }
         }
 
+        if( $devdetails->hasCap('interfaceIndexingPersistent') )
+        {
+            $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
+            storeIfIndexParams( $devdetails );
+        }
+            
         $hint =
             $devdetails->param('RFC2863_IF_MIB::subtree-name-hint');
         if( defined( $hint ) )

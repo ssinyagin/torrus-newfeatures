@@ -406,14 +406,18 @@ sub postProcessNodes
                     {
                         my $dsParam = $param . $dname;
                         my $value = $self->getNodeParam( $token, $dsParam );
-                        my $newValue = $value;
-                        $newValue =~ s/\s+//g;
-                        $newValue =
-                            $self->expandSubstitutions( $token, $dsParam,
-                                                        $newValue );
-                        if( $newValue ne $value )
+                        if( defined( $value ) )
                         {
-                            $self->setNodeParam( $token, $dsParam, $newValue );
+                            my $newValue = $value;
+                            $newValue =~ s/\s+//g;
+                            $newValue =
+                                $self->expandSubstitutions( $token, $dsParam,
+                                                            $newValue );
+                            if( $newValue ne $value )
+                            {
+                                $self->setNodeParam( $token, $dsParam,
+                                                     $newValue );
+                            }
                         }
                     }
                 }

@@ -120,7 +120,7 @@ sub checkdevtype
             ($devdetails, $interfaceFilterOverlay);
     }
 
-    $devdetails->setCap('interfaceIndexingManaged');
+    $devdetails->setCap('interfaceIndexingPersistent');
 
     return 1;
 }

@@ -121,6 +121,10 @@ crash (Bug ID CSCef53395). The problem is fixed in IOS versions
 
 Firewall performance statistics.
 
+=item * Cisco SCE
+
+Service Control Engine perfoemance statistics.
+
 =item * Compaq Insite Manager
 
 Temperature and memory health information statistics for Compaq servers.
@@ -137,6 +141,10 @@ In-detail traffic statistics.
 =item * Microsoft Windows 2000/XP
 
 Sets up proper interface indexing and provides FTP and HTTP server statistics.
+
+=item * Motorola BSR CMTS
+
+Displays modem qualtities.
 
 =item * NetApp.com storage products
 

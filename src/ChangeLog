@@ -1,5 +1,7 @@
 2006-09-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/CiscoSCE.pm: New discovery module
+
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
 	Improvements for persistent interface indexes
 

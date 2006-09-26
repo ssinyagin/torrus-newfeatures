@@ -122,6 +122,80 @@ sub buildConfig
 
         $cb->addParams( $upstrNode, $param );
         
+        # Build All_Modems summary graph
+        
+        my $param = {
+            'ds-type'              => 'rrd-multigraph',
+            'ds-names'             => 'registered,unregistered,offline',
+            'graph-lower-limit'    => '0',
+            'precedence'           => '1000',
+            'comment'              =>
+                'Registered, Unregistered and Offline modems on CMTS',
+                
+                'vertical-label'       => 'Modems',
+                'descriptive-nickname'     => '%system-id%: All modems',
+
+                'ds-expr-registered' => '{Modems_Registered}',
+                'graph-legend-registered' => 'Registered',
+                'line-style-registered' => 'AREA',
+                'line-color-registered' => '##blue',
+                'line-order-registered' => '1',
+                
+                'ds-expr-unregistered' => '{Modems_Unregistered}',
+                'graph-legend-unregistered' => 'Unregistered',
+                'line-style-unregistered' => 'STACK',
+                'line-color-unregistered' => '##crimson',
+                'line-order-unregistered' => '2',
+                
+                'ds-expr-offline' => '{Modems_Offline}',
+                'graph-legend-offline' => 'Offline',
+                'line-style-offline' => 'STACK',
+                'line-color-offline' => '##silver',
+                'line-order-offline' => '3',                
+            };
+        
+        my $first = 1;
+        foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+        {
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            
+            my $intf = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+            
+            if( $first )
+            {
+                $param->{'ds-expr-registered'} =
+                    '{' . $intf . '/Modems_Registered}';
+                $param->{'ds-expr-unregistered'} =
+                    '{' . $intf . '/Modems_Unregistered}';
+                $param->{'ds-expr-offline'} =
+                    '{' . $intf . '/Modems_Offline}';
+                $first = 0;
+            }
+            else
+            {
+                $param->{'ds-expr-registered'} .=
+                    ',{' . $intf . '/Modems_Registered},+';
+                $param->{'ds-expr-unregistered'} .=
+                    ',{' . $intf . '/Modems_Unregistered},+';
+                $param->{'ds-expr-offline'} .=
+                    ',{' . $intf . '/Modems_Offline},+';
+            }
+        }
+
+        my $usNode =
+            $cb->getChildSubtree( $devNode,
+                                  $data->{'docsConfig'}{
+                                      'docsCableUpstream'}{
+                                          'subtreeName'} );
+        if( defined( $usNode ) )
+        {
+            $cb->addLeaf( $usNode, 'All_Modems', $param, [] );
+        }
+        else
+        {
+            Error('Could not find the Upstream subtree');
+            exit 1;
+        }
     }
 }
 

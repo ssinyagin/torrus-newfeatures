@@ -49,7 +49,7 @@
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="950" />
       <param name="comment"
-              value="Active and Total modems on the interface" />
+       value="Registered, Unregistered and Offline modems on the interface" />
       <param name="vertical-label"    value="Modems" />
 
       <param name="ds-expr-registered">{Modems_Registered}</param>

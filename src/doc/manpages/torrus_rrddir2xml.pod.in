@@ -55,6 +55,11 @@ If specified, the directory will be searched recursively. All file names
 across all subdirectories must be unique. Symlinks to other directories
 are ignored.
 
+=item B<--filter>=I<Regexp>
+
+If the filter is specified, then B<rrddir2xml> lists only those files and
+subdirectories whose names match the given regular expression.
+
 =item B<--out>=I<FILE>
 
 Output XML file name. If relative path given, the file is placed in

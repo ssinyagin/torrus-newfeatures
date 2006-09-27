@@ -1,5 +1,7 @@
 2006-09-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/rrddir2xml.in: New option: --filter
+
 	* xmlconfig/generic/rfc2670.docsis-if.xml:
 	Added Frequency to upstream statictics monitoring.
 	Old upstream stats will be lost!!

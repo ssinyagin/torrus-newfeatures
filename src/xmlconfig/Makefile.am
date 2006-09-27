@@ -81,6 +81,7 @@ dist_old_DATA = \
 	old/cisco-mac-accounting-example.xml \
 	old/rfc1213.xml \
 	old/rfc2670.docsis-if.old.0.1.5d-20040224.xml \
+	old/rfc2670.docsis-if.old.1.0.4.xml \
 	old/rfc2863.if-mib.old-0.1.4.xml \
 	old/rfc2863.if-mib.old-0.1.7.xml \
 	old/snmp-defs.old-0.1.2.xml

@@ -156,8 +156,8 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'docsis-upstream-subtree',
          'source' => 'generic/rfc2670.docsis-if.xml'
          },
-     'RFC2670_DOCS_IF::docsis-upstream-signal-quality' => {
-         'name'   => 'docsis-upstream-signal-quality',
+     'RFC2670_DOCS_IF::docsis-upstream-stats' => {
+         'name'   => 'docsis-upstream-stats',
          'source' => 'generic/rfc2670.docsis-if.xml'
          },
 

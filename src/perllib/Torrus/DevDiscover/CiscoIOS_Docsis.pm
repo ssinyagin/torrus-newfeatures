@@ -237,7 +237,7 @@ sub buildConfig
 
         # Override the overview shortcus defined in rfc2670.docsis-if.xml
         
-        my $shortcuts = 'snr,fec,modems,util';
+        my $shortcuts = 'snr,fec,freq,modems,util';
         if( $devdetails->hasCap('cdxIfUpChannelMaxUGSLastFiveMins') )
         {
             $shortcuts .= ',ugs';

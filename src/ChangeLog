@@ -1,3 +1,11 @@
+2006-09-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2670.docsis-if.xml:
+	Added Frequency to upstream statictics monitoring.
+	Old upstream stats will be lost!!
+	The old templates file is
+	in xmlconfig/old/rfc2670.docsis-if.old.1.0.4.xml
+
 2006-09-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoSCE.pm: New discovery module

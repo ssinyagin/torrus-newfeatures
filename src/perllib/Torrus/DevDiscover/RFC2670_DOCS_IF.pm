@@ -132,7 +132,7 @@ sub discover
             {
                 push( @{$data->{'docsCableUpstream'}}, $ifIndex );
                 push( @{$interface->{'docsTemplates'}},
-                      'RFC2670_DOCS_IF::docsis-upstream-signal-quality' );
+                      'RFC2670_DOCS_IF::docsis-upstream-stats' );
                 
             }
         }

@@ -32,10 +32,7 @@
   <def name="docsIfSigQCorrecteds"      value="1.3.6.1.2.1.10.127.1.1.4.1.3"/>
   <def name="docsIfSigQUncorrectables"  value="1.3.6.1.2.1.10.127.1.1.4.1.4"/>
   <def name="docsIfSigQSignalNoise"     value="1.3.6.1.2.1.10.127.1.1.4.1.5"/>
-
-  <!-- DOCS-IF-MIB::docsIfUpstreamChannelTable -->
-  <def name="docsIfUpChannelFrequency"  value="1.3.6.1.2.1.10.127.1.1.2.1.2"/>
-    
+  
   <!-- DOCS-IF-MIB::docsIfCmtsDownChannelCounterTable -->
   <def name="docsIfCmtsDownChnlCtrExtTotalBytes"
                                 value="1.3.6.1.2.1.10.127.1.3.10.1.4"/>
@@ -57,7 +54,7 @@
     <param name="graph-title"          value="%descriptive-nickname%" />
 
     <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="snr,fec,freq"/>
+    <param name="overview-shortcuts" value="snr,fec"/>
     
     <param name="overview-subleave-name-snr" value="SNR"/>
     <param name="overview-direct-link-snr"      value="yes"/>
@@ -79,16 +76,6 @@
     <param name="overview-page-title-fec"
            value="FEC Graphs"/>
                       
-    <param name="overview-subleave-name-freq" value="Frequency"/>
-    <param name="overview-direct-link-freq"      value="yes"/>
-    <param name="overview-direct-link-view-freq" value="expanded-dir-html"/>
-    <param name="overview-shortcut-text-freq"
-           value="All Frequency"/>
-    <param name="overview-shortcut-title-freq"
-           value="Show all upstream frequenciesin one page"/>
-    <param name="overview-page-title-freq"
-           value="Upstream frequency Graphs"/>
-
     <param name="rrd-hwpredict"     value="disabled" />
   </template>
   
@@ -98,7 +85,7 @@
     <param name="graph-lower-limit"   value="0" />
   </template>
 
-  <template name="docsis-upstream-stats">
+  <template name="docsis-upstream-signal-quality">
     <leaf name="SNR">
       <param name="snmp-object"  value="$docsIfSigQSignalNoise.%ifindex-map%"/>
 
@@ -199,21 +186,6 @@
       <param name="graph-upper-limit"       value="100" />
       <param name="graph-logarithmic"       value="yes" />
       <param name="graph-rigid-boundaries"  value="yes" />
-    </leaf>
-    
-    <leaf name="Frequency">
-      <param name="snmp-object"
-                        value="$docsIfUpChannelFrequency.%ifindex-map%"/>
-      <param name="rrd-ds"       value="Frequency" />
-      <param name="rrd-create-dstype"   value="GAUGE" />
-      <param name="vertical-label"      value="Hz" />
-      <param name="graph-lower-limit"   value="5000000" />
-
-      <param name="comment"
-          value="Upstream frequency"/>
-      <param name="graph-legend" value="Frequency" />
-      <param name="precedence"   value="600" />
-      <param name="graph-logarithmic"       value="yes" />
     </leaf>
   </template>
 

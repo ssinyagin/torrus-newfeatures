@@ -105,7 +105,7 @@ sub buildConfig
                                   $data->{'docsConfig'}{'docsCableUpstream'}{
                                       'subtreeName'} );
         
-        my $shortcuts = 'snr,fec,modems';
+        my $shortcuts = 'snr,fec,freq,modems';
         
         my $param = {        
             'overview-shortcuts' =>

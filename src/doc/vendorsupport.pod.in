@@ -123,7 +123,7 @@ Firewall performance statistics.
 
 =item * Cisco SCE
 
-Service Control Engine perfoemance statistics.
+Service Control Engine performance statistics.
 
 =item * Compaq Insite Manager
 
@@ -144,7 +144,7 @@ Sets up proper interface indexing and provides FTP and HTTP server statistics.
 
 =item * Motorola BSR CMTS
 
-Displays modem qualtities.
+Displays modem quantities.
 
 =item * NetApp.com storage products
 

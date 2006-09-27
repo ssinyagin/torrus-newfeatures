@@ -207,13 +207,10 @@
       <param name="rrd-ds"       value="Frequency" />
       <param name="rrd-create-dstype"   value="GAUGE" />
       <param name="vertical-label"      value="Hz" />
-      <param name="graph-lower-limit"   value="5000000" />
-
       <param name="comment"
           value="Upstream frequency"/>
       <param name="graph-legend" value="Frequency" />
       <param name="precedence"   value="600" />
-      <param name="graph-logarithmic"       value="yes" />
     </leaf>
   </template>
 

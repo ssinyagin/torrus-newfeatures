@@ -52,6 +52,7 @@ $creator .= "\nOn " . scalar(localtime(time));
 
 my $indir;
 my $recursive = 0;
+my $filter = '.*';
 my $outfile = 'rrddir.xml';
 my $topsubtree = '/';
 my $splitexpr = '_+';
@@ -65,6 +66,7 @@ my $verbose = 0;
 my $ok = GetOptions(
                     'dir=s'       => \$indir,
                     'recursive'   => \$recursive,
+                    'filter=s'    => \$filter,
                     'out=s'       => \$outfile,
                     'subtree=s'   => \$topsubtree,
                     'split=s'     => \$splitexpr,
@@ -84,6 +86,7 @@ if( not $ok or not $indir or scalar( @ARGV ) > 0 )
     "Options:\n",
     " --dir=path              directory to read RRD files from\n",
     " --recursive             read the dircories recursively\n",
+    " --filter=re             filter RE for file and directory names\n",
     " --out=filename          output file             [".$outfile."]\n",
     " --subtree=subtree       XML config subtree      [".$topsubtree."]\n",
     " --split=regexp          regexp to split file names [".$splitexpr."]\n",
@@ -134,7 +137,7 @@ if( $outfile !~ /^\// )
 }
 
 my %rrdinfos;
-read_rrd_dir( \%rrdinfos, $indir, $recursive );
+read_rrd_dir( \%rrdinfos, $indir, $filter, $recursive );
 
 Verbose(sprintf('Found %d RRD files', scalar( keys( %rrdinfos ) ) ));
 
@@ -238,6 +241,7 @@ sub read_rrd_dir
 {
     my $infos = shift;
     my $indir = shift;
+    my $filter = shift;
     my $recursive = shift;
 
     my @subdirs;
@@ -248,6 +252,7 @@ sub read_rrd_dir
     foreach my $file ( keys %dir )
     {
         next if $file =~ /^\./;
+        next if $file !~ $filter;
         
         my $mode = $dir{$file}->mode();
         if( S_ISDIR( $mode ) )

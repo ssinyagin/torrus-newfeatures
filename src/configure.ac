@@ -46,6 +46,10 @@ AC_ARG_ENABLE(pkgonly,
                         [Skip all checking])])
 AC_SUBST(enable_pkgonly)
 
+AC_ARG_ENABLE(threads,
+        [AC_HELP_STRING([--disable-threads],
+                        [Disable Perl threads usage])])
+        
 perllibdirs="\'\${perllibdir}\'"
 
 PERLOPTS=
@@ -107,16 +111,40 @@ if test "$enable_pkgonly" != yes; then
      fi
    done
 
-   AC_MSG_CHECKING([threading support in Perl])
-   if ${PERL} ${PERLOPTS} -e 'use threads' 2>/dev/null; then
-       AC_MSG_RESULT([Ok])
-       perlithreads=1
+   perlithreads=1
+   if test x"$enable_threads" = xno; then
+     perlithreads=0     
    else
-       AC_MSG_RESULT([No. Multithreading features will not be used.])
-       perlithreads=0
-   fi
-   AC_SUBST(perlithreads, [${perlithreads}])
    
+     AC_MSG_CHECKING([threading support in Perl])
+     if ${PERL} ${PERLOPTS} -e 'use threads' 2>/dev/null; then
+       AC_MSG_RESULT([Ok])
+
+       AC_MSG_CHECKING([if threads module version is 1.41 or higher])
+       if ${PERL} ${PERLOPTS} -e \
+         'use threads; exit($threads::VERSION >= 1.41 ? 0:1)'; then
+           AC_MSG_RESULT([Ok])
+       else
+           AC_MSG_RESULT([No. Multithreading will not be used.])
+           perlithreads=0
+       fi
+       
+       AC_MSG_CHECKING([if threads::shared module version is 1.03 or higher])
+       if ${PERL} ${PERLOPTS} -e \
+         'use threads; use threads::shared;
+          exit($threads::shared::VERSION >= 1.03 ? 0:1)'; then
+           AC_MSG_RESULT([Ok])
+       else         
+           AC_MSG_RESULT([No. Multithreading will not be used.])
+           perlithreads=0
+       fi
+       
+     else
+       AC_MSG_RESULT([No. Multithreading will not be used.])
+       perlithreads=0
+     fi
+   fi
+   AC_SUBST(perlithreads, [${perlithreads}])   
 fi
 
 AC_ARG_VAR(torrus_user,  [[torrus] UID to run the daemons])

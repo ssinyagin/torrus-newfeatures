@@ -1,3 +1,8 @@
+2006-09-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* configure.ac: theads module version must be 1.41 or higher,
+	and threads::shared 1.03 or higher.
+
 2006-09-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/rrddir2xml.in: New option: --filter

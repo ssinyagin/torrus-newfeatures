@@ -183,7 +183,8 @@ sub buildConfig
     }
 
     my $tpNode = $cb->addSubtree( $devNode, 'SCE_TrafficProcessors',
-                                  { 'comment' => 'TP usage statistics' });
+                                  { 'comment' => 'TP usage statistics' },
+                                  [ 'CiscoSCE::cisco-sce-tp-subtree']);
 
     foreach my $tp ( 1 .. $data->{'sceTrafficProcessors'} )
     {

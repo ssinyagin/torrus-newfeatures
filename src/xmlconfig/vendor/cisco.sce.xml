@@ -31,7 +31,6 @@
   <def name="diskNumFreeBytes" value="1.3.6.1.4.1.5655.4.1.5.2.0" />
 
   <!-- PCUBE-SE-MIB::rdrFormatterGrp -->
-  <def name="rdrFormatterNumReportsSent" value="1.3.6.1.4.1.5655.4.1.6.3.0" />
   <def name="rdrFormatterNumReportsDiscarded"
                                          value="1.3.6.1.4.1.5655.4.1.6.4.0" />
   <def name="rdrFormatterReportRate"     value="1.3.6.1.4.1.5655.4.1.6.6.0" />
@@ -172,12 +171,6 @@
         <param name="snmp-object"  value="$rdrFormatterNumReportsDiscarded"/>
       </leaf>
       
-      <leaf name="Reports_Sent">
-        <param name="comment"         value="Total number of reports sent"/>
-        <param name="graph-legend"    value="Num of reports"/>
-        <param name="rrd-ds"          value="reportsSent"/>
-        <param name="snmp-object"     value="$rdrFormatterNumReportsSent"/>
-      </leaf>
     </subtree>
   </template>
 
@@ -300,6 +293,28 @@
     </subtree>
   </template>
 
+  <template name="cisco-sce-tp-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="util,discards"/>
+    
+    <param name="overview-subleave-name-util" value="CPU_Utilization"/>
+    <param name="overview-shortcut-text-util"
+           value="All CPU Utilization"/>
+    <param name="overview-shortcut-title-util"
+           value="Show CPU utilization for all TPs on one page"/>
+    <param name="overview-page-title-util"
+           value="Traffic Processors Utilization"/>
+
+    <param name="overview-subleave-name-discards" value="Packets_Discarded"/>
+    <param name="overview-shortcut-text-discards"
+           value="All Discards"/>
+    <param name="overview-shortcut-title-discards"
+           value="Show discarded packet graphs on one page"/>
+    <param name="overview-page-title-discards"
+           value="Packets discarded"/>
+  </template>
+
+  
   <template name="cisco-sce-tp">
     <param name="data-file"         value="%system-id%_SCE_tp.rrd"/>
     <param name="rrd-create-dstype" value="GAUGE"/>

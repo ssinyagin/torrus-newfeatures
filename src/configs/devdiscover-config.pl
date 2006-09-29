@@ -337,6 +337,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-sce-subscribers',
          'source' => 'vendor/cisco.sce.xml',
      },
+     'CiscoSCE::cisco-sce-tp-subtree' => {
+         'name'   => 'cisco-sce-tp-subtree',
+         'source' => 'vendor/cisco.sce.xml',
+     },
      'CiscoSCE::cisco-sce-tp' => {
          'name'   => 'cisco-sce-tp',
          'source' => 'vendor/cisco.sce.xml',

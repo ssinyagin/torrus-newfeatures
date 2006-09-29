@@ -1,5 +1,8 @@
 2006-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* xmlconfig/generic/rfc2863.if-mib.xml: added an overvew shortcut
+	for interface errors
+
 	* perllib/Torrus/RPN.pm: IF accepts UNKN values
 
 2006-09-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

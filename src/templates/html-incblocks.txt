@@ -273,7 +273,7 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
 [% BLOCK overviewShortcuts %]
 [%
   IF nodeParam(token, 'has-overview-shortcuts', 1) == 'yes';
-    FOREACH ovs = nodeParam(token,'overview-shortcuts').split(',');
+    FOREACH ovs = nodeParam(token,'overview-shortcuts').split('\s*,\s*');
      p1 = 'overview-shortcut-text-' _ ovs;
      p2 = 'overview-shortcut-title-' _ ovs;
      INCLUDE shortcut

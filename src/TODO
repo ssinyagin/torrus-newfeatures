@@ -2,7 +2,6 @@ Round Robin Database Framework
   
 To do now:
 
--- All errors on all interfaces overview
 -- Update User Guide
 -- Persistent maps in snmp collector
 -- Multithreading in collector

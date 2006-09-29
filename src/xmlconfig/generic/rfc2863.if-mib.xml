@@ -72,7 +72,8 @@
     <param name="comment" value="Interface traffic and error counters"/>
     
     <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="traffic"/>
+    <param name="overview-shortcuts" value="traffic,errors"/>
+    
     <param name="overview-subleave-name-traffic" value="InOut_bps"/>
     <param name="overview-shortcut-text-traffic"
            value="All traffic"/>
@@ -80,7 +81,16 @@
            value="Show traffic for all interfaces on one page"/>
     <param name="overview-page-title-traffic"
            value="Input/Output Graphs"/>
-           
+
+    <param name="overview-subleave-name-errors"
+           value="Discards_In,Discards_Out,Errors_In,Errors_Out"/>
+    <param name="overview-shortcut-text-errors"
+           value="All errors"/>
+    <param name="overview-shortcut-title-errors"
+           value="Show all interface errors on one page"/>
+    <param name="overview-page-title-errors"
+           value="Interface errors"/>
+                      
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
     <param name="data-file" value="%system-id%_%interface-nick%_if-mib.rrd" />
     <param name="graph-title" value="%descriptive-nickname%" />

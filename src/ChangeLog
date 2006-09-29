@@ -1,3 +1,7 @@
+2006-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/RPN.pm: IF accepts UNKN values
+
 2006-09-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* configure.ac: theads module version must be 1.41 or higher,

@@ -80,7 +80,7 @@ View and monitor names must be unique, and must
 start with a lower case letter.
 
 B<db_config_instances.db> is a I<Hash> database, with keys of form
-C<ds:E<gt>tree_nameE<lt>> or C<other:E<gt>tree_nameE<lt>>, and 0 or 1 as
+C<ds:E<lt>tree_nameE<gt>> or C<other:E<lt>tree_nameE<gt>>, and 0 or 1 as
 values.
 
 B<ds_config_INST.db> is a I<Btree> database, with the keys and values

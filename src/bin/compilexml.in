@@ -33,6 +33,7 @@ our @trees;
 our $all_trees;
 our $no_ds;
 our $no_validation;
+our $force;
 
 our $debug;
 our $verbose;
@@ -42,6 +43,7 @@ my $ok = GetOptions ('tree=s'   => \@trees,
                      'all'      => \$all_trees,
                      'nods'     => \$no_ds,
                      'noval'    => \$no_validation,
+                     'force'    => \$force,
                      'debug'    => \$debug,
                      'verbose'  => \$verbose,
                      'help'     => \$help_needed);
@@ -55,6 +57,8 @@ if( not $ok or not (scalar(@trees) or $all_trees) or
     "  --all           compile all trees\n",
     "  --nods          compile non-datasource configuration only\n",
     "  --noval         disable parameter validation\n",
+    "  --force         force the compiler even if anoother " .
+        "compiler process is probably running\n",
     "  --debug         set the log level to debug\n",
     "  --verbose       set the log level to info\n",
     "  --help          this help message\n";
@@ -105,8 +109,17 @@ foreach my $tree ( @trees )
     my $ok = 1;
     my $compiler =
         new Torrus::ConfigTree::XMLCompiler( -TreeName => $tree,
-                                             -NoDSRebuild => $no_ds );
-
+                                             -NoDSRebuild => $no_ds,
+                                             -ForceWriter => $force );
+    if( not defined( $compiler ) )
+    {
+        Error('Cannot initialize compiler for tree ' . $tree . '. Exiting');
+        Error('If you are sure there are no other compiler processes ' .
+              'running, use the --force option');
+        $global_ok = 0;
+        last;
+    }     
+    
     my @xmlFiles = @Torrus::Global::xmlAlwaysIncludeFirst;
     push( @xmlFiles, Torrus::SiteConfig::listXmlFiles( $tree ) );
     push( @xmlFiles, @Torrus::Global::xmlAlwaysIncludeLast );

@@ -41,6 +41,11 @@ sub new
     $options{'-Rebuild'} = 1;
 
     my $self  = $class->SUPER::new( %options );
+    if( not defined( $self ) )
+    {
+        return undef;
+    }
+
     bless $self, $class;
 
     if( $options{'-NoDSRebuild'} )

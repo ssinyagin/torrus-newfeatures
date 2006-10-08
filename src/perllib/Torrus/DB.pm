@@ -278,6 +278,34 @@ sub c_del
 }
 
 
+sub c_get
+{
+    my $self = shift;
+    my $cursor = shift;
+    my $key = shift;
+    my $val = undef;
+
+    if( $cursor->c_get( $key, $val, DB_SET ) == 0 )
+    {
+        return $val;
+    }
+    else
+    {
+        return undef;
+    }
+}
+
+sub c_put
+{
+    my $self = shift;
+    my $cursor = shift;
+    my $key = shift;
+    my $val = shift;
+
+    return ( $cursor->c_put( $key, $val, DB_KEYFIRST ) == 0 );
+}
+
+
 
 # Btree best match. We assume that the searchKey is longer or equal
 # than the matched key in the database.

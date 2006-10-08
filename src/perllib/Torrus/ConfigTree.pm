@@ -67,6 +67,42 @@ sub new
 
     if( $options{'-WriteAccess'} )
     {
+        $self->{'is_writing'} = 1;
+        
+        # Acquire exlusive lock on the database and set the compiling flag
+        {
+            my $ok = 1;
+            my $key = 'compiling:' . $self->{'treename'};
+            my $cursor = $self->{'db_config_instances'}->cursor( -Write => 1 );
+            my $compilingFlag =
+                $self->{'db_config_instances'}->c_get( $cursor, $key );
+            if( $compilingFlag )
+            {
+                if( $options{'-ForceWriter'} )
+                {
+                    Warn('Another compiler process is probably still ' .
+                         'running. This may lead to an unusable ' .
+                         'database state');
+                }
+                else
+                {
+                    Error('Another compiler is running for the tree ' .
+                          $self->{'treename'});
+                    $ok = 0;
+                }
+            }
+            else
+            {
+                $self->{'db_config_instances'}->c_put( $cursor, $key, 1 );
+            }
+            undef $cursor;
+            if( not $ok )
+            {
+                return undef;
+            }
+            $self->{'iam_writer'} = 1;
+        }
+
         if( not $options{'-NoDSRebuild'} )
         {
             $dsConfInstance = sprintf( '%d', ( $dsConfInstance + 1 ) % 2 );
@@ -81,11 +117,6 @@ sub new
                                          -Subdir => $self->{'treename'},
                                          -WriteAccess => 1 );
     defined( $self->{'db_readers'} ) or return( undef );
-
-    if( $options{'-WriteAccess'} )
-    {
-        $self->{'is_writing'} = 1;
-    }
 
     $self->{'db_dsconfig'} =
         new Torrus::DB('ds_config_' . $dsConfInstance,
@@ -193,7 +224,18 @@ sub DESTROY
 
     Debug('Destroying ConfigTree object');
 
-    $self->clearReader();
+    if( $self->{'iam_writer'} )
+    {
+        # Acquire exlusive lock on the database and clear the compiling flag
+        my $cursor = $self->{'db_config_instances'}->cursor( -Write => 1 );
+        $self->{'db_config_instances'}->c_put
+            ( $cursor, 'compiling:' . $self->{'treename'}, 0 );
+        undef $cursor;
+    }
+    else
+    {
+        $self->clearReader();
+    }
 
     undef $self->{'db_dsconfig'};
     undef $self->{'db_otherconfig'};

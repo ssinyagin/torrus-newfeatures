@@ -81,7 +81,9 @@ start with a lower case letter.
 
 B<db_config_instances.db> is a I<Hash> database, with keys of form
 C<ds:E<lt>tree_nameE<gt>> or C<other:E<lt>tree_nameE<gt>>, and 0 or 1 as
-values.
+values. Also the compiler addts an entry C<compiling:E<lt>tree_nameE<gt>>
+during the compilation time, in order to avoid two compiler processes
+running at the same time on the same tree.
 
 B<ds_config_INST.db> is a I<Btree> database, with the keys and values
 defined as follows:

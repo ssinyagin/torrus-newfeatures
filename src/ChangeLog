@@ -1,3 +1,8 @@
+2006-10-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/ConfigTree.pm (new): exclusivity lock:
+	only one compiler can run for a tree
+
 2006-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* xmlconfig/generic/rfc2863.if-mib.xml: added an overvew shortcut

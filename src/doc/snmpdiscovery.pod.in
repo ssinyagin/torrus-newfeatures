@@ -485,14 +485,15 @@ the results may be used by other discovery modules.
 =item * C<RFC2863_IF_MIB::bandwidth-usage>
 
 If set to C<yes>, the bandwidth usage percentage will be shown for those
-interfaces where two parameters are defined: C<bandwidth-limit-in> and
-C<bandwidth-limit-out>. These interface parameters may be set by
-C<RFC2863_IF_MIB::bandwidth-limits> discovery parameter, or by selectors
-with the action C<Parameters>, or by setting C<RFC2863_IF_MIB::copy-params>.
+interfaces where two parameters are defined (in megabits per second):
+C<bandwidth-limit-in> and C<bandwidth-limit-out>. These interface
+parameters may be set by C<RFC2863_IF_MIB::bandwidth-limits> discovery
+parameter, or by selectors with the action C<Parameters>, or by
+setting C<RFC2863_IF_MIB::copy-params>.
 
 =item * C<RFC2863_IF_MIB::bandwidth-limits>
 
-Sefines the values (in megabits per second) for C<bandwidth-limit-in> and
+Defines the values (in megabits per second) for C<bandwidth-limit-in> and
 C<bandwidth-limit-out> interface parameters. Semicolon-separated list
 of (I<Inteface name>:I<Input limit>:I<Output limit>) values, for example:
 

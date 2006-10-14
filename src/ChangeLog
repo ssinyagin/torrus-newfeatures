@@ -1,3 +1,10 @@
+2006-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	new discovery parameters:
+	RFC2863_IF_MIB::bandwidth-usage
+	RFC2863_IF_MIB::bandwidth-limits
+
 2006-10-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/ConfigTree.pm (new): exclusivity lock:

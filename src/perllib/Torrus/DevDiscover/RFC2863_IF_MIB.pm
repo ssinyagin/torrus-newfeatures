@@ -458,7 +458,19 @@ sub buildConfig
             $onlyName{$name} = 1;
         }
     }
-    
+
+    # Bandwidth usage
+    my %bandwidthLimits;
+    if( $devdetails->param('RFC2863_IF_MIB::bandwidth-usage') eq 'yes' )
+    {
+        my $limits = $devdetails->param('RFC2863_IF_MIB::bandwidth-limits');
+        foreach my $intfLimit ( split( /\s*;\s*/, $limits ) )
+        {
+            my( $intf, $limitIn, $limitOut ) = split( /\s*:\s*/, $intfLimit );
+            $bandwidthLimits{$intf}{'In'} = $limitIn;
+            $bandwidthLimits{$intf}{'Out'} = $limitOut;
+        }
+    }
 
     # tokenset member interfaces of the form
     # Format: tset:intf,intf; tokenset:intf,intf;
@@ -531,10 +543,17 @@ sub buildConfig
     }
     my $subtreeParams = {};
     my $subtreeComment = $devdetails->param('RFC2863_IF_MIB::subtree-comment');
+
     if( length( $subtreeComment ) > 0 )
     {
         $subtreeParams->{'comment'} = $subtreeComment;
     }
+
+    if( $devdetails->param('RFC2863_IF_MIB::bandwidth-usage') eq 'yes' )
+    {
+        $subtreeParams->{'overview-shortcuts'} = 'traffic,errors,bandwidth';
+    }
+    
     my $countersNode =
         $cb->addSubtree( $devNode, $subtreeName, $subtreeParams,
                          ['RFC2863_IF_MIB::rfc2863-ifmib-subtree'] );
@@ -688,6 +707,26 @@ sub buildConfig
             {
                 my ($param, $val) = split('\s*=\s*', $pair);
                 $interface->{'param'}{$param} = $val;
+            }
+        }
+
+        if( $devdetails->param('RFC2863_IF_MIB::bandwidth-usage') eq 'yes' )
+        {
+            if( defined( $bandwidthLimits{$subtreeName} ) )
+            {
+                $interface->{'param'}{'bandwidth-limit-in'} =
+                    $bandwidthLimits{$subtreeName}{'In'};
+                $interface->{'param'}{'bandwidth-limit-out'} =
+                    $bandwidthLimits{$subtreeName}{'Out'};
+            }
+
+            # We accept that parameters may be added by some other ways
+
+            if( defined( $interface->{'param'}{'bandwidth-limit-in'} ) and
+                defined( $interface->{'param'}{'bandwidth-limit-out'} ) )
+            {
+                push( @templates,
+                      'RFC2863_IF_MIB::interface-bandwidth-usage' );
             }
         }
 

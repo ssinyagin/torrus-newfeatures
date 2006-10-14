@@ -135,6 +135,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'ifxtable-hcucast-packets',
          'source' => 'generic/rfc2863.if-mib.xml'
          },
+     'RFC2863_IF_MIB::interface-bandwidth-usage' => {
+         'name'   => 'interface-bandwidth-usage',
+         'source' => 'generic/rfc2863.if-mib.xml'
+         },
 
      #### RDBMS MIB
      'RFC1697_RDBMS::rdbms-dbtable' => {

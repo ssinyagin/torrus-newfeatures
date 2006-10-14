@@ -482,6 +482,30 @@ If set to C<yes>, all the interface statistics are skipped from
 the XML configuration output. Still the interface table is examined and
 the results may be used by other discovery modules.
 
+=item * C<RFC2863_IF_MIB::bandwidth-usage>
+
+If set to C<yes>, the bandwidth usage percentage will be shown for those
+interfaces where two parameters are defined: C<bandwidth-limit-in> and
+C<bandwidth-limit-out>. These interface parameters may be set by
+C<RFC2863_IF_MIB::bandwidth-limits> discovery parameter, or by selectors
+with the action C<Parameters>, or by setting C<RFC2863_IF_MIB::copy-params>.
+
+=item * C<RFC2863_IF_MIB::bandwidth-limits>
+
+Sefines the values (in megabits per second) for C<bandwidth-limit-in> and
+C<bandwidth-limit-out> interface parameters. Semicolon-separated list
+of (I<Inteface name>:I<Input limit>:I<Output limit>) values, for example:
+
+  <host>
+    <param name="snmp-host" value="10.1.1.5"/>
+    <param name="symbolic-name" value="bsr2k.example.net"/>
+    <param name="output-file" value="bsr2k.example.net.xml"/>
+    <param name="RFC2863_IF_MIB::bandwidth-usage" value="yes" />
+    <param name="RFC2863_IF_MIB::bandwidth-limits">
+      ethernet0_0:10:10; ethernet0_1:20:20;
+    </param>
+  </host>
+
 =back
 
 =head3 Other generic MIB parameters

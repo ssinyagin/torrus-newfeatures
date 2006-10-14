@@ -90,7 +90,16 @@
            value="Show all interface errors on one page"/>
     <param name="overview-page-title-errors"
            value="Interface errors"/>
-                      
+
+    <param name="overview-subleave-name-bandwidth"
+           value="Bandwidth_Usage"/>
+    <param name="overview-shortcut-text-bandwidth"
+           value="All bandwidth"/>
+    <param name="overview-shortcut-title-bandwidth"
+           value="Show all bandwidth usage on one page"/>
+    <param name="overview-page-title-errors"
+           value="Bandwidth usage"/>
+           
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
     <param name="data-file" value="%system-id%_%interface-nick%_if-mib.rrd" />
     <param name="graph-title" value="%descriptive-nickname%" />
@@ -338,6 +347,39 @@
     </leaf>
   </template>
 
+
+  <!-- Bandwidth usage in percentage of megabits
+       100 * (bytes * 8 / 1e6) / limit = bytes / (limit * 1250)  -->
+  <template name="interface-bandwidth-usage">
+    <leaf name="Bandwidth_Usage">
+      <param name="comment" value="Bandwidth usage graphs" />
+      <param name="vertical-label"   value="percent" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="graph-upper-limit" value="100" />
+      <param name="upper-limit"      value="100" />
+      <param name="rrd-hwpredict"    value="disabled" />
+      <param name="precedence"       value="998" />
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="in,out" />
+
+      <param name="ds-expr-in"
+         value="{Bytes_In},%bandwidth-limit-in%,1250.0,*,/" />
+      <param name="graph-legend-in"  value="Input bandwidth usage" />
+      <param name="line-style-in"    value="##BpsIn" />
+      <param name="line-color-in"    value="##BpsIn" />
+      <param name="line-order-in"    value="1" />
+
+      <param name="ds-expr-out"
+         value="{Bytes_Out},%bandwidth-limit-out%,1250.0,*,/" />
+      <param name="graph-legend-out" value="Output bandwidth usage" />
+      <param name="line-style-out"   value="##BpsOut" />
+      <param name="line-color-out"   value="##BpsOut" />
+      <param name="line-order-out"   value="2" />
+    </leaf>
+  </template>
+
+
+  
   <!-- ********************************************************************
 
   Templates for read-only access to RRD files

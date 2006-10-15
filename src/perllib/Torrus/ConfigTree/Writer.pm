@@ -44,6 +44,11 @@ foreach my $param ( @remspace )
     $Torrus::ConfigTree::Writer::remove_space{$param} = 1;
 }
 
+our %multigraph_remove_space =
+    ('ds-expr-' => 1,
+     'graph-legend-' => 0);
+
+
 # instance of Torrus::ServiceID object, if needed
 my $srvIdParams;
 
@@ -407,14 +412,17 @@ sub postProcessNodes
                 
                 foreach my $dname ( @dsNames )
                 {
-                    foreach my $param ( 'ds-expr-' )
+                    foreach my $param ( 'ds-expr-', 'graph-legend-' )
                     {
                         my $dsParam = $param . $dname;
                         my $value = $self->getNodeParam( $token, $dsParam );
                         if( defined( $value ) )
                         {
                             my $newValue = $value;
-                            $newValue =~ s/\s+//g;
+                            if( $multigraph_remove_space{$param} )
+                            {
+                                $newValue =~ s/\s+//g;
+                            }
                             $newValue =
                                 $self->expandSubstitutions( $token, $dsParam,
                                                             $newValue );

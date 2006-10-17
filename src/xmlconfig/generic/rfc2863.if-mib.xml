@@ -97,7 +97,7 @@
            value="All bandwidth"/>
     <param name="overview-shortcut-title-bandwidth"
            value="Show all bandwidth usage on one page"/>
-    <param name="overview-page-title-errors"
+    <param name="overview-page-title-bandwidth"
            value="Bandwidth usage"/>
            
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>

@@ -44,8 +44,10 @@ my %rrd_params =
 
 my %rrdmulti_params = ( 'ds-names' => undef );
 
-my %collector_params =
+# Plugins might need to add a new storage type
+our %collector_params =
     (
+     'collector-type'  => undef,
      '@storage-type'   => {
          'rrd' => {
              'data-file'              => undef,
@@ -86,7 +88,8 @@ my %collector_params =
      );
 
 
-my %leaf_params =
+# Plugins might in theory create new datasource types
+our %leaf_params =
     ('ds-type' => {'rrd-file' => \%rrd_params,
                    'rrd-multigraph' => \%rrdmulti_params,
                    'collector' => \%collector_params},

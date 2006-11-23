@@ -40,7 +40,6 @@ our %oiddef =
      
      );
 
-
 sub checkdevtype
 {
     my $dd = shift;
@@ -75,6 +74,29 @@ sub discover
     }
     $devdetails->storeSnmpVars( $table );
 
+    # External storage serviceid assignment
+    my $extSrv =
+        $devdetails->param('CiscoIOS_MacAccounting::external-serviceid');
+    if( defined( $extSrv ) and length( $extSrv ) > 0 )
+    {
+        my $extStorage = {};
+        foreach my $srvDef ( split( /\s*,\s*/, $extSrv ) )
+        {
+            my ( $serviceid, $peerName, $direction ) =
+                split( /\s*:\s*/, $srvDef );
+            if( $direction eq 'Both' )
+            {
+                $extStorage->{$peerName}{'In'} = $serviceid . '_IN';
+                $extStorage->{$peerName}{'Out'} = $serviceid . '_OUT';
+            }
+            else
+            {
+                $extStorage->{$peerName}{$direction} = $serviceid;
+            }
+        }
+        $data->{'cipMacExtStorage'} = $extStorage;
+    }
+    
     Torrus::DevDiscover::RFC2011_IP_MIB::discover($dd, $devdetails);
     Torrus::DevDiscover::RFC1657_BGP4_MIB::discover($dd, $devdetails);
     
@@ -165,7 +187,7 @@ sub discover
                 next;
             }
         }
-
+                    
         $data->{'cipMac'}{$ifIndex . ':' . $phyAddr} = $peer;
     }
 
@@ -230,14 +252,45 @@ sub buildConfig
         my $param = {
             'peer-macaddr'         => $peer->{'phyAddr'},
             'peer-macoid'          => $peer->{'macAddrOID'},
+            'peer-ipaddr'          => $peer->{'peerIP'},
             'interface-name'       => $peer->{'ifReferenceName'},
             'interface-nick'       => $peer->{'ifNick'},
             'comment'              => $peer->{'description'},
             'descriptive-nickname' => $peer->{'subtreeName'}
             };
 
-        $cb->addSubtree( $countersNode, $peer->{'subtreeName'}, $param,
-                         ['CiscoIOS_MacAccounting::cisco-macacc'] );
+        my $peerNode = $cb->addSubtree
+            ( $countersNode, $peer->{'subtreeName'}, $param,
+              ['CiscoIOS_MacAccounting::cisco-macacc'] );
+
+        if( defined( $data->{'cipMacExtStorage'} ) )
+        {
+            my $extStorage = $data->{'cipMacExtStorage'};
+        
+            foreach my $peerName ( 'AS'.$peer->{'peerAS'}, $peer->{'peerIP'},
+                                   $peer->{'phyAddr'} )
+            {
+                if( defined( $peerName ) )
+                {
+                    if( defined( $extStorage->{$peerName} ) )
+                    {
+                        foreach my $dir ( 'In', 'Out' )
+                        {
+                            if( defined( $extStorage->{$peerName}{$dir} ) )
+                            {
+                                $cb->addLeaf
+                                    ( $peerNode, 'Bytes_' . $dir,
+                                      { 'storage-type' => 'rrd,ext',
+                                        'ext-service-units' => 'bytes',
+                                        'ext-service-id' =>
+                                            $extStorage->{$peerName}{$dir} } );
+                            }
+                        }
+                        last;
+                    }
+                }
+            }
+        }
     }
 }
 

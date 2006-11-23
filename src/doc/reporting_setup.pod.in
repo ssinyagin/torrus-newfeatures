@@ -208,6 +208,13 @@ C<_IN> or C<_OUT> postfix accordingly, for input and output byte counters.
   UPSTREAM2:GigabitEthernet0_1_1:Both,
  </param>
 
+=item * C<CiscoIOS_MacAccounting::external-serviceid>
+
+The same format as for the parameter listed above, but instead of
+interface names, you can specify the MAC accounting peer, in one
+of the following formats: AS number (I<AS12345>), IP address, or peer's MAC
+address (I<0x0003319c4200>).
+
 =back
 
 

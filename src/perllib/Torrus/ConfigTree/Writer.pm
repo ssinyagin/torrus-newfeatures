@@ -28,6 +28,7 @@ our @ISA=qw(Torrus::ConfigTree);
 
 use Torrus::Log;
 use Torrus::TimeStamp;
+use Torrus::SiteConfig;
 use Torrus::ServiceID;
     
 use strict;
@@ -68,6 +69,8 @@ sub new
     bless $self, $class;
 
     $self->{'viewparent'} = {};
+    $self->{'mayRunCollector'} =
+        Torrus::SiteConfig::mayRunCollector( $self->treeName() );
 
     return $self;
 }
@@ -435,7 +438,7 @@ sub postProcessNodes
                     }
                 }
             }
-            elsif( $dsType eq 'collector' )
+            elsif( $dsType eq 'collector' and $self->{'mayRunCollector'} )
             {
                 my $dispersed =
                     $self->getNodeParam($token,

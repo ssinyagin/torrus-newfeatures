@@ -160,7 +160,7 @@ if it causes problems with your RDBMS.
   rep_time TIME NOT NULL,             /* Start time of the report */
   reportname VARCHAR(64) NOT NULL,    /* Report name, such as MonthlyUsage */
   iscomplete INTEGER NOT NULL,        /* 0 when the report is in progress, */
-                                      /* 1 when it's ready */
+                                      /* 1 when it is ready */
   UNIQUE(rep_date, rep_time, reportname)
   );
  CREATE INDEX rep_date_idx ON reports (rep_date);
@@ -307,4 +307,4 @@ Also clicking a service ID leads to its monthly report throughout the year.
 
 
 
-Copyright (c) 2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2005-2006 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

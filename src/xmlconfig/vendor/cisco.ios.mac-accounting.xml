@@ -55,6 +55,7 @@
     <param name="rrd-ds" value="%direction%" />
     <param name="rrd-create-dstype" value="COUNTER" />
     <param name="graph-title" value="%descriptive-nickname%" />
+    <param name="graph-lower-limit" value="0" />
 
     <param name="has-overview-shortcuts" value="yes"/>
     <param name="overview-shortcuts" value="traffic"/>

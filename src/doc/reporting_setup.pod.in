@@ -288,10 +288,11 @@ in the database:
  nice torrus report --genhtml --tree=mytree
 
 It makes sence to set up a monthly cron job and generate the reports on
-the first day of every month, with the command like follows
-(works with FreeBSD, and not with Linux):
+the first day of every month, with the command like follows:
 
- nice torrus report --report=MonthlyUsage --date=`date -v -1m +%F`
+ nice torrus report --report=MonthlyUsage \
+   --date=`perl -e 'use Date::Format;    
+         print time2str("%Y-%m-%d", time()-1728000)'`
 
 The HTML output is optimized for printing, and is quite easy
 to navigate. The overview page provides the list of years. Clicking to the

@@ -94,7 +94,9 @@ sub-elements defining various sections, like datasources or views:</p>
   &lt;/configuration&gt;</pre>
 <p>Multiple XML files are interpreted in additive matter, i.e.
 <code>&lt;datasources&gt;</code> section from one file is concatenated with
-the corresponding sections of previous files.</p>
+the corresponding sections of previous files. If the same
+parameter is defined for the same subtree in several input files,
+the last processed value gets into the configuration.</p>
 <p>Additional XML files may be added to the compilation list by means of
 <code>&lt;include&gt;</code> statement. They will be processed recursively
 before the content of the XML file they are referenced from.

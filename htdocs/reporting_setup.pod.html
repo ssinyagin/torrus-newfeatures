@@ -155,7 +155,7 @@ if it causes problems with your RDBMS.</p>
   rep_time TIME NOT NULL,             /* Start time of the report */
   reportname VARCHAR(64) NOT NULL,    /* Report name, such as MonthlyUsage */
   iscomplete INTEGER NOT NULL,        /* 0 when the report is in progress, */
-                                      /* 1 when it's ready */
+                                      /* 1 when it is ready */
   UNIQUE(rep_date, rep_time, reportname)
   );
  CREATE INDEX rep_date_idx ON reports (rep_date);</pre>
@@ -263,10 +263,11 @@ in the database:</p>
 <pre>
  nice torrus report --genhtml --tree=mytree</pre>
 <p>It makes sence to set up a monthly cron job and generate the reports on
-the first day of every month, with the command like follows
-(works with FreeBSD, and not with Linux):</p>
+the first day of every month, with the command like follows:</p>
 <pre>
- nice torrus report --report=MonthlyUsage --date=`date -v -1m +%F`</pre>
+ nice torrus report --report=MonthlyUsage \
+   --date=`perl -e 'use Date::Format;    
+         print time2str(&quot;%Y-%m-%d&quot;, time()-1728000)'`</pre>
 <p>The HTML output is optimized for printing, and is quite easy
 to navigate. The overview page provides the list of years. Clicking to the
 year leads you into the list of monthly reports available.
@@ -277,7 +278,7 @@ maximum rate throughout the month, unavailable samples (how many 5-minutes
 intervals are missed in the collected data), and monthly volume (which
 is roughly less than the actual volume by the percentage of missed samples).
 Also clicking a service ID leads to its monthly report throughout the year.</p>
-<p>Copyright (c) 2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2005-2006 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

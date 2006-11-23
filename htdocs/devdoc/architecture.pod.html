@@ -3,7 +3,7 @@
 <head>
 <title>Torrus Framework Architecture</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gp@familiehaase.de" />
+<link rev="made" href="mailto:gerrit@familiehaase.de" />
 </head>
 
 <body>
@@ -73,8 +73,10 @@ parameters are inherited from this token's parameters.</p>
 <p>View and monitor names must be unique, and must
 start with a lower case letter.</p>
 <p><strong>db_config_instances.db</strong> is a <em>Hash</em> database, with keys of form
-<code>ds:&gt;tree_name&lt;</code> or <code>other:&gt;tree_name&lt;</code>, and 0 or 1 as
-values.</p>
+<code>ds:&lt;tree_name&gt;</code> or <code>other:&lt;tree_name&gt;</code>, and 0 or 1 as
+values. Also the compiler addts an entry <code>compiling:&lt;tree_name&gt;</code>
+during the compilation time, in order to avoid two compiler processes
+running at the same time on the same tree.</p>
 <p><strong>ds_config_INST.db</strong> is a <em>Btree</em> database, with the keys and values
 defined as follows:</p>
 <ul>
@@ -232,6 +234,39 @@ unneccessary configuration tree walk. Keys and values are as follows:</p>
 <li><strong><a name="item__3ctoken_3e__2d_2d__3cperiod_3e_3a_3coffset_3e">&lt;token&gt; -- &lt;period&gt;:&lt;offset&gt;</a></strong><br />
 </li>
 For each leaf token, period and time offset values are stored.
+<p></p></ul>
+<p><strong>snmp_lookup.db</strong> is a <em>Btree</em> database used by SNMP collector module.
+It serves as a persistent storage for such SNMP data as interface names etc.</p>
+<ul>
+<li><strong><a name="item_f_3a__2d_2d__3cformat_3e">F: -- &lt;format&gt;</a></strong><br />
+</li>
+Specifies the format version string. If the collector module's version
+string is different from the one in the database, the database is automatically
+flushed.
+<p></p>
+<li><strong><a name="item_m_3a_3cipaddr_3e_2f_3cport_3e_2f_3ccommunity_3e__5">M:&lt;ipaddr&gt;/&lt;port&gt;/&lt;community&gt;
+\0&lt;map&gt;\0&lt;key&gt; -- &lt;index&gt;</a></strong><br />
+</li>
+Community may contain SNMPv3 user name. Each record stores an SNMP reverse
+lookup for a table given in &lt;map&gt; parameter. &lt;key&gt; contains
+the OID return value, and &lt;index&gt; contains the index in the table.
+<p></p>
+<li><strong><a name="item_v_3a_3cipaddr_3e_2f_3cport_3e_2f_3ccommunity_3e__5">V:&lt;ipaddr&gt;/&lt;port&gt;/&lt;community&gt;
+\0&lt;oid&gt; -- &lt;value&gt;</a></strong><br />
+</li>
+These records contain the SNMP values for given OIDs.
+<p></p>
+<li><strong><a name="item_b_3a_3cipaddr_3e_2f_3cport_3e_2f_3ccommunity_3e__2">B:&lt;ipaddr&gt;/&lt;port&gt;/&lt;community&gt;
+-- &lt;timestamp&gt;</a></strong><br />
+</li>
+UNIX timestamp for the SNMP agent boot time.
+<p></p>
+<li><strong><a name="item_u_3a_3cipaddr_3e_2f_3cport_3e_2f_3ccommunity_3e__2">U:&lt;ipaddr&gt;/&lt;port&gt;/&lt;community&gt;
+-- &lt;timestamp&gt;</a></strong><br />
+</li>
+UNIX timestamp of the last update for this SNMP agent.
+The collector periodically re-scans the SNMP hosts,
+and if the host information is too old it will be deleted.
 <p></p></ul>
 <p><strong>scheduler_stats.db</strong> is a <em>Btree</em> database which stores the runtime
 statistics of Scheduler tasks. Each key is of structure

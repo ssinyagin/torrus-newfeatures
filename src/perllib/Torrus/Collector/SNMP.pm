@@ -49,6 +49,8 @@ $Torrus::Collector::params{'snmp'} = {
     'snmp-retries'      => undef,
     'domain-name'       => undef,
     'snmp-host'         => undef,
+    'snmp-localaddr'    => undef,
+    'snmp-localport'    => undef,
     'snmp-object'       => undef,
     'snmp-oids-per-pdu' => undef,
     'snmp-object-type'  => 'OTHER',
@@ -239,6 +241,14 @@ sub snmpSessionArgs
                 -retries      => $collector->param($token, 'snmp-retries'),
                 -version      => $version );
 
+    foreach my $arg ( qw(-localaddr -localport) )
+    {
+        if( defined( $collector->param($token, 'snmp' . $arg) ) )
+        {
+            push( @ret, $arg, $collector->param($token, 'snmp' . $arg) );
+        }
+    }
+            
     if( $version eq '1' or $version eq '2c' )
     {
         push( @ret, '-community', $community );

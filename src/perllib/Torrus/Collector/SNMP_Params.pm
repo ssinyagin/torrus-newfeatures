@@ -26,6 +26,8 @@ my %validatorLeafParams =
     (
      'snmp-host'          => undef,
      'snmp-port'          => undef,
+     '+snmp-localaddr'    => undef,
+     '+snmp-localport'    => undef,
      '+domain-name'       => undef,     
      'snmp-object'        => undef,
      'snmp-version'       => { '1'  => { 'snmp-community'     => undef },
@@ -64,6 +66,8 @@ my %admInfoLeafParams =
     (
      'snmp-host'          => undef,
      'snmp-port'          => undef,
+     'snmp-localaddr'     => undef,
+     'snmp-localport'     => undef,
      'domain-name'        => undef,
      'snmp-community'     => undef,
      'snmp-username'      => undef,
@@ -87,6 +91,8 @@ my %admInfoParamCategories =
     (
      'snmp-host'          => 'SNMP',
      'snmp-port'          => 'SNMP',
+     'snmp-localaddr'     => 'SNMP',
+     'snmp-localport'     => 'SNMP',
      'domain-name'        => 'SNMP',
      'snmp-community'     => 'SNMP',
      'snmp-username'      => 'SNMP',

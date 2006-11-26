@@ -69,6 +69,8 @@ our @copyParams =
       'monitor-timeoffset',
       'snmp-host',
       'snmp-port',
+      'snmp-localaddr',
+      'snmp-localport',
       'snmp-community',
       'snmp-version',
       'snmp-username',
@@ -155,7 +157,7 @@ sub discover
     my $version = $devdetails->param( 'snmp-version' );
     $snmpargs{'-version'} = $version;    
 
-    foreach my $arg ( qw(-port -timeout -retries) )
+    foreach my $arg ( qw(-port -localaddr -localport -timeout -retries) )
     {
         $snmpargs{$arg} = $devdetails->param( 'snmp' . $arg );
     }

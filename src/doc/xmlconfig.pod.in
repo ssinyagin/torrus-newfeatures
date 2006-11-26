@@ -778,6 +778,10 @@ SNMP agent.
 Optional DNS domain name. If given, and if C<snmp-host> does not contain
 dot symbol (.), this domain name is appended to C<snmp-host>.
 
+=item * C<snmp-localaddr> and C<snmp-localport>
+
+Optional parameters specifying the local socket binding address and port.
+
 =item * C<snmp-version>
 
 Mandatory when C<collector-type=snmp>. Specifies the SNMP version for the

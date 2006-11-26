@@ -267,6 +267,9 @@ copied one-to-one to the output configuration.
 
 Optional. Defines a DNS domain name to be appended to C<snmp-host>.
 
+=item * C<snmp-localaddr> and C<snmp-localport>
+
+Optional parameters specifying the local socket binding address and port.
 
 =item * C<data-dir>
 

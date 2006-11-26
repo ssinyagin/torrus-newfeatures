@@ -1,3 +1,9 @@
+2006-11-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm: new SNMP parameters:
+	  snmp-localaddr and snmp-localport
+
+
 2006-11-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS_MacAccounting.pm:

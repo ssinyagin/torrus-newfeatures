@@ -70,7 +70,7 @@
     <param name="action-type" value="exec" />
     <param name="command">
       echo `date '+%d-%b-%Y %H:%M:%S'` \
-      $Torrus_MONITOR $Torrus_EVENT $Torrus_NODEPATH \
+      $TORRUS_MONITOR $TORRUS_EVENT $TORRUS_NODEPATH \
       &gt;&gt; /tmp/torrus-events
     </param>
     <param name="launch-when" value="set, repeat, clear, forget" />
@@ -78,14 +78,14 @@
 
   <action name="snmptrap">
     <param name="action-type" value="exec" />
-    <param name="command" value="$Torrus_HOME/bin/action_snmptrap" />
+    <param name="command" value="$TORRUS_HOME/bin/action_snmptrap" />
     <param name="launch-when" value="set, clear" />
   </action>
 
   <action name="report-email">
     <param name="action-type" value="exec" />
     <param name="command">
-      $Torrus_HOME/bin/action_printemail | mail ssinyagin@yahoo.com
+      $TORRUS_HOME/bin/action_printemail | mail ssinyagin@yahoo.com
     </param>
     <param name="launch-when" value="set, clear" />
   </action>

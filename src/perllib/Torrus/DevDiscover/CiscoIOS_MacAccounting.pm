@@ -187,6 +187,12 @@ sub discover
                 next;
             }
         }
+
+        if( defined( $peer->{'description'} ) )
+        {
+            $peer->{'description'} .= ' ';
+        }
+        $peer->{'description'} .= '[' . $peerIP . ']';
                     
         $data->{'cipMac'}{$ifIndex . ':' . $phyAddr} = $peer;
     }

@@ -159,7 +159,10 @@ sub discover
 
     foreach my $arg ( qw(-port -localaddr -localport -timeout -retries) )
     {
-        $snmpargs{$arg} = $devdetails->param( 'snmp' . $arg );
+        if( defined( $devdetails->param( 'snmp' . $arg ) ) )
+        {
+            $snmpargs{$arg} = $devdetails->param( 'snmp' . $arg );
+        }
     }
     
     if( $version eq '1' or $version eq '2c' )

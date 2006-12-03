@@ -95,7 +95,7 @@ sub setParam
 
     if( $Torrus::ConfigTree::Writer::remove_space{$param} )
     {
-        $value =~ s/\s+//g;
+        $value =~ s/\s+//go;
     }
 
     $self->{'paramcache'}{$name}{$param} = $value;
@@ -112,7 +112,7 @@ sub setNodeParam
 
     if( $Torrus::ConfigTree::Writer::remove_space{$param} )
     {
-        $value =~ s/\s+//g;
+        $value =~ s/\s+//go;
     }
 
     $self->{'paramcache'}{$name}{$param} = $value;
@@ -168,7 +168,7 @@ sub addChild
         {
             $nodeType = 2; # alias
         }
-        elsif( $childname =~ /\/$/ )
+        elsif( $childname =~ /\/$/o )
         {
             $nodeType = 0; # subtree
         }
@@ -192,9 +192,9 @@ sub setAlias
     my $iamLeaf = $self->isLeaf($token);
 
     # TODO: Add more verification here
-    if( not defined($apath) or $apath !~ /^\// or
-        ( not $iamLeaf and $apath !~ /\/$/ ) or
-        ( $iamLeaf and $apath =~ /\/$/ ) )
+    if( not defined($apath) or $apath !~ /^\//o or
+        ( not $iamLeaf and $apath !~ /\/$/o ) or
+        ( $iamLeaf and $apath =~ /\/$/o ) )
     {
         my $path = $self->path($token);
         Error("Incorrect alias at $path: $apath"); $ok = 0;
@@ -312,7 +312,7 @@ sub isTrueVar
         if( defined( $value ) )
         {
             if( $value eq 'true' or
-                $value =~ /^\d+$/ and $value )
+                $value =~ /^\d+$/o and $value )
             {
                 $ret = 1;
             }
@@ -387,7 +387,7 @@ sub postProcessNodes
         my $tsets = $self->getNodeParam( $token, 'tokenset-member' );
         if( defined( $tsets ) )
         {
-            foreach my $tset ( split(',', $tsets) )
+            foreach my $tset ( split(/,/o, $tsets) )
             {
                 my $tsetName = 'S'.$tset;
                 if( not $self->tsetExists( $tsetName ) )
@@ -411,7 +411,7 @@ sub postProcessNodes
                 # Expand parameter substitutions in multigraph leaves
                 
                 my @dsNames =
-                    split(',', $self->getNodeParam($token, 'ds-names') );
+                    split(/,/o, $self->getNodeParam($token, 'ds-names') );
                 
                 foreach my $dname ( @dsNames )
                 {
@@ -424,7 +424,7 @@ sub postProcessNodes
                             my $newValue = $value;
                             if( $multigraph_remove_space{$param} )
                             {
-                                $newValue =~ s/\s+//g;
+                                $newValue =~ s/\s+//go;
                             }
                             $newValue =
                                 $self->expandSubstitutions( $token, $dsParam,
@@ -499,7 +499,7 @@ sub postProcessNodes
 
                 my $storagetypes =
                     $self->getNodeParam( $token, 'storage-type' );
-                foreach my $stype ( split(',', $storagetypes) )
+                foreach my $stype ( split(/,/o, $storagetypes) )
                 {
                     if( $stype eq 'ext' )
                     {

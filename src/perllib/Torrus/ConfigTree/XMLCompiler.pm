@@ -203,14 +203,14 @@ sub compile_params
         else
         {
             # Remove spaces in the head and tail.
-            $value =~ s/^\s+//;
-            $value =~ s/\s+$//;
+            $value =~ s/^\s+//o;
+            $value =~ s/\s+$//o;
 
             if( $param eq 'legend' )
             {
                 # Remove space around delimiters
-                $value =~ s/\s*\:\s*/\:/g;
-                $value =~ s/\s*\;\s*/\;/g;
+                $value =~ s/\s*\:\s*/\:/go;
+                $value =~ s/\s*\;\s*/\;/go;
             }
             elsif( $param eq 'ds-type' and $value eq 'RRDfile' )
             {
@@ -272,7 +272,7 @@ sub expand_name
     my $childname = shift;
     if( index($childname, '$PARENT') > -1 )
     {
-        my @pathparts = split('/', $parentpath);
+        my @pathparts = split(/\//o, $parentpath);
         my $parentname = pop @pathparts;
         $childname =~ s/\$PARENT/$parentname/g;
     }
@@ -284,8 +284,8 @@ sub validate_nodename
     my $self = shift;
     my $name = shift;
 
-    return ( $name =~ /^[0-9A-Za-z_\-\.]+$/ and
-             $name !~ /\.\./ );
+    return ( $name =~ /^[0-9A-Za-z_\-\.]+$/o and
+             $name !~ /\.\./o );
 }
 
 sub compile_subtrees
@@ -328,7 +328,7 @@ sub compile_subtrees
     foreach my $alias ( $node->getChildrenByTagName('alias') )
     {
         my $apath = $alias->textContent();
-        $apath =~ s/\s+//mg;
+        $apath =~ s/\s+//mgo;
         $ok = $self->setAlias($token, $apath) ? $ok:0;
     }
 

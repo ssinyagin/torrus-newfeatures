@@ -104,8 +104,24 @@ $SIG{'TERM'} = sub
 $SIG{'INT'} = sub
 {
     Warn('Collector process interrupted');
+    unlink $pidfile;
     exit 1;
 };
+
+$SIG{'PIPE'} = sub
+{
+    Warn('Collector process terminated due to SIGPIPE');
+    unlink $pidfile;
+    exit 1;
+};
+
+$SIG{'QUIT'} = sub
+{
+    Warn('Collector process terminated due to SIGQUIT');
+    unlink $pidfile;
+    exit 1;
+};
+
 
 if( not $nodaemon and not $runonce )
 {

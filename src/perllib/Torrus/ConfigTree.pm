@@ -301,7 +301,7 @@ sub waitReaders
         my $cursor = $self->{'db_readers'}->cursor();
         while( my ($key, $val) = $self->{'db_readers'}->next( $cursor ) )
         {
-            my( $timestamp, $dsInst, $otherInst ) = split( ':', $val );
+            my( $timestamp, $dsInst, $otherInst ) = split( /:/o, $val );
             if( $dsInst == $self->{'ds_config_instance'} or
                 $otherInst == $self->{'other_config_instance'} )
             {
@@ -343,7 +343,8 @@ sub waitReaders
                 while( my ($key, $val) =
                        $self->{'db_readers'}->next( $cursor ) )
                 {
-                    my( $timestamp, $dsInst, $otherInst ) = split( ':', $val );
+                    my( $timestamp, $dsInst, $otherInst ) =
+                        split( /:/o, $val );
                     if( $dsInst == $self->{'ds_config_instance'} or
                         $otherInst == $self->{'other_config_instance'} )
                     {
@@ -388,7 +389,7 @@ sub splitPath
     while( length($path) > 0 )
     {
         my $node;
-        $path =~ s/^([^\/]*\/?)//; $node = $1;
+        $path =~ s/^([^\/]*\/?)//o; $node = $1;
         push(@ret, $node);
     }
     return @ret;
@@ -398,7 +399,7 @@ sub nodeName
 {
     my $self = shift;
     my $path = shift;
-    $path =~ s/.*\/([^\/]+)\/?$/$1/;
+    $path =~ s/.*\/([^\/]+)\/?$/$1/o;
     return $path;
 }
 
@@ -479,7 +480,7 @@ sub getAliases
     my $self = shift;
     my $token = shift;
 
-    return split( ',', $self->{'db_dsconfig'}->get( 'ar:'.$token ) );
+    return split( /,/o, $self->{'db_dsconfig'}->get( 'ar:'.$token ) );
 }
 
 
@@ -677,7 +678,7 @@ sub getParamNames
 
     my $db = $fromDS ? $self->{'db_dsconfig'} : $self->{'db_otherconfig'};
 
-    return split( ',', $db->get( 'Pl:'.$name ) );
+    return split( /,/o, $db->get( 'Pl:'.$name ) );
 }
 
 sub getParams
@@ -726,7 +727,7 @@ sub getChildren
 
         if( defined $children )
         {
-            my @clist = split(',', $children);
+            my @clist = split(/,/o, $children);
             map { $self->{'parentcache'}{$_} = $token; } @clist;
             return @clist;
         }
@@ -746,7 +747,7 @@ sub getNodesByPattern
     my $self = shift;
     my $pattern = shift;
 
-    if( $pattern !~ /^\// )
+    if( $pattern !~ /^\//o )
     {
         Error("Incorrect pattern: $pattern");
         return undef;
@@ -759,9 +760,9 @@ sub getNodesByPattern
 
         # Cut the trailing slash, if any
         my $patternname = $nodepattern;
-        $patternname =~ s/\/$//;
+        $patternname =~ s/\/$//o;
 
-        if( $patternname =~ /\W/ )
+        if( $patternname =~ /\W/o )
         {
             foreach my $candidate ( @retlist )
             {
@@ -770,8 +771,8 @@ sub getNodesByPattern
                 {
                     # Cut the trailing slash and leading path
                     my $childname = $self->path($child);
-                    $childname =~ s/\/$//;
-                    $childname =~ s/.*\/([^\/]+)$/$1/;
+                    $childname =~ s/\/$//o;
+                    $childname =~ s/.*\/([^\/]+)$/$1/o;
                     if( $childname =~ $patternname )
                     {
                         push( @next_retlist, $child );
@@ -809,7 +810,7 @@ sub getRelative
     my $token = shift;
     my $relPath = shift;
 
-    if( $relPath =~ /^\// )
+    if( $relPath =~ /^\//o )
     {
         return $self->token( $relPath );
     }
@@ -822,9 +823,9 @@ sub getRelative
 
         while( length( $relPath ) > 0 )
         {
-            if( $relPath =~ /^\.\.\// )
+            if( $relPath =~ /^\.\.\//o )
             {
-                $relPath =~ s/^\.\.\///;
+                $relPath =~ s/^\.\.\///o;
                 if( $token ne $self->token('/') )
                 {
                     $token = $self->getParent( $token );
@@ -833,7 +834,7 @@ sub getRelative
             else
             {
                 my $childName;
-                $relPath =~ s/^([^\/]*\/?)//; $childName = $1;
+                $relPath =~ s/^([^\/]*\/?)//o; $childName = $1;
                 my $path = $self->path( $token );
                 $token = $self->token( $path . $childName );
                 if( not defined $token )
@@ -909,7 +910,7 @@ sub getViewNames
     my $self = shift;
     my $vlist = $self->{'db_otherconfig'}->get( 'V:' );
 
-    return defined($vlist) ? split(',', $vlist) : ();
+    return defined($vlist) ? split(/,/o, $vlist) : ();
 }
 
 
@@ -926,7 +927,7 @@ sub getMonitorNames
     my $self = shift;
     my $mlist = $self->{'db_otherconfig'}->get( 'M:' );
 
-    return defined($mlist) ? split(',', $mlist) : ();
+    return defined($mlist) ? split(/,/o, $mlist) : ();
 }
 
 sub monitorExists
@@ -942,7 +943,7 @@ sub getActionNames
     my $self = shift;
     my $alist = $self->{'db_otherconfig'}->get( 'A:' );
 
-    return defined($alist) ? split(',', $alist) : ();
+    return defined($alist) ? split(/,/o, $alist) : ();
 }
 
 
@@ -992,7 +993,7 @@ sub getTsets
 {
     my $self = shift;
     my $list = $self->{'db_sets'}->get('S:');
-    return defined($list) ? split(',', $list) : ();
+    return defined($list) ? split(/,/o, $list) : ();
 }
 
 sub tsetMembers
@@ -1001,7 +1002,7 @@ sub tsetMembers
     my $tset = shift;
 
     my $list = $self->{'db_sets'}->get('s:'.$tset);
-    return defined($list) ? split(',', $list) : ();
+    return defined($list) ? split(/,/o, $list) : ();
 }
 
 sub tsetAddMember
@@ -1037,7 +1038,7 @@ sub getDefinitionNames
     my $self = shift;
     my $dlist = $self->{'db_dsconfig'}->get( 'D:' );
 
-    return defined($dlist) ? split(',', $dlist) : ();
+    return defined($dlist) ? split(/,/o, $dlist) : ();
 }
 
 

@@ -242,24 +242,63 @@ sub initTargetAttributes
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'cisco-cbqos' );
 
+    if( Torrus::Collector::SNMP::activeMappingSessions() > 0 )
+    {
+        # ifDescr mapping tables are not yet ready
+        $cref->{'cbQoSNeedsRemapping'}{$token} = 1;
+        return 1;
+    }
+
     my $ipaddr = $tref->{'ipaddr'};
     my $port = $collector->param($token, 'snmp-port');
-    my $community = $collector->param($token, 'snmp-community');
 
-    if( Torrus::Collector::SNMP::isHostDead
-        ( $collector, $ipaddr, $port, $community ) )
+    my $version = $collector->param($token, 'snmp-version');
+    my $community;
+    if( $version eq '1' or $version eq '2c' )
+    {
+        $community = $collector->param($token, 'snmp-community');
+    }
+    else
+    {
+        # We use community string to identify the agent.
+        # For SNMPv3, it's the user name
+        $community = $collector->param($token, 'snmp-username');
+    }
+
+    my $hosthash = join('|', $ipaddr, $port, $community);
+    $tref->{'hosthash'} = $hosthash;
+    
+    if( Torrus::Collector::SNMP::isHostDead( $collector, $hosthash ) )
     {
         return 0;
     }
 
     if( not Torrus::Collector::SNMP::checkUnreachableRetry
-        ( $collector, $ipaddr, $port, $community ) )
+        ( $collector, $hosthash ) )
     {
         return 1;
     }
+
+    my $ifDescr = $collector->param($token, 'cbqos-interface-name');
+    my $ifIndex =
+        Torrus::Collector::SNMP::lookupMap( $collector, $token,
+                                            $hosthash,
+                                            $oiddef{'ifDescr'}, $ifDescr );
+
+    if( not defined( $ifIndex ) )
+    {
+        Debug('ifDescr mapping tables are not yet ready for ' . $hosthash);
+        $cref->{'cbQoSNeedsRemapping'}{$token} = 1;
+        return 1;
+    }
+    elsif( $ifIndex eq 'notfound' )
+    {
+        Error("Cannot find ifDescr mapping for $ifDescr at $hosthash");
+        return undef;
+    }
     
     my $session = Torrus::Collector::SNMP::openBlockingSession
-        ( $collector, $token, $ipaddr, $port, $community );
+        ( $collector, $token, $hosthash );
     if( not defined($session) )
     {
         return 0;
@@ -267,12 +306,12 @@ sub initTargetAttributes
 
     # Retrieve and translate cbQosServicePolicyTable
 
-    if( not defined $cref->{'ServicePolicyTable'}{$ipaddr}{$port}{$community} )
+    if( not defined $cref->{'ServicePolicyTable'}{$hosthash} )
     {
         Debug("Retrieving Cisco cbQoS maps from $ipaddr");
 
         my $ref = {};
-        $cref->{'ServicePolicyTable'}{$ipaddr}{$port}{$community} = $ref;
+        $cref->{'ServicePolicyTable'}{$hosthash} = $ref;
 
         my $result =
             $session->get_table( -baseoid =>
@@ -287,7 +326,7 @@ sub initTargetAttributes
             if( $session->error_status() == 0 )
             {
                 return Torrus::Collector::SNMP::probablyDead
-                    ( $collector, $ipaddr, $port, $community );
+                    ( $collector, $hosthash );
             }
             else
             {
@@ -313,7 +352,7 @@ sub initTargetAttributes
         }
 
         my $mapRef = {};
-        $cref->{'ServicePolicyMapping'}{$ipaddr}{$port}{$community} = $mapRef;
+        $cref->{'ServicePolicyMapping'}{$hosthash} = $mapRef;
 
         foreach my $policyIndex ( keys %{$ref} )
         {
@@ -329,10 +368,10 @@ sub initTargetAttributes
 
     # Retrieve config information from cbQosxxxCfgTable
 
-    if( not defined $cref->{'CfgTable'}{$ipaddr}{$port}{$community} )
+    if( not defined $cref->{'CfgTable'}{$hosthash} )
     {
         my $ref = {};
-        $cref->{'CfgTable'}{$ipaddr}{$port}{$community} = $ref;
+        $cref->{'CfgTable'}{$hosthash} = $ref;
 
         foreach my $table ( 'cbQosPolicyMapName', 'cbQosCMName',
                             'cbQosMatchStmtName', 'cbQosQueueingCfgBandwidth',
@@ -367,10 +406,10 @@ sub initTargetAttributes
 
     # Retrieve and translate cbQosObjectsTable
 
-    if( not defined $cref->{'ObjectsTable'}{$ipaddr}{$port}{$community} )
+    if( not defined $cref->{'ObjectsTable'}{$hosthash} )
     {
         my $ref = {};
-        $cref->{'ObjectsTable'}{$ipaddr}{$port}{$community} = $ref;
+        $cref->{'ObjectsTable'}{$hosthash} = $ref;
 
         my $result =
             $session->get_table( -baseoid =>
@@ -385,7 +424,7 @@ sub initTargetAttributes
             if( $session->error_status() == 0 )
             {
                 return Torrus::Collector::SNMP::probablyDead
-                    ( $collector, $ipaddr, $port, $community );
+                    ( $collector, $hosthash );
             }
             else
             {
@@ -437,7 +476,7 @@ sub initTargetAttributes
                     $objTypeAttributes{$parentType}{'name-oid'};
 
                 my $parentName = 
-                    $cref->{'CfgTable'}{$ipaddr}{$port}{$community}{
+                    $cref->{'CfgTable'}{$hosthash}{
                         $parentCfgIndex}{$parentNameOid};
                 
                 $objectID .= $parentName . ':';
@@ -451,7 +490,7 @@ sub initTargetAttributes
 
             if( defined($objNameOid) )
             {
-                $objectID .= $cref->{'CfgTable'}{$ipaddr}{$port}{$community}{
+                $objectID .= $cref->{'CfgTable'}{$hosthash}{
                     $objCfgIndex}{$objNameOid};
             }
             
@@ -459,17 +498,11 @@ sub initTargetAttributes
         }
     }
 
-    # Finished retrieving tables (except ifIndex)
+    # Finished retrieving tables
     # now find the snmp-object from token parameters
 
     # Prepare values for cbQosServicePolicyTable match
-
-    my $ifDescr = $collector->param($token, 'cbqos-interface-name');
-    my $ifIndex =
-        Torrus::Collector::SNMP::lookupMap( $collector, $token,
-                                          $ipaddr, $port, $community,
-                                          $oiddef{'ifDescr'}, $ifDescr );
-
+    
     my %policyParamValues = ( 'cbQosIfIndex' => $ifIndex );
     while( my($name, $param) = each %servicePolicyTableParams )
     {
@@ -480,7 +513,7 @@ sub initTargetAttributes
 
     # Find the entry in cbQosServicePolicyTable
 
-    my $mapRef = $cref->{'ServicePolicyMapping'}{$ipaddr}{$port}{$community};
+    my $mapRef = $cref->{'ServicePolicyMapping'}{$hosthash};
 
     my $mapString = '';
     foreach my $entryName ( @servicePolicyTableEntries )
@@ -517,7 +550,7 @@ sub initTargetAttributes
         $theObjectID .= $collector->param( $token, $objNameParam );
     }
     
-    my $theObjectIndex = $cref->{'ObjectsTable'}{$ipaddr}{$port}{$community}->{
+    my $theObjectIndex = $cref->{'ObjectsTable'}{$hosthash}->{
         $thePolicyIndex}{$theObjectID};
 
     if( not defined( $theObjectIndex ) )
@@ -558,42 +591,28 @@ sub postProcess
     # We use some SNMP collector internals
     my $scref = $collector->collectorData( 'snmp' );
 
-    # First time is executed right after collector initialization,
-    # so there's no need to initTargetAttributes()
-
-    if( exists( $scref->{'notFirstTimePostProcess'} ) )
+    # Flush all QoS object mapping
+    foreach my $token ( keys %{$scref->{'needsRemapping'}},
+                        keys %{$cref->{'cbQoSNeedsRemapping'}} )
     {
-        # Flush all QoS object mapping
-        foreach my $token ( keys %{$scref->{'needsRemapping'}} )
+        if( $cref->{'QosEnabled'}{$token} )
         {
-            if( $cref->{'QosEnabled'}{$token} )
-            {
-                my $tref = $collector->tokenData( $token );
-                my $ipaddr = $tref->{'ipaddr'};
-                my $port = $collector->param($token, 'snmp-port');
-                my $community = $collector->param($token, 'snmp-community');
-                
-                delete $cref->{
-                    'ServicePolicyTable'}{$ipaddr}{$port}{$community};
-                delete $cref->{
-                    'ServicePolicyMapping'}{$ipaddr}{$port}{$community};
-                delete $cref->{
-                    'ObjectsTable'}{$ipaddr}{$port}{$community};
-                delete $cref->{
-                    'CfgTable'}{$ipaddr}{$port}{$community};
+            my $tref = $collector->tokenData( $token );
+            my $hosthash = $tref->{'hosthash'};    
             
-                delete $scref->{'needsRemapping'}{$token};
-                if( not Torrus::Collector::Cisco_cbQoS::initTargetAttributes
-                    ( $collector, $token ) )
-                {
-                    $collector->deleteTarget($token);
-                }
+            delete $cref->{'ServicePolicyTable'}{$hosthash};
+            delete $cref->{'ServicePolicyMapping'}{$hosthash};
+            delete $cref->{'ObjectsTable'}{$hosthash};
+            delete $cref->{'CfgTable'}{$hosthash};
+            
+            delete $scref->{'needsRemapping'}{$token};
+            delete $cref->{'cbQoSNeedsRemapping'}{$token};
+            if( not Torrus::Collector::Cisco_cbQoS::initTargetAttributes
+                ( $collector, $token ) )
+            {
+                $collector->deleteTarget($token);
             }
         }
-    }
-    else
-    {
-        $scref->{'notFirstTimePostProcess'} = 1;
     }
 }
 

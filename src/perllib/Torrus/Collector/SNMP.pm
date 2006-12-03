@@ -59,6 +59,13 @@ $Torrus::Collector::params{'snmp'} = {
 
 my $sysUpTime = '1.3.6.1.2.1.1.3.0';
 
+# SNMP tables lookup maps
+my %maps;
+
+# Net::SNMP session objects for pending map lookups
+my @mapSessions;
+
+
 # This is first executed per target
 
 $Torrus::Collector::initTarget{'snmp'} = \&Torrus::Collector::SNMP::initTarget;
@@ -113,27 +120,29 @@ sub initTargetAttributes
         $community = $collector->param($token, 'snmp-username');
     }
 
+    my $hosthash = join('|', $ipaddr, $port, $community);
+    $tref->{'hosthash'} = $hosthash;
+
     # If the object is defined as a map, retrieve the whole map
     # and cache it.
 
-    if( isHostDead( $collector, $ipaddr, $port, $community ) )
+    if( isHostDead( $collector, $hosthash ) )
     {
         return 0;
     }
         
-    if( not checkUnreachableRetry( $collector, $ipaddr, $port, $community ) )
+    if( not checkUnreachableRetry( $collector, $hosthash ) )
     {
         $cref->{'needsRemapping'}{$token} = 1;
         return 1;
     }
     
     my $oid = $collector->param($token, 'snmp-object');
-    $oid = expandOidMappings( $collector, $token, $ipaddr, $port, $community,
-                              $oid );
+    $oid = expandOidMappings( $collector, $token, $hosthash, $oid );
 
     if( not $oid )
     {
-        if( $cref->{'unreachableHostDeleted'}{$ipaddr}{$port}{$community} )
+        if( $cref->{'unreachableHostDeleted'}{$hosthash} )
         {
             # we tried our best, but the target is dead
             return 0;
@@ -152,17 +161,17 @@ sub initTargetAttributes
 
     # Collector should be able to find the target
     # by host, port, community, and oid.
-    # There can be several targets with the same host/port/community/oid set.
+    # There can be several targets with the same host|port|community+oid set.
 
-    $cref->{'targets'}{$ipaddr}{$port}{$community}{$oid}{$token} = 1;
+    $cref->{'targets'}{$hosthash}{$oid}{$token} = 1;
 
-    # One representative for each host:port:community triple.
+    # One representative for each host|port|community triple.
     # I assume overridiing is faster than checking if it's already there
-    $cref->{'reptoken'}{$ipaddr}{$port}{$community} = $token;
+    $cref->{'reptoken'}{$hosthash} = $token;
 
     $tref->{'oid'} = $oid;
 
-    $cref->{'oids_per_pdu'}{$ipaddr}{$port}{$community} =
+    $cref->{'oids_per_pdu'}{$hosthash} =
         $collector->param($token, 'snmp-oids-per-pdu');
 
     if( $collector->param($token, 'snmp-object-type') eq 'COUNTER64' )
@@ -172,7 +181,7 @@ sub initTargetAttributes
 
     if( $collector->param($token, 'snmp-check-sysuptime') eq 'no' )
     {
-        $cref->{'nosysuptime'}{$ipaddr}{$port}{$community} = 1;
+        $cref->{'nosysuptime'}{$hosthash} = 1;
     }
     
     return 1;
@@ -230,9 +239,9 @@ sub snmpSessionArgs
 {
     my $collector = shift;
     my $token = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
+    my $hosthash = shift;
+
+    my ($ipaddr, $port, $community) = split('|', $hosthash);
 
     my $version = $collector->param($token, 'snmp-version');
     my @ret = ( -hostname     => $ipaddr,
@@ -276,18 +285,15 @@ sub openBlockingSession
 {
     my $collector = shift;
     my $token = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
-
+    my $hosthash = shift;
+    
     my ($session, $error) =
-        Net::SNMP->session( snmpSessionArgs( $collector, $token,
-                                             $ipaddr, $port, $community ),
+        Net::SNMP->session( snmpSessionArgs( $collector, $token, $hosthash ),
                             -nonblocking  => 0,
                             -translate    => ['-all', 0, '-octetstring', 1] );
     if( not defined($session) )
     {
-        Error('Cannot create SNMP session for ' . $ipaddr . ': ' . $error);
+        Error('Cannot create SNMP session for ' . $hosthash . ': ' . $error);
     }
 
     return $session;
@@ -297,13 +303,10 @@ sub openNonblockingSession
 {
     my $collector = shift;
     my $token = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
+    my $hosthash = shift;
 
     my ($session, $error) =
-        Net::SNMP->session( snmpSessionArgs( $collector, $token,
-                                             $ipaddr, $port, $community ),
+        Net::SNMP->session( snmpSessionArgs( $collector, $token, $hosthash ),
                             -nonblocking  => 0x1,
                             -translate    => ['-timeticks' => 0] );
     if( not defined($session) )
@@ -319,9 +322,7 @@ sub expandOidMappings
 {
     my $collector = shift;
     my $token = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
+    my $hosthash = shift;
     my $oid_in = shift;
         
     my $cref = $collector->collectorData( 'snmp' );
@@ -347,8 +348,7 @@ sub expandOidMappings
         $key =~ s/\s+$//o;
 
         my $value =
-            lookupMap( $collector, $token, $ipaddr, $port, $community,
-                       $map, $key );
+            lookupMap( $collector, $token, $hosthash, $map, $key );
 
         if( defined( $value ) )
         {
@@ -384,12 +384,11 @@ sub expandOidMappings
         my $value;
 
         if( not defined( $cref->{'value-lookups'}
-                         {$ipaddr}{$port}{$community}{$key} ) )
+                         {$hosthash}{$key} ) )
         {
             # Retrieve the OID value from host
 
-            my $session = openBlockingSession( $collector, $token,
-                                               $ipaddr, $port, $community );
+            my $session = openBlockingSession( $collector, $token, $hosthash );
             if( not defined($session) )
             {
                 return undef;
@@ -400,21 +399,20 @@ sub expandOidMappings
             if( defined $result )
             {
                 $value = $result->{$key};
-                $cref->{'value-lookups'}{$ipaddr}{$port}{$community}{$key} =
-                    $value;
+                $cref->{'value-lookups'}{$hosthash}{$key} = $value;
             }
             else
             {
                 Error("Error retrieving $key from $ipaddr: " .
                       $session->error());
-                probablyDead( $collector, $ipaddr, $port, $community );
+                probablyDead( $collector, $hosthash );
                 return undef;
             }
         }
         else
         {
             $value =
-                $cref->{'value-lookups'}{$ipaddr}{$port}{$community}{$key};
+                $cref->{'value-lookups'}{$hosthash}{$key};
         }
         if( defined( $value ) )
         {
@@ -436,21 +434,18 @@ sub lookupMap
 {
     my $collector = shift;
     my $token = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
+    my $hosthash = shift;
     my $map = shift;
     my $key = shift;
 
     my $cref = $collector->collectorData( 'snmp' );
 
-    if( not defined( $cref->{'maps'}{$ipaddr}{$port}{$community}{$map} ) )
+    if( not defined( $maps{$hosthash}{$map} ) )
     {
         # Retrieve map from host
         Debug("Retrieving map $map from $ipaddr");
 
-        my $session = openBlockingSession( $collector, $token,
-                                           $ipaddr, $port, $community );
+        my $session = openBlockingSession( $collector, $token, $hosthash );
         if( not defined($session) )
         {
             return undef;
@@ -466,7 +461,7 @@ sub lookupMap
             {
                 my $quoted = quotemeta( $map );
                 $val =~ s/^$quoted\.//;
-                $cref->{'maps'}{$ipaddr}{$port}{$community}{$map}{$key} =
+                $maps{$hosthash}{$map}{$key} =
                     $val;
                 # Debug("Map $map discovered: '$key' -> '$val'");
             }
@@ -477,21 +472,21 @@ sub lookupMap
             Error("Error retrieving table $map from $ipaddr: " .
                   $session->error());
             $session->close();
-            probablyDead( $collector, $ipaddr, $port, $community );
+            probablyDead( $collector, $hosthash );
             return undef;
         }
     }
 
-    my $value = $cref->{'maps'}{$ipaddr}{$port}{$community}{$map}{$key};
+    my $value = $maps{$hosthash}{$map}{$key};
     if( not defined $value )
     {
         Error("Cannot find value $key in map $map for $ipaddr in ".
               $collector->path($token));
-        if( defined ( $cref->{'maps'}{$ipaddr}{$port}{$community}{$map} ) )
+        if( defined ( $maps{$hosthash}{$map} ) )
         {
             Error("Current map follows");
             while( my($key, $val) = each
-                   %{$cref->{'maps'}{$ipaddr}{$port}{$community}{$map}} )
+                   %{$maps{$hosthash}{$map}} )
             {
                 Error("'$key' => '$val'");
             }
@@ -504,29 +499,28 @@ sub lookupMap
     }    
 }
 
+    
 # The target host is unreachable. We try to reach it few more times and
 # give it the final diagnose.
 
 sub probablyDead
 {
     my $collector = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
+    my $hosthash = shift;
 
     my $cref = $collector->collectorData( 'snmp' );
 
     # Stop all collection for this host, until next initTargetAttributes
     # is successful
-    delete $cref->{'reptoken'}{$ipaddr}{$port}{$community};
+    delete $cref->{'reptoken'}{$hosthash};
 
     my $probablyAlive = 1;
 
-    if( defined( $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} ) )
+    if( defined( $cref->{'hostUnreachableSeen'}{$hosthash} ) )
     {
         if( $Torrus::Collector::SNMP::unreachableTimeout > 0 and
             time() -
-            $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} >
+            $cref->{'hostUnreachableSeen'}{$hosthash} >
             $Torrus::Collector::SNMP::unreachableTimeout )
         {
             $probablyAlive = 0;
@@ -534,23 +528,22 @@ sub probablyDead
     }
     else
     {
-        $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} = time();
+        $cref->{'hostUnreachableSeen'}{$hosthash} = time();
     }
 
     if( $probablyAlive )
     {
-        Info('Target host is unreachable. Will try again later: ' .
-             "$ipaddr:$port:$community");
+        Info('Target host is unreachable. Will try again later: ' . $hosthash);
     }
     else
     {
         # It is dead indeed. Delete all tokens associated with this host
         Info('Target host is unreachable during last ' .
              $Torrus::Collector::SNMP::unreachableTimeout .
-             " seconds. Giving it up: $ipaddr:$port:$community");
+             ' seconds. Giving it up: ' . $hosthash);
         my @deleteTargets = ();
         while( my ($oid, $ref1) =
-               each %{$cref->{'targets'}{$ipaddr}{$port}{$community}} )
+               each %{$cref->{'targets'}{$hosthash}} )
         {
             while( my ($token, $dummy) = each %{$ref1} )
             {
@@ -564,10 +557,10 @@ sub probablyDead
             $collector->deleteTarget($token);
         }
         
-        delete $cref->{'reptoken'}{$ipaddr}{$port}{$community};
-        delete $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community};
-        delete $cref->{'hostUnreachableRetry'}{$ipaddr}{$port}{$community};
-        $cref->{'unreachableHostDeleted'}{$ipaddr}{$port}{$community} = 1;
+        delete $cref->{'reptoken'}{$hosthash};
+        delete $cref->{'hostUnreachableSeen'}{$hosthash};
+        delete $cref->{'hostUnreachableRetry'}{$hosthash};
+        $cref->{'unreachableHostDeleted'}{$hosthash} = 1;
     }
     
     return $probablyAlive;
@@ -578,22 +571,18 @@ sub probablyDead
 sub checkUnreachableRetry
 {
     my $collector = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
+    my $hosthash = shift;
 
     my $cref = $collector->collectorData( 'snmp' );
 
     my $ret = 1;
-    if( exists( $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} ) )
+    if( exists( $cref->{'hostUnreachableSeen'}{$hosthash} ) )
     {
-        my $lastRetry = $cref->{'hostUnreachableRetry'}{
-            $ipaddr}{$port}{$community};
+        my $lastRetry = $cref->{'hostUnreachableRetry'}{$hosthash};
 
         if( not defined( $lastRetry ) )
         {
-            $lastRetry =
-                $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community};
+            $lastRetry = $cref->{'hostUnreachableSeen'}{$hosthash};
         }
             
         if( time() < $lastRetry +
@@ -603,8 +592,7 @@ sub checkUnreachableRetry
         }
         else
         {
-            $cref->{'hostUnreachableRetry'}{
-                $ipaddr}{$port}{$community} = time();
+            $cref->{'hostUnreachableRetry'}{$hosthash} = time();
         }            
     }
     
@@ -615,26 +603,22 @@ sub checkUnreachableRetry
 sub isHostDead
 {
     my $collector = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
+    my $hosthash = shift;
 
     my $cref = $collector->collectorData( 'snmp' );
-    return $cref->{'unreachableHostDeleted'}{$ipaddr}{$port}{$community};
+    return $cref->{'unreachableHostDeleted'}{$hosthash};
 }
 
 
 sub hostReachableAgain
 {
     my $collector = shift;
-    my $ipaddr = shift;
-    my $port = shift;
-    my $community = shift;
-
+    my $hosthash = shift;
+    
     my $cref = $collector->collectorData( 'snmp' );
-    if( exists( $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community} ) )
+    if( exists( $cref->{'hostUnreachableSeen'}{$hosthash} ) )
     {
-        delete $cref->{'hostUnreachableSeen'}{$ipaddr}{$port}{$community};
+        delete $cref->{'hostUnreachableSeen'}{$hosthash};
     }
 }
 
@@ -648,29 +632,18 @@ sub deleteTarget
 
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
-    my $ipaddr = $tref->{'ipaddr'};
+
+    my $hosthash = $tref->{'hosthash'};    
     my $oid = $tref->{'oid'};
-    my $port = $collector->param($token, 'snmp-port');
-    my $community = $collector->param($token, 'snmp-community');
 
-    delete $cref->{'targets'}{$ipaddr}{$port}{$community}{$oid}{$token};
-    if( not %{$cref->{'targets'}{$ipaddr}{$port}{$community}{$oid}} )
+    delete $cref->{'targets'}{$hosthash}{$oid}{$token};
+    if( not %{$cref->{'targets'}{$hosthash}{$oid}} )
     {
-        delete $cref->{'targets'}{$ipaddr}{$port}{$community}{$oid};
+        delete $cref->{'targets'}{$hosthash}{$oid};
 
-        if( not %{$cref->{'targets'}{$ipaddr}{$port}{$community}} )
+        if( not %{$cref->{'targets'}{$hosthash}} )
         {
-            delete $cref->{'targets'}{$ipaddr}{$port}{$community};
-
-            if( not %{$cref->{'targets'}{$ipaddr}{$port}} )
-            {
-                delete $cref->{'targets'}{$ipaddr}{$port};
-
-                if( not %{$cref->{'targets'}{$ipaddr}} )
-                {
-                    delete $cref->{'targets'}{$ipaddr};
-                }
-            }
+            delete $cref->{'targets'}{$hosthash};
         }
     }
 
@@ -688,111 +661,103 @@ sub runCollector
     my $cref = shift;
 
     my @sessions;
+    my %socketSetBuflen;
 
     # Create one SNMP session per host address.
     # We assume that version, timeout and retries are the same
     # within one address
 
-    while( my ($ipaddr, $ref1) = each %{$cref->{'reptoken'}} )
+    while( my ($hosthash, $token) = each %{$cref->{'reptoken'}} )
     {
-        while( my ($port, $ref2) = each %{$ref1} )
+        my $session =
+            openNonblockingSession( $collector, $token, $hosthash );
+        
+        if( not defined($session) )
         {
-            while( my ($community, $token) = each %{$ref2} )
+            return 0;
+        }
+        else
+        {
+            push( @sessions, $session );
+            Debug('Created SNMP session for ' . $hosthash);
+
+            # We set SO_RCVBUF only once, because Net::SNMP shares
+            # one UDP socket for all sessions.
+            my $sockname = $session->transport()->sock_name();
+            if( not $socketSetBuflen{$sockname} )
             {
-                my $session =
-                    openNonblockingSession( $collector, $token,
-                                            $ipaddr, $port, $community );
-                if( not defined($session) )
+                my $buflen = int($Torrus::Collector::SNMP::RxBuffer);
+                my $ok = $session->transport()->socket()->
+                    sockopt( SO_RCVBUF, $buflen );
+                if( not $ok )
                 {
-                    return 0;
+                    Error('Could not set SO_RCVBUF to ' .
+                          $buflen . ': ' . $!);
                 }
                 else
                 {
-                    push( @sessions, $session );
-                    Debug("Created SNMP session for " .
-                          "$ipaddr:$port:$community");
-                    # We set SO_RCVBUF only once, because Net::SNMP shares
-                    # one UDP socket for all sessions.
-                    if( scalar( @sessions ) == 1 )
-                    {
-                        my $buflen = int($Torrus::Collector::SNMP::RxBuffer);
-                        my $ok = $session->transport()->socket()->
-                            sockopt( SO_RCVBUF, $buflen );
-                        if( not $ok )
-                        {
-                            Error('Could not set SO_RCVBUF to ' .
-                                  $buflen . ': ' . $!);
-                        }
-                        else
-                        {
-                            Debug('Set SO_RCVBUF to ' . $buflen);
-                        }
-                    }
+                    Debug('Set SO_RCVBUF to ' . $buflen);
                 }
+                $socketSetBuflen{$sockname} = 1;
+            }
+        }
+        
+        my $oids_per_pdu = $cref->{'oids_per_pdu'}{$hosthash};
 
-                my $oids_per_pdu =
-                    $cref->{'oids_per_pdu'}{$ipaddr}{$port}{$community};
+        my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
+        my @pdu_oids = ();
+        while( scalar( @oids ) > 0 )
+        {
+            my $oid = shift @oids;
+            push( @pdu_oids, $oid );
 
-                my @oids = sort keys
-                    %{$cref->{'targets'}{$ipaddr}{$port}{$community}};
-                my @pdu_oids = ();
-                while( scalar( @oids ) > 0 )
+            if( scalar( @oids ) == 0 or
+                ( scalar( @pdu_oids ) >= $oids_per_pdu ) )
+            {
+                if( not $cref->{'nosysuptime'}{$hosthash} )
                 {
-                    my $oid = shift @oids;
-                    push( @pdu_oids, $oid );
-
-                    if( scalar( @oids ) == 0 or
-                        ( scalar( @pdu_oids ) >= $oids_per_pdu ) )
+                    # We insert sysUpTime into every PDU, because
+                    # we need it in further processing
+                    push( @pdu_oids, $sysUpTime );
+                }
+                
+                if( Torrus::Log::isDebug() )
+                {
+                    Debug("Sending SNMP PDU to $ipaddr:");
+                    foreach my $oid ( @pdu_oids )
                     {
-                        if( not $cref->{'nosysuptime'}{$ipaddr}->
-                            {$port}{$community} )
-                        {
-                            # We insert sysUpTime into every PDU, because
-                            # we need it in further processing
-                            push( @pdu_oids, $sysUpTime );
-                        }
-                        
-                        if( Torrus::Log::isDebug() )
-                        {
-                            Debug("Sending SNMP PDU to $ipaddr:");
-                            foreach my $oid ( @pdu_oids )
-                            {
-                                Debug($oid);
-                            }
-                        }
-
-                        # Generate the list of tokens that form this PDU
-                        my $pdu_tokens = {};
-                        foreach my $oid ( @pdu_oids )
-                        {
-                            foreach my $token
-                                ( keys %{$cref->{'targets'}{$ipaddr}
-                                         {$port}{$community}{$oid}} )
-                            {
-                                $pdu_tokens->{$oid}{$token} = 1;
-                            }
-                        }
-                        my $result =
-                            $session->
-                            get_request( -callback =>
-                                         [ \&Torrus::Collector::SNMP::callback,
-                                           $collector, $pdu_tokens,
-                                           $port, $community ],
-                                         -varbindlist => \@pdu_oids );
-                        if( not defined $result )
-                        {
-                            Error("Cannot create SNMP request: " .
-                                  $session->error);
-                        }
-                        @pdu_oids = ();
+                        Debug($oid);
                     }
                 }
+
+                # Generate the list of tokens that form this PDU
+                my $pdu_tokens = {};
+                foreach my $oid ( @pdu_oids )
+                {
+                    foreach my $token
+                        ( keys %{$cref->{'targets'}{$ipaddr}{$hosthash}} )
+                    {
+                        $pdu_tokens->{$oid}{$token} = 1;
+                    }
+                }
+                my $result =
+                    $session->
+                    get_request( -callback =>
+                                 [ \&Torrus::Collector::SNMP::callback,
+                                   $collector, $pdu_tokens, $hosthash ],
+                                 -varbindlist => \@pdu_oids );
+                if( not defined $result )
+                {
+                    Error("Cannot create SNMP request: " .
+                          $session->error);
+                }
+                @pdu_oids = ();
             }
         }
     }
-
+    
     snmp_dispatcher();
-
+    
     foreach my $idx ( 0 .. $#sessions )
     {
         if( $idx == 0 and defined( $sessions[0]->transport() ) )
@@ -810,23 +775,21 @@ sub callback
     my $session = shift;
     my $collector = shift;
     my $pdu_tokens = shift;
-    my $port = shift;
-    my $community = shift;
+    my $hosthash = shift;
 
     my $cref = $collector->collectorData( 'snmp' );
-    my $ipaddr = $session->hostname();
 
-    Debug("SNMP Callback executed for $ipaddr:$port:$community");
+    Debug('SNMP Callback executed for ' . $hosthash);
 
     if( not defined( $session->var_bind_list() ) )
     {
-        Error("SNMP Error for $ipaddr:$port:$community: " . $session->error() .
+        Error('SNMP Error for ' . $hosthash ': ' . $session->error() .
               ' when retrieving ' . join(' ', sort keys %{$pdu_tokens}));
 
-        probablyDead( $collector, $ipaddr, $port, $community );
+        probablyDead( $collector, $hosthash );
         
         # Clear the mapping
-        delete $cref->{'maps'}{$ipaddr}{$port}{$community};
+        delete $maps{$hosthash};
         foreach my $oid ( keys %{$pdu_tokens} )
         {
             foreach my $token ( keys %{$pdu_tokens->{$oid}} )
@@ -838,12 +801,12 @@ sub callback
     }
     else
     {
-        hostReachableAgain( $collector, $ipaddr, $port, $community );
+        hostReachableAgain( $collector, $hosthash );
     }
 
     my $timestamp = time();
 
-    my $checkUptime = not $cref->{'nosysuptime'}{$ipaddr}{$port}{$community};
+    my $checkUptime = not $cref->{'nosysuptime'}{$hosthash};
     my $doSetValue = 1;
     
     my $uptime = 0;
@@ -858,20 +821,20 @@ sub callback
         }
         else
         {
-            Error("Did not receive sysUpTime for $ipaddr:$port:$community. ");
+            Error('Did not receive sysUpTime for ' . $hosthash);
         }
 
         if( $uptime < $collector->period() or
-            ( defined($cref->{'knownUptime'}{$ipaddr}{$port}{$community})
+            ( defined($cref->{'knownUptime'}{$hosthash})
               and
               $uptime + $collector->period() <
-              $cref->{'knownUptime'}{$ipaddr}{$port}{$community} ) )
+              $cref->{'knownUptime'}{$hosthash} ) )
         {
             # The agent has reloaded. Clean all maps and push UNDEF
             # values to the storage
             
-            Info("Agent rebooted: $ipaddr:$port:$community");
-            delete $cref->{'maps'}{$ipaddr}{$port}{$community};
+            Info('Agent rebooted: ' . $hosthash);
+            delete $maps{$hosthash};
 
             $timestamp -= $uptime;
             foreach my $oid ( keys %{$pdu_tokens} )
@@ -885,7 +848,7 @@ sub callback
             
             $doSetValue = 0;
         }
-        $cref->{'knownUptime'}{$ipaddr}{$port}{$community} = $uptime;
+        $cref->{'knownUptime'}{$hosthash} = $uptime;
     }
     
     if( $doSetValue )
@@ -897,8 +860,7 @@ sub callback
                 $value eq 'noSuchInstance' or
                 $value eq 'endOfMibView' )
             {
-                Error("Error retrieving $oid from " .
-                      "$ipaddr:$port:$community: $value");
+                Error("Error retrieving $oid from $hosthash: $value");
             }
             else
             {

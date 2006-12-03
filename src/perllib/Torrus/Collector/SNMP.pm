@@ -62,9 +62,11 @@ my $sysUpTime = '1.3.6.1.2.1.1.3.0';
 # SNMP tables lookup maps
 my %maps;
 
-# Net::SNMP session objects for pending map lookups
-my @mapSessions;
+# Lookups scheduled for execution
+my %mapLookupScheduled;
 
+# SNMP session objects for map lookups
+my @mappingSessions;
 
 # This is first executed per target
 
@@ -241,7 +243,7 @@ sub snmpSessionArgs
     my $token = shift;
     my $hosthash = shift;
 
-    my ($ipaddr, $port, $community) = split('|', $hosthash);
+    my ($ipaddr, $port, $community) = split(/\|/o, $hosthash);
 
     my $version = $collector->param($token, 'snmp-version');
     my @ret = ( -hostname     => $ipaddr,
@@ -311,7 +313,32 @@ sub openNonblockingSession
                             -translate    => ['-timeticks' => 0] );
     if( not defined($session) )
     {
-        Error('Cannot create SNMP session for ' . $ipaddr . ': ' . $error);
+        Error('Cannot create SNMP session for ' . $hosthash . ': ' . $error);
+    }
+    else
+    {
+        # We set SO_RCVBUF only once, because Net::SNMP shares
+        # one UDP socket for all sessions.
+        
+        my $sock_name = $session->transport()->sock_name();
+        my $refcount = $Net::SNMP::Transport::SOCKETS->{
+            $sock_name}->[&Net::SNMP::Transport::_SHARED_REFC()];
+                                                                      
+        if( $refcount == 1 )
+        {
+            my $buflen = int($Torrus::Collector::SNMP::RxBuffer);
+            my $socket = $session->transport()->socket();
+            my $ok = $socket->sockopt( SO_RCVBUF, $buflen );
+            if( not $ok )
+            {
+                Error('Could not set SO_RCVBUF to ' .
+                      $buflen . ': ' . $!);
+            }
+            else
+            {
+                Debug('Set SO_RCVBUF to ' . $buflen);
+            }
+        }
     }
 
     return $session;
@@ -403,7 +430,7 @@ sub expandOidMappings
             }
             else
             {
-                Error("Error retrieving $key from $ipaddr: " .
+                Error("Error retrieving $key from $hosthash: " .
                       $session->error());
                 probablyDead( $collector, $hosthash );
                 return undef;
@@ -442,45 +469,39 @@ sub lookupMap
 
     if( not defined( $maps{$hosthash}{$map} ) )
     {
+        if( $mapLookupScheduled{$hosthash}{$map} )
+        {
+            return undef;
+        }
+        
         # Retrieve map from host
-        Debug("Retrieving map $map from $ipaddr");
+        Debug("Retrieving map $map from $hosthash");
 
-        my $session = openBlockingSession( $collector, $token, $hosthash );
+        my $session = openNonblockingSession( $collector, $token, $hosthash );
         if( not defined($session) )
         {
             return undef;
         }
+        else
+        {
+            push( @mappingSessions, $session );
+        }
 
         # Retrieve the map table
 
-        my $result = $session->get_table( -baseoid => $map );
-        
-        if( defined $result )
-        {
-            while( my( $val, $key ) = each %{$result} )
-            {
-                my $quoted = quotemeta( $map );
-                $val =~ s/^$quoted\.//;
-                $maps{$hosthash}{$map}{$key} =
-                    $val;
-                # Debug("Map $map discovered: '$key' -> '$val'");
-            }
-            $session->close();
-        }
-        else
-        {
-            Error("Error retrieving table $map from $ipaddr: " .
-                  $session->error());
-            $session->close();
-            probablyDead( $collector, $hosthash );
-            return undef;
-        }
+        $session->get_table( -baseoid => $map,
+                             -callback => [\&mapLookupCallback,
+                                           $collector, $hosthash, $map] );
+
+        $mapLookupScheduled{$hosthash}{$map} = 1;
+
+        return undef;
     }
 
     my $value = $maps{$hosthash}{$map}{$key};
     if( not defined $value )
     {
-        Error("Cannot find value $key in map $map for $ipaddr in ".
+        Error("Cannot find value $key in map $map for $hosthash in ".
               $collector->path($token));
         if( defined ( $maps{$hosthash}{$map} ) )
         {
@@ -496,6 +517,38 @@ sub lookupMap
     else
     {
         return $value;
+    }    
+}
+
+
+sub mapLookupCallback
+{
+    my $session = shift;
+    my $collector = shift;
+    my $hosthash = shift;
+    my $map = shift;
+
+    Debug('Received mapping PDU from ' . $hosthash);
+
+    my $result = $session->var_bind_list();
+    if( defined $result )
+    {
+        while( my( $val, $key ) = each %{$result} )
+        {
+            my $quoted = quotemeta( $map );
+            $val =~ s/^$quoted\.//;
+            $maps{$hosthash}{$map}{$key} =
+                $val;
+            # Debug("Map $map discovered: '$key' -> '$val'");
+        }
+    }
+    else
+    {
+        Error("Error retrieving table $map from $hosthash: " .
+              $session->error());
+        $session->close();
+        probablyDead( $collector, $hosthash );
+        return undef;
     }    
 }
 
@@ -576,7 +629,7 @@ sub checkUnreachableRetry
     my $cref = $collector->collectorData( 'snmp' );
 
     my $ret = 1;
-    if( exists( $cref->{'hostUnreachableSeen'}{$hosthash} ) )
+    if( $cref->{'hostUnreachableSeen'}{$hosthash} )
     {
         my $lastRetry = $cref->{'hostUnreachableRetry'}{$hosthash};
 
@@ -659,14 +712,13 @@ sub runCollector
 {
     my $collector = shift;
     my $cref = shift;
-
-    my @sessions;
-    my %socketSetBuflen;
-
+        
     # Create one SNMP session per host address.
     # We assume that version, timeout and retries are the same
     # within one address
 
+    my @sessions;
+    
     while( my ($hosthash, $token) = each %{$cref->{'reptoken'}} )
     {
         my $session =
@@ -678,34 +730,16 @@ sub runCollector
         }
         else
         {
-            push( @sessions, $session );
             Debug('Created SNMP session for ' . $hosthash);
-
-            # We set SO_RCVBUF only once, because Net::SNMP shares
-            # one UDP socket for all sessions.
-            my $sockname = $session->transport()->sock_name();
-            if( not $socketSetBuflen{$sockname} )
-            {
-                my $buflen = int($Torrus::Collector::SNMP::RxBuffer);
-                my $ok = $session->transport()->socket()->
-                    sockopt( SO_RCVBUF, $buflen );
-                if( not $ok )
-                {
-                    Error('Could not set SO_RCVBUF to ' .
-                          $buflen . ': ' . $!);
-                }
-                else
-                {
-                    Debug('Set SO_RCVBUF to ' . $buflen);
-                }
-                $socketSetBuflen{$sockname} = 1;
-            }
+            push( @sessions, $session );
         }
         
         my $oids_per_pdu = $cref->{'oids_per_pdu'}{$hosthash};
 
         my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
         my @pdu_oids = ();
+        my $delay = 0;
+        
         while( scalar( @oids ) > 0 )
         {
             my $oid = shift @oids;
@@ -723,7 +757,7 @@ sub runCollector
                 
                 if( Torrus::Log::isDebug() )
                 {
-                    Debug("Sending SNMP PDU to $ipaddr:");
+                    Debug("Sending SNMP PDU to $hosthash:");
                     foreach my $oid ( @pdu_oids )
                     {
                         Debug($oid);
@@ -735,14 +769,15 @@ sub runCollector
                 foreach my $oid ( @pdu_oids )
                 {
                     foreach my $token
-                        ( keys %{$cref->{'targets'}{$ipaddr}{$hosthash}} )
+                        ( keys %{$cref->{'targets'}{$hosthash}{$oid}} )
                     {
                         $pdu_tokens->{$oid}{$token} = 1;
                     }
                 }
                 my $result =
                     $session->
-                    get_request( -callback =>
+                    get_request( -delay => $delay,
+                                 -callback =>
                                  [ \&Torrus::Collector::SNMP::callback,
                                    $collector, $pdu_tokens, $hosthash ],
                                  -varbindlist => \@pdu_oids );
@@ -752,20 +787,19 @@ sub runCollector
                           $session->error);
                 }
                 @pdu_oids = ();
+                $delay += 0.01;
             }
         }
     }
     
     snmp_dispatcher();
+
+    # Check if there were pending map lookup sessions
     
-    foreach my $idx ( 0 .. $#sessions )
+    if( scalar( @mappingSessions ) > 0 )
     {
-        if( $idx == 0 and defined( $sessions[0]->transport() ) )
-        {
-            $sessions[0]->transport()->socket()->close();
-        }
-        $sessions[$idx]->close();
-        delete $sessions[$idx];
+        @mappingSessions = ();
+        %mapLookupScheduled = ();
     }
 }
 
@@ -783,7 +817,7 @@ sub callback
 
     if( not defined( $session->var_bind_list() ) )
     {
-        Error('SNMP Error for ' . $hosthash ': ' . $session->error() .
+        Error('SNMP Error for ' . $hosthash . ': ' . $session->error() .
               ' when retrieving ' . join(' ', sort keys %{$pdu_tokens}));
 
         probablyDead( $collector, $hosthash );
@@ -890,25 +924,15 @@ sub postProcess
     my $collector = shift;
     my $cref = shift;
 
-    # First time is executed right after collector initialization,
-    # so there's no need to initTargetAttributes()
-
-    if( exists( $cref->{'notFirstTimePostProcess'} ) )
+    foreach my $token ( keys %{$cref->{'needsRemapping'}} )
     {
-        foreach my $token ( keys %{$cref->{'needsRemapping'}} )
+        delete $cref->{'needsRemapping'}{$token};
+        if( not Torrus::Collector::SNMP::initTargetAttributes
+            ( $collector, $token ) )
         {
-            delete $cref->{'needsRemapping'}{$token};
-            if( not Torrus::Collector::SNMP::initTargetAttributes
-                ( $collector, $token ) )
-            {
-                $collector->deleteTarget($token);
-            }
+            $collector->deleteTarget($token);
         }
-    }
-    else
-    {
-        $cref->{'notFirstTimePostProcess'} = 1;
-    }
+    }    
 }
 
 1;

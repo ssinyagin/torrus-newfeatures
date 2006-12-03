@@ -1,3 +1,9 @@
+2006-12-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm:
+	SNMP mapping lookups are now asynchronous.
+	PDUs are rescheduled with delays
+
 2006-11-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/SNMP.pm: new SNMP parameters:

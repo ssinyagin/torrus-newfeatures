@@ -1,5 +1,9 @@
 2006-12-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):
+	New discovery parameter:
+	RFC2863_IF_MIB::exclude-down-interfaces
+
 	* bin/configinfo.in: Added the tree compilation timestamp
 
 2006-12-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

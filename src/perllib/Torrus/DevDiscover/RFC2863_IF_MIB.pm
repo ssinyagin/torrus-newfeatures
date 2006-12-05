@@ -136,19 +136,26 @@ sub discover
     
     # Pre-populate the interfaces table, so that other modules may
     # delete unneeded interfaces
+    my $includeAdmDown =
+        $devdetails->param('RFC2863_IF_MIB::list-admindown-interfaces')
+        eq 'yes';
+    my $includeNotpresent =
+        $devdetails->param('RFC2863_IF_MIB::list-notpresent-interfaces')
+        eq 'yes';
+    my $excludeOperDown =
+        $devdetails->param('RFC2863_IF_MIB::exclude-down-interfaces')
+        eq 'yes';
     foreach my $ifIndex
         ( $devdetails->getSnmpIndices( $dd->oiddef('ifDescr') ) )
     {
-        if( ( $devdetails->param('RFC2863_IF_MIB::list-admindown-interfaces')
-              eq 'yes'
-              or
-              $devdetails->snmpVar($dd->oiddef('ifAdminStatus') .
-                                   '.' . $ifIndex) == 1 ) and
-            ( $devdetails->param('RFC2863_IF_MIB::list-notpresent-interfaces')
-              eq 'yes'
-              or
-              $devdetails->snmpVar($dd->oiddef('ifOperStatus') .
-                                   '.' . $ifIndex) != 6 ) )
+        my $admStatus =
+            $devdetails->snmpVar($dd->oiddef('ifAdminStatus') .'.'. $ifIndex);
+        my $operStatus =
+            $devdetails->snmpVar($dd->oiddef('ifOperStatus') .'.'. $ifIndex);
+        
+        if( ( $admStatus == 1 or $includeAdmDown ) and
+            ( $operStatus != 6 or $includeNotpresent ) and
+            ( $operStatus != 2 or not $excludeOperDown ) )
         {
             my $interface = {};
             $data->{'interfaces'}{$ifIndex} = $interface;

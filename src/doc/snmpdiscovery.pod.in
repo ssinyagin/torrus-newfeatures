@@ -405,6 +405,11 @@ If set to C<yes>, the interfaces with ifOperStatus status set to notPresent(6)
 are included in the discovery results. By default, such interfaces are
 not listed.
 
+=item * C<RFC2863_IF_MIB::exclude-down-interfaces>
+
+If set to C<yes>, the interfaces with ifOperStatus equal to down(2)
+are excluded from the discovery results.
+
 =item * C<RFC2863_IF_MIB::exclude-interfaces>
 
 Comma-separated list of interface names which should be excluded from

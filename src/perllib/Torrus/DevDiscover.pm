@@ -145,7 +145,7 @@ sub discover
 
     foreach my $param ( @requiredParams )
     {
-        if( not $devdetails->param( $param ) )
+        if( not defined( $devdetails->param( $param ) ) )
         {
             Error('Required parameter not defined: ' . $param);
             return 0;

@@ -595,6 +595,11 @@ Specifies a description for a peer by its IP address. Dots in IP address should
 be replaced with underscores. Currently it's used with Cisco
 MAC accounting only.
 
+=item * C<CiscoIOS_MacAccounting::tokenset-members>
+
+Works the same way as C<RFC2863_IF_MIB::tokenset-members> and assigns MAC
+accounting peers to tokensets.
+
 =item * C<Paradyne::slot-name>
 
 Mandatory for Paradyne DSLAM devices. It should uniquely identify

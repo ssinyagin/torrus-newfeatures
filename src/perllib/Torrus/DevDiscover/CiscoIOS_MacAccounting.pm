@@ -96,6 +96,26 @@ sub discover
         }
         $data->{'cipMacExtStorage'} = $extStorage;
     }
+
+
+    # tokenset members
+    # Format: tokenset:ASXXXX,ASXXXX; tokenset:ASXXXX,ASXXXX;
+    # Peer MAC or IP addresses could be used too
+    my $tsetMembership =
+        $devdetails->param('CiscoIOS_MacAccounting::tokenset-members');
+    if( defined( $tsetMembership ) and length( $tsetMembership ) > 0 )
+    {
+        my $tsetMember = {};
+        foreach my $memList ( split( /\s*;\s*/, $tsetMembership ) )
+        {
+            my ($tset, $list) = split( /\s*:\s*/, $memList );
+            foreach my $peerName ( split( /\s*,\s*/, $list ) )
+            {
+                $tsetMember->{$peerName}{$tset} = 1;
+            }
+        }
+        $data->{'cipTokensetMember'} = $tsetMember;
+    }
     
     Torrus::DevDiscover::RFC2011_IP_MIB::discover($dd, $devdetails);
     Torrus::DevDiscover::RFC1657_BGP4_MIB::discover($dd, $devdetails);
@@ -269,31 +289,48 @@ sub buildConfig
             ( $countersNode, $peer->{'subtreeName'}, $param,
               ['CiscoIOS_MacAccounting::cisco-macacc'] );
 
-        if( defined( $data->{'cipMacExtStorage'} ) )
+        if( defined( $data->{'cipMacExtStorage'} ) or
+            defined( $data->{'cipTokensetMember'} ) )
         {
-            my $extStorage = $data->{'cipMacExtStorage'};
-        
+            my $extStorageApplied = 0;
+            my $tsetMemberApplied = 0;
+            
             foreach my $peerName ( 'AS'.$peer->{'peerAS'}, $peer->{'peerIP'},
                                    $peer->{'phyAddr'} )
             {
                 if( defined( $peerName ) )
                 {
-                    if( defined( $extStorage->{$peerName} ) )
+                    if( not $extStorageApplied and
+                        defined( $data->{'cipMacExtStorage'}{$peerName} ) )
                     {
+                        my $extStorage =
+                            $data->{'cipMacExtStorage'}{$peerName};
                         foreach my $dir ( 'In', 'Out' )
                         {
-                            if( defined( $extStorage->{$peerName}{$dir} ) )
+                            if( defined( $extStorage->{$dir} ) )
                             {
                                 $cb->addLeaf
                                     ( $peerNode, 'Bytes_' . $dir,
                                       { 'storage-type' => 'rrd,ext',
                                         'ext-service-units' => 'bytes',
                                         'ext-service-id' =>
-                                            $extStorage->{$peerName}{$dir} } );
+                                            $extStorage->{$dir} } );
                             }
                         }
-                        last;
+                        $extStorageApplied = 1;
                     }
+
+                    if( not $tsetMemberApplied and
+                        defined( $data->{'cipTokensetMember'}{$peerName} ) )
+                    {
+                        my $tsetList =
+                            join( ',', sort keys
+                                  %{$data->{'cipTokensetMember'}{$peerName}} );
+
+                        $cb->addLeaf
+                            ( $peerNode, 'InOut_bps',
+                              { 'tokenset-member' => $tsetList } );
+                    }                        
                 }
             }
         }

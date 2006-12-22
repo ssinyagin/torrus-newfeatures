@@ -60,6 +60,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
+     'Torrus::DevDiscover::JunOS',
      'Torrus::DevDiscover::MicrosoftWindows',
      'Torrus::DevDiscover::MotorolaBSR',
      'Torrus::DevDiscover::NetApp',

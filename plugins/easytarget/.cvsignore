@@ -1,0 +1,14 @@
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+Makefile
+Makefile.in
+configure
+configure.lineno
+config.status.lineno
+easytarget
+substvars.sh
+tp-*.tar.gz
+*.txt
+

@@ -1,0 +1,121 @@
+#!@PERL@
+#  Copyright (C) 2007  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+BEGIN { require '@easytarget_config_pl@'; }
+
+
+use strict;
+use Getopt::Long;
+use Config::Any;
+
+use Torrus::Log;
+use Torrus::EasyTarget;
+
+my @infiles;
+my $debug = 0;
+my $verbose = 0;
+
+
+
+my $ok = GetOptions( 'in=s'        => \@infiles,
+                     'verbose'     => \$verbose,
+                     'debug'       => \$debug );
+
+if( not $ok or scalar( @infiles ) == 0 or
+    scalar( @ARGV ) > 0 )
+{
+    print STDERR "Usage: $0 --in=filename.ini options...\n",
+    "Options:\n",
+    " --in=filename.ini       Easytarget config file\n",
+    " --verbose               print extra information\n",
+    " --debug                 print debugging information\n",
+    "\n",
+    "Input file extension is important. Use .ini for Windows-style " .
+        "INI files\n";
+ 
+    exit 1;
+}
+
+if( $debug )
+{
+    Torrus::Log::setLevel('debug');
+}
+elsif( $verbose )
+{
+    Torrus::Log::setLevel('verbose');
+}
+
+
+my @realinfiles;
+
+foreach my $infile ( @infiles )
+{
+    if( not -r $infile )
+    {
+        my $altfile = $Torrus::Global::easytargetDir . $infile;
+        if( not -r $altfile )
+        {
+            Error('Cannot find file ' . $infile .
+                  ' neither in current directory nor in ' .
+                  $Torrus::Global::easytargetDir);
+            exit 1;
+        }
+        else
+        {
+            $infile = $altfile;
+        }
+    }
+    push( @realinfiles, $infile );
+}
+
+my $ok = 1;
+
+Verbose('Processing ' . join(' ', @realinfiles));
+
+my $cfg = Config::Any->load_files({files => \@realinfiles, use_ext => 1});
+
+if( not defined( $cfg ) )
+{
+    Error('Error opening input files: $!');
+    $ok = 0;
+}
+else
+{
+    my $et = new Torrus::EasyTarget;
+
+    foreach my $cfgElem ( @{$cfg} )
+    {
+        foreach my $cfgHash ( values ( %{$cfgElem} ) )
+        {
+            $ok = $et->genConfig( $cfgHash ) ? $ok : 0;
+        }
+    }
+}
+
+exit( $ok ? 0:1 );
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:
+
+

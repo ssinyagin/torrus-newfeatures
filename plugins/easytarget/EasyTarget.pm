@@ -206,7 +206,7 @@ sub genConfig
             # Propagate global parameters and templates at the leaf level
             if( not $thisIsSubtree )
             {
-                foreach my $param ( %globalParameters )
+                foreach my $param ( keys %globalParameters )
                 {
                     $params->{$param} = $globalParameters{$param};
                 }

@@ -210,18 +210,18 @@ sub genConfig
                 {
                     $params->{$param} = $globalParameters{$param};
                 }
+                
+                if( defined( $nodeElementName ) )
+                {
+                    $params->{'rrd-ds'} = $nodeElementName;
+                }
              
                 push( @{$templates}, @defaultTemplates );
                 if( defined( $cfg->{$node}{'TEMPLATES'} ) )
                 {
                     push( @{$templates},
                           split( /\s+,\s+/, $cfg->{$node}{'TEMPLATES'} ) );
-                }
-                
-                if( defined( $nodeElementName ) )
-                {
-                    $params->{'rrd-ds'} = $nodeElementName;
-                }
+                }                
             }
                 
             foreach my $param ( keys %{$cfg->{$node}} )

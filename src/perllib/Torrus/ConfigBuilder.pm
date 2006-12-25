@@ -203,22 +203,26 @@ sub addTemplateApplication
         $parentNode = $self->{'datasources'};
     }
 
-    if( defined( $Torrus::ConfigBuilder::templateRegistry{$template} ) )
+    if( defined( $Torrus::ConfigBuilder::templateRegistry ) )
     {
-        $self->{'required_templates'}{$template} = 1;
-
-        my $name = $Torrus::ConfigBuilder::templateRegistry{$template}{'name'};
-        if( defined( $name ) )
+        if( defined( $Torrus::ConfigBuilder::templateRegistry{$template} ) )
         {
-            $template = $name;
+            $self->{'required_templates'}{$template} = 1;
+            
+            my $name =
+                $Torrus::ConfigBuilder::templateRegistry{$template}{'name'};
+            if( defined( $name ) )
+            {
+                $template = $name;
+            }
+        }
+        else
+        {
+            Warn('Template ' . $template .
+                 ' is not listed in $Torrus::ConfigBuilder::templateRegistry');
         }
     }
-    else
-    {
-        Warn('Template ' . $template .
-             ' is not listed in $Torrus::ConfigBuilder::templateRegistry');
-    }
-
+    
     my $tmplNode = $self->{'doc'}->createElement( 'apply-template' );
     $tmplNode->setAttribute( 'name', $template );
     $parentNode->appendChild( $tmplNode );

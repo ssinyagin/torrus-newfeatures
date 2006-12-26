@@ -1,3 +1,73 @@
-=head1 Dummy documentation file
+=head1 EasyTarget, quick Torrus config generator
 
-there's nothing interesting here
+EastTarget is a Torrus plugin designed for those users who need
+to add some specific SNMP OIDs to Torrus collector, without
+having to edit the complex XML files. EasyTarget is a quick way to
+add a few new objects without too much efforts.
+
+=head2 Installation
+
+Follow the Torrus installation guide for the main software installation.
+
+Unpack the plugin distribution package in some directory:
+
+  gzip -dc tp-easytarget-1.X.tar.gz | tar xvf -
+
+Then run the Torrus plugin installation utility, pointing to the
+unpacked plugin directory:
+
+  torrus install_plugin tp-easytarget-1.X
+
+
+=head2 Quick steps
+
+EasyTarget accepts input files in Windows-style INI format. It is important
+that the file extension is exactly ".ini". By default, the files are searched
+in the current directpoy and then in F<@sitedir@/easytarget>.
+
+The input file consists of sections, each representing a leaf or a subtree
+of Torrus datasource tree. You define the default parameters at the top of
+the file in global section, and then create a section for
+each tree element that you want to define. Here is a minimalistic example:
+
+ OUTXML = mydevices.xml
+
+ [/EasyTarget/dev1]
+ snmp-host = 10.0.0.1
+ snmp-community = public
+ snmp-object = 1.3.6.1.4.1.5655.4.2.2.1.1.1.1.1.1
+
+ [/EasyTarget/dev2]
+ snmp-host = 10.0.0.2
+ snmp-community = public
+ snmp-object = 1.3.6.1.4.1.5655.4.2.2.1.1.1.1.1.1
+
+Here's a more complex example:
+
+ OUTXML = mydevices.xml
+
+ [/EasyTarget/Myrouter/]
+ snmp-host = 10.0.0.1
+ snmp-community = public
+
+ [/EasyTarget/Myrouter/data1]
+ snmp-object = 1.3.6.1.4.1.5655.4.2.2.1.1.1.1.1.1
+ 
+ [/EasyTarget/Myrouter/data2]
+ snmp-object = 1.3.6.1.4.1.5655.4.2.2.1.1.1.1.2.1
+
+Next step is to feed the input file to EasyTarget:
+
+ torrus et --in=mydevices.ini --verbose
+
+Then you need to add the generated XML file to the tree by editing the
+F<torrus-siteconfig.pl> file, and compile the resulting tree:
+
+ torrus compile --tree=main --verbose
+
+Now you can start the collector and Apache server if they aren't yet running.
+If they were already running, you don't need to restart them.
+
+
+
+

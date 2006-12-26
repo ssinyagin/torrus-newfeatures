@@ -37,7 +37,6 @@ $Torrus::EasyTarget::siteXmlDir     = '@sitexmldir@';
      'data-file'         => '%system-id%.easytarget.rrd',
      'snmp-version'      => '2c',
      'snmp-port'         => 161,
-     'snmp-community'    => 'public',
      'rrd-create-dstype' => 'COUNTER');
      
      

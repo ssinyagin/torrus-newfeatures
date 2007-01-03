@@ -58,7 +58,7 @@ sub new
 #  TEMPLATES => 'custom-template1, custom-template2'
 #
 # Parameters accepted at global level:
-#  OUTXML, INCLUDE
+#  OUTXML, BUNDLE, INCLUDE
 
 sub genConfig
 {
@@ -82,7 +82,7 @@ sub genConfig
         delete $cfg->{'OUTXML'};
         $globalOutFile = absXmlFilename( $globalOutFile );
     }
-
+        
     foreach my $file ( @defaultIncludes )
     {
         $includeFiles{$file} = 1;
@@ -138,6 +138,11 @@ sub genConfig
                 if( defined( $cfg->{$node}{'BUNDLE'} ) )
                 {
                     $outputBundles{absXmlFilename($cfg->{$node}{'BUNDLE'})} =
+                        $outxml;
+                }
+                elsif( defined( $cfg->{'BUNDLE'} ) )
+                {
+                    $outputBundles{absXmlFilename($cfg->{'BUNDLE'})} =
                         $outxml;
                 }
 

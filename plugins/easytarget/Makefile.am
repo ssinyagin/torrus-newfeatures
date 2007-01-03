@@ -71,6 +71,10 @@ install-data-local:
 #####   What you do not need after "make clean"  #####
 CLEANFILES = $(pkgbin_SCRIPTS)
 
+htdocs: tp-easytarget.pod
+	for f in *.pod; do \
+	  pod2html -css=../torrusdoc.css $$f > ../../htdocs/plugins/$$f.html; \
+	done
 
 UPLOADPATH = \
    ssinyagin@shell.sourceforge.net:/home/groups/t/to/torrus/htdocs/devel

@@ -11,4 +11,5 @@ easytarget
 substvars.sh
 tp-*.tar.gz
 *.txt
-
+*.pod
+*.tmp

@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>EasyTarget, quick Torrus config generator</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gerrit@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#easytarget__quick_torrus_config_generator">EasyTarget, quick Torrus config generator</a></li>
+	<ul>
+
+		<li><a href="#installation">Installation</a></li>
+		<li><a href="#quick_steps">Quick steps</a></li>
+		<li><a href="#plugin_documentation">Plugin documentation</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="easytarget__quick_torrus_config_generator">EasyTarget, quick Torrus config generator</a></h1>
+<p>EastTarget is a Torrus plugin designed for those users who need
+to add some specific SNMP OIDs to Torrus collector, without
+having to edit the complex XML files. EasyTarget is a quick way to
+add a few new objects without too much efforts.</p>
+<p>
+</p>
+<h2><a name="installation">Installation</a></h2>
+<p>Follow the Torrus installation guide for the main software installation.</p>
+<p>Install two Perl modules from CPAN:</p>
+<pre>
+  perl -MCPAN -e 'install Config::Tiny'
+  perl -MCPAN -e 'install Config::Any'</pre>
+<p>Unpack the plugin distribution package in some directory:</p>
+<pre>
+  gzip -dc tp-easytarget-1.X.tar.gz | tar xvf -</pre>
+<p>Then run the Torrus plugin installation utility, pointing to the
+unpacked plugin directory:</p>
+<pre>
+  torrus install_plugin tp-easytarget-1.X</pre>
+<p>
+</p>
+<h2><a name="quick_steps">Quick steps</a></h2>
+<p>EasyTarget accepts input files in Windows-style INI format. It is important
+that the file extension is exactly ``.ini''. By default, the files are searched
+in the current directpoy and then in <em>/easytarget</em>.</p>
+<p>The input file consists of sections, each representing a leaf or a subtree
+of Torrus datasource tree. You define the default parameters at the top of
+the file in global section, and then create a section for
+each tree element that you want to define. Here is a minimalistic example:</p>
+<pre>
+ OUTXML = mydevices.xml</pre>
+<pre>
+ [/EasyTarget/dev1]
+ snmp-host = 10.0.0.1
+ snmp-community = public
+ snmp-object = 1.3.6.1.4.1.5655.4.2.2.1.1.1.1.1.1</pre>
+<pre>
+ [/EasyTarget/dev2]
+ snmp-host = 10.0.0.2
+ snmp-community = public
+ snmp-object = 1.3.6.1.4.1.5655.4.2.2.1.1.1.1.1.1</pre>
+<p>Here's a more complex example:</p>
+<pre>
+ OUTXML = mydevices.xml</pre>
+<pre>
+ [/EasyTarget/Myrouter/]
+ snmp-host = 10.0.0.1
+ snmp-community = public</pre>
+<pre>
+ [/EasyTarget/Myrouter/data1]
+ snmp-object = 1.3.6.1.4.1.5655.4.2.2.1.1.1.1.1.1
+ 
+ [/EasyTarget/Myrouter/data2]
+ snmp-object = 1.3.6.1.4.1.5655.4.2.2.1.1.1.1.2.1</pre>
+<p>Next step is to feed the input file to EasyTarget:</p>
+<pre>
+ torrus et --in=mydevices.ini --verbose</pre>
+<p>Then you need to add the generated XML file to the tree by editing the
+<em>torrus-siteconfig.pl</em> file, and compile the resulting tree:</p>
+<pre>
+ torrus compile --tree=main --verbose</pre>
+<p>Now you can start the collector and Apache server if they aren't yet running.
+If they were already running, you don't need to restart them.</p>
+<p>
+</p>
+<h2><a name="plugin_documentation">Plugin documentation</a></h2>
+<p>The input file for the EasyTarget plugin is a two-level configuration file.
+Currently Windows-style INI format is supported. Other formats implemented in
+<code>Config::Any</code> Perl module should also work, but they were not tested.</p>
+<p>The input file consists of two parts: the global parameters and
+per-section parameters. The section name defines the Torrus datasource
+subtree or leaf: if the name ends with the slash (/), it denotes a subtree
+and defines parameters for child leaves. Otherwise the section defines
+a leaf. The section name should always start with slash.</p>
+<p>There are two types of parameters: the ones consisting of capitals ([A-Z]) are
+the parameters for the EasyTarget engine, and all others are the parameters
+passed to the generated Torrus config file.</p>
+<p>There is no parameter inheritance. You can only define either a parameter
+on the global level, or in each of the sections. That means, for example,
+that if <a href="#item_outxml"><code>OUTXML</code></a> is missing at the global level, it should be present
+in each section, regardless of the generated tree hierarchy.
+If a parameter exists both at the global level and in a section,
+the value in the section overrides the global one.</p>
+<p>EasyTarget understands the following parameters:</p>
+<ul>
+<li><strong><a name="item_outxml"><code>OUTXML</code></a></strong><br />
+</li>
+The name of the generated Torrus configuration XML. This parameter can be
+set globally or per-section. For example, the value <em>myisp1/targets1.xml</em>
+would cause EasyTarget to generate the file
+<em>/myisp1/targets1.xml</em>.
+<p></p>
+<li><strong><a name="item_bundle"><code>BUNDLE</code></a></strong><br />
+</li>
+This parameter specifies the name of Torrus XML conifg file that would
+include <code>&lt;inclde&gt;</code> statements for every <a href="#item_outxml"><code>OUTXML</code></a> in every section.
+This is useful if the EasyTarget file is long enough (e.g. automatically
+generated by an external program) and contains multiple output file statements.
+<p></p>
+<li><strong><a name="item_include"><code>INCLUDE</code></a></strong><br />
+</li>
+Set this parameter to a comma-separated list of XML file names that
+should be included in the generated file. Usually suh files contain some
+template definitions.
+<p></p>
+<li><strong><a name="item_templates"><code>TEMPLATES</code></a></strong><br />
+</li>
+Comma-separated list of templates that will be applied at the given
+subtree or leaf in the output file.
+<p></p></ul>
+<p>The following parameters are set implicitly to their default values:</p>
+<ul>
+<li><strong><a name="item_data_2ddir_3a__27_27"><code>data-dir</code>: ''</a></strong><br />
+</li>
+This value is taken from the one given in <code>defrrddir=DIR</code> parameter of
+the Torrus configure script at its installation time. This is the directory
+where the collector will generate the RRD files.
+<p></p>
+<li><strong><a name="item_data_2dfile_3a__27_25system_2did_25_2eeasytarget_2"><code>data-file</code>: '%system-id%.easytarget.rrd'</a></strong><br />
+</li>
+This is the name of RRD file. System-id parameter is usually equal to
+snmp-host.
+<p></p>
+<li><strong><a name="item_rrd_2dds_3a_the_same_as_the_name_of_the_leaf"><code>rrd-ds</code>: the same as the name of the leaf</a></strong><br />
+</li>
+This is the datasource name used in the RRD file for the corresponding
+dataelement. It is usually equal to the last word in the leaf path,
+and can be overridden by explicitly defining the parameter.
+<p></p>
+<li><strong><a name="item_snmp_2dversion_3a_2c"><code>snmp-version</code>: 2c</a></strong><br />
+</li>
+<li><strong><a name="item_snmp_2dport_3a_161"><code>snmp-port</code>: 161</a></strong><br />
+</li>
+<li><strong><a name="item_rrd_2dcreate_2ddstype_3a__27counter_27"><code>rrd-create-dstype</code>: 'COUNTER'</a></strong><br />
+</li>
+This is the type of the datasource to be collected. In case of non-counter
+type of the OID, this parameter should be changed to <code>GAUGE</code>.
+<p></p></ul>
+<p>By default, EasyTarget applies the template <code>snmp-defaults</code> from
+<code>snmp-defs.xml</code> to each leaf.</p>
+<p>The minimum set of parameters that should be defined in EasyTarget
+input files are: <a href="#item_outxml"><code>OUTXML</code></a>, <code>snmp-host</code>, <code>snmp-community</code>
+and <code>snmp-object</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2007 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

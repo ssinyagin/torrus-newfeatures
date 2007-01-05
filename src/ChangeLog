@@ -2,6 +2,7 @@
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm (checkdevtype):
 	New discovery parameter: CiscoIOS::enable-vlan-interfaces
+	(discover): added Cisco BGP statistics
 
 2006-12-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 

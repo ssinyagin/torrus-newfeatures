@@ -94,6 +94,13 @@
   <def name="cipSecGlobalHcOutOctets" value="1.3.6.1.4.1.9.9.171.1.3.1.17.0"/>
   <def name="cipSecGlobalOutPkts"     value="1.3.6.1.4.1.9.9.171.1.3.1.22.0"/>
   <def name="cipSecGlobalOutDrops"    value="1.3.6.1.4.1.9.9.171.1.3.1.23.0"/>
+
+  <!-- CISCO-BGP4-MIB -->
+  <def name="cbgpPeerAcceptedPrefixes"
+          value="1.3.6.1.4.1.9.9.187.1.2.4.1.1"/>
+  <def name="cbgpPeerAdvertisedPrefixes"
+          value="1.3.6.1.4.1.9.9.187.1.2.4.1.6"/>
+
 </definitions>
 
 <datasources>
@@ -712,7 +719,56 @@
       </leaf>
     </subtree>
   </template>
-  
+
+  <template name="cisco-bgp-subtree">
+    <param name="data-file">
+      %system-id%_%peer-index%_cbgp.rrd"
+    </param>
+
+    <param name="rrd-create-dstype" value="GAUGE" />
+    <param name="graph-title" value="%descriptive-nickname%" />
+    <param name="graph-lower-limit" value="0" />
+    <param name="vertical-label" value="prefixes" />
+
+    <param name="has-overview-shortcuts" value="yes"/>    
+    <param name="overview-shortcuts" value="accepted,advertised"/>
+
+    <param name="overview-subleave-name-accepted"
+           value="Accepted_Prefixes"/>
+    <param name="overview-shortcut-text-accepted"
+           value="All accepted"/>
+    <param name="overview-shortcut-title-accepted"
+           value="Show accepted prefix quantities for all peers"/>
+    <param name="overview-page-title-accepted"
+           value="Accepted Prefixes"/>    
+
+    <param name="overview-subleave-name-advertised"
+           value="Advertised_Prefixes"/>
+    <param name="overview-shortcut-text-advertised"
+           value="All advertised"/>
+    <param name="overview-shortcut-title-advertised"
+           value="Show advertised prefix quantities for all peers"/>
+    <param name="overview-page-title-advertised"
+           value="Advertised Prefixes"/>    
+  </template>
+
+  <template name="cisco-bgp">
+    <leaf name="Accepted_Prefixes">
+      <param name="comment"     value="Number of accepted BGP prefixes" />
+      <param name="graph-legend"    value="Accepted" />      
+      <param name="snmp-object"
+          value="$cbgpPeerAcceptedPrefixes.%peer-index%"/>
+      <param name="rrd-ds"          value="Accepted" />
+    </leaf>
+    <leaf name="Advertised_Prefixes">
+      <param name="comment"     value="Number of advertised BGP prefixes" />
+      <param name="graph-legend"    value="Advertised" />      
+      <param name="snmp-object"
+          value="$cbgpPeerAdvertisedPrefixes.%peer-index%"/>
+      <param name="rrd-ds"          value="Advertised" />
+    </leaf>
+  </template>
+    
 </datasources>
 
 </configuration>

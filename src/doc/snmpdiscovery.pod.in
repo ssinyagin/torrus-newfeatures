@@ -574,6 +574,10 @@ discovery.
 
 When set to C<yes>, IPSec statistics are excluded from discovery.
 
+=item * C<CiscoIOS::disable-bgp-stats>
+
+If set to C<yes>, BGP statistics are not included.
+
 =item * C<CiscoIOS::enable-vlan-interfaces>
 
 When set to C<yes>, the interfaces VlanXXX are added to statistics.
@@ -593,13 +597,13 @@ those MACs which correspond to BGP peers only.
 =item * C<bgp-as-description-NNNN>
 
 Specifies a description for an autonomous system number. Currently it's used
-with Cisco MAC accounting only.
+with Cisco MAC accounting and Cisco BGP statistics only.
 
 =item * C<peer-ipaddr-description-AAA_AAA_AAA_AAA>
 
 Specifies a description for a peer by its IP address. Dots in IP address should
 be replaced with underscores. Currently it's used with Cisco
-MAC accounting only.
+MAC accounting and Cisco BGP statistics only.
 
 =item * C<CiscoIOS_MacAccounting::tokenset-members>
 

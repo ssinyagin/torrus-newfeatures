@@ -47,7 +47,10 @@ our %oiddef =
      # OLD-CISCO-MEMORY-MIB
      'bufferElFree'                      => '1.3.6.1.4.1.9.2.1.9.0',
      # CISCO-IPSEC-FLOW-MONITOR-MIB
-     'cipSecGlobalHcInOctets'            => '1.3.6.1.4.1.9.9.171.1.3.1.4.0'
+     'cipSecGlobalHcInOctets'            => '1.3.6.1.4.1.9.9.171.1.3.1.4.0',
+     # CISCO-BGP4-MIB
+     'cbgpPeerAddrFamilyName'            => '1.3.6.1.4.1.9.9.187.1.2.3.1.3',
+     'cbgpPeerAcceptedPrefixes'          => '1.3.6.1.4.1.9.9.187.1.2.4.1.1'
      );
 
 
@@ -141,8 +144,7 @@ sub checkdevtype
     }
 
     my $session = $dd->session();
-    if( not defined( $session->get_table
-                     ( -baseoid => $dd->oiddef('ciscoImageTable') ) ) )
+    if( not $dd->checkSnmpTable('ciscoImageTable') )
     {
         return 0;
     }
@@ -258,7 +260,130 @@ sub discover
             $data->{'param'}{'snmp-oids-per-pdu'} = 10;
         }
     }
-    
+
+    if( $devdetails->param('CiscoIOS::disable-bgp-stats') ne 'yes' )
+    {
+        my $peerTable =
+            $session->get_table( -baseoid =>
+                                 $dd->oiddef('cbgpPeerAcceptedPrefixes') );
+        if( defined( $peerTable ) and scalar( %{$peerTable} ) > 0 )
+        {
+            $devdetails->storeSnmpVars( $peerTable );
+            $devdetails->setCap('CiscoBGP');
+
+            $data->{'cbgpPeers'} = {};
+            
+            # retrieve AS numbers for neighbor peers
+            Torrus::DevDiscover::RFC1657_BGP4_MIB::discover($dd, $devdetails);
+            
+            # list of indices for peers that are not IPv4 Unicast
+            my @nonV4Unicast;
+
+            # Number of peers for each AS
+            my %asNumbers;    
+
+            foreach my $INDEX
+                ( $devdetails->
+                  getSnmpIndices( $dd->oiddef('cbgpPeerAcceptedPrefixes') ) )
+            {
+                my ($a1, $a2, $a3, $a4, $afi, $safi) = split(/\./, $INDEX);
+                my $peerIP = join('.', $a1, $a2, $a3, $a4);
+
+                my $peer = {
+                    'peerIP' => $peerIP,
+                    'addrFamily' => 'IPv4 Unicast'
+                    };
+                
+                if( $afi != 1 and $safi != 1 )
+                {
+                    push( @nonV4Unicast, $INDEX );
+                }
+
+                my $desc =
+                    $devdetails->param('peer-ipaddr-description-' .
+                                       join('_', split('\.', $peerIP)));
+                if( length( $desc ) > 0 )
+                {
+                    $peer->{'description'} = $desc;
+                }        
+                
+                my $peerAS = $data->{'bgpPeerAS'}{$peerIP};
+                if( defined( $peerAS ) )
+                {
+                    $peer->{'peerAS'} = $data->{'bgpPeerAS'}{$peerIP};
+                    $asNumbers{$peer->{'peerAS'}}++;
+
+                    my $desc =
+                        $devdetails->param('bgp-as-description-' . $peerAS);
+                    if( length( $desc ) > 0 )
+                    {
+                        if( defined( $peer->{'description'} ) )
+                        {
+                            Warn('Conflicting descriptions for peer ' .
+                                 $peerIP);
+                        }
+                        $peer->{'description'} = $desc;
+                    }
+                }
+                else
+                {
+                    Error('Cannot find AS number for BGP peer ' . $peerIP);
+                    next;
+                }
+
+                if( defined( $peer->{'description'} ) )
+                {
+                    $peer->{'description'} .= ' ';
+                }
+                $peer->{'description'} .= '[' . $peerIP . ']';
+
+                $data->{'cbgpPeers'}{$INDEX} = $peer;
+            }
+
+            if( scalar( @nonV4Unicast ) > 0 )
+            {
+                my $addrFamTable =
+                    $session->get_table
+                    ( -baseoid => $dd->oiddef('cbgpPeerAddrFamilyName') );
+                
+                foreach my $INDEX ( @nonV4Unicast )
+                {
+                    my $peer = $data->{'cbgpPeers'}{$INDEX};
+
+                    my $fam = $addrFamTable->{
+                        $dd->oiddef('cbgpPeerAddrFamilyName') .
+                            '.' . $INDEX};
+
+                    $peer->{'addrFamily'} = $fam;
+                    $peer->{'otherAddrFamily'} = 1;
+                    $peer->{'description'} .= ' ' . $fam;
+                }
+            }
+
+            # Construct the subtree names from AS, peer IP, and address
+            # family
+            foreach my $INDEX ( keys %{$data->{'cbgpPeers'}} )
+            {
+                my $peer = $data->{'cbgpPeers'}{$INDEX};
+                
+                my $subtreeName = 'AS' . $peer->{'peerAS'};
+                if( $asNumbers{$peer->{'peerAS'}} > 1 )
+                {
+                    $subtreeName .= '_' . $peer->{'peerIP'};
+                }
+                
+                if( $peer->{'otherAddrFamily'} )
+                {
+                    my $fam = $data->{'cbgpPeers'}{$INDEX}{'addrFamily'};
+                    $fam =~ s/\W/_/g;
+                    $subtreeName .= '_' . $fam;
+                }
+                
+                $peer->{'subtreeName'} = $subtreeName;
+            }
+        }
+    }
+        
     return 1;
 }
 
@@ -269,6 +394,35 @@ sub buildConfig
     my $cb = shift;
     my $devNode = shift;
 
+    my $data = $devdetails->data();
+
+    if( $devdetails->hasCap('CiscoBGP') )
+    {
+        my $countersNode =
+            $cb->addSubtree( $devNode, 'BGP_Stats',
+                             { 'comment' => 'BGP peer statistics'},
+                             ['CiscoIOS::cisco-bgp-subtree']);
+
+        foreach my $INDEX ( sort
+                            { $data->{'cbgpPeers'}{$a}{'subtreeName'} <=>
+                                  $data->{'cbgpPeers'}{$b}{'subtreeName'} }
+                            keys %{$data->{'cbgpPeers'}} )
+        {
+            my $peer = $data->{'cbgpPeers'}{$INDEX};
+
+            my $param = {
+                'peer-index'           => $INDEX,
+                'peer-ipaddr'          => $peer->{'peerIP'},
+                'comment'              => $peer->{'description'},
+                'descriptive-nickname' => $peer->{'subtreeName'},
+                'precedence'           => 65000 - $peer->{'peerAS'}
+            };
+
+            $cb->addSubtree
+                ( $countersNode, $peer->{'subtreeName'}, $param,
+                  ['CiscoIOS::cisco-bgp'] );
+        }
+    }
 }
 
 

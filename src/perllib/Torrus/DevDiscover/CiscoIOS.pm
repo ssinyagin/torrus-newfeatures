@@ -96,11 +96,6 @@ if( not defined( $interfaceFilter ) )
          'ifDescr' => '^Loopback'
          },
 
-     'VlanN' => {
-         'ifType'  => 53,                     # propVirtual
-         'ifDescr' => '^Vlan\d+'
-         },
-
      'unrouted VLAN N' => {
          'ifType'  => 53,                     # propVirtual
          'ifDescr' => '^unrouted\s+VLAN\s+\d+'
@@ -152,6 +147,17 @@ sub checkdevtype
         return 0;
     }
 
+    # On some Layer3 switching devices, VlanXXX interfaces give some
+    # useful stats, while on others the stats are not relevant at all
+    
+    if( $devdetails->param('CiscoIOS::enable-vlan-interfaces') ne 'yes' )
+    {
+        $interfaceFilter->{'VlanN'} = {
+            'ifType'  => 53,                     # propVirtual
+            'ifDescr' => '^Vlan\d+'
+            };
+    }
+        
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
 

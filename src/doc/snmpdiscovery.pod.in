@@ -574,6 +574,12 @@ discovery.
 
 When set to C<yes>, IPSec statistics are excluded from discovery.
 
+=item * C<CiscoIOS::enable-vlan-interfaces>
+
+When set to C<yes>, the interfaces VlanXXX are added to statistics.
+By default they are not included, because some hardware platforms give
+irrelevant counter statistics.
+
 =item * C<CiscoCatOS::suppress-noname-ports>
 
 When set to C<yes>, only those Catalyst ports are included in configuration

@@ -1,3 +1,8 @@
+2007-01-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS.pm (checkdevtype):
+	IOS XR support
+
 2007-01-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm (checkdevtype):

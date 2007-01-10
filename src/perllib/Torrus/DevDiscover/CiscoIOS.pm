@@ -44,6 +44,8 @@ our %oiddef =
      'ciscoLS1010'                       => '1.3.6.1.4.1.9.1.107',
      # CISCO-IMAGE-MIB
      'ciscoImageTable'                   => '1.3.6.1.4.1.9.9.25.1.1',
+     # CISCO-ENHANCED-IMAGE-MIB
+     'ceImageTable'                      => '1.3.6.1.4.1.9.9.249.1.1.1',
      # OLD-CISCO-MEMORY-MIB
      'bufferElFree'                      => '1.3.6.1.4.1.9.2.1.9.0',
      # CISCO-IPSEC-FLOW-MONITOR-MIB
@@ -146,7 +148,15 @@ sub checkdevtype
     my $session = $dd->session();
     if( not $dd->checkSnmpTable('ciscoImageTable') )
     {
-        return 0;
+        if( $dd->checkSnmpTable('ceImageTable') )
+        {
+            # IOS XR has a new MIB for software image management
+            $devdetails->setCap('CiscoIOSXR');            
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     # On some Layer3 switching devices, VlanXXX interfaces give some

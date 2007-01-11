@@ -2,6 +2,7 @@ Round Robin Database Framework
   
 To do now:
 
+-- index the parameters during compilation and add search function to UI
 -- Update User Guide
 -- Persistent maps in snmp collector
 -- Multithreading in collector

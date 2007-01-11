@@ -26,6 +26,9 @@
   and default view definitions.
 
   WARNING: This file is overwritten by "make install"
+  
+  It is recommended to place all site customizations in site-global.xml,
+  as it would not be overwritten by the installer.
 -->
 
 <configuration>

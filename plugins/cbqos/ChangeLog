@@ -1,3 +1,8 @@
+2007-01-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* DevDiscover/CiscoIOS_cbQoS.pm:
+	Added a stub support for vlanPort interface type
+
 2006-02-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Collector/Cisco_cbQoS.pm: cbQosEntityIndex and cbQosVlanIndex

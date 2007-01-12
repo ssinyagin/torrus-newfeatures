@@ -48,6 +48,8 @@ our %oiddef =
      'cbQosFrDLCI'                     => '1.3.6.1.4.1.9.9.166.1.1.1.1.5',
      'cbQosAtmVPI'                     => '1.3.6.1.4.1.9.9.166.1.1.1.1.6',
      'cbQosAtmVCI'                     => '1.3.6.1.4.1.9.9.166.1.1.1.1.7',
+     'cbQosEntityIndex'                => '1.3.6.1.4.1.9.9.166.1.1.1.1.8',
+     'cbQosVlanIndex'                  => '1.3.6.1.4.1.9.9.166.1.1.1.1.9',
 
      'cbQosObjectsTable'               => '1.3.6.1.4.1.9.9.166.1.5.1',
      'cbQosObjectsIndex'               => '1.3.6.1.4.1.9.9.166.1.5.1.1.1',
@@ -178,12 +180,16 @@ sub discover
         $data->{'cbqos_policies'}{$policyIndex} = {};
 
         foreach my $row ('cbQosIfType', 'cbQosPolicyDirection', 'cbQosIfIndex',
-                         'cbQosFrDLCI', 'cbQosAtmVPI', 'cbQosAtmVCI')
+                         'cbQosFrDLCI', 'cbQosAtmVPI', 'cbQosAtmVCI',
+                         'cbQosEntityIndex', 'cbQosVlanIndex')
         {
             my $value = $devdetails->snmpVar($dd->oiddef($row) .
                                              '.' . $policyIndex);
-            $value = translateCbQoSValue( $value, $row );
-            $data->{'cbqos_policies'}{$policyIndex}{$row} = $value;
+            if( defined( $value ) )
+            {
+                $value = translateCbQoSValue( $value, $row );            
+                $data->{'cbqos_policies'}{$policyIndex}{$row} = $value;
+            }
         }
     }
 
@@ -541,6 +547,20 @@ sub buildChildrenConfigs
                         $param->{'cbqos-atm-vpi'} = $vpi;
                         $param->{'cbqos-atm-vci'} = $vci;
                     }
+                    elsif( $ifType eq 'controlPlane' )
+                    {
+                        Warn('controlPlane interface type is not yet ' .
+                             'fully supported. Please contact the Torrus ' .
+                             'mailing list if your statistics do not ' .
+                             'look right.');
+                    }
+                    elsif( $ifType eq 'vlanPort' )
+                    {
+                        Warn('vlanPort interface type is not yet ' .
+                             'fully supported. Please contact the Torrus ' .
+                             'mailing list if your statistics do not ' .
+                             'look right.');                        
+                    }
                     
                     my $direction = $policyRef->{'cbQosPolicyDirection'};
                     
@@ -848,7 +868,9 @@ my %cbQosValueTranslation =
          1 => 'mainInterface',
          2 => 'subInterface',
          3 => 'frDLCI',
-         4 => 'atmPVC' },
+         4 => 'atmPVC',
+         5 => 'controlPlane',
+         6 => 'vlanPort' },
 
      'cbQosPolicyDirection' => {
          1 => 'input',

@@ -104,7 +104,9 @@ my %cbQosValueTranslation =
          'mainInterface'  => 1,
          'subInterface'   => 2,
          'frDLCI'         => 3,
-         'atmPVC'         => 4 },
+         'atmPVC'         => 4,
+         'controlPlane'   => 5,
+         'vlanPort'       => 6 },
 
      'cbQosPolicyDirection' => {
          'input'          => 1,

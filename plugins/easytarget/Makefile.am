@@ -45,8 +45,8 @@ easytarget: easytarget.in
 
 
 #####   Documentation files   #####
-docdir  = @docdir@
-dist_doc_DATA = tp-easytarget.txt tp-easytarget.pod.in 
+pkgdocdir  = @pkgdocdir@
+dist_pkgdoc_DATA = tp-easytarget.txt tp-easytarget.pod.in 
 SUFFIXES = .pod.in .pod .txt
 .pod.in.pod:
 	$(SUBST) $<  > $@

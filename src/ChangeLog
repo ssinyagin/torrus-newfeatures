@@ -1,3 +1,9 @@
+2007-01-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* configure.ac: Synchronized with Autoconf 2.60.
+	Now 2.60 is the minimum required version.
+	Changed docdir to pkgdocdir
+
 2007-01-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm (checkdevtype):

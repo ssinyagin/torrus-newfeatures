@@ -59,7 +59,7 @@ install-data-local:
 
 
 #####   Documentation files   #####
-mydocdir  = $(docdir)
+mydocdir  = $(pkgdocdir)
 dist_mydoc_DATA = tp-overview.txt tp-overview.pod
 SUFFIXES = .pod .txt
 .pod.txt:

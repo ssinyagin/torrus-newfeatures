@@ -46,8 +46,8 @@ dist_myxml_DATA = cisco.ios.cbqos.xml
 
 
 #####   Documentation files   #####
-docdir  = @docdir@
-dist_doc_DATA = tp-cisco-cbqos.txt tp-cisco-cbqos.pod 
+pkgdocdir  = @pkgdocdir@
+dist_pkgdoc_DATA = tp-cisco-cbqos.txt tp-cisco-cbqos.pod 
 SUFFIXES = .pod .txt
 .pod.txt:
 	pod2text $< $@ 

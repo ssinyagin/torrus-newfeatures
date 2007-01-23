@@ -39,8 +39,8 @@ dist_xmpxml_DATA = localhost-apache2.xml localhost-apache1.xml
 
 
 #####   Documentation files   #####
-docdir  = @docdir@
-dist_doc_DATA = tp-httpcollector.txt tp-httpcollector.pod 
+pkgdocdir  = @pkgdocdir@
+dist_pkgdoc_DATA = tp-httpcollector.txt tp-httpcollector.pod 
 SUFFIXES = .pod .txt
 .pod.txt:
 	pod2text $< $@ 

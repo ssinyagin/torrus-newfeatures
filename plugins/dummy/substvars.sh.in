@@ -21,6 +21,7 @@
 
 PACKAGE=@PACKAGE@
 prefix=@prefix@
+datarootdir=@datarootdir@
 pkghome=@pkghome@
 exec_prefix=@exec_prefix@
 perllibdir=@perllibdir@

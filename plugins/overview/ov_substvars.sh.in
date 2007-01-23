@@ -20,6 +20,7 @@
 #
 
 prefix=@prefix@
+datarootdir=@datarootdir@
 pkghome=@pkghome@
 supdir=@supdir@
 varprefix=@varprefix@

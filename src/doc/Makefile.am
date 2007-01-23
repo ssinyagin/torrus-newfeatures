@@ -53,10 +53,10 @@ POD_FILES = \
 		xmlconfig.pod
 
 
-docdir  = @docdir@
+pkgdocdir  = @pkgdocdir@
 
 if POD2TEXT_PRESENT
-nodist_doc_DATA = \
+nodist_pkgdoc_DATA = \
 		install.txt \
 		reporting_setup.txt \
 		rpnexpr.txt \
@@ -70,7 +70,7 @@ nodist_doc_DATA = \
 		xmlconfig.txt
 endif
 
-devdocdir  = $(docdir)/devdoc
+devdocdir  = $(pkgdocdir)/devdoc
 
 dist_devdoc_DATA = \
 		devdoc/architecture.pod \

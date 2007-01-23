@@ -21,6 +21,7 @@
 
 PACKAGE=@PACKAGE@
 prefix=@prefix@
+datarootdir=@datarootdir@
 pkghome=@pkghome@
 exec_prefix=@exec_prefix@
 perllibdir=@perllibdir@
@@ -54,7 +55,7 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
     -e "s,\@devdiscover_config_pl\@,$devdiscover_config_pl,g" \
     -e "s,\@devdiscover_siteconfig_pl\@,$devdiscover_siteconfig_pl,g" \
     -e "s,\@distxmldir\@,@distxmldir@,g" \
-    -e "s,\@docdir\@,@docdir@,g" \
+    -e "s,\@pkgdocdir\@,@pkgdocdir@,g" \
     -e "s,\@email_siteconfig_pl\@,$email_siteconfig_pl,g" \
     -e "s,\@exmpdir\@,@exmpdir@,g" \
     -e "s,\@logdir\@,@logdir@,g" \

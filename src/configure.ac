@@ -20,6 +20,7 @@
 
 
 AC_INIT([torrus],[1.0.5d],[ssinyagin@users.sourceforge.net])
+AC_PREREQ([2.60])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)
@@ -194,9 +195,9 @@ AC_ARG_VAR(cfgdefdir,   [[PKGHOME/conf_defaults] torrus-config.pl and others])
 if test -z "$cfgdefdir"; then
    cfgdefdir='${pkghome}/conf_defaults'; fi
 
-AC_ARG_VAR(docdir, [[PKGHOME/doc] Documentation files])
-if test -z "$docdir"; then
-   docdir='${pkghome}/doc'; fi
+AC_ARG_VAR(pkgdocdir, [[PKGHOME/doc] Documentation files])
+if test -z "$pkgdocdir"; then
+   pkgdocdir='${pkghome}/doc'; fi
 
 AC_ARG_VAR(exmpdir, [[PKGHOME/examples] Examples])
 if test -z "$exmpdir"; then

@@ -173,7 +173,7 @@ if( defined $hostfile )
 
 # Create XML DOM
 
-my $doc = XML::LibXML->createDocument( "1.0", "UTF8" );
+my $doc = XML::LibXML->createDocument( "1.0", "UTF-8" );
 my $root = $doc->createElement('snmp-discovery');
 $doc->setDocumentElement( $root );
 

@@ -151,7 +151,7 @@ A typical place to store the discovery XML is F<@siteconfdir@/discovery/>.
 
 Example:
 
-    <?xml version="1.0" encoding="UTF8"?>
+    <?xml version="1.0" encoding="UTF-8"?>
     <snmp-discovery>
       <file-info>
         <format-version>

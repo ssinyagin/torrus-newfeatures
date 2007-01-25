@@ -1,3 +1,7 @@
+2007-01-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 1.0.5
+
 2007-01-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* configure.ac: Synchronized with Autoconf 2.60.

@@ -38,7 +38,7 @@
 	* perllib/Torrus/Collector/SNMP.pm:
 	SNMP mapping lookups are now asynchronous.
 	PDUs are rescheduled with delays
-	Not compatible with old cbQos olugin, needs tp-cisco-cbqos-1.4d
+	Not compatible with old cbQos plugin, needs tp-cisco-cbqos-1.4d
 
 2006-11-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 

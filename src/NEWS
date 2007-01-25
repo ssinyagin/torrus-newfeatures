@@ -1,3 +1,38 @@
+25-JAN-2007: Torrus release 1.0.5
+
+This is a major release with many new features.
+
+In this release:
+
+-- Bugfixes in SNMPv3 support
+
+-- Perl multithreading. If threads are supported by local Perl,
+   Devdiscover can perform parallel discoveries per output file.
+   Also the Collector runs a background thread for RRD updates.
+
+-- Improvement in SNMP collector initialization. Now the collector expands
+   the interface names and other maps asynchronously, which dramatically
+   reduces the initialization time for large installations.
+   Cisco QoS plugin needs an upgrade to version 1.4 or higher.
+
+-- New vendor support in SNMP discovery engine:
+   Motorola BSR CMTS (ex-Riverdelta), Cisco SCE, BGP prefix statistics for
+   Cisco IOS routers, Cisco IOS XR support.
+
+-- DOCSIS upstream statistics have changed the format, therefore
+   the old stats will be lost after upgrade. The stats now include the
+   US Frequency graphs.
+
+-- Interface statistics now contain "All Errors" tab with all error graphs
+   in one page.
+
+-- Interface traffic graphs may contain bandwidth utilization percentage
+   information (see RFC2863_IF_MIB::bandwidth-usage in SNMP Discovery
+   Guide).
+
+-- Cisco MAC accounting can also be used for billing reports.
+
+
 20-JUL-2006: Torrus release 1.0.4
 
 This is a major release with many new features.

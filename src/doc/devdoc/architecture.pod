@@ -179,6 +179,23 @@ Comma-separated list of actions defined
 
 =back
 
+
+
+
+B<paramprops_DSINST.db> is a I<Btree> database for storing the
+datasource parameter properties, such as expandable, list parameters,
+searchable, etc.:
+
+=over 4
+
+=item * E<lt>pnameE<gt>:E<lt>propertyE<gt> -- E<lt>valueE<gt>
+
+=back
+
+
+
+
+
 B<aliases_DSINST.db> is a I<Btree> database with alias paths as keys
 and target tokens as values. It is used for quick alias expansion.
 

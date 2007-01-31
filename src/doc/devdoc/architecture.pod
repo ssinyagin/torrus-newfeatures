@@ -52,10 +52,11 @@ All runtime data is stored in
 B<Berkeley DB> database environment (http://www.sleepycat.com).
 
 The compiled version of the configuration XML is stored in
-the B<ds_config_INST.db> and B<other_config_INST.db>.
+the B<ds_config_DSINST.db> and B<other_config_OINST.db>.
 These databases have similar structure, and
-B<ds_config_INST.db> keeps all datasource-related information.
-C<INST> stands for the productive instance number, and has value 0 or 1.
+B<ds_config_DSINST.db> keeps all datasource-related information.
+C<DSINST> and C<OINST> stand for the productive instance number,
+and have values of 0 or 1.
 Current productive instance numbers are stored in B<db_config_instances.db>
 database.
 
@@ -81,11 +82,11 @@ start with a lower case letter.
 
 B<db_config_instances.db> is a I<Hash> database, with keys of form
 C<ds:E<lt>tree_nameE<gt>> or C<other:E<lt>tree_nameE<gt>>, and 0 or 1 as
-values. Also the compiler addts an entry C<compiling:E<lt>tree_nameE<gt>>
+values. Also the compiler adds an entry C<compiling:E<lt>tree_nameE<gt>>
 during the compilation time, in order to avoid two compiler processes
 running at the same time on the same tree.
 
-B<ds_config_INST.db> is a I<Btree> database, with the keys and values
+B<ds_config_DSINST.db> is a I<Btree> database, with the keys and values
 defined as follows:
 
 =over 4
@@ -140,7 +141,7 @@ Defines a node type. Type is a number with the following values:
 
 =back
 
-B<other_config.db> is a I<Btree> database, with the keys and values
+B<other_config_OINST.db> is a I<Btree> database, with the keys and values
 defined as follows:
 
 =over 4
@@ -178,8 +179,8 @@ Comma-separated list of actions defined
 
 =back
 
-B<aliases.db> is a I<Btree> database with aliase paths as keys and target
-tokens as values. It is used for quick alias expansion.
+B<aliases_DSINST.db> is a I<Btree> database with alias paths as keys
+and target tokens as values. It is used for quick alias expansion.
 
 B<tokensets.db> is a I<Hash> database containing the token sets.
 The keys and values are as follows:
@@ -196,8 +197,8 @@ For given tokenset, keeps its contents.
 
 =back
 
-B<nodepcache.db> is a I<Btree> database containing the cached node parameter
-values. The keys and values are as follows:
+B<nodepcache_DSINST.db> is a I<Btree> database containing the cached
+node parameter values. The keys and values are as follows:
 
 =over 4
 
@@ -275,47 +276,6 @@ unneccessary configuration tree walk. Keys and values are as follows:
 For each leaf token, period and time offset values are stored.
 
 =back
-
-
-
-B<snmp_lookup.db> is a I<Btree> database used by SNMP collector module.
-It serves as a persistent storage for such SNMP data as interface names etc.
-
-=over 4
-
-=item * F: -- E<lt>formatE<gt>
-
-Specifies the format version string. If the collector module's version
-string is different from the one in the database, the database is automatically
-flushed.
-
-=item * M:E<lt>ipaddrE<gt>/E<lt>portE<gt>/E<lt>communityE<gt>
-\0E<lt>mapE<gt>\0E<lt>keyE<gt> -- E<lt>indexE<gt>
-
-Community may contain SNMPv3 user name. Each record stores an SNMP reverse
-lookup for a table given in E<lt>mapE<gt> parameter. E<lt>keyE<gt> contains
-the OID return value, and E<lt>indexE<gt> contains the index in the table.
-
-=item * V:E<lt>ipaddrE<gt>/E<lt>portE<gt>/E<lt>communityE<gt>
-\0E<lt>oidE<gt> -- E<lt>valueE<gt>
-
-These records contain the SNMP values for given OIDs.
-
-=item * B:E<lt>ipaddrE<gt>/E<lt>portE<gt>/E<lt>communityE<gt>
--- E<lt>timestampE<gt>
-
-UNIX timestamp for the SNMP agent boot time.
-
-=item * U:E<lt>ipaddrE<gt>/E<lt>portE<gt>/E<lt>communityE<gt>
--- E<lt>timestampE<gt>
-
-UNIX timestamp of the last update for this SNMP agent.
-The collector periodically re-scans the SNMP hosts,
-and if the host information is too old it will be deleted.
-
-=back
-
-
 
 
 B<scheduler_stats.db> is a I<Btree> database which stores the runtime

@@ -358,6 +358,18 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-sce-tp',
          'source' => 'vendor/cisco.sce.xml',
      },
+     'CiscoSCE::cisco-sce-queues-subtree' => {
+         'name'   => 'cisco-sce-queues-subtree',
+         'source' => 'vendor/cisco.sce.xml',
+     },
+     'CiscoSCE::cisco-sce-gc-subtree' => {
+         'name'   => 'cisco-sce-gc-subtree',
+         'source' => 'vendor/cisco.sce.xml',
+     },
+     'CiscoSCE::cisco-sce-gcounter' => {
+         'name'   => 'cisco-sce-gcounter',
+         'source' => 'vendor/cisco.sce.xml',
+     },
      
      'CiscoVDSL::cvdsl-subtree' => {
          'name'   => 'cvdsl-subtree',

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
    Copyright (C) 2006 Jon Nistor
-   Copyright (C) 2006 Stanislav Sinyagin
+   Copyright (C) 2007 Stanislav Sinyagin
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@
   <def name="subNumWithSessions"  value="1.3.6.1.4.1.5655.4.1.8.1.1.17.1" />
 
 
-<!-- PCUBE-SE-MIB::tpInfoEntry -->
+  <!-- PCUBE-SE-MIB::tpInfoEntry -->
   <def name="tpNumActiveFlows"     value="1.3.6.1.4.1.5655.4.1.9.1.1.5.1" />
   <def name="tpNumTcpActiveFlows"  value="1.3.6.1.4.1.5655.4.1.9.1.1.8.1" />
   <def name="tpNumUdpActiveFlows"  value="1.3.6.1.4.1.5655.4.1.9.1.1.11.1" />
@@ -73,6 +73,20 @@
   <def name="tpCpuUtilization"     value="1.3.6.1.4.1.5655.4.1.9.1.1.35.1" />
   <def name="tpFlowsCapacityUtilization"
                                    value="1.3.6.1.4.1.5655.4.1.9.1.1.38.1" />
+
+  <!-- PCUBE-SE-MIB::txQueuesTable -->
+  <def name="txQueuesUtilization"
+                                   value="1.3.6.1.4.1.5655.4.1.11.1.1.6.1" />
+  
+  <!-- CISCO-SCAS-BB-MIB::linkServiceUsageTable -->
+  <def name="linkServiceUsageUpVolume"
+                                 value="1.3.6.1.4.1.5655.4.2.2.1.1.1.1" />
+  <def name="linkServiceUsageDownVolume"
+                                 value="1.3.6.1.4.1.5655.4.2.2.1.1.2.1" />
+  <def name="linkServiceUsageConcurrentSessions"
+                                 value="1.3.6.1.4.1.5655.4.2.2.1.1.5.1" />
+  
+                                   
 </definitions>
 
 
@@ -90,7 +104,7 @@
       <leaf name="Usage">
         <param name="precedence"         value="1000"/>
         <param name="comment"            value="Total vs Used disk space"/>
-        <param name="title"              value="Disk Usage"/>
+        <param name="graph-title"        value="Disk Usage"/>
         <param name="ds-type"            value="rrd-multigraph"/>
         <param name="ds-names"           value="total,used"/>
         <param name="graph-lower-limit"  value="0"/>
@@ -412,8 +426,64 @@
     </leaf>
                         
   </template>
+
+    
+  <template name="cisco-sce-queues-subtree">
+    <param name="data-file"      value="%system-id%_SCE_queues.rrd"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+    <param name="vertical-label"    value="Percent"/>
+    <param name="graph-legend"      value="Queue utilization"/>
+    <param name="graph-title"       value="Queue Utilization"/>
+    <param name="rrd-ds"        value="%sce-port-index%_%sce-queue-index%"/>
+    <param name="snmp-object"
+        value="$txQueuesUtilization.%sce-port-index%.%sce-queue-index%"/>
+  </template>
+
+
+  <template name="cisco-sce-gc-subtree">  
+    <param name="data-file"
+        value="%system-id%_SCE_gc_%sce-link-index%_%sce-gc-index%.rrd"/>
+    <param name="graph-lower-limit" value="0" />
+  </template>
   
+  <template name="cisco-sce-gcounter">
   
+    <leaf name="Upstream_Bandwidth">
+      <param name="comment"
+              value="Upstream bandwidth usage per service"/>
+      <param name="graph-legend"    value="Upstream BW"/>
+      <param name="vertical-label"  value="bps"/>
+      <param name="rrd-ds"          value="UpstreamBW"/>
+      <param name="snmp-object"
+        value="$linkServiceUsageUpVolume.%sce-link-index%.%sce-gc-index%"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+    </leaf>
+    
+    <leaf name="Downstream_Bandwidth">
+      <param name="comment"
+              value="Downstream bandwidth usage per service"/>
+      <param name="graph-legend"    value="Downstream BW"/>
+      <param name="vertical-label"  value="bps"/>
+      <param name="rrd-ds"          value="DownstreamBW"/>
+      <param name="snmp-object"
+        value="$linkServiceUsageDownVolume.%sce-link-index%.%sce-gc-index%"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+    </leaf>
+
+    <leaf name="Concurrent_Sessions">
+      <param name="comment"
+              value="Number of concurrent sessions per service"/>
+      <param name="graph-legend"    value="Sessions"/>
+      <param name="vertical-label"  value=""/>
+      <param name="rrd-ds"          value="Sessions"/>
+      <param name="snmp-object"
+  value="$linkServiceUsageConcurrentSessions.%sce-link-index%.%sce-gc-index%"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+    </leaf>
+        
+  </template>
+
+    
 </datasources>
 
 </configuration>

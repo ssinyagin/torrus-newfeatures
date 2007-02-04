@@ -437,6 +437,7 @@
     <param name="rrd-ds"        value="%sce-port-index%_%sce-queue-index%"/>
     <param name="snmp-object"
         value="$txQueuesUtilization.%sce-port-index%.%sce-queue-index%"/>
+    <param name="graph-lower-limit" value="0" />
   </template>
 
 
@@ -444,30 +445,88 @@
     <param name="data-file"
         value="%system-id%_SCE_gc_%sce-link-index%_%sce-gc-index%.rrd"/>
     <param name="graph-lower-limit" value="0" />
+    <param name="graph-title"        value="%sce-service-name%"/>
+    
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="up,down,sessions"/>
+    
+    <param name="overview-subleave-name-up"    value="Up_bps"/>
+    <param name="overview-direct-link-up"      value="yes"/>
+    <param name="overview-direct-link-view-up" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-up"
+           value="Upstream Usage"/>
+    <param name="overview-shortcut-title-up"
+           value="Show upstream bandwidth usage for all services"/>
+    <param name="overview-page-title-up"
+           value="Upstream Usage"/>
+
+    <param name="overview-subleave-name-down"  value="Down_bps"/>
+    <param name="overview-direct-link-down"      value="yes"/>
+    <param name="overview-direct-link-view-down" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-down"
+           value="Downstream Usage"/>
+    <param name="overview-shortcut-title-down"
+           value="Show downstream bandwidth usage for all services"/>
+    <param name="overview-page-title-down"
+           value="Downstream Usage"/>
+
+    <param name="overview-subleave-name-sessions" value="Concurrent_Sessions"/>
+    <param name="overview-direct-link-sessions"      value="yes"/>
+    <param name="overview-direct-link-view-sessions"
+                                            value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-sessions"
+           value="Sessions"/>
+    <param name="overview-shortcut-title-sessions"
+           value="Show numbers of concurrent sessions for all services"/>
+    <param name="overview-page-title-sessions"
+           value="Concurrent Sessions"/>
+           
   </template>
   
   <template name="cisco-sce-gcounter">
   
-    <leaf name="Upstream_Bandwidth">
+    <leaf name="UpVolume">
+      <param name="comment"
+              value="Upstream volume in kilobytes/s"/>
+      <param name="hidden"          value="yes"/>
+      <param name="rrd-ds"          value="UpVolume"/>
+      <param name="snmp-object"
+        value="$linkServiceUsageUpVolume.%sce-link-index%.%sce-gc-index%"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="precedence" value="90"/>
+    </leaf>
+
+    <leaf name="DownVolume">
+      <param name="comment"
+              value="Downstream volume in kilobytes/s"/>
+      <param name="hidden"          value="yes"/>
+      <param name="rrd-ds"          value="DownVolume"/>
+      <param name="snmp-object"
+        value="$linkServiceUsageDownVolume.%sce-link-index%.%sce-gc-index%"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="precedence" value="85"/>
+    </leaf>
+    
+    <leaf name="Up_bps">
       <param name="comment"
               value="Upstream bandwidth usage per service"/>
       <param name="graph-legend"    value="Upstream BW"/>
       <param name="vertical-label"  value="bps"/>
-      <param name="rrd-ds"          value="UpstreamBW"/>
-      <param name="snmp-object"
-        value="$linkServiceUsageUpVolume.%sce-link-index%.%sce-gc-index%"/>
-      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="ds-type"         value="rrd-file" />
+      <param name="leaf-type"       value="rrd-cdef" />
+      <param name="rpn-expr"        value="{UpVolume},8192,*" />    
+      <param name="precedence"      value="70"/>
     </leaf>
     
-    <leaf name="Downstream_Bandwidth">
+    <leaf name="Down_bps">
       <param name="comment"
               value="Downstream bandwidth usage per service"/>
       <param name="graph-legend"    value="Downstream BW"/>
       <param name="vertical-label"  value="bps"/>
-      <param name="rrd-ds"          value="DownstreamBW"/>
-      <param name="snmp-object"
-        value="$linkServiceUsageDownVolume.%sce-link-index%.%sce-gc-index%"/>
-      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="ds-type"         value="rrd-file" />
+      <param name="leaf-type"       value="rrd-cdef" />
+      <param name="rpn-expr"        value="{DownVolume},8192,*" />    
+      <param name="precedence"      value="65"/>
     </leaf>
 
     <leaf name="Concurrent_Sessions">
@@ -479,11 +538,11 @@
       <param name="snmp-object"
   value="$linkServiceUsageConcurrentSessions.%sce-link-index%.%sce-gc-index%"/>
       <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="precedence"      value="50"/>
     </leaf>
         
   </template>
 
-    
 </datasources>
 
 </configuration>

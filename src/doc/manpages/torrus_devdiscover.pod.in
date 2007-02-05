@@ -65,6 +65,15 @@ Requires B<--forcebundle>. In case if an SNMP device is not available,
 the bundle file will include an older version of the XML output file,
 provided that it exists and it is not older than the specified number of days.
 
+=item B<--threads>=I<INTEGER>
+
+If the threads are enabled in the local Perl, this option determins
+how many parallel discovery threads are to be executed.
+The discovery jobs are distributed per output files, thus it makes
+sence to use threads only when there are many output files defined in
+a single DDX file.
+
+
 =item B<--verbose>
 
 Prints extra information.

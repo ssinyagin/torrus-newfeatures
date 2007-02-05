@@ -55,6 +55,14 @@ compilation up to 2 times, while adding a risk to end up with an
 unusable configuration. In addition, the first initialization cycle of
 Collector and Monitor in this case would be much longer.
 
+=item B<--force>
+
+Normally the compiler would fail to start if another compiler process
+is already running for the specific tree. In case of abnormal function,
+the running status of the previous pcompiler may stay in the database.
+This option forces the compiler to continue even if if sees the presence
+of another orocess.
+
 =item B<--debug>
 
 Sets the log level to debug.

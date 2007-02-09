@@ -490,6 +490,7 @@
               value="Upstream volume in kilobytes/s"/>
       <param name="hidden"          value="yes"/>
       <param name="rrd-ds"          value="UpVolume"/>
+      <param name="rrd-create-max"  value="200000000"/>
       <param name="snmp-object"
         value="$linkServiceUsageUpVolume.%sce-link-index%.%sce-gc-index%"/>
       <param name="rrd-create-dstype" value="COUNTER"/>
@@ -501,6 +502,7 @@
               value="Downstream volume in kilobytes/s"/>
       <param name="hidden"          value="yes"/>
       <param name="rrd-ds"          value="DownVolume"/>
+      <param name="rrd-create-max"  value="200000000"/>
       <param name="snmp-object"
         value="$linkServiceUsageDownVolume.%sce-link-index%.%sce-gc-index%"/>
       <param name="rrd-create-dstype" value="COUNTER"/>

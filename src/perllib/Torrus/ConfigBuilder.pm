@@ -48,8 +48,55 @@ sub new
 
     $self->{'statistics'} = {};
 
+    $self->{'registry_overlays'} = [];
+    
     return $self;
 }
+
+
+sub setRegistryOverlays
+{
+    my $self = shift;
+    
+    $self->{'registry_overlays'} = [];
+    push( @{$self->{'registry_overlays'}}, @_ );
+}
+
+
+sub lookupRegistry
+{
+    my $self = shift;
+    my $template = shift;
+
+    my $ret = undef;
+
+    foreach my $regOverlay ( @{$self->{'registry_overlays'}} )
+    {
+        if( defined( $regOverlay->{$template} ) )
+        {
+            $ret = $regOverlay->{$template};
+        }
+    }
+    
+    if( not defined( $ret ) and
+        defined( $Torrus::ConfigBuilder::templateRegistry{$template} ) )
+    {
+        $ret = $Torrus::ConfigBuilder::templateRegistry{$template};
+    }
+    
+    if( not defined( $ret ) )
+    {
+        if( scalar( %Torrus::ConfigBuilder::templateRegistry ) > 0 )
+        {
+            Warn('Template ' . $template .
+                 ' is not listed in ConfigBuilder template registry');
+        }
+    }
+
+    return $ret;
+}
+    
+
 
 
 sub addCreatorInfo
@@ -203,23 +250,16 @@ sub addTemplateApplication
         $parentNode = $self->{'datasources'};
     }
 
-    if( defined( $Torrus::ConfigBuilder::templateRegistry{$template} ) )
+    my $found = 0;
+
+    my $reg = $self->lookupRegistry( $template );
+    if( defined( $reg ) )
     {
         $self->{'required_templates'}{$template} = 1;
-        
-        my $name =
-            $Torrus::ConfigBuilder::templateRegistry{$template}{'name'};
+        my $name = $reg->{'name'};
         if( defined( $name ) )
         {
             $template = $name;
-        }
-    }
-    else
-    {
-        if( scalar( %Torrus::ConfigBuilder::templateRegistry ) > 0 )
-        {
-            Warn('Template ' . $template .
-                 ' is not listed in $Torrus::ConfigBuilder::templateRegistry');
         }
     }
     
@@ -383,8 +423,13 @@ sub requiredFiles
     my %files;
     foreach my $template ( keys %{$self->{'required_templates'}} )
     {
-        my $file =
-            $Torrus::ConfigBuilder::templateRegistry{$template}{'source'};
+        my $file;
+        my $reg = $self->lookupRegistry( $template );
+        if( defined( $reg ) )
+        {
+            $file = $reg->{'source'};
+        }
+        
         if( defined( $file ) )
         {
             $files{$file} = 1;
@@ -392,7 +437,7 @@ sub requiredFiles
         else
         {
             Error('Source file is not defined for template ' . $template .
-                  ' in $Torrus::ConfigBuilder::templateRegistry');
+                  ' in ConfigBuilder template registry');
         }
     }
     return( sort keys %files );

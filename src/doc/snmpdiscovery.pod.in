@@ -366,6 +366,32 @@ software version, and contact information for the SNMP device.
 
 Sets the comment string for the host.
 
+=item * C<template-registry-overlays>
+
+If defined, this should be a comma-separated list of template registry
+entries that override the default template references. The overlaying
+templates should be referred in
+C<%Torrus::DevDiscover::templateOverlays>.
+For example, we want to redefine the interface counter template. Then
+in the DDX file, we set
+
+  <param name="template-registry-overlays" value="my_ifcounters"/>
+
+Then in F<devdiscover-siteconfig.pl> we set 
+
+  %Torrus::DevDiscover::templateOverlays = {
+      'my_ifcounters' => {
+          'RFC2863_IF_MIB::iftable-octets' => {
+             'name'   => 'my-iftable-octets',
+             'source' => 'mycustom-rfc2863.if-mib.xml'
+             },
+         'RFC2863_IF_MIB::ifxtable-hcoctets' => {
+             'name'   => 'my-ifxtable-hcoctets',
+             'source' => 'mycustom-rfc2863.if-mib.xml'
+             },
+         }};
+
+
 =back
 
 

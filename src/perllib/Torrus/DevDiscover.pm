@@ -39,6 +39,12 @@ BEGIN
     }
 }
 
+# Custom overlays for templates
+# overlayName ->
+#     'Module::templateName' -> { 'name' => 'templateName',
+#                                 'source' => 'filename.xml' }
+our %templateOverlays;
+
 our @requiredParams =
     (
      'snmp-port',
@@ -445,6 +451,31 @@ sub buildConfig
 
             my $data = $devdetails->data();
 
+            my @registryOverlays = ();
+            if( defined( $devdetails->param('template-registry-overlays' ) ) )
+            {
+                my @overlayNames = 
+                    split(/\s*,\s*/,
+                          $devdetails->param('template-registry-overlays' ));
+                foreach my $overlayName ( @overlayNames )
+                {
+                    if( defined( $templateOverlays{$overlayName}) )
+                    {
+                        push( @registryOverlays,
+                              $templateOverlays{$overlayName} );
+                    }
+                    else
+                    {
+                        Error('Cannot find the template overlay named ' .
+                              $overlayName);
+                    }
+                }
+            }
+
+            # we should call this anyway, in order to flush the overlays
+            # set by previous host
+            $cb->setRegistryOverlays( @registryOverlays );            
+            
             if( $devdetails->param('disable-snmpcollector' ) eq 'yes' )
             {
                 push( @{$data->{'templates'}}, '::viewonly-defaults' );

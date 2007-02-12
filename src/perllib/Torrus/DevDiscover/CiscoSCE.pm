@@ -59,7 +59,7 @@ our %oiddef =
      'txQueuesDescription'  => '1.3.6.1.4.1.5655.4.1.11.1.1.4.1',
 
      # CISCO-SCAS-BB-MIB (PCUBE-ENGAGE-MIB)
-     'globalScopeServiceCounterName' => '1.3.6.1.4.1.5655.4.2.5.1.1.3',
+     'globalScopeServiceCounterName' => '1.3.6.1.4.1.5655.4.2.5.1.1.3.1',
      
      );
 
@@ -122,6 +122,8 @@ sub discover
           'pmoduleSerialNumber', 'pmoduleNumTrafficProcessors',
           'subscribersNumIpAddrMappings', 'subscribersNumIpRangeMappings',
           'subscribersNumVlanMappings', 'subscribersNumAnonymous' );
+
+    $data->{'sceInfo'} = $sceInfo;
     
     $data->{'param'}{'comment'} =
         $sceChassisNames{$sceInfo->{'pchassisSysType'}} .
@@ -191,21 +193,15 @@ sub discover
 
     $devdetails->storeSnmpVars( $counterNames );
 
-    foreach my $linkIndex ( 1 .. $sceInfo->{'pmoduleNumLinks'} )
+    foreach my $gcIndex
+        ( $devdetails->getSnmpIndices
+          ( $dd->oiddef('globalScopeServiceCounterName') ) )
     {
-        foreach my $gcIndex
-            ( $devdetails->getSnmpIndices
-              ( $dd->oiddef('globalScopeServiceCounterName') .
-                '.' . $linkIndex ) )
+        my $oid =
+            $dd->oiddef('globalScopeServiceCounterName') . '.' . $gcIndex;
+        if( length( $counterNames->{$oid} ) > 0 )
         {
-            my $oid =
-                $dd->oiddef('globalScopeServiceCounterName') . '.' .
-                $linkIndex . '.' . $gcIndex;
-            if( length( $counterNames->{$oid} ) > 0 )
-            {
-                $data->{'sceGlobalCounters'}{$linkIndex}{$gcIndex} =
-                    $counterNames->{$oid};
-            }
+            $data->{'sceGlobalCounters'}{$gcIndex} = $counterNames->{$oid};
         }
     }
 
@@ -275,9 +271,7 @@ sub buildConfig
 
     # Global counters
 
-
-    foreach my $linkIndex ( sort {$a <=> $b}
-                            keys %{$data->{'sceGlobalCounters'}} )
+    foreach my $linkIndex ( 1 .. $data->{'sceInfo'}{'pmoduleNumLinks'} )
     {
         my $gcNode =
             $cb->addSubtree
@@ -288,9 +282,9 @@ sub buildConfig
         
         foreach my $gcIndex
             ( sort {$a <=> $b}
-              keys %{$data->{'sceGlobalCounters'}{$linkIndex}} )
+              keys %{$data->{'sceGlobalCounters'}} )
         {
-            my $srvName = $data->{'sceGlobalCounters'}{$linkIndex}{$gcIndex};
+            my $srvName = $data->{'sceGlobalCounters'}{$gcIndex};
             my $subtreeName = $srvName;
             $subtreeName =~ s/\W/_/g;
             

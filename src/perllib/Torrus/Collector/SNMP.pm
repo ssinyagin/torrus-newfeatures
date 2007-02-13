@@ -71,15 +71,6 @@ our $mapsRefreshRandom;
 # how often we check for expired maps
 our $mapsExpireCheckPeriod;
 
-my $mapsLastExpireChecked = 0;
-my @mapsRefreshed;
-
-# Expiration timestamp for each map
-my %mapsExpire;
-
-# Tokens that depend on a given map
-my %mapsDependentTokens;
-
 # Lookups scheduled for execution
 my %mapLookupScheduled;
 
@@ -112,6 +103,13 @@ sub initTarget
 
     $tref->{'ipaddr'} = $ipaddr;
 
+    if( not defined( $cref->{'mapsLastExpireChecked'} ) )
+    {
+        $cref->{'mapsLastExpireChecked'} = 0;
+        $cref->{'mapsRefreshed'} = [];
+        $cref->{'mapsExpire'} = {};
+    }
+    
     return Torrus::Collector::SNMP::initTargetAttributes( $collector, $token );
 }
 
@@ -514,7 +512,7 @@ sub lookupMap
 
         $mapLookupScheduled{$maphash} = 1;
 
-        $mapsExpire{$maphash} =
+        $cref->{'mapsExpire'}{$maphash} =
             int( time() + $mapsRefreshPeriod +
                  rand( $mapsRefreshPeriod * $mapsRefreshRandom ) );
             
@@ -541,7 +539,8 @@ sub lookupMap
         }
         else
         {
-            $mapsDependentTokens{$maphash}{$token} = 1;
+            $cref->{'mapsDependentTokens'}{$maphash}{$token} = 1;
+            $cref->{'mapsRepToken'}{$maphash} = $token;
             return $value;
         }
     }
@@ -960,27 +959,28 @@ sub postProcess
     my $cref = shift;
 
     # look if some maps are ready after last expiration check
-    if( scalar( @mapsRefreshed ) > 0 )
+    if( scalar( @{$cref->{'mapsRefreshed'}} ) > 0 )
     {
-        foreach my $maphash ( @mapsRefreshed )
+        foreach my $maphash ( @{$cref->{'mapsRefreshed'}} )
         {
-            foreach my $token ( keys %{$mapsDependentTokens{$maphash}} )
+            foreach my $token
+                ( keys %{$cref->{'mapsDependentTokens'}{$maphash}} )
             {
                 $cref->{'needsRemapping'}{$token} = 1;
             }
         }
-        @mapsRefreshed = ();
+        $cref->{'mapsRefreshed'} = [];
     }
 
     my $now = time();
     
-    if( $mapsLastExpireChecked + $mapsExpireCheckPeriod <= $now )
+    if( $cref->{'mapsLastExpireChecked'} + $mapsExpireCheckPeriod <= $now )
     {
-        $mapsLastExpireChecked = $now;
-
+        $cref->{'mapsLastExpireChecked'} = $now;
+        
         # Check the maps expiration and arrange lookup for expired
         
-        while( my ( $maphash, $expire ) = each %mapsExpire )
+        while( my ( $maphash, $expire ) = each %{$cref->{'mapsExpire'}} )
         {
             if( $expire <= $now and not $mapLookupScheduled{$maphash} )
             {
@@ -992,12 +992,12 @@ sub postProcess
                 # collector cycle
                 Debug('Refreshing map: ' . $maphash);
                 
-                lookupMap( $collector, $cref->{'reptoken'}{$hosthash},
+                lookupMap( $collector, $cref->{'mapsRepToken'}{$maphash},
                            $hosthash, $map, undef );
 
                 # After the next collector period, the maps will be ready and
                 # tokens may be updated without losing the data
-                push( @mapsRefreshed, $maphash );
+                push( @{$cref->{'mapsRefreshed'}}, $maphash );
             }                
         }
     }

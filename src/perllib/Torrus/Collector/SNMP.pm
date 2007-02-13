@@ -62,6 +62,24 @@ my $sysUpTime = '1.3.6.1.2.1.1.3.0';
 # SNMP tables lookup maps
 my %maps;
 
+# How frequent we refresh the SNMP mapping
+our $mapsRefreshPeriod;
+
+# Random factor in refresh period
+our $mapsRefreshRandom;
+
+# how often we check for expired maps
+our $mapsExpireCheckPeriod;
+
+my $mapsLastExpireChecked = 0;
+my @mapsRefreshed;
+
+# Expiration timestamp for each map
+my %mapsExpire;
+
+# Tokens that depend on a given map
+my %mapsDependentTokens;
+
 # Lookups scheduled for execution
 my %mapLookupScheduled;
 
@@ -466,10 +484,11 @@ sub lookupMap
     my $key = shift;
 
     my $cref = $collector->collectorData( 'snmp' );
+    my $maphash = join('#', $hosthash, $map);
 
     if( not defined( $maps{$hosthash}{$map} ) )
-    {
-        if( $mapLookupScheduled{$hosthash}{$map} )
+    {        
+        if( $mapLookupScheduled{$maphash} )
         {
             return undef;
         }
@@ -493,31 +512,43 @@ sub lookupMap
                              -callback => [\&mapLookupCallback,
                                            $collector, $hosthash, $map] );
 
-        $mapLookupScheduled{$hosthash}{$map} = 1;
+        $mapLookupScheduled{$maphash} = 1;
 
+        $mapsExpire{$maphash} =
+            int( time() + $mapsRefreshPeriod +
+                 rand( $mapsRefreshPeriod * $mapsRefreshRandom ) );
+            
         return undef;
     }
 
-    my $value = $maps{$hosthash}{$map}{$key};
-    if( not defined $value )
+    if( defined( $key ) )
     {
-        Error("Cannot find value $key in map $map for $hosthash in ".
-              $collector->path($token));
-        if( defined ( $maps{$hosthash}{$map} ) )
+        my $value = $maps{$hosthash}{$map}{$key};
+        if( not defined $value )
         {
-            Error("Current map follows");
-            while( my($key, $val) = each
-                   %{$maps{$hosthash}{$map}} )
+            Error("Cannot find value $key in map $map for $hosthash in ".
+                  $collector->path($token));
+            if( defined ( $maps{$hosthash}{$map} ) )
             {
-                Error("'$key' => '$val'");
+                Error("Current map follows");
+                while( my($key, $val) = each
+                       %{$maps{$hosthash}{$map}} )
+                {
+                    Error("'$key' => '$val'");
+                }
             }
+            return 'notfound';
         }
-        return 'notfound';
+        else
+        {
+            $mapsDependentTokens{$maphash}{$token} = 1;
+            return $value;
+        }
     }
     else
     {
-        return $value;
-    }    
+        return undef;
+    }
 }
 
 
@@ -928,6 +959,49 @@ sub postProcess
     my $collector = shift;
     my $cref = shift;
 
+    # look if some maps are ready after last expiration check
+    if( scalar( @mapsRefreshed ) > 0 )
+    {
+        foreach my $maphash ( @mapsRefreshed )
+        {
+            foreach my $token ( keys %{$mapsDependentTokens{$maphash}} )
+            {
+                $cref->{'needsRemapping'}{$token} = 1;
+            }
+        }
+        @mapsRefreshed = ();
+    }
+
+    my $now = time();
+    
+    if( $mapsLastExpireChecked + $mapsExpireCheckPeriod <= $now )
+    {
+        $mapsLastExpireChecked = $now;
+
+        # Check the maps expiration and arrange lookup for expired
+        
+        while( my ( $maphash, $expire ) = each %mapsExpire )
+        {
+            if( $expire <= $now and not $mapLookupScheduled{$maphash} )
+            {
+                my ( $hosthash, $map ) = split( /\#/, $maphash );
+
+                delete $maps{$hosthash}{$map};
+
+                # this will schedule the map retrieval for the next
+                # collector cycle
+                Debug('Refreshing map: ' . $maphash);
+                
+                lookupMap( $collector, $cref->{'reptoken'}{$hosthash},
+                           $hosthash, $map, undef );
+
+                # After the next collector period, the maps will be ready and
+                # tokens may be updated without losing the data
+                push( @mapsRefreshed, $maphash );
+            }                
+        }
+    }
+    
     foreach my $token ( keys %{$cref->{'needsRemapping'}} )
     {
         delete $cref->{'needsRemapping'}{$token};

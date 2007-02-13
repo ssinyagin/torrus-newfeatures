@@ -86,6 +86,20 @@ $Torrus::Collector::SNMP::unreachableTimeout = 21600; # 6 hours
 # For unreachable host, we retry SNMP query not earlier than this
 $Torrus::Collector::SNMP::unreachableRetryDelay = 600; # 10 min
 
+# Variables that define the SNMP map refreshing.
+# The maps (e.g. ifDescr=>ifIndex mapping) are stored in the collector
+# process and are not automatically refreshed after recompiling.
+# They refresh only when the SNMP agent is rebooted or at periodic intervals
+# defined below.
+#
+# Refresh SNMP maps every 6 hours
+$Torrus::Collector::SNMP::mapsRefreshPeriod = 21600;
+
+# Disperce the refresh periods randomly within 1 hour
+$Torrus::Collector::SNMP::mapsRefreshRandom = 0.17;
+
+# Wait 10min between refresh checkups
+$Torrus::Collector::SNMP::mapsExpireCheckPeriod = 600;
 
 # When enabled, the collector starts a background thread that
 # writes to RRD files

@@ -32,17 +32,17 @@ use Torrus::ConfigBuilder;
 
 $| = 1;
 
-our $infile;
-our $makedirs;
-our $limitre;
-our $forcebundle;
-our $fallback;
-our $workerThreads = 0;
+my @infiles;
+my $makedirs;
+my $limitre;
+my $forcebundle;
+my $fallback;
+my $workerThreads = 0;
 
 # Hidden parameter for debugging
-our $snmpdebug = 0;
-our $debug = 0;
-our $verbose = 0;
+my $snmpdebug = 0;
+my $debug = 0;
+my $verbose = 0;
 
 my %formatsSupported = ( '1.0' => 1 );
 
@@ -64,7 +64,7 @@ foreach my $arg ( @ARGV )
 $creator .= "\n On " . scalar(localtime(time));
 
 my $ok = GetOptions(
-                    'in=s'        => \$infile,
+                    'in=s'        => \@infiles,
                     'mkdir'       => \$makedirs,
                     'limit=s'     => \$limitre,
                     'forcebundle' => \$forcebundle,
@@ -74,14 +74,17 @@ my $ok = GetOptions(
                     'verbose'     => \$verbose,
                     'debug'       => \$debug
                     );
-
-if( not $ok or not $infile or
-    ($workerThreads > 1 and not $Torrus::Global::threadsEnabled ) or
-    scalar( @ARGV ) > 0 )
+if( $ok and scalar( @ARGV ) > 0 )
 {
-    print STDERR "Usage: $0 --in=filename.ddx options...\n",
+    push( @infiles, @ARGV );
+}
+
+if( not $ok or scalar(@infiles) == 0 or
+    ($workerThreads > 1 and not $Torrus::Global::threadsEnabled ) )
+{
+    print STDERR "Usage: $0 --in=filename.ddx options... [ddx files]\n",
     "Options:\n",
-    " --in=filename.ddx       discovery instructions XML file\n",
+    " --in=filename.ddx       discovery instructions XML file(s)\n",
     " --mkdir                 create data-dir directories\n",
     " --limit=regexp          limit the discovery by output files\n",
     " --forcebundle           always write the bundle file\n",
@@ -117,96 +120,92 @@ elsif( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-if( not -r $infile )
+my $everythingsOk = 1;
+my $perOutfileHostParams = {};
+my %outputBundles;
+
+foreach my $infile ( @infiles )
 {
-    my $altfile = $Torrus::Global::discoveryDir . $infile;
-    if( not -r $altfile )
+    if( not -r $infile )
     {
-        Error('Cannot find file ' . $infile .
-              ' neither in current directory nor in ' .
-              $Torrus::Global::discoveryDir);
+        my $altfile = $Torrus::Global::discoveryDir . $infile;
+        if( not -r $altfile )
+        {
+            Error('Cannot find file ' . $infile .
+                  ' neither in current directory nor in ' .
+                  $Torrus::Global::discoveryDir);
+            exit 1;
+        }
+        else
+        {
+            $infile = $altfile;
+        }
+    }
+
+    Verbose('Processing ' . $infile);
+
+    my $parser = new XML::LibXML;
+    my $doc;
+    eval { $doc = $parser->parse_file( $infile );  };
+    if( $@ )
+    {
+        Error("Failed to parse $infile: $@");
         exit 1;
     }
-    else
+
+    my $root = $doc->documentElement();
+    if( $root->nodeName() ne 'snmp-discovery' )
     {
-        $infile = $altfile;
+        Error('XML root element is not "snmp-discovery" in ' . $infile);
+        exit 1;
     }
-}
-
-Verbose('Processing ' . $infile);
-
-my $parser = new XML::LibXML;
-my $doc;
-eval { $doc = $parser->parse_file( $infile );  };
-if( $@ )
-{
-    Error("Failed to parse $infile: $@");
-    exit 1;
-}
-
-my $root = $doc->documentElement();
-if( $root->nodeName() ne 'snmp-discovery' )
-{
-    Error('XML root element is not "snmp-discovery" in ' . $infile);
-    exit 1;
-}
-
-{
+        
     my $format_version =
         (($root->getElementsByTagName('file-info'))[0]->
          getElementsByTagName('format-version'))[0]->textContent();
-
+    
     $format_version =~ s/\s//g;
-
+    
     if( not $format_version or not $formatsSupported{$format_version} )
     {
         Error('Invalid format or format version not supported: ' . $infile);
         exit 1;
     }
-}
+
+    my $globalParams = parseParams( $root );
 
 
-our $everythingsOk = 1;
+    # Parse the body of the XML
 
-our $globalParams = parseParams( $root );
-
-our $perOutfileHostParams = {};
-our %outputBundles;
-
-# Parse the body of the XML
-
-foreach my $hostNode ( $root->getChildrenByTagName('host') )
-{
-    my $hostParams = parseParams( $hostNode, $globalParams );
-    normalizeParams( $hostParams );
-
-    my $outfile = $hostParams->{'output-file'};
-    if( not exists($perOutfileHostParams->{$outfile}) )
+    foreach my $hostNode ( $root->getChildrenByTagName('host') )
     {
-        $perOutfileHostParams->{$outfile} = [];
-    }
-    push( @{$perOutfileHostParams->{$outfile}}, $hostParams );
+        my $hostParams = parseParams( $hostNode, $globalParams );
+        normalizeParams( $hostParams );
 
-    my $outBundles = $hostParams->{'output-bundle'};
-    if( length( $outBundles ) > 0 )
-    {
-        foreach my $bundleName ( split( /\s*,\s*/, $outBundles ) )
+        my $outfile = $hostParams->{'output-file'};
+        if( not exists($perOutfileHostParams->{$outfile}) )
         {
-            $bundleName = absXmlFilename( $bundleName );
-            $outputBundles{$bundleName}{ relXmlFilename($outfile) } = 1;
+            $perOutfileHostParams->{$outfile} = [];
+        }
+        push( @{$perOutfileHostParams->{$outfile}}, $hostParams );
+
+        my $outBundles = $hostParams->{'output-bundle'};
+        if( length( $outBundles ) > 0 )
+        {
+            foreach my $bundleName ( split( /\s*,\s*/, $outBundles ) )
+            {
+                $bundleName = absXmlFilename( $bundleName );
+                $outputBundles{$bundleName}{ relXmlFilename($outfile) } = 1;
+            }
         }
     }
 }
 
-# Cleanup memory
-undef $root;
-undef $doc;
-undef $parser;
 
 # Start discovery
-our $jobQueue;
-our $bundleDeletionQueue;
-our $confBuildSemaphore;
+my $jobQueue;
+my $bundleDeletionQueue;
+my $confBuildSemaphore;
 
 if( $workerThreads > 1 )
 {

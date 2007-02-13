@@ -26,7 +26,7 @@ configuration file.
 
 =head1 SYNOPSIS
 
-B<torrus devdiscover> --in=I<XMLFILE> [I<options...>]
+B<torrus devdiscover> [--in=I<XMLFILE>] [I<options...>] [I<XMLFILES>]
 
 =head1 DESCRIPTION
 
@@ -37,6 +37,8 @@ details.
 
 The generic input file, or device discovery XML (DDX), may be generated 
 by the B<genddx> utility, and then edited and maintained manually.
+Multiple input files may be specified by several instances of I<--in>
+option, or simply as arguments.
 
 Input file name is searched in the current directory, and then in
 F<@sitedir@/discovery/>.

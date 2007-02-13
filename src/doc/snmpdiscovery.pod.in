@@ -98,11 +98,14 @@ examples.
 
 =head2 C<torrus devdiscover>: SNMP discovery tool
 
-  Usage: torrus devdiscover --in=filename.ddx options...
+  Usage: torrus devdiscover --in=filename.ddx options... [ddx files]
   Options:
-   --in=filename.ddx       discovery instructions XML file
+   --in=filename.ddx       discovery instructions XML file(s)
    --mkdir                 create data-dir directories
    --limit=regexp          limit the discovery by output files
+   --forcebundle           always write the bundle file
+   --fallback=integer      maximum age of XML file to fall back to
+   --threads=integer       number of parallel discovery threads
    --verbose               print extra information
    --debug                 print debugging information
    --snmpdebug             print SNMP protocol details

@@ -90,13 +90,12 @@ $Torrus::Collector::SNMP::unreachableRetryDelay = 600; # 10 min
 # The maps (e.g. ifDescr=>ifIndex mapping) are stored in the collector
 # process and are not automatically refreshed after recompiling.
 # They refresh only when the SNMP agent is rebooted or at periodic intervals
-# defined below.
+# defined below. For SNMPv1 agents, periodic refreshing is disabled
+# because of performance impact.
 #
-# Refresh SNMP maps every 6 hours
-$Torrus::Collector::SNMP::mapsRefreshPeriod = 21600;
-
-# Disperce the refresh periods randomly within 1 hour
-$Torrus::Collector::SNMP::mapsRefreshRandom = 0.17;
+# Refresh SNMP maps every 5 to 7 hours
+$Torrus::Collector::SNMP::mapsRefreshPeriod = 18000;
+$Torrus::Collector::SNMP::mapsRefreshRandom = 0.40;
 
 # Wait 10min between refresh checkups
 $Torrus::Collector::SNMP::mapsExpireCheckPeriod = 600;

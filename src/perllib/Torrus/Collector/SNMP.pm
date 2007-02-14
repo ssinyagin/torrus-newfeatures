@@ -59,6 +59,10 @@ $Torrus::Collector::params{'snmp'} = {
 
 my $sysUpTime = '1.3.6.1.2.1.1.3.0';
 
+# Hosts that are running SNMPv1. We do not reresh maps on them, as
+# they are too slow
+my %snmpV1Hosts;
+
 # SNMP tables lookup maps
 my %maps;
 
@@ -70,6 +74,9 @@ our $mapsRefreshRandom;
 
 # how often we check for expired maps
 our $mapsExpireCheckPeriod;
+
+# expiration time for each map
+my %mapsExpire;
 
 # Lookups scheduled for execution
 my %mapLookupScheduled;
@@ -107,7 +114,6 @@ sub initTarget
     {
         $cref->{'mapsLastExpireChecked'} = 0;
         $cref->{'mapsRefreshed'} = [];
-        $cref->{'mapsExpire'} = {};
     }
     
     return Torrus::Collector::SNMP::initTargetAttributes( $collector, $token );
@@ -141,6 +147,11 @@ sub initTargetAttributes
     my $hosthash = join('|', $ipaddr, $port, $community);
     $tref->{'hosthash'} = $hosthash;
 
+    if( $version eq '1' )
+    {
+        $snmpV1Hosts{$hosthash} = 1;
+    }
+    
     # If the object is defined as a map, retrieve the whole map
     # and cache it.
 
@@ -512,10 +523,13 @@ sub lookupMap
 
         $mapLookupScheduled{$maphash} = 1;
 
-        $cref->{'mapsExpire'}{$maphash} =
-            int( time() + $mapsRefreshPeriod +
-                 rand( $mapsRefreshPeriod * $mapsRefreshRandom ) );
-            
+        if( not $snmpV1Hosts{$hosthash} )
+        {
+            $mapsExpire{$maphash} =
+                int( time() + $mapsRefreshPeriod +
+                     rand( $mapsRefreshPeriod * $mapsRefreshRandom ) );
+        }
+        
         return undef;
     }
 
@@ -539,8 +553,12 @@ sub lookupMap
         }
         else
         {
-            $cref->{'mapsDependentTokens'}{$maphash}{$token} = 1;
-            $cref->{'mapsRepToken'}{$maphash} = $token;
+            if( not $snmpV1Hosts{$hosthash} )
+            {
+                $cref->{'mapsDependentTokens'}{$maphash}{$token} = 1;
+                $cref->{'mapsRepToken'}{$maphash} = $token;
+            }
+            
             return $value;
         }
     }
@@ -980,9 +998,10 @@ sub postProcess
         
         # Check the maps expiration and arrange lookup for expired
         
-        while( my ( $maphash, $expire ) = each %{$cref->{'mapsExpire'}} )
+        while( my ( $maphash, $expire ) = each %mapsExpire )
         {
-            if( $expire <= $now and not $mapLookupScheduled{$maphash} )
+            if( $expire <= $now and not $mapLookupScheduled{$maphash} and
+                defined( $cref->{'mapsRepToken'}{$maphash} ) )
             {
                 my ( $hosthash, $map ) = split( /\#/, $maphash );
 

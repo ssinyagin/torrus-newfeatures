@@ -594,10 +594,11 @@ if set to C<yes>, Cisco power supply statistics are not collected.
 
 Name of the power supply monitor for Cisco devices.
 
-=item * C<CiscoIOS::disable-membuf-stats>
+=item * C<CiscoIOS::enaable-membuf-stats>
 
-When set to C<yes>, Cisco memory buffer statistics are excluded from
-discovery.
+When set to C<yes>, Cisco memory buffer statistics are included to the 
+discovery. Many IOS releases report faulty information, thus these
+stats are disabled by default.
 
 =item * C<CiscoIOS::disable-ipsec-stats>
 

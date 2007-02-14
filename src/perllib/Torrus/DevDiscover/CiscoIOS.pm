@@ -237,7 +237,7 @@ sub discover
         }
     }
 
-    if( $devdetails->param('CiscoIOS::disable-membuf-stats') ne 'yes' )
+    if( $devdetails->param('CiscoIOS::enable-membuf-stats') eq 'yes' )
     {
         # Old Memory Buffers, if we have bufferElFree we assume
         # the rest as they are "required"

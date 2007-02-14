@@ -1,3 +1,10 @@
+2007-02-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS.pm (discover):
+	Replaced CiscoIOS::disable-membuf-stats with
+	CiscoIOS::enable-membuf-stats.
+	Now cisco buffer stats are disabled by default
+
 2007-02-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/SNMP.pm: SNMP maps automatic refreshing

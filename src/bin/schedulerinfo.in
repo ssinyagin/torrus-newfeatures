@@ -326,14 +326,15 @@ sub reportTimeline
     }
 
     printf("Least common period: %d seconds\n", $lcm);
-    printf("Number of chunks: %d \n\n", scalar( keys %{$schedule} ) );
 
     # populate the common period
     my %cp;
+    my $chunks = 0;
     foreach my $period ( keys %{$schedule} )
     {
         foreach my $offset ( keys %{$schedule->{$period}} )
         {
+            $chunks++;
             foreach my $type ( keys %{$schedule->{$period}{$offset}} )
             {
                 for( my $i = 0; $i < ($lcm / $period); $i++ )
@@ -344,6 +345,7 @@ sub reportTimeline
             }
         }
     }
+    printf("Number of chunks: %d \n\n", $chunks );
 
     # calculate interval lengths
 

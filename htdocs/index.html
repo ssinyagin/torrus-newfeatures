@@ -9,13 +9,15 @@
 
 <h1>Torrus: The Data Series Processing Framework</h1>
 
-<p>
-<b>Torrus</b> is the new name for RRFW, the Round Robin Database
-Framework. The changes are summarized in the
-<a href="devdoc/torrus_roadmap.pod.html">transition roadmap</a>.
-Old RRFW documentation is available at
-<a href="http://rrfw.sourceforge.net/">RRFW home page</a>.
+<p>In short, Torrus is an alternative software platform to
+<a href="http://oss.oetiker.ch/mrtg/">MRTG</a>, 
+<a href="http://cricket.sourceforge.net/">Cricket</a> and
+<a href="http://www.cacti.net/">Cacti</a>. In most cases it brings more
+flexibility and performance. We are able to poll more than 50,000 SNMP
+OIDs every 5 minutes from a single moderately equipped server,
+with simultaneous threshold monitoring of half of them.
 </p>
+
 
 <p>
 Torrus is designed to be the universal data series processing 
@@ -78,13 +80,20 @@ growing.
 </li>
 
 <li>
+<strong>Billing reports generator</strong>.
+Torrus can be configured to store the network traffic usage in an SQL
+database (without RRDTools' aggregation and interpolation), and produce
+monthly reports on traffic volume and 95th Percentile bandwidth usage.
+</li>
+
+<li>
 <strong>Threshold monitor.</strong>
 All data, regardless of their type and nature,
 can be monitored according to the user-defined rules. The rules can also
 include the datasource-specific parameters, e.g. boundary values etc.
 The following types of action may be combined for event reporting:
 1) Displaying the list of alarmed datasources; 2) E-mail notification;
-3) SNMPv2c trap; 4) Any custom executable. Thresholds are specified by RPN
+3) SNMP trap; 4) Any custom executable. Thresholds are specified by RPN
 expressions.
 </li>
 
@@ -305,6 +314,14 @@ details)
 <ul>
 
 <li>
+Torrus was the new name for RRFW, the Round Robin Database
+Framework. The changes are summarized in the
+<a href="devdoc/torrus_roadmap.pod.html">transition roadmap</a>.
+Old RRFW documentation is available at
+<a href="http://rrfw.sourceforge.net/">RRFW home page</a>.
+</li>
+
+<li>
 Development of RRFW releases 0.0.1 to 0.0.7, as well as development and testing
 of Cisco class-based QoS monitoring was sponsored by
 <a href="http://www.cablecom.ch/">Cablecom GmbH</a>
@@ -421,6 +438,11 @@ Contributed in manpages creation. Maintainer of
 <a href="http://pkg-torrus.alioth.debian.org/">Torrus Debian package</a>
 </li>
 
+<li>
+<a href="mailto:nistor@snickers.org">Jon Nistor</a>.
+Lots of bug reports and feature suggestions.
+</li>
+
 
 </ul>
 
@@ -473,7 +495,7 @@ alt="syscovery AG, an IT services company, Germany"/></a>
 
 </div>
 <hr>
-<p>Copyright &copy; 2002-2005 Stanislav Sinyagin
+<p>Copyright &copy; 2002-2007 Stanislav Sinyagin
 &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 <A href="http://sourceforge.net">
 <IMG src="http://sourceforge.net/sflogo.php?group_id=119282&amp;type=1"

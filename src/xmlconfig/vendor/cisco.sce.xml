@@ -444,6 +444,8 @@
   <template name="cisco-sce-gc-subtree">  
     <param name="data-file"
         value="%system-id%_SCE_gc_%sce-link-index%_%sce-gc-index%.rrd"/>
+    <param name="collector-timeoffset-hashstring"
+        value="%system-id%:%sce-link-index%:%sce-gc-index%" />
     <param name="graph-lower-limit" value="0" />
     <param name="graph-title"        value="%sce-service-name%"/>
     

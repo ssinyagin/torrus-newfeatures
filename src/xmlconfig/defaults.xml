@@ -45,9 +45,9 @@
   <!-- Minimum set of parameters if we use
        collector-dispersed-timeoffset=yes -->
   <param name="collector-timeoffset-hashstring" value="%system-id%" />
-  <param name="collector-timeoffset-min" value="20" />
-  <param name="collector-timeoffset-max" value="220" />
-  <param name="collector-timeoffset-step" value="20" />
+  <param name="collector-timeoffset-min" value="0" />
+  <param name="collector-timeoffset-max" value="300" />
+  <param name="collector-timeoffset-step" value="30" />
 
 </datasources>
 

@@ -325,7 +325,8 @@ sub reportTimeline
         }
     }
 
-    printf("Least common period: %d seconds\n\n", $lcm);
+    printf("Least common period: %d seconds\n", $lcm);
+    printf("Number of chunks: %d \n\n", scalar( keys %{$schedule} ) );
 
     # populate the common period
     my %cp;

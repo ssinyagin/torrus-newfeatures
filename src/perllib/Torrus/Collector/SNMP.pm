@@ -84,6 +84,17 @@ my %mapLookupScheduled;
 # SNMP session objects for map lookups
 my @mappingSessions;
 
+
+# Timestamps of hosts last found unreachable
+my %hostUnreachableSeen;
+
+# Last time we tried to reach an unreachable host
+my %hostUnreachableRetry;
+
+# Hosts that were deleted because of unreachability for too long
+my %unreachableHostDeleted;
+
+
 # This is first executed per target
 
 $Torrus::Collector::initTarget{'snmp'} = \&Torrus::Collector::SNMP::initTarget;
@@ -171,7 +182,7 @@ sub initTargetAttributes
 
     if( not $oid )
     {
-        if( $cref->{'unreachableHostDeleted'}{$hosthash} )
+        if( $unreachableHostDeleted{$hosthash} )
         {
             # we tried our best, but the target is dead
             return 0;
@@ -621,11 +632,11 @@ sub probablyDead
 
     my $probablyAlive = 1;
 
-    if( defined( $cref->{'hostUnreachableSeen'}{$hosthash} ) )
+    if( defined( $hostUnreachableSeen{$hosthash} ) )
     {
         if( $Torrus::Collector::SNMP::unreachableTimeout > 0 and
             time() -
-            $cref->{'hostUnreachableSeen'}{$hosthash} >
+            $hostUnreachableSeen{$hosthash} >
             $Torrus::Collector::SNMP::unreachableTimeout )
         {
             $probablyAlive = 0;
@@ -633,7 +644,7 @@ sub probablyDead
     }
     else
     {
-        $cref->{'hostUnreachableSeen'}{$hosthash} = time();
+        $hostUnreachableSeen{$hosthash} = time();
     }
 
     if( $probablyAlive )
@@ -663,9 +674,9 @@ sub probablyDead
         }
         
         delete $cref->{'reptoken'}{$hosthash};
-        delete $cref->{'hostUnreachableSeen'}{$hosthash};
-        delete $cref->{'hostUnreachableRetry'}{$hosthash};
-        $cref->{'unreachableHostDeleted'}{$hosthash} = 1;
+        delete $hostUnreachableSeen{$hosthash};
+        delete $hostUnreachableRetry{$hosthash};
+        $unreachableHostDeleted{$hosthash} = 1;
     }
     
     return $probablyAlive;
@@ -681,13 +692,13 @@ sub checkUnreachableRetry
     my $cref = $collector->collectorData( 'snmp' );
 
     my $ret = 1;
-    if( $cref->{'hostUnreachableSeen'}{$hosthash} )
+    if( $hostUnreachableSeen{$hosthash} )
     {
-        my $lastRetry = $cref->{'hostUnreachableRetry'}{$hosthash};
+        my $lastRetry = $hostUnreachableRetry{$hosthash};
 
         if( not defined( $lastRetry ) )
         {
-            $lastRetry = $cref->{'hostUnreachableSeen'}{$hosthash};
+            $lastRetry = $hostUnreachableSeen{$hosthash};
         }
             
         if( time() < $lastRetry +
@@ -697,7 +708,7 @@ sub checkUnreachableRetry
         }
         else
         {
-            $cref->{'hostUnreachableRetry'}{$hosthash} = time();
+            $hostUnreachableRetry{$hosthash} = time();
         }            
     }
     
@@ -711,7 +722,7 @@ sub isHostDead
     my $hosthash = shift;
 
     my $cref = $collector->collectorData( 'snmp' );
-    return $cref->{'unreachableHostDeleted'}{$hosthash};
+    return $unreachableHostDeleted{$hosthash};
 }
 
 
@@ -721,9 +732,9 @@ sub hostReachableAgain
     my $hosthash = shift;
     
     my $cref = $collector->collectorData( 'snmp' );
-    if( exists( $cref->{'hostUnreachableSeen'}{$hosthash} ) )
+    if( exists( $hostUnreachableSeen{$hosthash} ) )
     {
-        delete $cref->{'hostUnreachableSeen'}{$hosthash};
+        delete $hostUnreachableSeen{$hosthash};
     }
 }
 

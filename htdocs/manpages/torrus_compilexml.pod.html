@@ -70,6 +70,16 @@ unusable configuration. In addition, the first initialization cycle of
 Collector and Monitor in this case would be much longer.
 </dd>
 <p></p>
+<dt><strong><a name="item__2d_2dforce"><strong>--force</strong></a></strong><br />
+</dt>
+<dd>
+Normally the compiler would fail to start if another compiler process
+is already running for the specific tree. In case of abnormal function,
+the running status of the previous pcompiler may stay in the database.
+This option forces the compiler to continue even if if sees the presence
+of another process.
+</dd>
+<p></p>
 <dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
 </dt>
 <dd>

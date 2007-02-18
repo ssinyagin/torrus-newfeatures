@@ -118,11 +118,14 @@ examples.</p>
 </p>
 <h2><a name="torrus_devdiscover__snmp_discovery_tool"><code>torrus devdiscover</code>: SNMP discovery tool</a></h2>
 <pre>
-  Usage: torrus devdiscover --in=filename.ddx options...
+  Usage: torrus devdiscover --in=filename.ddx options... [ddx files]
   Options:
-   --in=filename.ddx       discovery instructions XML file
+   --in=filename.ddx       discovery instructions XML file(s)
    --mkdir                 create data-dir directories
    --limit=regexp          limit the discovery by output files
+   --forcebundle           always write the bundle file
+   --fallback=integer      maximum age of XML file to fall back to
+   --threads=integer       number of parallel discovery threads
    --verbose               print extra information
    --debug                 print debugging information
    --snmpdebug             print SNMP protocol details</pre>
@@ -161,7 +164,7 @@ in Torrus distribution in <em>snmp-discovery.dtd</em>.</p>
 <p>A typical place to store the discovery XML is <em>/usr/local/etc/torrus/conf/discovery/</em>.</p>
 <p>Example:</p>
 <pre>
-    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF8&quot;?&gt;
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
     &lt;snmp-discovery&gt;
       &lt;file-info&gt;
         &lt;format-version&gt;
@@ -271,6 +274,10 @@ copied one-to-one to the output configuration.
 </li>
 Optional. Defines a DNS domain name to be appended to <code>snmp-host</code>.
 <p></p>
+<li><strong><a name="item_snmp_2dlocaladdr_and_snmp_2dlocalport"><code>snmp-localaddr</code> and <code>snmp-localport</code></a></strong><br />
+</li>
+Optional parameters specifying the local socket binding address and port.
+<p></p>
 <li><strong><a name="item_data_2ddir"><code>data-dir</code></a></strong><br />
 </li>
 Mandatory. Defines the directory path where RRD files for this host
@@ -365,6 +372,30 @@ software version, and contact information for the SNMP device.
 <li><strong><a name="item_comment"><code>comment</code></a></strong><br />
 </li>
 Sets the comment string for the host.
+<p></p>
+<li><strong><a name="item_template_2dregistry_2doverlays"><code>template-registry-overlays</code></a></strong><br />
+</li>
+If defined, this should be a comma-separated list of template registry
+entries that override the default template references. The overlaying
+templates should be referred in
+<code>%Torrus::DevDiscover::templateOverlays</code>.
+For example, we want to redefine the interface counter template. Then
+in the DDX file, we set
+<pre>
+  &lt;param name=&quot;template-registry-overlays&quot; value=&quot;my_ifcounters&quot;/&gt;</pre>
+<p>Then in <em>devdiscover-siteconfig.pl</em> we set</p>
+<pre>
+  %Torrus::DevDiscover::templateOverlays = {
+      'my_ifcounters' =&gt; {
+          'RFC2863_IF_MIB::iftable-octets' =&gt; {
+             'name'   =&gt; 'my-iftable-octets',
+             'source' =&gt; 'mycustom-rfc2863.if-mib.xml'
+             },
+         'RFC2863_IF_MIB::ifxtable-hcoctets' =&gt; {
+             'name'   =&gt; 'my-ifxtable-hcoctets',
+             'source' =&gt; 'mycustom-rfc2863.if-mib.xml'
+             },
+         }};</pre>
 <p></p></ul>
 <p>
 </p>
@@ -400,6 +431,11 @@ By default, such interfaces are not listed.
 If set to <code>yes</code>, the interfaces with ifOperStatus status set to <code>notPresent(6)</code>
 are included in the discovery results. By default, such interfaces are
 not listed.
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3aexclude_2ddown_2dinterfaces"><code>RFC2863_IF_MIB::exclude-down-interfaces</code></a></strong><br />
+</li>
+If set to <code>yes</code>, the interfaces with ifOperStatus equal to <code>down(2)</code>
+are excluded from the discovery results.
 <p></p>
 <li><strong><a name="item_rfc2863_if_mib_3a_3aexclude_2dinterfaces"><code>RFC2863_IF_MIB::exclude-interfaces</code></a></strong><br />
 </li>
@@ -550,14 +586,25 @@ if set to <code>yes</code>, Cisco power supply statistics are not collected.
 </li>
 Name of the power supply monitor for Cisco devices.
 <p></p>
-<li><strong><a name="item_ciscoios_3a_3adisable_2dmembuf_2dstats"><code>CiscoIOS::disable-membuf-stats</code></a></strong><br />
+<li><strong><a name="item_ciscoios_3a_3aenaable_2dmembuf_2dstats"><code>CiscoIOS::enaable-membuf-stats</code></a></strong><br />
 </li>
-When set to <code>yes</code>, Cisco memory buffer statistics are excluded from
-discovery.
+When set to <code>yes</code>, Cisco memory buffer statistics are included to the 
+discovery. Many IOS releases report faulty information, thus these
+stats are disabled by default.
 <p></p>
 <li><strong><a name="item_ciscoios_3a_3adisable_2dipsec_2dstats"><code>CiscoIOS::disable-ipsec-stats</code></a></strong><br />
 </li>
 When set to <code>yes</code>, IPSec statistics are excluded from discovery.
+<p></p>
+<li><strong><a name="item_ciscoios_3a_3adisable_2dbgp_2dstats"><code>CiscoIOS::disable-bgp-stats</code></a></strong><br />
+</li>
+If set to <code>yes</code>, BGP statistics are not included.
+<p></p>
+<li><strong><a name="item_ciscoios_3a_3aenable_2dvlan_2dinterfaces"><code>CiscoIOS::enable-vlan-interfaces</code></a></strong><br />
+</li>
+When set to <code>yes</code>, the interfaces VlanXXX are added to statistics.
+By default they are not included, because some hardware platforms give
+irrelevant counter statistics.
 <p></p>
 <li><strong><a name="item_ciscocatos_3a_3asuppress_2dnoname_2dports"><code>CiscoCatOS::suppress-noname-ports</code></a></strong><br />
 </li>
@@ -572,13 +619,18 @@ those MACs which correspond to BGP peers only.
 <li><strong><a name="item_bgp_2das_2ddescription_2dnnnn"><code>bgp-as-description-NNNN</code></a></strong><br />
 </li>
 Specifies a description for an autonomous system number. Currently it's used
-with Cisco MAC accounting only.
+with Cisco MAC accounting and Cisco BGP statistics only.
 <p></p>
 <li><strong><a name="item_peer_2dipaddr_2ddescription_2daaa_aaa_aaa_aaa"><code>peer-ipaddr-description-AAA_AAA_AAA_AAA</code></a></strong><br />
 </li>
 Specifies a description for a peer by its IP address. Dots in IP address should
 be replaced with underscores. Currently it's used with Cisco
-MAC accounting only.
+MAC accounting and Cisco BGP statistics only.
+<p></p>
+<li><strong><a name="item_ciscoios_macaccounting_3a_3atokenset_2dmembers"><code>CiscoIOS_MacAccounting::tokenset-members</code></a></strong><br />
+</li>
+Works the same way as <a href="#item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a> and assigns MAC
+accounting peers to tokensets.
 <p></p>
 <li><strong><a name="item_paradyne_3a_3aslot_2dname"><code>Paradyne::slot-name</code></a></strong><br />
 </li>

@@ -36,7 +36,7 @@ configuration file.</p>
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p><strong>torrus devdiscover</strong> --in=<em>XMLFILE</em> [<em>options...</em>]</p>
+<p><strong>torrus devdiscover</strong> [--in=<em>XMLFILE</em>] [<em>options...</em>] [<em>XMLFILES</em>]</p>
 <p>
 </p>
 <hr />
@@ -46,7 +46,9 @@ for the discovery instructions. It generates a corresponding
 Torrus XML configuration file. See <strong>Torrus SNMP Discovery User Guide</strong> for
 details.</p>
 <p>The generic input file, or device discovery XML (DDX), may be generated 
-by the <strong>genddx</strong> utility, and then edited and maintained manually.</p>
+by the <strong>genddx</strong> utility, and then edited and maintained manually.
+Multiple input files may be specified by several instances of <em>--in</em>
+option, or simply as arguments.</p>
 <p>Input file name is searched in the current directory, and then in
 <em>/usr/local/etc/torrus/discovery/</em>.</p>
 <p>
@@ -80,6 +82,16 @@ file even if some of the bundle members were not created because of errors.
 Requires <strong>--forcebundle</strong>. In case if an SNMP device is not available,
 the bundle file will include an older version of the XML output file,
 provided that it exists and it is not older than the specified number of days.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dthreads_3dinteger"><strong>--threads</strong>=<em>INTEGER</em></a></strong><br />
+</dt>
+<dd>
+If the threads are enabled in the local Perl, this option determins
+how many parallel discovery threads are to be executed.
+The discovery jobs are distributed per output files, thus it makes
+sence to use threads only when there are many output files defined in
+a single DDX file.
 </dd>
 <p></p>
 <dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />

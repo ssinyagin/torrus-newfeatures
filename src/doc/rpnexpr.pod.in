@@ -23,8 +23,8 @@
 =head1 RPN expressions in Torrus
 
 In Torrus framework, RPN expressions are the superset of those
-in RRDtool. See the C<rrdtool graph> manual at
-E<lt>http://www.rrdtool.com/manual/rrdgraph.htmlE<gt>.
+in RRDtool version 1.0. See the C<rrdtool graph> manual at
+E<lt>http://oss.oetiker.ch/rrdtool/doc/rrdgraph_rpn.en.htmlE<gt>.
 
 =head2 New functions added
 

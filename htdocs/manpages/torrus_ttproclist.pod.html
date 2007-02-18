@@ -116,6 +116,7 @@ The template is as follows:</p>
   [% FOREACH n = nodes.keys.sort %]
   &lt;host&gt;
     &lt;param name=&quot;snmp-host&quot; value=&quot;[% n %]&quot;/&gt;
+    &lt;param name=&quot;symbolic-name&quot; value=&quot;[% nodes.$n %]&quot;/&gt;
     &lt;param name=&quot;output-file&quot; value=&quot;nodes/[% n %].xml&quot;/&gt;
   &lt;/host&gt;
   [% END %]

@@ -1,8 +1,8 @@
 #
 #  Discovery module for Cisco Service Control Engine (formely PCube)
 #
-#  Copyright (C) 2006 Jon Nistor
-#  Copyright (C) 2006 Stanislav Sinyagin
+#  Copyright (C) 2007 Jon Nistor
+#  Copyright (C) 2007 Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -49,7 +49,9 @@ our %oiddef =
      'pmoduleType'          => '1.3.6.1.4.1.5655.4.1.3.1.1.2.1',
      'pmoduleNumLinks'      => '1.3.6.1.4.1.5655.4.1.3.1.1.7.1',
      'pmoduleSerialNumber'  => '1.3.6.1.4.1.5655.4.1.3.1.1.9.1',
-     'pmoduleNumTrafficProcessors' => '1.3.6.1.4.1.5655.4.1.3.1.1.3.1',
+     'pmoduleNumTrafficProcessors'   => '1.3.6.1.4.1.5655.4.1.3.1.1.3.1',
+     'rdrFormatterEnable'            => '1.3.6.1.4.1.5655.4.1.6.1.0',
+     'rdrFormatterCategoryName'      => '1.3.6.1.4.1.5655.4.1.6.11.1.2',
      'subscribersNumIpAddrMappings'  => '1.3.6.1.4.1.5655.4.1.8.1.1.3.1',
      'subscribersNumIpRangeMappings' => '1.3.6.1.4.1.5655.4.1.8.1.1.5.1',
      'subscribersNumVlanMappings'    => '1.3.6.1.4.1.5655.4.1.8.1.1.7.1',
@@ -120,6 +122,7 @@ sub discover
     my $sceInfo = $dd->retrieveSnmpOIDs
         ( 'pchassisSysType', 'pmoduleType', 'pmoduleNumLinks',
           'pmoduleSerialNumber', 'pmoduleNumTrafficProcessors',
+          'rdrFormatterEnable',
           'subscribersNumIpAddrMappings', 'subscribersNumIpRangeMappings',
           'subscribersNumVlanMappings', 'subscribersNumAnonymous' );
 
@@ -205,6 +208,29 @@ sub discover
         }
     }
 
+    # Check to see if RDR information is available
+    
+    if( $sceInfo->{'rdrFormatterEnable'} > 0 )
+    {
+        # Set Capability for the RDR section of XML
+        $devdetails->setCap('sceRDR');
+        
+        # Get the names of the RDR Category
+        my $categoryNames = $session->get_table
+            ( -baseoid => $dd->oiddef('rdrFormatterCategoryName') );
+        
+        $devdetails->storeSnmpVars( $categoryNames );
+        
+	foreach my $categoryIndex
+            ( $devdetails->getSnmpIndices
+              ( $dd->oiddef('rdrFormatterCategoryName') ) )
+        {
+            my $oid =
+                $dd->oiddef('rdrFormatterCategoryName') . '.' . $categoryIndex;
+            $data->{'sceRDR'}{$categoryIndex} = $categoryNames->{$oid};
+	}
+    }
+    
     return 1;
 }
 
@@ -216,7 +242,7 @@ sub buildConfig
     my $devNode = shift;
     my $data = $devdetails->data();
 
-    $cb->addTemplateApplication($devNode, 'CiscoSCE::cisco-sce-common');
+    $cb->addTemplateApplication($devNode, 'CiscoSCE::cisco-sce-disk');
 
     if( $devdetails->hasCap('sceSubscribers') )
     {
@@ -244,7 +270,6 @@ sub buildConfig
                                  { 'comment' => 'TX queues usage statistics' },
                                  [ 'CiscoSCE::cisco-sce-queues-subtree']);
     
-
     foreach my $pIndex ( sort {$a <=> $b} keys %{$data->{'scePortIfIndex'}} )
     {
         my $ifIndex = $data->{'scePortIfIndex'}{$pIndex};
@@ -297,6 +322,39 @@ sub buildConfig
                              [ 'CiscoSCE::cisco-sce-gcounter' ]);
         }
     }
+
+
+    # RDR Formatter reports
+    
+    if( $devdetails->hasCap('sceRDR') )
+    {
+        $cb->addTemplateApplication($devNode, 'CiscoSCE::cisco-sce-rdr');
+
+        # Add a Subtree for "SCE_RDR_Categories"
+        my $rdrNode =
+            $cb->addSubtree( $devNode, 'SCE_RDR_Categories',
+                             { 'comment' => 'Raw Data Records per Category' },
+                             [ 'CiscoSCE::cisco-sce-rdr-category-subtree' ]);
+        
+        foreach my $cIndex ( sort {$a <=> $b} keys %{$data->{'sceRDR'}} )
+        {
+            my $categoryName;
+            if ( $data->{'sceRDR'}{$cIndex} )
+            {
+                $categoryName = $data->{'sceRDR'}{$cIndex};
+            }
+            else
+            {
+                $categoryName = 'Category_' . $cIndex;
+            }
+            
+            $cb->addSubtree( $rdrNode, 'Category_' . $cIndex,
+                             { 'precedence'      => 1000 - $cIndex,
+                               'sce-rdr-index'   => $cIndex,
+                               'sce-rdr-comment' => $categoryName },
+                             ['CiscoSCE::cisco-sce-rdr-category'] );
+        }
+    }    
 }
 
 1;

@@ -342,8 +342,8 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source' => 'vendor/cisco.firewall.xml',
      },
 
-     'CiscoSCE::cisco-sce-common' => {
-         'name'   => 'cisco-sce-common',
+     'CiscoSCE::cisco-sce-disk' => {
+         'name'   => 'cisco-sce-disk',
          'source' => 'vendor/cisco.sce.xml',
      },
      'CiscoSCE::cisco-sce-subscribers' => {
@@ -356,6 +356,18 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      },
      'CiscoSCE::cisco-sce-tp' => {
          'name'   => 'cisco-sce-tp',
+         'source' => 'vendor/cisco.sce.xml',
+     },
+     'CiscoSCE::cisco-sce-rdr' => {
+         'name'   => 'cisco-sce-rdr',
+         'source' => 'vendor/cisco.sce.xml',
+     },
+     'CiscoSCE::cisco-sce-rdr-category' => {
+         'name'   => 'cisco-sce-rdr-category',
+         'source' => 'vendor/cisco.sce.xml',
+     },
+     'CiscoSCE::cisco-sce-rdr-category-subtree' => {
+         'name'   => 'cisco-sce-rdr-category-subtree',
          'source' => 'vendor/cisco.sce.xml',
      },
      'CiscoSCE::cisco-sce-queues-subtree' => {

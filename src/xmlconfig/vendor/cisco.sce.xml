@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-   Copyright (C) 2006 Jon Nistor
+   Copyright (C) 2007 Jon Nistor
    Copyright (C) 2007 Stanislav Sinyagin
 
    This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,16 @@
                                          value="1.3.6.1.4.1.5655.4.1.6.4.0" />
   <def name="rdrFormatterReportRate"     value="1.3.6.1.4.1.5655.4.1.6.6.0" />
   <def name="rdrFormatterReportRatePeak" value="1.3.6.1.4.1.5655.4.1.6.7.0" />
+  <def name="rdrFormatterCategoryNumReportsSent"
+                                  value="1.3.6.1.4.1.5655.4.1.6.11.1.3" />
+  <def name="rdrFormatterCategoryNumReportsDiscarded"
+                                  value="1.3.6.1.4.1.5655.4.1.6.11.1.4" />
+  <def name="rdrFormatterCategoryReportRate"
+                                  value="1.3.6.1.4.1.5655.4.1.6.11.1.5" />
+  <def name="rdrFormatterCategoryReportRatePeak"
+                                  value="1.3.6.1.4.1.5655.4.1.6.11.1.6" />
+  <def name="rdrFormatterCategoryNumReportsQueued" 
+                                  value="1.3.6.1.4.1.5655.4.1.6.11.1.8" />
 
   <!-- PCUBE-SE-MIB::subscribersInfoEntry -->
   <def name="subNumIntroduced"    value="1.3.6.1.4.1.5655.4.1.8.1.1.1.1" />
@@ -91,13 +101,13 @@
 
 
 <datasources>
-  <template name="cisco-sce-common">
-    <param name="scecommon-datafile"  value="%system-id%_SCE_stats.rrd"/>
+  <template name="cisco-sce-disk">
+    <param name="scedisk-datafile"  value="%system-id%_SCE_disk.rrd"/>
     <subtree name="SCE_Disk">
       <param name="comment">
         Disk usage information
       </param>
-      <param name="data-file"         value="%scecommon-datafile%"/>
+      <param name="data-file"         value="%scedisk-datafile%"/>
       <param name="rrd-create-dstype" value="GAUGE"/>
       <param name="vertical-label"    value="Bytes"/>
 
@@ -136,12 +146,15 @@
         <param name="snmp-object"     value="$diskNumFreeBytes"/>
       </leaf>
     </subtree>
+  </template>
     
+  <template name="cisco-sce-rdr">
+    <param name="scerdr-datafile"  value="%system-id%_SCE_RDR.rrd"/>
     <subtree name="SCE_RDR">
       <param name="comment">
         Raw Data Record information
       </param>
-      <param name="data-file"         value="%scecommon-datafile%"/>
+      <param name="data-file"         value="%scerdr-datafile%"/>
       <param name="rrd-create-dstype" value="GAUGE"/>
       <param name="vertical-label"    value="RDRs/s"/>
       <leaf name="Report_Rate_vs_Peak">
@@ -150,13 +163,13 @@
         <param name="precedence"          value="1000"/>
         <param name="ds-type"             value="rrd-multigraph"/>
         <param name="ds-names"            value="rate,peak"/>
-
+        <!-- Reports per second Peak -->
         <param name="ds-expr-peak"        value="{Report_RatePeak}"/>
         <param name="graph-legend-peak"   value="Reports per second Peak"/>
         <param name="line-style-peak"     value="##totalresource"/>
         <param name="line-color-peak"     value="##totalresource"/>
         <param name="line-order-peak"     value="1"/>
-
+        <!-- Reports per second -->
         <param name="ds-expr-rate"        value="{Report_Rate}"/>
         <param name="graph-legend-rate"   value="Reports per second"/>
         <param name="line-style-rate"     value="##resourceusage"/>
@@ -187,6 +200,83 @@
       
     </subtree>
   </template>
+
+  <template name="cisco-sce-rdr-category-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="rate,discards"/>
+    <!-- Rate --> 
+    <param name="overview-subleave-name-rate" value="Report_Rate"/>
+    <param name="overview-shortcut-text-rate"
+           value="All Report Rates"/>
+    <param name="overview-shortcut-title-rate"
+           value="Show RDR Report Rate for all categories on one page"/>
+    <param name="overview-page-title-rate"
+           value="Category RDR Report Rates"/>
+    <!-- Discards -->
+    <param name="overview-subleave-name-discards" value="Reports_Discarded"/>
+    <param name="overview-shortcut-text-discards"
+           value="All Report Discards"/>
+    <param name="overview-shortcut-title-discards"
+           value="Show discarded RDR rate on one page"/>
+    <param name="overview-page-title-discards"
+           value="RDR Reports discarded"/>
+  </template>
+
+  <template name="cisco-sce-rdr-category">
+    <param name="comment"            value="%sce-rdr-comment%"/>
+    <param name="data-file"
+        value="%system-id%_SCE_RDR_category_%sce-rdr-index%.rrd"/>
+    <param name="rrd-create-dstype"  value="GAUGE"/>
+    <param name="vertical-label"     value="RDRs/s"/>
+    <param name="graph-lower-limit"  value="0" />
+    <param name="graph-title"        value="%system-id%:%sce-rdr-comment%"/>
+
+      <leaf name="Report_Rate_vs_Peak">
+        <param name="comment"
+                       value="The rate of RDR exports vs the peak recorded"/>
+        <param name="precedence"          value="1000"/>
+        <param name="ds-type"             value="rrd-multigraph"/>
+        <param name="ds-names"            value="rate,peak"/>
+        <!-- Reports per second Peak -->
+        <param name="ds-expr-peak"        value="{Report_RatePeak}"/>
+        <param name="graph-legend-peak"   value="Reports per second Peak"/>
+        <param name="line-style-peak"     value="##totalresource"/>
+        <param name="line-color-peak"     value="##totalresource"/>
+        <param name="line-order-peak"     value="1"/>
+        <!-- Reports per second -->
+        <param name="ds-expr-rate"        value="{Report_Rate}"/>
+        <param name="graph-legend-rate"   value="Reports per second"/>
+        <param name="line-style-rate"     value="##resourceusage"/>
+        <param name="line-color-rate"     value="##resourceusage"/>
+        <param name="line-order-rate"     value="2"/>
+      </leaf>
+
+      <leaf name="Report_Rate">
+        <param name="comment"  value="The rate of reports sent per second"/>
+        <param name="graph-legend"    value="Reports per second"/>
+        <param name="rrd-ds"          value="reportRate"/>
+        <param name="snmp-object"
+              value="$rdrFormatterCategoryReportRate.%sce-rdr-index%"/>
+      </leaf>
+
+      <leaf name="Report_RatePeak">
+        <param name="comment"         value="The max rate of reports sent"/>
+        <param name="graph-legend"    value="Reports per second peak"/>
+        <param name="rrd-ds"          value="reportRatePeak"/>
+        <param name="snmp-object"
+              value="$rdrFormatterCategoryReportRatePeak.%sce-rdr-index%"/>
+      </leaf>
+      
+      <leaf name="Reports_Discarded">
+        <param name="comment"     value="Total number of reports discarded"/>
+        <param name="graph-legend"    value="Num of reports"/>
+        <param name="rrd-ds"          value="reportsDiscarded"/>
+        <param name="snmp-object"
+           value="$rdrFormatterCategoryNumReportsDiscarded.%sce-rdr-index%"/>
+      </leaf>
+      
+  </template>
+
 
   <template name="cisco-sce-subscribers">
     <subtree name="SCE_Subscribers">
@@ -310,7 +400,7 @@
   <template name="cisco-sce-tp-subtree">
     <param name="has-overview-shortcuts" value="yes"/>
     <param name="overview-shortcuts" value="util,discards"/>
-    
+    <!-- Utilization -->
     <param name="overview-subleave-name-util" value="CPU_Utilization"/>
     <param name="overview-shortcut-text-util"
            value="All CPU Utilization"/>
@@ -318,7 +408,7 @@
            value="Show CPU utilization for all TPs on one page"/>
     <param name="overview-page-title-util"
            value="Traffic Processors Utilization"/>
-
+    <!-- Discards -->
     <param name="overview-subleave-name-discards" value="Packets_Discarded"/>
     <param name="overview-shortcut-text-discards"
            value="All Discards"/>
@@ -444,14 +534,12 @@
   <template name="cisco-sce-gc-subtree">  
     <param name="data-file"
         value="%system-id%_SCE_gc_%sce-link-index%_%sce-gc-index%.rrd"/>
-    <param name="collector-timeoffset-hashstring"
-        value="%system-id%:%sce-link-index%:%sce-gc-index%" />
     <param name="graph-lower-limit" value="0" />
     <param name="graph-title"        value="%sce-service-name%"/>
     
     <param name="has-overview-shortcuts" value="yes"/>
     <param name="overview-shortcuts" value="up,down,sessions"/>
-    
+    <!-- Up Volume -->
     <param name="overview-subleave-name-up"    value="Up_bps"/>
     <param name="overview-direct-link-up"      value="yes"/>
     <param name="overview-direct-link-view-up" value="expanded-dir-html"/>
@@ -461,7 +549,7 @@
            value="Show upstream bandwidth usage for all services"/>
     <param name="overview-page-title-up"
            value="Upstream Usage"/>
-
+    <!-- Down Volume -->
     <param name="overview-subleave-name-down"  value="Down_bps"/>
     <param name="overview-direct-link-down"      value="yes"/>
     <param name="overview-direct-link-view-down" value="expanded-dir-html"/>
@@ -471,7 +559,7 @@
            value="Show downstream bandwidth usage for all services"/>
     <param name="overview-page-title-down"
            value="Downstream Usage"/>
-
+    <!-- Sessions -->
     <param name="overview-subleave-name-sessions" value="Concurrent_Sessions"/>
     <param name="overview-direct-link-sessions"      value="yes"/>
     <param name="overview-direct-link-view-sessions"
@@ -486,6 +574,25 @@
   </template>
   
   <template name="cisco-sce-gcounter">
+    <leaf name="Volume">
+      <param name="comment"
+                     value="InOut volume in kilobytes/s"/>
+      <param name="precedence"          value="1000"/>
+      <param name="ds-type"             value="rrd-multigraph"/>
+      <param name="ds-names"            value="down,up"/>
+      <!-- Volume Download -->
+      <param name="ds-expr-down"        value="{DownVolume},8192,*"/>
+      <param name="graph-legend-down"   value="Bits per second in"/>
+      <param name="line-style-down"     value="##BpsIn"/>
+      <param name="line-color-down"     value="##BpsIn"/>
+      <param name="line-order-down"     value="1"/>
+      <!-- Volume Upload -->
+      <param name="ds-expr-up"          value="{UpVolume},8192,*"/>
+      <param name="graph-legend-up"     value="Bits per second out"/>
+      <param name="line-style-up"       value="##BpsOut"/>
+      <param name="line-color-up"       value="##BpsOut"/>
+      <param name="line-order-up"       value="2"/>
+    </leaf>
   
     <leaf name="UpVolume">
       <param name="comment"
@@ -504,7 +611,7 @@
               value="Downstream volume in kilobytes/s"/>
       <param name="hidden"          value="yes"/>
       <param name="rrd-ds"          value="DownVolume"/>
-      <param name="rrd-create-max"  value="2000000"/>
+      <param name="rrd-create-max"  value="200000"/>
       <param name="snmp-object"
         value="$linkServiceUsageDownVolume.%sce-link-index%.%sce-gc-index%"/>
       <param name="rrd-create-dstype" value="COUNTER"/>

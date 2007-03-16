@@ -291,7 +291,7 @@ sub handler
                             $Torrus::Global::cacheDir);            
     }
 
-    &Torrus::Log::setLevel('warn');
+    &Torrus::Log::setLevel('info');
     return $retval;
 }
 

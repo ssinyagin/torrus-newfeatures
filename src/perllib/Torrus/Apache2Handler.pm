@@ -284,7 +284,7 @@ sub handler : method
     
     if( not $Torrus::Renderer::globalDebug )
     {
-        &Torrus::Log::setLevel('warn');
+        &Torrus::Log::setLevel('info');
     }
     
     return $retval;

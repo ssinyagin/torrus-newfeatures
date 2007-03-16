@@ -1,3 +1,11 @@
+2007-03-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Apache2Handler.pm, perllib/Torrus/ApacheHandler.pm:
+	User login event in the apache error log
+
+	* perllib/Torrus/DevDiscover/CiscoIOS_MacAccounting.pm:
+	MAC accounting on subinterfaces
+
 2007-02-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm (discover):

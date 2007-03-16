@@ -146,6 +146,13 @@ sub discover
         my $peerIP = $interface->{'mediaToIpNet'}{$phyAddr};
         if( not defined( $peerIP ) )
         {
+            # Try in the global table, as the ARP is stored per subinterface,
+            # and MAC accounting is on main interface
+            $peerIP = $data->{'mediaToIpNet'}{$phyAddr};
+        }
+        
+        if( not defined( $peerIP ) )
+        {
             # high logging level, because who cares about staled entries?
             Debug('Cannot determine IP address for MAC accounting ' .
                   'entry: ' . $macAddrString);            

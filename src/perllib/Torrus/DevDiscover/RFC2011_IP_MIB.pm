@@ -71,7 +71,12 @@ sub discover
                                  '.' . $INDEX);
 
         $interface->{'ipNetToMedia'}{$ipAddr} = $phyAddr;
-        $interface->{'mediaToIpNet'}{$phyAddr} = $ipAddr;        
+        $interface->{'mediaToIpNet'}{$phyAddr} = $ipAddr;
+
+        # Cisco routers assign ARP to subinterfaces, but MAC accounting
+        # to main interfaces. Let them search in a global table
+        $data->{'ipNetToMedia'}{$ipAddr} = $phyAddr;
+        $data->{'mediaToIpNet'}{$phyAddr} = $ipAddr;
     }
                             
     return 1;

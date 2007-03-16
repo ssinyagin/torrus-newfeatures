@@ -143,7 +143,7 @@ sub handler : method
                 {
                     $session{'uid'} = $options{'uid'} = $uid;
                     $needsLogin = 0;
-                    Info('User logged in: ' . $args{'uid'});
+                    Info('User logged in: ' . $uid);
                 }
                 else
                 {

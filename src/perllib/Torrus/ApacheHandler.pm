@@ -136,6 +136,7 @@ sub handler
                 {
                     $session{'uid'} = $options{'uid'} = $args{'uid'};
                     $needsLogin = 0;
+                    Info('User logged in: ' . $args{'uid'});
                 }
                 else
                 {

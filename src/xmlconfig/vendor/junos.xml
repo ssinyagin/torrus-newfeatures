@@ -1,0 +1,428 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2007 Jon Nistor
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+  $Id$
+  Jon Nistor <nistor at snickers dot org>
+
+-->
+<!-- Juniper Operating system for M/T series routers -->
+
+<configuration>
+
+<definitions>
+  <!-- JUNIPER-COS-MIB -->
+  <def name="jnxCosQstatQedPkts"      value="1.3.6.1.4.1.2636.3.15.4.1.3" />
+  <def name="jnxCosQstatQedPktRate"   value="1.3.6.1.4.1.2636.3.15.4.1.4" />
+  <def name="jnxCosQstatQedBytes"     value="1.3.6.1.4.1.2636.3.15.4.1.5" />
+  <def name="jnxCosQstatQedByteRate"  value="1.3.6.1.4.1.2636.3.15.4.1.6" />
+  <def name="jnxCosQstatTxedPkts"     value="1.3.6.1.4.1.2636.3.15.4.1.7" />
+  <def name="jnxCosQstatTxedPktRate"  value="1.3.6.1.4.1.2636.3.15.4.1.8" />
+  <def name="jnxCosQstatTxedBytes"    value="1.3.6.1.4.1.2636.3.15.4.1.9" />
+  <def name="jnxCosQstatTxedByteRate" value="1.3.6.1.4.1.2636.3.15.4.1.10" />
+  <def name="jnxCosQstatTailDropPkts" value="1.3.6.1.4.1.2636.3.15.4.1.11" />
+  <def name="jnxCosQstatTailDropPktRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.12" />
+  <def name="jnxCosQstatTotalRedDropPkts"
+             value="1.3.6.1.4.1.2636.3.15.4.1.13" />
+  <def name="jnxCosQstatTotalRedDropPktRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.14" />
+  <def name="jnxCosQstatLpNonTcpRedDropPkts"
+             value="1.3.6.1.4.1.2636.3.15.4.1.15" />
+  <def name="jnxCosQstatLpNonTcpRDropPktRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.16" />
+  <def name="jnxCosQstatLpTcpRedDropPkts"
+             value="1.3.6.1.4.1.2636.3.15.4.1.17" />
+  <def name="jnxCosQstatLpTcpRedDropPktRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.18" />
+  <def name="jnxCosQstatHpNonTcpRedDropPkts"
+             value="1.3.6.1.4.1.2636.3.15.4.1.19" />
+  <def name="jnxCosQstatHpNonTcpRDropPktRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.20" />
+  <def name="jnxCosQstatHpTcpRedDropPkts"
+             value="1.3.6.1.4.1.2636.3.15.4.1.21" />
+  <def name="jnxCosQstatHpTcpRedDropPktRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.22" />
+  <def name="jnxCosQstatTotalRedDropBytes"
+             value="1.3.6.1.4.1.2636.3.15.4.1.23" />
+  <def name="jnxCosQstatTotalRedDropByteRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.24" />
+  <def name="jnxCosQstatLpNonTcpRedDropBytes"
+             value="1.3.6.1.4.1.2636.3.15.4.1.25" />
+  <def name="jnxCosQstatLpNonTcpRDropByteRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.26" />
+  <def name="jnxCosQstatLpTcpRedDropBytes"
+             value="1.3.6.1.4.1.2636.3.15.4.1.27" />
+  <def name="jnxCosQstatLpTcpRedDropByteRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.28" />
+  <def name="jnxCosQstatHpNonTcpRedDropBytes"
+             value="1.3.6.1.4.1.2636.3.15.4.1.29" />
+  <def name="jnxCosQstatHpNonTcpRDropByteRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.30" />
+  <def name="jnxCosQstatHpTcpRedDropBytes"
+             value="1.3.6.1.4.1.2636.3.15.4.1.31" />
+  <def name="jnxCosQstatHpTcpRedDropByteRate"
+             value="1.3.6.1.4.1.2636.3.15.4.1.32" />
+
+</definitions>
+
+
+<datasources>
+  <template name="junos-cos-subtree">
+    <param name="comment"     value="Class of Service"/>
+  </template>
+
+  <template name="junos-cos-leaf">
+    <param name="comment"            value="%cos-name%"/>
+    <param name="data-file"
+        value="%system-id%_COS_%ifName%_out_%cos-name%.rrd"/>
+    <param name="graph-title"        value="%system-id%:%ifName%:%cos-name%"/>
+    <param name="graph-lower-limit"  value="0"/>
+
+
+    <!-- Queued packet/byte stats -->
+    <leaf name="Packets_Queued">
+        <param name="comment"
+               value="Total number of packets queued at the output"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="904"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="QedPkts"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatQedPkts.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Queued_Rate">
+        <param name="comment"
+               value="The rate (PPS) at which packets were queued"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="903"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="QedPktRate"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatQedPktRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Queued_Bytes">
+        <param name="comment"
+               value="Number of bytes queued at the output"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="902"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="QedBytes"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatQedBytes.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Queued_Bytes_Rate">
+        <param name="comment"
+               value="The rate (PPS) at which bytes were queued"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="901"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="QedByteRate"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatQedByteRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+
+
+    <!-- Transmitted packet/byte stats -->
+    <leaf name="Packets_Transmitted">
+        <param name="comment"
+               value="Number of packets transmitted on the queue"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="804"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="TxedPkts"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTxedPkts.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Transmitted_Rate">
+        <param name="comment"
+               value="Output queue's packet transmit rate, (PPS)"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="803"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="TxedPktRate"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTxedPktRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Transmitted_Bytes">
+        <param name="comment"
+               value="Number of bytes transmitted on the queue"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="802"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="TxedBytes"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTxedBytes.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Transmitted_Bytes_Rate_hidden">
+        <param name="comment"
+               value="See leaf below: Packets_Transmitted_Bytes_Rate"/>
+        <param name="hidden"             value="yes"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="TxedByteRate"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTxedByteRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Transmitted_Bytes_Rate">
+        <param name="comment"
+               value="Queue's current transmit rate in bytes per second"/>
+        <param name="graph-legend"       value="Bytes per second"/>
+        <param name="precedence"         value="801"/>
+        <param name="vertical-label"     value="bps"/>
+        <param name="ds-type"            value="rrd-file"/>
+        <param name="leaf-type"          value="rrd-cdef"/>
+        <param name="rpn-expr"
+               value="{Packets_Transmitted_Bytes_Rate_hidden},8,*"/>
+    </leaf>
+
+
+
+    <!-- Tail-dropped packet stats --> 
+    <leaf name="Packets_Tail_Dropped">
+        <param name="comment"
+               value="Tail drop packet volume (PPS) for the queue"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="702"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="TailDropPkts"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTailDropPkts.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Tail_Dropped_Rate">
+        <param name="comment"
+               value="Tail drop packet rate (PPS) for the queue"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="701"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="TailDropPktRate"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTailDropPktRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+
+
+    <!-- RED-dropped packet stats -->
+    <leaf name="Packets_Dropped_RED">
+        <param name="comment"
+               value="Total number of packets dropped (due to RED)"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="610"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="TotalRedDropPkts"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTotalRedDropPkts.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_Rate">
+        <param name="comment"
+               value="Most recent estimate of per-second RED-dropped pkts"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="609"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="TotalRedDropPktRate"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTotalRedDropPktRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+
+    <!-- RED: PLP Packet information -->
+    <leaf name="Packets_Dropped_RED_PLP_low_non_tcp">
+        <param name="comment"
+               value="Low Priority - Non-TCP packets RED-dropped"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="608"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="LpNonTcpRedDropPkts"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatLpNonTcpRedDropPkts.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_PLP_low_non_tcp_Rate">
+        <param name="comment"
+            value="Low Priority - Rate (PPS) of non-TCP packets RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="607"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="LpNonTcpRDropPktRat"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatLpNonTcpRDropPktRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_PLP_low_tcp">
+        <param name="comment"
+               value="Low Priority - TCP packets RED-dropped"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="606"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="LpTcpRedDropPkts"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatLpTcpRedDropPkts.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_PLP_low_tcp_Rate">
+        <param name="comment"
+              value="Low Priority - Rate (PPS) of TCP packets RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="605"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="LpTcpRedDropPktRate"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatLpTcpRedDropPktRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_PLP_high_non_tcp">
+        <param name="comment"
+              value="High Priority - Non-TCP packets RED-dropped"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="604"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="HpNonTcpRedDropPkts"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatHpNonTcpRedDropPkts.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_PLP_high_non_tcp_Rate">
+        <param name="comment"
+            value="High Priority - Rate (PPS) of non-TCP packets RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="603"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="HpNonTcpRDropPktRat"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatHpNonTcpRDropPktRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_PLP_high_tcp">
+        <param name="comment"
+               value="High Priority - TCP packets RED-dropped"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="602"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="HpTcpRedDropPkts"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatHpTcpRedDropPkts.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_PLP_high_tcp_Rate">
+        <param name="comment"
+              value="High Priority - Rate (PPS) of TCP packets RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="601"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="HpTcpRedDropPktRate"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatHpTcpRedDropPktRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+
+
+    <!-- RED-dropped byte stats -->
+    <leaf name="Packets_Dropped_RED_Total_bytes">
+        <param name="comment"
+              value="Total number of bytes RED-dropped at the output"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="510"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="TotalRedDropBytes"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTotalRedDropBytes.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_Total_bytes_Rate">
+        <param name="comment"
+              value="Rate (PPS) at which bytes were RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="509"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="TotalRedDropByteRat"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatTotalRedDropByteRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_low_PLP_non_TCP_bytes">
+        <param name="comment"
+              value="Low Priority - Non-TCP bytes RED-dropped"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="508"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="LpNonTcpRedDropByte"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatLpNonTcpRedDropBytes.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_low_PLP_non_TCP_bytes_Rate">
+        <param name="comment"
+               value="Low Priority - Rate (BPS) of non-TCP bytes RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="507"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="LpNonTcpRDropByteR"/>
+        <param name="snmp-object"
+              value="$jnxCosQstatLpNonTcpRDropByteRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_low_PLP_TCP_bytes">
+        <param name="comment"
+               value="Low Priority - TCP byte RED-dropped"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="506"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="LpTcpRedDropBytes"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatLpTcpRedDropBytes.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_low_PLP_TCP_bytes_Rate">
+        <param name="comment"
+         value="Low Priority - Rate (BPS) of TCP bytes RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="505"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="LpTcpRedDropByteRat"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatLpTcpRedDropByteRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_high_PLP_non_TCP_bytes">
+        <param name="comment"
+               value="High Priority - Non-TCP bytes RED-dropped"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="504"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="HpNonTcpRedDropByte"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatHpNonTcpRedDropBytes.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_high_PLP_non_TCP_bytes_Rate">
+        <param name="comment"
+              value="High Priority - Rate (BPS) of non-TCP bytes RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="503"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="HpNonTcpRDropByteR"/>
+        <param name="snmp-object"
+              value="$jnxCosQstatHpNonTcpRDropByteRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_high_PLP_TCP_bytes">
+        <param name="comment"
+               value="High Priority - TCP bytes RED-dropped"/>
+        <param name="graph-legend"       value="Packets"/>
+        <param name="precedence"         value="502"/>
+        <param name="rrd-create-dstype"  value="COUNTER"/>
+        <param name="rrd-ds"             value="HpTcpRedDropBytes"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatHpTcpRedDropBytes.%ifIndex%.%cos-index%"/>
+    </leaf>
+    <leaf name="Packets_Dropped_RED_high_PLP_TCP_bytes_Rate">
+        <param name="comment"
+         value="High Priority - Rate (BPS) of TCP byte RED-dropped"/>
+        <param name="graph-legend"       value="Packets per second"/>
+        <param name="precedence"         value="501"/>
+        <param name="rrd-create-dstype"  value="GAUGE"/>
+        <param name="rrd-ds"             value="HpTcpRedDropByteR"/>
+        <param name="snmp-object"
+               value="$jnxCosQstatHpTcpRedDropByteRate.%ifIndex%.%cos-index%"/>
+    </leaf>
+
+  </template>
+
+</datasources>
+
+</configuration>

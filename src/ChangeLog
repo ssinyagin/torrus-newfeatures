@@ -1,3 +1,7 @@
+2007-03-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/JunOS.pm: Added per-CoS traffic statistics
+
 2007-03-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Apache2Handler.pm, perllib/Torrus/ApacheHandler.pm:

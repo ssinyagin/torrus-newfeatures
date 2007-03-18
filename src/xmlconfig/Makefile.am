@@ -42,6 +42,7 @@ dist_vendor_DATA = \
 	vendor/empire.systemedge.xml \
 	vendor/empire.systemedge.ntregperf.xml \
 	vendor/f5.bigip.xml \
+	vendor/junos.xml \
 	vendor/hp.hpux.xml \
 	vendor/microsoft.windows.xml \
 	vendor/motorola.bsr.xml \

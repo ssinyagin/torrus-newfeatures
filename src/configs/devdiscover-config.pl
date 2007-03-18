@@ -716,6 +716,17 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'BigIp_3.x',
          'source'   => 'vendor/f5.bigip.xml',
      },
+     
+     ##### Juniper JunOS (by Jon Nistor)
+     'JunOS::junos-cos-subtree' => {
+         'name'     => 'junos-cos-subtree',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-cos-leaf' => {
+         'name'     => 'junos-cos-leaf',
+         'source'   => 'vendor/junos.xml',
+     },
+     
      ##### Ucd Snmp
      'UcdSnmp::ucdsnmp-memory-real' => {
          'name'     => 'ucdsnmp-memory-real',

@@ -139,6 +139,10 @@ may provide about the server health and performance.
 
 In-detail traffic statistics.
 
+=item * Juniper JunOS
+
+CoS statistics. More stats in the future.
+
 =item * Microsoft Windows 2000/XP
 
 Sets up proper interface indexing and provides FTP and HTTP server statistics.

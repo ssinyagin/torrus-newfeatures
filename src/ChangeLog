@@ -1,3 +1,9 @@
+2007-03-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_graphline):
+	line-style line-color from the node params override thse
+	in the view params
+
 2007-03-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/JunOS.pm: Added per-CoS traffic statistics

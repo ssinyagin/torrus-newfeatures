@@ -503,6 +503,10 @@
       <param name="rrd-ds"          value="Util_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpCpuUtilization.%sce-tp-index%"/>
+      <param name="line-style"         value="##resourceusage" />
+      <param name="line-color"         value="##resourceusage" />
+      <param name="graph-lower-limit"  value="0" />
+      <param name="graph-upper-limit"  value="100" />
     </leaf>
 
     <leaf name="Flows_Utilization">
@@ -513,6 +517,10 @@
       <param name="rrd-ds"          value="FlowsUtil_%sce-tp-index%"/>
       <param name="snmp-object"
                 value="$tpFlowsCapacityUtilization.%sce-tp-index%"/>
+      <param name="line-style"         value="##resourceusage" />
+      <param name="line-color"         value="##resourceusage" />
+      <param name="graph-lower-limit"  value="0" />
+      <param name="graph-upper-limit"  value="100" />
     </leaf>
                         
   </template>

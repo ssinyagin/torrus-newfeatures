@@ -531,6 +531,11 @@ or storage sizes.
 
 Optional. When set to "yes", the graph is drawn in logarithmic y-axis scale.
 
+=item * C<line-style>, C<line-color>
+
+These optional parameters override the corresponding ones from the view
+definition.
+
 =item * C<default-subtree-view>, C<default-leaf-view>
 
 Mandatory. Determine the default view for a leaf or subtree, correspondingly.

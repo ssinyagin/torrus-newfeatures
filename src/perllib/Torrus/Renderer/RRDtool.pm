@@ -450,12 +450,22 @@ sub rrd_make_graphline
     {
         $legend = '';
     }
-    
-    my $linestyle =
-        $self->mkline( $config_tree->getParam($view, 'line-style') );
 
-    my $linecolor =
-        $self->mkcolor( $config_tree->getParam($view, 'line-color') );
+    my $styleval = $config_tree->getNodeParam($token, 'line-style');
+    if( not defined( $styleval ) or length( $styleval ) == 0 )
+    {
+        $styleval = $config_tree->getParam($view, 'line-style');
+    }
+    
+    my $linestyle = $self->mkline( $styleval );
+
+    my $colorval = $config_tree->getNodeParam($token, 'line-color');
+    if( not defined( $colorval ) or length( $colorval ) == 0 )
+    {
+        $colorval = $config_tree->getParam($view, 'line-color');
+    }
+    
+    my $linecolor = $self->mkcolor( $colorval );
 
     if( $self->rrd_if_gprint( $config_tree, $token ) )
     {

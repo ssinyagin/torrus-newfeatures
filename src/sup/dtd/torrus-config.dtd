@@ -35,7 +35,7 @@
 
 <!ELEMENT creator-info ( #PCDATA ) >
 
-<!ELEMENT datasources ( template | alias | apply-template | filepattern |
+<!ELEMENT datasources ( template | alias | apply-template |
                         leaf | param | subtree |
                         setvar | iftrue | iffalse )* >
                         
@@ -45,17 +45,10 @@
 
 <!ELEMENT definitions ( def )* >
 
-<!ELEMENT detailed ( alias | apply-template | filepattern |
+<!ELEMENT detailed ( alias | apply-template |
                     leaf | param | subtree |
                     setvar | iftrue | iffalse )* >
 <!ATTLIST detailed match NMTOKEN #REQUIRED >
-
-<!ELEMENT filepattern ( alias | apply-template | detailed | filepattern |
-                        leaf | param | subtree |
-                        setvar | iftrue | iffalse )* >
-<!ATTLIST filepattern filere CDATA #REQUIRED >
-<!ATTLIST filepattern name CDATA #REQUIRED >
-<!ATTLIST filepattern type NMTOKEN #REQUIRED >
 
 <!ELEMENT include EMPTY >
 <!ATTLIST include filename ID #REQUIRED >
@@ -73,11 +66,11 @@
 <!ATTLIST param name NMTOKEN #REQUIRED >
 <!ATTLIST param value CDATA #IMPLIED >
 
-<!ELEMENT subtree ( alias | apply-template | filepattern |
+<!ELEMENT subtree ( alias | apply-template |
                     leaf | param | subtree | setvar | iftrue | iffalse )* >
 <!ATTLIST subtree name NMTOKEN #REQUIRED >
 
-<!ELEMENT template ( alias | apply-template | filepattern |
+<!ELEMENT template ( alias | apply-template |
                      leaf | param | subtree | setvar | iftrue | iffalse )* >
 <!ATTLIST template name NMTOKEN #REQUIRED >
 

@@ -202,8 +202,8 @@ the part of the name. In this case, any subtree is identified by a path
 ending with slash, while leaf paths always end with a word symbol.
 The top-level subtree is identified by a single slash.
 
-The other components of the datasouce definition are I<templates>,
-I<aliases>, and I<filepatterns>.
+The other components of the datasouce definition are I<templates> and
+I<aliases>.
 
 =head3 Templates
 
@@ -260,93 +260,6 @@ subtrees are created:
   <subtree name="62.3.44.55">
     <alias>/Netflow/ExportersByName/rtrTelehouse1/</alias>
     ...
-
-=head3 Filepatterns
-
-Some subtree hierarchies can be built based on file name pattern.
-Suppose you have a bunch of RRD files named conforming to a known rule.
-In this case, filepatterns allow to build the subtrees based on those
-names.
-
-Parameter C<data-dir> must be defined in the parent node. It determines
-the directory where the files are searched.
-
-A filepattern is defined by three mandatory attributes:
-
-=over 4
-
-=item * type
-
-Must be set to C<subtree> or C<leaf>. It defines what kind of elements
-will be built in the configuration tree.
-
-=item * name
-
-Defines the names of the future subtrees or leaves. Must include
-the regular expressions variables, like C<$1> etc.
-
-=item * filere
-
-A regular expression which defines the filename matching. Must
-contain grouping, like C<(.*)> etc.
-
-=back
-
-At the time of compilation, the files are scanned in the given directory,
-and for those matched, the new subtrees or leaves are created, with one
-parameter implicitly defined: C<data-file> is set to the file name
-being matched.
-
-The string given in C<filere> attribute, is a normal Perl regular expression,
-except one thing: C<$PARENT> is replaced by the parent subtree name.
-This allows to build nested filepattern constructs:
-
-    <subtree name="Exporters">
-      <param name="comment" value="Netflow exporting devices" />
-      <param name="data-dir" value="/var/local/flowscan/graphs" />
-
-      <!-- All netflow exporters look the same from here -->
-      <filepattern type="subtree" name="$1" filere="exporter_(.*)_total\.rrd">
-        <param name="comment" value="" />
-
-        <!-- And here we describe the difference -->
-        <detailed match="62.5.55.233">
-          <!-- Let's give it a nicer name -->
-          <alias>/Netflow/ExportersByName/rtrTelehouse1/</alias>
-          <!-- And give all the paramal details if needed -->
-          <param name="location" value="Telehouse Street 1, New Yourk" />
-          <param name="contact" value="John Smith" />
-          <param name="phone" value="+1-800-444555" />
-          <subtree name="if11">
-              <param name="comment" value="France Telecom 1" />
-              <param name="phone" value="+1-800-666555" />
-              <!-- We can give it a name from different subtree -->
-              <alias>/Netflow/Peering/FranceTelecom-1/</alias>
-          </subtree>
-        </detailed>
-
-        <!-- Again, on each router, the interfaces look the same -->
-        <filepattern type="subtree" name="'if'.$1"
-                     filere="exporter_$PARENT_(\d.*)\.rrd">
-            <param name="comment" value="Netflow exporting interface" />
-
-            <!-- For each of the interfaces, the bps leaf is taken from the
-                 template above -->
-            <apply-template name="bps" />
-        </filepattern>
-      </filepattern>
-
-    </subtree>
-
-In this example, the files are searched in the directory
-F</var/local/flowscan/graphs>, and those matching the patterns
-F<exporter_[router-ip]_total.rrd> and F<exporter_[router-ip]_[if-index].rrd>
-build the corresponding hierarchy.
-
-The construct C<E<lt>detailed match="[name]"E<gt>> allows to
-specify additional parameters for the subtree or leaf whose name
-coincides the given string. Should no elements match the given name, a warning
-message is issued by the compiler.
 
 =head3 Compile-time variables
 

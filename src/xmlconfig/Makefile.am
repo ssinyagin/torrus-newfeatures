@@ -49,7 +49,6 @@ dist_vendor_DATA = \
 	vendor/netapp.filer.xml \
 	vendor/netscreen.xml \
 	vendor/paradyne.xdsl.xml \
-	vendor/smokeping.xml \
 	vendor/ucd.ucd-snmp.xml
 
 genericdir    =  $(distxmldir)/generic
@@ -66,7 +65,6 @@ dist_examples_DATA = \
 	examples/apc-ups.xml \
 	examples/ascend.max.xml \
 	examples/docsis-monitors.xml \
-	examples/flowscan.xml \
 	examples/generic-netsnmp.xml \
 	examples/hpux.xml \
 	examples/monitors.xml \

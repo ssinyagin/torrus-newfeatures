@@ -47,10 +47,6 @@ sub initValidatorLeafParams {
     \%validatorLeafParams;
 }
 
-# These parameters may be expanded with $defs and %paramrefs%
-
-$Torrus::ConfigTree::expand_params{'http-url'} = 1;
-
 
 # List of needed parameters and default values
 

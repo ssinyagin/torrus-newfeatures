@@ -28,6 +28,16 @@
 
 <configuration>
 
+<param-properties>
+  <!-- Parameters which need to be expanded accorrding
+       to $defs and %paramrefs% -->
+
+  <prop param="ifindex-table"       prop="expand" value="1"/>
+  <prop param="snmp-host"           prop="expand" value="1"/>
+  <prop param="snmp-object"         prop="expand" value="1"/>  
+</param-properties>
+
+
 <datasources>
 
   <template name="snmp-defaults">

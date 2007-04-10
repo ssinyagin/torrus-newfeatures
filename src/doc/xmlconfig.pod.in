@@ -142,6 +142,24 @@ and are referenced with dollar sign and the definition name, e.g.:
       ...
 
 
+=head2 Parameter properties
+
+Some parameters require special handling during the compilation or
+at the runtime. The parameter properties define such behaviour in the
+XML configuration.
+
+Currently two properties are recognized: "remspace" and "expand".
+
+  <configuration>
+    <param-properties>
+      <!-- Parameters where space is removed from values -->
+      <prop param="action"             prop="remspace" value="1"/>
+      <prop param="display-rpn-expr"   prop="remspace" value="1"/>
+      <prop param="ds-names"           prop="remspace" value="1"/>
+      ...
+    </param-properties>
+
+
 
 =head2 Datasource definitions
 

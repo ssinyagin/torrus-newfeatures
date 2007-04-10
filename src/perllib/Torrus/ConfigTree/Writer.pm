@@ -1,4 +1,4 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2007  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -34,16 +34,6 @@ use Torrus::ServiceID;
 use strict;
 use Digest::MD5 qw(md5); # needed as hash function
 
-# Global list of parameters requiring space removal
-my @remspace =
-    (qw(storage-type monitor action launch-when rpn-expr tokenset-member
-        setenv-params setenv-dataexpr ds-names value-map rrgraph-views
-        print-cf hrules display-rpn-expr));
-
-foreach my $param ( @remspace )
-{
-    $Torrus::ConfigTree::Writer::remove_space{$param} = 1;
-}
 
 our %multigraph_remove_space =
     ('ds-expr-' => 1,
@@ -93,7 +83,7 @@ sub setParam
     my $param = shift;
     my $value = shift;
 
-    if( $Torrus::ConfigTree::Writer::remove_space{$param} )
+    if( $self->getParamProperty( $param, 'remspace' ) )
     {
         $value =~ s/\s+//go;
     }
@@ -110,7 +100,7 @@ sub setNodeParam
     my $param = shift;
     my $value = shift;
 
-    if( $Torrus::ConfigTree::Writer::remove_space{$param} )
+    if( $self->getParamProperty( $param, 'remspace' ) )
     {
         $value =~ s/\s+//go;
     }
@@ -118,6 +108,18 @@ sub setNodeParam
     $self->{'paramcache'}{$name}{$param} = $value;
     $self->{'db_dsconfig'}->put( 'P:'.$name.':'.$param, $value );
     $self->{'db_dsconfig'}->addToList('Pl:'.$name, $param);
+}
+
+
+sub setParamProperty
+{
+    my $self = shift;
+    my $param = shift;
+    my $prop = shift;
+    my $value = shift;
+
+    $self->{'paramprop'}{$prop}{$param} = $value;
+    $self->{'db_paramprops'}->put( $param . ':' . $prop, $value );
 }
 
 

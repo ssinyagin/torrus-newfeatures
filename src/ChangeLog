@@ -1,3 +1,9 @@
+2007-04-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/ConfigTree.pm:
+	Moved the param properties to the XML config.
+	All trees need recompilation after this change.
+
 2007-04-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/ConfigTree/XMLCompiler.pm (compile_subtrees):

@@ -40,6 +40,14 @@
 
 <configuration>
 
+<param-properties>
+  <!-- Parameters which need to be expanded accorrding
+       to $defs and %paramrefs% -->
+
+  <prop param="http-url"       prop="expand" value="1"/>
+</param-properties>
+
+
 <datasources>
 
   <template name="apache-httpd-common">

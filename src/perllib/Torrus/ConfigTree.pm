@@ -1,4 +1,4 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2007  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -26,19 +26,6 @@ use Torrus::TimeStamp;
 
 use strict;
 
-# Global list of parameters which need to be expanded
-# accorrding to $defs and %paramrefs%
-
-my @expand_params =
-    (qw(data-file data-dir rrd-ds rpn-expr rrd-create-max rrd-create-min
-        monitor-vars comment graph-title graph-legend descriptive-nickname
-        collector-timeoffset-hashstring collector-scale
-        lower-limit normal-level upper-limit transform-value));
-
-foreach my $param( @expand_params )
-{
-    $Torrus::ConfigTree::expand_params{$param} = 1;
-}
 
 
 sub new
@@ -114,26 +101,26 @@ sub new
     $self->{'other_config_instance'} = $otherConfInstance;
 
     $self->{'db_readers'} = new Torrus::DB('config_readers',
-                                         -Subdir => $self->{'treename'},
-                                         -WriteAccess => 1 );
+                                           -Subdir => $self->{'treename'},
+                                           -WriteAccess => 1 );
     defined( $self->{'db_readers'} ) or return( undef );
 
     $self->{'db_dsconfig'} =
         new Torrus::DB('ds_config_' . $dsConfInstance,
-                     -Subdir => $self->{'treename'},  -Btree => 1,
-                     -WriteAccess => $options{'-WriteAccess'});
+                       -Subdir => $self->{'treename'},  -Btree => 1,
+                       -WriteAccess => $options{'-WriteAccess'});
     defined( $self->{'db_dsconfig'} ) or return( undef );
-
+    
     $self->{'db_otherconfig'} =
         new Torrus::DB('other_config_' . $otherConfInstance,
-                     -Subdir => $self->{'treename'}, -Btree => 1,
-                     -WriteAccess => $options{'-WriteAccess'});
+                       -Subdir => $self->{'treename'}, -Btree => 1,
+                       -WriteAccess => $options{'-WriteAccess'});
     defined( $self->{'db_otherconfig'} ) or return( undef );
-
+    
     $self->{'db_aliases'} =
         new Torrus::DB('aliases_' . $dsConfInstance,
-                     -Subdir => $self->{'treename'},  -Btree => 1,
-                     -WriteAccess => $options{'-WriteAccess'});
+                       -Subdir => $self->{'treename'},  -Btree => 1,
+                       -WriteAccess => $options{'-WriteAccess'});
     defined( $self->{'db_aliases'} ) or return( undef );
 
     if( $options{'-WriteAccess'} )
@@ -202,16 +189,44 @@ sub new
         }
     }
 
+    # Read the parameter properties into memory
+    $self->{'db_paramprops'} =
+        new Torrus::DB('paramprops_' . $dsConfInstance,
+                       -Subdir => $self->{'treename'},  -Btree => 1,
+                       -WriteAccess => $options{'-WriteAccess'});
+    defined( $self->{'db_paramprops'} ) or return( undef );
+    
+    if( $options{'-Rebuild'} )
+    {
+        $self->{'db_paramprops'}->trunc();
+    }
+    else
+    {
+        my $cursor = $self->{'db_paramprops'}->cursor();
+        while( my ($key, $val) =
+               $self->{'db_paramprops'}->next( $cursor ) )
+        {
+            my( $param, $prop ) = split( /:/o, $key );
+            $self->{'paramprop'}{$prop}{$param} = $val;
+        }
+        undef $cursor;
+        $self->{'db_paramprops'}->closeNow();
+        delete $self->{'db_paramprops'};
+    }
+
+    
     $self->{'db_sets'} =
         new Torrus::DB('tokensets',
-                     -Subdir => $self->{'treename'}, -Btree => 0,
-                     -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
+                       -Subdir => $self->{'treename'}, -Btree => 0,
+                       -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
     defined( $self->{'db_sets'} ) or return( undef );
 
     $self->{'db_nodepcache'} =
         new Torrus::DB('nodepcache_' . $dsConfInstance,
-                     -Subdir => $self->{'treename'}, -Btree => 1,
-                     -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
+                       -Subdir => $self->{'treename'}, -Btree => 1,
+                       -WriteAccess => 1,
+                       -Truncate => ($options{'-Rebuild'} and
+                                     not $options{'-NoDSRebuild'}));
     defined( $self->{'db_nodepcache'} ) or return( undef );
 
     return $self;
@@ -534,7 +549,7 @@ sub expandNodeParam
 
     # %parameter_substitutions% in ds-path-* in multigraph leaves
     # are expanded by the Writer post-processing
-    if( defined $value and $Torrus::ConfigTree::expand_params{$param} )
+    if( defined $value and $self->getParamProperty( $param, 'expand' ) )
     {
         $value = $self->expandSubstitutions( $token, $param, $value );
     }
@@ -615,7 +630,7 @@ sub expandSubstitutions
     if( ref( $Torrus::ConfigTree::nodeParamHook ) )
     {
         $value = &{$Torrus::ConfigTree::nodeParamHook}( $self, $token,
-                                                      $param, $value );
+                                                        $param, $value );
     }
 
     return $value;
@@ -737,6 +752,17 @@ sub getChildren
         }
     }
 }
+
+sub getParamProperty
+{
+    my $self = shift;
+    my $param = shift;
+    my $prop = shift;
+
+    return $self->{'paramprop'}{$prop}{$param};
+}
+
+
 
 # Recognize the regexp patterns within a path,
 # like /Netflow/Exporters/.*/.*/bps.

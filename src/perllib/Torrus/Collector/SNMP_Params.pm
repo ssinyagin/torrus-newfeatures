@@ -127,14 +127,6 @@ sub initAdmInfo
 }
 
 
-
-# These parameters may be expanded with $defs and %paramrefs%
-
-$Torrus::ConfigTree::expand_params{'snmp-object'} = 1;
-$Torrus::ConfigTree::expand_params{'ifindex-table'} = 1;
-$Torrus::ConfigTree::expand_params{'snmp-host'} = 1;
-
-
 1;
 
 

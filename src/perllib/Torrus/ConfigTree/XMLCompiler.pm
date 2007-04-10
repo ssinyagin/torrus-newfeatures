@@ -114,6 +114,11 @@ sub compile
         }
     }
 
+    foreach $node ( $root->getElementsByTagName('param-properties') )
+    {
+        $ok = $self->compile_paramprops( $node ) ? $ok:0;
+    }
+
     if( not $self->{'-NoDSRebuild'} )
     {
         foreach $node ( $root->getElementsByTagName('definitions') )
@@ -175,6 +180,31 @@ sub compile_definitions
     }
     return $ok;
 }
+
+
+sub compile_paramprops
+{
+    my $self = shift;
+    my $node = shift;
+    my $ok = 1;
+
+    foreach my $def ( $node->getChildrenByTagName('prop') )
+    {
+        my $param = $def->getAttribute('param'); 
+        my $prop = $def->getAttribute('prop');
+        my $value = $def->getAttribute('value');
+        if( not $param or not $prop or not defined($value) )
+        {
+            Error("Property definition error"); $ok = 0;
+        }
+        else
+        {
+            $self->setParamProperty($param, $prop, $value);
+        }
+    }
+    return $ok;
+}
+
 
 
 # Process <param name="name" value="value"/> and put them into DB.

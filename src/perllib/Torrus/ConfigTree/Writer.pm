@@ -490,8 +490,8 @@ sub postProcessNodes
                                 $step * ( unpack( 'N', md5( $hashString ) ) %
                                           $bucketSize );
                             
-                            Debug('Hashed offset ' . $offset . ' for ' .
-                                  $token);
+                            #Debug('Hashed offset ' . $offset . ' for ' .
+                            #      $token);
                             $self->setNodeParam( $token,
                                                  'collector-timeoffset',
                                                  $offset );

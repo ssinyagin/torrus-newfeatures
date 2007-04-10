@@ -140,7 +140,7 @@ sub translate
     my $string = shift;
     my $callback = shift;
 
-    Debug("Translating RPN: $string");
+    # Debug("Translating RPN: $string");
     my $item;
     my @new_items;
     foreach $item ( split( /,/, $string ) )
@@ -155,7 +155,7 @@ sub translate
             }
             my $value = &{$callback}( $noderef, $timeoffset );
             $value = 'UNKN' unless defined( $value );
-            Debug("$item translated into $value");
+            # Debug("$item translated into $value");
             $item = $value;
         }
         elsif( $item eq 'MOD' )
@@ -168,7 +168,7 @@ sub translate
     }
 
     $string = join( ',', @new_items );
-    Debug("RPN translated: $string");
+    # Debug("RPN translated: $string");
     return $string;
 }
 
@@ -179,7 +179,7 @@ sub run
     my $string = shift;
     my $callback = shift;
 
-    Debug("Input RPN: $string");
+    # Debug("Input RPN: $string");
 
     if( index( $string, '{' ) >= 0 )
     {
@@ -200,7 +200,7 @@ sub run
     }
     
     my $retval = $self->popStack();
-    Debug("RPN result: $retval");
+    # Debug("RPN result: $retval");
     return $retval;
 }
 

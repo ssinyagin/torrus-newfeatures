@@ -763,6 +763,12 @@ sub getParamProperty
 }
 
 
+sub getParamProperties
+{
+    my $self = shift;
+
+    return $self->{'paramprop'};
+}
 
 # Recognize the regexp patterns within a path,
 # like /Netflow/Exporters/.*/.*/bps.

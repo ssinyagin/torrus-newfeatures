@@ -156,6 +156,32 @@ sub addDefinition
 }
 
 
+sub startParamProps
+{
+    my $self = shift;
+
+    my $node = $self->{'doc'}->createElement('param-properties');
+    $self->{'docroot'}->insertBefore( $node, $self->{'datasources'} );
+    return $node;
+}
+
+
+sub addParamProp
+{
+    my $self = shift;
+    my $propsNode = shift;;
+    my $param = shift;
+    my $prop = shift;
+    my $value = shift;
+
+    my $node = $self->{'doc'}->createElement('prop');
+    $node->setAttribute( 'param', $param );
+    $node->setAttribute( 'prop', $prop );
+    $node->setAttribute( 'value', $value );
+    $propsNode->appendChild( $node );
+}
+
+
 
 sub addSubtree
 {

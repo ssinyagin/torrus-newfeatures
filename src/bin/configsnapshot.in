@@ -173,6 +173,17 @@ sub collect_definitions
         my $value = $config_tree->getDefinition( $defName );
         $cb->addDefinition( $definitionsNode, $defName, $value );
     }
+
+    my $propsNode = $cb->startParamProps();
+    my $props = $config_tree->getParamProperties();
+    foreach my $prop ( sort keys %{$props} )
+    {
+        foreach my $param ( sort keys %{$props->{$prop}} )
+        {
+            $cb->addParamProp( $propsNode, $param, $prop,
+                               $props->{$prop}{$param} );
+        }
+    }
 }
 
 sub collect_subtrees

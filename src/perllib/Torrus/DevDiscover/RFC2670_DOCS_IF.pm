@@ -201,6 +201,9 @@ sub buildConfig
                 my $interface = $data->{'interfaces'}{$ifIndex};
 
                 my $param = $interface->{'docsParams'};
+
+                $param->{'searchable'} = 'yes';
+                
                 $param->{'interface-name'} =
                     $interface->{'param'}{'interface-name'};            
                 $param->{'interface-nick'} =

@@ -533,6 +533,11 @@ GPRINT-related parameters are ignored.
 Optional. If a horizontal rule with the given name is defined, this parameter
 specifies the legend to be printed.
 
+=item * C<searchable>
+
+Optional. If set to C<yes>, the corresponding subtree or leaf is included
+in the search database.
+
 =back
 
 

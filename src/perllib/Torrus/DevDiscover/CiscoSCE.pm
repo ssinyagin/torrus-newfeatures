@@ -318,7 +318,8 @@ sub buildConfig
                                'sce-gc-index' => $gcIndex,
                                'comment' => $srvName,
                                'sce-service-name' => $srvName,
-                               'precedence' => 1000 - $gcIndex},
+                               'precedence' => 1000 - $gcIndex,
+                               'searchable' => 'yes'},
                              [ 'CiscoSCE::cisco-sce-gcounter' ]);
         }
     }

@@ -374,11 +374,6 @@ Sets the comment string for the host.
 Default: C<yes>. When set to C<no>, the link to the recursive view at the
 host level is omitted.
 
-=item * C<searchable>
-
-Default: C<yes>. When set to C<no>, the host is excluded from the search DB.
-
-
 =item * C<template-registry-overlays>
 
 If defined, this should be a comma-separated list of template registry

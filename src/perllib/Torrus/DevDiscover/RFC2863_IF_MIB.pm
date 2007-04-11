@@ -410,6 +410,8 @@ sub buildConfig
         next if $interface->{'excluded'};
         $nInterfaces++;
 
+        $interface->{'param'}{'searchable'} = 'yes';
+        
         $interface->{'param'}{'interface-iana-type'} = $interface->{'ifType'};
 
         $interface->{'param'}{'interface-name'} =

@@ -61,7 +61,7 @@
                      text="Expand leaves"
                      title="Show all leaf graphs in one page";
    END;
-   IF hasSubtrees;
+   IF hasSubtrees and nodeParam(token,'show-recursive',1) == 'yes';
     INCLUDE shortcut url=url(token, 'recursive-dir-html')
                      text="Recursive view"
                      title="Show all subtrees and leaves in one page";

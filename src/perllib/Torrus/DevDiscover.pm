@@ -61,6 +61,7 @@ $defaultParams{'rrd-hwpredict'} = 'no';
 $defaultParams{'domain-name'} = '';
 $defaultParams{'host-subtree'} = '';
 $defaultParams{'snmp-check-sysuptime'} = 'yes';
+$defaultParams{'show-recursive'} = 'yes';
 
 our @copyParams =
     ( 'collector-period',
@@ -73,6 +74,7 @@ our @copyParams =
       'domain-name',
       'monitor-period',
       'monitor-timeoffset',
+      'show-recursive',
       'snmp-host',
       'snmp-port',
       'snmp-localaddr',

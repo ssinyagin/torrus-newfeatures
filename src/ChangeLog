@@ -1,3 +1,10 @@
+2007-04-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm: New discovery param: show-recursive
+
+	* templates/default-dir.html: Limit recursive view to
+	subtrees having show-recursive=yes
+
 2007-04-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/ConfigTree.pm:

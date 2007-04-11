@@ -375,6 +375,34 @@ List of parameter names for a service ID.
 =back
 
 
+B<searchwords.db> is a I<Btree> database with DB_DUP and DB_DUPSORT flags.
+It contains the search strings for the given tree:
+
+=over 4
+
+=item * E<lt>keywordE<gt> -- E<lt>pathE<gt>[:E<lt>paramE<gt>]
+
+For a given keyword, refer to a path of a node that contains this word.
+If the node name matches the keyword, the I<param> element
+is omitted. Otherwise it refers to the parameter that matches the keyword.
+
+=back
+
+B<globsearchwords.db> is a I<Btree> database with DB_DUP and DB_DUPSORT flags.
+It contains the search strings for all trees:
+
+=over 4
+
+=item * E<lt>keywordE<gt> -- E<lt>treeE<gt>:E<lt>pathE<gt>[:E<lt>paramE<gt>]
+
+For a given keyword, refer to a path of a node that contains this word.
+If the node name matches the keyword, the I<param> element
+is omitted. Otherwise it refers to the parameter that matches the keyword.
+
+=back
+
+
+
 
 =head2 Modular Structure
 

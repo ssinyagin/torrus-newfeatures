@@ -388,6 +388,8 @@ is omitted. Otherwise it refers to the parameter that matches the keyword.
 
 =back
 
+
+
 B<globsearchwords.db> is a I<Btree> database with DB_DUP and DB_DUPSORT flags.
 It contains the search strings for all trees:
 

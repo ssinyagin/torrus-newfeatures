@@ -40,9 +40,86 @@ sub new
 }
 
 
+sub openTree
+{
+    my $self = shift;
+    my $tree = shift;
+
+    my $db = new Torrus::DB
+        ( 'searchwords',
+          -Subdir => $tree,
+          -Btree => 1,
+          -Duplicates => 1,
+          -WriteAccess => $self->{'options'}{'-WriteAccess'} );
+
+    $self->{'db_treewords'}{$tree} = $db;
+}
 
 
+sub closeTree
+{
+    my $self = shift;
+    my $tree = shift;
 
+    $self->{'db_treewords'}{$tree}->closeNow();
+}
+
+
+sub openGlobal
+{
+    my $self = shift;
+
+    my $db = new Torrus::DB
+        ( 'globsearchwords',
+          -Btree => 1,
+          -Duplicates => 1,
+          -WriteAccess => $self->{'options'}{'-WriteAccess'} );
+
+    $self->{'db_globwords'} = $db;    
+}
+
+
+sub storeKeyword
+{
+    my $self = shift;
+    my $tree = shift;
+    my $keyword = shift;
+    my $path = shift;
+    my $param = shift;
+
+    $self->{'db_treewords'}{$tree}->put( $keyword, join(':', $path, $param) );
+    $self->{'db_globwords'}->put( $keyword, join(':', $tree, $path, $param) );
+}
+
+sub searchPrefix
+{
+    my $self = shift;
+    my $prefix = shift;
+    my $tree = shift;
+
+    my $db = defined( $tree ) ?
+        $self->{'db_treewords'}{$tree} : $self->{'db_globwords'};
+
+    my $result = $db->searchPrefix( $prefix );
+
+    my $ret = undef;
+    
+    if( defined( $result ) )
+    {
+        $ret = [];
+        foreach my $pair ( @{$result} )
+        {
+            push( @{$ret}, split(':', $pair->[1]) );
+        }
+    }
+
+    return $ret;
+}
+    
+    
+
+
+    
 1;
 
 

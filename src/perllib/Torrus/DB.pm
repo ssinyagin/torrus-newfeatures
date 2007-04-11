@@ -124,6 +124,12 @@ sub new
         $flags = DB_CREATE;
     }
 
+    my $property = 0;
+    if( $options{'-Duplicates'} )
+    {
+        $property = DB_DUP | DB_DUPSORT;
+    }
+        
     if( not exists( $Torrus::DB::dbPool{$filename} ) )
     {
         Debug('Opening ' . $self->{'dbname'});
@@ -131,6 +137,7 @@ sub new
         my $dbh = new $accmethod (
                                   -Filename => $filename,
                                   -Flags    => $flags,
+                                  -Property => $property,
                                   -Mode     => 0664,
                                   -Env      => $Torrus::DB::env );
         if( not $dbh )
@@ -371,6 +378,87 @@ sub getBestMatch
 
     return( $ok ? $ret : undef );
 }
+
+
+# Search the keys that match the specified prefix.
+# Return value is an array of [key,val] pairs or undef
+# Returned keys may be duplicated if the DB is created with -Duplicates
+
+sub searchPrefix
+{
+    my $self = shift;
+    my $prefix = shift;
+
+    my $ret = [];
+    my $ok = 0;
+
+    my $key = $prefix;
+    my $val = '';
+
+    my $cursor = $self->{'dbh'}->db_cursor();
+
+    if( $cursor->c_get( $key, $val, DB_SET_RANGE ) == 0 )
+    {
+        # the returned key/data pair is the smallest data item greater
+        # than or equal to the specified data item.
+        my $finished = 0;
+        while( not $finished )
+        {
+            if( index( $key, $prefix ) == 0 )
+            {
+                $ok = 1;
+                push( @{$ret}, [ $key, $val ] );
+
+                if( $cursor->c_get($key, $val, DB_NEXT) != 0 )
+                {
+                    $finished = 1;
+                }
+            }
+            else
+            {
+                $finished = 1;
+            }
+        }
+    }
+
+    undef $cursor;
+
+    return( $ok ? $ret : undef );    
+}
+    
+
+# Search the keys that match the specified substring.
+# Return value is an array of [key,val] pairs or undef
+# Returned keys may be duplicated if the DB is created with -Duplicates
+
+sub searchSubstring
+{
+    my $self = shift;
+    my $substring = shift;
+
+    my $ret = [];
+    my $ok = 0;
+
+    my $key = '';
+    my $val = '';
+
+    my $cursor = $self->{'dbh'}->db_cursor();
+
+    while( $cursor->c_get($key, $val, DB_NEXT) == 0 )
+    {
+        if( index( $key, $substring ) >= 0 )
+        {
+            $ok = 1;
+            push( @{$ret}, [ $key, $val ] );
+        }
+    }
+    
+    undef $cursor;
+    
+    return( $ok ? $ret : undef );    
+}
+    
+
 
 
 

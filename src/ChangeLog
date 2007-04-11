@@ -1,6 +1,9 @@
 2007-04-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* perllib/Torrus/DevDiscover.pm: New discovery param: show-recursive
+	* bin/buildsearchdb.in: The search DB builder (GUI is not ready yet)
+
+	* perllib/Torrus/DevDiscover.pm:
+	New discovery param: show-recursive, searchable	
 
 	* templates/default-dir.html: Limit recursive view to
 	subtrees having show-recursive=yes

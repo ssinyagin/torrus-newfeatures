@@ -34,7 +34,11 @@
 
   <prop param="ifindex-table"       prop="expand" value="1"/>
   <prop param="snmp-host"           prop="expand" value="1"/>
-  <prop param="snmp-object"         prop="expand" value="1"/>  
+  <prop param="snmp-object"         prop="expand" value="1"/>
+
+  <!-- Parameters which are included in search DB -->
+  <prop param="snmp-host"               prop="search" value="1"/>
+  
 </param-properties>
 
 

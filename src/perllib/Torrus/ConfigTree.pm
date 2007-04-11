@@ -693,7 +693,15 @@ sub getParamNames
 
     my $db = $fromDS ? $self->{'db_dsconfig'} : $self->{'db_otherconfig'};
 
-    return split( /,/o, $db->get( 'Pl:'.$name ) );
+    my $list = $db->get( 'Pl:'.$name );
+    if( defined( $list ) )
+    {
+        return split( /,/o, $list );
+    }
+    else
+    {
+        return ();
+    }
 }
 
 sub getParams

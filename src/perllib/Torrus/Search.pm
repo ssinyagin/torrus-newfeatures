@@ -50,7 +50,8 @@ sub openTree
           -Subdir => $tree,
           -Btree => 1,
           -Duplicates => 1,
-          -WriteAccess => $self->{'options'}{'-WriteAccess'} );
+          -WriteAccess => $self->{'options'}{'-WriteAccess'},
+          -Truncate => $self->{'options'}{'-WriteAccess'} );
 
     $self->{'db_treewords'}{$tree} = $db;
 }
@@ -73,7 +74,8 @@ sub openGlobal
         ( 'globsearchwords',
           -Btree => 1,
           -Duplicates => 1,
-          -WriteAccess => $self->{'options'}{'-WriteAccess'} );
+          -WriteAccess => $self->{'options'}{'-WriteAccess'},
+          -Truncate => $self->{'options'}{'-WriteAccess'} );
 
     $self->{'db_globwords'} = $db;    
 }
@@ -87,8 +89,23 @@ sub storeKeyword
     my $path = shift;
     my $param = shift;
 
-    $self->{'db_treewords'}{$tree}->put( $keyword, join(':', $path, $param) );
-    $self->{'db_globwords'}->put( $keyword, join(':', $tree, $path, $param) );
+    my $val = $path;
+    if( defined( $param ) )
+    {
+        $val .= ':' . $param;
+    }
+
+    my $lookupkey = join( ':', $tree, $keyword, $val );    
+    if( not $self->{'stored'}{$lookupkey} )
+    {
+        $self->{'db_treewords'}{$tree}->put( $keyword, $val );
+        if( defined( $self->{'db_globwords'} ) )
+        {
+            $self->{'db_globwords'}->put( $keyword, join(':', $tree, $val) );
+        }
+
+        $self->{'stored'}{$lookupkey} = 1;
+    }
 }
 
 sub searchPrefix

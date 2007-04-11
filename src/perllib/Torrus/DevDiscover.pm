@@ -62,6 +62,7 @@ $defaultParams{'domain-name'} = '';
 $defaultParams{'host-subtree'} = '';
 $defaultParams{'snmp-check-sysuptime'} = 'yes';
 $defaultParams{'show-recursive'} = 'yes';
+$defaultParams{'searchable'} = 'yes';
 
 our @copyParams =
     ( 'collector-period',
@@ -74,6 +75,7 @@ our @copyParams =
       'domain-name',
       'monitor-period',
       'monitor-timeoffset',
+      'searchable',
       'show-recursive',
       'snmp-host',
       'snmp-port',

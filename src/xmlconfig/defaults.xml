@@ -71,6 +71,12 @@
   <prop param="rrd-ds"                prop="expand" value="1"/>
   <prop param="transform-value"       prop="expand" value="1"/>
   <prop param="upper-limit"           prop="expand" value="1"/>
+
+  <!-- Parameters which are included in search DB -->
+  <prop param="comment"               prop="search" value="1"/>
+  <prop param="legend"                prop="search" value="1"/>
+
+  
 </param-properties>
 
 <datasources>

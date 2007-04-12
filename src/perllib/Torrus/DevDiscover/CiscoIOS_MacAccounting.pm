@@ -290,7 +290,8 @@ sub buildConfig
             'interface-nick'       => $peer->{'ifNick'},
             'comment'              => $peer->{'description'},
             'descriptive-nickname' => $peer->{'subtreeName'},
-            'precedence'           => 65000 - $peer->{'peerAS'}
+            'precedence'           => 65000 - $peer->{'peerAS'},
+            'searchable'           => 'yes'
             };
 
         my $peerNode = $cb->addSubtree

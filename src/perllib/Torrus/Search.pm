@@ -85,7 +85,7 @@ sub storeKeyword
 {
     my $self = shift;
     my $tree = shift;
-    my $keyword = shift;
+    my $keyword = lc( shift );
     my $path = shift;
     my $param = shift;
 
@@ -111,7 +111,7 @@ sub storeKeyword
 sub searchPrefix
 {
     my $self = shift;
-    my $prefix = shift;
+    my $prefix = lc( shift );
     my $tree = shift;
 
     my $db = defined( $tree ) ?

@@ -136,12 +136,12 @@ sub walkSubtree
             walkSubtree( $config_tree, $search, $token );
         }
 
-        my $path = $config_tree->path( $token );
-
         my $isSearchable =
             $config_tree->getNodeParam( $token, 'searchable', 1 );
         if( defined( $isSearchable ) and $isSearchable eq 'yes' )
         {
+            my $path = $config_tree->path( $token );
+            
             my $nodeName = $config_tree->nodeName( $path );
             splitAndStore( $tree, $nodeName, $path );
             

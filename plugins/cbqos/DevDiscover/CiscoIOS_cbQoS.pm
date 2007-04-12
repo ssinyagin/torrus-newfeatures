@@ -513,6 +513,7 @@ sub buildChildrenConfigs
                 {
                     my $interfaceName = $interface->{'ifDescr'};
                     $param->{'cbqos-interface-name'} = $interfaceName;
+                    $param->{'searchable'} = 'yes';
                     
                     my $policyNick =
                         $interface->{$data->{'nameref'}{'ifNick'}};

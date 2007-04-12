@@ -170,7 +170,7 @@ ready, you need to execute the compiler:
 B<Build the search database>. The search database is updated by executing
 the following command:
 
-  torrus bs --global --verbose
+  torrus bs --all --verbose
   
 For most of the processes that you run within Torrus, you need to specify
 the tree name with C<--tree> option. Some proramms accept C<--all> option,

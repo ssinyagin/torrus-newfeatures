@@ -575,6 +575,13 @@ sub buildChildrenConfigs
                     $policyNick .=  '_' . $dir;
                     
                     $param->{'cbqos-policy-nick'} = $policyNick;
+
+                    my $ifComment =
+                        $interface->{$data->{'nameref'}{'ifComment'}};
+                    if( length( $ifComment ) > 0 )
+                    {
+                        $subtreeComment .= ' (' . $ifComment . ')';
+                    }
                 }
                 else
                 {

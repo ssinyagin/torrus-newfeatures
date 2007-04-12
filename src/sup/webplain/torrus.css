@@ -472,6 +472,25 @@ SPAN.LoginInput INPUT {
   font-size : 9px;
 }
 
+
+*.SearchDialog {
+  font-size : 9px;
+  padding-bottom : 0;
+  padding-left : 2em;
+  padding-right : 2em;
+  padding-top : 0;
+}
+
+*.SearchDialog FORM {
+  display : inline;
+}
+
+*.SearchDialog INPUT {
+  font-size : 9px;
+}
+
+
+
 *.ErrorMessage {
   color : red;
   height : 15px;

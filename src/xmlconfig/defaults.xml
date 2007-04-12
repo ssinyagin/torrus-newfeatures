@@ -290,7 +290,14 @@
     <param name="expires"       value="3600" />
     <param name="html-template" value="adminfo.html" />
   </view>
-  
+
+  <view name="search">
+    <param name="view-type"     value="html" />
+    <param name="expires"       value="0" />
+    <param name="html-template" value="search.html" />
+  </view>
+
+    
 </views>
 
 </configuration>

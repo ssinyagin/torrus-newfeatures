@@ -165,8 +165,13 @@ in building the data hierarchies.
 B<Compile the configuration>. Now that your configuration is
 ready, you need to execute the compiler:
 
-  torrus compilexml --tree=treename --verbose
+  torrus compile --tree=treename --verbose
 
+B<Build the search database>. The search database is updated by executing
+the following command:
+
+  torrus bs --global --verbose
+  
 For most of the processes that you run within Torrus, you need to specify
 the tree name with C<--tree> option. Some proramms accept C<--all> option,
 which causes them to process all existing trees.
@@ -856,4 +861,4 @@ the contents of the database.
 
 =head1 Author
 
-Copyright (c) 2002-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2007 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

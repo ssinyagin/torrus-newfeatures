@@ -126,7 +126,9 @@ sub searchPrefix
         $ret = [];
         foreach my $pair ( @{$result} )
         {
-            push( @{$ret}, split(':', $pair->[1]) );
+            my $retstrings = [];
+            push( @{$retstrings}, split(':', $pair->[1]) );
+            push( @{$ret}, $retstrings );
         }
     }
 

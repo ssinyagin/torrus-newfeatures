@@ -1,3 +1,7 @@
+2007-04-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/HTML.pm: Search engine GUI
+
 2007-04-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/buildsearchdb.in: The search DB builder (GUI is not ready yet)

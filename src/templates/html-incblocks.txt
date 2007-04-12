@@ -186,6 +186,7 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
                       newwindow=1;
    END %]
 [% IF global.setDateDialog; INCLUDE enterdate; END %]
+[% INCLUDE searchdialog %]
 </DIV>
 [% END %]
 
@@ -201,6 +202,7 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
                     title="Prepare this page for printing"
                     newwindow=1%]
 [% INCLUDE helpshortcut %]
+[% INCLUDE searchdialog %]
 </DIV>
 [% END %]
 
@@ -323,4 +325,17 @@ Set date</LABEL>
 [% END %]
 
 
-
+[%# ########   Print the searchform HTML   ####### %]
+[% BLOCK searchdialog %]
+[% IF searchEnabled %]
+<SPAN CLASS="SearchDialog">
+<FORM METHOD=GET ACTION="[%topUrl()%]">
+<INPUT TYPE="hidden" NAME="token" VALUE="[%pathToken('/')%]"/>
+<INPUT TYPE="hidden" NAME="view" VALUE="search"/>
+<LABEL>Search</LABEL>
+<INPUT TYPE="text" NAME="SEARCH" SIZE="22" VALUE=""/>
+<INPUT TYPE="submit" VALUE="&gt;"/>
+</FORM>
+</SPAN>
+[% END %]
+[% END %]

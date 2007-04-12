@@ -22,6 +22,7 @@ package Torrus::Renderer::HTML;
 use strict;
 
 use Torrus::ConfigTree;
+use Torrus::Search;
 use Torrus::Log;
 
 use URI::Escape;
@@ -106,7 +107,9 @@ sub render_html
         'timestamp'  => sub { return time2str($Torrus::Renderer::timeFormat,
                                               time()); },
         'verifyDate'  => sub { return verifyDate($_[0]); },
-        'markup'     => sub{ return $self->translateMarkup( @_ ); }
+        'markup'     => sub{ return $self->translateMarkup( @_ ); },
+        'searchEnabled' => $Torrus::Renderer::searchEnabled,
+        'searchResults'   => sub { return $self->doSearch($config_tree); }
     };
     
     
@@ -458,6 +461,25 @@ sub reportsUrl
 
     return $Torrus::Renderer::rendererURL . '/' .
         $config_tree->treeName() . '?htmlreport=index.html';
+}
+
+
+sub doSearch
+{
+    my $self = shift;
+    my $config_tree = shift;
+    
+    my $string = $self->{'options'}{'variables'}{'SEARCH'};
+    delete $self->{'options'}{'variables'}{'SEARCH'};
+
+    my $tree = $config_tree->treeName();
+    
+    my $sr = new Torrus::Search;
+    $sr->openTree( $tree );
+    my $result = $sr->searchPrefix( $string, $tree );
+    $sr->closeTree( $tree );
+    
+    return $result;
 }
 
 

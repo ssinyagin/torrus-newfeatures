@@ -216,6 +216,10 @@ $Torrus::Renderer::hwGraphLegend = 0;
 # When true, users may view service usage reports (requires SQL connection)
 $Torrus::Renderer::displayReports = 0;
 
+# Allow tree searching. The search DB should be built with buildsearchdb
+$Torrus::Renderer::searchEnabled = 1;
+
+
 # Modules that Collector will use for collecting and storing data.
 @Torrus::Collector::loadModules =
     ( 'Torrus::Collector::SNMP',

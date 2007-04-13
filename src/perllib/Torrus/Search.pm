@@ -119,11 +119,10 @@ sub searchPrefix
 
     my $result = $db->searchPrefix( $prefix );
 
-    my $ret = undef;
+    my $ret = [];
     
     if( defined( $result ) )
     {
-        $ret = [];
         foreach my $pair ( @{$result} )
         {
             my $retstrings = [];

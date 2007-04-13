@@ -43,6 +43,7 @@ dist_tmpl_DATA = \
 	templates/default-rrd.html \
 	templates/default-tset.html \
 	templates/expanded-dir.html \
+	templates/globalsearch.html \
 	templates/overview-subleaves.html \
 	templates/report-index.html \
 	templates/report-monthly.html \

@@ -339,3 +339,16 @@ Set date</LABEL>
 </SPAN>
 [% END %]
 [% END %]
+
+[%# ########   Print the Global searchform HTML   ####### %]
+[% BLOCK globalsearchdialog %]
+[% IF mayGlobalSearch() %]
+<SPAN CLASS="SearchDialog">
+<FORM METHOD=GET ACTION="[%topUrl()%]">
+<LABEL>Search</LABEL>
+<INPUT TYPE="text" NAME="SEARCH" SIZE="22" VALUE=""/>
+<INPUT TYPE="submit" VALUE="&gt;"/>
+</FORM>
+</SPAN>
+[% END %]
+[% END %]

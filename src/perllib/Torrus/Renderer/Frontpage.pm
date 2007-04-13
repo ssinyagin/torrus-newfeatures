@@ -22,7 +22,7 @@ package Torrus::Renderer::Frontpage;
 use strict;
 
 use Torrus::ConfigTree;
-use Torrus::RPN;
+use Torrus::Search;
 use Torrus::Log;
 
 use Template;
@@ -74,7 +74,7 @@ sub renderUserLogin
     {
         $url .= '/' . $self->{'options'}->{'urlPassTree'};
     }
-       
+    
     my $ttvars =
     {
         'url'        => $url,
@@ -87,7 +87,7 @@ sub renderUserLogin
         'siteInfo'   => $Torrus::Renderer::siteInfo,
         'version'    => $Torrus::Global::version,
         'xmlnorm'    => \&Torrus::Renderer::xmlnormalize
-    };
+        };
 
 
     # Pass the options from Torrus::Renderer::render() to Template
@@ -159,7 +159,18 @@ sub renderTreeChooser
 
     $t_expires = time() + $Torrus::Renderer::Chooser::expires;
     $mime_type = $Torrus::Renderer::Chooser::mimeType;
-    my $tmplfile = $Torrus::Renderer::Chooser::template;
+    
+    my $tmplfile;
+    if( defined( $self->{'options'}{'variables'}{'SEARCH'} ) and
+        $Torrus::Renderer::searchEnabled and
+        $self->hasPrivilege( '*', 'GlobalSearch' ) )
+    {
+        $tmplfile = $Torrus::Renderer::Chooser::searchTemplate;
+    }
+    else
+    {
+        $tmplfile = $Torrus::Renderer::Chooser::template;
+    }
 
     # Create the Template Toolkit processor once, and reuse
     # it in subsequent render() calls
@@ -175,9 +186,15 @@ sub renderTreeChooser
     {
         'treeNames' => sub{ return Torrus::SiteConfig::listTreeNames() },
         'treeDescr' => sub{ return
-                                Torrus::SiteConfig::treeDescription($_[0]) },
+                                Torrus::SiteConfig::treeDescription($_[0]) }
+        ,
         'url'  => sub { return $Torrus::Renderer::rendererURL . '/' . $_[0] },
         'plainURL'   => $Torrus::Renderer::plainURL,
+        'pathUrl'    => sub { return $Torrus::Renderer::rendererURL . '/' .
+                                  $_[0] . '?path=' . uri_escape($_[1])}
+        ,
+        'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
+                              return undef;},
         'style'      => sub { return $self->style($_[0]); },
         'companyName'=> $Torrus::Renderer::companyName,
         'companyLogo'=> $Torrus::Renderer::companyLogo,
@@ -190,6 +207,12 @@ sub renderTreeChooser
         'userAttr'   => sub { return $self->userAttribute( $_[0] ) },
         'mayDisplayTree' => sub { return $self->
                                       hasPrivilege( $_[0], 'DisplayTree' ) }
+        ,
+        'mayGlobalSearch' => sub { return( $Torrus::Renderer::searchEnabled and
+                                           $self->hasPrivilege
+                                           ( '*', 'GlobalSearch' )) }
+        ,        
+        'searchResults'   => sub { return $self->doGlobalSearch($_[0]); }
     };
 
 
@@ -218,6 +241,36 @@ sub renderTreeChooser
     $self->{'options'} = undef;   
 
     return @ret;
+}
+
+
+sub doGlobalSearch
+{
+    my $self = shift;
+    my $string = shift;
+    
+    my $sr = new Torrus::Search;
+    $sr->openGlobal();
+    my $result = $sr->searchPrefix( $string );
+
+    my $sorted = [];
+    push( @{$sorted}, sort {$a->[0] cmp $b->[0]} @{$result} );
+
+    # remove duplicating entries
+    my %seen;
+    my $ret = [];
+    
+    foreach my $element ( @{$sorted} )
+    {
+        my $string = join( ':', $element->[0], $element->[1] );
+        if( not $seen{$string} )
+        {
+            $seen{$string} = 1;
+            push( @{$ret}, $element );
+        }
+    }
+        
+    return $ret;
 }
 
 

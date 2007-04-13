@@ -109,7 +109,7 @@ sub render_html
         'verifyDate'  => sub { return verifyDate($_[0]); },
         'markup'     => sub{ return $self->translateMarkup( @_ ); },
         'searchEnabled' => $Torrus::Renderer::searchEnabled,
-        'searchResults'   => sub { return $self->doSearch($config_tree); }
+        'searchResults' => sub { return $self->doSearch($config_tree, $_[0]); }
     };
     
     
@@ -468,9 +468,8 @@ sub doSearch
 {
     my $self = shift;
     my $config_tree = shift;
+    my $string = shift;
     
-    my $string = $self->{'options'}{'variables'}{'SEARCH'};
-    delete $self->{'options'}{'variables'}{'SEARCH'};
 
     my $tree = $config_tree->treeName();
     
@@ -478,8 +477,11 @@ sub doSearch
     $sr->openTree( $tree );
     my $result = $sr->searchPrefix( $string, $tree );
     $sr->closeTree( $tree );
+
+    my $ret = [];
+    push( @{$ret}, sort {$a->[0] cmp $b->[0]} @{$result} );
     
-    return $result;
+    return $ret;
 }
 
 

@@ -29,9 +29,11 @@ use Torrus::SiteConfig;
 
 exit(1) if not Torrus::SiteConfig::verify();
 
-our %knownPrivileges = ( 'DisplayTree' => 'tree',
-                         'DisplayAdmInfo' => 'tree',
-                         'DisplayReports' => 'tree' );
+our %knownPrivileges =
+    ( 'DisplayTree' => 'tree',
+      'DisplayAdmInfo' => 'tree',
+      'DisplayReports' => 'tree',
+      'GlobalSearch' => 'global' );
 
 our @addgroups;
 our @delgroups;
@@ -125,7 +127,9 @@ if( not $ok or $help_needed or scalar(@ARGV) > 0 or
     "  --help                  this help message\n\n",
     "Privileges:\n",
     "  DisplayTree             see the datasources for a tree\n",
-    "  DisplayAdmInfo          see the administrative info for a tree\n";
+    "  DisplayAdmInfo          see the administrative info for a tree\n",
+    "  DisplayReports          see the administrative info for a tree\n",
+    "  GlobalSearch            search globally for '*'\n";
     exit 1;
 }
 
@@ -351,6 +355,34 @@ sub setupPrivileges
                     else
                     {
                         Error('No such tree: ' . $obj); $ok = 0;
+                    }
+                }
+            }
+            elsif( $knownPrivileges{$priv} eq '*' )
+            {
+                foreach my $obj ( @{$objects} )
+                {
+                    if( $obj ne '*' )
+                    {
+                        Error("Privilege GlobalSearch should be for '*'");
+                        $ok = 0;
+                    }                    
+                }
+
+                if( $ok )
+                {
+                    foreach my $group ( @{$groups} )
+                    {
+                        if( $permit )
+                        {
+                            $ok = $aclEdit->
+                                setPrivilege( $group, '*', $priv ) ? $ok:0;
+                        }
+                        else
+                        {
+                            $ok = $aclEdit->
+                                clearPrivilege( $group, '*', $priv ) ? $ok:0;
+                        }
                     }
                 }
             }

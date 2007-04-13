@@ -199,6 +199,7 @@ $Torrus::Renderer::timeFormat = '%d-%m-%Y %H:%M';
 $Torrus::Renderer::Chooser::mimeType = 'text/html; charset=UTF-8';
 $Torrus::Renderer::Chooser::expires = '300';
 $Torrus::Renderer::Chooser::template = 'default-chooser.html';
+$Torrus::Renderer::Chooser::searchTemplate = 'globalsearch.html';
 
 # We clean the renderer cache at least once a day
 $Torrus::Renderer::cacheMaxAge = 86400;

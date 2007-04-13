@@ -1,13 +1,13 @@
 [% PROCESS 'html-incblocks.txt' %]
+[% global.SearchString = variables.SEARCH; clearVar('SEARCH') %]
 [% INCLUDE htmlstart
-     title='Search results: ' _ variables.SEARCH
-     contentClass="SingleColumnContent"
-     noTopMenu=1 %]
+     title='Search results: ' _ global.SearchString
+     contentClass="SingleColumnContent" %]
 
-<H1>Search results: [% variables.SEARCH %]</H1>
+<H1>Search results: [% global.SearchString %]</H1>
 [% INCLUDE treename %]
 <DIV CLASS="Listing">
-[% results = searchResults();
+[% results = searchResults(global.SearchString);
 
    FOREACH entry = results;
 
@@ -21,10 +21,12 @@
     etoken = pathToken(entry.0);
 %]
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
-    <SPAN CLASS="NodeName"><A HREF="[%url(etoken)%]">
+    <SPAN CLASS="NodeName"><A HREF="[%pathUrl(entry.0)%]">
     [% entry.0 %]</A></SPAN>
     <SPAN CLASS="NodeDescr">
-    [% IF entry.1; entry.1 _ ': ' _ nodeParam(etoken, entry.1); END %]</SPAN>
+    [% IF entry.1; entry.1 _ ': ' _ xmlnorm(nodeParam(etoken, entry.1));
+    END %]
+    </SPAN>
   </DIV>
 [% END %]
 </DIV>

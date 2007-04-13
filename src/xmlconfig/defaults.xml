@@ -293,7 +293,7 @@
 
   <view name="search">
     <param name="view-type"     value="html" />
-    <param name="expires"       value="0" />
+    <param name="expires"       value="3600" />
     <param name="html-template" value="search.html" />
   </view>
 

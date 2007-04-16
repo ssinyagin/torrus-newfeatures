@@ -21,7 +21,7 @@
     etoken = pathToken(entry.0);
 %]
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
-    <SPAN CLASS="NodeName"><A HREF="[%pathUrl(entry.0)%]">
+    <SPAN CLASS="NodeName"><A HREF="[%pathUrl(etoken)%]">
     [% entry.0 %]</A></SPAN>
     <SPAN CLASS="NodeDescr">
     [% IF entry.1; entry.1 _ ': ' _ xmlnorm(nodeParam(etoken, entry.1));

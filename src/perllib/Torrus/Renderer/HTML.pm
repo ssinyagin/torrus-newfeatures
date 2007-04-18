@@ -282,7 +282,7 @@ sub rrPrint
     my $view = shift;
 
     my @ret = ();
-    my($fname, $mimetype) =  $self->render($config_tree, $token, $view);
+    my($fname, $mimetype) = $self->render( $config_tree, $token, $view );
 
     if( $mimetype ne 'text/plain' )
     {

@@ -80,13 +80,10 @@ sub render
     my $view = shift;
     my %new_options = @_;
 
+    # If no options given, preserve the existing ones
     if( %new_options )
     {
         $self->{'options'} = \%new_options;
-    }
-    else
-    {
-        $self->{'options'} = {};
     }
 
     $self->checkAndClearCache( $config_tree );
@@ -144,7 +141,10 @@ sub render
     ($t_expires, $mime_type) =
         $self->$method( $config_tree, $token, $view, $cachefile );
 
-    $self->{'options'} = undef;
+    if( %new_options )
+    {
+        $self->{'options'} = undef;
+    }
 
     my @ret;
     if( defined($t_expires) and defined($mime_type) )

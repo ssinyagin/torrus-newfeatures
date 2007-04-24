@@ -30,6 +30,7 @@ SRCPOD = \
 	torrus_action_notify.pod.in \
 	torrus_action_printemail.pod.in \
 	torrus_action_snmptrap.pod.in \
+	torrus_buildsearchdb.pod.in \
 	torrus_cleanup.pod.in \
 	torrus_clearcache.pod.in \
 	torrus_collector.pod.in \
@@ -39,6 +40,8 @@ SRCPOD = \
 	torrus_devdiscover.pod.in \
 	torrus_genddx.pod.in \
 	torrus_genlist.pod.in \
+	torrus_genreport.pod.in \
+	torrus_install_plugin.pod.in \
 	torrus_monitor.pod.in \
 	torrus_rrddir2xml.pod.in \
 	torrus_schedulerinfo.pod.in \
@@ -50,6 +53,7 @@ POD_FILES = \
 	torrus_action_notify.pod \
 	torrus_action_printemail.pod \
 	torrus_action_snmptrap.pod \
+	torrus_buildsearchdb.pod \
 	torrus_cleanup.pod \
 	torrus_clearcache.pod \
 	torrus_collector.pod \
@@ -59,6 +63,8 @@ POD_FILES = \
 	torrus_devdiscover.pod \
 	torrus_genddx.pod \
 	torrus_genlist.pod \
+	torrus_genreport.pod \
+	torrus_install_plugin.pod \
 	torrus_monitor.pod \
 	torrus_rrddir2xml.pod \
 	torrus_schedulerinfo.pod \
@@ -70,6 +76,7 @@ PODMAN = \
 	torrus_action_notify.@mansec_misc@ \
 	torrus_action_printemail.@mansec_misc@ \
 	torrus_action_snmptrap.@mansec_misc@ \
+	torrus_buildsearchdb.@mansec_usercmd@ \
 	torrus_cleanup.@mansec_usercmd@ \
 	torrus_clearcache.@mansec_usercmd@ \
 	torrus_collector.@mansec_usercmd@ \
@@ -79,6 +86,8 @@ PODMAN = \
 	torrus_devdiscover.@mansec_usercmd@ \
 	torrus_genddx.@mansec_usercmd@ \
 	torrus_genlist.@mansec_usercmd@ \
+	torrus_genreport.@mansec_usercmd@ \
+	torrus_install_plugin.@mansec_misc@ \
 	torrus_monitor.@mansec_usercmd@ \
 	torrus_rrddir2xml.@mansec_usercmd@ \
 	torrus_schedulerinfo.@mansec_usercmd@ \

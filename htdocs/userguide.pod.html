@@ -183,13 +183,22 @@ in building the data hierarchies.</p>
 <p><strong>Compile the configuration</strong>. Now that your configuration is
 ready, you need to execute the compiler:</p>
 <pre>
-  torrus compilexml --tree=treename --verbose</pre>
-<p>For most of the processes that you run within Torrus, you need to specify
-the tree name with <code>--tree</code> option. Some proramms accept <code>--all</code> option,
+  torrus compile --tree=treename --verbose
+  
+For most of the processes that you run within Torrus, you need to specify
+the tree name with C&lt;--tree&gt; option. Some proramms accept C&lt;--all&gt; option,
 which causes them to process all existing trees.
-With <code>--verbose</code> option, the compiler tells you about the files being
+With C&lt;--verbose&gt; option, the compiler tells you about the files being
 processed, and about some other actions that may take quite a long time.
-It will also tell you if there's any error in your configuration.</p>
+It will also tell you if there's any error in your configuration.</pre>
+<p><strong>Build the search database</strong>. The search database is updated by executing
+the following command:</p>
+<pre>
+  torrus bs --global --verbose</pre>
+<p>For users that are allowed to display all the trees, you can enable the
+global search across all trees:</p>
+<pre>
+  torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'</pre>
 <p><strong>Launch the collector</strong>. Assuming that compilation went smoothly,
 you may now launch the data collector:</p>
 <pre>
@@ -793,7 +802,7 @@ the contents of the database.</p>
 </p>
 <hr />
 <h1><a name="author">Author</a></h1>
-<p>Copyright (c) 2002-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2002-2007 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

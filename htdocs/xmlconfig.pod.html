@@ -19,12 +19,12 @@
 		<li><a href="#common_rules">Common rules</a></li>
 		<li><a href="#character_sets">Character sets</a></li>
 		<li><a href="#macros">Macros</a></li>
+		<li><a href="#parameter_properties">Parameter properties</a></li>
 		<li><a href="#datasource_definitions">Datasource definitions</a></li>
 		<ul>
 
 			<li><a href="#templates">Templates</a></li>
 			<li><a href="#aliases">Aliases</a></li>
-			<li><a href="#filepatterns">Filepatterns</a></li>
 			<li><a href="#compiletime_variables">Compile-time variables</a></li>
 			<li><a href="#parameter_value_substitution">Parameter value substitution</a></li>
 			<li><a href="#common_parameters">Common parameters</a></li>
@@ -167,6 +167,22 @@ and are referenced with dollar sign and the definition name, e.g.:</p>
       ...</pre>
 <p>
 </p>
+<h2><a name="parameter_properties">Parameter properties</a></h2>
+<p>Some parameters require special handling during the compilation or
+at the runtime. The parameter properties define such behaviour in the
+XML configuration.</p>
+<p>Currently two properties are recognized: ``remspace'' and ``expand''.</p>
+<pre>
+  &lt;configuration&gt;
+    &lt;param-properties&gt;
+      &lt;!-- Parameters where space is removed from values --&gt;
+      &lt;prop param=&quot;action&quot;             prop=&quot;remspace&quot; value=&quot;1&quot;/&gt;
+      &lt;prop param=&quot;display-rpn-expr&quot;   prop=&quot;remspace&quot; value=&quot;1&quot;/&gt;
+      &lt;prop param=&quot;ds-names&quot;           prop=&quot;remspace&quot; value=&quot;1&quot;/&gt;
+      ...
+    &lt;/param-properties&gt;</pre>
+<p>
+</p>
 <h2><a name="datasource_definitions">Datasource definitions</a></h2>
 <p>Datasources are organized into a tree hierarchy. All parameters are inherited
 by the subtrees and leafs from their parents, and can be overridden on
@@ -220,8 +236,8 @@ subtree names always end with slash (/), and this trailing slash is
 the part of the name. In this case, any subtree is identified by a path
 ending with slash, while leaf paths always end with a word symbol.
 The top-level subtree is identified by a single slash.</p>
-<p>The other components of the datasouce definition are <em>templates</em>,
-<em>aliases</em>, and <em>filepatterns</em>.</p>
+<p>The other components of the datasouce definition are <em>templates</em> and
+<em>aliases</em>.</p>
 <p>
 </p>
 <h3><a name="templates">Templates</a></h3>
@@ -278,91 +294,13 @@ subtrees are created:</p>
     ...</pre>
 <p>
 </p>
-<h3><a name="filepatterns">Filepatterns</a></h3>
-<p>Some subtree hierarchies can be built based on file name pattern.
-Suppose you have a bunch of RRD files named conforming to a known rule.
-In this case, filepatterns allow to build the subtrees based on those
-names.</p>
-<p>Parameter <a href="#item_data_2ddir"><code>data-dir</code></a> must be defined in the parent node. It determines
-the directory where the files are searched.</p>
-<p>A filepattern is defined by three mandatory attributes:</p>
-<ul>
-<li><strong><a name="item_type">type</a></strong><br />
-</li>
-Must be set to <code>subtree</code> or <code>leaf</code>. It defines what kind of elements
-will be built in the configuration tree.
-<p></p>
-<li><strong><a name="item_name">name</a></strong><br />
-</li>
-Defines the names of the future subtrees or leaves. Must include
-the regular expressions variables, like <code>$1</code> etc.
-<p></p>
-<li><strong><a name="item_filere">filere</a></strong><br />
-</li>
-A regular expression which defines the filename matching. Must
-contain grouping, like <code>(.*)</code> etc.
-<p></p></ul>
-<p>At the time of compilation, the files are scanned in the given directory,
-and for those matched, the new subtrees or leaves are created, with one
-parameter implicitly defined: <a href="#item_data_2dfile"><code>data-file</code></a> is set to the file name
-being matched.</p>
-<p>The string given in <a href="#item_filere"><code>filere</code></a> attribute, is a normal Perl regular expression,
-except one thing: <code>$PARENT</code> is replaced by the parent subtree name.
-This allows to build nested filepattern constructs:</p>
-<pre>
-    &lt;subtree name=&quot;Exporters&quot;&gt;
-      &lt;param name=&quot;comment&quot; value=&quot;Netflow exporting devices&quot; /&gt;
-      &lt;param name=&quot;data-dir&quot; value=&quot;/var/local/flowscan/graphs&quot; /&gt;</pre>
-<pre>
-      &lt;!-- All netflow exporters look the same from here --&gt;
-      &lt;filepattern type=&quot;subtree&quot; name=&quot;$1&quot; filere=&quot;exporter_(.*)_total\.rrd&quot;&gt;
-        &lt;param name=&quot;comment&quot; value=&quot;&quot; /&gt;</pre>
-<pre>
-        &lt;!-- And here we describe the difference --&gt;
-        &lt;detailed match=&quot;62.5.55.233&quot;&gt;
-          &lt;!-- Let's give it a nicer name --&gt;
-          &lt;alias&gt;/Netflow/ExportersByName/rtrTelehouse1/&lt;/alias&gt;
-          &lt;!-- And give all the paramal details if needed --&gt;
-          &lt;param name=&quot;location&quot; value=&quot;Telehouse Street 1, New Yourk&quot; /&gt;
-          &lt;param name=&quot;contact&quot; value=&quot;John Smith&quot; /&gt;
-          &lt;param name=&quot;phone&quot; value=&quot;+1-800-444555&quot; /&gt;
-          &lt;subtree name=&quot;if11&quot;&gt;
-              &lt;param name=&quot;comment&quot; value=&quot;France Telecom 1&quot; /&gt;
-              &lt;param name=&quot;phone&quot; value=&quot;+1-800-666555&quot; /&gt;
-              &lt;!-- We can give it a name from different subtree --&gt;
-              &lt;alias&gt;/Netflow/Peering/FranceTelecom-1/&lt;/alias&gt;
-          &lt;/subtree&gt;
-        &lt;/detailed&gt;</pre>
-<pre>
-        &lt;!-- Again, on each router, the interfaces look the same --&gt;
-        &lt;filepattern type=&quot;subtree&quot; name=&quot;'if'.$1&quot;
-                     filere=&quot;exporter_$PARENT_(\d.*)\.rrd&quot;&gt;
-            &lt;param name=&quot;comment&quot; value=&quot;Netflow exporting interface&quot; /&gt;</pre>
-<pre>
-            &lt;!-- For each of the interfaces, the bps leaf is taken from the
-                 template above --&gt;
-            &lt;apply-template name=&quot;bps&quot; /&gt;
-        &lt;/filepattern&gt;
-      &lt;/filepattern&gt;</pre>
-<pre>
-    &lt;/subtree&gt;</pre>
-<p>In this example, the files are searched in the directory
-<em>/var/local/flowscan/graphs</em>, and those matching the patterns
-<em>exporter_[router-ip]_total.rrd</em> and <em>exporter_[router-ip]_[if-index].rrd</em>
-build the corresponding hierarchy.</p>
-<p>The construct <code>&lt;detailed match=&quot;[name]&quot;&gt;</code> allows to
-specify additional parameters for the subtree or leaf whose name
-coincides the given string. Should no elements match the given name, a warning
-message is issued by the compiler.</p>
-<p>
-</p>
 <h3><a name="compiletime_variables">Compile-time variables</a></h3>
 <p>Compile-time variables are those defined somewhere in datasource hierarchy,
 and valid within a given subtree and its children. It is possible to define
 pieces of XML configuration which are or are not compiled, depending on the
 value of corresponding variable.</p>
 <p>Variables are set by <code>setvar</code> XML element, with mandatory attributes
-<a href="#item_name"><code>name</code></a> and <code>value</code>.</p>
+<code>name</code> and <code>value</code>.</p>
 <p>Variable values are used in <code>iftrue</code> and <code>iffalse</code> XML elements.
 Mandatory parameter <code>var</code> specifies the variable name. The child XML elements
 are compiled if the variable value is true or false, correspondingly.
@@ -525,6 +463,11 @@ or storage sizes.
 </li>
 Optional. When set to ``yes'', the graph is drawn in logarithmic y-axis scale.
 <p></p>
+<li><strong><a name="item_line_2dstyle_2c_line_2dcolor"><a href="#item_line_2dstyle"><code>line-style</code></a>, <a href="#item_line_2dcolor"><code>line-color</code></a></a></strong><br />
+</li>
+These optional parameters override the corresponding ones from the view
+definition.
+<p></p>
 <li><strong><a name="item_default_2dsubtree_2dview_2c_default_2dleaf_2dview"><code>default-subtree-view</code>, <code>default-leaf-view</code></a></strong><br />
 </li>
 Mandatory. Determine the default view for a leaf or subtree, correspondingly.
@@ -590,6 +533,11 @@ GPRINT-related parameters are ignored.
 </li>
 Optional. If a horizontal rule with the given name is defined, this parameter
 specifies the legend to be printed.
+<p></p>
+<li><strong><a name="item_searchable"><code>searchable</code></a></strong><br />
+</li>
+Optional. If set to <code>yes</code>, the corresponding subtree or leaf is included
+in the search database.
 <p></p></ul>
 <p>
 </p>

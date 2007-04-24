@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>genreport - Generate the Usage Report</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gerrit@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>genreport - Generate the Usage Report</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>torrus genreport</strong> --report=<em>ReportName</em> --date=<em>YYYY-MM-DD</em> [<em>options...</em>]
+<strong>torrus genreport</strong> --genhtml [<em>options...</em>]</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>When the Torrus Reporting engine is set up, this command is used
+to generate the reports from the collected data.
+See <em>Torrus Reporting Setup Guide</em> for more information.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dreport_3dreportname"><strong>--report</strong>=<em>ReportName</em></a></strong><br />
+</dt>
+<dd>
+The name of the report that is to be generated. Currently supported:
+<code>MonthlyUsage</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2ddate_3dyyyy_2dmm_2ddd"><strong>--date</strong>=<em>YYYY-MM-DD</em></a></strong><br />
+</dt>
+<dd>
+Specifies the start date of the reported period. For the monthly report,
+this should be any day within the calendar month.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dtime_3dhh_3amm"><strong>--time</strong>=<em>hh:mm</em></a></strong><br />
+</dt>
+<dd>
+Specifies the start time of the reported period. This option
+is ignored for the monthly reports.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dgenhtml"><strong>--genhtml</strong></a></strong><br />
+</dt>
+<dd>
+Instructs the report engine to build the HTML output from the generated
+reports.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
+</dt>
+<dd>
+Prints extra informatgion.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
+</dt>
+<dd>
+Prints debugging information.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>torrus(1)</em></p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See more documentation at Torrus home page: <a href="http://torrus.org">http://torrus.org</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

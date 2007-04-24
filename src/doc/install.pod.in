@@ -506,6 +506,7 @@ ACLs are controlled by C<acledit> utility. See I<Torrus Manual pages>
 for detailed description. Example:
 
   torrus acledit --addgroup=staff --permit=DisplayTree --for='*'
+  torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'
   torrus acledit --adduser=jsmith --password=mysecretpassword \
     --cn="John Smith" --addtogroup=staff
   torrus acledit --addgroup=admin \
@@ -606,4 +607,4 @@ and its comments in F<torrus-config.pl> for more details.
 
 =head1 Author
 
-Copyright (c) 2002-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2007 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

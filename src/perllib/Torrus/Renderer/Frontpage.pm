@@ -162,8 +162,7 @@ sub renderTreeChooser
     
     my $tmplfile;
     if( defined( $self->{'options'}{'variables'}{'SEARCH'} ) and
-        $Torrus::Renderer::searchEnabled and
-        $self->hasPrivilege( '*', 'GlobalSearch' ) )
+        $self->mayGlobalSearch() )
     {
         $tmplfile = $Torrus::Renderer::Chooser::searchTemplate;
     }
@@ -208,10 +207,7 @@ sub renderTreeChooser
         'mayDisplayTree' => sub { return $self->
                                       hasPrivilege( $_[0], 'DisplayTree' ) }
         ,
-        'mayGlobalSearch' => sub { return( $Torrus::Renderer::searchEnabled and
-                                           $self->hasPrivilege
-                                           ( '*', 'GlobalSearch' )) }
-        ,        
+        'mayGlobalSearch' => sub { return $self->mayGlobalSearch(); },        
         'searchResults'   => sub { return $self->doGlobalSearch($_[0]); }
     };
 
@@ -243,6 +239,15 @@ sub renderTreeChooser
     return @ret;
 }
 
+
+sub mayGlobalSearch
+{
+    my $self = shift;
+    
+    return ( $Torrus::Renderer::globalSearchEnabled and
+             ( not $Torrus::ApacheHandler::authorizeUsers or
+               ( $self->hasPrivilege( '*', 'GlobalSearch' ) ) ) );
+}
 
 sub doGlobalSearch
 {

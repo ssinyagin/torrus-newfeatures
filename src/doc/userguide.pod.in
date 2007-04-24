@@ -166,11 +166,6 @@ B<Compile the configuration>. Now that your configuration is
 ready, you need to execute the compiler:
 
   torrus compile --tree=treename --verbose
-
-B<Build the search database>. The search database is updated by executing
-the following command:
-
-  torrus bs --global --verbose
   
 For most of the processes that you run within Torrus, you need to specify
 the tree name with C<--tree> option. Some proramms accept C<--all> option,
@@ -178,6 +173,16 @@ which causes them to process all existing trees.
 With C<--verbose> option, the compiler tells you about the files being
 processed, and about some other actions that may take quite a long time.
 It will also tell you if there's any error in your configuration.
+
+B<Build the search database>. The search database is updated by executing
+the following command:
+
+  torrus bs --global --verbose
+
+For users that are allowed to display all the trees, you can enable the
+global search across all trees:
+
+  torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'
 
 B<Launch the collector>. Assuming that compilation went smoothly,
 you may now launch the data collector:

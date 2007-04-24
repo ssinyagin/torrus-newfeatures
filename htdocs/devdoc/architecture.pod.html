@@ -306,6 +306,24 @@ Parameter value for a given service ID. Mandatory parameters are:
 </li>
 List of parameter names for a service ID.
 <p></p></ul>
+<p><strong>searchwords.db</strong> is a <em>Btree</em> database with DB_DUP and DB_DUPSORT flags.
+It contains the search strings for the given tree:</p>
+<ul>
+<li><strong><a name="item__3ckeyword_3e__2d_2d__3cpath_3e_5b_3a_3cparam_3e_5">&lt;keyword&gt; -- &lt;path&gt;[:&lt;param&gt;]</a></strong><br />
+</li>
+For a given keyword, refer to a path of a node that contains this word.
+If the node name matches the keyword, the <em>param</em> element
+is omitted. Otherwise it refers to the parameter that matches the keyword.
+<p></p></ul>
+<p><strong>globsearchwords.db</strong> is a <em>Btree</em> database with DB_DUP and DB_DUPSORT flags.
+It contains the search strings for all trees:</p>
+<ul>
+<li><strong><a name="item__3ckeyword_3e__2d_2d__3ctree_3e_3a_3cpath_3e_5b_3a">&lt;keyword&gt; -- &lt;tree&gt;:&lt;path&gt;[:&lt;param&gt;]</a></strong><br />
+</li>
+For a given keyword, refer to a path of a node that contains this word.
+If the node name matches the keyword, the <em>param</em> element
+is omitted. Otherwise it refers to the parameter that matches the keyword.
+<p></p></ul>
 <p>
 </p>
 <h2><a name="modular_structure">Modular Structure</a></h2>

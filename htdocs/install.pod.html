@@ -274,7 +274,7 @@ enough, for example:</p>
   /usr/local/torrus/bin/
         Command-line executables</pre>
 <pre>
-  /usr/local/torrus/doc/
+  @docdir@/
         POD and TXT documentation files</pre>
 <pre>
   /usr/local/torrus/examples/
@@ -313,7 +313,7 @@ enough, for example:</p>
   /usr/local/etc/torrus/xmlconfig/
         User XML configuration files</pre>
 <pre>
-  /usr/local/man
+  /usr/local/share/man
         Place for man pages. All articles have the prefix C&lt;torrus_&gt;</pre>
 <pre>
   /var/log/torrus/
@@ -472,6 +472,7 @@ to zero in your <em>torrus-siteconfig.pl</em>.</p>
 for detailed description. Example:</p>
 <pre>
   torrus acledit --addgroup=staff --permit=DisplayTree --for='*'
+  torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'
   torrus acledit --adduser=jsmith --password=mysecretpassword \
     --cn=&quot;John Smith&quot; --addtogroup=staff
   torrus acledit --addgroup=admin \
@@ -555,7 +556,7 @@ and its comments in <em>torrus-config.pl</em> for more details.</p>
 </p>
 <hr />
 <h1><a name="author">Author</a></h1>
-<p>Copyright (c) 2002-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2002-2007 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

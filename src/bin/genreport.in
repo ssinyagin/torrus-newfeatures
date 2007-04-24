@@ -64,7 +64,7 @@ if( not $ok or (not $report and not $genhtml) or
     " --report=ReportName Report name.\n",
     " --date=YYYY-MM-DD   Report start date. ",
     "For monthly reports, 1st day in a month.\n",
-    " --time=mm:ss        Report start time. Ignored for monthly reports\n",
+    " --time=hh:mm        Report start time. Ignored for monthly reports\n",
     " --genhtml           Generate HTML output from the database\n",
     " --verbose           print extra information\n",
     " --debug             print debugging information\n",   

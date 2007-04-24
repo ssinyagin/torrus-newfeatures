@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>buildsearchdb - Build the search database</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<link rev="made" href="mailto:gerrit@familiehaase.de" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>buildsearchdb - Build the search database</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>torrus buildsearchdb</strong> <em>options...</em></p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This command indexes the Torrus configuration objects and builds the
+search index database. One of the three options <strong>--tree</strong>, <strong>--all</strong> or
+<strong>--global</strong> is required.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dtree_3dtree"><strong>--tree</strong>=<em>TREE</em></a></strong><br />
+</dt>
+<dd>
+Build the indexes for a given tree.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dall"><strong>--all</strong></a></strong><br />
+</dt>
+<dd>
+Builds the tree indexes for all trees.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dglobal"><strong>--global</strong></a></strong><br />
+</dt>
+<dd>
+Builds the global index for all trees and also the tree indexes for every
+tree. In order to use the global search database, the web user
+should have the permission to display all trees and also it should have
+the permission for GlobalSearch for all trees, for example:
+</dd>
+<dd>
+<pre>
+   torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
+</dt>
+<dd>
+Prints extra information
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
+</dt>
+<dd>
+Displays a help message.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>torrus(1)</em></p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See more documentation at Torrus home page: <a href="http://torrus.org">http://torrus.org</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

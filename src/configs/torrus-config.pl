@@ -220,6 +220,10 @@ $Torrus::Renderer::displayReports = 0;
 # Allow tree searching. The search DB should be built with buildsearchdb
 $Torrus::Renderer::searchEnabled = 1;
 
+# Allow global searching across the trees. If the user authentication
+# is enabled, the user should have rights DisplayTree and GlobalSearch for '*'
+$Torrus::Renderer::globalSearchEnabled = 1;
+
 
 # Modules that Collector will use for collecting and storing data.
 @Torrus::Collector::loadModules =

@@ -170,6 +170,23 @@ sub storeData
 }
 
 
+sub semaphoreDown
+{    
+    if( $threadsInUse )
+    {
+        $rrdtoolSemaphore->down();
+    }
+}
+
+sub semaphoreUp
+{
+    if( $threadsInUse )
+    {
+        $rrdtoolSemaphore->up();
+    }
+}
+
+
 sub createRRD
 {
     my $collector = shift;
@@ -285,10 +302,7 @@ sub createRRD
 
     Debug("Creating RRD $filename: " . join(" ", @OPT, @DS, @RRA));
 
-    if( $threadsInUse )
-    {
-        $rrdtoolSemaphore->down();
-    }
+    semaphoreDown();
     
     RRDs::create($filename,
                  @OPT,
@@ -297,10 +311,7 @@ sub createRRD
 
     my $err = RRDs::error();
 
-    if( $threadsInUse )
-    {
-        $rrdtoolSemaphore->up();
-    }
+    semaphoreUp();
 
     Error("ERROR creating $filename: $err") if $err;
     
@@ -320,17 +331,11 @@ sub updateRRD
         my $ref = {};
         $sref->{'rrdinfo_ds'}{$filename} = $ref;
 
-        if( $threadsInUse )
-        {
-            $rrdtoolSemaphore->down();
-        }
-
+        semaphoreDown();
+        
         my $rrdinfo = RRDs::info( $filename );
 
-        if( $threadsInUse )
-        {
-            $rrdtoolSemaphore->up();
-        }
+        semaphoreUp();
 
         foreach my $prop ( keys %$rrdinfo )
         {

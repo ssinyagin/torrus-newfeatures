@@ -29,7 +29,8 @@ $Torrus::DevDiscover::registry{'RFC2863_IF_MIB'} = {
     'sequence'     => 10,
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
-    'buildConfig'  => \&buildConfig
+    'buildConfig'  => \&buildConfig,
+    'buildGlobalConfig' => \&buildGlobalConfig
     };
 
 
@@ -381,6 +382,7 @@ sub buildConfig
     my $devdetails = shift;
     my $cb = shift;
     my $devNode = shift;
+    my $globalData = shift;
 
     my $data = $devdetails->data();
 
@@ -511,7 +513,7 @@ sub buildConfig
             }
         }
     }
-
+       
         
     # External storage serviceid assignment
     my $extSrv =
@@ -531,6 +533,52 @@ sub buildConfig
             else
             {
                 $extStorage{$intfName}{$direction} = $serviceid;
+            }
+        }
+    }
+
+    # Sums of several interfaces into single graphs (via CDef collector)
+    # RFC2863_IF_MIB::traffic-summaries: the list of sums to create;
+    # RFC2863_IF_MIB::traffic-XXX-path: the full path of the summary leaf
+    # RFC2863_IF_MIB::traffic-XXX-comment: description
+    # RFC2863_IF_MIB::traffic-XXX-interfaces: list of interfaces to add
+    #   format: "intf,intf" or "host/intf, host/intf"
+    my $trafficSums = $devdetails->param('RFC2863_IF_MIB::traffic-summaries');
+    my %trafficSummary;
+    if( defined( $trafficSums ) )
+    {
+        foreach my $summary ( split( /\s*,\s*/, $trafficSums ) )
+        {
+            $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
+                $summary}{'path'} =
+                    $devdetails->param
+                    ('RFC2863_IF_MIB::traffic-' . $summary . '-path');
+            $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
+                $summary}{'comment'} =
+                    $devdetails->param
+                    ('RFC2863_IF_MIB::traffic-' . $summary . '-comment');
+            
+            $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
+                $summary}{'data-dir'} = $devdetails->param('data-dir');
+                    
+            my $intfList = $devdetails->param
+                ('RFC2863_IF_MIB::traffic-' . $summary . '-interfaces');
+
+            # get the intreface names for this host
+            foreach my $intfName ( split( /\s*,\s*/, $intfList ) )
+            {
+                if( $intfName =~ /\// )
+                {
+                    my( $host, $intf ) = split( '/', $intfName );
+                    if( $host eq $devdetails->param('snmp-host') )
+                    {
+                        $trafficSummary{$intf}{$summary} = 1;
+                    }
+                }
+                else
+                {
+                    $trafficSummary{$intfName}{$summary} = 1;
+                }
             }
         }
     }
@@ -803,10 +851,20 @@ sub buildConfig
                         ( $intfNode, $childName,
                           $interface->{'childCustomizations'}->{$childName} );
                 }
-            }            
+            }
+
+            # If the interafce is a member of traffic summary
+            if( defined( $trafficSummary{$subtreeName} ) )
+            {
+                foreach my $summary ( keys %{$trafficSummary{$subtreeName}} )
+                {
+                    addTrafficSummaryElement( $globalData,
+                                              $summary, $intfNode );
+                }
+            }
         }
     }
-
+    
     if( $nExplExcluded > 0 )
     {
         Debug('Explicitly excluded ' . $nExplExcluded .
@@ -840,6 +898,96 @@ sub buildConfig
     }
 }
 
+
+sub addTrafficSummaryElement
+{
+    my $globalData = shift;
+    my $summary = shift;
+    my $node = shift;
+
+    if( not defined( $globalData->{
+        'RFC2863_IF_MIB::summaryMembers'}{$summary} ) )
+    {
+        $globalData->{'RFC2863_IF_MIB::summaryMembers'}{$summary} = [];
+    }
+
+    push( @{$globalData->{'RFC2863_IF_MIB::summaryMembers'}{$summary}},
+          $node );
+}
+      
+
+sub buildGlobalConfig
+{
+    my $cb = shift;
+    my $globalData = shift;
+
+    if( not defined( $globalData->{'RFC2863_IF_MIB::summaryMembers'} ) )
+    {
+        return;
+    }
+    
+    foreach my $summary ( keys %{$globalData->{
+        'RFC2863_IF_MIB::summaryMembers'}} )
+    {
+        next if scalar( @{$globalData->{
+            'RFC2863_IF_MIB::summaryMembers'}{$summary}} ) == 0;
+
+        my $attr = $globalData->{'RFC2863_IF_MIB::summaryAttr'}{$summary};
+        my $path = $attr->{'path'};
+
+        if( not defined( $path ) )
+        {
+            Error('Missing the path for traffic summary ' . $summary);
+            next;
+        }
+
+        Debug('Building summary: ' . $summary);
+        
+        # Chop the first and last slashes
+        $path =~ s/^\///;
+        $path =~ s/\/$//;
+        
+        # generate subtree path XML
+        my $subtreeNode = undef;
+        foreach my $subtreeName ( split( '/', $path ) )
+        {
+            $subtreeNode = $cb->addSubtree( $subtreeNode, $subtreeName, {
+                'comment'  => $attr->{'comment'},
+                'data-dir' => $attr->{'data-dir'} } );
+        }
+
+        foreach my $dir ('In', 'Out')
+        {
+            my $rpn = '';
+            foreach my $member ( @{$globalData->{
+                'RFC2863_IF_MIB::summaryMembers'}{$summary}} )
+            {
+                my $memRef = '{' . $cb->getElementPath($member) .
+                    'Bytes_' . $dir . '}';
+                if( length( $rpn ) == 0 )
+                {
+                    $rpn = $memRef;
+                }
+                else
+                {
+                    $rpn .= ',' . $memRef . ',+';
+                }
+            }
+            
+            my $param = {
+                'rpn-expr' => $rpn,
+                'data-file' => 'summary_' . $summary . '.rrd',
+                'rrd-ds' => 'Bytes' . $dir };
+          
+            $cb->addLeaf( $subtreeNode, 'Bytes_' . $dir, $param,
+                          ['::cdef-collector-defaults'] );
+        }
+    }
+}
+
+                       
+
+        
 
 # $filterHash is a hash reference
 # Key is some unique symbolic name, does not mean anything

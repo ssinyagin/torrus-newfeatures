@@ -132,11 +132,18 @@ sub new
     }
 
     $self->{'datadirs'} = {};
+    $self->{'globalData'} = {};
 
     return $self;
 }
 
 
+
+sub globalData
+{
+    my $self = shift;
+    return $self->{'globalData'};
+}
 
 
 sub discover
@@ -523,13 +530,24 @@ sub buildConfig
                   $devdetails->getDevTypes() )
             {
                 &{$reg->{$devtype}{'buildConfig'}}
-                ( $devdetails, $cb, $devNode );
+                ( $devdetails, $cb, $devNode, $self->{'globalData'} );
             }
 
             $cb->{'statistics'}{'hosts'}++;
         }
     }
 
+    foreach my $devtype
+        ( sort {$reg->{$a}{'sequence'} <=> $reg->{$b}{'sequence'}}
+          keys %{$reg} )
+    {
+        if( defined( $reg->{$devtype}{'buildGlobalConfig'} ) )
+        {
+            &{$reg->{$devtype}{'buildGlobalConfig'}}($cb,
+                                                     $self->{'globalData'});
+        }
+    }
+    
     if( defined( $self->{'define-tokensets'} ) )
     {
         my $tsetsNode = $cb->startTokensets();

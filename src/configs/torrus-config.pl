@@ -228,15 +228,18 @@ $Torrus::Renderer::globalSearchEnabled = 1;
 # Modules that Collector will use for collecting and storing data.
 @Torrus::Collector::loadModules =
     ( 'Torrus::Collector::SNMP',
+      'Torrus::Collector::CDef',
       'Torrus::Collector::RRDStorage' );
 
 # Configurable part of Validator
 @Torrus::Validator::loadLeafValidators =
-    ( 'Torrus::Collector::SNMP_Params' );
+    ( 'Torrus::Collector::SNMP_Params',
+      'Torrus::Collector::CDef_Params' );
 
 # Configurable part of AdmInfo renderer
 @Torrus::Renderer::loadAdmInfo =
-    ( 'Torrus::Collector::SNMP_Params' );
+    ( 'Torrus::Collector::SNMP_Params',
+      'Torrus::Collector::CDef_Params' );
 
 # Parameters that are comma-separated values
 @Torrus::ConfigTree::XMLCompiler::listparams = ();

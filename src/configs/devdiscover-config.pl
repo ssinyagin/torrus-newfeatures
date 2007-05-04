@@ -93,6 +93,12 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'viewonly-defaults',
          'source' => 'snmp-defs.xml'
          },
+
+     #### CDef Collector defaults
+     '::cdef-collector-defaults' => {
+         'name'   => 'cdef-collector-defaults',
+         'source' => 'cdef-collector-defs.xml'
+         },
      
      #### IF-MIB
 

@@ -1,3 +1,15 @@
+2007-05-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/CDef.pm: Imported the CDEF collector
+	from Chrstian Schnidrig and adapted to multithreading.
+
+	* perllib/Torrus/DevDiscover.pm: Adapted for global configuration.
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	New discovery parameter: RFC2863_IF_MIB::traffic-summaries
+	Currently summaries work only within single output file.
+	
+
 2007-04-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/HTML.pm: Search engine GUI

@@ -263,7 +263,30 @@ sub getChildSubtree
     }
     return $subtrees[0];
 }
+
+
+# Reconstruct the path to the given subtree or leaf
+sub getElementPath
+{
+    my $self = shift;
+    my $node = shift;
+
+    my $path = '';
+    if( $node->nodeName() eq 'subtree' )
+    {
+        $path = '/';
+    }
+
+    while( not $node->isSameNode( $self->{'datasources'} ) )
+    {
+        $path = '/' . $node->getAttribute( 'name' ) . $path;
+        $node = $node->parentNode();
+    }
     
+    return $path;
+}
+
+
 
 sub addTemplateApplication
 {

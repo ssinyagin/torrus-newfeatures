@@ -1,3 +1,9 @@
+2007-05-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm:
+	fixed the bug for unreachable timeout
+	the target that receives noSuchObject is deleted from polling
+
 2007-05-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/CDef.pm: Imported the CDEF collector

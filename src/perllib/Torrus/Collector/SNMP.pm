@@ -958,6 +958,11 @@ sub callback
                 $value eq 'endOfMibView' )
             {
                 Error("Error retrieving $oid from $hosthash: $value");
+
+                foreach my $token ( keys %{$pdu_tokens->{$oid}} )
+                {
+                    $collector->deleteTarget($token);
+                }
             }
             else
             {
@@ -1016,18 +1021,28 @@ sub postProcess
             {
                 my ( $hosthash, $map ) = split( /\#/, $maphash );
 
-                delete $maps{$hosthash}{$map};
+                if( $unreachableHostDeleted{$hosthash} )
+                {
+                    # This host is no longer polled. Remove the leftovers
+                    
+                    delete $mapsExpire{$maphash};
+                    delete $maps{$hosthash};
+                }
+                else
+                {
+                    delete $maps{$hosthash}{$map};
 
-                # this will schedule the map retrieval for the next
-                # collector cycle
-                Debug('Refreshing map: ' . $maphash);
+                    # this will schedule the map retrieval for the next
+                    # collector cycle
+                    Debug('Refreshing map: ' . $maphash);
                 
-                lookupMap( $collector, $cref->{'mapsRepToken'}{$maphash},
-                           $hosthash, $map, undef );
+                    lookupMap( $collector, $cref->{'mapsRepToken'}{$maphash},
+                               $hosthash, $map, undef );
 
-                # After the next collector period, the maps will be ready and
-                # tokens may be updated without losing the data
-                push( @{$cref->{'mapsRefreshed'}}, $maphash );
+                    # After the next collector period, the maps will be
+                    # ready and tokens may be updated without losing the data
+                    push( @{$cref->{'mapsRefreshed'}}, $maphash );
+                }
             }                
         }
     }

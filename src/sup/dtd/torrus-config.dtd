@@ -31,7 +31,8 @@
 <!ATTLIST apply-template name NMTOKEN #REQUIRED >
 
 <!ELEMENT configuration ( creator-info | definitions | datasources |
-                          include | monitors | token-sets | views )* >
+                          include | monitors | param-properties |
+                          token-sets | views )* >
 
 <!ELEMENT creator-info ( #PCDATA ) >
 
@@ -65,6 +66,13 @@
 <!ELEMENT param ( #PCDATA ) >
 <!ATTLIST param name NMTOKEN #REQUIRED >
 <!ATTLIST param value CDATA #IMPLIED >
+
+<!ELEMENT param-properties ( prop )* >
+
+<!ELEMENT prop >
+<!ATTLIST prop param NMTOKEN #REQUIRED >
+<!ATTLIST prop prop NMTOKEN #REQUIRED >
+<!ATTLIST prop value CDATA #REQUIRED >
 
 <!ELEMENT subtree ( alias | apply-template |
                     leaf | param | subtree | setvar | iftrue | iffalse )* >

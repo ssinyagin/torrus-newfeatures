@@ -642,7 +642,7 @@ Optional Holt-Winters parameters. Default values are:
 =item * C<collector-type>
 
 Mandatory parameter for datasource type C<collector>. Currently supported
-value is: C<snmp>. Other valid values may be added with plugins.
+values are: C<snmp> and C<cdef>. Other valid values may be added with plugins.
 
 =item * C<storage-type>
 
@@ -824,9 +824,30 @@ with some non-standard agents which don't implement this OID.
 
 =item * C<system-id>
 
-Mandatory. Default value: C<%snmp-host%>. Unique identifier of the host.
+Mandatory for every collector type.
+Default value for SNMP collector: C<%snmp-host%>.
+Unique identifier of the host.
 This parameter is used in various template definitions for
-C<data-file> and C<descriptive-nickname>.
+C<data-file>, C<descriptive-nickname> and C<collector-timeoffset-hashstring>.
+
+=item * C<rpn-expr>
+
+Mandatory when C<collector-type=cdef>. The RPN defines an arithmetic expression
+that is used to create a new datasource from several other ones. For example,
+it may define the sum of traffic on several different interfaces.
+
+=item * C<cdef-collector-delay>
+
+Mandatory when C<collector-type=cdef>. Defines the delay time in collector
+periods. The collector will read the data from the RPN datasources with the
+specified delay from the current time. F<cdef-collector-defs.xml> sets
+the default value to 0.
+
+=item * C<cdef-collector-tolerance>
+
+Mandatory when C<collector-type=cdef>. Delay time in collector periods that
+the collector accepts when no recent data is available.
+F<cdef-collector-defs.xml> sets the default value to 2.
 
 =back
 

@@ -645,6 +645,11 @@ MAC accounting and Cisco BGP statistics only.
 Works the same way as C<RFC2863_IF_MIB::tokenset-members> and assigns MAC
 accounting peers to tokensets.
 
+=item * C<CiscoIOS::disable-car-stats>
+
+When set to C<yes>, the Committed Access Rate statistics are disabled
+from discovery.
+
 =item * C<Paradyne::slot-name>
 
 Mandatory for Paradyne DSLAM devices. It should uniquely identify

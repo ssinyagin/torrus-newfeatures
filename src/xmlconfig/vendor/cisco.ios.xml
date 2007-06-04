@@ -100,6 +100,18 @@
           value="1.3.6.1.4.1.9.9.187.1.2.4.1.1"/>
   <def name="cbgpPeerAdvertisedPrefixes"
           value="1.3.6.1.4.1.9.9.187.1.2.4.1.6"/>
+          
+  <!-- CISCO-CAR-MIB -->
+  <def name="ccarStatCurBurst"
+          value="1.3.6.1.4.1.9.9.113.1.2.1.1.5"/>
+  <def name="ccarStatHCSwitchedPkts"
+          value="1.3.6.1.4.1.9.9.113.1.2.1.1.10"/>
+  <def name="ccarStatHCSwitchedBytes"
+          value="1.3.6.1.4.1.9.9.113.1.2.1.1.11"/>
+  <def name="ccarStatHCFilteredPkts"
+          value="1.3.6.1.4.1.9.9.113.1.2.1.1.12"/>
+  <def name="ccarStatHCFilteredBytes"
+          value="1.3.6.1.4.1.9.9.113.1.2.1.1.13"/>
 
 </definitions>
 
@@ -767,6 +779,115 @@
           value="$cbgpPeerAdvertisedPrefixes.%peer-index%"/>
       <param name="rrd-ds"          value="Advertised" />
     </leaf>
+  </template>
+
+
+  <template name="cisco-car-subtree">
+    <param name="data-file">
+      %system-id%_%interface-nick%_%car-direction%_%car-index%_ccar.rrd"
+    </param>
+
+    <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
+    <param name="collector-timeoffset-hashstring"
+                                      value="%system-id%:%interface-nick%"/>
+    <param name="graph-title" value="%descriptive-nickname%" />
+    <param name="graph-lower-limit" value="0" />    
+  </template>
+  
+  <template name="cisco-car">
+    <leaf name="Current_Burst">
+      <param name="comment"     value="Current received burst size" />
+      <param name="graph-legend"    value="Burst" />      
+      <param name="snmp-object"
+          value="$ccarStatCurBurst.%ifindex-map%.%car-direction%.%car-index%"/>
+      <param name="rrd-ds"          value="Burst" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="vertical-label" value="bytes" />
+    </leaf>
+    
+    <leaf name="Switched_Packets">
+      <param name="comment"
+         value="Packets per second permitted by the rate limit" />
+      <param name="graph-legend"    value="Switched Packets" />      
+      <param name="snmp-object">
+         $ccarStatHCSwitchedPkts.%ifindex-map%.%car-direction%.%car-index%
+      </param>
+      <param name="rrd-ds"          value="SwPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="snmp-object-type"  value="COUNTER64" />
+      <param name="vertical-label" value="pps" />
+    </leaf>
+
+    <leaf name="Switched_Bytes">
+      <param name="comment"
+         value="Bytes per second permitted by the rate limit" />
+      <param name="graph-legend"    value="Switched Bytes" />      
+      <param name="snmp-object">
+         $ccarStatHCSwitchedBytes.%ifindex-map%.%car-direction%.%car-index%
+      </param>
+      <param name="rrd-ds"          value="SwBytes" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="snmp-object-type"  value="COUNTER64" />
+      <param name="vertical-label" value="bytes/s" />
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="Filtered_Packets">
+      <param name="comment"
+         value="Packets per second filtered by the rate limit" />
+      <param name="graph-legend"    value="Filtered Packets" />      
+      <param name="snmp-object">
+         $ccarStatHCFilteredPkts.%ifindex-map%.%car-direction%.%car-index%
+      </param>
+      <param name="rrd-ds"          value="FltrPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="snmp-object-type"  value="COUNTER64" />
+      <param name="vertical-label" value="pps" />
+    </leaf>
+
+    <leaf name="Filtered_Bytes">
+      <param name="comment"
+         value="Bytes per second filtered by the rate limit" />
+      <param name="graph-legend"    value="Filtered Bytes" />      
+      <param name="snmp-object">
+         $ccarStatHCFilteredBytes.%ifindex-map%.%car-direction%.%car-index%
+      </param>
+      <param name="rrd-ds"          value="FltrBytes" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="snmp-object-type"  value="COUNTER64" />
+      <param name="vertical-label" value="bytes/s" />
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="Switched_Bps">
+      <param name="comment"
+         value="Bit per second permitted by the rate limit" />
+      <param name="vertical-label" value="bps" />
+      
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="bytes" />
+
+      <param name="ds-expr-bytes"    value="{Switched_Bytes},8,*" />
+      <param name="graph-legend-bytes"  value="Switched" />
+      <param name="line-style-bytes"    value="##SingleGraph" />
+      <param name="line-color-bytes"    value="##SingleGraph" />
+      <param name="line-order-bytes"    value="1" />      
+    </leaf>
+    
+    <leaf name="Filtered_Bps">
+      <param name="comment"
+         value="Bit per second filtered by the rate limit" />
+      <param name="vertical-label" value="bps" />
+      
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="bytes" />
+
+      <param name="ds-expr-bytes"    value="{Filtered_Bytes},8,*" />
+      <param name="graph-legend-bytes"  value="Filtered" />
+      <param name="line-style-bytes"    value="##SingleGraph" />
+      <param name="line-color-bytes"    value="##SingleGraph" />
+      <param name="line-order-bytes"    value="1" />      
+    </leaf>            
   </template>
     
 </datasources>

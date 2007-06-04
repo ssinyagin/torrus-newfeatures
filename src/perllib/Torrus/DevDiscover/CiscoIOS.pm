@@ -52,7 +52,16 @@ our %oiddef =
      'cipSecGlobalHcInOctets'            => '1.3.6.1.4.1.9.9.171.1.3.1.4.0',
      # CISCO-BGP4-MIB
      'cbgpPeerAddrFamilyName'            => '1.3.6.1.4.1.9.9.187.1.2.3.1.3',
-     'cbgpPeerAcceptedPrefixes'          => '1.3.6.1.4.1.9.9.187.1.2.4.1.1'
+     'cbgpPeerAcceptedPrefixes'          => '1.3.6.1.4.1.9.9.187.1.2.4.1.1',
+     # CISCO-CAR-MIB
+     'ccarConfigTable'                   => '1.3.6.1.4.1.9.9.113.1.1.1',
+     'ccarConfigType'                    => '1.3.6.1.4.1.9.9.113.1.1.1.1.3',
+     'ccarConfigAccIdx'                  => '1.3.6.1.4.1.9.9.113.1.1.1.1.4',
+     'ccarConfigRate'                    => '1.3.6.1.4.1.9.9.113.1.1.1.1.5',
+     'ccarConfigLimit'                   => '1.3.6.1.4.1.9.9.113.1.1.1.1.6',
+     'ccarConfigExtLimit'                => '1.3.6.1.4.1.9.9.113.1.1.1.1.7',
+     'ccarConfigConformAction'           => '1.3.6.1.4.1.9.9.113.1.1.1.1.8',
+     'ccarConfigExceedAction'            => '1.3.6.1.4.1.9.9.113.1.1.1.1.9',
      );
 
 
@@ -183,6 +192,20 @@ sub checkdevtype
 
     return 1;
 }
+
+
+my %ccarConfigType =
+    ( 1 => 'all',
+      2 => 'quickAcc',
+      3 => 'standardAcc' );
+
+my %ccarAction =
+    ( 1 => 'drop',
+      2 => 'xmit',
+      3 => 'continue',
+      4 => 'precedXmit',
+      5 => 'precedCont' );
+                      
 
 
 sub discover
@@ -393,7 +416,68 @@ sub discover
             }
         }
     }
-        
+
+    
+    if( $devdetails->param('CiscoIOS::disable-car-stats') ne 'yes' )
+    {
+        my $carTable =
+            $session->get_table( -baseoid =>
+                                 $dd->oiddef('ccarConfigTable') );
+        if( defined( $carTable ) and scalar( %{$carTable} ) > 0 )
+        {
+            $devdetails->storeSnmpVars( $carTable );
+            $devdetails->setCap('CiscoCAR');
+
+            $data->{'ccar'} = {};
+
+            foreach my $INDEX
+                ( $devdetails->
+                  getSnmpIndices( $dd->oiddef('ccarConfigType') ) )
+            {
+                my ($ifIndex, $dir, $carIndex) = split(/\./, $INDEX);
+                my $interface = $data->{'interfaces'}{$ifIndex};
+
+                my $car = {
+                    'ifIndex'   => $ifIndex,
+                    'direction' => $dir,
+                    'carIndex'  => $carIndex };
+
+                $car->{'configType'} =
+                    $ccarConfigType{ $carTable->{$dd->oiddef
+                                                     ('ccarConfigType') .
+                                                     '.' . $INDEX} };
+
+                $car->{'accIdx'} = $carTable->{$dd->oiddef
+                                                   ('ccarConfigAccIdx') .
+                                                   '.' . $INDEX};
+                
+                $car->{'rate'} = $carTable->{$dd->oiddef
+                                                 ('ccarConfigRate') .
+                                                 '.' . $INDEX};
+
+                
+                $car->{'limit'} = $carTable->{$dd->oiddef
+                                                  ('ccarConfigLimit') .
+                                                  '.' . $INDEX};
+                
+                $car->{'extLimit'} = $carTable->{$dd->oiddef
+                                                     ('ccarConfigExtLimit') .
+                                                     '.' . $INDEX};
+                $car->{'conformAction'} =
+                    $ccarAction{ $carTable->{$dd->oiddef
+                                                 ('ccarConfigConformAction') .
+                                                 '.' . $INDEX} };
+                
+                $car->{'exceedAction'} =
+                    $ccarAction{ $carTable->{$dd->oiddef
+                                                 ('ccarConfigExceedAction') .
+                                                 '.' . $INDEX} };
+
+                $data->{'ccar'}{$INDEX} = $car;
+            }
+        }
+    }
+
     return 1;
 }
 
@@ -431,6 +515,66 @@ sub buildConfig
             $cb->addSubtree
                 ( $countersNode, $peer->{'subtreeName'}, $param,
                   ['CiscoIOS::cisco-bgp'] );
+        }
+    }
+
+    
+    if( $devdetails->hasCap('CiscoCAR') )
+    {
+        my $countersNode =
+            $cb->addSubtree( $devNode, 'CAR_Stats',
+                             { 'comment' =>
+                                   'Committed Access Rate statistics'},
+                             ['CiscoIOS::cisco-car-subtree']);
+        
+        foreach my $INDEX ( sort keys %{$data->{'ccar'}} )
+        {
+            my $car = $data->{'ccar'}{$INDEX};
+            my $interface = $data->{'interfaces'}{$car->{'ifIndex'}};
+            
+            my $subtreeName =
+                $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+
+            $subtreeName .= ($car->{'direction'} == 1) ? '_IN':'_OUT';
+            if( $car->{'carIndex'} > 1 )
+            {
+                $subtreeName .= '_' . $car->{'carIndex'};
+            }
+               
+            my $param = {
+                'searchable' => 'yes',
+                'car-direction' => $car->{'direction'},
+                'car-index' => $car->{'carIndex'} };
+                
+            $param->{'interface-name'} =
+                $interface->{'param'}{'interface-name'};            
+            $param->{'interface-nick'} =
+                $interface->{'param'}{'interface-nick'};            
+            $param->{'comment'} =
+                $interface->{'param'}{'comment'};
+
+            my $legend = sprintf("Type: %s;", $car->{'configType'});
+            if( $car->{'accIdx'} > 0 )
+            {
+                $legend .= sprintf("Access list: %d;", $car->{'accIdx'});
+            }
+            
+            $legend .=
+                sprintf("Rate: %d bps; Limit: %d bytes; Ext limit: %d bytes;" .
+                        "Conform action: %s; Exceed action: %s",
+                        $car->{'rate'},
+                        $car->{'limit'},
+                        $car->{'extLimit'},
+                        $car->{'conformAction'},
+                        $car->{'exceedAction'});
+
+            $param->{'legend'} = $legend;
+
+            $cb->addSubtree
+                ( $countersNode,
+                  $subtreeName,
+                  $param, 
+                  ['CiscoIOS::cisco-car']);
         }
     }
 }

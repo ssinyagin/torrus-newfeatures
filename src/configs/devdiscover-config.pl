@@ -307,6 +307,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-bgp',
          'source' => 'vendor/cisco.ios.xml'
          },
+     'CiscoIOS::cisco-car-subtree' => {
+         'name'   => 'cisco-car-subtree',
+         'source' => 'vendor/cisco.ios.xml'
+         },
+     'CiscoIOS::cisco-car' => {
+         'name'   => 'cisco-car',
+         'source' => 'vendor/cisco.ios.xml'
+         },
      'CiscoIOS_Docsis::cisco-docsis-mac-subtree' => {
          'name'   => 'cisco-docsis-mac-subtree',
          'source' => 'vendor/cisco.ios.docsis.xml'

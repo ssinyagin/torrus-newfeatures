@@ -1,4 +1,4 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2007  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -476,12 +476,9 @@ sub updateRRD
 
         Debug('Enqueueing update job for ' . $filename);
         
-        my $cmdlist;
-        &threads::shared::share( \$cmdlist );
-        $cmdlist = &threads::shared::share([]);
+        my $cmdlist = &threads::shared::share([]);
         push( @{$cmdlist}, $filename, @cmd );
         $thrUpdateQueue->enqueue( $cmdlist );
-        $cmdlist = undef;
     }
     else
     {
@@ -528,8 +525,6 @@ sub rrdUpdateThread
             Error('ERROR updating' . $cmdlist->[0] . ': ' . $err);
             $thrErrorsQueue->enqueue( $cmdlist->[0] );
         }
-        
-        $cmdlist = undef;
     }
 }
 

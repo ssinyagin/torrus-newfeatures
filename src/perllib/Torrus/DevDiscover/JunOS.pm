@@ -95,44 +95,46 @@ sub discover
     }
 
     # NOTE: Class of Service
-
-    # Get the output Queue number
-    my $cosQueueNumTable =
-        $session->get_table( -baseoid =>
-                             $dd->oiddef('jnxCosFcIdToFcName'));
-    $devdetails->storeSnmpVars( $cosQueueNumTable );
-    if ( $cosQueueNumTable )
+    if( $devdetails->param('JunOS::disable-cos') ne 'yes' )
     {
-        $devdetails->setCap('jnxCoS');
-
-        foreach my $cosFcIndex
-            ( $devdetails->getSnmpIndices($dd->oiddef('jnxCosFcIdToFcName') ))
-        {
-            my $cosFcNameOid = $dd->oiddef('jnxCosFcIdToFcName') . "." .
-                $cosFcIndex;
-	    my $cosFcName    = $cosQueueNumTable->{$cosFcNameOid};
-	    $data->{'cos'}{'queue'}{$cosFcIndex} = $cosFcName;
-
-	    Debug("JunOS::CoS  FcInfo index: $cosFcIndex  name: $cosFcName");
-        }
-
-        # We need to find out all the interfaces that have CoS enabled on them
-        # We will use jnxCosQstatQedPkts as our reference point.
-        my $cosIfIndex =
+        # Get the output Queue number
+        my $cosQueueNumTable =
             $session->get_table( -baseoid =>
-                                 $dd->oiddef('jnxCosQstatQedPkts'));
-        $devdetails->storeSnmpVars( $cosIfIndex );
-
-        foreach my $INDEX
-            ( $devdetails->getSnmpIndices($dd->oiddef('jnxCosQstatQedPkts') ) )
+                                 $dd->oiddef('jnxCosFcIdToFcName'));
+        $devdetails->storeSnmpVars( $cosQueueNumTable );
+        if ( $cosQueueNumTable )
         {
-            my( $ifIndex, $cosQueueIndex ) = split( '\.', $INDEX );
-            $data->{'cos'}{'ifIndex'}{$ifIndex} = {
-                'ifIndex'	=> $ifIndex
-                }
-        }
-    }
+            $devdetails->setCap('jnxCoS');
     
+            foreach my $cosFcIndex
+                ( $devdetails->getSnmpIndices
+                  ($dd->oiddef('jnxCosFcIdToFcName') ))
+            {
+                my $cosFcNameOid = $dd->oiddef('jnxCosFcIdToFcName') . "." .
+                    $cosFcIndex;
+                my $cosFcName    = $cosQueueNumTable->{$cosFcNameOid};
+                $data->{'cos'}{'queue'}{$cosFcIndex} = $cosFcName;
+
+                Debug("JunOS::CoS  FcInfo index: " .
+                      "$cosFcIndex  name: $cosFcName");
+            }
+
+            # We need to find out all the interfaces that have CoS enabled
+            # on them. We will use jnxCosQstatQedPkts as our reference point.
+            my $cosIfIndex =
+                $session->get_table( -baseoid =>
+                                     $dd->oiddef('jnxCosQstatQedPkts'));
+            $devdetails->storeSnmpVars( $cosIfIndex );
+    
+            foreach my $INDEX
+                ( $devdetails->getSnmpIndices
+                  ($dd->oiddef('jnxCosQstatQedPkts') ) )
+            {
+                my( $ifIndex, $cosQueueIndex ) = split( '\.', $INDEX );
+                $data->{'cos'}{'ifIndex'}{$ifIndex} = 1;
+            }
+        }
+    } # END of JunOS::disable-cos    
     return 1;
 }
 
@@ -151,9 +153,9 @@ sub buildConfig
                                        { 'precendence' => 1000 },
                                        [ 'JunOS::junos-cos-subtree']);
         
-        foreach my $INDEX ( sort keys %{$data->{'cos'}{'ifIndex'}} )
+        foreach my $ifIndex ( sort {$a <=> $b} keys
+                              %{$data->{'cos'}{'ifIndex'}} )
         {
-            my $ifIndex   = $INDEX;
             my $interface = $data->{'interfaces'}{$ifIndex};
             my $ifAlias   = $interface->{'ifAlias'};
             my $ifDescr   = $interface->{'ifDescr'};
@@ -167,10 +169,9 @@ sub buildConfig
                                    'precedence' => 1000 - $ifIndex });
 
             # Loop to create subtree's for each QueueName/ID pair
-            foreach my $INDEXqID ( sort keys %{$data->{'cos'}{'queue'}} )
+            foreach my $cosIndex ( sort keys %{$data->{'cos'}{'queue'}} )
             {
-                my $cosIndex = $INDEXqID;
-                my $cosName  = $data->{'cos'}{'queue'}{$INDEXqID};
+                my $cosName  = $data->{'cos'}{'queue'}{$cosIndex};
                 
                 # Add Leaf for each one
                 Debug("JunOS::CoS  addSubtree ifIndex: $ifIndex " . 

@@ -650,6 +650,11 @@ accounting peers to tokensets.
 When set to C<yes>, the Committed Access Rate statistics are disabled
 from discovery.
 
+=item * C<JunOS::disable-cos>
+
+When set to C<yes>, the COS statistics are disabled for a Juniper device.
+
+
 =item * C<Paradyne::slot-name>
 
 Mandatory for Paradyne DSLAM devices. It should uniquely identify

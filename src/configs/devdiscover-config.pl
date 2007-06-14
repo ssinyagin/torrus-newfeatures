@@ -207,6 +207,40 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source' => 'generic/rfc2662.adsl-line.xml'
          },
 
+     #### Alteon application switches
+     'Alteon::alteon-cpu' => {
+         'name'   => 'alteon-cpu',
+         'source' => 'vendor/alteon.xml'
+         },     
+     'Alteon::alteon-mem' => {
+         'name'   => 'alteon-mem',
+         'source' => 'vendor/alteon.xml'
+         },     
+     'Alteon::alteon-packets' => {
+         'name'   => 'alteon-packets',
+         'source' => 'vendor/alteon.xml'
+         },     
+     'Alteon::alteon-sensor' => {
+         'name'   => 'alteon-sensor',
+         'source' => 'vendor/alteon.xml'
+         },     
+     'Alteon::alteon-vserver-subtree' => {
+         'name'   => 'alteon-vserver-subtree',
+         'source' => 'vendor/alteon.xml'
+         },     
+     'Alteon::alteon-vserver' => {
+         'name'   => 'alteon-vserver',
+         'source' => 'vendor/alteon.xml'
+         },     
+     'Alteon::alteon-maint-subtree' => {
+         'name'   => 'alteon-maint-subtree',
+         'source' => 'vendor/alteon.xml'
+         },     
+     'Alteon::alteon-maint' => {
+         'name'   => 'alteon-maint',
+         'source' => 'vendor/alteon.xml'
+         },     
+     
      #### ATMEL smartbridges
 
      'ATMEL::atmel-device-subtree' => {

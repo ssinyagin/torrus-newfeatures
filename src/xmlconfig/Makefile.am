@@ -27,6 +27,7 @@ dist_xml_DATA  = defaults.xml snmp-defs.xml cdef-collector-defs.xml
 
 vendordir      = $(distxmldir)/vendor
 dist_vendor_DATA = \
+	vendor/alteon.xml \
 	vendor/apc.ups.xml  \
 	vendor/ascend.max.xml \
 	vendor/atmel.xml \

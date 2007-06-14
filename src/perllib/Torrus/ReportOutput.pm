@@ -38,7 +38,7 @@ sub new
     my $self = {};
     bless ($self, $class);
     
-    $self->{'options'} = $options;
+    $self->{'options'} = $options;    
     defined( $self->{'options'}->{'Tree'} ) or die;
     
     my $sqlRep = Torrus::SQL::Reports->new( $options->{'ReportsSqlSubtype'} );
@@ -82,8 +82,12 @@ sub generate
     
     my %monthlyReportNames;
 
-    my $srvId = new Torrus::ServiceID;
-    my $srvIdList = $srvId->getAllForTree( $self->{'options'}->{'Tree'} );
+    my $srvIdList;
+    if( not $self->{'options'}->{'All_Service_IDs'} )
+    {
+        my $srvId = new Torrus::ServiceID;
+        $srvIdList = $srvId->getAllForTree( $self->{'options'}->{'Tree'} );
+    }
     
     my $allReports = $self->{'backend'}->getAllReports( $srvIdList );
 

@@ -187,6 +187,7 @@ sub render
 
     my $outfile = $self->{'htmldir'} . '/' . $opt->{'filename'};
     my $tmplfile = $Torrus::ReportOutput::HTML::templates{$opt->{'template'}};
+    Debug('Rendering ' . $outfile . ' from ' . $tmplfile);
     
     my $ttvars =
     {

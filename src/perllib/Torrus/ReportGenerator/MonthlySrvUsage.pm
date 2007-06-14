@@ -129,7 +129,8 @@ sub generate
         # Calculate the total volume, if it's a counter
         my $volume = Math::BigFloat->new(0);
         my $volumeDefined = 0;
-        if( $params->{'dstype'} =~ /^COUNTER/ )
+        if( not defined( $params->{'dstype'} ) or
+            $params->{'dstype'} =~ /^COUNTER/ )
         {
             $volumeDefined = 1;
             foreach my $row ( @{$data} )
@@ -142,7 +143,8 @@ sub generate
 
         my $usageUnits = '';
         my $volumeUnits = '';
-        if( $params->{'units'} eq 'bytes' )
+        if( not defined( $params->{'units'} ) or
+            $params->{'units'} eq 'bytes' )
         {
             # Adjust bytes into megabit per second
             $usageUnits = 'Mbps';

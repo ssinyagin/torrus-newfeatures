@@ -59,6 +59,16 @@ is ignored for the monthly reports.
 Instructs the report engine to build the HTML output from the generated
 reports.
 
+=item B<--tree=TREE>
+
+When used with C<--genhtml>, generates the HTML reports only for
+the specified tree.
+
+=item B<--all2tree=TREE>
+
+When used with C<--genhtml>, generates the HTML reports only for
+all available service IDs in the specified tree.
+
 =item B<--verbose>
 
 Prints extra informatgion.

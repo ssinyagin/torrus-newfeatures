@@ -1,5 +1,7 @@
 2007-06-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/genreport.in: New option: --all2tree
+
 	* perllib/Torrus/DevDiscover/Alteon.pm: New discovery module
 
 2007-06-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

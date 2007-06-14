@@ -29,14 +29,15 @@ use Torrus::Log;
 use Torrus::ReportOutput::HTML;
 use Torrus::SiteConfig;
 
-our $report;
-our $date;
-our $time = '00:00';
-our $genhtml;
-our @trees;
+my $report;
+my $date;
+my $time = '00:00';
+my $genhtml;
+my @trees;
+my $all2tree;
 
-our $debug = 0;
-our $verbose = 0;
+my $debug = 0;
+my $verbose = 0;
 
 my $ok = GetOptions(
                     'report=s'    => \$report,
@@ -44,6 +45,7 @@ my $ok = GetOptions(
                     'time=s'      => \$time,
                     'genhtml'     => \$genhtml,
                     'tree=s'      => \@trees,
+                    'all2tree=s'  => \$all2tree,
                     'verbose'     => \$verbose,
                     'debug'       => \$debug
                     );
@@ -55,7 +57,9 @@ if( $report and not defined($Torrus::ReportGenerator::modules{$report}) )
 }
                                             
 if( not $ok or (not $report and not $genhtml) or
-    ($report and not $date) or scalar( @ARGV ) > 0 )
+    ($report and not $date) or
+    ($genhtml and scalar(@trees) > 0 and $all2tree) or
+    scalar( @ARGV ) > 0 )
 {
     print STDERR
         "Usage: $0 --report=ReportName --date=YYYY-MM-DD | ",
@@ -66,6 +70,9 @@ if( not $ok or (not $report and not $genhtml) or
     "For monthly reports, 1st day in a month.\n",
     " --time=hh:mm        Report start time. Ignored for monthly reports\n",
     " --genhtml           Generate HTML output from the database\n",
+    " --tree=TREE         Generate HTML for a given tree only\n",
+    " --all2tree=TREE     Generate reports for all service IDs and place\n",
+    "                     into the given tree (excludes the option --tree)\n",
     " --verbose           print extra information\n",
     " --debug             print debugging information\n",   
     "\n",
@@ -123,6 +130,11 @@ if( $report )
 
 if( $genhtml )
 {
+    if( $all2tree )
+    {
+        push( @trees, $all2tree );
+    }
+    
     if( scalar( @trees ) == 0 )
     {
         @trees = Torrus::SiteConfig::listTreeNames();
@@ -144,7 +156,15 @@ if( $genhtml )
         foreach my $tree ( @trees )
         {
             Verbose('Generating HTML report for tree ' . $tree);
-            my $out = new Torrus::ReportOutput::HTML({'Tree' => $tree});
+
+            my $options = {'Tree' => $tree};
+
+            if( length( $all2tree ) > 0 )
+            {
+                $options->{'All_Service_IDs'} = 1;
+            }
+            
+            my $out = new Torrus::ReportOutput::HTML( $options );
             
             if( $out->init() )
             {

@@ -57,6 +57,14 @@ running C<./configure>, otherwise use
 
   ./configure PERL=/path/to/perl
 
+Torrus also supports Perl multithreading in Device Discovery engine and
+in the Collector. Minimum requirements are as follows: Perl version 5.8.8
+or higher, "threads" module version 1.41 or higher, "threads::shared" module
+version 1.03 or higher. Older versions had bugs that were leading to
+severe memory leaks and instability. After installing Perl 5.8.8,
+you need to upgrade the threads and threads::shared modules manually
+from CPAN.
+
 =item * RRDtool
 
 Round Robin Database Tool is available at:

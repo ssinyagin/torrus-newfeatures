@@ -1,3 +1,7 @@
+2007-06-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* configure.ac: Perl 5.8.8 is required for threads
+
 2007-06-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/genreport.in: New option: --all2tree

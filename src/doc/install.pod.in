@@ -63,7 +63,8 @@ or higher, C<threads> module version 1.41 or higher, C<threads::shared> module
 version 1.03 or higher. Older versions had bugs that were leading to
 severe memory leaks and instability. After installing Perl 5.8.8,
 you need to upgrade the C<threads> and C<threads::shared> modules manually
-from CPAN.
+from CPAN. If any of the requirements is not met, the installer will
+automatically disable the threads support in Torrus.
 
 =item * RRDtool
 

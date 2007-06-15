@@ -59,10 +59,10 @@ running C<./configure>, otherwise use
 
 Torrus also supports Perl multithreading in Device Discovery engine and
 in the Collector. Minimum requirements are as follows: Perl version 5.8.8
-or higher, "threads" module version 1.41 or higher, "threads::shared" module
+or higher, C<threads> module version 1.41 or higher, C<threads::shared> module
 version 1.03 or higher. Older versions had bugs that were leading to
 severe memory leaks and instability. After installing Perl 5.8.8,
-you need to upgrade the threads and threads::shared modules manually
+you need to upgrade the C<threads> and C<threads::shared> modules manually
 from CPAN.
 
 =item * RRDtool

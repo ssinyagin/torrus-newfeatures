@@ -52,14 +52,11 @@ if test x"$2" = x; then
   monitor_cmdopts="$TORRUS_MONITOR_DELAY"
 else
   daemons=$2
-    # Third argument may be the tree name
-  if test x"$3" != x; then
+    # Third and fourth arguments may be the tree name and instance
+  if test x"$3" != x -a x"$4" != x; then
     eval trees_${daemons}=$3
+    eval col_inst_${3}=$4
     read_treenames=no
-      # Fourth argument may be cmdopts
-    if test x"$4" != x; then
-      TORRUS_CMDOPTS="$4"
-    fi
   fi
 fi
 
@@ -68,6 +65,7 @@ if test x"$TORRUS_COLLECTOR_CMDOPTS" != x; then
 fi
 
 if test x${read_treenames} != xno; then
+
   # Get the names of the trees for each daemon
   for d in ${daemons}; do
     eval trees_${d}=\"`@PERL@ -e 'require "'$torrus_config_pl'";
@@ -75,15 +73,33 @@ if test x${read_treenames} != xno; then
       print "$key " if $val->{run}{'${d}'};
     };'`\"
   done
+
+  # Get the collector instance numbers for each tree
+  eval trees=\"\$\{trees_collector\}\"  
+  for t in ${trees}; do
+    eval col_inst_${t}=\"`@PERL@ -e 'require "'$torrus_config_pl'";
+    print join(" ",
+    (0 .. $Torrus::Global::treeConfig{'${t}'}{run}{collector}-1))'`\"
+  done
 fi
 
 start_daemons () {
   for d in ${daemons}; do
     eval trees=\"\$\{trees_${d}\}\"
     eval daemon_cmdopts=\"\$\{${d}_cmdopts\}\"
+        
     for t in ${trees}; do
-      echo "starting Torrus ${d} for tree ${t} ${daemon_cmdopts}"
-      ${su} "${cmddir}/${d} --tree=${t} ${TORRUS_CMDOPTS} ${daemon_cmdopts}"
+      if test ${d} = collector; then
+        eval instances=\"\$\{col_inst_${t}\}\"
+        for i in ${instances}; do
+          echo "starting Torrus collector instance ${i} for tree ${t}"
+          ${su} "${cmddir}/${d} --tree=${t} --instance=${i} \
+               ${daemon_cmdopts} ${TORRUS_CMDOPTS}"
+        done
+      else
+        echo "starting Torrus ${d} for tree ${t} ${daemon_cmdopts}"
+        ${su} "${cmddir}/${d} --tree=${t} ${daemon_cmdopts} ${TORRUS_CMDOPTS}"
+      fi
     done
   done
 }
@@ -91,8 +107,26 @@ start_daemons () {
 stop_daemons () {
   tokill=""
   for d in ${daemons}; do
+  
     eval trees=\"\$\{trees_${d}\}\"
-      for t in ${trees}; do
+    for t in ${trees}; do
+    
+      if test ${d} = collector; then
+        eval instances=\"\$\{col_inst_${t}\}\"
+        
+        for i in ${instances}; do
+          pidfile="${piddir}/${d}.${t}_${i}.pid"
+          if test -r ${pidfile}; then
+            tokill=${tokill}' t='${t}'_'${i}';d='${d}
+            echo "stopping Torrus collector instance ${i} for tree ${t}"
+            pid=`cat ${pidfile}`
+            @KILL@ ${pid} || \
+              echo "Error: Cannot kill collector instance ${i} for tree ${t}"
+          fi
+        done
+        
+      else
+            
         pidfile="${piddir}/${d}.${t}.pid"
         if test -r ${pidfile}; then
           tokill=${tokill}' t='${t}';d='${d}
@@ -100,7 +134,9 @@ stop_daemons () {
           pid=`cat ${pidfile}`
           @KILL@ ${pid} || echo "Error: Cannot kill ${d} for tree ${t}"
         fi
-      done
+        
+      fi
+    done
   done
 
   killed=`echo $tokill | wc -w`

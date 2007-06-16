@@ -1,3 +1,11 @@
+2007-06-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/collector.in: Now multiple collector instances can run
+	in a single tree. Need to recompile all trees and re-start the
+	daemons. A new copy of init.d/torrus should be copied
+	in startup scripts directory.
+	
+
 2007-06-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* configure.ac: Perl 5.8.8 is required for threads

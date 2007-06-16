@@ -279,9 +279,16 @@ sub listTreeNames
 sub mayRunCollector
 {
     my $tree = shift;
-    return $Torrus::Global::treeConfig{$tree}{'run'}{'collector'};
+    my $run = $Torrus::Global::treeConfig{$tree}{'run'}{'collector'};
+    return( defined($run) and $run > 0 );   
 }
 
+sub collectorInstances
+{
+    my $tree = shift;
+    my $run = $Torrus::Global::treeConfig{$tree}{'run'}{'collector'};
+    return( (defined($run) and $run > 1) ? int($run) : 1 ); 
+}
 
 sub mayRunMonitor
 {

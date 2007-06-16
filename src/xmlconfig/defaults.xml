@@ -56,6 +56,8 @@
   <prop param="collector-scale"       prop="expand" value="1"/>
   <prop param="collector-timeoffset-hashstring"
                                       prop="expand" value="1"/>
+  <prop param="collector-instance-hashstring"
+                                      prop="expand" value="1"/>
   <prop param="comment"               prop="expand" value="1"/>
   <prop param="data-dir"              prop="expand" value="1"/>
   <prop param="data-file"             prop="expand" value="1"/>
@@ -94,6 +96,8 @@
   <param name="collector-timeoffset-min" value="0" />
   <param name="collector-timeoffset-max" value="300" />
   <param name="collector-timeoffset-step" value="30" />
+
+  <param name="collector-instance-hashstring" value="%system-id%" />
 
 </datasources>
 

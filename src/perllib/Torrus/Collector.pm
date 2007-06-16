@@ -395,7 +395,7 @@ sub run
         {
             $self->{'config_tree'} =
                 new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
-                                      -Wait => 1 );
+                                        -Wait => 1 );
         }
         
         &{$Torrus::Collector::runCollector{$collector_type}}( $self, $ref );
@@ -413,7 +413,7 @@ sub run
         {
             $self->{'config_tree'} =
                 new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
-                                      -Wait => 1 );
+                                        -Wait => 1 );
         }
 
         &{$Torrus::Collector::storeData{$storage_type}}( $self, $ref );
@@ -433,7 +433,7 @@ sub run
             {
                 $self->{'config_tree'} =
                     new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
-                                          -Wait => 1 );
+                                            -Wait => 1 );
             }
             
             &{$Torrus::Collector::postProcess{$collector_type}}( $self, $ref );
@@ -512,8 +512,11 @@ sub setValue
         }
     }
 
-    Debug('Value ' . $value . ' set for ' .
-          $self->path($token) . ' TS=' . $timestamp);
+    if( isDebug() )
+    {
+        Debug('Value ' . $value . ' set for ' .
+              $self->path($token) . ' TS=' . $timestamp);
+    }
 
     foreach my $storage_type
         ( @{$self->{'targets'}{$token}{'storage-types'}} )
@@ -565,13 +568,16 @@ sub beforeRun
 
     my $data = $self->data();
 
+    my $instance = $self->{'options'}{'-Instance'};
+        
     # Prepare the list of tokens, sorted by period and offset,
     # from config tree or from cache.
 
     my $need_new_tasks = 0;
 
     Torrus::TimeStamp::init();
-    my $known_ts = Torrus::TimeStamp::get($tree . ':collector_cache');
+    my $timestamp_key = $tree . ':' . $instance . ':collector_cache';
+    my $known_ts = Torrus::TimeStamp::get( $timestamp_key );
     my $actual_ts = $config_tree->getTimestamp();
     if( $actual_ts >= $known_ts )
     {
@@ -581,18 +587,20 @@ sub beforeRun
         undef $data->{'targets'};
         $need_new_tasks = 1;
 
-        $data->{'db_tokens'} = new Torrus::DB( 'collector_tokens',
-                                             -Subdir => $tree,
-                                             -WriteAccess => 1,
-                                             -Truncate    => 1 );
-        $self->cacheCollectors( $config_tree, $config_tree->token('/') );
+        $data->{'db_tokens'} =
+            new Torrus::DB( 'collector_tokens' . '_' . $instance,
+                            -Subdir => $tree,
+                            -WriteAccess => 1,
+                            -Truncate    => 1 );
+        $self->cacheCollectors( $config_tree, $instance,
+                                $config_tree->token('/') );
         # explicitly close, since we don't need it often, and sometimes
         # open it in read-only mode
         $data->{'db_tokens'}->closeNow();
         undef $data->{'db_tokens'};
 
         # Set the timestamp
-        &Torrus::TimeStamp::setNow($tree . ':collector_cache');
+        &Torrus::TimeStamp::setNow( $timestamp_key );
     }
     Torrus::TimeStamp::release();
 
@@ -600,8 +608,10 @@ sub beforeRun
     {
         $need_new_tasks = 1;
 
-        $data->{'db_tokens'} = new Torrus::DB('collector_tokens',
-                                            -Subdir => $tree);
+        $data->{'db_tokens'} =
+            new Torrus::DB('collector_tokens' . '_' . $instance,
+                           -Subdir => $tree);
+        
         my $cursor = $data->{'db_tokens'}->cursor();
         while( my ($token, $schedule) = $data->{'db_tokens'}->next($cursor) )
         {
@@ -631,8 +641,9 @@ sub beforeRun
             {
                 my $collector =
                     new Torrus::Collector( -Period => $period,
-                                         -Offset => $offset,
-                                         -TreeName => $tree );
+                                           -Offset => $offset,
+                                           -TreeName => $tree,
+                                           -Instance => $instance );
 
                 foreach my $token ( @{$data->{'targets'}{$period}{$offset}} )
                 {
@@ -654,6 +665,7 @@ sub cacheCollectors
 {
     my $self = shift;
     my $config_tree = shift;
+    my $instance = shift;
     my $ptoken = shift;
 
     my $data = $self->data();
@@ -662,11 +674,13 @@ sub cacheCollectors
     {
         if( $config_tree->isSubtree( $ctoken ) )
         {
-            $self->cacheCollectors( $config_tree, $ctoken );
+            $self->cacheCollectors( $config_tree, $instance, $ctoken );
         }
         elsif( $config_tree->isLeaf( $ctoken ) and
-               $config_tree->getNodeParam( $ctoken, 'ds-type' )
-               eq 'collector' )
+               ( $config_tree->getNodeParam( $ctoken, 'ds-type' )
+                 eq 'collector' ) and
+               ( $config_tree->getNodeParam( $ctoken, 'collector-instance' )
+                 == $instance ) )
         {
             my $period = sprintf('%d',
                                  $config_tree->getNodeParam

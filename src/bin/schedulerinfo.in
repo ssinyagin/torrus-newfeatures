@@ -93,15 +93,22 @@ if( $report_config )
         exit 1;
     }
 
-    my $stats = { 'collectorLeaves' => 0, 'monitorLeaves' => 0 };
+    my $stats = { 'collectorLeaves' => {}, 'monitorLeaves' => 0 };
     
     collectStats( $config_tree, $stats );
 
     thickLine();
     printf("Scheduler configuration report\n\n");
 
-    printf("Total collector leaves: %d\n", $stats->{'collectorLeaves'});
+    foreach my $instance ( sort {$a<=>$b} keys %{$stats->{'collectorLeaves'}} )
+    {
+        printf("Collector leaves for instance #%d: %d\n",
+               $instance, 
+               $stats->{'collectorLeaves'}{$instance});
+    }
+    
     printf("Total monitor leaves: %d\n\n", $stats->{'monitorLeaves'});
+
     printf("Scheduled leaves by type:\n");
 
     foreach my $type ( sort keys %{$stats->{'leavesPerType'}} )
@@ -111,15 +118,19 @@ if( $report_config )
     }
     printf("\n");
 
-    if( $stats->{'collectorLeaves'} > 0 )
+    foreach my $instance ( sort {$a<=>$b} keys %{$stats->{'collectorLeaves'}} )
     {
-        printf("Collectors execution timeline:\n");
-        reportTimeline( $stats->{'collectorSchedule'} );
+        if( $stats->{'collectorLeaves'}{$instance} > 0 )
+        {
+            printf("Collector execution timeline for instance #%d:\n",
+                   $instance);
+            reportTimeline( $stats->{'collectorSchedule'}{$instance} );
+        }
     }
 
     if( $stats->{'monitorLeaves'} > 0 )
     {
-        printf("Monitors execution timeline:\n");
+        printf("Monitor execution timeline:\n");
         reportTimeline( $stats->{'monitorSchedule'} );
     }
 }
@@ -170,57 +181,67 @@ if( $report_runtime )
     my $periodicTasks = {};
     foreach my $taskId ( keys %{$stats} )
     {
-        my ($type, $taskName, $period, $offset) = split( ':', $taskId );
+        my ($type, $taskName, $instance, $period, $offset) =
+            split( ':', $taskId );
         if( $type eq 'P' )
         {
-            $periodicTasks->{$taskName}{$period}{$offset} = $taskId;
+            $periodicTasks->{$taskName}{$instance}{$period}{$offset} = $taskId;
         }
     }
     
     foreach my $taskName ( sort keys %{$periodicTasks} )
     {
-        foreach my $period
-            ( sort {$a<=>$b} keys %{$periodicTasks->{$taskName}} )
+        foreach my $instance ( sort {$a<=>$b}
+                               keys %{$periodicTasks->{$taskName}} )
         {
-            foreach my $offset
-                ( sort {$a<=>$b} keys %{$periodicTasks->{$taskName}{$period}} )
+            foreach my $period
+                ( sort {$a<=>$b}
+                  keys %{$periodicTasks->{$taskName}{$instance}} )
             {
-                my $taskId = $periodicTasks->{$taskName}{$period}{$offset};
-                my $ref = $stats->{$taskId};
-                
-                printf("Task: %s, Period: %d seconds, Offset: %d seconds\n",
-                       $taskName, $period, $offset);
-                
-                foreach my $format ( @counterFormats )
+                foreach my $offset
+                    ( sort {$a<=>$b}
+                      keys %{$periodicTasks->{$taskName}{$instance}{$period}} )
                 {
-                    if( defined( $ref->{$format->{'varname'}} ) )
+                    my $taskId =
+                        $periodicTasks->{$taskName}{$instance}{
+                            $period}{$offset};
+                    my $ref = $stats->{$taskId};
+                
+                    printf("Task: %s, Instance: %d, " .
+                           "Period: %d seconds, Offset: %d seconds\n",
+                           $taskName, $instance, $period, $offset);
+                
+                    foreach my $format ( @counterFormats )
                     {
-                        printf("%5d %s\n",
-                               $ref->{$format->{'varname'}},
-                               $format->{'label'} );
+                        if( defined( $ref->{$format->{'varname'}} ) )
+                        {
+                            printf("%5d %s\n",
+                                   $ref->{$format->{'varname'}},
+                                   $format->{'label'} );
+                        }
                     }
-                }
 
-                thinLine();
-                printf("%-15s%-10s%-10s%-10s%-10s\n",
-                       '', 'Min', 'Max', 'Average', 'Exp Average');
+                    thinLine();
+                    printf("%-15s%-10s%-10s%-10s%-10s\n",
+                           '', 'Min', 'Max', 'Average', 'Exp Average');
 
-                foreach my $format ( @reportFormats )
-                {
-                    my $varname =  $format->{'varname'};
-                    if( defined( $ref->{'Min' . $varname} ) )
+                    foreach my $format ( @reportFormats )
                     {
-                        printf("%-15s%-10d%-10d%-10.1f%-10.1f\n",
-                               $format->{'label'},
-                               $ref->{'Min' . $varname},
-                               $ref->{'Max' . $varname},
-                               $ref->{'Avg' . $varname},
-                               $ref->{'ExpAvg' . $varname});
+                        my $varname =  $format->{'varname'};
+                        if( defined( $ref->{'Min' . $varname} ) )
+                        {
+                            printf("%-15s%-10d%-10d%-10.1f%-10.1f\n",
+                                   $format->{'label'},
+                                   $ref->{'Min' . $varname},
+                                   $ref->{'Max' . $varname},
+                                   $ref->{'Avg' . $varname},
+                                   $ref->{'ExpAvg' . $varname});
+                        }
                     }
-                }
 
-                thinLine();
-                printf("\n");
+                    thinLine();
+                    printf("\n");
+                }
             }
         }
     }
@@ -254,7 +275,12 @@ sub collectStats
             if( $config_tree->getNodeParam( $ctoken, 'ds-type' )
                 eq 'collector' )
             {
-                $stats->{'collectorLeaves'}++;
+                my $instance =
+                    $config_tree->getNodeParam
+                    ( $ctoken, 'collector-instance' );
+                
+                $stats->{'collectorLeaves'}{$instance}++;
+                
                 my $type = 'c:' .
                     $config_tree->getNodeParam( $ctoken, 'collector-type' );
 
@@ -264,10 +290,10 @@ sub collectStats
 
                 my $offset = $config_tree->
                     getNodeParam( $ctoken, 'collector-timeoffset' );
-                $offset = int($offset) % $period;
-
+                
                 $stats->{'leavesPerType'}{$type}++;
-                $stats->{'collectorSchedule'}{$period}{$offset}{$type}++;
+                $stats->{'collectorSchedule'}{$instance}{$period}{
+                    $offset}{$type}++;
             }
             
             if( defined( $config_tree->getNodeParam( $ctoken, 'monitor' ) ) )
@@ -407,8 +433,8 @@ sub thinLine
     }
     print "\n";
 }
-                
-    
+
+
 
 
 

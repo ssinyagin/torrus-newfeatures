@@ -276,8 +276,9 @@ sub data
 # Periodic task base class
 # Options:
 #   -Period   => seconds    -- cycle period
-#   -Offset   => seconds   -- time offset from even period moments
+#   -Offset   => seconds    -- time offset from even period moments
 #   -Name     => "string"   -- Symbolic name for log messages
+#   -Instance => N          -- instance number
 
 package Torrus::Scheduler::PeriodicTask;
 
@@ -291,6 +292,11 @@ sub new
     my %options = @_;
     bless $self, $class;
 
+    if( not defined( $options{'-Instance'} ) )
+    {
+        $options{'-Instance'} = 0;
+    }
+
     %{$self->{'options'}} = %options;
 
     $self->{'options'}{'-Period'} = 0 unless
@@ -298,7 +304,7 @@ sub new
 
     $self->{'options'}{'-Offset'} = 0 unless
         defined( $self->{'options'}{'-Offset'} );
-
+        
     $self->{'options'}{'-Name'} = "PeriodicTask" unless
         defined( $self->{'options'}{'-Name'} );
 
@@ -440,6 +446,13 @@ sub name
     return $self->{'options'}->{'-Name'};
 }
 
+sub instance
+{
+    my $self = shift;
+    return $self->{'options'}->{'-Instance'};
+}
+
+
 sub whenStarted
 {
     my $self = shift;
@@ -450,7 +463,8 @@ sub whenStarted
 sub id
 {
     my $self = shift;
-    return join(':', 'P', $self->name(), $self->period(), $self->offset());
+    return join(':', 'P', $self->name(), $self->instance(),
+                $self->period(), $self->offset());
 }
 
 sub setStatValue

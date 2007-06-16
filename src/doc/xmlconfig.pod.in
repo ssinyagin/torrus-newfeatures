@@ -323,12 +323,8 @@ The parameter substitution is performed at runtime. The substitution formula
 may be defined at a higher subtree level, and the substitution itself will
 occur at leaf level.
 
-Currently parameter substitution is supported for the following parameters:
-  data-file data-dir rrd-ds rpn-expr rrd-create-max rrd-create-min
-  monitor-vars comment graph-title graph-legend descriptive-nickname
-  collector-timeoffset-hashstring collector-scale
-  lower-limit normal-level upper-limit transform-value
-
+The parameter substitution is performed only to those paraneters
+which are defined with the property "expand".
 
 =head3 Common parameters
 
@@ -676,6 +672,19 @@ They define the limits and the step for collector timeoffset dispersion.
 
 Mandatory when C<collector-dispersed-timeoffset> is set to C<yes>.
 Defines the string that is used as a hash for timeoffset dispersion.
+
+=item * C<collector-instance-hashstring>
+
+Mandatory.
+Defines the string that is used as a hash to calculate the collector
+instance number for a particular leaf.
+By default it is defined as C<%system-id%>, so that
+the same collector instance deals with every remote system.
+
+=item * C<collector-instance>
+
+Mandatiry. The parameter defines the collector instance number.
+This parameter is automatically calculated by the configuration compiler.
 
 =item * C<transform-value>
 

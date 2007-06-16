@@ -62,6 +62,9 @@ sub new
     $self->{'mayRunCollector'} =
         Torrus::SiteConfig::mayRunCollector( $self->treeName() );
 
+    $self->{'collectorInstances'} =
+        Torrus::SiteConfig::collectorInstances( $self->treeName() );
+    
     return $self;
 }
 
@@ -442,6 +445,31 @@ sub postProcessNodes
             }
             elsif( $dsType eq 'collector' and $self->{'mayRunCollector'} )
             {
+                # Split the collecting job between collector instances
+                my $instance = 0;
+                my $nInstances = $self->{'collectorInstances'};
+
+                my $oldOffset =
+                    $self->getNodeParam($token, 'collector-timeoffset');
+                my $newOffset = $oldOffset;
+                
+                my $period =
+                    $self->getNodeParam($token, 'collector-period');
+                
+                if( $nInstances > 1 )
+                {
+                    my $hashString =
+                        $self->getNodeParam($token,
+                                            'collector-instance-hashstring');
+                    
+                    $instance =
+                        unpack( 'N', md5( $hashString ) ) % $nInstances;
+                }          
+
+                $self->setNodeParam( $token,
+                                     'collector-instance',
+                                     $instance );
+                
                 my $dispersed =
                     $self->getNodeParam($token,
                                         'collector-dispersed-timeoffset');
@@ -484,19 +512,30 @@ sub postProcessNodes
                             my $step = $p{'collector-timeoffset-step'};
                             my $hashString =
                                 $p{'collector-timeoffset-hashstring'};
-
-                            my $bucketSize = int( ($max - $min) / $step );
-                            my $offset = $min +
-                                $step * ( unpack( 'N', md5( $hashString ) ) %
-                                          $bucketSize );
                             
-                            #Debug('Hashed offset ' . $offset . ' for ' .
-                            #      $token);
-                            $self->setNodeParam( $token,
-                                                 'collector-timeoffset',
-                                                 $offset );
+                            my $bucketSize = int( ($max - $min) / $step );
+                            $newOffset =
+                                $min
+                                +
+                                $step * ( unpack( 'N', md5( $hashString ) ) %
+                                          $bucketSize )
+                                +
+                                $instance * int( $step / $nInstances );
                         }
                     }
+                }
+                else
+                {
+                    $newOffset += $instance * int( $period / $nInstances ); 
+                } 
+
+                $newOffset %= $period;
+                
+                if( $newOffset != $oldOffset )
+                {
+                    $self->setNodeParam( $token,
+                                         'collector-timeoffset',
+                                         $newOffset );
                 }
 
                 my $storagetypes =

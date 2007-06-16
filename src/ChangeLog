@@ -3,7 +3,8 @@
 	* bin/collector.in: Now multiple collector instances can run
 	in a single tree. Need to recompile all trees and re-start the
 	daemons. A new copy of init.d/torrus should be copied
-	in startup scripts directory.
+	in startup scripts directory. Also execute for every tree:
+	torrus si --tree=TREE --clear
 	
 
 2007-06-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

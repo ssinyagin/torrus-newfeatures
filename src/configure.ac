@@ -112,6 +112,10 @@ if test "$enable_pkgonly" != yes; then
      fi
    done
 
+#  Check if Perl threads can be used.
+#  Requirements are: perl 5.8.8 with threads compiled,
+#  threads ver. 1.41 or higher, threads::shared ver. 1.03 or higher
+   
    perlithreads=1
    if test x"$enable_threads" = xno; then
      perlithreads=0     
@@ -121,7 +125,6 @@ if test "$enable_pkgonly" != yes; then
      if ${PERL} ${PERLOPTS} -e 'use 5.8.8' 2>/dev/null; then
        AC_MSG_RESULT([Ok])
      else
-       AC_MSG_RESULT([No. Multithreading will not be used.])
        perlithreads=0
      fi       
 
@@ -130,7 +133,6 @@ if test "$enable_pkgonly" != yes; then
        if ${PERL} ${PERLOPTS} -e 'use threads' 2>/dev/null; then
          AC_MSG_RESULT([Ok])
        else
-         AC_MSG_RESULT([No. Multithreading will not be used.])
          perlithreads=0
        fi
      fi
@@ -141,7 +143,6 @@ if test "$enable_pkgonly" != yes; then
          'use threads; exit($threads::VERSION >= 1.41 ? 0:1)'; then
            AC_MSG_RESULT([Ok])
        else
-           AC_MSG_RESULT([No. Multithreading will not be used.])
            perlithreads=0
        fi
      fi
@@ -153,10 +154,14 @@ if test "$enable_pkgonly" != yes; then
           exit($threads::shared::VERSION >= 1.03 ? 0:1)'; then
            AC_MSG_RESULT([Ok])
        else         
-           AC_MSG_RESULT([No. Multithreading will not be used.])
            perlithreads=0
        fi
      fi
+     
+     if test ${perlithreads} -eq 0; then  
+       AC_MSG_RESULT([No. Multithreading will not be used.])
+     fi
+          
    fi
    AC_SUBST(perlithreads, [${perlithreads}])   
 fi

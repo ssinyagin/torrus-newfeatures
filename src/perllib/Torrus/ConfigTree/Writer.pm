@@ -461,6 +461,12 @@ sub postProcessNodes
                     my $hashString =
                         $self->getNodeParam($token,
                                             'collector-instance-hashstring');
+                    if( not defined( $hashString ) )
+                    {
+                        Error('collector-instance-hashstring is not defined ' .
+                              'in ' . $self->path( $token ));
+                        $hashString = '';
+                    }
                     
                     $instance =
                         unpack( 'N', md5( $hashString ) ) % $nInstances;

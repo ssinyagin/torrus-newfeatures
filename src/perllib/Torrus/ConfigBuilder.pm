@@ -23,6 +23,7 @@ package Torrus::ConfigBuilder;
 
 use strict;
 use XML::LibXML;
+use IO::File;
 
 use Torrus::Log;
 
@@ -499,7 +500,17 @@ sub toFile
     my $self = shift;
     my $filename = shift;
 
-    return $self->{'doc'}->toFile( $filename, 2 );
+    my $fh = new IO::File('> ' . $filename);
+    if( defined( $fh ) )
+    {
+        my $ok = $self->{'doc'}->toFH( $fh, 2 );
+        $fh->close();
+        return $ok;
+    }
+    else
+    {
+        return undef;
+    }
 }
 
 1;

@@ -734,7 +734,7 @@
 
   <template name="cisco-bgp-subtree">
     <param name="data-file">
-      %system-id%_%peer-index%_cbgp.rrd"
+      %system-id%_%peer-index%_cbgp.rrd
     </param>
 
     <param name="rrd-create-dstype" value="GAUGE" />
@@ -784,7 +784,7 @@
 
   <template name="cisco-car-subtree">
     <param name="data-file">
-      %system-id%_%interface-nick%_%car-direction%_%car-index%_ccar.rrd"
+      %system-id%_%interface-nick%_%car-direction%_%car-index%_ccar.rrd
     </param>
 
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>

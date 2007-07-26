@@ -88,7 +88,12 @@ sub generate
             my $rowtime = str2time( $row->{'srv_date'} . 'T' .
                                     $row->{'srv_time'} );
             my $pos = floor( ($rowtime - $self->{'StartUnixTime'}) / $step );
-            my $value = $row->{'value'};
+            my $value = Math::BigFloat->new( $row->{'value'} );
+            if( $value->is_nan() )
+            {
+                $value->bzero();
+                $row->{'value'} = 0;
+            }
             
             if( ( not defined( $aligned[$pos] ) ) or
                 $aligned[$pos] < $value )

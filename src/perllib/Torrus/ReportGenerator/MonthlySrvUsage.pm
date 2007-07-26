@@ -103,7 +103,7 @@ sub generate
 
         # Set undefined values to zero and calculate the average
 
-        my $sum = 0;
+        my $sum = Math::BigFloat->new(0);
         my $unavailCount = 0;
         foreach my $pos ( 0 .. $#aligned )
         {

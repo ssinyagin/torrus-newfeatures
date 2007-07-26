@@ -115,7 +115,6 @@ sub initTarget
     my $ipaddr = getHostIpAddress( $collector, $token );
     if( not defined( $ipaddr ) )
     {
-        $collector->deleteTarget($token);
         return 0;
     }
 

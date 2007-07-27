@@ -81,7 +81,7 @@
     <leaf name="Vtuc_SnrMgn">
       <param name="comment"            value="VTUC SNR Margin" />
       <param name="snmp-object"  value="$cvdslCurrSnrMgn.%ifindex-map%.1" />
-      <!-- param name="collector-scale"    value="10,/" -->
+      <param name="collector-scale"    value="DUP,100,GT,10,1,IF,/" />
       <param name="rrd-ds"             value="VtucSnrMgn" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="hidden"             value="yes" />
@@ -90,7 +90,7 @@
     <leaf name="Vtur_SnrMgn">
       <param name="comment"            value="VTUR SNR Margin" />
       <param name="snmp-object"  value="$cvdslCurrSnrMgn.%ifindex-map%.2" />
-      <!-- param name="collector-scale"    value="10,/" -->
+      <param name="collector-scale"    value="DUP,100,GT,10,1,IF,/" />
       <param name="rrd-ds"             value="VturSnrMgn" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="hidden"             value="yes" />

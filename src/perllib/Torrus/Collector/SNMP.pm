@@ -197,10 +197,7 @@ sub initTargetAttributes
     # There can be several targets with the same host|port|community+oid set.
 
     $cref->{'targets'}{$hosthash}{$oid}{$token} = 1;
-
-    # One representative for each host|port|community triple.
-    # I assume overridiing is faster than checking if it's already there
-    $cref->{'reptoken'}{$hosthash} = $token;
+    $cref->{'activehosts'}{$hosthash} = 1;
 
     $tref->{'oid'} = $oid;
 
@@ -274,42 +271,50 @@ sub snmpSessionArgs
     my $token = shift;
     my $hosthash = shift;
 
+    my $cref = $collector->collectorData( 'snmp' );
+    if( defined( $cref->{'snmpargs'}{$hosthash} ) )
+    {
+        return $cref->{'snmpargs'}{$hosthash};
+    }
+
     my ($ipaddr, $port, $community) = split(/\|/o, $hosthash);
 
     my $version = $collector->param($token, 'snmp-version');
-    my @ret = ( -hostname     => $ipaddr,
+    my $ret = [ -hostname     => $ipaddr,
                 -port         => $port,
                 -timeout      => $collector->param($token, 'snmp-timeout'),
                 -retries      => $collector->param($token, 'snmp-retries'),
-                -version      => $version );
-
+                -version      => $version ];
+    
     foreach my $arg ( qw(-localaddr -localport) )
     {
         if( defined( $collector->param($token, 'snmp' . $arg) ) )
         {
-            push( @ret, $arg, $collector->param($token, 'snmp' . $arg) );
+            push( @{$ret}, $arg, $collector->param($token, 'snmp' . $arg) );
         }
     }
             
     if( $version eq '1' or $version eq '2c' )
     {
-        push( @ret, '-community', $community );
+        push( @{$ret}, '-community', $community );
     }
     else
     {
-        push( @ret, -username, $community);
+        push( @{$ret}, -username, $community);
 
         foreach my $arg ( qw(-authkey -authpassword -authprotocol
                              -privkey -privpassword -privprotocol) )
         {
             if( defined( $collector->param($token, 'snmp' . $arg) ) )
             {
-                push( @ret, $arg, $collector->param($token, 'snmp' . $arg) );
+                push( @{$ret},
+                      $arg, $collector->param($token, 'snmp' . $arg) );
             }
         }
     }
 
-    return @ret;
+    $cref->{'snmpargs'}{$hosthash} = $ret;
+    return $ret;
 }
               
 
@@ -319,9 +324,10 @@ sub openBlockingSession
     my $collector = shift;
     my $token = shift;
     my $hosthash = shift;
-    
+
+    my $args = snmpSessionArgs( $collector, $token, $hosthash );
     my ($session, $error) =
-        Net::SNMP->session( snmpSessionArgs( $collector, $token, $hosthash ),
+        Net::SNMP->session( @{$args},
                             -nonblocking  => 0,
                             -translate    => ['-all', 0, '-octetstring', 1] );
     if( not defined($session) )
@@ -338,8 +344,10 @@ sub openNonblockingSession
     my $token = shift;
     my $hosthash = shift;
 
+    my $args = snmpSessionArgs( $collector, $token, $hosthash );
+    
     my ($session, $error) =
-        Net::SNMP->session( snmpSessionArgs( $collector, $token, $hosthash ),
+        Net::SNMP->session( @{$args},
                             -nonblocking  => 0x1,
                             -translate    => ['-timeticks' => 0] );
     if( not defined($session) )
@@ -560,7 +568,7 @@ sub lookupMap
             if( not $snmpV1Hosts{$hosthash} )
             {
                 $cref->{'mapsDependentTokens'}{$maphash}{$token} = 1;
-                $cref->{'mapsRepToken'}{$maphash} = $token;
+                $cref->{'mapsRelatedMaps'}{$token}{$maphash} = 1;
             }
             
             return $value;
@@ -621,7 +629,7 @@ sub probablyDead
 
     # Stop all collection for this host, until next initTargetAttributes
     # is successful
-    delete $cref->{'reptoken'}{$hosthash};
+    delete $cref->{'activehosts'}{$hosthash};
 
     my $probablyAlive = 1;
 
@@ -665,8 +673,7 @@ sub probablyDead
         {
             $collector->deleteTarget($token);
         }
-        
-        delete $cref->{'reptoken'}{$hosthash};
+                
         delete $hostUnreachableSeen{$hosthash};
         delete $hostUnreachableRetry{$hosthash};
         $unreachableHostDeleted{$hosthash} = 1;
@@ -757,6 +764,12 @@ sub deleteTarget
     }
 
     delete $cref->{'needsRemapping'}{$token};
+    
+    foreach my $maphash ( keys %{$cref->{'mapsRelatedMaps'}{$token}} )
+    {
+        delete $cref->{'mapsDependentTokens'}{$maphash}{$token};
+    }
+    delete $cref->{'mapsRelatedMaps'}{$token};
 }
 
 # Main collector cycle
@@ -774,11 +787,26 @@ sub runCollector
     # within one address
 
     my @sessions;
-    
-    while( my ($hosthash, $token) = each %{$cref->{'reptoken'}} )
+
+    foreach my $hosthash ( keys %{$cref->{'activehosts'}} )
     {
+        my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
+
+        # Find one representative token for the host
+        if( scalar( @oids ) == 0 )
+        {
+            next;
+        }
+        
+        my @reptokens = keys %{$cref->{'targets'}{$hosthash}{$oids[0]}};
+        if( scalar( @reptokens ) == 0 )
+        {
+            next;
+        }
+        my $reptoken = $reptokens[0];
+                    
         my $session =
-            openNonblockingSession( $collector, $token, $hosthash );
+            openNonblockingSession( $collector, $reptoken, $hosthash );
         
         if( not defined($session) )
         {
@@ -792,7 +820,7 @@ sub runCollector
         
         my $oids_per_pdu = $cref->{'oids_per_pdu'}{$hosthash};
 
-        my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
+        
         my @pdu_oids = ();
         my $delay = 0;
         
@@ -951,7 +979,7 @@ sub callback
                 $value eq 'endOfMibView' )
             {
                 Error("Error retrieving $oid from $hosthash: $value");
-
+                
                 foreach my $token ( keys %{$pdu_tokens->{$oid}} )
                 {
                     $collector->deleteTarget($token);
@@ -1023,10 +1051,9 @@ sub postProcess
         
         while( my ( $maphash, $expire ) = each %mapsExpire )
         {
-            if( $expire <= $now and not $mapLookupScheduled{$maphash} and
-                defined( $cref->{'mapsRepToken'}{$maphash} ) )
-            {
-                my ( $hosthash, $map ) = split( /\#/, $maphash );
+            if( $expire <= $now and not $mapLookupScheduled{$maphash} )
+            {                
+                my ( $hosthash, $map ) = split( /\#/o, $maphash );
 
                 if( $unreachableHostDeleted{$hosthash} )
                 {
@@ -1037,13 +1064,22 @@ sub postProcess
                 }
                 else
                 {
+                    # Find one representative token for the map
+                    my @tokens =
+                        keys %{$cref->{'mapsDependentTokens'}{$maphash}};
+                    if( scalar( @tokens ) == 0 )
+                    {
+                        next;
+                    }
+                    my $reptoken = $tokens[0];
+
                     delete $maps{$hosthash}{$map};
 
                     # this will schedule the map retrieval for the next
                     # collector cycle
                     Debug('Refreshing map: ' . $maphash);
                 
-                    lookupMap( $collector, $cref->{'mapsRepToken'}{$maphash},
+                    lookupMap( $collector, $reptoken,
                                $hosthash, $map, undef );
 
                     # After the next collector period, the maps will be

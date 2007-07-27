@@ -1,3 +1,8 @@
+2007-07-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm: removed "reptoken" and
+	optimized the snmp arguments
+
 2007-06-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/collector.in: Now multiple collector instances can run

@@ -119,12 +119,6 @@ sub initTarget
     }
 
     $tref->{'ipaddr'} = $ipaddr;
-
-    if( not defined( $cref->{'mapsLastExpireChecked'} ) )
-    {
-        $cref->{'mapsLastExpireChecked'} = 0;
-        $cref->{'mapsRefreshed'} = [];
-    }
     
     return Torrus::Collector::SNMP::initTargetAttributes( $collector, $token );
 }
@@ -991,6 +985,20 @@ sub postProcess
     my $collector = shift;
     my $cref = shift;
 
+    # It could happen that postProcess is called for a collector which
+    # has no targets, and therefore it's the only place where we can
+    # initialize these variables
+    
+    if( not defined( $cref->{'mapsLastExpireChecked'} ) )
+    {
+        $cref->{'mapsLastExpireChecked'} = 0;
+    }
+
+    if( not defined( $cref->{'mapsRefreshed'} ) )
+    {
+        $cref->{'mapsRefreshed'} = [];
+    }
+    
     # look if some maps are ready after last expiration check
     if( scalar( @{$cref->{'mapsRefreshed'}} ) > 0 )
     {

@@ -791,8 +791,9 @@ sub runCollector
     foreach my $hosthash ( keys %{$cref->{'activehosts'}} )
     {
         my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
-
+        
         # Find one representative token for the host
+        
         if( scalar( @oids ) == 0 )
         {
             next;
@@ -820,7 +821,6 @@ sub runCollector
         
         my $oids_per_pdu = $cref->{'oids_per_pdu'}{$hosthash};
 
-        
         my @pdu_oids = ();
         my $delay = 0;
         
@@ -852,10 +852,13 @@ sub runCollector
                 my $pdu_tokens = {};
                 foreach my $oid ( @pdu_oids )
                 {
-                    foreach my $token
-                        ( keys %{$cref->{'targets'}{$hosthash}{$oid}} )
+                    if( defined( $cref->{'targets'}{$hosthash}{$oid} ) )
                     {
-                        $pdu_tokens->{$oid}{$token} = 1;
+                        foreach my $token
+                            ( keys %{$cref->{'targets'}{$hosthash}{$oid}} )
+                        {
+                            $pdu_tokens->{$oid}{$token} = 1;
+                        }
                     }
                 }
                 my $result =

@@ -85,7 +85,7 @@ if( not $ok or not $indir or scalar( @ARGV ) > 0 )
     print STDERR "Usage: $0 --dir=path options...\n",
     "Options:\n",
     " --dir=path              directory to read RRD files from\n",
-    " --recursive             read the dircories recursively\n",
+    " --recursive             read the directories recursively\n",
     " --filter=re             filter RE for file and directory names\n",
     " --out=filename          output file             [".$outfile."]\n",
     " --subtree=subtree       XML config subtree      [".$topsubtree."]\n",

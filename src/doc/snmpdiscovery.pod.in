@@ -549,6 +549,42 @@ of (I<Inteface name>:I<Input limit>:I<Output limit>) values, for example:
     </param>
   </host>
 
+
+=item * C<RFC2863_IF_MIB::traffic-summaries>,
+C<RFC2863_IF_MIB::traffic-XXX-path>, C<RFC2863_IF_MIB::traffic-XXX-comment>,
+C<RFC2863_IF_MIB::traffic-XXX-interfaces>
+
+Defines traffic summary graphs. A summary graph presents a sum of
+traffic from several interfaces. The interfaces can belong to different
+hosts, but then these hosts should have the same C<output-file> parameter
+value. C<RFC2863_IF_MIB::traffic-summaries> defines a list of summary names,
+C<RFC2863_IF_MIB::traffic-XXX-path> specifies the full path in the
+datasource tree to display the graph, optional
+C<RFC2863_IF_MIB::traffic-XXX-comment> defines a descriptive comment
+for the graph, and C<RFC2863_IF_MIB::traffic-XXX-interfaces> lists the
+interfaces that comprise this sum. The interfaces can be defined at the host
+level in the form C<name, name, ...> or at the global level in the form
+C<host/intf, host/intf, ...>. Example:
+
+  <param name="RFC2863_IF_MIB::traffic-summaries" value="sum1" />
+  <param name="RFC2863_IF_MIB::traffic-sum1-path" value="/Summary/Sum1" />
+  <param name="RFC2863_IF_MIB::traffic-sum1-comment" value="Test summary" />
+
+  <host>
+    <param name="snmp-host" value="router1.network.net"/>
+    <param name="RFC2863_IF_MIB::traffic-sum1-interfaces" 
+             value="GigabitEthernet0_2" />
+    <param name="output-file" value="TEST/core.xml"/>
+  </host>
+
+  <host>
+    <param name="snmp-host" value="router2.network.net"/>
+    <param name="RFC2863_IF_MIB::traffic-sum1-interfaces" 
+             value="GigabitEthernet1_0" />
+    <param name="output-file" value="TEST/core.xml"/>
+  </host>
+
+
 =back
 
 =head3 Other generic MIB parameters

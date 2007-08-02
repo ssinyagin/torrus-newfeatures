@@ -583,6 +583,8 @@ sub removeFromBundle
 {
     my $outfile = shift;
     
+    my $relname  = relXmlFilename($outfile);
+    
     my $removeFromBundle = 1;
         
     if( $forcebundle )
@@ -590,8 +592,7 @@ sub removeFromBundle
         if( defined( $fallback ) and
             -e $outfile and -M $outfile <= $fallback )
         {               
-            Warn('Falling back to the old version of ' .
-                 relXmlFilename($outfile));
+            Warn('Falling back to the old version of ' . $relname);
             $removeFromBundle = 0;
         }
         $everythingsOk = 1;
@@ -601,9 +602,12 @@ sub removeFromBundle
     {
         foreach my $bundleName ( sort keys %outputBundles )
         {
-            delete $outputBundles{$bundleName}{ relXmlFilename($outfile) };
-            Warn('Bundle ' . $bundleName . ' will not have ' .
-                 relXmlFilename($outfile) . ' included because of errors');
+            if( exists( $outputBundles{$bundleName}{$relname} ) )
+            {
+                delete $outputBundles{$bundleName}{$relname};
+                Warn('Bundle ' . $bundleName . ' will not have ' .
+                     $relname . ' included because of errors');
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ In this release:
    Earlier versions are known for memory leaks in multithreaded operation.
 
 -- Multiple collector instances per tree. This improves the CPU utilization
-   foor multi-CPU servers. See the torrus_collector manpage.
+   for multi-CPU servers. See the torrus_collector manpage.
 
 
 

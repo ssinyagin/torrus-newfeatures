@@ -244,6 +244,8 @@ sub read_rrd_dir
     my $filter = shift;
     my $recursive = shift;
 
+    Debug('Reading directory: ' . $indir);
+    
     my @subdirs;
     
     my %dir;
@@ -251,16 +253,21 @@ sub read_rrd_dir
     
     foreach my $file ( keys %dir )
     {
-        next if $file =~ /^\./;
-        next if $file !~ $filter;
+        if( $file =~ /^\./ or $file !~ $filter )
+        {
+            Debug('Skipping ' . $file);
+            next;
+        }
         
         my $mode = $dir{$file}->mode();
         if( S_ISDIR( $mode ) )
         {
+            Debug($file . ' is a directory');
             push( @subdirs, $file );
         }
         elsif( S_ISREG( $mode ) )
         {
+            Debug($file . ' is a regular file');
             if( defined( $infos->{$file} ) )
             {
                 Warn("Duplicate file name: $file");
@@ -276,6 +283,7 @@ sub read_rrd_dir
                 }
                 else
                 {
+                    Debug('Found RRD file: ' . $file);
                     $infos->{$file}->{'fullname'} = $fullname;
                     $infos->{$file}->{'dir'} = $indir;
                     $infos->{$file}->{'rrdinfo'} = $rrdinfo;
@@ -290,7 +298,8 @@ sub read_rrd_dir
     {
         foreach my $subdir ( @subdirs )
         {
-            read_rrd_dir( $infos, $indir . '/' . $subdir, $recursive );
+            read_rrd_dir( $infos, $indir . '/' . $subdir,
+                          $filter, $recursive );
         }
     }
 }

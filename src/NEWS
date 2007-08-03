@@ -1,3 +1,49 @@
+03-AUG-2007: Torrus release 1.0.6
+
+In this release:
+
+-- All the trees need to be recompiled after Torrus upgrade.
+
+-- Search capability. The nodes can be searched within a tree or globally.
+   The search database needs to be updated with "torrus buildsearchdb"
+   utility.
+
+-- GUI improvements. Recursive view is restricted and is not offered
+   averywhere. Bugfix for Mozilla browser compatibility: now the graph
+   images are clickable.
+
+-- devdiscover accepts multiple DDX files. Combined with multithreading,
+   this improves the discovery performance even further.
+
+-- SNMP collector periodically refreshes the table mappings. This helps
+   for modular routers with online insertion and removal: the collector
+   does not need to be restarted after the physical configuration changes.
+   Also the OIDs that return noSuchObject are excluded from polling
+   immediately.
+
+-- New MIBs support: Cisco SCE per-service traffic statistics; Cisco CAR
+   statistics; Cisco Ethernet MAC accounting statistics now available on
+   subinterfaces; JunOS per-CoS stats; support for Alteon hardware.
+
+-- <filepattern> XML statement is no longer supported. Use the rrddir2xml
+   utility instead.
+
+-- The CDEF collector from Chrstian Schnidrig is integrated in the main
+   distribution. Devdiscover supports traffic summaries for multiple
+   interfaces.
+
+-- The report generator can generate HTML in any tree. Earlier it was
+   generating the reports only for the trees where data was collected.
+   This improvement allows to split the collecting and viewing trees.
+
+-- The installer allows multithreading for Perl version 5.8.8 or higher only.
+   Earlier versions are known for memory leaks in multithreaded operation.
+
+-- Multiple collector instances per tree. This improves the CPU utilization
+   foor multi-CPU servers. See the torrus_collector manpage.
+
+
+
 25-JAN-2007: Torrus release 1.0.5
 
 This is a major release with many new features.

@@ -1,3 +1,7 @@
+2007-08-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Torrus release 1.0.6
+
 2007-07-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/SNMP.pm: removed "reptoken" and

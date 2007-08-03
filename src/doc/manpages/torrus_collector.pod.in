@@ -50,6 +50,25 @@ overwritten at the host level.
 
 =over 4
 
+=item B<--instance>=I<N>
+
+Defines the collector instance. A single tree can allow more than one
+collector instance. The number of instances is defined in C<run> hash
+in the F<torrus-siteconfig.pl>'s C<%Torrus::Global::treeConfig>.
+If the number of instances is more than one, this option is mandatory.
+The collecting job is split between the instances, and normally all
+instances should be started by the startup scripts. The tree should
+be re-compiled after the number of instances is changed in the siteconfig.
+In the example below the tree I<tree_A> will be served by three
+collector instances:
+
+  %Torrus::Global::treeConfig = (
+    'tree_A' => {
+      'description' => 'The First Tree',
+      'xmlfiles' => [qw(a1.xml a2.xml a3.xml)],
+      'run' => { 'collector' => 3, 'monitor' => 1 } },
+   );
+
 =item B<--nodaemon>
 
 Prevents the process from becoming a daemon and sets the log to STDERR.

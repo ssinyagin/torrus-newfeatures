@@ -53,6 +53,7 @@ our %oiddef =
      # CISCO-BGP4-MIB
      'cbgpPeerAddrFamilyName'            => '1.3.6.1.4.1.9.9.187.1.2.3.1.3',
      'cbgpPeerAcceptedPrefixes'          => '1.3.6.1.4.1.9.9.187.1.2.4.1.1',
+     'cbgpPeerPrefixAdminLimit'          => '1.3.6.1.4.1.9.9.187.1.2.4.1.3',
      # CISCO-CAR-MIB
      'ccarConfigTable'                   => '1.3.6.1.4.1.9.9.113.1.1.1',
      'ccarConfigType'                    => '1.3.6.1.4.1.9.9.113.1.1.1.1.3',
@@ -304,6 +305,11 @@ sub discover
             $devdetails->storeSnmpVars( $peerTable );
             $devdetails->setCap('CiscoBGP');
 
+            my $limitsTable =
+                $session->get_table( -baseoid =>
+                                     $dd->oiddef('cbgpPeerPrefixAdminLimit') );
+            $limitsTable = {} if not defined( $limitsTable );
+            
             $data->{'cbgpPeers'} = {};
             
             # retrieve AS numbers for neighbor peers
@@ -370,7 +376,11 @@ sub discover
                 }
                 $peer->{'description'} .= '[' . $peerIP . ']';
 
-                $data->{'cbgpPeers'}{$INDEX} = $peer;
+                $peer->{'prefixLimit'} =
+                    $limitsTable->{$dd->oiddef('cbgpPeerPrefixAdminLimit') .
+                                       '.' . $INDEX};
+                    
+                $data->{'cbgpPeers'}{$INDEX} = $peer;                
             }
 
             if( scalar( @nonV4Unicast ) > 0 )
@@ -493,9 +503,8 @@ sub buildConfig
     if( $devdetails->hasCap('CiscoBGP') )
     {
         my $countersNode =
-            $cb->addSubtree( $devNode, 'BGP_Stats',
-                             { 'comment' => 'BGP peer statistics'},
-                             ['CiscoIOS::cisco-bgp-subtree']);
+            $cb->addSubtree( $devNode, 'BGP_Prefixes',
+                             { 'comment' => 'Accepted prefixes'} );
 
         foreach my $INDEX ( sort
                             { $data->{'cbgpPeers'}{$a}{'subtreeName'} <=>
@@ -512,7 +521,14 @@ sub buildConfig
                 'precedence'           => 65000 - $peer->{'peerAS'}
             };
 
-            $cb->addSubtree
+            if( defined( $peer->{'prefixLimit'} ) and
+                $peer->{'prefixLimit'} > 0 )
+            {
+                $param->{'upper-limit'} = $peer->{'prefixLimit'};
+                $param->{'graph-upper-limit'} = $peer->{'prefixLimit'} * 1.03;
+            }
+            
+            $cb->addLeaf
                 ( $countersNode, $peer->{'subtreeName'}, $param,
                   ['CiscoIOS::cisco-bgp'] );
         }

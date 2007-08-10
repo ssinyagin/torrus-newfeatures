@@ -334,10 +334,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-ipsec-flow-globals',
          'source' => 'vendor/cisco.ios.xml'
          },
-     'CiscoIOS::cisco-bgp-subtree' => {
-         'name'   => 'cisco-bgp-subtree',
-         'source' => 'vendor/cisco.ios.xml'
-         },
      'CiscoIOS::cisco-bgp' => {
          'name'   => 'cisco-bgp',
          'source' => 'vendor/cisco.ios.xml'

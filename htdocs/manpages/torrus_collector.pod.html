@@ -58,6 +58,29 @@ overwritten at the host level.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
+<dt><strong><a name="item__2d_2dinstance_3dn"><strong>--instance</strong>=<em>N</em></a></strong><br />
+</dt>
+<dd>
+Defines the collector instance. A single tree can allow more than one
+collector instance. The number of instances is defined in <code>run</code> hash
+in the <em>torrus-siteconfig.pl</em>'s <code>%Torrus::Global::treeConfig</code>.
+If the number of instances is more than one, this option is mandatory.
+The collecting job is split between the instances, and normally all
+instances should be started by the startup scripts. The tree should
+be re-compiled after the number of instances is changed in the siteconfig.
+In the example below the tree <em>tree_A</em> will be served by three
+collector instances:
+</dd>
+<dd>
+<pre>
+  %Torrus::Global::treeConfig = (
+    'tree_A' =&gt; {
+      'description' =&gt; 'The First Tree',
+      'xmlfiles' =&gt; [qw(a1.xml a2.xml a3.xml)],
+      'run' =&gt; { 'collector' =&gt; 3, 'monitor' =&gt; 1 } },
+   );</pre>
+</dd>
+<p></p>
 <dt><strong><a name="item__2d_2dnodaemon"><strong>--nodaemon</strong></a></strong><br />
 </dt>
 <dd>

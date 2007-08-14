@@ -331,11 +331,8 @@ by embracing the parameter name with percent signs:</p>
 <p>The parameter substitution is performed at runtime. The substitution formula
 may be defined at a higher subtree level, and the substitution itself will
 occur at leaf level.</p>
-<p>Currently parameter substitution is supported for the following parameters:
-  data-file data-dir rrd-ds rpn-expr rrd-create-max rrd-create-min
-  monitor-vars comment graph-title graph-legend descriptive-nickname
-  collector-timeoffset-hashstring collector-scale
-  lower-limit normal-level upper-limit transform-value</p>
+<p>The parameter substitution is performed only to those paraneters
+which are defined with the property ``expand''.</p>
 <p>
 </p>
 <h3><a name="common_parameters">Common parameters</a></h3>
@@ -634,7 +631,7 @@ Optional Holt-Winters parameters. Default values are:
 <li><strong><a name="item_collector_2dtype"><code>collector-type</code></a></strong><br />
 </li>
 Mandatory parameter for datasource type <a href="#item_collector"><code>collector</code></a>. Currently supported
-value is: <code>snmp</code>. Other valid values may be added with plugins.
+values are: <code>snmp</code> and <code>cdef</code>. Other valid values may be added with plugins.
 <p></p>
 <li><strong><a name="item_storage_2dtype"><code>storage-type</code></a></strong><br />
 </li>
@@ -668,6 +665,19 @@ They define the limits and the step for collector timeoffset dispersion.
 </li>
 Mandatory when <a href="#item_collector_2ddispersed_2dtimeoffset"><code>collector-dispersed-timeoffset</code></a> is set to <code>yes</code>.
 Defines the string that is used as a hash for timeoffset dispersion.
+<p></p>
+<li><strong><a name="item_collector_2dinstance_2dhashstring"><code>collector-instance-hashstring</code></a></strong><br />
+</li>
+Mandatory.
+Defines the string that is used as a hash to calculate the collector
+instance number for a particular leaf.
+By default it is defined as <code>%system-id%</code>, so that
+the same collector instance deals with every remote system.
+<p></p>
+<li><strong><a name="item_collector_2dinstance"><code>collector-instance</code></a></strong><br />
+</li>
+Mandatiry. The parameter defines the collector instance number.
+This parameter is automatically calculated by the configuration compiler.
 <p></p>
 <li><strong><a name="item_transform_2dvalue"><code>transform-value</code></a></strong><br />
 </li>
@@ -810,9 +820,30 @@ with some non-standard agents which don't implement this OID.
 <p></p>
 <li><strong><a name="item_system_2did"><code>system-id</code></a></strong><br />
 </li>
-Mandatory. Default value: <code>%snmp-host%</code>. Unique identifier of the host.
+Mandatory for every collector type.
+Default value for SNMP collector: <code>%snmp-host%</code>.
+Unique identifier of the host.
 This parameter is used in various template definitions for
-<a href="#item_data_2dfile"><code>data-file</code></a> and <a href="#item_descriptive_2dnickname"><code>descriptive-nickname</code></a>.
+<a href="#item_data_2dfile"><code>data-file</code></a>, <a href="#item_descriptive_2dnickname"><code>descriptive-nickname</code></a> and <a href="#item_collector_2dtimeoffset_2dhashstring"><code>collector-timeoffset-hashstring</code></a>.
+<p></p>
+<li><strong><a name="item_rpn_2dexpr"><code>rpn-expr</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=cdef</code>. The RPN defines an arithmetic expression
+that is used to create a new datasource from several other ones. For example,
+it may define the sum of traffic on several different interfaces.
+<p></p>
+<li><strong><a name="item_cdef_2dcollector_2ddelay"><code>cdef-collector-delay</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=cdef</code>. Defines the delay time in collector
+periods. The collector will read the data from the RPN datasources with the
+specified delay from the current time. <em>cdef-collector-defs.xml</em> sets
+the default value to 0.
+<p></p>
+<li><strong><a name="item_cdef_2dcollector_2dtolerance"><code>cdef-collector-tolerance</code></a></strong><br />
+</li>
+Mandatory when <code>collector-type=cdef</code>. Delay time in collector periods that
+the collector accepts when no recent data is available.
+<em>cdef-collector-defs.xml</em> sets the default value to 2.
 <p></p></ul>
 <p>
 </p>
@@ -1354,7 +1385,7 @@ See <em>RPN expressions in Torrus</em> manual for more details.
 This monitor type implies that the RPN expression is specified in
 <a href="#item_rpn_2dexpr"><code>rpn-expr</code></a> parameter. The current leaf value is prepended to the given RPN.
 <p></p></ul>
-<li><strong><a name="item_rpn_2dexpr"><code>rpn-expr</code></a></strong><br />
+<li><strong><code>rpn-expr</code></strong><br />
 </li>
 Mandatory for monitor type <a href="#item_expression"><code>expression</code></a>. Defines the RPN expression to
 evaluate. The current leaf value is prepended to the given RPN.

@@ -544,6 +544,40 @@ of (<em>Inteface name</em>:<em>Input limit</em>:<em>Output limit</em>) values, f
       ethernet0_0:10:10; ethernet0_1:20:20;
     &lt;/param&gt;
   &lt;/host&gt;</pre>
+<p></p>
+<li><strong><a name="item_rfc2863_if_mib_3a_3atraffic_2dsummaries_2c_c_3crfc"><code>RFC2863_IF_MIB::traffic-summaries</code>,
+<code>RFC2863_IF_MIB::traffic-XXX-path</code>, <code>RFC2863_IF_MIB::traffic-XXX-comment</code>,
+<code>RFC2863_IF_MIB::traffic-XXX-interfaces</code></a></strong><br />
+</li>
+Defines traffic summary graphs. A summary graph presents a sum of
+traffic from several interfaces. The interfaces can belong to different
+hosts, but then these hosts should have the same <a href="#item_output_2dfile"><code>output-file</code></a> parameter
+value. <code>RFC2863_IF_MIB::traffic-summaries</code> defines a list of summary names,
+<code>RFC2863_IF_MIB::traffic-XXX-path</code> specifies the full path in the
+datasource tree to display the graph, optional
+<code>RFC2863_IF_MIB::traffic-XXX-comment</code> defines a descriptive comment
+for the graph, and <code>RFC2863_IF_MIB::traffic-XXX-interfaces</code> lists the
+interfaces that comprise this sum. The interfaces can be defined at the host
+level in the form <code>name, name, ...</code> or at the global level in the form
+<code>host/intf, host/intf, ...</code>. Example:
+<pre>
+  &lt;param name=&quot;RFC2863_IF_MIB::traffic-summaries&quot; value=&quot;sum1&quot; /&gt;
+  &lt;param name=&quot;RFC2863_IF_MIB::traffic-sum1-path&quot; value=&quot;/Summary/Sum1&quot; /&gt;
+  &lt;param name=&quot;RFC2863_IF_MIB::traffic-sum1-comment&quot; value=&quot;Test summary&quot; /&gt;</pre>
+<pre>
+  &lt;host&gt;
+    &lt;param name=&quot;snmp-host&quot; value=&quot;router1.network.net&quot;/&gt;
+    &lt;param name=&quot;RFC2863_IF_MIB::traffic-sum1-interfaces&quot; 
+             value=&quot;GigabitEthernet0_2&quot; /&gt;
+    &lt;param name=&quot;output-file&quot; value=&quot;TEST/core.xml&quot;/&gt;
+  &lt;/host&gt;</pre>
+<pre>
+  &lt;host&gt;
+    &lt;param name=&quot;snmp-host&quot; value=&quot;router2.network.net&quot;/&gt;
+    &lt;param name=&quot;RFC2863_IF_MIB::traffic-sum1-interfaces&quot; 
+             value=&quot;GigabitEthernet1_0&quot; /&gt;
+    &lt;param name=&quot;output-file&quot; value=&quot;TEST/core.xml&quot;/&gt;
+  &lt;/host&gt;</pre>
 <p></p></ul>
 <p>
 </p>
@@ -636,6 +670,15 @@ MAC accounting and Cisco BGP statistics only.
 </li>
 Works the same way as <a href="#item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a> and assigns MAC
 accounting peers to tokensets.
+<p></p>
+<li><strong><a name="item_ciscoios_3a_3adisable_2dcar_2dstats"><code>CiscoIOS::disable-car-stats</code></a></strong><br />
+</li>
+When set to <code>yes</code>, the Committed Access Rate statistics are disabled
+from discovery.
+<p></p>
+<li><strong><a name="item_junos_3a_3adisable_2dcos"><code>JunOS::disable-cos</code></a></strong><br />
+</li>
+When set to <code>yes</code>, the COS statistics are disabled for a Juniper device.
 <p></p>
 <li><strong><a name="item_paradyne_3a_3aslot_2dname"><code>Paradyne::slot-name</code></a></strong><br />
 </li>

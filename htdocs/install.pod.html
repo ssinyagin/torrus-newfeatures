@@ -69,6 +69,14 @@ Perl interpreter should be in PATH environment variable when
 running <code>./configure</code>, otherwise use
 <pre>
   ./configure PERL=/path/to/perl</pre>
+<p>Torrus also supports Perl multithreading in Device Discovery engine and
+in the Collector. Minimum requirements are as follows: Perl version 5.8.8
+or higher, <code>threads</code> module version 1.41 or higher, <code>threads::shared</code> module
+version 1.03 or higher. Older versions had bugs that were leading to
+severe memory leaks and instability. After installing Perl 5.8.8,
+you need to upgrade the <code>threads</code> and <code>threads::shared</code> modules manually
+from CPAN. If any of the requirements is not met, the installer will
+automatically disable the threads support in Torrus.</p>
 <p></p>
 <li><strong><a name="item_rrdtool">RRDtool</a></strong><br />
 </li>

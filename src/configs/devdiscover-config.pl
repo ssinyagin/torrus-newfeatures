@@ -69,6 +69,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::OracleDatabase',
      'Torrus::DevDiscover::Paradyne',          # needs testing
      'Torrus::DevDiscover::RFC1697_RDBMS',
+     'Torrus::DevDiscover::Symmetricom',
      'Torrus::DevDiscover::UcdSnmp',
      'Torrus::DevDiscover::Xylan'
      );
@@ -912,6 +913,11 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Paradyne::paradyne-xdsl-interface' => {
          'name'   => 'paradyne-xdsl-interface',
          'source' => 'vendor/paradyne.xdsl.xml'
+         },
+     #### Symmetricom
+     'Symmetricom::ntp-stats' => {
+         'name'   => 'ntp-stats',
+         'source' => 'vendor/symmetricom.xml'
          },
      );
 

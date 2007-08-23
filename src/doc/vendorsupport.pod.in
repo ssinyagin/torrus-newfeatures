@@ -172,6 +172,10 @@ Database engine statistics.
 
 xDSL statistics and line status.
 
+=item * Symmetricom NTP appliance
+
+NTP clock statistics
+
 =item * UCD SNMP and Net-SNMP
 
 Memory, CPU, and disk usage information.

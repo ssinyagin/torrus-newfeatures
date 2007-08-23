@@ -1,3 +1,8 @@
+2007-08-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/Symmetricom.pm:
+	New discovery module for Symmetricom NTP clock (Jon Nistor)
+
 2007-08-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm:

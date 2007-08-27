@@ -68,7 +68,7 @@ Template                - this is template-toolkit
 
 Proc::Daemon
 
-Net::SNMP       4.0.3   - older versions have problems with Ip addressing
+Net::SNMP       5.2.0   - older versions may not work
 
 URI::Escape
 

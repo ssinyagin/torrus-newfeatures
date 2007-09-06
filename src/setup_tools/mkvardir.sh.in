@@ -23,6 +23,7 @@ dir=$1
 user=@var_user@
 group=@var_group@
 mode=@var_mode@
+SHELL=@SHELL@
 
 if test ! -d $dir; then
 

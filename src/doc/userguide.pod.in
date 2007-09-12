@@ -162,11 +162,11 @@ There is a configuration statement that allows you to include other
 XML files into configuration, thus giving you a big flexibility
 in building the data hierarchies.
 
-B<Compile the configuration>. Now that your configuration is
-ready, you need to execute the compiler:
+B<Compile the configuration>. After the XML configuration is prepared, 
+you need to execute the compiler:
 
   torrus compile --tree=treename --verbose
-  
+
 For most of the processes that you run within Torrus, you need to specify
 the tree name with C<--tree> option. Some proramms accept C<--all> option,
 which causes them to process all existing trees.

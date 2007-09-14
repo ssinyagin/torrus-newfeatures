@@ -13,6 +13,7 @@
 <H1>Global Search results: [% global.SearchString %]</H1>
 <DIV CLASS="Listing">
 [% results = searchResults( global.SearchString );
+   counter = 0;
 
    FOREACH entry = results;
 

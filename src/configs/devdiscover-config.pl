@@ -768,8 +768,72 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'junos-cos-subtree',
          'source'   => 'vendor/junos.xml',
      },
+     'JunOS::junos-cos-subtree-interface' => {
+         'name'     => 'junos-cos-subtree-interface',
+         'source'   => 'vendor/junos.xml',
+     },
      'JunOS::junos-cos-leaf' => {
          'name'     => 'junos-cos-leaf',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-cos-red' => {
+         'name'     => 'junos-cos-red',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-cos-tail' => {
+         'name'     => 'junos-cos-tail',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-cpu-subtree' => {
+         'name'     => 'junos-cpu-subtree',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-cpu' => {
+         'name'     => 'junos-cpu',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-firewall-subtree' => {
+         'name'     => 'junos-firewall-subtree',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-firewall-filter-subtree' => {
+         'name'     => 'junos-firewall-filter-subtree',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-firewall-filter' => {
+         'name'     => 'junos-firewall-filter',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-firewall-filter-counter' => {
+         'name'     => 'junos-firewall-filter-counter',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-firewall-filter-policer' => {
+         'name'     => 'junos-firewall-filter-policer',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-memory-subtree' => {
+         'name'     => 'junos-memory-subtree',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-memory' => {
+         'name'     => 'junos-memory',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-rpf-subtree' => {
+         'name'     => 'junos-rpf-subtree',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-rpf' => {
+         'name'     => 'junos-rpf',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-temperature-subtree' => {
+         'name'     => 'junos-temperature-subtree',
+         'source'   => 'vendor/junos.xml',
+     },
+     'JunOS::junos-temperature-sensor' => {
+         'name'     => 'junos-temperature-sensor',
          'source'   => 'vendor/junos.xml',
      },
      

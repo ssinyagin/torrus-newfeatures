@@ -50,6 +50,7 @@ dist_vendor_DATA = \
 	vendor/netapp.filer.xml \
 	vendor/netscreen.xml \
 	vendor/paradyne.xdsl.xml \
+	vendor/symmetricom.xml \
 	vendor/ucd.ucd-snmp.xml
 
 genericdir    =  $(distxmldir)/generic

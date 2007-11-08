@@ -619,9 +619,14 @@ sub buildConfig
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
+        if( $interface->{'selectorActions'}{'RemoveInterface'} )
+        {
+            $interface->{'excluded'} = 1;
+        }
+
         # Some vendor-specific modules may exclude some interfaces
         next if $interface->{'excluded'};
-        
+
         # Create a subtree for the interface
         my $subtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
 
@@ -1181,6 +1186,7 @@ our %knownSelectorActions =
       'HoltWinters'       => 'RFC2863_IF_MIB',
       'NoPacketCounters'  => 'RFC2863_IF_MIB',
       'NoErrorCounters'   => 'RFC2863_IF_MIB',
+      'RemoveInterface'   => 'RFC2863_IF_MIB',
       'TokensetMember'    => 'RFC2863_IF_MIB',
       'Parameters'        => 'RFC2863_IF_MIB' );
 

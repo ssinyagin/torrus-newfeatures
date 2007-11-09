@@ -509,7 +509,7 @@ sub buildChildrenConfigs
                 my $ifIndex    = $policyRef->{'cbQosIfIndex'};
                 my $interface  = $data->{'interfaces'}{$ifIndex};
 
-                if( defined( $interface ) )
+                if( defined( $interface ) and not $interface->{'excluded'} )
                 {
                     my $interfaceName = $interface->{'ifDescr'};
                     $param->{'cbqos-interface-name'} = $interfaceName;

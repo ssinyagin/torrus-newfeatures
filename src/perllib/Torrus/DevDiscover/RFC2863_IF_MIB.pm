@@ -622,6 +622,8 @@ sub buildConfig
         if( $interface->{'selectorActions'}{'RemoveInterface'} )
         {
             $interface->{'excluded'} = 1;
+            Debug('Removing interface by selector action: ' .
+                  $interface->{$data->{'nameref'}{'ifReferenceName'}});
         }
 
         # Some vendor-specific modules may exclude some interfaces
@@ -1214,7 +1216,7 @@ sub applySelectorAction
     }
     else
     {
-        Error('Unknown CiscoSensor selector action: ' . $action);
+        Error('Unknown RFC2863_IF_MIB selector action: ' . $action);
     }
 }
    

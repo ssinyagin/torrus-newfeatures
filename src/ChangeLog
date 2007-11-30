@@ -1,3 +1,9 @@
+2007-11-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/defaults.xml: Default collector-timeoffset-step increased
+	from 30 to 60 seconds. 30 seconds is too short for too many
+	installations.
+
 2007-11-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):

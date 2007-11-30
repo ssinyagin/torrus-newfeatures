@@ -95,7 +95,7 @@
   <param name="collector-timeoffset-hashstring" value="%system-id%" />
   <param name="collector-timeoffset-min" value="0" />
   <param name="collector-timeoffset-max" value="300" />
-  <param name="collector-timeoffset-step" value="30" />
+  <param name="collector-timeoffset-step" value="60" />
 
   <param name="collector-instance-hashstring" value="%system-id%" />
 

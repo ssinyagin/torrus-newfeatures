@@ -131,11 +131,11 @@ sub generate
         my $pcPos = floor( $nDatapoints * $percentile / 100 );
         my $pcVal = $sorted[$pcPos];
 
-        # Calculate the total volume, if it's a counter
+        # Calculate the total volume if it's a counter
         my $volume = Math::BigFloat->new(0);
         my $volumeDefined = 0;
         if( not defined( $params->{'dstype'} ) or
-            $params->{'dstype'} =~ /^COUNTER/ )
+            $params->{'dstype'} =~ /^COUNTER/o )
         {
             $volumeDefined = 1;
             foreach my $row ( @{$data} )

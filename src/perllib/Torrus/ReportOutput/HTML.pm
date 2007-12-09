@@ -214,9 +214,15 @@ sub render
         'yearlyUrl' => sub {
             return $self->reportUrl($self->yearlyFilename($_[0]));},
         'monthName' => sub {$self->monthName($_[0]);},
-        'formatValue' => sub {return sprintf('%.2f %s',
-                                             $_[0]->{'value'},
-                                             $_[0]->{'units'})},
+        'formatValue' => sub {
+            if( ref($_[0]))
+            {
+                return sprintf('%.2f %s', $_[0]->{'value'}, $_[0]->{'units'});
+            }
+            else
+            {
+                return 'N/A';
+            }},
         'timestamp'  => sub { return time2str($Torrus::Renderer::timeFormat,
                                               time()); },
     };

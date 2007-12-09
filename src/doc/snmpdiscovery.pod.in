@@ -686,6 +686,14 @@ accounting peers to tokensets.
 When set to C<yes>, the Committed Access Rate statistics are disabled
 from discovery.
 
+=item * C<CiscoSCE::disable-disk>, C<CiscoSCE::disable-gc>,
+    C<CiscoSCE::disable-qos>, C<CiscoSCE::disable-rdr>,
+    C<CiscoSCE::disable-subs>, C<CiscoSCE::disable-tp>
+
+If set to C<yes>, the corresponding statistics are excluded from Cisco SCE
+graphs.
+
+    
 =item * C<JunOS::disable-cos>, C<JunOS::disable-cos-red>,
 C<JunOS::disable-cos-tail>, C<JunOS::disable-firewall>,
 C<JunOS::disable-operating>, C<JunOS::disable-rpf>

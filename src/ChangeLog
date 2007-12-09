@@ -1,3 +1,8 @@
+2007-12-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoSCE.pm: New discovery parameters:
+	CiscoSCE::disable-*** (Jon Nistor)
+
 2007-11-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* xmlconfig/defaults.xml: Default collector-timeoffset-step increased

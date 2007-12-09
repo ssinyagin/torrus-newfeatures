@@ -21,7 +21,14 @@
 # $Id$
 # Jon Nistor <nistor at snickers dot org>
 #
-
+# NOTE: Options for this module
+#       CiscoSCE::disable-disk
+#       CiscoSCE::disable-gc
+#       CiscoSCE::disable-qos
+#       CiscoSCE::disable-rdr
+#       CiscoSCE::disable-subs
+#       CiscoSCE::disable-tp
+#
 
 # Cisco SCE devices discovery
 package Torrus::DevDiscover::CiscoSCE;
@@ -35,7 +42,7 @@ $Torrus::DevDiscover::registry{'CiscoSCE'} = {
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig
-    };
+};
 
 # pmodule-dependend OIDs are presented for module #1 only.
 # currently devices with more than one module do not exist
@@ -63,7 +70,7 @@ our %oiddef =
      # CISCO-SCAS-BB-MIB (PCUBE-ENGAGE-MIB)
      'globalScopeServiceCounterName' => '1.3.6.1.4.1.5655.4.2.5.1.1.3.1',
      
-     );
+    );
 
 our %sceChassisNames =
     (
@@ -104,7 +111,7 @@ sub checkdevtype
               'devices');
         return 0;
     }
-            
+    
     $devdetails->setCap('interfaceIndexingPersistent');
 
     return 1;
@@ -133,102 +140,131 @@ sub discover
         " chassis, " . $sceModuleDesc{$sceInfo->{'pmoduleType'}} .
         ", Hw Serial#: " . $sceInfo->{'pmoduleSerialNumber'};
     
-    $data->{'sceTrafficProcessors'} =
-        $sceInfo->{'pmoduleNumTrafficProcessors'};
+    # TP: Traffic Processor
+    if( $devdetails->param('CiscoSCE::disable-tp') ne 'yes' )
+    { 
+        $devdetails->setCap('sceTP');
 
-    # Check if the installation is subscriber-aware
-    
-    if( $sceInfo->{'subscribersNumIpAddrMappings'} > 0 or
-        $sceInfo->{'subscribersNumIpRangeMappings'} > 0 or
-        $sceInfo->{'subscribersNumVlanMappings'} > 0 or
-        $sceInfo->{'subscribersNumAnonymous'} > 0 )
+        $data->{'sceTrafficProcessors'} =
+            $sceInfo->{'pmoduleNumTrafficProcessors'};
+    }
+
+    # HDD: Disk Usage
+    if( $devdetails->param('CiscoSCE::disable-disk') ne 'yes' )
     {
-        $devdetails->setCap('sceSubscribers');
+        $devdetails->setCap('sceDisk');
+    }
+
+    # SUBS: subscriber aware configuration
+    if( $devdetails->param('CiscoSCE::disable-subs') ne 'yes' )
+    {
+        if( $sceInfo->{'subscribersNumIpAddrMappings'}  > 0 or
+            $sceInfo->{'subscribersNumIpRangeMappings'} > 0 or
+            $sceInfo->{'subscribersNumVlanMappings'}    > 0 or
+            $sceInfo->{'subscribersNumAnonymous'}       > 0 )
+        {
+            $devdetails->setCap('sceSubscribers');
+        }
     }
     
-    # Get the names of TX queues
     
-    my $txQueueNum = $session->get_table
-        ( -baseoid => $dd->oiddef('pportNumTxQueues') );
-    
-     $devdetails->storeSnmpVars( $txQueueNum );
-    
-    my $ifIndexTable = $session->get_table
-        ( -baseoid => $dd->oiddef('pportIfIndex') );
+    # QOS: TX Queues Names
+    if( $devdetails->param('CiscoSCE::disable-qos') ne 'yes' )
+    { 
+        $devdetails->setCap('sceQos');
 
-    my $txQueueDesc = $session->get_table
-        ( -baseoid => $dd->oiddef('txQueuesDescription') );
-    
-    $devdetails->storeSnmpVars( $txQueueDesc );
-    
-    foreach my $pIndex
-        ( $devdetails->getSnmpIndices( $dd->oiddef('pportNumTxQueues') ) )
-    {
-        # We take ports with more than one queue and add queueing
-        # statistics to interface counters
-        if( $txQueueNum->{$dd->oiddef('pportNumTxQueues') .
-                              '.' . $pIndex} > 1 )
+        # Get the names of TX queues
+        my $txQueueNum = $session->get_table
+            ( -baseoid => $dd->oiddef('pportNumTxQueues') );
+        $devdetails->storeSnmpVars( $txQueueNum );
+        
+        my $ifIndexTable = $session->get_table
+            ( -baseoid => $dd->oiddef('pportIfIndex') );
+
+        my $txQueueDesc = $session->get_table
+            ( -baseoid => $dd->oiddef('txQueuesDescription') );
+        
+        $devdetails->storeSnmpVars( $txQueueDesc );
+        
+        foreach my $pIndex
+            ( $devdetails->getSnmpIndices( $dd->oiddef('pportNumTxQueues') ) )
         {
-            # We need the ifIndex to retrieve the interface name
-            
-            my $ifIndex =
-                $ifIndexTable->{$dd->oiddef('pportIfIndex') . '.' . $pIndex};
-
-            $data->{'scePortIfIndex'}{$pIndex} = $ifIndex;
-            
-            foreach my $qIndex
-                ( $devdetails->getSnmpIndices
-                  ( $dd->oiddef('txQueuesDescription') . '.' . $pIndex ) )
+            # We take ports with more than one queue and add queueing
+            # statistics to interface counters
+            if( $txQueueNum->{$dd->oiddef('pportNumTxQueues') .
+                                  '.' . $pIndex} > 1 )
             {
-                my $oid = $dd->oiddef('txQueuesDescription') . '.' .
-                    $pIndex . '.' . $qIndex;
+                # We need the ifIndex to retrieve the interface name
                 
-                $data->{'sceQueues'}{$pIndex}{$qIndex} =
-                    $txQueueDesc->{$oid};
+                my $ifIndex =
+                    $ifIndexTable->{$dd->oiddef('pportIfIndex') . '.'
+                                        . $pIndex};
+
+                $data->{'scePortIfIndex'}{$pIndex} = $ifIndex;
+                
+                foreach my $qIndex
+                    ( $devdetails->getSnmpIndices
+                      ( $dd->oiddef('txQueuesDescription') . '.' . $pIndex ) )
+                {
+                    my $oid = $dd->oiddef('txQueuesDescription') . '.' .
+                        $pIndex . '.' . $qIndex;
+                    
+                    $data->{'sceQueues'}{$pIndex}{$qIndex} =
+                        $txQueueDesc->{$oid};
+                }
             }
         }
     }
 
-    # Get the names of global service counters
 
-    my $counterNames = $session->get_table
-        ( -baseoid => $dd->oiddef('globalScopeServiceCounterName') );
-
-    $devdetails->storeSnmpVars( $counterNames );
-
-    foreach my $gcIndex
-        ( $devdetails->getSnmpIndices
-          ( $dd->oiddef('globalScopeServiceCounterName') ) )
+    # GC: Global Service Counters
+    if( $devdetails->param('CiscoSCE::disable-gc') ne 'yes' )
     {
-        my $oid =
-            $dd->oiddef('globalScopeServiceCounterName') . '.' . $gcIndex;
-        if( length( $counterNames->{$oid} ) > 0 )
+        # Set the Capability for the Global Counters
+        $devdetails->setCap('sceGlobalCounters');
+
+        my $counterNames = $session->get_table
+            ( -baseoid => $dd->oiddef('globalScopeServiceCounterName') );
+        
+        $devdetails->storeSnmpVars( $counterNames );
+        
+        foreach my $gcIndex
+            ( $devdetails->getSnmpIndices
+              ( $dd->oiddef('globalScopeServiceCounterName') ) )
         {
-            $data->{'sceGlobalCounters'}{$gcIndex} = $counterNames->{$oid};
+            my $oid =
+                $dd->oiddef('globalScopeServiceCounterName') . '.' . $gcIndex;
+            if( length( $counterNames->{$oid} ) > 0 )
+            {
+                $data->{'sceGlobalCounters'}{$gcIndex} = $counterNames->{$oid};
+            }
         }
     }
 
-    # Check to see if RDR information is available
-    
-    if( $sceInfo->{'rdrFormatterEnable'} > 0 )
-    {
-        # Set Capability for the RDR section of XML
-        $devdetails->setCap('sceRDR');
-        
-        # Get the names of the RDR Category
-        my $categoryNames = $session->get_table
-            ( -baseoid => $dd->oiddef('rdrFormatterCategoryName') );
-        
-        $devdetails->storeSnmpVars( $categoryNames );
-        
-	foreach my $categoryIndex
-            ( $devdetails->getSnmpIndices
-              ( $dd->oiddef('rdrFormatterCategoryName') ) )
+
+    # RDR: Raw Data Record
+    if( $devdetails->param('CiscoSCE::disable-rdr') ne 'yes' )
+    {   
+        if( $sceInfo->{'rdrFormatterEnable'} > 0 )
         {
-            my $oid =
-                $dd->oiddef('rdrFormatterCategoryName') . '.' . $categoryIndex;
-            $data->{'sceRDR'}{$categoryIndex} = $categoryNames->{$oid};
-	}
+            # Set Capability for the RDR section of XML
+            $devdetails->setCap('sceRDR');
+            
+            # Get the names of the RDR Category
+            my $categoryNames = $session->get_table
+                ( -baseoid => $dd->oiddef('rdrFormatterCategoryName') );
+            
+            $devdetails->storeSnmpVars( $categoryNames );
+            
+            foreach my $categoryIndex
+                ( $devdetails->getSnmpIndices
+                  ( $dd->oiddef('rdrFormatterCategoryName') ) )
+            {
+                my $oid = $dd->oiddef('rdrFormatterCategoryName') . '.'
+                    . $categoryIndex;
+                $data->{'sceRDR'}{$categoryIndex} = $categoryNames->{$oid};
+            }
+        }
     }
     
     return 1;
@@ -242,7 +278,11 @@ sub buildConfig
     my $devNode = shift;
     my $data = $devdetails->data();
 
-    $cb->addTemplateApplication($devNode, 'CiscoSCE::cisco-sce-disk');
+    # Disk Usage information
+    if( $devdetails->hasCap('sceDisk') )
+    {
+        $cb->addTemplateApplication($devNode, 'CiscoSCE::cisco-sce-disk');
+    }
 
     if( $devdetails->hasCap('sceSubscribers') )
     {
@@ -251,82 +291,93 @@ sub buildConfig
     }
 
     # Traffic processors subtree
-    
-    my $tpNode = $cb->addSubtree( $devNode, 'SCE_TrafficProcessors',
-                                  { 'comment' => 'TP usage statistics' },
-                                  [ 'CiscoSCE::cisco-sce-tp-subtree']);
+    if( $devdetails->hasCap('sceTP') )
+    {   
+        my $tpNode = $cb->addSubtree( $devNode, 'SCE_TrafficProcessors',
+                                      { 'comment' => 'TP usage statistics' },
+                                      [ 'CiscoSCE::cisco-sce-tp-subtree']);
 
-    foreach my $tp ( 1 .. $data->{'sceTrafficProcessors'} )
-    {
-        $cb->addSubtree( $tpNode,
-                         sprintf('TP_%d', $tp),
-                         { 'sce-tp-index' => $tp },
-                         ['CiscoSCE::cisco-sce-tp'] );
-    }
-
-    # Queues subtree
-    
-    my $qNode = $cb->addSubtree( $devNode, 'SCE_Queues',
-                                 { 'comment' => 'TX queues usage statistics' },
-                                 [ 'CiscoSCE::cisco-sce-queues-subtree']);
-    
-    foreach my $pIndex ( sort {$a <=> $b} keys %{$data->{'scePortIfIndex'}} )
-    {
-        my $ifIndex = $data->{'scePortIfIndex'}{$pIndex};
-        my $interface = $data->{'interfaces'}{$ifIndex};
-
-        my $portNode =
-            $cb->addSubtree( $qNode,
-                             $interface->{$data->{'nameref'}{'ifSubtreeName'}},
-                             { 'sce-port-index' => $pIndex,
-                               'precedence' => 1000 - $pIndex });
-
-        foreach my $qIndex ( sort {$a <=> $b} keys 
-                             %{$data->{'sceQueues'}{$pIndex}} )
+        foreach my $tp ( 1 .. $data->{'sceTrafficProcessors'} )
         {
-            my $qName = $data->{'sceQueues'}{$pIndex}{$qIndex};
-            my $subtreeName = 'Q' . $qIndex;
-            
-            $cb->addLeaf( $portNode, $subtreeName,
-                          { 'sce-queue-index' => $qIndex,
-                            'comment' => $qName,
-                            'precedence' => 1000 - $qIndex });
+            $cb->addSubtree( $tpNode, sprintf('TP_%d', $tp),
+                             { 'sce-tp-index' => $tp },
+                             ['CiscoSCE::cisco-sce-tp'] );
         }
     }
+
+
+    # QoS queues
+    if( $devdetails->hasCap('sceQos') )
+    { 
+        # Queues subtree
+        my $qNode =
+            $cb->addSubtree( $devNode, 'SCE_Queues',
+                             { 'comment' => 'TX queues usage statistics' },
+                             [ 'CiscoSCE::cisco-sce-queues-subtree']);
+        
+        foreach my $pIndex ( sort {$a <=> $b}
+                             keys %{$data->{'scePortIfIndex'}} )
+        {
+            my $ifIndex = $data->{'scePortIfIndex'}{$pIndex};
+            my $interface = $data->{'interfaces'}{$ifIndex};
+
+            my $portNode =
+                $cb->addSubtree
+                ( $qNode,
+                  $interface->{$data->{'nameref'}{'ifSubtreeName'}},
+                  { 'sce-port-index' => $pIndex,
+                    'precedence' => 1000 - $pIndex });
+            
+            foreach my $qIndex ( sort {$a <=> $b} keys 
+                                 %{$data->{'sceQueues'}{$pIndex}} )
+            {
+                my $qName = $data->{'sceQueues'}{$pIndex}{$qIndex};
+                my $subtreeName = 'Q' . $qIndex;
+                
+                $cb->addLeaf( $portNode, $subtreeName,
+                              { 'sce-queue-index' => $qIndex,
+                                'comment' => $qName,
+                                'precedence' => 1000 - $qIndex });
+            }
+        }
+    } # hasCap sceQos
+
 
     # Global counters
-
-    foreach my $linkIndex ( 1 .. $data->{'sceInfo'}{'pmoduleNumLinks'} )
+    if( $devdetails->hasCap('sceGlobalCounters') )
     {
-        my $gcNode =
-            $cb->addSubtree
-            ( $devNode, 'SCE_Global_Counters_L' . $linkIndex,
-              { 'comment' => 'Global service counters for link #' . $linkIndex
-                },
-              [ 'CiscoSCE::cisco-sce-gc-subtree']);
-        
-        foreach my $gcIndex
-            ( sort {$a <=> $b}
-              keys %{$data->{'sceGlobalCounters'}} )
+        foreach my $linkIndex ( 1 .. $data->{'sceInfo'}{'pmoduleNumLinks'} )
         {
-            my $srvName = $data->{'sceGlobalCounters'}{$gcIndex};
-            my $subtreeName = $srvName;
-            $subtreeName =~ s/\W/_/g;
+            my $gcNode =
+                $cb->addSubtree( $devNode,
+                                 'SCE_Global_Counters_L' . $linkIndex,
+                                 { 'comment' =>
+                                       'Global service counters for link #'
+                                       . $linkIndex
+                                 },
+                                 [ 'CiscoSCE::cisco-sce-gc-subtree']);
             
-            $cb->addSubtree( $gcNode, $subtreeName,
-                             { 'sce-link-index' => $linkIndex,
-                               'sce-gc-index' => $gcIndex,
-                               'comment' => $srvName,
-                               'sce-service-name' => $srvName,
-                               'precedence' => 1000 - $gcIndex,
-                               'searchable' => 'yes'},
-                             [ 'CiscoSCE::cisco-sce-gcounter' ]);
+            foreach my $gcIndex
+                ( sort {$a <=> $b} keys %{$data->{'sceGlobalCounters'}} )
+            {
+                my $srvName = $data->{'sceGlobalCounters'}{$gcIndex};
+                my $subtreeName = $srvName;
+                $subtreeName =~ s/\W/_/g;
+                
+                $cb->addSubtree( $gcNode, $subtreeName,
+                                 { 'sce-link-index'   => $linkIndex,
+                                   'sce-gc-index'     => $gcIndex,
+                                   'comment'          => $srvName,
+                                   'sce-service-name' => $srvName,
+                                   'precedence'       => 1000 - $gcIndex,
+                                   'searchable'       => 'yes'},
+                                 [ 'CiscoSCE::cisco-sce-gcounter' ]);
+            }
         }
-    }
+    } # END hasCap sceGlobalCounters
 
 
     # RDR Formatter reports
-    
     if( $devdetails->hasCap('sceRDR') )
     {
         $cb->addTemplateApplication($devNode, 'CiscoSCE::cisco-sce-rdr');
@@ -355,7 +406,7 @@ sub buildConfig
                                'sce-rdr-comment' => $categoryName },
                              ['CiscoSCE::cisco-sce-rdr-category'] );
         }
-    }    
+    } # END hasCap sceRDR    
 }
 
 1;

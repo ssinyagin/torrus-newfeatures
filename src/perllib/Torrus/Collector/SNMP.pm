@@ -127,7 +127,7 @@ sub initTarget
 
 sub initTargetAttributes
 {
-    my $collector = shift;x
+    my $collector = shift;
     my $token = shift;
 
     my $tref = $collector->tokenData( $token );

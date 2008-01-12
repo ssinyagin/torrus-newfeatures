@@ -45,7 +45,7 @@ $Torrus::DevDiscover::registry{'JunOS'} = {
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig
-    };
+};
 
 
 our %oiddef =
@@ -81,7 +81,62 @@ our %oiddef =
      # Reverse path forwarding
      'jnxRpfStatsPackets'   => '1.3.6.1.4.1.2636.3.17.1.1.1.3'
 
-     );
+    );
+
+
+# Not all interfaces are normally needed to monitor.
+# You may override the interface filtering in devdiscover-siteconfig.pl:
+# redefine $Torrus::DevDiscover::JunOS::interfaceFilter
+# or define $Torrus::DevDiscover::JunOS::interfaceFilterOverlay
+
+our $interfaceFilter;
+our $interfaceFilterOverlay;
+my %junosInterfaceFilter;
+
+if( not defined( $interfaceFilter ) )
+{
+    $interfaceFilter = \%junosInterfaceFilter;
+}
+
+
+# Key is some unique symbolic name, does not mean anything
+# ifType is the number to match the interface type
+# ifDescr is the regexp to match the interface description
+%junosInterfaceFilter =
+    (
+     'lsi' => {
+         'ifType'  => 150,                   # mplsTunnel
+         'ifDescr' => '^lsi$'
+     },
+     
+     'other' => {
+         'ifType'  => 1,                     # other
+     },
+     
+     'loopback' => {
+         'ifType'  => 24,                    # softwareLoopback
+     },
+     
+     'propVirtual' => {
+         'ifType'  => 53,                    # propVirtual
+     },
+     
+     'gre_ipip_pime_pimd_mtun'  => {
+         'ifType'  => 131,                     # tunnel
+         'ifDescr' => '^(gre)|(ipip)|(pime)|(pimd)|(mtun)$'
+     },
+
+     'pd_pe_gr_ip_mt_lt' => {
+         'ifType'  => 131,                     # tunnel
+         'ifDescr' => '^(pd)|(pe)|(gr)|(ip)|(mt)|(lt)-\d+\/\d+\/\d+$'
+     },
+     
+     'ls' => {
+         'ifType'  => 108,                     # pppMultilinkBundle
+         'ifDescr' => '^ls-\d+\/\d+\/\d+$'
+     },
+    );
+
 
 
 sub checkdevtype
@@ -95,6 +150,15 @@ sub checkdevtype
         )
     {
         return 0;
+    }
+
+    &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+        ($devdetails, $interfaceFilter);
+    
+    if( defined( $interfaceFilterOverlay ) )
+    {
+        &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+            ($devdetails, $interfaceFilterOverlay);
     }
 
     $devdetails->setCap('interfaceIndexingPersistent');

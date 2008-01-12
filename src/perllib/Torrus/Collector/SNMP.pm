@@ -214,12 +214,6 @@ sub initTargetAttributes
     {
         $cref->{'nosysuptime'}{$hosthash} = 1;
     }
-
-    if( defined $collector->param($token, 'snmp-max-msg-size') )
-    {
-        $cref->{'max_msg_size'}{$hosthash} =
-            $collector->param($token, 'snmp-max-msg-size');
-    }
     
     return 1;
 }
@@ -343,10 +337,10 @@ sub openBlockingSession
     }
     else
     {
-        if( defined $cref->{'max_msg_size'}{$hosthash} )
+        my $maxmsgsize = $collector->param($token, 'snmp-max-msg-size');
+        if( defined( $maxmsgsize ) and $maxmsgsize > 0 )
         {
-            $session->max_msg_size(
-                $cref->{'max_msg_size'}{$hosthash} );
+            $session->max_msg_size( $maxmsgsize );
         }
     }
     
@@ -394,11 +388,11 @@ sub openNonblockingSession
             }
         }
 
-        if( defined $cref->{'max_msg_size'}{$hosthash} )
+        my $maxmsgsize = $collector->param($token, 'snmp-max-msg-size');
+        if( defined( $maxmsgsize ) and $maxmsgsize > 0 )
         {
-            $session->max_msg_size(
-                $cref->{'max_msg_size'}{$hosthash} );
-        }        
+            $session->max_msg_size( $maxmsgsize );
+        }
     }
     
     return $session;

@@ -831,6 +831,12 @@ the collector cycles. In this case the dynamic maps for the given host
 are automatically rebuilt. This parameter is needed for compatibility
 with some non-standard agents which don't implement this OID.
 
+=item * C<snmp-max-msg-size>
+
+Optional. If defined, it sets the SNMP maximum message size different from
+default 1472 octets (true for UDP/IPv4, see Net::SNMP documentation for more
+information). 
+    
 =item * C<system-id>
 
 Mandatory for every collector type.

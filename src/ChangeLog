@@ -1,3 +1,8 @@
+2008-01-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm, perllib/Torrus/Collector/SNMP.pm:
+	snmp-max-msg-size, new parameter for SNMP session
+
 2007-12-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoSCE.pm: New discovery parameters:

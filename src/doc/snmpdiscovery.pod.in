@@ -301,6 +301,12 @@ template and vendor-specific discovery modules.
 Optional. Default: C<yes>. Devdiscover sets this parameter to C<no> when it
 finds SNMPv2-MIB::sysUpTime variable unavailable in the device.
 
+=item * C<snmp-max-msg-size>
+
+Optional. If defined, it sets the SNMP maximum message size different from
+default 1472 octets (true for UDP/IPv4, see Net::SNMP documentation for more
+information). 
+
 =item * C<host-subtree>
 
 Optional. Defines the datasourse tree path under which the host-specific

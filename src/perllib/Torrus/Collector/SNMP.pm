@@ -54,7 +54,8 @@ $Torrus::Collector::params{'snmp'} = {
     'snmp-object'       => undef,
     'snmp-oids-per-pdu' => undef,
     'snmp-object-type'  => 'OTHER',
-    'snmp-check-sysuptime' => 'yes'
+    'snmp-check-sysuptime' => 'yes',
+    'snmp-max-msg-size' => undef
     };
 
 my $sysUpTime = '1.3.6.1.2.1.1.3.0';
@@ -126,7 +127,7 @@ sub initTarget
 
 sub initTargetAttributes
 {
-    my $collector = shift;
+    my $collector = shift;x
     my $token = shift;
 
     my $tref = $collector->tokenData( $token );
@@ -212,6 +213,12 @@ sub initTargetAttributes
     if( $collector->param($token, 'snmp-check-sysuptime') eq 'no' )
     {
         $cref->{'nosysuptime'}{$hosthash} = 1;
+    }
+
+    if( defined $collector->param($token, 'snmp-max-msg-size') )
+    {
+        $cref->{'max_msg_size'}{$hosthash} =
+            $collector->param($token, 'snmp-max-msg-size');
     }
     
     return 1;
@@ -334,7 +341,15 @@ sub openBlockingSession
     {
         Error('Cannot create SNMP session for ' . $hosthash . ': ' . $error);
     }
-
+    else
+    {
+        if( defined $cref->{'max_msg_size'}{$hosthash} )
+        {
+            $session->max_msg_size(
+                $cref->{'max_msg_size'}{$hosthash} );
+        }
+    }
+    
     return $session;
 }
 
@@ -378,8 +393,14 @@ sub openNonblockingSession
                 Debug('Set SO_RCVBUF to ' . $buflen);
             }
         }
-    }
 
+        if( defined $cref->{'max_msg_size'}{$hosthash} )
+        {
+            $session->max_msg_size(
+                $cref->{'max_msg_size'}{$hosthash} );
+        }        
+    }
+    
     return $session;
 }
 

@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Torrus SNMP Discovery User Guide</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:rurban@x-ray.at" />
 </head>
 
 <body>
@@ -202,41 +204,42 @@ in Torrus distribution in <em>snmp-discovery.dtd</em>.</p>
 </p>
 <h3><a name="xml_elements">XML elements</a></h3>
 <ul>
-<li><strong><a name="item_snmp_2ddiscovery"><code>snmp-discovery</code></a></strong><br />
+<li><strong><a name="item_snmp_2ddiscovery"><code>snmp-discovery</code></a></strong>
+
+<p>Mandatory. The top-level element.</p>
 </li>
-Mandatory. The top-level element.
-<p></p>
-<li><strong><a name="item_file_2dinfo"><code>file-info</code></a></strong><br />
+<li><strong><a name="item_file_2dinfo"><code>file-info</code></a></strong>
+
+<p>Mandatory. It must contain the element <a href="#item_format_2dversion"><code>format-version</code></a>.</p>
 </li>
-Mandatory. It must contain the element <a href="#item_format_2dversion"><code>format-version</code></a>.
-<p></p>
-<li><strong><a name="item_format_2dversion"><code>format-version</code></a></strong><br />
+<li><strong><a name="item_format_2dversion"><code>format-version</code></a></strong>
+
+<p>Mandatory. It must contain a format version currently
+supported by devdiscover. Currently supported version is <code>1.0</code>.</p>
 </li>
-Mandatory. It must contain a format version currently
-supported by devdiscover. Currently supported version is <code>1.0</code>.
-<p></p>
-<li><strong><a name="item_creator_2dinfo"><code>creator-info</code></a></strong><br />
+<li><strong><a name="item_creator_2dinfo"><code>creator-info</code></a></strong>
+
+<p>Optional. May contain the information about the file creator: a human author
+name, or a program.</p>
 </li>
-Optional. May contain the information about the file creator: a human author
-name, or a program.
-<p></p>
-<li><strong><a name="item_param"><code>param</code></a></strong><br />
-</li>
-Some parameters are mandatory. This element defines a global or host-specific
+<li><strong><a name="item_param"><code>param</code></a></strong>
+
+<p>Some parameters are mandatory. This element defines a global or host-specific
 parameter. Mandatory attribute <code>name</code> identifies the parameter,
 and the value is taken eother from <code>value</code> attribute, or from the
-textual content of the element.
+textual content of the element.</p>
 <p><a href="#item_param"><code>param</code></a> element should be the child element of <a href="#item_snmp_2ddiscovery"><code>snmp-discovery</code></a> for global
 parameters or <a href="#item_host"><code>host</code></a> for host-level parameters. Host-level parameters
 override the values of global parameters.</p>
 <p>These parameters are for <code>devdiscover</code> only. They are not Torrus configuration
 parameters, although some of them are directly copied into the generated
 configuration file.</p>
-<p></p>
-<li><strong><a name="item_host"><code>host</code></a></strong><br />
 </li>
-Mandatory. Defines a host to run SNMP discovery.
-<p></p></ul>
+<li><strong><a name="item_host"><code>host</code></a></strong>
+
+<p>Mandatory. Defines a host to run SNMP discovery.</p>
+</li>
+</ul>
 <p>
 </p>
 <h3><a name="common_parameters">Common parameters</a></h3>
@@ -244,148 +247,154 @@ Mandatory. Defines a host to run SNMP discovery.
 <li><strong><a name="item_collector_2dperiod_2c_collector_2dtimeoffset_2c_c_"><code>collector-period</code>, <code>collector-timeoffset</code>,
 <code>collector-dispersed-timeoffset</code>, <code>collector-timeoffset-min</code>,
 <code>collector-timeoffset-max</code>, <code>collector-timeoffset-step</code>,
-<code>monitor-period</code>, <code>monitor-timeoffset</code></a></strong><br />
+<code>monitor-period</code>, <code>monitor-timeoffset</code></a></strong>
+
+<p>Optional. When defined, these parameters override those from <code>snmp-defaults</code>
+template in <em>snmp-defs.xml</em>.</p>
 </li>
-Optional. When defined, these parameters override those from <code>snmp-defaults</code>
-template in <em>snmp-defs.xml</em>.
-<p></p>
-<li><strong><a name="item_output_2dfile"><code>output-file</code></a></strong><br />
+<li><strong><a name="item_output_2dfile"><code>output-file</code></a></strong>
+
+<p>Mandatory. Specifies the output filename for generated Torrus configuration.
+If it's a relative path, the file is placed in <em>/usr/local/etc/torrus/xmlconfig</em> directory.</p>
 </li>
-Mandatory. Specifies the output filename for generated Torrus configuration.
-If it's a relative path, the file is placed in <em>/usr/local/etc/torrus/xmlconfig</em> directory.
-<p></p>
-<li><strong><a name="item_output_2dbundle"><code>output-bundle</code></a></strong><br />
-</li>
-Optional. Specifies a comma-separated list of XML file names for bundle
+<li><strong><a name="item_output_2dbundle"><code>output-bundle</code></a></strong>
+
+<p>Optional. Specifies a comma-separated list of XML file names for bundle
 output. Each bundle file will contain &lt;include&gt; statement for each
-corresponding <a href="#item_output_2dfile"><code>output-file</code></a>.
-<p></p>
+corresponding <a href="#item_output_2dfile"><code>output-file</code></a>.</p>
+</li>
 <li><strong><a name="item_snmp_2dport_2c_snmp_2dcommunity_2c_snmp_2dversion_"><code>snmp-port</code>, <code>snmp-community</code>,  <code>snmp-version</code>, <code>snmp-timeout</code>,
         <code>snmp-retries</code>, <code>snmp-host</code>, <code>snmp-username</code>, <code>snmp-authkey</code>,
         <code>snmp-authpassword</code>, <code>snmp-authprotocol</code>, <code>snmp-privkey</code>,
-        <code>snmp-privpassword</code>, <code>snmp-privprotocol</code></a></strong><br />
-</li>
-Mandatory SNMP session parameters. Authentication parameters depend on the
+        <code>snmp-privpassword</code>, <code>snmp-privprotocol</code></a></strong>
+
+<p>Mandatory SNMP session parameters. Authentication parameters depend on the
 SNMP version used. See the <em>XML Configuration Guide</em> for details.
 These parameters define the SNMP agent properties and are
-copied one-to-one to the output configuration.
-<p></p>
-<li><strong><a name="item_domain_2dname"><code>domain-name</code></a></strong><br />
+copied one-to-one to the output configuration.</p>
 </li>
-Optional. Defines a DNS domain name to be appended to <code>snmp-host</code>.
-<p></p>
-<li><strong><a name="item_snmp_2dlocaladdr_and_snmp_2dlocalport"><code>snmp-localaddr</code> and <code>snmp-localport</code></a></strong><br />
+<li><strong><a name="item_domain_2dname"><code>domain-name</code></a></strong>
+
+<p>Optional. Defines a DNS domain name to be appended to <code>snmp-host</code>.</p>
 </li>
-Optional parameters specifying the local socket binding address and port.
-<p></p>
-<li><strong><a name="item_data_2ddir"><code>data-dir</code></a></strong><br />
+<li><strong><a name="item_snmp_2dlocaladdr_and_snmp_2dlocalport"><code>snmp-localaddr</code> and <code>snmp-localport</code></a></strong>
+
+<p>Optional parameters specifying the local socket binding address and port.</p>
 </li>
-Mandatory. Defines the directory path where RRD files for this host
+<li><strong><a name="item_data_2ddir"><code>data-dir</code></a></strong>
+
+<p>Mandatory. Defines the directory path where RRD files for this host
 are stored. In case if hashed directories are enabled, <a href="#item_data_2ddir"><code>data-dir</code></a> specifies
-the base path under which the hashed subdirectories are created.
-<p></p>
-<li><strong><a name="item_symbolic_2dname"><code>symbolic-name</code></a></strong><br />
+the base path under which the hashed subdirectories are created.</p>
 </li>
-Optional. Determines the host-specific subtree name. If not specified,
+<li><strong><a name="item_symbolic_2dname"><code>symbolic-name</code></a></strong>
+
+<p>Optional. Determines the host-specific subtree name. If not specified,
 the subtree is named by <a href="#item_system_2did"><code>system-id</code></a>, or by <code>snmp-host</code> if system ID is
-not defined.
-<p></p>
-<li><strong><a name="item_system_2did"><code>system-id</code></a></strong><br />
+not defined.</p>
 </li>
-Optional. If defined, it overrides the default value of system ID, which
-is equal to the value of <code>snmp-host</code>.
-<p></p>
-<li><strong><a name="item_snmp_2doids_2dper_2dpdu"><code>snmp-oids-per-pdu</code></a></strong><br />
+<li><strong><a name="item_system_2did"><code>system-id</code></a></strong>
+
+<p>Optional. If defined, it overrides the default value of system ID, which
+is equal to the value of <code>snmp-host</code>.</p>
 </li>
-Optional. When defined, these parameters overwrites the value from the
-template and vendor-specific discovery modules.
-<p></p>
-<li><strong><a name="item_snmp_2dcheck_2dsysuptime"><code>snmp-check-sysuptime</code></a></strong><br />
+<li><strong><a name="item_snmp_2doids_2dper_2dpdu"><code>snmp-oids-per-pdu</code></a></strong>
+
+<p>Optional. When defined, these parameters overwrites the value from the
+template and vendor-specific discovery modules.</p>
 </li>
-Optional. Default: <code>yes</code>. Devdiscover sets this parameter to <code>no</code> when it
-finds SNMPv2-MIB::sysUpTime variable unavailable in the device.
-<p></p>
-<li><strong><a name="item_host_2dsubtree"><code>host-subtree</code></a></strong><br />
+<li><strong><a name="item_snmp_2dcheck_2dsysuptime"><code>snmp-check-sysuptime</code></a></strong>
+
+<p>Optional. Default: <code>yes</code>. Devdiscover sets this parameter to <code>no</code> when it
+finds SNMPv2-MIB::sysUpTime variable unavailable in the device.</p>
 </li>
-Optional. Defines the datasourse tree path under which the host-specific
-subtree is created.
-<p></p>
-<li><strong><a name="item_rrd_2dhwpredict"><code>rrd-hwpredict</code></a></strong><br />
+<li><strong><a name="item_snmp_2dmax_2dmsg_2dsize"><code>snmp-max-msg-size</code></a></strong>
+
+<p>Optional. If defined, it sets the SNMP maximum message size different from
+default 1472 octets (true for UDP/IPv4, see Net::SNMP documentation for more
+information).</p>
 </li>
-Optional. Valid values: <code>yes</code>, <code>no</code>. Determines if Holt-Winters forecasting
-should be enabled for the given host.
-<p></p>
-<li><strong><a name="item_disable_2ddevtypes"><code>disable-devtypes</code></a></strong><br />
+<li><strong><a name="item_host_2dsubtree"><code>host-subtree</code></a></strong>
+
+<p>Optional. Defines the datasourse tree path under which the host-specific
+subtree is created.</p>
 </li>
-Optional. Comma-separated list of discovery device types that need to be
+<li><strong><a name="item_rrd_2dhwpredict"><code>rrd-hwpredict</code></a></strong>
+
+<p>Optional. Valid values: <code>yes</code>, <code>no</code>. Determines if Holt-Winters forecasting
+should be enabled for the given host.</p>
+</li>
+<li><strong><a name="item_disable_2ddevtypes"><code>disable-devtypes</code></a></strong>
+
+<p>Optional. Comma-separated list of discovery device types that need to be
 excluded from discovery process. For example, ATMEL appliances conflict with
 Empire SystemEdge MIBs, and you need to disable <code>EmpireSystemedge</code> module
-in order to run the discovery on those appliances.
-<p></p>
-<li><strong><a name="item_only_2ddevtypes"><code>only-devtypes</code></a></strong><br />
+in order to run the discovery on those appliances.</p>
 </li>
-Optional comma-separated list of device types. If defined, only the specified
-types will be used for device probing.
-<p></p>
-<li><strong><a name="item_host_2daliases"><code>host-aliases</code></a></strong><br />
+<li><strong><a name="item_only_2ddevtypes"><code>only-devtypes</code></a></strong>
+
+<p>Optional comma-separated list of device types. If defined, only the specified
+types will be used for device probing.</p>
 </li>
-Optional comma-separated list of alias paths for a given host. Aliases
-must be unique for each host.
-<p></p>
-<li><strong><a name="item_custom_2dhost_2dtemplates"><code>custom-host-templates</code></a></strong><br />
+<li><strong><a name="item_host_2daliases"><code>host-aliases</code></a></strong>
+
+<p>Optional comma-separated list of alias paths for a given host. Aliases
+must be unique for each host.</p>
 </li>
-Optional comma-separated list of template names that will be applied
-to the resulting XML configuration at the host level.
-<p></p>
-<li><strong><a name="item_host_2dcopy_2dparams"><code>host-copy-params</code></a></strong><br />
+<li><strong><a name="item_custom_2dhost_2dtemplates"><code>custom-host-templates</code></a></strong>
+
+<p>Optional comma-separated list of template names that will be applied
+to the resulting XML configuration at the host level.</p>
 </li>
-Optional comma-separated list of parameter names that should be copied
+<li><strong><a name="item_host_2dcopy_2dparams"><code>host-copy-params</code></a></strong>
+
+<p>Optional comma-separated list of parameter names that should be copied
 from the discovery configuration file to the generated Torrus configuration
-at the host level.
-<p></p>
-<li><strong><a name="item_selectors"><code>selectors</code></a></strong><br />
+at the host level.</p>
 </li>
-Optional comma-separated list of object selectors. They are explained in more
-detail below.
-<p></p>
-<li><strong><a name="item_disable_2dsnmpcollector"><code>disable-snmpcollector</code></a></strong><br />
+<li><strong><a name="item_selectors"><code>selectors</code></a></strong>
+
+<p>Optional comma-separated list of object selectors. They are explained in more
+detail below.</p>
 </li>
-When set to <code>yes</code>, this parameter disables SNMP collection for this
+<li><strong><a name="item_disable_2dsnmpcollector"><code>disable-snmpcollector</code></a></strong>
+
+<p>When set to <code>yes</code>, this parameter disables SNMP collection for this
 host. It is useful for creating custom views, in conjunction with
-<a href="#item_rfc2863_if_mib_3a_3aonly_2dinterfaces"><code>RFC2863_IF_MIB::only-interfaces</code></a> parameter.
-<p></p>
-<li><strong><a name="item_define_2dtokensets"><code>define-tokensets</code></a></strong><br />
+<a href="#item_rfc2863_if_mib_3a_3aonly_2dinterfaces"><code>RFC2863_IF_MIB::only-interfaces</code></a> parameter.</p>
 </li>
-Semicolon-separated (;) list of pairs of tokenset names and descriptions.
-Each tokenset name is followed by colon (:) and the description text:
+<li><strong><a name="item_define_2dtokensets"><code>define-tokensets</code></a></strong>
+
+<p>Semicolon-separated (;) list of pairs of tokenset names and descriptions.
+Each tokenset name is followed by colon (:) and the description text:</p>
 <pre>
   &lt;param name=&quot;define-tokensets&quot;&gt;
     important-graphs: Important Graphs;
     unimportant-graphs: Unimportant Graphs
   &lt;/param&gt;</pre>
-<p></p>
-<li><strong><a name="item_suppress_2dlegend"><code>suppress-legend</code></a></strong><br />
 </li>
-if set to <code>yes</code>, the legend is not shown. It usually has uptime,
-software version, and contact information for the SNMP device.
-<p></p>
-<li><strong><a name="item_comment"><code>comment</code></a></strong><br />
+<li><strong><a name="item_suppress_2dlegend"><code>suppress-legend</code></a></strong>
+
+<p>if set to <code>yes</code>, the legend is not shown. It usually has uptime,
+software version, and contact information for the SNMP device.</p>
 </li>
-Sets the comment string for the host.
-<p></p>
-<li><strong><a name="item_show_2drecursive"><code>show-recursive</code></a></strong><br />
+<li><strong><a name="item_comment"><code>comment</code></a></strong>
+
+<p>Sets the comment string for the host.</p>
 </li>
-Default: <code>yes</code>. When set to <code>no</code>, the link to the recursive view at the
-host level is omitted.
-<p></p>
-<li><strong><a name="item_template_2dregistry_2doverlays"><code>template-registry-overlays</code></a></strong><br />
+<li><strong><a name="item_show_2drecursive"><code>show-recursive</code></a></strong>
+
+<p>Default: <code>yes</code>. When set to <code>no</code>, the link to the recursive view at the
+host level is omitted.</p>
 </li>
-If defined, this should be a comma-separated list of template registry
+<li><strong><a name="item_template_2dregistry_2doverlays"><code>template-registry-overlays</code></a></strong>
+
+<p>If defined, this should be a comma-separated list of template registry
 entries that override the default template references. The overlaying
 templates should be referred in
 <code>%Torrus::DevDiscover::templateOverlays</code>.
 For example, we want to redefine the interface counter template. Then
-in the DDX file, we set
+in the DDX file, we set</p>
 <pre>
   &lt;param name=&quot;template-registry-overlays&quot; value=&quot;my_ifcounters&quot;/&gt;</pre>
 <p>Then in <em>devdiscover-siteconfig.pl</em> we set</p>
@@ -401,68 +410,69 @@ in the DDX file, we set
              'source' =&gt; 'mycustom-rfc2863.if-mib.xml'
              },
          }};</pre>
-<p></p></ul>
+</li>
+</ul>
 <p>
 </p>
 <h3><a name="parameters_for_rfc2863_if_mib">Parameters for <code>RFC2863_IF_MIB</code></a></h3>
 <p>This discovery module is responsible for agent's interfaces table and
 interface counters. Recognized optional parameters are:</p>
 <ul>
-<li><strong><a name="item_rfc2863_if_mib_3a_3asuppress_2dhc_2dcounters"><code>RFC2863_IF_MIB::suppress-hc-counters</code></a></strong><br />
-</li>
-Some agents do not implement 64-bit counters correctly. When this parameter
+<li><strong><a name="item_rfc2863_if_mib_3a_3asuppress_2dhc_2dcounters"><code>RFC2863_IF_MIB::suppress-hc-counters</code></a></strong>
+
+<p>Some agents do not implement 64-bit counters correctly. When this parameter
 is set to <code>yes</code>, 64-bit interface counters are not used for the host.
 For Cisco IOS devices, the <code>CiscoIOS</code> discovery module tries to detect
-such situation automatically.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dname"><code>RFC2863_IF_MIB::subtree-name</code></a></strong><br />
+such situation automatically.</p>
 </li>
-Defines the child subtree name within host-level subtree where interface
-counters are located. Default: <code>Interface_Counters</code>.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dcomment"><code>RFC2863_IF_MIB::subtree-comment</code></a></strong><br />
+<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dname"><code>RFC2863_IF_MIB::subtree-name</code></a></strong>
+
+<p>Defines the child subtree name within host-level subtree where interface
+counters are located. Default: <code>Interface_Counters</code>.</p>
 </li>
-Defines the comment string for interface counters subtree.
-Default: <em>Interface traffic and error counters</em>.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3alist_2dadmindown_2dinterfaces"><code>RFC2863_IF_MIB::list-admindown-interfaces</code></a></strong><br />
+<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dcomment"><code>RFC2863_IF_MIB::subtree-comment</code></a></strong>
+
+<p>Defines the comment string for interface counters subtree.
+Default: <em>Interface traffic and error counters</em>.</p>
 </li>
-If set to <code>yes</code>, interfaces with ifAdminStatus set to other than <code>up(1)</code>
+<li><strong><a name="item_rfc2863_if_mib_3a_3alist_2dadmindown_2dinterfaces"><code>RFC2863_IF_MIB::list-admindown-interfaces</code></a></strong>
+
+<p>If set to <code>yes</code>, interfaces with ifAdminStatus set to other than <code>up(1)</code>
 are included in the discovery results.
-By default, such interfaces are not listed.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3alist_2dnotpresent_2dinterfaces"><code>RFC2863_IF_MIB::list-notpresent-interfaces</code></a></strong><br />
+By default, such interfaces are not listed.</p>
 </li>
-If set to <code>yes</code>, the interfaces with ifOperStatus status set to <code>notPresent(6)</code>
+<li><strong><a name="item_rfc2863_if_mib_3a_3alist_2dnotpresent_2dinterfaces"><code>RFC2863_IF_MIB::list-notpresent-interfaces</code></a></strong>
+
+<p>If set to <code>yes</code>, the interfaces with ifOperStatus status set to <code>notPresent(6)</code>
 are included in the discovery results. By default, such interfaces are
-not listed.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3aexclude_2ddown_2dinterfaces"><code>RFC2863_IF_MIB::exclude-down-interfaces</code></a></strong><br />
+not listed.</p>
 </li>
-If set to <code>yes</code>, the interfaces with ifOperStatus equal to <code>down(2)</code>
-are excluded from the discovery results.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3aexclude_2dinterfaces"><code>RFC2863_IF_MIB::exclude-interfaces</code></a></strong><br />
+<li><strong><a name="item_rfc2863_if_mib_3a_3aexclude_2ddown_2dinterfaces"><code>RFC2863_IF_MIB::exclude-down-interfaces</code></a></strong>
+
+<p>If set to <code>yes</code>, the interfaces with ifOperStatus equal to <code>down(2)</code>
+are excluded from the discovery results.</p>
 </li>
-Comma-separated list of interface names which should be excluded from
+<li><strong><a name="item_rfc2863_if_mib_3a_3aexclude_2dinterfaces"><code>RFC2863_IF_MIB::exclude-interfaces</code></a></strong>
+
+<p>Comma-separated list of interface names which should be excluded from
 configuration. Spaces are allowed between the names and commas.
-The names should be the ones that are used for interface subtrees.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3aonly_2dinterfaces"><code>RFC2863_IF_MIB::only-interfaces</code></a></strong><br />
+The names should be the ones that are used for interface subtrees.</p>
 </li>
-If defined, this parameter specifies the list of interfaces that will be
+<li><strong><a name="item_rfc2863_if_mib_3a_3aonly_2dinterfaces"><code>RFC2863_IF_MIB::only-interfaces</code></a></strong>
+
+<p>If defined, this parameter specifies the list of interfaces that will be
 included in the discovery results. The names should match the interface
 subtree names. Caution: if specified incorrectly, this parameter may
-disable discovery for all interfaces on a device.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a></strong><br />
+disable discovery for all interfaces on a device.</p>
 </li>
-This parameter defines which interfaces' <code>InOut_bps</code> leaves to add to
+<li><strong><a name="item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a></strong>
+
+<p>This parameter defines which interfaces' <code>InOut_bps</code> leaves to add to
 which tokensets. The value is a semicolon-separated (;) list of
 entries of form <em>tset:interface,interface</em>, where <em>tset</em> is a name of the
 tokenset, and the <em>interface</em> is the subtree name of the corresponding
 interface. The token sets must be defined elsewhere in Torrus configuration.
-Example:
+Example:</p>
 <pre>
   &lt;host&gt;
     &lt;param name=&quot;snmp-host&quot; value=&quot;192.168.49.131&quot;/&gt;
@@ -478,14 +488,14 @@ in <code>snmp-host</code> parameter) and slash sign (/):</p>
     &lt;param name=&quot;RFC2863_IF_MIB::tokenset-members&quot;&gt;
      clusters: RTR01/Ethernet0_0, RTR01/FastEthernet2_1;
     &lt;/param&gt;</pre>
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a></strong><br />
 </li>
-Optional comma-separated list of parameter names that would be copied
+<li><strong><a name="item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a></strong>
+
+<p>Optional comma-separated list of parameter names that would be copied
 to the output Torrus configuration at interface level.
 For each parameter <em>param</em>, the value for a particular interface <em>intf</em>
 will be taken from parameter <code>RFC2863_IF_MIB::param::intf</code> in
-the discovery configuration file. Example:
+the discovery configuration file. Example:</p>
 <pre>
   &lt;host&gt;
     &lt;param name=&quot;snmp-host&quot; value=&quot;192.168.49.131&quot;/&gt;
@@ -493,10 +503,10 @@ the discovery configuration file. Example:
     &lt;param name=&quot;RFC2863_IF_MIB::intf-error-threshold::10_1&quot; value=&quot;300&quot;/&gt;
     &lt;param name=&quot;RFC2863_IF_MIB::intf-error-threshold::2_1&quot; value=&quot;900&quot;/&gt;
   &lt;/host&gt;</pre>
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3aifindex_2dmap_2dhint"><code>RFC2863_IF_MIB::ifindex-map-hint</code></a></strong><br />
 </li>
-Optional. For a device that doesn't have a corresponding vendor-specific
+<li><strong><a name="item_rfc2863_if_mib_3a_3aifindex_2dmap_2dhint"><code>RFC2863_IF_MIB::ifindex-map-hint</code></a></strong>
+
+<p>Optional. For a device that doesn't have a corresponding vendor-specific
 discovery module, this parameter would advice <code>devdiscover</code> how to build
 <code>ifTable</code> index mapping. By default, the interfaces are mapped by
 <code>ifDescr</code> variables. For many vendors, this would not give reliable
@@ -505,35 +515,35 @@ The first two suggest the mapping by corresponding SNMP variables, and
 the third one should be used for devices with fixed <code>ifIndex</code> layout: in
 this case, the <code>ifIndex</code> values are recorded as they are at the moment of
 discovery. This option is ignored if the device is supported by a vendor
-specific discovery module.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dname_2dhint"><code>RFC2863_IF_MIB::subtree-name-hint</code></a></strong><br />
+specific discovery module.</p>
 </li>
-Optional. By default, per-interface subtrees are named after the values of
+<li><strong><a name="item_rfc2863_if_mib_3a_3asubtree_2dname_2dhint"><code>RFC2863_IF_MIB::subtree-name-hint</code></a></strong>
+
+<p>Optional. By default, per-interface subtrees are named after the values of
 <code>ifDescr</code> SNMP variables. If this option is set to <code>ifName</code>, this
 SNMP variable would be used for subtree naming. This option is ignored if
-the device is supported by a vendor specific discovery module.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3anoout"><code>RFC2863_IF_MIB::noout</code></a></strong><br />
+the device is supported by a vendor specific discovery module.</p>
 </li>
-If set to <code>yes</code>, all the interface statistics are skipped from
+<li><strong><a name="item_rfc2863_if_mib_3a_3anoout"><code>RFC2863_IF_MIB::noout</code></a></strong>
+
+<p>If set to <code>yes</code>, all the interface statistics are skipped from
 the XML configuration output. Still the interface table is examined and
-the results may be used by other discovery modules.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3abandwidth_2dusage"><code>RFC2863_IF_MIB::bandwidth-usage</code></a></strong><br />
+the results may be used by other discovery modules.</p>
 </li>
-If set to <code>yes</code>, the bandwidth usage percentage will be shown for those
+<li><strong><a name="item_rfc2863_if_mib_3a_3abandwidth_2dusage"><code>RFC2863_IF_MIB::bandwidth-usage</code></a></strong>
+
+<p>If set to <code>yes</code>, the bandwidth usage percentage will be shown for those
 interfaces where two parameters are defined (in megabits per second):
 <code>bandwidth-limit-in</code> and <code>bandwidth-limit-out</code>. These interface
 parameters may be set by <a href="#item_rfc2863_if_mib_3a_3abandwidth_2dlimits"><code>RFC2863_IF_MIB::bandwidth-limits</code></a> discovery
 parameter, or by selectors with the action <a href="#item_parameters"><code>Parameters</code></a>, or by
-setting <a href="#item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a>.
-<p></p>
-<li><strong><a name="item_rfc2863_if_mib_3a_3abandwidth_2dlimits"><code>RFC2863_IF_MIB::bandwidth-limits</code></a></strong><br />
+setting <a href="#item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a>.</p>
 </li>
-Defines the values (in megabits per second) for <code>bandwidth-limit-in</code> and
+<li><strong><a name="item_rfc2863_if_mib_3a_3abandwidth_2dlimits"><code>RFC2863_IF_MIB::bandwidth-limits</code></a></strong>
+
+<p>Defines the values (in megabits per second) for <code>bandwidth-limit-in</code> and
 <code>bandwidth-limit-out</code> interface parameters. Semicolon-separated list
-of (<em>Inteface name</em>:<em>Input limit</em>:<em>Output limit</em>) values, for example:
+of (<em>Inteface name</em>:<em>Input limit</em>:<em>Output limit</em>) values, for example:</p>
 <pre>
   &lt;host&gt;
     &lt;param name=&quot;snmp-host&quot; value=&quot;10.1.1.5&quot;/&gt;
@@ -544,12 +554,12 @@ of (<em>Inteface name</em>:<em>Input limit</em>:<em>Output limit</em>) values, f
       ethernet0_0:10:10; ethernet0_1:20:20;
     &lt;/param&gt;
   &lt;/host&gt;</pre>
-<p></p>
+</li>
 <li><strong><a name="item_rfc2863_if_mib_3a_3atraffic_2dsummaries_2c_c_3crfc"><code>RFC2863_IF_MIB::traffic-summaries</code>,
 <code>RFC2863_IF_MIB::traffic-XXX-path</code>, <code>RFC2863_IF_MIB::traffic-XXX-comment</code>,
-<code>RFC2863_IF_MIB::traffic-XXX-interfaces</code></a></strong><br />
-</li>
-Defines traffic summary graphs. A summary graph presents a sum of
+<code>RFC2863_IF_MIB::traffic-XXX-interfaces</code></a></strong>
+
+<p>Defines traffic summary graphs. A summary graph presents a sum of
 traffic from several interfaces. The interfaces can belong to different
 hosts, but then these hosts should have the same <a href="#item_output_2dfile"><code>output-file</code></a> parameter
 value. <code>RFC2863_IF_MIB::traffic-summaries</code> defines a list of summary names,
@@ -559,7 +569,7 @@ datasource tree to display the graph, optional
 for the graph, and <code>RFC2863_IF_MIB::traffic-XXX-interfaces</code> lists the
 interfaces that comprise this sum. The interfaces can be defined at the host
 level in the form <code>name, name, ...</code> or at the global level in the form
-<code>host/intf, host/intf, ...</code>. Example:
+<code>host/intf, host/intf, ...</code>. Example:</p>
 <pre>
   &lt;param name=&quot;RFC2863_IF_MIB::traffic-summaries&quot; value=&quot;sum1&quot; /&gt;
   &lt;param name=&quot;RFC2863_IF_MIB::traffic-sum1-path&quot; value=&quot;/Summary/Sum1&quot; /&gt;
@@ -578,113 +588,126 @@ level in the form <code>name, name, ...</code> or at the global level in the for
              value=&quot;GigabitEthernet1_0&quot; /&gt;
     &lt;param name=&quot;output-file&quot; value=&quot;TEST/core.xml&quot;/&gt;
   &lt;/host&gt;</pre>
-<p></p></ul>
+</li>
+</ul>
 <p>
 </p>
 <h3><a name="other_generic_mib_parameters">Other generic MIB parameters</a></h3>
 <ul>
-<li><strong><a name="item_rfc2790_host_resources_3a_3asysperf_2dsubtree_2dna"><code>RFC2790_HOST_RESOURCES::sysperf-subtree-name</code></a></strong><br />
+<li><strong><a name="item_rfc2790_host_resources_3a_3asysperf_2dsubtree_2dna"><code>RFC2790_HOST_RESOURCES::sysperf-subtree-name</code></a></strong>
+
+<p>Defines the child subtree name within host-level subtree where system CPU
+and memory statistics are located. Default: <code>System_Performance</code>.</p>
 </li>
-Defines the child subtree name within host-level subtree where system CPU
-and memory statistics are located. Default: <code>System_Performance</code>.
-<p></p></ul>
+</ul>
 <p>
 </p>
 <h3><a name="vendor_parameters">Vendor parameters</a></h3>
 <ul>
-<li><strong><a name="item_ciscogeneric_3a_3adisable_2dcpu_2dstats"><code>CiscoGeneric::disable-cpu-stats</code></a></strong><br />
+<li><strong><a name="item_ciscogeneric_3a_3adisable_2dcpu_2dstats"><code>CiscoGeneric::disable-cpu-stats</code></a></strong>
+
+<p>When set to <code>yes</code>, Cisco CPU usage statistics are excluded from discovery.</p>
 </li>
-When set to <code>yes</code>, Cisco CPU usage statistics are excluded from discovery.
-<p></p>
-<li><strong><a name="item_ciscogeneric_3a_3adisable_2dmemory_2dpools"><code>CiscoGeneric::disable-memory-pools</code></a></strong><br />
-</li>
-When set to <code>yes</code>, Cisco memory pool usage statistics are excluded from
+<li><strong><a name="item_ciscogeneric_3a_3adisable_2dmemory_2dpools"><code>CiscoGeneric::disable-memory-pools</code></a></strong>
+
+<p>When set to <code>yes</code>, Cisco memory pool usage statistics are excluded from
 discovery. For Cisco series 7500, see the note in the
-<em>Torrus Vendor Support List</em>.
-<p></p>
-<li><strong><a name="item_ciscogeneric_3a_3adisable_2dsensors"><code>CiscoGeneric::disable-sensors</code></a></strong><br />
+<em>Torrus Vendor Support List</em>.</p>
 </li>
-When set to <code>yes</code>, Cisco temperature sensors are excluded from discovery.
-<p></p>
-<li><strong><a name="item_ciscogeneric_3a_3ause_2dfahrenheit"><code>CiscoGeneric::use-fahrenheit</code></a></strong><br />
+<li><strong><a name="item_ciscogeneric_3a_3adisable_2dsensors"><code>CiscoGeneric::disable-sensors</code></a></strong>
+
+<p>When set to <code>yes</code>, Cisco temperature sensors are excluded from discovery.</p>
 </li>
-When set to <code>yes</code>, Cisco temperature sensors are recorded and displayed
-in degrees Fahrenheit.
-<p></p>
-<li><strong><a name="item_ciscogeneric_3a_3afile_2dper_2dsensor"><code>CiscoGeneric::file-per-sensor</code></a></strong><br />
+<li><strong><a name="item_ciscogeneric_3a_3ause_2dfahrenheit"><code>CiscoGeneric::use-fahrenheit</code></a></strong>
+
+<p>When set to <code>yes</code>, Cisco temperature sensors are recorded and displayed
+in degrees Fahrenheit.</p>
 </li>
-When set to <code>yes</code>, Cisco temperature sensor values are stored in
+<li><strong><a name="item_ciscogeneric_3a_3afile_2dper_2dsensor"><code>CiscoGeneric::file-per-sensor</code></a></strong>
+
+<p>When set to <code>yes</code>, Cisco temperature sensor values are stored in
 a separate RRD file per sensor ID. This is useful for modular big routers
-like Cisco GSR.
-<p></p>
-<li><strong><a name="item_ciscogeneric_3a_3adisable_2dpsupplies"><code>CiscoGeneric::disable-psupplies</code></a></strong><br />
+like Cisco GSR.</p>
 </li>
-if set to <code>yes</code>, Cisco power supply statistics are not collected.
-<p></p>
-<li><strong><a name="item_ciscogeneric_3a_3apower_2dmonitor"><code>CiscoGeneric::power-monitor</code></a></strong><br />
+<li><strong><a name="item_ciscogeneric_3a_3adisable_2dpsupplies"><code>CiscoGeneric::disable-psupplies</code></a></strong>
+
+<p>if set to <code>yes</code>, Cisco power supply statistics are not collected.</p>
 </li>
-Name of the power supply monitor for Cisco devices.
-<p></p>
-<li><strong><a name="item_ciscoios_3a_3aenable_2dmembuf_2dstats"><code>CiscoIOS::enable-membuf-stats</code></a></strong><br />
+<li><strong><a name="item_ciscogeneric_3a_3apower_2dmonitor"><code>CiscoGeneric::power-monitor</code></a></strong>
+
+<p>Name of the power supply monitor for Cisco devices.</p>
 </li>
-When set to <code>yes</code>, Cisco memory buffer statistics are included to the 
+<li><strong><a name="item_ciscoios_3a_3aenable_2dmembuf_2dstats"><code>CiscoIOS::enable-membuf-stats</code></a></strong>
+
+<p>When set to <code>yes</code>, Cisco memory buffer statistics are included to the 
 discovery. Many IOS releases report faulty information, thus these
-stats are disabled by default.
-<p></p>
-<li><strong><a name="item_ciscoios_3a_3adisable_2dipsec_2dstats"><code>CiscoIOS::disable-ipsec-stats</code></a></strong><br />
+stats are disabled by default.</p>
 </li>
-When set to <code>yes</code>, IPSec statistics are excluded from discovery.
-<p></p>
-<li><strong><a name="item_ciscoios_3a_3adisable_2dbgp_2dstats"><code>CiscoIOS::disable-bgp-stats</code></a></strong><br />
+<li><strong><a name="item_ciscoios_3a_3adisable_2dipsec_2dstats"><code>CiscoIOS::disable-ipsec-stats</code></a></strong>
+
+<p>When set to <code>yes</code>, IPSec statistics are excluded from discovery.</p>
 </li>
-If set to <code>yes</code>, BGP statistics are not included.
-<p></p>
-<li><strong><a name="item_ciscoios_3a_3aenable_2dvlan_2dinterfaces"><code>CiscoIOS::enable-vlan-interfaces</code></a></strong><br />
+<li><strong><a name="item_ciscoios_3a_3adisable_2dbgp_2dstats"><code>CiscoIOS::disable-bgp-stats</code></a></strong>
+
+<p>If set to <code>yes</code>, BGP statistics are not included.</p>
 </li>
-When set to <code>yes</code>, the interfaces VlanXXX are added to statistics.
+<li><strong><a name="item_ciscoios_3a_3aenable_2dvlan_2dinterfaces"><code>CiscoIOS::enable-vlan-interfaces</code></a></strong>
+
+<p>When set to <code>yes</code>, the interfaces VlanXXX are added to statistics.
 By default they are not included, because some hardware platforms give
-irrelevant counter statistics.
-<p></p>
-<li><strong><a name="item_ciscocatos_3a_3asuppress_2dnoname_2dports"><code>CiscoCatOS::suppress-noname-ports</code></a></strong><br />
+irrelevant counter statistics.</p>
 </li>
-When set to <code>yes</code>, only those Catalyst ports are included in configuration
-which have a port name (set up by <code>set port name</code> command).
-<p></p>
-<li><strong><a name="item_ciscoios_macaccounting_3a_3abgponly"><code>CiscoIOS_MacAccounting::bgponly</code></a></strong><br />
+<li><strong><a name="item_ciscocatos_3a_3asuppress_2dnoname_2dports"><code>CiscoCatOS::suppress-noname-ports</code></a></strong>
+
+<p>When set to <code>yes</code>, only those Catalyst ports are included in configuration
+which have a port name (set up by <code>set port name</code> command).</p>
 </li>
-When set to <code>yes</code>, Cisco MAC accounting statistics will be enabled for
-those MACs which correspond to BGP peers only.
-<p></p>
-<li><strong><a name="item_bgp_2das_2ddescription_2dnnnn"><code>bgp-as-description-NNNN</code></a></strong><br />
+<li><strong><a name="item_ciscoios_macaccounting_3a_3abgponly"><code>CiscoIOS_MacAccounting::bgponly</code></a></strong>
+
+<p>When set to <code>yes</code>, Cisco MAC accounting statistics will be enabled for
+those MACs which correspond to BGP peers only.</p>
 </li>
-Specifies a description for an autonomous system number. Currently it's used
-with Cisco MAC accounting and Cisco BGP statistics only.
-<p></p>
-<li><strong><a name="item_peer_2dipaddr_2ddescription_2daaa_aaa_aaa_aaa"><code>peer-ipaddr-description-AAA_AAA_AAA_AAA</code></a></strong><br />
+<li><strong><a name="item_bgp_2das_2ddescription_2dnnnn"><code>bgp-as-description-NNNN</code></a></strong>
+
+<p>Specifies a description for an autonomous system number. Currently it's used
+with Cisco MAC accounting and Cisco BGP statistics only.</p>
 </li>
-Specifies a description for a peer by its IP address. Dots in IP address should
+<li><strong><a name="item_peer_2dipaddr_2ddescription_2daaa_aaa_aaa_aaa"><code>peer-ipaddr-description-AAA_AAA_AAA_AAA</code></a></strong>
+
+<p>Specifies a description for a peer by its IP address. Dots in IP address should
 be replaced with underscores. Currently it's used with Cisco
-MAC accounting and Cisco BGP statistics only.
-<p></p>
-<li><strong><a name="item_ciscoios_macaccounting_3a_3atokenset_2dmembers"><code>CiscoIOS_MacAccounting::tokenset-members</code></a></strong><br />
+MAC accounting and Cisco BGP statistics only.</p>
 </li>
-Works the same way as <a href="#item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a> and assigns MAC
-accounting peers to tokensets.
-<p></p>
-<li><strong><a name="item_ciscoios_3a_3adisable_2dcar_2dstats"><code>CiscoIOS::disable-car-stats</code></a></strong><br />
+<li><strong><a name="item_ciscoios_macaccounting_3a_3atokenset_2dmembers"><code>CiscoIOS_MacAccounting::tokenset-members</code></a></strong>
+
+<p>Works the same way as <a href="#item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a> and assigns MAC
+accounting peers to tokensets.</p>
 </li>
-When set to <code>yes</code>, the Committed Access Rate statistics are disabled
-from discovery.
-<p></p>
-<li><strong><a name="item_junos_3a_3adisable_2dcos"><code>JunOS::disable-cos</code></a></strong><br />
+<li><strong><a name="item_ciscoios_3a_3adisable_2dcar_2dstats"><code>CiscoIOS::disable-car-stats</code></a></strong>
+
+<p>When set to <code>yes</code>, the Committed Access Rate statistics are disabled
+from discovery.</p>
 </li>
-When set to <code>yes</code>, the COS statistics are disabled for a Juniper device.
-<p></p>
-<li><strong><a name="item_paradyne_3a_3aslot_2dname"><code>Paradyne::slot-name</code></a></strong><br />
+<li><strong><a name="item_ciscosce_3a_3adisable_2ddisk_2c_ciscosce_3a_3adisa"><code>CiscoSCE::disable-disk</code>, <code>CiscoSCE::disable-gc</code>,
+    <code>CiscoSCE::disable-qos</code>, <code>CiscoSCE::disable-rdr</code>,
+    <code>CiscoSCE::disable-subs</code>, <code>CiscoSCE::disable-tp</code></a></strong>
+
+<p>If set to <code>yes</code>, the corresponding statistics are excluded from Cisco SCE
+graphs.</p>
+<pre>
+    
+=item * C&lt;JunOS::disable-cos&gt;, C&lt;JunOS::disable-cos-red&gt;,
+C&lt;JunOS::disable-cos-tail&gt;, C&lt;JunOS::disable-firewall&gt;,
+C&lt;JunOS::disable-operating&gt;, C&lt;JunOS::disable-rpf&gt;</pre>
+<p>When set to <code>yes</code>, disables the correspoding statistics category for JunOS
+devices</p>
 </li>
-Mandatory for Paradyne DSLAM devices. It should uniquely identify
-the slot within the device. Any sequence of word characters is allowed.
-<p></p></ul>
+<li><strong><a name="item_paradyne_3a_3aslot_2dname"><code>Paradyne::slot-name</code></a></strong>
+
+<p>Mandatory for Paradyne DSLAM devices. It should uniquely identify
+the slot within the device. Any sequence of word characters is allowed.</p>
+</li>
+</ul>
 <p>See also: <em>Torrus Vendor Support List</em> for the list of supported MIBs and
 vendors.</p>
 <p>
@@ -701,141 +724,144 @@ defines which objects will be searched: IF-MIB interfaces, or Cisco
 temperature sensors, or something else. The parameters are described
 below.</p>
 <ul>
-<li><strong><code>selectors</code></strong><br />
+<li><strong><code>selectors</code></strong>
+
+<p>Comma-separated list of selector names. Further below we use <code>S</code> as
+selector name, <code>A</code> as attribute name, and <code>T</code> as action name.</p>
 </li>
-Comma-separated list of selector names. Further below we use <code>S</code> as
-selector name, <code>A</code> as attribute name, and <code>T</code> as action name.
-<p></p>
-<li><strong><a name="item_s_2dselector_2dtype"><code>S-selector-type</code></a></strong><br />
+<li><strong><a name="item_s_2dselector_2dtype"><code>S-selector-type</code></a></strong>
+
+<p>Type of objects to be selected. Supported values are: <code>RFC2863_IF_MIB</code>,
+<code>CiscoCPU</code>, <code>CiscoSensor</code>.</p>
 </li>
-Type of objects to be selected. Supported values are: <code>RFC2863_IF_MIB</code>,
-<code>CiscoCPU</code>, <code>CiscoSensor</code>.
-<p></p>
-<li><strong><a name="item_s_2dselector_2dexpr"><code>S-selector-expr</code></a></strong><br />
-</li>
-An RPN (reverse Polish notation) expression that defines the
+<li><strong><a name="item_s_2dselector_2dexpr"><code>S-selector-expr</code></a></strong>
+
+<p>An RPN (reverse Polish notation) expression that defines the
 object attributes to be checked and relation between them. Attribute names
 should be specified in curly braces ({}). The rest of the syntax is described
 in <em>RPN expressions in Torrus</em> guide. The attribute names are specific to the
-selector type and are described below.
-<p></p>
-<li><strong><a name="item_s_2da"><code>S-A</code></a></strong><br />
+selector type and are described below.</p>
 </li>
-For a given selector name <code>S</code> and attribute name <code>A</code>,
+<li><strong><a name="item_s_2da"><code>S-A</code></a></strong>
+
+<p>For a given selector name <code>S</code> and attribute name <code>A</code>,
 this parameter defines the attribute value that should be compared
 to the object's properties. In most cases it defines a regular
 expression that should match the value of a corresponding object's
-property.
-<p></p>
-<li><strong><a name="item_s_2dselector_2dactions"><code>S-selector-actions</code></a></strong><br />
+property.</p>
 </li>
-For a given selector name <code>S</code>, this parameter defines a comma-separated
+<li><strong><a name="item_s_2dselector_2dactions"><code>S-selector-actions</code></a></strong>
+
+<p>For a given selector name <code>S</code>, this parameter defines a comma-separated
 list of actions to be applied for objects where <a href="#item_s_2dselector_2dexpr"><code>S-selector-expr</code></a> returns
 true. The action names are specific to the selector type and are
-described below.
-<p></p>
-<li><strong><a name="item_s_2dt_2darg"><code>S-T-arg</code></a></strong><br />
+described below.</p>
 </li>
-For a given selector <code>S</code> and action <code>T</code>, this parameter defines
+<li><strong><a name="item_s_2dt_2darg"><code>S-T-arg</code></a></strong>
+
+<p>For a given selector <code>S</code> and action <code>T</code>, this parameter defines
 an argument that should be passed to the action. Each action
-defines its own meaning of the argument.
-<p></p></ul>
+defines its own meaning of the argument.</p>
+</li>
+</ul>
 <p>
 </p>
 <h3><a name="rfc2863_if_mib_selector">RFC2863_IF_MIB selector</a></h3>
 <p>This type of selector selects the network interfaces on a SNMP device.
 The following attribute names are supported:</p>
 <ul>
-<li><strong><a name="item_ifsubtreename_2c_ifsubtreename1_2c__2e_2e_2e"><code>ifSubtreeName</code>, <code>ifSubtreeName1</code>, ...</a></strong><br />
-</li>
-Interface-level subtree name as you see it in the discovery results.
+<li><strong><a name="item_ifsubtreename_2c_ifsubtreename1_2c__2e_2e_2e"><code>ifSubtreeName</code>, <code>ifSubtreeName1</code>, ...</a></strong>
+
+<p>Interface-level subtree name as you see it in the discovery results.
 You can compose a complex expression of subtree matches, by
-createing attributes with different numbers at the end.
-<p></p>
-<li><strong><a name="item_ifcomment"><code>ifComment</code></a></strong><br />
+createing attributes with different numbers at the end.</p>
 </li>
-Comment string that is defined in <a href="#item_comment"><code>comment</code></a> parameter. It is
-usually derived from an interface description.
-<p></p>
-<li><strong><a name="item_iftype"><code>ifType</code></a></strong><br />
+<li><strong><a name="item_ifcomment"><code>ifComment</code></a></strong>
+
+<p>Comment string that is defined in <a href="#item_comment"><code>comment</code></a> parameter. It is
+usually derived from an interface description.</p>
 </li>
-Numeric IANA interface type, as returned by <a href="#item_iftype"><code>ifType</code></a> SNMP variable.
-<p></p></ul>
+<li><strong><a name="item_iftype"><code>ifType</code></a></strong>
+
+<p>Numeric IANA interface type, as returned by <a href="#item_iftype"><code>ifType</code></a> SNMP variable.</p>
+</li>
+</ul>
 <p><a href="#item_iftype"><code>ifType</code></a> is compared numerically.
 <code>ifSubtreeName</code> and <a href="#item_ifcomment"><code>ifComment</code></a> are regular expressions.
 <code>ifSubtreeName</code> accepts multiple expressions separated by space,
 and the selector matches if any of these expressions matches the subtree name.</p>
 <p>The following actions are supported:</p>
 <ul>
-<li><strong><a name="item_inbytesmonitor_2c_outbytesmonitor"><code>InBytesMonitor</code>, <code>OutBytesMonitor</code></a></strong><br />
+<li><strong><a name="item_inbytesmonitor_2c_outbytesmonitor"><code>InBytesMonitor</code>, <code>OutBytesMonitor</code></a></strong>
+
+<p>The argument defines the monitor name to be applied to the input
+or output bytes counter.</p>
 </li>
-The argument defines the monitor name to be applied to the input
-or output bytes counter.
-<p></p>
-<li><strong><a name="item_inerrorsmonitor_2c_outerrorsmonitor"><code>InErrorsMonitor</code>, <code>OutErrorsMonitor</code></a></strong><br />
+<li><strong><a name="item_inerrorsmonitor_2c_outerrorsmonitor"><code>InErrorsMonitor</code>, <code>OutErrorsMonitor</code></a></strong>
+
+<p>The argument defines the monitor name to be applied to error and discard
+counters that are discovered for a given interface.</p>
 </li>
-The argument defines the monitor name to be applied to error and discard
-counters that are discovered for a given interface.
-<p></p>
-<li><strong><a name="item_holtwinters"><code>HoltWinters</code></a></strong><br />
+<li><strong><a name="item_holtwinters"><code>HoltWinters</code></a></strong>
+
+<p>No argument needed. This action enables Holt-Winters prediction
+for given interface's counters.</p>
 </li>
-No argument needed. This action enables Holt-Winters prediction
-for given interface's counters.
-<p></p>
-<li><strong><a name="item_nopacketcounters_2c_noerrorcounters"><code>NoPacketCounters</code>, <code>NoErrorCounters</code></a></strong><br />
+<li><strong><a name="item_nopacketcounters_2c_noerrorcounters"><code>NoPacketCounters</code>, <code>NoErrorCounters</code></a></strong>
+
+<p>No argument needed. The action disables the packet or error counters
+for a given interface to be collected.</p>
 </li>
-No argument needed. The action disables the packet or error counters
-for a given interface to be collected.
-<p></p>
-<li><strong><a name="item_tokensetmember"><code>TokensetMember</code></a></strong><br />
-</li>
-The argument is a comma-separated list of tokenset names where <code>InOutBbs</code>
+<li><strong><a name="item_tokensetmember"><code>TokensetMember</code></a></strong>
+
+<p>The argument is a comma-separated list of tokenset names where <code>InOutBbs</code>
 graphs would be added. This action complements
-<a href="#item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a>.
-<p></p>
-<li><strong><a name="item_parameters"><code>Parameters</code></a></strong><br />
+<a href="#item_rfc2863_if_mib_3a_3atokenset_2dmembers"><code>RFC2863_IF_MIB::tokenset-members</code></a>.</p>
 </li>
-The argument defines additional configuration parameters to be
+<li><strong><a name="item_parameters"><code>Parameters</code></a></strong>
+
+<p>The argument defines additional configuration parameters to be
 placed at the interface level. The value should be one
 or several <code>param=value</code> pairs separated by semicolon (;).
 Parameters defined in <a href="#item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a> may override
-the ones defined in this action.
-<p></p>
-<li><strong><a name="item_docsisupsnrmonitor"><code>DocsisUpSNRMonitor</code></a></strong><br />
+the ones defined in this action.</p>
 </li>
-For a DOCSIS CMTS, this action assigns a new  monitor to the upstream
-Signal/Noise ratio gauge, instead of the default monitor.
-<p></p>
-<li><strong><a name="item_docsisupsnrtokenset"><code>DocsisUpSNRTokenset</code></a></strong><br />
+<li><strong><a name="item_docsisupsnrmonitor"><code>DocsisUpSNRMonitor</code></a></strong>
+
+<p>For a DOCSIS CMTS, this action assigns a new  monitor to the upstream
+Signal/Noise ratio gauge, instead of the default monitor.</p>
 </li>
-For a DOCSIS CMTS, this action adds the Signal/Noise ratio graph to a
-specified tokenset.
-<p></p>
-<li><strong><a name="item_docsisupfeccormonitor"><code>DocsisUpFECCorMonitor</code></a></strong><br />
+<li><strong><a name="item_docsisupsnrtokenset"><code>DocsisUpSNRTokenset</code></a></strong>
+
+<p>For a DOCSIS CMTS, this action adds the Signal/Noise ratio graph to a
+specified tokenset.</p>
 </li>
-For a DOCSIS CMTS, this action assigns a monitor to the <code>Correctable</code>
-counter of the upstream FEC statistics.
-<p></p>
-<li><strong><a name="item_docsisupfecuncormonitor"><code>DocsisUpFECUncorMonitor</code></a></strong><br />
+<li><strong><a name="item_docsisupfeccormonitor"><code>DocsisUpFECCorMonitor</code></a></strong>
+
+<p>For a DOCSIS CMTS, this action assigns a monitor to the <code>Correctable</code>
+counter of the upstream FEC statistics.</p>
 </li>
-For a DOCSIS CMTS, this action assigns a monitor to the <code>Uncorrectable</code>
-counter of the upstream FEC statistics.
-<p></p>
-<li><strong><a name="item_docsisdownutilmonitor"><code>DocsisDownUtilMonitor</code></a></strong><br />
+<li><strong><a name="item_docsisupfecuncormonitor"><code>DocsisUpFECUncorMonitor</code></a></strong>
+
+<p>For a DOCSIS CMTS, this action assigns a monitor to the <code>Uncorrectable</code>
+counter of the upstream FEC statistics.</p>
 </li>
-For a DOCSIS CMTS, this action assigns a monitor to the downstream
-<code>UsedBytes</code> counter.
-<p></p>
-<li><strong><a name="item_docsismacmodemsmonitor"><code>DocsisMacModemsMonitor</code></a></strong><br />
+<li><strong><a name="item_docsisdownutilmonitor"><code>DocsisDownUtilMonitor</code></a></strong>
+
+<p>For a DOCSIS CMTS, this action assigns a monitor to the downstream
+<code>UsedBytes</code> counter.</p>
 </li>
-For Cisco uBR, this action assigns a monitor to the <code>Modems_Registered</code> gauge
-in the MAC layer stats.
-<p></p>
-<li><strong><a name="item_docsisuputilmonitor_2c_docsisupslotsmonitor"><code>DocsisUpUtilMonitor</code>, <code>DocsisUpSlotsMonitor</code></a></strong><br />
+<li><strong><a name="item_docsismacmodemsmonitor"><code>DocsisMacModemsMonitor</code></a></strong>
+
+<p>For Cisco uBR, this action assigns a monitor to the <code>Modems_Registered</code> gauge
+in the MAC layer stats.</p>
 </li>
-For Cisco uBR, this action assigns a monitor to upstream utilization and
-free contention timeslots gauges correspondingly.
-<p></p></ul>
+<li><strong><a name="item_docsisuputilmonitor_2c_docsisupslotsmonitor"><code>DocsisUpUtilMonitor</code>, <code>DocsisUpSlotsMonitor</code></a></strong>
+
+<p>For Cisco uBR, this action assigns a monitor to upstream utilization and
+free contention timeslots gauges correspondingly.</p>
+</li>
+</ul>
 <p>
 </p>
 <h3><a name="ciscocpu_selector">CiscoCPU selector</a></h3>

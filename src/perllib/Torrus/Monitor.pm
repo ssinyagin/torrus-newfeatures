@@ -456,6 +456,7 @@ sub run_event_exec
                 my ($value, $timestamp) =
                     $obj->{'da'}->read_RPN( $config_tree, $token, $expr );
                 my $envName = 'TORRUS_'.$env;
+                Debug("Setting environment $envName to $value");
                 $ENV{$envName} = $value;
             }
         }

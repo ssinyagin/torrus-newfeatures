@@ -699,14 +699,12 @@ from discovery.
 If set to C<yes>, the corresponding statistics are excluded from Cisco SCE
 graphs.
 
- 
 =item * C<JunOS::disable-cos>, C<JunOS::disable-cos-red>,
-C<JunOS::disable-cos-tail>, C<JunOS::disable-firewall>,
-C<JunOS::disable-operating>, C<JunOS::disable-rpf>
+    C<JunOS::disable-cos-tail>, C<JunOS::disable-firewall>,
+    C<JunOS::disable-operating>, C<JunOS::disable-rpf>
 
 When set to C<yes>, disables the correspoding statistics category for JunOS
 devices
-
 
 =item * C<Paradyne::slot-name>
 

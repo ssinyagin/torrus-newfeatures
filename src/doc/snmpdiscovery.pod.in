@@ -699,7 +699,7 @@ from discovery.
 If set to C<yes>, the corresponding statistics are excluded from Cisco SCE
 graphs.
 
-    
+ 
 =item * C<JunOS::disable-cos>, C<JunOS::disable-cos-red>,
 C<JunOS::disable-cos-tail>, C<JunOS::disable-firewall>,
 C<JunOS::disable-operating>, C<JunOS::disable-rpf>

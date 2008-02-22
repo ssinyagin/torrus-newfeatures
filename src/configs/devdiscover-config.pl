@@ -45,6 +45,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
      'Torrus::DevDiscover::Alteon',
      'Torrus::DevDiscover::AlliedTelesyn_PBC18',
+     'Torrus::DevDiscover::Apple_AE',
      'Torrus::DevDiscover::AscendMax',
      'Torrus::DevDiscover::ATMEL',
      'Torrus::DevDiscover::AxxessIT',
@@ -241,6 +242,21 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'alteon-maint',
          'source' => 'vendor/alteon.xml'
          },     
+     
+     #### Apple Airport Extreme
+
+     'Apple_AE::ae-wireless-clients-subtree' => {
+         'name'   => 'ae-wireless-clients-subtree',
+         'source' => 'vendor/apple.ae.xml'
+         },
+     'Apple_AE::ae-wireless-clients-leaf' => {
+         'name'   => 'ae-wireless-clients-leaf',
+         'source' => 'vendor/apple.ae.xml'
+         },
+     'Apple_AE::ae-global-stats' => {
+         'name'   => 'ae-global-stats',
+         'source' => 'vendor/apple.ae.xml'
+         },
      
      #### ATMEL smartbridges
 

@@ -29,6 +29,7 @@ vendordir      = $(distxmldir)/vendor
 dist_vendor_DATA = \
 	vendor/alteon.xml \
 	vendor/apc.ups.xml  \
+	vendor/apple.ae.xml \
 	vendor/ascend.max.xml \
 	vendor/atmel.xml \
 	vendor/betternetworks.xml \

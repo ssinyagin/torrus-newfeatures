@@ -20,7 +20,7 @@
 
 
 AC_INIT([torrus],[1.0.7d],[ssinyagin@users.sourceforge.net])
-AC_PREREQ([2.60])
+AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)

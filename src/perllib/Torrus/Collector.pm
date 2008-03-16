@@ -472,7 +472,7 @@ sub setValue
                 Error('Fatal error in transformation code: ' . $@ );
                 $value = 'U';
             }
-            elsif( $value !~ /^[0-9.+-eE]+$/ and $value ne 'U' )
+            elsif( $value !~ /^[0-9.+-eE]+$/o and $value ne 'U' )
             {
                 Error('Non-numeric value after transformation: ' . $value);
                 $value = 'U';

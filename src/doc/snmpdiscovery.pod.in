@@ -855,7 +855,6 @@ the ones defined in this action.
 Analagous to C<Parameters>, but the parameters are applied to InBytes and
 OutBytes leaves of the selected interface.
 
-
 =item * C<DocsisUpSNRMonitor>
 
 For a DOCSIS CMTS, this action assigns a new  monitor to the upstream

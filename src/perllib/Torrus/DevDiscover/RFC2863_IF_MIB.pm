@@ -673,11 +673,25 @@ sub buildConfig
                 if( defined( $interface->{'selectorActions'}->
                              {$dir . 'BytesMonitor'} ) )
                 {
+                    $interface->{'childCustomizations'}->{
+                        'Bytes_' . $dir}->{'monitor'} =
+                            $interface->{'selectorActions'}->{
+                                $dir . 'BytesMonitor'};
+                }
+
+                if( defined( $interface->{'selectorActions'}->
+                             {$dir . 'BytesParameters'} ) )
+                {
+                    my @pairs =
+                        split('\s*;\s*',
+                              $interface->{'selectorActions'}{
+                                  $dir . 'BytesParameters'});
+                    
+                    foreach my $pair( @pairs )
                     {
+                        my ($param, $val) = split('\s*=\s*', $pair);
                         $interface->{'childCustomizations'}->{
-                            'Bytes_' . $dir}->{'monitor'} =
-                                $interface->{'selectorActions'}->{
-                                    $dir . 'BytesMonitor'};
+                            'Bytes_' . $dir}->{$param} = $val;
                     }
                 }
             }
@@ -1190,7 +1204,9 @@ our %knownSelectorActions =
       'NoErrorCounters'   => 'RFC2863_IF_MIB',
       'RemoveInterface'   => 'RFC2863_IF_MIB',
       'TokensetMember'    => 'RFC2863_IF_MIB',
-      'Parameters'        => 'RFC2863_IF_MIB' );
+      'Parameters'        => 'RFC2863_IF_MIB',
+      'InBytesParameters' => 'RFC2863_IF_MIB',
+      'OutBytesParameters' => 'RFC2863_IF_MIB',);
 
                             
 sub applySelectorAction

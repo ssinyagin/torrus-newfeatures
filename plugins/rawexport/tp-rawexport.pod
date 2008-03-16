@@ -1,0 +1,27 @@
+
+
+# $Id$
+#
+#
+
+=head1 Raw Export Collector Plugin
+
+
+=head2 Introduction
+
+
+=head2 Installation
+
+Follow the Torrus installation guide for the main software installation.
+
+Unpack the plugin distribution package in some directory:
+
+  gzip -dc tp-rawexport-1.X.tar.gz | tar xvf -
+
+Then run the Torrus plugin installation utility:
+
+  torrus install_plugin tp-rawexport-1.X
+
+Restart Torrus collector processes.
+
+TODO: describe all parameters

@@ -524,6 +524,16 @@ sub buildConfig
                 }
             }
 
+            my $includeFiles = $devdetails->param('include-files');
+            if( length( $includeFiles ) > 0 )
+            {
+                foreach my $file ( split( '\s*,\s*', $includeFiles ) )
+                {
+                    $cb->addFileInclusion( $file );
+                }
+            }
+                    
+
             # Let the device type-specific modules add children
             # to the subtree
             foreach my $devtype

@@ -339,6 +339,12 @@ must be unique for each host.
 Optional comma-separated list of template names that will be applied
 to the resulting XML configuration at the host level.
 
+=item * C<include-files>
+
+Optional comma-separated list of XML files that will be listed in C<include>
+statements in the resulting XML output.
+
+
 =item * C<host-copy-params>
 
 Optional comma-separated list of parameter names that should be copied

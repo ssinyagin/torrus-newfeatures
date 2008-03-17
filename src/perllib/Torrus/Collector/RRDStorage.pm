@@ -166,7 +166,7 @@ sub storeData
         }
     }
 
-    undef $sref->{'values'};
+    delete $sref->{'values'};
 }
 
 

@@ -168,6 +168,8 @@ sub storeData
             $thrUpdateQueue->enqueue( $filejob );
         }
     }
+    
+    delete $sref->{'values'};
 }
 
 

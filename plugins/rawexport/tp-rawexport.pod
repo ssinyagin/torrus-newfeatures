@@ -33,7 +33,8 @@ parameter in the datasource leaf.
 =item * Collected value
 
 The last field is the value that was collected. It may be a very large integer
-in case if the datasource is a 64-bit counter.
+in case if the datasource is a 64-bit counter. The value is set to C<U> in
+the event of a counter reset, such as when a monitored device is rebooted.
 
 =back
 

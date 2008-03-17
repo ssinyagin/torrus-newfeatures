@@ -25,7 +25,8 @@
   <template name="raw-defaults-ifoctets-examle">
   
     <param name="raw-datadir" value="/srv/torrus/raw" />
-    <param name="raw-file" value="#Y-#m-#d.%raw-file-suffix%" />
+    <param name="raw-file"
+           value="#Y-#m-#d.%collector-instance%.%raw-file-suffix%" />
     <param name="raw-field-separator" value="," />
     <param name="raw-timestamp-format" value="#d#b#Y:#H:#M:#S" />
     <param name="raw-rowid" value="%system-id%,%interface-name%,%rrd-ds%" />

@@ -9,6 +9,37 @@
 
 =head2 Introduction
 
+The Raw Export plugin implments a new storage type for Torrus.
+It allows exporting the raw collected data in plain files.
+Currently the counter values are exported without changes, and
+in the future there will be support for exporting counter increments.
+
+The data is exported in text form, one datasource per line.
+Each line contains three fields, separated by the characters defined
+by C<raw-field-separator> parameter:
+
+=over 4
+
+=item * Timestamp
+
+The timestamp of the collected data, in format defined
+by C<raw-timestamp-format> parameter.
+
+=item * Row ID
+
+A text string that identifies the datasource. It is defined by C<raw-rowid>
+parameter in the datasource leaf.
+
+=item * Collected value
+
+The last field is the value that was collected. It may be a very large integer
+in case if the datasource is a 64-bit counter.
+
+=back
+
+
+
+
 
 =head2 Installation
 
@@ -24,4 +55,114 @@ Then run the Torrus plugin installation utility:
 
 Restart Torrus collector processes.
 
-TODO: describe all parameters
+
+=head2 Configuration
+
+In order to get use of Raw export, the C<storage-type> parameter should
+contain C<raw> as one of the comma-separated values. Usually
+C<storage-type> is set to the value C<raw,rrd>.
+
+Also the datasource leaf must have the following parameters defined:
+
+=over 4
+
+=item * C<raw-datadir>
+
+The directory where the raw export files are stored.
+
+=item * C<raw-file>
+
+The export file name. It can contain any strftime(3) conversion characters,
+but the percent sign (C<%>) should be replaced with hash sign (C<#>).
+
+=item * C<raw-field-separator>
+
+Field separator inside the export line.
+
+=item * C<raw-timestamp-format>
+
+Timestamp format in strftime(3) notation, with the percent sign
+(C<%>) replaced with hash sign (C<#>).
+
+=item * C<raw-rowid>
+
+A string that uniquely identifies the datasource.
+
+=back
+
+
+=head2 Example
+
+The following XML template is installed as F<examples/rawexport-example.xml>
+by the plugin installer. It provides basic functionality for exporting of
+IF-MIB counters. The example refers to a parameter C<raw-file-suffix> which
+is not part of this plugin, and is given only as an example. The
+discovery instruction (DDX) file listed below defines this parameter at
+the host level. 
+
+Note that your templates should also declare the parameters as expandable,
+as given in the eample below.
+
+It is important that C<raw-file> depends on C<collector-instance>. It
+ensures that several collector instance for a given tree would never write
+to the same file concurrently.
+
+This example stores the data in files that depend on the calendar date.
+This makes them convenient to grab for daily processing.
+For example, at 3:00 every morning you can move all the files that
+are more than 2 hours old for further processing. Also their
+alphabetical sorting would list them in temporal order.
+
+
+
+File: F<examples/rawexport-example.xml>
+
+ <configuration>
+
+   <param-properties>
+     <prop param="raw-file"       prop="expand" value="1"/>
+     <prop param="raw-rowid"      prop="expand" value="1"/>
+   </param-properties>
+
+   <datasources>
+
+     <template name="raw-defaults-ifoctets-examle">
+  
+       <param name="raw-datadir" value="/srv/torrus/raw" />
+       <param name="raw-file"
+              value="#Y-#m-#d.%collector-instance%.%raw-file-suffix%" />
+       <param name="raw-field-separator" value="," />
+       <param name="raw-timestamp-format" value="#d#b#Y:#H:#M:#S" />
+       <param name="raw-rowid" value="%system-id%,%interface-name%,%rrd-ds%" />
+    
+     </template>
+  
+   </datasources>
+
+ </configuration>
+
+
+The following is a fragment of a Devdiscover instructions file (DDX)
+which sets up the raw export for input and output byte counters,
+for all interfaces whose names start with 'eth':
+
+  <host>
+    <param name="snmp-host" value="mylinuxhost"/>
+
+    <param name="include-files" value="examples/rawexport-example.xml"/>
+    <param name="custom-host-templates" value="raw-defaults-ifoctets-examle"/>
+    <param name="host-copy-params" value="raw-file-suffix"/>
+    <param name="raw-file-suffix" value="rawexport"/>
+
+    <param name="selectors"            value="raw"/>
+    <param name="raw-selector-type"    value="RFC2863_IF_MIB"/>
+    <param name="raw-selector-expr"    value="{ifSubtreeName}"/>
+    <param name="raw-ifSubtreeName"    value="^eth"/>
+    <param name="raw-selector-actions"
+                             value="InBytesParameters,OutBytesParameters"/>
+    <param name="raw-InBytesParameters-arg"
+                             value="storage-type=raw,rrd"/>    
+    <param name="raw-OutBytesParameters-arg"
+                             value="storage-type=raw,rrd"/>    
+  </host>
+

@@ -38,12 +38,16 @@ in case if the datasource is a 64-bit counter.
 =back
 
 
-
+The raw export files are written by a background thread, leaving the main
+thread more time to perform the collecting work. The C<torrus schedulerinfio>
+reports the size of the raw update queue in runtime statistics.
 
 
 =head2 Installation
 
 Follow the Torrus installation guide for the main software installation.
+This plugin requires the multithreading support in Torrus. It would not
+function in a non-multithreaded environment.
 
 Unpack the plugin distribution package in some directory:
 
@@ -104,7 +108,7 @@ Note that your templates should also declare the parameters as expandable,
 as given in the eample below.
 
 It is important that C<raw-file> depends on C<collector-instance>. It
-ensures that several collector instance for a given tree would never write
+ensures that several collector instances for a given tree would never write
 to the same file concurrently.
 
 This example stores the data in files that depend on the calendar date.

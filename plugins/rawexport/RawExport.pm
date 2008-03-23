@@ -27,6 +27,8 @@ use threads::shared;
 use Thread::Queue;
 use IO::File;
 use Date::Format;
+use Math::BigInt lib => 'GMP';
+use Math::BigFloat;
 
 
 use Torrus::Log;
@@ -44,6 +46,8 @@ $Torrus::Collector::params{'raw-storage'} = {
     'raw-field-separator'  => undef,
     'raw-timestamp-format' => undef,
     'raw-rowid'            => undef,
+    'raw-counter-base'     => undef,
+    'raw-counter-maxrate'  => undef,
 };
 
 
@@ -68,6 +72,9 @@ sub initThreads
 
 $Torrus::Collector::initTarget{'raw-storage'} = \&initTarget;
 
+
+my $base32 = Math::BigInt->new(2)->bpow(32);
+my $base64 = Math::BigInt->new(2)->bpow(64);
 
 sub initTarget
 {
@@ -96,6 +103,18 @@ sub initTarget
 
         $sref->{'field_separator'}{$filename} =
             $collector->param($token, 'raw-field-separator');
+    }
+
+    my $base = $collector->param($token, 'raw-counter-base');
+    if( defined( $base ) )
+    {       
+        $sref->{'base'}{$token} = ($base == 32 ? $base32:$base64);
+        
+        my $maxrate = $collector->param($token, 'raw-counter-maxrate');
+        if( defined( $maxrate ) )
+        {
+            $sref->{'maxrate'}{$token} = Math::BigFloat->new($maxrate);
+        }
     }
 }
 
@@ -138,7 +157,8 @@ sub storeData
         
         $filejob->{'filename'} = $filename;
         $filejob->{'ts_format'} = $sref->{'timestamp_format'}{$filename};
-        $filejob->{'separator'} = $sref->{'field_separator'}{$filename};
+        my $separator = $sref->{'field_separator'}{$filename};
+        $filejob->{'separator'} = $separator;
         $filejob->{'values'} = &threads::shared::share([]);
         
         while( my($token, $dummy) = each %{$tokens} )
@@ -147,15 +167,79 @@ sub storeData
             {
                 my $rowentry = &threads::shared::share({});
 
-                # Convert BigInt to string
-                my $val = $sref->{'values'}{$token}[0];
-                if( ref( $val ) )
+                my ( $value, $timestamp ) = @{$sref->{'values'}{$token}};
+
+                if( exists( $sref->{'base'}{$token} ) )
                 {
-                    $val = $val->bstr();
+                    # we're dealing with a counter. Calculate the increment
+
+                    if( $value eq 'U' )
+                    {
+                        delete $sref->{'prevCounter'}{$token};
+                        delete $sref->{'prevTimestamp'}{$token};
+                        next;
+                    }
+
+                    my $increment;
+                    my $prevTimestamp;
+                    
+                    if( exists( $sref->{'prevCounter'}{$token} ) )
+                    {
+                        my $prevValue = $sref->{'prevCounter'}{$token};
+                        $prevTimestamp = $sref->{'prevTimestamp'}{$token};
+                        
+                        if( $prevValue->bcmp( $value ) > 0 ) 
+                        {
+                            # previous is bigger
+                            $increment =
+                                Math::BigInt->new($sref->{'base'}{$token});
+                            $increment->bsub( $prevValue );
+                            $increment->badd( $value );
+                        }
+                        else
+                        {
+                            $increment = Math::BigInt->new( $value );
+                            $increment->bsub( $prevValue );
+                        }
+                        
+                        
+                        if( defined( $sref->{'maxrate'}{$token} ) )
+                        {
+                            my $rate = Math::BigFloat->new( $increment );
+                            $rate->bdiv( $timestamp - $prevTimestamp );
+                            if( $rate->bcmp($sref->{'maxrate'}{$token}) > 0 )
+                            {
+                                $increment = undef;
+                            }
+                        }
+                    }
+                    
+                    $sref->{'prevCounter'}{$token} = $value;
+                    $sref->{'prevTimestamp'}{$token} = $timestamp;
+
+                    # Set the value to pair of text values: increment, interval
+                    if( defined( $increment ) )
+                    {
+                        $value = join( $separator, $increment->bstr(),
+                                       $timestamp - $prevTimestamp );
+                    }
+                    else
+                    {
+                        # nothing to store, proceed to the next token
+                        next;
+                    }
                 }
-                
-                $rowentry->{'value'} = $val;
-                $rowentry->{'time'} = $sref->{'values'}{$token}[1];
+                else
+                {
+                    if( ref( $value ) )
+                    {
+                        # Convert BigInt to string
+                        $value = $value->bstr();
+                    }
+                }
+                    
+                $rowentry->{'value'} = $value;
+                $rowentry->{'time'} = $timestamp;
                 $rowentry->{'rowid'} =
                     $collector->param($token, 'raw-rowid');
                 

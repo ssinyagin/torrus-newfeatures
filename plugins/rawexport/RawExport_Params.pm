@@ -32,6 +32,11 @@ my %validatorLeafParams =
      'raw-field-separator'  => undef,
      'raw-timestamp-format' => undef,
      'raw-rowid'            => undef,
+     '+raw-counter-base'     => {
+         '32' => undef,
+         '64' => undef,
+     },
+     '+raw-counter-maxrate'  => undef,
   );
 
 sub initValidatorLeafParams {

@@ -39,7 +39,7 @@ It allows exporting the raw collected data in plain files.
 Currently the counter values are exported without changes, and
 in the future there will be support for exporting counter increments.</p>
 <p>The data is exported in text form, one datasource per line.
-Each line contains three fields, separated by the characters defined
+Each line contains three or four fields, separated by the characters defined
 by <a href="#item_raw_2dfield_2dseparator"><code>raw-field-separator</code></a> parameter:</p>
 <ul>
 <li><strong><a name="item_timestamp">Timestamp</a></strong>
@@ -54,9 +54,17 @@ parameter in the datasource leaf.</p>
 </li>
 <li><strong><a name="item_collected_value">Collected value</a></strong>
 
-<p>The last field is the value that was collected. It may be a very large integer
-in case if the datasource is a 64-bit counter. The value is set to <code>U</code> in
-the event of a counter reset, such as when a monitored device is rebooted.</p>
+<p>If <a href="#item_raw_2dcounter_2dbase"><code>raw-counter-base</code></a> is not defined, the third and the last field contains
+the raw value that was collected. It may be a very large integer
+in case if the datasource is a 64-bit counter.
+The value is set to <code>U</code> in the event of a counter reset, such as
+when a monitored device is rebooted.</p>
+<p>If <a href="#item_raw_2dcounter_2dbase"><code>raw-counter-base</code></a> is set to <code>32</code> or &lt;64&gt;, the third field contains the
+counter increment, and the fourth field contains the time interval for it.</p>
+</li>
+<li><strong><a name="item_time_interval">Time interval</a></strong>
+
+<p>The time interval in seconds, if the datasource is exported as a counter.</p>
 </li>
 </ul>
 <p>The raw export files are written by a background thread, leaving the main
@@ -81,29 +89,45 @@ function in a non-multithreaded environment.</p>
 <p>In order to get use of Raw export, the <code>storage-type</code> parameter should
 contain <code>raw</code> as one of the comma-separated values. Usually
 <code>storage-type</code> is set to the value <code>raw,rrd</code>.</p>
-<p>Also the datasource leaf must have the following parameters defined:</p>
+<p>The following parameters define the raw storage operation:</p>
 <ul>
 <li><strong><a name="item_raw_2ddatadir"><code>raw-datadir</code></a></strong>
 
-<p>The directory where the raw export files are stored.</p>
+<p>Mandatory, the directory where the raw export files are stored.</p>
 </li>
 <li><strong><a name="item_raw_2dfile"><code>raw-file</code></a></strong>
 
-<p>The export file name. It can contain any <code>strftime(3)</code> conversion characters,
-but the percent sign (<code>%</code>) should be replaced with hash sign (<code>#</code>).</p>
+<p>Mandatory, the export file name. It can contain any <code>strftime(3)</code> conversion
+characters, but the percent sign (<code>%</code>) should be replaced with hash
+sign (<code>#</code>).</p>
 </li>
 <li><strong><a name="item_raw_2dfield_2dseparator"><code>raw-field-separator</code></a></strong>
 
-<p>Field separator inside the export line.</p>
+<p>Mandatory, the field separator inside the export line.</p>
 </li>
 <li><strong><a name="item_raw_2dtimestamp_2dformat"><code>raw-timestamp-format</code></a></strong>
 
-<p>Timestamp format in <code>strftime(3)</code> notation, with the percent sign
+<p>Mandatory, timestamp format in <code>strftime(3)</code> notation, with the percent sign
 (<code>%</code>) replaced with hash sign (<code>#</code>).</p>
 </li>
 <li><strong><a name="item_raw_2drowid"><code>raw-rowid</code></a></strong>
 
-<p>A string that uniquely identifies the datasource.</p>
+<p>Mandatory, a string that uniquely identifies the datasource.</p>
+</li>
+<li><strong><a name="item_raw_2dcounter_2dbase"><code>raw-counter-base</code></a></strong>
+
+<p>Optional. Valid values: <code>32</code> or <code>64</code>.
+When defined, it declares the given datasource as a 32- or 64-bit counter.
+The stored value is then recorded as a pair (increment, interval) with a
+defined field separator.</p>
+</li>
+<li><strong><a name="item_raw_2dcounter_2dmaxrate"><code>raw-counter-maxrate</code></a></strong>
+
+<p>Optional. If it is defined, it should contain the maximum rate at which
+the counter can increment, in units per second. It is used only when
+<a href="#item_raw_2dcounter_2dbase"><code>raw-counter-base</code></a> is defined. A counter may accidentally increase to huge
+values because of a remote device reset, and this option prevents such
+bursts from recording.</p>
 </li>
 </ul>
 <p>
@@ -168,10 +192,16 @@ for all interfaces whose names start with 'eth':</p>
     &lt;param name=&quot;raw-ifSubtreeName&quot;    value=&quot;^eth&quot;/&gt;
     &lt;param name=&quot;raw-selector-actions&quot;
                              value=&quot;InBytesParameters,OutBytesParameters&quot;/&gt;
-    &lt;param name=&quot;raw-InBytesParameters-arg&quot;
-                             value=&quot;storage-type=raw,rrd&quot;/&gt;    
-    &lt;param name=&quot;raw-OutBytesParameters-arg&quot;
-                             value=&quot;storage-type=raw,rrd&quot;/&gt;    
+    &lt;param name=&quot;raw-InBytesParameters-arg&quot;&gt;
+      storage-type=raw,rrd;
+      raw-counter-base=64;
+      raw-counter-maxrate=1e15
+    &lt;/param&gt;
+    &lt;param name=&quot;raw-OutBytesParameters-arg&quot;&gt;
+      storage-type=raw,rrd;
+      raw-counter-base=64;
+      raw-counter-maxrate=1e15
+    &lt;/param&gt;
   &lt;/host&gt;</pre>
 
 </body>

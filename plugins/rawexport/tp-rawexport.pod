@@ -38,7 +38,7 @@ in case if the datasource is a 64-bit counter.
 The value is set to C<U> in the event of a counter reset, such as
 when a monitored device is rebooted.
 
-If C<raw-counter-base> is set to C<32> or <64>, the third field contains the
+If C<raw-counter-base> is set to C<32> or C<64>, the third field contains the
 counter increment, and the fourth field contains the time interval for it.
 
 =item * Time interval

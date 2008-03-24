@@ -392,7 +392,8 @@ sub validateNode
                 }
             }
         }
-        elsif($config_tree->getNodeParam( $token, 'leaf-type' ) eq 'rrd-cdef')
+        elsif( $dsType eq 'rrd-file' and
+               $config_tree->getNodeParam( $token, 'leaf-type' ) eq 'rrd-cdef')
         {
             my $expr = $config_tree->getNodeParam( $token, 'rpn-expr' );
             if( defined( $expr ) )

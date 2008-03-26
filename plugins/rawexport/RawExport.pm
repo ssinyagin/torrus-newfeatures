@@ -91,6 +91,7 @@ sub initTarget
     
     $filename = $collector->param($token, 'raw-datadir') . '/' . $filename;
     $sref->{'byfile'}{$filename}{$token} = 1;
+    $sref->{'filename'}{$token} = $filename;
 
     # We assume that timestamp format is the same within one file
     
@@ -117,6 +118,34 @@ sub initTarget
         }
     }
 }
+
+
+
+# Callback executed by Collector
+
+sub deleteTarget
+{
+    my $collector = shift;
+    my $token = shift;
+
+    my $sref = $collector->storageData( 'rrd' );
+    my $filename = $sref->{'filename'}{$token};
+
+    delete $sref->{'filename'}{$token};
+
+    delete $sref->{'byfile'}{$filename}{$token};
+    if( scalar( keys %{$sref->{'byfile'}{$filename}} ) == 0 )
+    {
+        delete $sref->{'byfile'}{$filename};
+        delete $sref->{'timestamp_format'}{$filename};
+        delete $sref->{'field_separator'}{$filename};
+    }
+
+    delete $sref->{'values'}{$token};
+    delete $sref->{'base'}{$token};
+    delete $sref->{'maxrate'}{$token};
+}
+
 
 
 

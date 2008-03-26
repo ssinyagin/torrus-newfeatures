@@ -25,24 +25,25 @@ use strict;
 
 ###  Initialize the configuration validator with module-specific parameters
 
-my %validatorLeafParams =
-    (
-     'raw-datadir'          => undef,
-     'raw-file'             => undef,
-     'raw-field-separator'  => undef,
-     'raw-timestamp-format' => undef,
-     'raw-rowid'            => undef,
-     '+raw-counter-base'     => {
-         '32' => undef,
-         '64' => undef,
-     },
-     '+raw-counter-maxrate'  => undef,
-  );
+my $validatorLeafParams = {
+    'raw-datadir'          => undef,
+    'raw-file'             => undef,
+    'raw-field-separator'  => undef,
+    'raw-timestamp-format' => undef,
+    'raw-rowid'            => undef,
+    '+raw-counter-base'     => {
+        '32' => undef,
+        '64' => undef,
+    },
+    '+raw-counter-maxrate'  => undef,
+};
 
-sub initValidatorLeafParams {
+sub initValidatorLeafParams
+{
   my $hashref = shift;
+
   $hashref->{'ds-type'}{'collector'}{'@storage-type'}{'raw'} =
-    \%validatorLeafParams;
+      $validatorLeafParams;
 }
 
 

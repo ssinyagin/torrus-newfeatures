@@ -153,10 +153,12 @@ sub finalize
     my $self = shift;
     my $reportId = shift;
 
-    my $result = $self->{'sql'}->update({
+    $self->{'sql'}->update({
         'table' => $tableName,
         'where' => { $columns{'id'}   => $reportId },
         'fields' => { $columns{'iscomplete'} => 1 } });
+
+    $self->{'sql'}->commit();
 }
 
 

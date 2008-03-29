@@ -198,15 +198,27 @@ their subtree names in Torrus configuration. The example below is
 typical for a Cisco IOS router. The value of the parameter consists of
 comma-separated triples. The values in each triple are separated by colons,
 and they correspond to the service ID, interface name, and the counter type.
+The interface name can be prefixed by hostname and slash (/),
+the same way as in C<RFC2863_IF_MIB::tokenset-members>. 
 All strings are case-sensitive. Three counter types are supported: C<In>,
 C<Out>, and C<Both>. When set to C<Both>, the service ID is appended with
 C<_IN> or C<_OUT> postfix accordingly, for input and output byte counters.
 
+ <!-- global parameter that will match specific routers -->
  <param name="RFC2863_IF_MIB::external-serviceid">
-  UPSTREAM1_IN:FastEthernet0_0_0:In,
-  UPSTREAM1_OUT:FastEthernet0_0_0:Out,
-  UPSTREAM2:GigabitEthernet0_1_1:Both,
+  CUSTOMERONE:nyc01br01/GigabitEthernet9_2_1:Both,
+  CUSTOMERTWO:wdc01br02/GigabitEthernet6_3_1:Both,
  </param>
+
+ <host>
+   <param name="snmp-host" value="lsn01br01"/>
+   <!-- host-specfic parameter  -->
+   <param name="RFC2863_IF_MIB::external-serviceid">
+     UPSTREAM1_IN:FastEthernet0_0_0:In,
+     UPSTREAM1_OUT:FastEthernet0_0_0:Out,
+     UPSTREAM2:GigabitEthernet0_1_1:Both,
+   </param>
+ </host>
 
 =item * C<CiscoIOS_MacAccounting::external-serviceid>
 

@@ -1,3 +1,8 @@
+2008-03-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	RFC2863_IF_MIB::external-serviceid now accepts host/interface notation
+
 2008-03-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/SQL/Reports.pm (finalize): added SQL commit

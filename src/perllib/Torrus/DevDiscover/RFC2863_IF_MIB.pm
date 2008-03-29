@@ -525,14 +525,31 @@ sub buildConfig
         {
             my ( $serviceid, $intfName, $direction ) =
                 split( /\s*:\s*/, $srvDef );
-            if( $direction eq 'Both' )
+
+            if( $intfName =~ /\// )
             {
-                $extStorage{$intfName}{'In'} = $serviceid . '_IN';
-                $extStorage{$intfName}{'Out'} = $serviceid . '_OUT';
+                my( $host, $intf ) = split( '/', $intfName );
+                if( $host eq $devdetails->param('snmp-host') )
+                {
+                    $intfName = $intf;
+                }
+                else
+                {
+                    $intfName = undef;
+                }
             }
-            else
+
+            if( defined( $intfName ) and length( $intfName ) > 0 )
             {
-                $extStorage{$intfName}{$direction} = $serviceid;
+                if( $direction eq 'Both' )
+                {
+                    $extStorage{$intfName}{'In'} = $serviceid . '_IN';
+                    $extStorage{$intfName}{'Out'} = $serviceid . '_OUT';
+                }
+                else
+                {
+                    $extStorage{$intfName}{$direction} = $serviceid;
+                }
             }
         }
     }

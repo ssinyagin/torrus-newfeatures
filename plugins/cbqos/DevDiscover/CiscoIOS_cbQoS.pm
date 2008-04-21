@@ -138,6 +138,19 @@ my %cfgTablesForType =
      'police'          => ['cbQosPoliceCfgTable']
      );
 
+my %objTypeMap  =
+    (
+     'policymap'      => 1,
+     'classmap'       => 2,
+     'matchStatement' => 3,
+     'queueing'       => 4,
+     'randomDetect'   => 5,
+     'trafficShaping' => 6,
+     'police'         => 7,
+     'set'            => 8 
+     );
+
+
 
 sub checkdevtype
 {
@@ -456,7 +469,7 @@ sub buildConfig
     
     # Recursively build a subtree for every policy
 
-    buildChildrenConfigs( $data, $cb, $topNode, '0', '', '' );
+    buildChildrenConfigs( $data, $cb, $topNode, '0', '', '', '', '' );
 }
 
 
@@ -468,7 +481,9 @@ sub buildChildrenConfigs
     my $parentObjIndex = shift;
     my $parentObjType = shift;
     my $parentObjName = shift;
-    
+    my $parentObjNick = shift;
+    my $parentFullName = shift;
+
     if( not defined( $data->{'cbqos_children'}{$parentObjIndex} ) )
     {
         return;
@@ -496,7 +511,7 @@ sub buildChildrenConfigs
 
         $param->{'cbqos-parent-type'} = $parentObjType;
         $param->{'cbqos-parent-name'} = $parentObjName;
-                
+        
         my $buildSubtree = 1;
         
         if( $objType eq 'policymap' )
@@ -520,7 +535,7 @@ sub buildChildrenConfigs
 
                     $subtreeName =
                         $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-                
+                    
                     $subtreeComment = $interfaceName;
                     
                     my $ifType = $policyRef->{'cbQosIfType'};
@@ -593,6 +608,7 @@ sub buildChildrenConfigs
                 # Nested policy map
                 $subtreeName = $objectName;
                 $subtreeComment = 'Policy map: ' . $objectName;
+                $objectNick = 'pm_' . $objectName;
             }                
 
             $param->{'legend'} = 'Policy map:' . $objectName;
@@ -631,6 +647,8 @@ sub buildChildrenConfigs
         elsif( $objType eq 'matchStatement' )
         {
             my $name = $configRef->{'cbQosMatchStmtName'};
+            $objectName = $name;
+
             $subtreeName = $name;
             $subtreeComment = 'Match statement statistics';
             $objectNick = 'ms_' . $name;
@@ -641,6 +659,8 @@ sub buildChildrenConfigs
         elsif( $objType eq 'queueing' )
         {
             my $bandwidth = $configRef->{'cbQosQueueingCfgBandwidth'};
+            $objectName = $bandwidth;
+
             my $units = $configRef->{'cbQosQueueingCfgBandwidthUnits'};
 
             $subtreeName = 'Bandwidth_' . $bandwidth . '_' . $units;
@@ -711,6 +731,7 @@ sub buildChildrenConfigs
         elsif( $objType eq 'trafficShaping' )
         {
             my $rate = $configRef->{'cbQosTSCfgRate'};
+            $objectName = $rate;
             $subtreeName = sprintf('Shape_%d_bps', $rate );
             $subtreeComment = 'Traffic shaping statistics';
             $objectNick = 'ts_' . $rate;
@@ -735,6 +756,8 @@ sub buildChildrenConfigs
         elsif( $objType eq 'police' )
         {
             my $rate = $configRef->{'cbQosPoliceCfgRate'};
+            $objectName = $rate;
+
             $subtreeName = sprintf('Police_%d_bps', $rate );
             $subtreeComment = 'Rate policing statistics';
             $objectNick = 'p_' . $rate;
@@ -776,23 +799,29 @@ sub buildChildrenConfigs
 
             if( $objectNick )
             {
-                if( length($parentObjName) > 0 )
+                if( $parentObjNick )
                 {
-                    # For previous version compatibility, we have to
-                    # preserve dash (-) in parent name
-                    my $parent = $parentObjName;                    
-                    $parent =~ s/[^0-9a-zA-Z-_]/_/g;
-                    $parent =~ s/__/_/g;
-                    $objectNick = $parent . '_' . $objectNick;
+		    $objectNick = $parentObjNick . '_' . $objectNick;
                 }
                 
                 $param->{'cbqos-object-nick'} = $objectNick;
             }
 
+	    my $fullName = '';
+            if( $parentFullName ) {
+                $fullName .= $parentFullName . ':';
+            }
+
+            $fullName .= $objectName . ':' . $objTypeMap{$objType};
+
+            $param->{'cbqos-full-name'} = $fullName;
+
+            
+
             $param->{'comment'} = $subtreeComment;
 
             my $objectNode = $cb->addSubtree( $parentNode, $subtreeName,
-                                             $param, \@templates );
+                                              $param, \@templates );
 
             if( $objType eq 'randomDetect')
             {
@@ -837,7 +866,8 @@ sub buildChildrenConfigs
             {
                 # Recursivery build children
                 buildChildrenConfigs( $data, $cb, $objectNode, $objectIndex,
-                                      $objType, $objectName );
+                                      $objType, $objectName, $objectNick,
+                                      $fullName);
             }
         }
     }
@@ -917,7 +947,7 @@ my %cbQosValueTranslation =
          1 => 'average',
          2 => 'peak'
          },
-         
+     
      'cbQosPoliceCfgConformAction'  => $policyActionTranslation,
      'cbQosPoliceCfgExceedAction'   => $policyActionTranslation,
      'cbQosPoliceCfgViolateAction'  => $policyActionTranslation

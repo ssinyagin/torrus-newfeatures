@@ -1,3 +1,11 @@
+2008-04-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Patch from Andrey Rouskol <arouskol@gldn.net>, allowing to use
+	the same child policy name in several places inside a policy map.
+	The configuration has to be re-discovered and re-compiled
+	after installing the new version of plugin. The old QoS stats would 
+        be lost after the upgrade.
+
 2007-11-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* DevDiscover/CiscoIOS_cbQoS.pm (buildChildrenConfigs):

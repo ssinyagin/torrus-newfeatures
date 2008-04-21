@@ -236,6 +236,49 @@ sub initTarget
 }
 
 
+# Recursively create the object name
+
+sub make_full_name
+{
+    my $objects = shift;
+    my $hosthash = shift;
+    my $attr = shift;
+    my $cref = shift;
+    
+
+    # Compose the object ID as "parent:type:name" string
+    my $objectID = '';
+    
+    my $parentIndex = $attr->{'cbQosParentObjectsIndex'};
+    if( $parentIndex > 0 )
+    {
+	$objectID =
+            make_full_name($objects, $hosthash,
+                           $objects->{$parentIndex}, $cref);
+    }
+
+    if( $objectID ) {
+        $objectID .= ':';
+    }
+
+    my $objType = $attr->{'cbQosObjectsType'};
+
+    my $objCfgIndex = $attr->{'cbQosConfigIndex'};
+    
+    my $objNameOid = $objTypeAttributes{$objType}{'name-oid'};
+
+    if( defined($objNameOid) )
+    {
+        $objectID .= $cref->{'CfgTable'}{$hosthash}{
+            $objCfgIndex}{$objNameOid};
+    }
+    
+    $objectID .= ':' . $objType;
+
+    return $objectID;
+}
+
+
 sub initTargetAttributes
 {
     my $collector = shift;
@@ -462,40 +505,10 @@ sub initTargetAttributes
 
             my $objType = $attr->{'cbQosObjectsType'};
             next if not defined( $objTypeAttributes{$objType} );
-                                
-            # Compose the object ID as "parent:type:name" string
-            my $objectID = '';
-            
-            my $parentIndex = $attr->{'cbQosParentObjectsIndex'};
-            if( $parentIndex > 0 )
-            {
-                my $parentType = $objects{$parentIndex}{'cbQosObjectsType'};
 
-                my $parentCfgIndex =
-                    $objects{$parentIndex}{'cbQosConfigIndex'};
-                
-                my $parentNameOid =
-                    $objTypeAttributes{$parentType}{'name-oid'};
+	    my $objectID =
+                make_full_name( \%objects, $hosthash, $attr, $cref );
 
-                my $parentName = 
-                    $cref->{'CfgTable'}{$hosthash}{
-                        $parentCfgIndex}{$parentNameOid};
-                
-                $objectID .= $parentName . ':';
-            }
-
-            $objectID .= $objType  . ':';
-
-            my $objCfgIndex = $attr->{'cbQosConfigIndex'};
-
-            my $objNameOid = $objTypeAttributes{$objType}{'name-oid'};
-
-            if( defined($objNameOid) )
-            {
-                $objectID .= $cref->{'CfgTable'}{$hosthash}{
-                    $objCfgIndex}{$objNameOid};
-            }
-            
             $ref->{$policyIndex}{$objectID} = $objIndex;
         }
     }
@@ -534,23 +547,7 @@ sub initTargetAttributes
 
     # compose the object ID from token parameters as "parent:type:name" string
 
-    my $theObjectID = $collector->param($token, 'cbqos-parent-name');
-    if( length( $theObjectID ) > 0 )
-    {
-        $theObjectID .= ':';
-    }
-
-    my $theObjectType =
-        translateCbQoSValue( $collector->param($token, 'cbqos-object-type'),
-                             'cbQosObjectsType' );
-
-    $theObjectID .= $theObjectType . ':';
-
-    my $objNameParam = $objTypeAttributes{$theObjectType}{'name-param'};
-    if( defined($objNameParam) )
-    {
-        $theObjectID .= $collector->param( $token, $objNameParam );
-    }
+    my $theObjectID = $collector->param($token, 'cbqos-full-name');
     
     my $theObjectIndex = $cref->{'ObjectsTable'}{$hosthash}->{
         $thePolicyIndex}{$theObjectID};
@@ -558,7 +555,7 @@ sub initTargetAttributes
     if( not defined( $theObjectIndex ) )
     {
         Error('Cannot find object index for ' . $thePolicyIndex . ':' .
-              $theObjectType . '--' . $theObjectID);
+              '--' . $theObjectID);
         return undef;
     }
 
@@ -632,7 +629,7 @@ sub deleteTarget
 
     Torrus::Collector::SNMP::deleteTarget( $collector, $token );
 }
-    
+
 
 1;
 

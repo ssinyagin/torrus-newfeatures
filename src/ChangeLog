@@ -1,3 +1,7 @@
+2008-05-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/bdbinfo.in: BerkeleyDB version info utility
+
 2008-03-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):

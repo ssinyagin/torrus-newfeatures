@@ -24,6 +24,8 @@ package Torrus::Collector::SNMP_Params;
 
 my %validatorLeafParams =
     (
+     'snmp-ipversion'     => {'4'   => undef, '6'   => undef},
+     'snmp-transport'     => {'udp' => undef, 'tcp' => undef},
      'snmp-host'          => undef,
      'snmp-port'          => undef,
      '+snmp-localaddr'    => undef,
@@ -65,6 +67,8 @@ sub initValidatorLeafParams
 
 my %admInfoLeafParams =
     (
+     'snmp-ipversion'     => undef,
+     'snmp-transport'     => undef,
      'snmp-host'          => undef,
      'snmp-port'          => undef,
      'snmp-localaddr'     => undef,
@@ -91,6 +95,8 @@ my %admInfoLeafParams =
 
 my %admInfoParamCategories =
     (
+     'snmp-ipversion'     => 'SNMP',
+     'snmp-transport'     => 'SNMP',
      'snmp-host'          => 'SNMP',
      'snmp-port'          => 'SNMP',
      'snmp-localaddr'     => 'SNMP',

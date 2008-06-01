@@ -35,6 +35,8 @@ $Torrus::Collector::collectorTypes{'snmp'} = 1;
 # List of needed parameters and default values
 
 $Torrus::Collector::params{'snmp'} = {
+    'snmp-ipversion'    => undef,
+    'snmp-transport'    => undef,
     'snmp-version'      => undef,
     'snmp-port'         => undef,
     'snmp-community'    => undef,
@@ -113,13 +115,13 @@ sub initTarget
     $collector->registerDeleteCallback
         ( $token, \&Torrus::Collector::SNMP::deleteTarget );
 
-    my $ipaddr = getHostIpAddress( $collector, $token );
-    if( not defined( $ipaddr ) )
+    my $hostname = getHostname( $collector, $token );
+    if( not defined( $hostname ) )
     {
         return 0;
     }
 
-    $tref->{'ipaddr'} = $ipaddr;
+    $tref->{'hostname'} = $hostname;
     
     return Torrus::Collector::SNMP::initTargetAttributes( $collector, $token );
 }
@@ -133,7 +135,7 @@ sub initTargetAttributes
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
 
-    my $ipaddr = $tref->{'ipaddr'};
+    my $hostname = $tref->{'hostname'};
     my $port = $collector->param($token, 'snmp-port');
     my $version = $collector->param($token, 'snmp-version');
 
@@ -149,7 +151,7 @@ sub initTargetAttributes
         $community = $collector->param($token, 'snmp-username');
     }
 
-    my $hosthash = join('|', $ipaddr, $port, $community);
+    my $hosthash = join('|', $hostname, $port, $community);
     $tref->{'hosthash'} = $hosthash;
 
     if( $version eq '1' )
@@ -219,7 +221,7 @@ sub initTargetAttributes
 }
 
 
-sub getHostIpAddress
+sub getHostname
 {
     my $collector = shift;
     my $token = shift;
@@ -228,41 +230,15 @@ sub getHostIpAddress
 
     my $hostname = $collector->param($token, 'snmp-host');
     my $domain = $collector->param($token, 'domain-name');
-    if( $hostname !~ /\./o and length( $domain ) > 0 )
+    
+    if( length( $domain ) > 0 and
+        index($hostname, '.') < 0 and
+        index($hostname, ':') < 0 )
     {
         $hostname .= '.' . $domain;
     }
-
-    my $ipaddr;
-    if( $hostname =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/o )
-    {
-        $ipaddr = $hostname;
-    }
-    else
-    {
-        if( not defined( $cref->{'dnscache'}{$hostname} ) )
-        {
-            my $h = gethost($hostname);
-
-            if( not $h )
-            {
-                Error("Cannot resolve $hostname in " .
-                      $collector->path($token));
-                $collector->deleteTarget($token);
-                return undef;
-            }
-
-            # Save the resolved address
-            $ipaddr = inet_ntoa( $h->addr() );
-            $cref->{'dnscache'}{$hostname} = $ipaddr;
-        }
-        else
-        {
-            $ipaddr = $cref->{'dnscache'}{$hostname};
-        }
-    }
-
-    return $ipaddr;
+    
+    return $hostname;
 }
 
 
@@ -278,10 +254,14 @@ sub snmpSessionArgs
         return $cref->{'snmpargs'}{$hosthash};
     }
 
-    my ($ipaddr, $port, $community) = split(/\|/o, $hosthash);
+    my $transport = $collector->param($token, 'snmp-transport') . '/ipv' .
+        $collector->param($token, 'snmp-ipversion');
+    
+    my ($hostname, $port, $community) = split(/\|/o, $hosthash);
 
     my $version = $collector->param($token, 'snmp-version');
-    my $ret = [ -hostname     => $ipaddr,
+    my $ret = [ -domain       => $transport,
+                -hostname     => $hostname,
                 -port         => $port,
                 -timeout      => $collector->param($token, 'snmp-timeout'),
                 -retries      => $collector->param($token, 'snmp-retries'),

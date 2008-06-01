@@ -222,14 +222,14 @@ sub initTarget
     $collector->registerDeleteCallback
         ( $token, \&Torrus::Collector::Cisco_cbQoS::deleteTarget );
     
-    my $ipaddr =
-        Torrus::Collector::SNMP::getHostIpAddress( $collector, $token );
-    if( not defined( $ipaddr ) )
+    my $hostname =
+        Torrus::Collector::SNMP::getHostname( $collector, $token );
+    if( not defined( $hostname ) )
     {
         $collector->deleteTarget($token);
         return 0;
     }
-    $tref->{'ipaddr'} = $ipaddr;
+    $tref->{'hostname'} = $hostname;
 
     return Torrus::Collector::Cisco_cbQoS::initTargetAttributes
         ( $collector, $token );
@@ -294,7 +294,7 @@ sub initTargetAttributes
         return 1;
     }
 
-    my $ipaddr = $tref->{'ipaddr'};
+    my $hostname = $tref->{'hostname'};
     my $port = $collector->param($token, 'snmp-port');
 
     my $version = $collector->param($token, 'snmp-version');
@@ -310,7 +310,7 @@ sub initTargetAttributes
         $community = $collector->param($token, 'snmp-username');
     }
 
-    my $hosthash = join('|', $ipaddr, $port, $community);
+    my $hosthash = join('|', $hostname, $port, $community);
     $tref->{'hosthash'} = $hosthash;
     
     if( Torrus::Collector::SNMP::isHostDead( $collector, $hosthash ) )
@@ -353,7 +353,7 @@ sub initTargetAttributes
 
     if( not defined $cref->{'ServicePolicyTable'}{$hosthash} )
     {
-        Debug("Retrieving Cisco cbQoS maps from $ipaddr");
+        Debug("Retrieving Cisco cbQoS maps from $hostname");
 
         my $ref = {};
         $cref->{'ServicePolicyTable'}{$hosthash} = $ref;
@@ -363,7 +363,7 @@ sub initTargetAttributes
                                  $oiddef{'cbQosServicePolicyTable'} );
         if( not defined( $result ) )
         {
-            Error("Error retrieving cbQosServicePolicyTable from $ipaddr: " .
+            Error("Error retrieving cbQosServicePolicyTable from $hostname: " .
                   $session->error());
             
             # When the remote agent is reacheable, but system objecs are
@@ -461,7 +461,7 @@ sub initTargetAttributes
                                  $oiddef{'cbQosObjectsTable'} );
         if( not defined( $result ) )
         {
-            Error("Error retrieving cbQosObjectsTable from $ipaddr: " .
+            Error("Error retrieving cbQosObjectsTable from $hostname: " .
                   $session->error());
 
             # When the remote agent is reacheable, but system objecs are

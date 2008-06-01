@@ -62,6 +62,8 @@ $defaultParams{'domain-name'} = '';
 $defaultParams{'host-subtree'} = '';
 $defaultParams{'snmp-check-sysuptime'} = 'yes';
 $defaultParams{'show-recursive'} = 'yes';
+$defaultParams{'snmp-ipversion'} = '4';
+$defaultParams{'snmp-transport'} = 'udp';
 
 our @copyParams =
     ( 'collector-period',
@@ -79,6 +81,8 @@ our @copyParams =
       'snmp-port',
       'snmp-localaddr',
       'snmp-localport',
+      'snmp-ipversion',
+      'snmp-transport',
       'snmp-community',
       'snmp-version',
       'snmp-username',
@@ -170,6 +174,7 @@ sub discover
 
     my %snmpargs;
     my $community;
+    
     my $version = $devdetails->param( 'snmp-version' );
     $snmpargs{'-version'} = $version;    
 
@@ -181,6 +186,9 @@ sub discover
         }
     }
     
+    $snmpargs{'-domain'} = $devdetails->param('snmp-transport') . '/ipv' .
+        $devdetails->param('snmp-ipversion');
+
     if( $version eq '1' or $version eq '2c' )
     {
         $community = $devdetails->param( 'snmp-community' );
@@ -217,7 +225,7 @@ sub discover
     my $hostname = $devdetails->param('snmp-host');
     my $domain = $devdetails->param('domain-name');
 
-    if( $domain and index($hostname, '.') < 0 )
+    if( $domain and index($hostname, '.') < 0 and index($hostname, ':') < 0 )
     {
          $hostname .= '.' . $domain;
     }

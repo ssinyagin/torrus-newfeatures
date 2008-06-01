@@ -79,6 +79,11 @@
       data-dir
       data-file
     -->
+    
+    <!-- Mandatory transport protocol -->
+    <param name="snmp-ipversion" value="4" />
+    <param name="snmp-transport" value="udp" />
+    
     <!-- Mandatory session timeout and no. of retries -->
     <param name="snmp-timeout" value="10" />
     <param name="snmp-retries" value="2" />

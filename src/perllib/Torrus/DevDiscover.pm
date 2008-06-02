@@ -341,6 +341,17 @@ sub discover
         }
     }
 
+    # If snmp-host is ipv6 address, system-id needs to be adapted to
+    # remove colons
+    
+    if( not defined( $data->{'param'}{'system-id'} ) and
+        index($data->{'param'}{'snmp-host'}, ':') >= 0 )
+    {
+        my $systemid = $data->{'param'}{'snmp-host'};
+        $systemid =~ s/:/_/g;
+        $data->{'param'}{'system-id'} = $systemid;
+    }
+
     if( not defined( $devdetails->snmpVar($self->oiddef('sysUpTime')) ) )
     {
         Debug('Agent does not support sysUpTime');
@@ -508,7 +519,7 @@ sub buildConfig
                 push( @{$data->{'templates'}}, '::holt-winters-defaults' );
             }
 
-
+            
             my $devNodeName = $devdetails->param('symbolic-name');
             if( length( $devNodeName ) == 0 )
             {
@@ -517,8 +528,8 @@ sub buildConfig
                 {
                     $devNodeName = $devdetails->param('snmp-host');
                 }
-            }
-
+            }                
+                
             my $devNode = $cb->addSubtree( $subtreeNode, $devNodeName,
                                            $data->{'param'},
                                            $data->{'templates'} );

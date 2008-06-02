@@ -314,7 +314,7 @@ sub validate_nodename
     my $self = shift;
     my $name = shift;
 
-    return ( $name =~ /^[0-9A-Za-z_\-\.]+$/o and
+    return ( $name =~ /^[0-9A-Za-z_\-\.\:]+$/o and
              $name !~ /\.\./o );
 }
 

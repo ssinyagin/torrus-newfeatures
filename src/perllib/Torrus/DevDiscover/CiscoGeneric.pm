@@ -397,7 +397,7 @@ sub buildConfig
                      'precedence' => -600};
         my $templates = [];
                 
-        $param->{'data-file'} = '%snmp-host%_power.rrd';
+        $param->{'data-file'} = '%system-id%_power.rrd';
 
         my $monitor = $devdetails->param('CiscoGeneric::power-monitor');
         if( length( $monitor ) > 0 )

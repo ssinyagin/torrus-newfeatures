@@ -730,6 +730,18 @@ to the left of the given RPN. I<Warning:> the translation works I<before>
 the RRDtool processes the data, so it makes sence to scale only non-COUNTER
 values.
 
+=item * C<snmp-ipversion>
+
+Mandatory for C<collector-type=snmp>. Valid values are C<4> and C<6>. The
+parameter defines the IP protocol version. If C<snmp-host> contains a DNS
+name, the IP address is determined by looking up A or AAAA DNS records,
+according to IP version.
+
+=item * C<snmp-transport>
+
+Mandatory for C<collector-type=snmp>. Valid values are C<tcp> and C<udp>.
+
+
 =item * C<snmp-host>
 
 Mandatory when C<collector-type=snmp>. Specifies the hostname or IP address

@@ -256,7 +256,8 @@ Optional. Specifies a comma-separated list of XML file names for bundle
 output. Each bundle file will contain E<lt>includeE<gt> statement for each
 corresponding C<output-file>.
 
-=item * C<snmp-port>, C<snmp-community>,  C<snmp-version>, C<snmp-timeout>,
+=item * C<snmp-ipversion>, C<snmp-transport>, C<snmp-port>,
+        C<snmp-community>,  C<snmp-version>, C<snmp-timeout>,
         C<snmp-retries>, C<snmp-host>, C<snmp-username>, C<snmp-authkey>,
         C<snmp-authpassword>, C<snmp-authprotocol>, C<snmp-privkey>,
         C<snmp-privpassword>, C<snmp-privprotocol>

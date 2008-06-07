@@ -426,8 +426,9 @@ sub buildConfig
             not defined( $interface->{'param'}{'comment'} ) and
             length( $interface->{$data->{'nameref'}{'ifComment'}} ) > 0 )
         {
-            $interface->{'param'}{'comment'} =
-                $interface->{$data->{'nameref'}{'ifComment'}};
+            my $comment = $interface->{$data->{'nameref'}{'ifComment'}};
+            $interface->{'param'}{'comment'} = $comment;
+            $interface->{'param'}{'interface-comment'} = $comment;
         }
 
         # Order the interfaces by ifIndex, not by interface name

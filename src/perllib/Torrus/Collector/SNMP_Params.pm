@@ -54,7 +54,8 @@ my %validatorLeafParams =
                                'COUNTER64' => undef },
      '+snmp-check-sysuptime' => { 'yes' => undef,
                                    'no'  => undef },
-     '+snmp-max-msg-size' => undef
+     '+snmp-max-msg-size' => undef,
+     '+snmp-ignore-mib-errors' => undef,
      );
 
 sub initValidatorLeafParams
@@ -89,7 +90,8 @@ my %admInfoLeafParams =
      'snmp-oids-per-pdu'  => undef,
      'snmp-object-type'   => undef,
      'snmp-check-sysuptime' => undef,
-     'snmp-max-msg-size' => undef
+     'snmp-max-msg-size' => undef,
+     'snmp-ignore-mib-errors' => undef,
      );
 
 
@@ -117,7 +119,8 @@ my %admInfoParamCategories =
      'snmp-oids-per-pdu'  => 'SNMP',
      'snmp-object-type'   => 'SNMP',
      'snmp-check-sysuptime' => 'SNMP',
-     'snmp-max-msg-size'  => 'SNMP'
+     'snmp-max-msg-size'  => 'SNMP',
+     'snmp-ignore-mib-errors' => 'SNMP'
      );
 
 

@@ -864,7 +864,13 @@ with some non-standard agents which don't implement this OID.
 
 Optional. If defined, it sets the SNMP maximum message size different from
 default 1472 octets (true for UDP/IPv4, see Net::SNMP documentation for more
-information). 
+information).
+
+=item * C<snmp-ignore-mib-errors>
+
+Optional. If set to C<yes>, the SNMP errors C<noSuchObject>, C<noSuchInstance>,
+C<endOfMibView> are ignored, and no action is performed when such errors
+occur.
     
 =item * C<system-id>
 

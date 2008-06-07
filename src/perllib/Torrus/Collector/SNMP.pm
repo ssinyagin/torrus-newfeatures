@@ -57,7 +57,8 @@ $Torrus::Collector::params{'snmp'} = {
     'snmp-oids-per-pdu' => undef,
     'snmp-object-type'  => 'OTHER',
     'snmp-check-sysuptime' => 'yes',
-    'snmp-max-msg-size' => undef
+    'snmp-max-msg-size' => undef,
+    'snmp-ignore-mib-errors' => undef,
     };
 
 my $sysUpTime = '1.3.6.1.2.1.1.3.0';
@@ -215,6 +216,11 @@ sub initTargetAttributes
     if( $collector->param($token, 'snmp-check-sysuptime') eq 'no' )
     {
         $cref->{'nosysuptime'}{$hosthash} = 1;
+    }
+
+    if( $collector->param($token, 'snmp-ignore-mib-errors' eq 'yes' ) )
+    {
+        $cref->{'ignoremiberrors'}{$hosthash}{$oid} = 1;
     }
     
     return 1;
@@ -976,11 +982,14 @@ sub callback
                 $value eq 'noSuchInstance' or
                 $value eq 'endOfMibView' )
             {
-                Error("Error retrieving $oid from $hosthash: $value");
-                
-                foreach my $token ( keys %{$pdu_tokens->{$oid}} )
+                if( not $cref->{'ignoremiberrors'}{$hosthash}{$oid} )
                 {
-                    $collector->deleteTarget($token);
+                    Error("Error retrieving $oid from $hosthash: $value");
+                    
+                    foreach my $token ( keys %{$pdu_tokens->{$oid}} )
+                    {
+                        $collector->deleteTarget($token);
+                    }
                 }
             }
             else

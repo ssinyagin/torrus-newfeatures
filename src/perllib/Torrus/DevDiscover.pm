@@ -833,7 +833,7 @@ sub storeSnmpVars
 
     while( my( $oid, $value ) = each %{$vars} )
     {
-        if( $oid !~ /^\d[0-9.]+\d$/ )
+        if( $oid !~ /^\d[0-9.]+\d$/o )
         {
             Error("Invalid OID syntax: '$oid'");
         }
@@ -843,8 +843,8 @@ sub storeSnmpVars
             
             while( length( $oid ) > 0 )
             {
-                $oid =~ s/\d+$//;
-                $oid =~ s/\.$//;
+                $oid =~ s/\d+$//o;
+                $oid =~ s/\.$//o;
                 if( not exists( $self->{'snmpvars'}{$oid} ) )
                 {
                     $self->{'snmpvars'}{$oid} = undef;
@@ -852,6 +852,9 @@ sub storeSnmpVars
             }
         }
     }
+
+    # Clean the cache of sorted OIDs
+    $self->{'sortedoids'} = undef;
 }
 
 ##
@@ -888,18 +891,28 @@ sub getSnmpIndices
     my $self = shift;
     my $prefix = shift;
 
+    # Remember the sorted OIDs, as sorting is quite expensive for large
+    # arrays.
+    
+    if( not defined( $self->{'sortedoids'} ) )
+    {
+        $self->{'sortedoids'} = [];
+        push( @{$self->{'sortedoids'}},
+              Net::SNMP::oid_lex_sort( keys %{$self->{'snmpvars'}} ) );
+    }
+        
     my @ret;
-    my $prefixLen = length( $prefix );
+    my $prefixLen = length( $prefix ) + 1;
     my $matched = 0;
 
-    foreach my $oid ( Net::SNMP::oid_lex_sort( keys %{$self->{'snmpvars'}} ) )
+    foreach my $oid ( @{$self->{'sortedoids'}} )
     {
         if( defined($self->{'snmpvars'}{$oid} ) )
         {
             if( Net::SNMP::oid_base_match( $prefix, $oid ) )
             {
                 # Extract the index from OID
-                my $index = substr( $oid, $prefixLen + 1 );
+                my $index = substr( $oid, $prefixLen );
                 push( @ret, $index );
                 $matched = 1;
             }

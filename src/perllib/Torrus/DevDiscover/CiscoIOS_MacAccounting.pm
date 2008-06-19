@@ -80,21 +80,37 @@ sub discover
     if( defined( $extSrv ) and length( $extSrv ) > 0 )
     {
         my $extStorage = {};
+        my $extStorageTrees = {};
+
         foreach my $srvDef ( split( /\s*,\s*/, $extSrv ) )
         {
-            my ( $serviceid, $peerName, $direction ) =
+            my ( $serviceid, $peerName, $direction, $trees ) =
                 split( /\s*:\s*/, $srvDef );
+
+            if( defined( $trees ) )
+            {
+                # Trees are listed with '|' as separator,
+                # whereas compiler expects commas
+                
+                $trees =~ s/\s*\|\s*/,/g;
+            }
+            
             if( $direction eq 'Both' )
             {
                 $extStorage->{$peerName}{'In'} = $serviceid . '_IN';
+                $extStorageTrees->{$serviceid . '_IN'} = $trees;
+                
                 $extStorage->{$peerName}{'Out'} = $serviceid . '_OUT';
+                $extStorageTrees->{$serviceid . '_OUT'} = $trees;
             }
             else
             {
                 $extStorage->{$peerName}{$direction} = $serviceid;
+                $extStorageTrees->{$serviceid} = $trees;
             }
         }
         $data->{'cipMacExtStorage'} = $extStorage;
+        $data->{'cipMacExtStoragetrees'} = $extStorageTrees;
     }
 
 
@@ -318,12 +334,26 @@ sub buildConfig
                         {
                             if( defined( $extStorage->{$dir} ) )
                             {
+                                my $serviceid = $extStorage->{$dir};
+                                
+                                my $params = {
+                                    'storage-type' => 'rrd,ext',
+                                    'ext-service-units' => 'bytes',
+                                    'ext-service-id' => $serviceid };
+                                
+                                if( defined( $data->{'cipMacExtStoragetrees'}{
+                                    $serviceid}) and
+                                    length( $data->{'cipMacExtStoragetrees'}{
+                                        $serviceid}) > 0 )
+                                {
+                                    $params->{'ext-service-trees'} =
+                                        $data->{'cipMacExtStoragetrees'}{
+                                            $serviceid};
+                                }
+                                
                                 $cb->addLeaf
                                     ( $peerNode, 'Bytes_' . $dir,
-                                      { 'storage-type' => 'rrd,ext',
-                                        'ext-service-units' => 'bytes',
-                                        'ext-service-id' =>
-                                            $extStorage->{$dir} } );
+                                      $params );
                             }
                         }
                         $extStorageApplied = 1;

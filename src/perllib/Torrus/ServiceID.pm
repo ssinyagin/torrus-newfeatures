@@ -74,8 +74,12 @@ sub add
 
     $self->{'db_params'}->addToList( 'a:', $serviceid );
     
-    my $tree = $parameters->{'tree'};
-    $self->{'db_params'}->addToList( 't:'.$tree, $serviceid );
+    my $trees = $parameters->{'trees'};
+
+    foreach my $tree ( split(/\s*,\s*/o, $trees) )
+    {
+        $self->{'db_params'}->addToList( 't:'.$tree, $serviceid );
+    }
 
     foreach my $param ( keys %{$parameters} )
     {

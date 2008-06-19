@@ -43,6 +43,9 @@ our %multigraph_remove_space =
 # instance of Torrus::ServiceID object, if needed
 my $srvIdParams;
 
+# tree names where we initialized service IDs
+my %srvIdInitialized;
+
 
 sub new
 {
@@ -550,14 +553,21 @@ sub postProcessNodes
                 {
                     if( $stype eq 'ext' )
                     {
-                        my $tree = $self->treeName();
                         if( not defined( $srvIdParams ) )
                         {
                             $srvIdParams =
                                 new Torrus::ServiceID( -WriteAccess => 1 );
-                            $srvIdParams->cleanAllForTree( $tree );
                         }
 
+                        my $srvTrees =
+                            $self->getNodeParam($token, 'ext-service-trees');
+
+                        if( not defined( $srvTrees ) or
+                            length( $srvTrees ) == 0 )
+                        {
+                            $srvTrees = $self->treeName();
+                        }
+                                                
                         my $serviceid =
                             $self->getNodeParam($token, 'ext-service-id');
                         if( $srvIdParams->idExists( $serviceid ) )
@@ -567,15 +577,45 @@ sub postProcessNodes
                         }
                         else
                         {
-                            my $params = {
-                                'tree' => $tree,
-                                'token' => $token,
-                                'dstype' => $self->getNodeParam($token,
-                                                                'ext-dstype'),
-                                'units' => $self->getNodeParam
-                                    ($token, 'ext-service-units') };
+                            foreach my $srvTree (split(/\s*,\s*/o, $srvTrees))
+                            {
+                                if( not Torrus::SiteConfig::treeExists
+                                    ( $srvTree ) )
+                                {
+                                    Error
+                                        ('Error processing ext-service-trees' .
+                                         'for ' . $self->path( $token ) .
+                                         ': tree ' . $srvTree .
+                                         ' does not exist');
+                                    $ok = 0;
+                                }
+                                else
+                                {
+                                    if( not $srvIdInitialized{$srvTree} )
+                                    {
+                                        $srvIdParams->cleanAllForTree
+                                            ( $srvTree );
+                                        $srvIdInitialized{$srvTree} = 1;
+                                    }
+                                }
+                            }
 
-                            $srvIdParams->add( $serviceid, $params );
+                            if( $ok )
+                            {
+                                # sorry for ackward Emacs auto-indent
+                                my $params = {
+                                    'trees' => $srvTrees,
+                                    'token' => $token,
+                                    'dstype' =>
+                                        $self->getNodeParam($token,
+                                                            'ext-dstype'),
+                                        'units' =>
+                                        $self->getNodeParam
+                                        ($token, 'ext-service-units')
+                                    };
+                                
+                                $srvIdParams->add( $serviceid, $params );
+                            }
                         }
                     }
                 }

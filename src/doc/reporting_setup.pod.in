@@ -66,6 +66,14 @@ the generated numeric data, and the Torrus software developers disclaim
 any responsibility for the data accuracy and usability.
 
 
+B<New in version 1.0.7:> You can assign the list of trees where the reports
+should be generated and shown. B<Warning:> after changing the destination tree,
+the compiler may complain about I<duplicate service IDs>. Then you need to
+stop all the torrus processes, including Apache, and then remove the file
+F<serviceid_params.db> from Torrus database directory, then recompile the
+trees and start the processes.
+
+
 =head2 Install Perl modules
 
 Install the following Perl modules from CPAN:
@@ -196,8 +204,9 @@ This discovery parameter specifies which service IDs are assigned to which
 interface names. The interface names whould be specified in the form of
 their subtree names in Torrus configuration. The example below is
 typical for a Cisco IOS router. The value of the parameter consists of
-comma-separated triples. The values in each triple are separated by colons,
-and they correspond to the service ID, interface name, and the counter type.
+comma-separated strings. The values in each string are separated by colons,
+and they correspond to the service ID, interface name, counter type,
+and optional destination tree names separated by the pipe symbol (|).
 The interface name can be prefixed by hostname and slash (/),
 the same way as in C<RFC2863_IF_MIB::tokenset-members>. 
 All strings are case-sensitive. Three counter types are supported: C<In>,
@@ -214,9 +223,10 @@ C<_IN> or C<_OUT> postfix accordingly, for input and output byte counters.
    <param name="snmp-host" value="lsn01br01"/>
    <!-- host-specfic parameter  -->
    <param name="RFC2863_IF_MIB::external-serviceid">
-     UPSTREAM1_IN:FastEthernet0_0_0:In,
-     UPSTREAM1_OUT:FastEthernet0_0_0:Out,
-     UPSTREAM2:GigabitEthernet0_1_1:Both,
+     UPSTREAM1_IN:FastEthernet0_0_0:In:upstreams,
+     UPSTREAM1_OUT:FastEthernet0_0_0:Out:upstreams,
+     UPSTREAM2:GigabitEthernet0_1_1:Both:upstreams,
+     CUST1:GigabitEthernet0_2_2:Both:customers|cust1,
    </param>
  </host>
 
@@ -304,7 +314,7 @@ The example below generates the monthly usage report for September 2005:
 The next example generates HTML output for all reports that are found
 in the database:
 
- nice torrus report --genhtml --tree=mytree
+ nice torrus report --genhtml --tree=customers
 
 It makes sence to set up a monthly cron job and generate the reports on
 the first day of every month, with the command like follows:
@@ -327,4 +337,4 @@ Also clicking a service ID leads to its monthly report throughout the year.
 
 
 
-Copyright (c) 2005-2006 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2005-2008 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

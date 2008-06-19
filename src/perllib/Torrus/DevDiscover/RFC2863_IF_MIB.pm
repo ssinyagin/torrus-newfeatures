@@ -520,11 +520,13 @@ sub buildConfig
     my $extSrv =
         $devdetails->param('RFC2863_IF_MIB::external-serviceid');
     my %extStorage;
+    my %extStorageTrees;
+    
     if( defined( $extSrv ) and length( $extSrv ) > 0 )
     {
         foreach my $srvDef ( split( /\s*,\s*/, $extSrv ) )
         {
-            my ( $serviceid, $intfName, $direction ) =
+            my ( $serviceid, $intfName, $direction, $trees ) =
                 split( /\s*:\s*/, $srvDef );
 
             if( $intfName =~ /\// )
@@ -542,14 +544,26 @@ sub buildConfig
 
             if( defined( $intfName ) and length( $intfName ) > 0 )
             {
+                if( defined( $trees ) )
+                {
+                    # Trees are listed with '|' as separator,
+                    # whereas compiler expects commas
+                    
+                    $trees =~ s/\s*\|\s*/,/g;
+                }
+                            
                 if( $direction eq 'Both' )
                 {
                     $extStorage{$intfName}{'In'} = $serviceid . '_IN';
+                    $extStorageTrees{$serviceid . '_IN'} = $trees;
+                    
                     $extStorage{$intfName}{'Out'} = $serviceid . '_OUT';
+                    $extStorageTrees{$serviceid . '_OUT'} = $trees;
                 }
                 else
                 {
                     $extStorage{$intfName}{$direction} = $serviceid;
+                    $extStorageTrees{$serviceid} = $trees;
                 }
             }
         }
@@ -866,13 +880,22 @@ sub buildConfig
                 {
                     if( defined( $extStorage{$subtreeName}{$dir} ) )
                     {
+                        my $serviceid = $extStorage{$subtreeName}{$dir};
+
+                        my $params = {
+                            'storage-type'      => 'rrd,ext',
+                            'ext-service-id'    => $serviceid,
+                            'ext-service-units' => 'bytes' };
+                        
+                        if( defined( $extStorageTrees{$serviceid} )
+                            and length( $extStorageTrees{$serviceid} ) > 0 )
+                        {
+                            $params->{'ext-service-trees'} =
+                                $extStorageTrees{$serviceid};
+                        }
+                        
                         $interface->{'childCustomizations'}->{
-                            'Bytes_' . $dir}->{'storage-type'} = 'rrd,ext';
-                        $interface->{'childCustomizations'}->{
-                            'Bytes_' . $dir}->{'ext-service-id'} =
-                                $extStorage{$subtreeName}{$dir};
-                        $interface->{'childCustomizations'}->{
-                            'Bytes_' . $dir}->{'ext-service-units'} = 'bytes';
+                            'Bytes_' . $dir} = $params;
                     }
                 }
             }

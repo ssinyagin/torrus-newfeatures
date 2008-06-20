@@ -218,7 +218,7 @@ sub initTargetAttributes
         $cref->{'nosysuptime'}{$hosthash} = 1;
     }
 
-    if( $collector->param($token, 'snmp-ignore-mib-errors' eq 'yes' ) )
+    if( $collector->param($token, 'snmp-ignore-mib-errors') eq 'yes' )
     {
         $cref->{'ignoremiberrors'}{$hosthash}{$oid} = 1;
     }

@@ -61,8 +61,9 @@ sub idExists
 {
     my $self = shift;
     my $serviceid = shift;
+    my $tree = shift;
 
-    return $self->{'db_params'}->searchList( 'a:', $serviceid );
+    return $self->{'db_params'}->searchList( 't:'.$tree, $serviceid );
 }    
     
 
@@ -136,19 +137,37 @@ sub cleanAllForTree
     {
         foreach my $serviceid ( split( ',', $idlist ) )
         {
+            # A ServiceID may belong to several trees.
+            # delete it from all other trees.
+
+            my $srvTrees =
+                $self->{'db_params'}->get( 'p:'.$serviceid.':trees' );
+            
+            foreach my $srvTree ( split(/\s*,\s*/o, $srvTrees) )
+            {
+                if( $srvTree ne $tree )
+                {
+                    $self->{'db_params'}->delFromList( 't:'.$srvTree,
+                                                       $serviceid );
+                }
+            }            
+            
             $self->{'db_params'}->delFromList( 'a:', $serviceid );
             
             my $plist = $self->{'db_params'}->get( 'P:'.$serviceid );
+
             foreach my $param ( split(',', $plist ) )
             {
                 $self->{'db_params'}->del( 'p:'.$serviceid.':'.$param );
             }
+
             $self->{'db_params'}->del( 'P:'.$serviceid );
+            
         }
-        $self->{'db_params'}->del('t:'.$tree);
+        $self->{'db_params'}->deleteList('t:'.$tree);
     }
 }
-            
+
             
             
             

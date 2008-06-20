@@ -584,6 +584,17 @@ sub delFromList
 }
 
 
+
+sub deleteList
+{
+    my $self = shift;
+    my $key = shift;
+
+    delete $self->{'listcache'}{$key};
+    $self->del($key);
+}
+
+
 1;
 
 

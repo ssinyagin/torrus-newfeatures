@@ -570,52 +570,55 @@ sub postProcessNodes
                                                 
                         my $serviceid =
                             $self->getNodeParam($token, 'ext-service-id');
-                        if( $srvIdParams->idExists( $serviceid ) )
+
+                        foreach my $srvTree (split(/\s*,\s*/o, $srvTrees))
                         {
-                            Error('Duplicate ServiceID: ' . $serviceid);
-                            $ok = 0;
-                        }
-                        else
-                        {
-                            foreach my $srvTree (split(/\s*,\s*/o, $srvTrees))
+                            if( not Torrus::SiteConfig::treeExists($srvTree) )
                             {
-                                if( not Torrus::SiteConfig::treeExists
-                                    ( $srvTree ) )
+                                Error
+                                    ('Error processing ext-service-trees' .
+                                     'for ' . $self->path( $token ) .
+                                     ': tree ' . $srvTree .
+                                     ' does not exist');
+                                $ok = 0;
+                            }
+                            else
+                            {
+                                if( not $srvIdInitialized{$srvTree} )
                                 {
-                                    Error
-                                        ('Error processing ext-service-trees' .
-                                         'for ' . $self->path( $token ) .
-                                         ': tree ' . $srvTree .
-                                         ' does not exist');
-                                    $ok = 0;
+                                    $srvIdParams->cleanAllForTree
+                                        ( $srvTree );
+                                    $srvIdInitialized{$srvTree} = 1;
                                 }
                                 else
                                 {
-                                    if( not $srvIdInitialized{$srvTree} )
+                                    if( $srvIdParams->idExists( $serviceid,
+                                                                $srvTree ) )
                                     {
-                                        $srvIdParams->cleanAllForTree
-                                            ( $srvTree );
-                                        $srvIdInitialized{$srvTree} = 1;
+                                        Error('Duplicate ServiceID: ' .
+                                              $serviceid . ' in tree ' .
+                                              $srvTree);
+                                        $ok = 0;
                                     }
                                 }
                             }
+                        }
 
-                            if( $ok )
-                            {
-                                # sorry for ackward Emacs auto-indent
-                                my $params = {
-                                    'trees' => $srvTrees,
-                                    'token' => $token,
-                                    'dstype' =>
-                                        $self->getNodeParam($token,
-                                                            'ext-dstype'),
-                                        'units' =>
-                                        $self->getNodeParam
-                                        ($token, 'ext-service-units')
-                                    };
-                                
-                                $srvIdParams->add( $serviceid, $params );
-                            }
+                        if( $ok )
+                        {
+                            # sorry for ackward Emacs auto-indent
+                            my $params = {
+                                'trees' => $srvTrees,
+                                'token' => $token,
+                                'dstype' =>
+                                    $self->getNodeParam($token,
+                                                        'ext-dstype'),
+                                    'units' =>
+                                    $self->getNodeParam
+                                    ($token, 'ext-service-units')
+                                };
+                            
+                            $srvIdParams->add( $serviceid, $params );
                         }
                     }
                 }

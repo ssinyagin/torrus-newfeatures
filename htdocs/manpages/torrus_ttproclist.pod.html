@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>ttproclist - Process a template with a nodelist</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -50,56 +52,58 @@ Alternatively, it can produce Torrus XML configuration for a given list
 of objects, etc.</p>
 <p>The following variables are predefined when the template is processed:</p>
 <ul>
-<li><strong><a name="item_nodes"><code>nodes</code></a></strong><br />
+<li><strong><a name="item_nodes"><code>nodes</code></a></strong>
+
+<p>Hash array of nodes. Hash keys are the node names. Values are symbolic
+names. If symbolic names are not defined, values are the same as keys.</p>
 </li>
-Hash array of nodes. Hash keys are the node names. Values are symbolic
-names. If symbolic names are not defined, values are the same as keys.
-<p></p>
-<li><strong><a name="item_param"><code>param</code></a></strong><br />
+<li><strong><a name="item_param"><code>param</code></a></strong>
+
+<p>Hash array of command-line parameters given in <strong>--param</strong> option.</p>
 </li>
-Hash array of command-line parameters given in <strong>--param</strong> option.
-<p></p>
-<li><strong><a name="item_nodesfile_2c_creator"><code>nodesfile</code>, <code>creator</code></a></strong><br />
-</li>
-Informative variables. They can be used to produce the creation
+<li><strong><a name="item_nodesfile_2c_creator"><code>nodesfile</code>, <code>creator</code></a></strong>
+
+<p>Informative variables. They can be used to produce the creation
 note in the resulting files. <code>nodesfile</code> returns the file name of nodes,
 and <code>creator</code> returns a detailed information how the file was generated,
-with timestamp and command line options.
-<p></p></ul>
+with timestamp and command line options.</p>
+</li>
+</ul>
 <p>
 </p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dtmpl_3dtfile"><strong>--tmpl</strong>=<em>TFILE</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dtmpl_3dtfile"><strong>--tmpl</strong>=<em>TFILE</em></a></strong>
+
 <dd>
-The file name of the input template. Relative names are looked in
+<p>The file name of the input template. Relative names are looked in
 the current directory and in <em>/usr/local/etc/torrus/templates</em>. The file name may also be
-an absolute path.
+an absolute path.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dout_3dofile"><strong>--out</strong>=<em>OFILE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dout_3dofile"><strong>--out</strong>=<em>OFILE</em></a></strong>
+
 <dd>
-Output file name. If no absolute path given, the file is written in the current
-directory.
+<p>Output file name. If no absolute path given, the file is written in the current
+directory.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dnodes_3dnfile"><strong>--nodes</strong>=<em>NFILE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dnodes_3dnfile"><strong>--nodes</strong>=<em>NFILE</em></a></strong>
+
 <dd>
-The name of the nodes list. Nodes should be separated by space or tab
+<p>The name of the nodes list. Nodes should be separated by space or tab
 character or newline. Additional information, referred to as symbolic name,
-can be supplied after a colon, of the form NODENAME:SYMBOLICNAME.
+can be supplied after a colon, of the form NODENAME:SYMBOLICNAME.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dparam_3dname_3avalue_2cname_3avalue_2e_2e_2e"><strong>--param</strong>=<em>NAME:VALUE,NAME:VALUE...</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dparam_3dname_3avalue_2cname_3avalue_2e_2e_2e"><strong>--param</strong>=<em>NAME:VALUE,NAME:VALUE...</em></a></strong>
+
 <dd>
-List of optional parameters that may be used in the template.
+<p>List of optional parameters that may be used in the template.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

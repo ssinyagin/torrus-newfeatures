@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Torrus Web Interface Reference</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -65,29 +67,30 @@ appearance of your Torrus installation, you need to clean both caches:</p>
 <p>The following variables may need to be set in your
 <em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em> file:</p>
 <ul>
-<li><strong><a name="item__24torrus_3a_3arenderer_3a_3acompanyname"><code>$Torrus::Renderer::companyName</code></a></strong><br />
+<li><strong><a name="item__torrus__renderer__companyname"><code>$Torrus::Renderer::companyName</code></a></strong>
+
+<p>The text that you specify here will appear in the top left corner
+of all HTML pages.</p>
 </li>
-The text that you specify here will appear in the top left corner
-of all HTML pages.
-<p></p>
-<li><strong><a name="item__24torrus_3a_3arenderer_3a_3acompanyurl"><code>$Torrus::Renderer::companyURL</code></a></strong><br />
+<li><strong><a name="item__torrus__renderer__companyurl"><code>$Torrus::Renderer::companyURL</code></a></strong>
+
+<p>The company name text will be clickable with the URL specified in
+this variable.</p>
 </li>
-The company name text will be clickable with the URL specified in
-this variable.
-<p></p>
-<li><strong><a name="item__24torrus_3a_3arenderer_3a_3arendererurl"><code>$Torrus::Renderer::rendererURL</code></a></strong><br />
+<li><strong><a name="item__torrus__renderer__rendererurl"><code>$Torrus::Renderer::rendererURL</code></a></strong>
+
+<p>Default: <code>'/torrus'</code>. A URL that points to Torrus renderer.</p>
 </li>
-Default: <code>'/torrus'</code>. A URL that points to Torrus renderer.
-<p></p>
-<li><strong><a name="item__24torrus_3a_3arenderer_3a_3aplainurl"><code>$Torrus::Renderer::plainURL</code></a></strong><br />
+<li><strong><a name="item__torrus__renderer__plainurl"><code>$Torrus::Renderer::plainURL</code></a></strong>
+
+<p>Default: <code>'/torrus/plain'</code>. A URL that points to Torrus plain files directory.
+Normally CSS stylesheet files are resided there..</p>
 </li>
-Default: <code>'/torrus/plain'</code>. A URL that points to Torrus plain files directory.
-Normally CSS stylesheet files are resided there..
-<p></p>
-<li><strong><a name="item__24torrus_3a_3aapachehandler_3a_3aauthorizeusers"><code>$Torrus::ApacheHandler::authorizeUsers</code></a></strong><br />
+<li><strong><a name="item__torrus__apachehandler__authorizeusers"><code>$Torrus::ApacheHandler::authorizeUsers</code></a></strong>
+
+<p>Default: <code>1</code>. When true, the web interface users are required to log in.</p>
 </li>
-Default: <code>1</code>. When true, the web interface users are required to log in.
-<p></p></ul>
+</ul>
 <p>
 </p>
 <h2><a name="mod_perl_1_0_handler__torrus__apachehandler">mod_perl 1.0 handler: Torrus::ApacheHandler</a></h2>
@@ -145,71 +148,72 @@ with Torrus.</p>
 <h2><a name="known_cgi_parameters">Known CGI parameters</a></h2>
 <p>The following CGI parameters are recognized by mod_perl handler:</p>
 <dl>
-<dt><strong><a name="item_token">token</a></strong><br />
-</dt>
+<dt><strong><a name="item_token">token</a></strong>
+
 <dd>
-Optional. Each configuration tree element is referenced by a <em>token</em>, a short
-unique identifier. If not given, the root of the tree (<code>/</code>) is displayed.
+<p>Optional. Each configuration tree element is referenced by a <em>token</em>, a short
+unique identifier. If not given, the root of the tree (<code>/</code>) is displayed.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_path">path</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_path">path</a></strong>
+
 <dd>
-Optional. Alternatively to token reference, the full path of the tree element
-may be referenced.
+<p>Optional. Alternatively to token reference, the full path of the tree element
+may be referenced.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_view">view</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_view">view</a></strong>
+
 <dd>
-Optional. Specifies the <a href="#item_view"><code>view</code></a> name for displaying the tree element.
-If not specified, the defaul view is used.
+<p>Optional. Specifies the <a href="#item_view"><code>view</code></a> name for displaying the tree element.
+If not specified, the defaul view is used.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_tz">TZ</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_tz">TZ</a></strong>
+
 <dd>
-Optional. If given, specifies the timezone that you want the graphs to be
+<p>Optional. If given, specifies the timezone that you want the graphs to be
 displayed for. This must be the URL-encoded zone name which is understood by
-your server system. You may use <code>zdump(8)</code> for testing.
+your server system. You may use <code>zdump(8)</code> for testing.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_now">NOW</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_now">NOW</a></strong>
+
 <dd>
-Optional. If given, presents the output for the given moment, instead of the
+<p>Optional. If given, presents the output for the given moment, instead of the
 current time. Must be of the form understood by <code>rrdtool</code> (see
-RRDTool manuals).
+RRDTool manuals).</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_debug">DEBUG</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_debug">DEBUG</a></strong>
+
 <dd>
-Optional. If true, turns on the debug level of logging. The debug messages
-are sent to HTTP server's error log.
+<p>Optional. If true, turns on the debug level of logging. The debug messages
+are sent to HTTP server's error log.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_showhidden">SHOWHIDDEN</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_showhidden">SHOWHIDDEN</a></strong>
+
 <dd>
-Optional. If true, makes the grapher display those subtree and leaves
-which have <code>hidden</code> parameter set to <code>yes</code>.
+<p>Optional. If true, makes the grapher display those subtree and leaves
+which have <code>hidden</code> parameter set to <code>yes</code>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_nohw">NOHW</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_nohw">NOHW</a></strong>
+
 <dd>
-Optional. If true, disables the displaying of Holt-Winters
-boundaries and failures.
+<p>Optional. If true, disables the displaying of Holt-Winters
+boundaries and failures.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_logout">LOGOUT</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_logout">LOGOUT</a></strong>
+
 <dd>
-Optional. When user authorization is enabled, causes the current user
-session to log out.
+<p>Optional. When user authorization is enabled, causes the current user
+session to log out.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>All other parameters whose name starts with capital letter, are passed
 to the HTML template as-is, and may be used for your custom purposes.</p>
 <p>

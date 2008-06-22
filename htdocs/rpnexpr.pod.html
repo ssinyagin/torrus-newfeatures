@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>RPN expressions in Torrus</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -35,43 +37,44 @@ in RRDtool version 1.0. See the <code>rrdtool graph</code> manual at
 </p>
 <h2><a name="new_functions_added">New functions added</a></h2>
 <ul>
-<li><strong><a name="item_ne">NE</a></strong><br />
+<li><strong><a name="item_ne">NE</a></strong>
+
+<p>Pops two arguments from stack, and pushes 0 if the arguments are equal,
+and 1 otherwise.</p>
 </li>
-Pops two arguments from stack, and pushes 0 if the arguments are equal,
-and 1 otherwise.
-<p></p>
-<li><strong><a name="item_and_2c_or">AND, OR</a></strong><br />
+<li><strong><a name="item_and_2c_or">AND, OR</a></strong>
+
+<p>These functions pop two arguments from stack, and push back the result of
+logical operation. Unlike C operators,</p>
 </li>
-These functions pop two arguments from stack, and push back the result of
-logical operation. Unlike C operators,
-<p></p>
-<li><strong><a name="item_not">NOT</a></strong><br />
+<li><strong><a name="item_not">NOT</a></strong>
+
+<p>Pops one value from stack and pushes 0 if the argument is nonzero,
+otherwise 1.</p>
 </li>
-Pops one value from stack and pushes 0 if the argument is nonzero,
-otherwise 1.
-<p></p>
-<li><strong><a name="item_abs">ABS</a></strong><br />
+<li><strong><a name="item_abs">ABS</a></strong>
+
+<p>Pops one value from stack and pushes the absolute value of it.</p>
 </li>
-Pops one value from stack and pushes the absolute value of it.
-<p></p>
-<li><strong><a name="item_now">NOW</a></strong><br />
+<li><strong><a name="item_now">NOW</a></strong>
+
+<p>Pushes the current time, in seconds since Epoch.</p>
 </li>
-Pushes the current time, in seconds since Epoch.
-<p></p>
-<li><strong><a name="item_mod">MOD</a></strong><br />
+<li><strong><a name="item_mod">MOD</a></strong>
+
+<p>Equivalent of <code>%</code>, the modulo operator. In Torrus parameter value,
+percent sign is reserved for parameter substitution.</p>
 </li>
-Equivalent of <code>%</code>, the modulo operator. In Torrus parameter value,
-percent sign is reserved for parameter substitution.
-<p></p>
-<li><strong><a name="item_num">NUM</a></strong><br />
+<li><strong><a name="item_num">NUM</a></strong>
+
+<p>Returns zero if the argument is undefined, and the argument's numeric value
+otherwise</p>
 </li>
-Returns zero if the argument is undefined, and the argument's numeric value
-otherwise
-<p></p>
-<li><strong><a name="item_inf_2c_neginf">INF, NEGINF</a></strong><br />
+<li><strong><a name="item_inf_2c_neginf">INF, NEGINF</a></strong>
+
+<p>Returns the positive or negative infinity.</p>
 </li>
-Returns the positive or negative infinity.
-<p></p></ul>
+</ul>
 <p>
 </p>
 <h2><a name="data_access">Data access</a></h2>

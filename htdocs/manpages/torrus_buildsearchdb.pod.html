@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>buildsearchdb - Build the search database</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -46,43 +48,44 @@ search index database. One of the three options <strong>--tree</strong>, <strong
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dtree_3dtree"><strong>--tree</strong>=<em>TREE</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dtree_3dtree"><strong>--tree</strong>=<em>TREE</em></a></strong>
+
 <dd>
-Build the indexes for a given tree.
+<p>Build the indexes for a given tree.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dall"><strong>--all</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dall"><strong>--all</strong></a></strong>
+
 <dd>
-Builds the tree indexes for all trees.
+<p>Builds the tree indexes for all trees.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dglobal"><strong>--global</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dglobal"><strong>--global</strong></a></strong>
+
 <dd>
-Builds the global index for all trees and also the tree indexes for every
+<p>Builds the global index for all trees and also the tree indexes for every
 tree. In order to use the global search database, the web user
 should have the permission to display all trees and also it should have
-the permission for GlobalSearch for all trees, for example:
+the permission for GlobalSearch for all trees, for example:</p>
 </dd>
 <dd>
 <pre>
    torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'</pre>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>
+
 <dd>
-Prints extra information
+<p>Prints extra information</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong>
+
 <dd>
-Displays a help message.
+<p>Displays a help message.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

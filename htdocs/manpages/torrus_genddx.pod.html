@@ -1,10 +1,12 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>genddx - Generates SNMP discovery instructions file for 
 B&lt;devdiscover&gt;</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -62,97 +64,99 @@ complex DDX generator.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dout_3doutfilename"><strong>--out</strong>=<em>OUTFILENAME</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dout_3doutfilename"><strong>--out</strong>=<em>OUTFILENAME</em></a></strong>
+
 <dd>
-Sets the output file to <em>OUTFILENAME</em>. Default is <em>routers.ddx</em>. Without
-absolute path, the file will be placed in <em>/usr/local/etc/torrus/discovery</em>.
+<p>Sets the output file to <em>OUTFILENAME</em>. Default is <em>routers.ddx</em>. Without
+absolute path, the file will be placed in <em>/usr/local/etc/torrus/discovery</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddiscout_3dfilename"><strong>--discout</strong>=<em>FILENAME</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddiscout_3dfilename"><strong>--discout</strong>=<em>FILENAME</em></a></strong>
+
 <dd>
-Sets the discovery output file to <em>FILENAME</em>. This will be the filename of
+<p>Sets the discovery output file to <em>FILENAME</em>. This will be the filename of
 the Torrus XML configuration file once the output file of the <strong>genddx</strong>
 is processed by the <strong>devdiscover</strong> utility. Default value is
 <em>routers.xml</em>. Without absolute path, the file would be resided in
-<em>/usr/local/etc/torrus/xmlconfig</em>.
+<em>/usr/local/etc/torrus/xmlconfig</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddomain_3ddomain"><strong>--domain</strong>=<em>DOMAIN</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddomain_3ddomain"><strong>--domain</strong>=<em>DOMAIN</em></a></strong>
+
 <dd>
-Sets the DNS domain name to <em>DOMAIN</em>.
+<p>Sets the DNS domain name to <em>DOMAIN</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dversion_3dsnmpversion"><strong>--version</strong>=<em>SNMPVERSION</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dversion_3dsnmpversion"><strong>--version</strong>=<em>SNMPVERSION</em></a></strong>
+
 <dd>
-Sets discovery SNMP version to SNMPVERSION. Default value is <code>2c</code>.
+<p>Sets discovery SNMP version to SNMPVERSION. Default value is <code>2c</code>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dcommunity_3dcommunity"><strong>--community</strong>=<em>COMMUNITY</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dcommunity_3dcommunity"><strong>--community</strong>=<em>COMMUNITY</em></a></strong>
+
 <dd>
-Sets discovery SNMP read community value to string <em>COMMUNITY</em>. Default 
-is <code>public</code>.
+<p>Sets discovery SNMP read community value to string <em>COMMUNITY</em>. Default 
+is <code>public</code>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dport_3dport"><strong>--port</strong>=<em>PORT</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dport_3dport"><strong>--port</strong>=<em>PORT</em></a></strong>
+
 <dd>
-Sets SNMP port to <em>PORT</em>. Default is 161.
+<p>Sets SNMP port to <em>PORT</em>. Default is 161.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dretries_3dnumretries"><strong>--retries</strong>=<em>NUMRETRIES</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dretries_3dnumretries"><strong>--retries</strong>=<em>NUMRETRIES</em></a></strong>
+
 <dd>
-Sets number of retries to <em>NUMRETRIES</em>. Default value is 2.
+<p>Sets number of retries to <em>NUMRETRIES</em>. Default value is 2.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dtimeout_3dtimeout"><strong>--timeout</strong>=<em>TIMEOUT</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dtimeout_3dtimeout"><strong>--timeout</strong>=<em>TIMEOUT</em></a></strong>
+
 <dd>
-Sets SNMP timeout to <em>TIMEOUT</em> seconds. Default value is 10.
+<p>Sets SNMP timeout to <em>TIMEOUT</em> seconds. Default value is 10.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dsubtree_3dsubtree"><strong>--subtree</strong>=<em>SUBTREE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dsubtree_3dsubtree"><strong>--subtree</strong>=<em>SUBTREE</em></a></strong>
+
 <dd>
-Sets the subtree name to <em>SUBTREE</em>. Default is <code>/Routers</code>.
+<p>Sets the subtree name to <em>SUBTREE</em>. Default is <code>/Routers</code>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddatadir_3ddatadir"><strong>--datadir</strong>=<em>DATADIR</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddatadir_3ddatadir"><strong>--datadir</strong>=<em>DATADIR</em></a></strong>
+
 <dd>
-Sets the path of the directory where SNMP data is collected to <em>DATADIR</em>.
-Default value is <em>/srv/torrus/collector_rrd</em>.
+<p>Sets the path of the directory where SNMP data is collected to <em>DATADIR</em>.
+Default value is <em>/srv/torrus/collector_rrd</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dholtwinters"><strong>--holtwinters</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dholtwinters"><strong>--holtwinters</strong></a></strong>
+
 <dd>
-Enables Holt-Winters analysis.
+<p>Enables Holt-Winters analysis.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fdiscovery_2frouter"><em>/usr/local/etc/torrus/discovery/routers.ddx</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fdiscovery_2frouter"><em>/usr/local/etc/torrus/discovery/routers.ddx</em></a></strong>
+
 <dd>
-Default output file of genddx.
+<p>Default output file of genddx.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fxmlconfig_2frouter"><em>/usr/local/etc/torrus/xmlconfig/routers.xml</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fxmlconfig_2frouter"><em>/usr/local/etc/torrus/xmlconfig/routers.xml</em></a></strong>
+
 <dd>
-Default Torrus XML configuration file which will be written once the 
-genddx output file is processed with devdiscover utility.
+<p>Default Torrus XML configuration file which will be written once the 
+genddx output file is processed with devdiscover utility.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

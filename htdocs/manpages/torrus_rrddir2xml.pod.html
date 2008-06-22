@@ -1,10 +1,12 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>rrddir2xml - Searches a directory for RRD files and generates Torrus XML
 configuration file.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -53,80 +55,81 @@ top that host name are sorted alphabetically in that subtree.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2ddir_3ddir"><strong>--dir</strong>=<em>DIR</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2ddir_3ddir"><strong>--dir</strong>=<em>DIR</em></a></strong>
+
 <dd>
-Absolute path to the directory for searching. The directory may contain also
-non-RRD files. Only regular files are processed, and the symlinks are ignored.
+<p>Absolute path to the directory for searching. The directory may contain also
+non-RRD files. Only regular files are processed, and the symlinks are ignored.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2drecursive"><strong>--recursive</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2drecursive"><strong>--recursive</strong></a></strong>
+
 <dd>
-If specified, the directory will be searched recursively. All file names
+<p>If specified, the directory will be searched recursively. All file names
 across all subdirectories must be unique. Symlinks to other directories
-are ignored.
+are ignored.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dfilter_3dregexp"><strong>--filter</strong>=<em>Regexp</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dfilter_3dregexp"><strong>--filter</strong>=<em>Regexp</em></a></strong>
+
 <dd>
-If the filter is specified, then <strong>rrddir2xml</strong> lists only those files and
-subdirectories whose names match the given regular expression.
+<p>If the filter is specified, then <strong>rrddir2xml</strong> lists only those files and
+subdirectories whose names match the given regular expression.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dout_3dfile"><strong>--out</strong>=<em>FILE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dout_3dfile"><strong>--out</strong>=<em>FILE</em></a></strong>
+
 <dd>
-Output XML file name. If relative path given, the file is placed in
-<em>/usr/local/etc/torrus/xmlconfig</em>. Default: <em>rrddir.xml</em>.
+<p>Output XML file name. If relative path given, the file is placed in
+<em>/usr/local/etc/torrus/xmlconfig</em>. Default: <em>rrddir.xml</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dsubtree_3dsubtree"><strong>--subtree</strong>=<em>SUBTREE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dsubtree_3dsubtree"><strong>--subtree</strong>=<em>SUBTREE</em></a></strong>
+
 <dd>
-Top subtree path in the generted XML. Default is the top of the tree (<code>/</code>).
+<p>Top subtree path in the generted XML. Default is the top of the tree (<code>/</code>).</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dsplit_3dregexp"><strong>--split</strong>=<em>REGEXP</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dsplit_3dregexp"><strong>--split</strong>=<em>REGEXP</em></a></strong>
+
 <dd>
-Regular expression used for splitting the file name into parts
-to build the subtree hierarchy. Default is a sequence of underscores (<code>_+</code>).
+<p>Regular expression used for splitting the file name into parts
+to build the subtree hierarchy. Default is a sequence of underscores (<code>_+</code>).</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dlevels_3dinteger"><strong>--levels</strong>=<em>INTEGER</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dlevels_3dinteger"><strong>--levels</strong>=<em>INTEGER</em></a></strong>
+
 <dd>
-Number of levels of hierarchy to build by splitting the file names.
-Default is 2 levels.
+<p>Number of levels of hierarchy to build by splitting the file names.
+Default is 2 levels.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dcomment_3dtext"><strong>--comment</strong>=<em>TEXT</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dcomment_3dtext"><strong>--comment</strong>=<em>TEXT</em></a></strong>
+
 <dd>
-Text to put as <code>comment</code> parameter to the top subtree.
+<p>Text to put as <code>comment</code> parameter to the top subtree.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dholtwinters"><strong>--holtwinters</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dholtwinters"><strong>--holtwinters</strong></a></strong>
+
 <dd>
-If specified, Holt-Winters prediciton boundaries and failures are displayed
-in the graphs.
+<p>If specified, Holt-Winters prediciton boundaries and failures are displayed
+in the graphs.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>
+
 <dd>
-Prints extra diagnosics.
+<p>Prints extra diagnosics.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong>
+
 <dd>
-Prints debugging information.
+<p>Prints debugging information.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

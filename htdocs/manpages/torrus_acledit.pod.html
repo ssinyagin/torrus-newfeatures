@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>acledit - Manage Torrus access control lists.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -58,154 +60,157 @@ this group is allowed to browse.</p>
 <hr />
 <h1><a name="group_management_options">GROUP MANAGEMENT OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2daddgroup_3dgroup"><strong>--addgroup</strong>=<em>GROUP</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2daddgroup_3dgroup"><strong>--addgroup</strong>=<em>GROUP</em></a></strong>
+
 <dd>
-Creates a new group with the given name.
+<p>Creates a new group with the given name.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddelgroup_3dgroup"><strong>--delgroup</strong>=<em>GROUP</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddelgroup_3dgroup"><strong>--delgroup</strong>=<em>GROUP</em></a></strong>
+
 <dd>
-Deletes the group with the given name.
+<p>Deletes the group with the given name.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dmodgroup_3dgroup"><strong>--modgroup</strong>=<em>GROUP</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dmodgroup_3dgroup"><strong>--modgroup</strong>=<em>GROUP</em></a></strong>
+
 <dd>
-Modifies the given group.
+<p>Modifies the given group.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dpermit_3dprivilege"><strong>--permit</strong>=<em>PRIVILEGE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dpermit_3dprivilege"><strong>--permit</strong>=<em>PRIVILEGE</em></a></strong>
+
 <dd>
-Grants privilege to group(s). Currently supported privileges are:
+<p>Grants privilege to group(s). Currently supported privileges are:
 <code>DisplayTree</code> for displaying a datasource tree, and <code>DisplayAdmInfo</code>
 for displaying the administrative information (all significant
-parameters for a given datasource leaf).
+parameters for a given datasource leaf).</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddeny_3dprivilege"><strong>--deny</strong>=<em>PRIVILEGE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddeny_3dprivilege"><strong>--deny</strong>=<em>PRIVILEGE</em></a></strong>
+
 <dd>
-Revokes <code>group(s)</code> privilege.
+<p>Revokes <code>group(s)</code> privilege.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dfor_3dobject"><strong>--for</strong>=<em>OBJECT</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dfor_3dobject"><strong>--for</strong>=<em>OBJECT</em></a></strong>
+
 <dd>
-Object for which privileges are granted or revoked. Currently it must be
+<p>Object for which privileges are granted or revoked. Currently it must be
 the name of the tree for which the <code>DisplayTree</code> and  <code>DisplayAdmInfo</code>
 privilegs are granted or revoked. The asterisk (*) instead of the object
-name assigns the privilege for all objects.
+name assigns the privilege for all objects.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="user_management_options">USER MANAGEMENT OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dadduser_3duid"><strong>--adduser</strong>=<em>UID</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dadduser_3duid"><strong>--adduser</strong>=<em>UID</em></a></strong>
+
 <dd>
-Creates a new user with the given user ID.
+<p>Creates a new user with the given user ID.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddeluser_3duid"><strong>--deluser</strong>=<em>UID</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddeluser_3duid"><strong>--deluser</strong>=<em>UID</em></a></strong>
+
 <dd>
-Deletes user with the given user ID.
+<p>Deletes user with the given user ID.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dmoduser_3duid"><strong>--moduser</strong>=<em>UID</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dmoduser_3duid"><strong>--moduser</strong>=<em>UID</em></a></strong>
+
 <dd>
-Modifies the user attributes for the given user ID.
+<p>Modifies the user attributes for the given user ID.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2daddtogroup_3dgroup"><strong>--addtogroup</strong>=<em>GROUP</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2daddtogroup_3dgroup"><strong>--addtogroup</strong>=<em>GROUP</em></a></strong>
+
 <dd>
-Adds user to the given group.
+<p>Adds user to the given group.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddelfromgroup_3dgroup"><strong>--delfromgroup</strong>=<em>GROUP</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddelfromgroup_3dgroup"><strong>--delfromgroup</strong>=<em>GROUP</em></a></strong>
+
 <dd>
-Deletes user from the given group.
+<p>Deletes user from the given group.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dpassword_3dpassword"><strong>--password</strong>=<em>PASSWORD</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dpassword_3dpassword"><strong>--password</strong>=<em>PASSWORD</em></a></strong>
+
 <dd>
-Sets user's password.
+<p>Sets user's password.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dcn_3dname"><strong>--cn</strong>=<em>NAME</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dcn_3dname"><strong>--cn</strong>=<em>NAME</em></a></strong>
+
 <dd>
-Sets user's common name.
+<p>Sets user's common name.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dshowuser_3duid"><strong>--showuser</strong>=<em>UID</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dshowuser_3duid"><strong>--showuser</strong>=<em>UID</em></a></strong>
+
 <dd>
-Displays information for a given user.
+<p>Displays information for a given user.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="general_options">GENERAL OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dexport_3dfile"><strong>--export</strong>=<em>FILE</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dexport_3dfile"><strong>--export</strong>=<em>FILE</em></a></strong>
+
 <dd>
-Exports ACL configuration to a given file.
+<p>Exports ACL configuration to a given file.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dtemplate_3dfile"><strong>--template</strong>=<em>FILE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dtemplate_3dfile"><strong>--template</strong>=<em>FILE</em></a></strong>
+
 <dd>
-Uses the given template file when exporting. Default value is <em>aclexport.xml</em>.
+<p>Uses the given template file when exporting. Default value is <em>aclexport.xml</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dimport_3dfile"><strong>--import</strong>=<em>FILE</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dimport_3dfile"><strong>--import</strong>=<em>FILE</em></a></strong>
+
 <dd>
-Imports ACL configuration from the given file.
+<p>Imports ACL configuration from the given file.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dclear"><strong>--clear</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dclear"><strong>--clear</strong></a></strong>
+
 <dd>
-Deletes all user and privileges configuration.
+<p>Deletes all user and privileges configuration.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dlist"><strong>--list</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dlist"><strong>--list</strong></a></strong>
+
 <dd>
-Lists all users and groups they belong to.
+<p>Lists all users and groups they belong to.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong>
+
 <dd>
-Sets the log level to debug.
+<p>Sets the log level to debug.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>
+
 <dd>
-Sets the log level to info.
+<p>Sets the log level to info.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong>
+
 <dd>
-Displays a help message.
+<p>Displays a help message.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
@@ -227,18 +232,19 @@ o browse all existing trees.</p>
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2ftorrus_2dsi"><em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2ftorrus_2dsi"><em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em></a></strong>
+
 <dd>
-Torrus site configuration script.
+<p>Torrus site configuration script.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2fusr_2flocal_2ftorrus_2ftemplates_2faclexport_2e"><em>/usr/local/torrus/templates/aclexport.xml</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2fusr_2flocal_2ftorrus_2ftemplates_2faclexport_2e"><em>/usr/local/torrus/templates/aclexport.xml</em></a></strong>
+
 <dd>
-Default template for the exports of ACL configuration.
+<p>Default template for the exports of ACL configuration.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

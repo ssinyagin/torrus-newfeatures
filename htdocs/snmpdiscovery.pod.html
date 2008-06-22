@@ -5,7 +5,7 @@
 <title>Torrus SNMP Discovery User Guide</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:rurban@x-ray.at" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -263,7 +263,8 @@ If it's a relative path, the file is placed in <em>/usr/local/etc/torrus/xmlconf
 output. Each bundle file will contain &lt;include&gt; statement for each
 corresponding <a href="#item_output_2dfile"><code>output-file</code></a>.</p>
 </li>
-<li><strong><a name="item_snmp_2dport_2c_snmp_2dcommunity_2c_snmp_2dversion_"><code>snmp-port</code>, <code>snmp-community</code>,  <code>snmp-version</code>, <code>snmp-timeout</code>,
+<li><strong><a name="item_snmp_2dipversion_2c_snmp_2dtransport_2c_snmp_2dpor"><code>snmp-ipversion</code>, <code>snmp-transport</code>, <code>snmp-port</code>,
+        <code>snmp-community</code>,  <code>snmp-version</code>, <code>snmp-timeout</code>,
         <code>snmp-retries</code>, <code>snmp-host</code>, <code>snmp-username</code>, <code>snmp-authkey</code>,
         <code>snmp-authpassword</code>, <code>snmp-authprotocol</code>, <code>snmp-privkey</code>,
         <code>snmp-privpassword</code>, <code>snmp-privprotocol</code></a></strong>
@@ -345,6 +346,11 @@ must be unique for each host.</p>
 
 <p>Optional comma-separated list of template names that will be applied
 to the resulting XML configuration at the host level.</p>
+</li>
+<li><strong><a name="item_include_2dfiles"><code>include-files</code></a></strong>
+
+<p>Optional comma-separated list of XML files that will be listed in <code>include</code>
+statements in the resulting XML output.</p>
 </li>
 <li><strong><a name="item_host_2dcopy_2dparams"><code>host-copy-params</code></a></strong>
 
@@ -825,6 +831,11 @@ placed at the interface level. The value should be one
 or several <code>param=value</code> pairs separated by semicolon (;).
 Parameters defined in <a href="#item_rfc2863_if_mib_3a_3acopy_2dparams"><code>RFC2863_IF_MIB::copy-params</code></a> may override
 the ones defined in this action.</p>
+</li>
+<li><strong><a name="item_inbytesparameters_2c_outbytesparameters"><code>InBytesParameters</code>, <code>OutBytesParameters</code></a></strong>
+
+<p>Analagous to <a href="#item_parameters"><code>Parameters</code></a>, but the parameters are applied to InBytes and
+OutBytes leaves of the selected interface.</p>
 </li>
 <li><strong><a name="item_docsisupsnrmonitor"><code>DocsisUpSNRMonitor</code></a></strong>
 

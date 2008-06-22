@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>schedulerinfo - Displays extended scheduler tasks information.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -46,133 +48,136 @@ and analysis.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dconfig"><strong>--config</strong></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dconfig"><strong>--config</strong></a></strong>
+
 <dd>
-Reports scheduler's configuration. The values are explained below.
+<p>Reports scheduler's configuration. The values are explained below.</p>
 </dd>
 <dl>
-<dt><strong><a name="item_total_collector_2fmonitor_leaves_3a_n">Total collector/monitor leaves: <em>N</em></a></strong><br />
-</dt>
+<dt><strong><a name="item_total_collector_2fmonitor_leaves_3a_n">Total collector/monitor leaves: <em>N</em></a></strong>
+
 <dd>
-Total number of datasources being processed by collector or monitor daemon.
+<p>Total number of datasources being processed by collector or monitor daemon.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_scheduled_leaves_by_type">Scheduled leaves by type</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_scheduled_leaves_by_type">Scheduled leaves by type</a></strong>
+
 <dd>
-Torrus supports arbitrary number of collector types, and this report
+<p>Torrus supports arbitrary number of collector types, and this report
 shows how many datasources belong to every type. Currently the monitor leaves
-are not divided into types.
+are not divided into types.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_least_common_period_3a_n_seconds">Least common period: <em>N</em> seconds</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_least_common_period_3a_n_seconds">Least common period: <em>N</em> seconds</a></strong>
+
 <dd>
-The report below shows how the tasks are distributed across the time line,
-and the least common period shows the period of this time line.
+<p>The report below shows how the tasks are distributed across the time line,
+and the least common period shows the period of this time line.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_tasks_execution_timeline">Tasks execution timeline</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_tasks_execution_timeline">Tasks execution timeline</a></strong>
+
 <dd>
-This report tells which task and how many datasources are involved in
+<p>This report tells which task and how many datasources are involved in
 each task startup event, and how these events are dispersed across the time.
 The column <em>Interval</em> shows the time interval from each task execution
-event to the next event on the timeline.
+event to the next event on the timeline.</p>
 </dd>
-<p></p></dl>
-<dt><strong><a name="item__2d_2druntime"><strong>--runtime</strong></a></strong><br />
-</dt>
+</li>
+</dl>
+<dt><strong><a name="item__2d_2druntime"><strong>--runtime</strong></a></strong>
+
 <dd>
-Reports scheduler's runtime statistics, such as running cycle times,
+<p>Reports scheduler's runtime statistics, such as running cycle times,
 late starts etc. The meaning of the output values is as follows. Values
-that have zero values are usually not printed.
+that have zero values are usually not printed.</p>
 </dd>
 <dl>
-<dt><strong><a name="item_task_3a_name_2c_period_3a_n_seconds_2c_offset_3a_m">Task: <em>Name</em>, Period: <em>N</em> seconds, Offset: <em>M</em> seconds</a></strong><br />
-</dt>
+<dt><strong><a name="item_task_3a_name_2c_period_3a_n_seconds_2c_offset_3a_m">Task: <em>Name</em>, Period: <em>N</em> seconds, Offset: <em>M</em> seconds</a></strong>
+
 <dd>
-Each scheduler task is characterized by its name (usually Collector or
+<p>Each scheduler task is characterized by its name (usually Collector or
 Monitor), period, and timeoffset. Fore example, if period is set to 300
 seconds, and offset is 14 seconds, then the task would be executed at
-00:00:14, 00:05:14, 00:10:14, and so on for every hour in a day.
+00:00:14, 00:05:14, 00:10:14, and so on for every hour in a day.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_n_running_cycles_passed"><em>N</em> running cycles passed</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_n_running_cycles_passed"><em>N</em> running cycles passed</a></strong>
+
 <dd>
-How many times the task was executed since last reset. The counter
+<p>How many times the task was executed since last reset. The counter
 is normally reset after <em>torrus_compilexml(1)</em> successfully
-compiles the configuration.
+compiles the configuration.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_n_late_starts"><em>N</em> late starts</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_n_late_starts"><em>N</em> late starts</a></strong>
+
 <dd>
-How many times the task has started with a delay from its normal schedule.
+<p>How many times the task has started with a delay from its normal schedule.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_n_too_long_runs"><em>N</em> too long runs</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_n_too_long_runs"><em>N</em> too long runs</a></strong>
+
 <dd>
-How many times the task execution time was longer than its period.
+<p>How many times the task execution time was longer than its period.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_n_overrun_periods"><em>N</em> overrun periods</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_n_overrun_periods"><em>N</em> overrun periods</a></strong>
+
 <dd>
-How many periods have been missed because of too long executions.
+<p>How many periods have been missed because of too long executions.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_n_missed_periods"><em>N</em> missed periods</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_n_missed_periods"><em>N</em> missed periods</a></strong>
+
 <dd>
-How many periods were missed because of any reason (such as other tasks
-delaying).
+<p>How many periods were missed because of any reason (such as other tasks
+delaying).</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_min_2c_max_2c_average_2c_exp_average">Min, Max, Average, Exp Average</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_min_2c_max_2c_average_2c_exp_average">Min, Max, Average, Exp Average</a></strong>
+
 <dd>
-The time values are displayed in four columns: Mimimum, Maximum and Average
+<p>The time values are displayed in four columns: Mimimum, Maximum and Average
 values since last reset, and Exponential decay value, which may be interpreted
 as the average for last several values. With defaults defined in
-<em>torrus-config.pl</em>, 95% of the average is calculated from last 3 values.
+<em>torrus-config.pl</em>, 95% of the average is calculated from last 3 values.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_running_time">Running Time</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_running_time">Running Time</a></strong>
+
 <dd>
-How long the task executes each period.
+<p>How long the task executes each period.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_late_start">Late Start</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_late_start">Late Start</a></strong>
+
 <dd>
-How long the task start was delayed.
+<p>How long the task start was delayed.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_too_long">Too Long</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_too_long">Too Long</a></strong>
+
 <dd>
-How much time the too long run took.
+<p>How much time the too long run took.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_rrd_queue">RRD Queue</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_rrd_queue">RRD Queue</a></strong>
+
 <dd>
-In a multithreaded environment, the RRD files are writen in a background
+<p>In a multithreaded environment, the RRD files are writen in a background
 thread. This value shows the length of the RRD update queue at the beginning
-of each update cycle.
+of each update cycle.</p>
 </dd>
-<p></p></dl>
-<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
-</dt>
+</li>
+</dl>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong>
+
 <dd>
-Displays a help message.
+<p>Displays a help message.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

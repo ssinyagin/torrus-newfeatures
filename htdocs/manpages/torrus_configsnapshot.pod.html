@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>configsnapshot - Generates a configuration snapshot for a Torrus tree.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -54,72 +56,75 @@ does not preserve aliases.</p>
 structure is changing in Torrus default templates, and <code>user(s)</code> demand to
 preserve the historical data, the following steps could be done:</p>
 <ul>
-<li></li>
-Stop the collector and monitor processes.
-<p></p>
-<li></li>
-Install newest Torrus software and do not run <code>compilexml</code> immediately.
-<p></p>
-<li></li>
-Create snapshots of the trees that you want to preserve for historical reasons:
+<li>
+<p>Stop the collector and monitor processes.</p>
+</li>
+<li>
+<p>Install newest Torrus software and do not run <code>compilexml</code> immediately.</p>
+</li>
+<li>
+<p>Create snapshots of the trees that you want to preserve for historical reasons:</p>
 <pre>
   torrus configsnapshot --tree=myrouters \
     --out=/usr/local/etc/torrus/xmlconfig/myrouters-snapshot.xml</pre>
-<p></p>
-<li></li>
-If needed, move the existing RRD files into different directory. Then
-change the <code>data-dir</code> parameters in the snapshot XML accordingly.
-<p></p>
-<li></li>
-Create a new tree with only the snapshot file in it. Compile the tree.
-<p></p>
-<li></li>
-At this stage, it is up to the user to decide wether to continue running the
+</li>
+<li>
+<p>If needed, move the existing RRD files into different directory. Then
+change the <code>data-dir</code> parameters in the snapshot XML accordingly.</p>
+</li>
+<li>
+<p>Create a new tree with only the snapshot file in it. Compile the tree.</p>
+</li>
+<li>
+<p>At this stage, it is up to the user to decide wether to continue running the
 collector and monitor daemons for this new tree. The old data may be preserved
 for historical reference, and collector may be run with the newest tree
-structure and definitions.
-<p></p></ul>
+structure and definitions.</p>
+</li>
+</ul>
 <p>
 </p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dout_3dfile"><strong>--out</strong>=<em>FILE</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dout_3dfile"><strong>--out</strong>=<em>FILE</em></a></strong>
+
 <dd>
-Sets the output file to <em>FILE</em>. Default is <em>snapshot.xml</em>.
+<p>Sets the output file to <em>FILE</em>. Default is <em>snapshot.xml</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>
+
 <dd>
-Displays some extra information.
+<p>Displays some extra information.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong>
+
 <dd>
-Displays a help message.
+<p>Displays a help message.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__2fusr_2flocal_2ftorrus_2fxmlconfig_2fdefaults_2ex"><em>/usr/local/torrus/xmlconfig/defaults.xml</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2fusr_2flocal_2ftorrus_2fxmlconfig_2fdefaults_2ex"><em>/usr/local/torrus/xmlconfig/defaults.xml</em></a></strong>
+
 <dd>
-XML configuration file with default settings for the datasources and
-tokensets, as well as default view definitions.
+<p>XML configuration file with default settings for the datasources and
+tokensets, as well as default view definitions.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_snapshot_2exml"><em>snapshot.xml</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item_snapshot_2exml"><em>snapshot.xml</em></a></strong>
+
 <dd>
-Default <strong>configsnapshot</strong> output file.
+<p>Default <strong>configsnapshot</strong> output file.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

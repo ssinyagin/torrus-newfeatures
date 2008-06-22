@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>collector - Torrus data Collector.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -58,10 +60,10 @@ overwritten at the host level.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dinstance_3dn"><strong>--instance</strong>=<em>N</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dinstance_3dn"><strong>--instance</strong>=<em>N</em></a></strong>
+
 <dd>
-Defines the collector instance. A single tree can allow more than one
+<p>Defines the collector instance. A single tree can allow more than one
 collector instance. The number of instances is defined in <code>run</code> hash
 in the <em>torrus-siteconfig.pl</em>'s <code>%Torrus::Global::treeConfig</code>.
 If the number of instances is more than one, this option is mandatory.
@@ -69,7 +71,7 @@ The collecting job is split between the instances, and normally all
 instances should be started by the startup scripts. The tree should
 be re-compiled after the number of instances is changed in the siteconfig.
 In the example below the tree <em>tree_A</em> will be served by three
-collector instances:
+collector instances:</p>
 </dd>
 <dd>
 <pre>
@@ -80,68 +82,70 @@ collector instances:
       'run' =&gt; { 'collector' =&gt; 3, 'monitor' =&gt; 1 } },
    );</pre>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dnodaemon"><strong>--nodaemon</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dnodaemon"><strong>--nodaemon</strong></a></strong>
+
 <dd>
-Prevents the process from becoming a daemon and sets the log to STDERR.
+<p>Prevents the process from becoming a daemon and sets the log to STDERR.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2drunonce"><strong>--runonce</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2drunonce"><strong>--runonce</strong></a></strong>
+
 <dd>
-Instructs the collector to run once and exit. Implies <strong>--nodaemon</strong>.
+<p>Instructs the collector to run once and exit. Implies <strong>--nodaemon</strong>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2drunalways"><strong>--runalways</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2drunalways"><strong>--runalways</strong></a></strong>
+
 <dd>
-Instructs the collector process to continue running even if no collector
+<p>Instructs the collector process to continue running even if no collector
 datasources are defined in the tree. In this case, the process will check
-once per hour if the configuration has changed.
+once per hour if the configuration has changed.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong>
+
 <dd>
-Sets the log level to debug.
+<p>Sets the log level to debug.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>
+
 <dd>
-Sets the debug level to info.
+<p>Sets the debug level to info.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong>
+
 <dd>
-Displays a help message.
+<p>Displays a help message.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2ftorrus_2dsi"><em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2ftorrus_2dsi"><em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em></a></strong>
+
 <dd>
-Torrus site configuration script.
+<p>Torrus site configuration script.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2fvar_2flog_2ftorrus_2fcollector_2etreename_2elog"><em>/var/log/torrus/collector.TREENAME.log</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2fvar_2flog_2ftorrus_2fcollector_2etreename_2elog"><em>/var/log/torrus/collector.TREENAME.log</em></a></strong>
+
 <dd>
-Collector's log for the tree <em>TREENAME</em>.
+<p>Collector's log for the tree <em>TREENAME</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2fusr_2flocal_2ftorrus_2fxmlconfig_2fsnmp_2ddefs_"><em>/usr/local/torrus/xmlconfig/snmp-defs.xml</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2fusr_2flocal_2ftorrus_2fxmlconfig_2fsnmp_2ddefs_"><em>/usr/local/torrus/xmlconfig/snmp-defs.xml</em></a></strong>
+
 <dd>
-Basic variable definitions for the SNMP collector.
+<p>Basic variable definitions for the SNMP collector.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

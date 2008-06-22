@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -5,7 +6,8 @@
 SNMP traps from monitor action. 
 C&lt;action_snmpv1trap&gt; is obsolete as the preferred SNMP version is 2c.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -61,49 +63,51 @@ runs of <code>make install</code> do not override this file.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dhost_3dhostname"><strong>--host</strong>=<em>HOSTNAME</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dhost_3dhostname"><strong>--host</strong>=<em>HOSTNAME</em></a></strong>
+
 <dd>
-Sets the hostname of the destination host.
+<p>Sets the hostname of the destination host.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dcommunity_3dcommunity"><strong>--community</strong>=<em>COMMUNITY</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dcommunity_3dcommunity"><strong>--community</strong>=<em>COMMUNITY</em></a></strong>
+
 <dd>
-Sets the community string to use when sending the trap.
+<p>Sets the community string to use when sending the trap.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dport_3dport"><strong>--port</strong>=<em>PORT</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dport_3dport"><strong>--port</strong>=<em>PORT</em></a></strong>
+
 <dd>
-Sets the destination UDP port.
+<p>Sets the destination UDP port.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2denterprise_3doid"><strong>--enterprise</strong>=<em>OID</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2denterprise_3doid"><strong>--enterprise</strong>=<em>OID</em></a></strong>
+
 <dd>
-Sets the <code>enterprise</code> field of the SNMPv1 trap to a given OID (see
+<p>Sets the <code>enterprise</code> field of the SNMPv1 trap to a given OID (see
 RFC 1157 for more details). This option is only available for
-<code>action_snmpv1trap</code> and will be ignored for <code>action_snmptrap</code>.
+<code>action_snmpv1trap</code> and will be ignored for <code>action_snmptrap</code>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dseverity_3dseverity"><strong>--severity</strong>=<em>SEVERITY</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dseverity_3dseverity"><strong>--severity</strong>=<em>SEVERITY</em></a></strong>
+
 <dd>
-Sets the optional severity SNMP variable to some integer value.
+<p>Sets the optional severity SNMP variable to some integer value.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2fsnmptrap_2d"><em>/usr/local/etc/torrus/conf/snmptrap-siteconfig.pl</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2fsnmptrap_2d"><em>/usr/local/etc/torrus/conf/snmptrap-siteconfig.pl</em></a></strong>
+
 <dd>
-Torrus site configuration script for SNMP traps.
+<p>Torrus site configuration script for SNMP traps.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

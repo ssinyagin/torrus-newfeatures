@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Torrus Styling Profile Guide</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -44,35 +46,35 @@ coded values for <code>line-color</code> and <code>line-style</code>.</p>
 <h3><a name="schema_definitions">Schema Definitions</a></h3>
 <p>The following styles are defined in the default schema.</p>
 <ul>
-<li><strong><a name="item_styles">Required Styles  (<code>line-style</code>, <code>line-color</code>)</a></strong><br />
-</li>
+<li><strong><a name="item_styles">Required Styles  (<code>line-style</code>, <code>line-color</code>)</a></strong>
+
 <pre>
            SingleGraph            HWBoundary             HWFailure
               HruleMin           HruleNormal              HruleMax
                  BpsIn                BpsOut</pre>
-<li><strong><a name="item_styles">Generic Symbolic styles (<code>line-color</code> only)</a></strong><br />
-</li>
+<li><strong><a name="item_styles">Generic Symbolic styles (<code>line-color</code> only)</a></strong>
+
 <pre>
                     in                   out</pre>
 <li><strong><a name="item_items">Symbolic, Symbolic names, for default use in graphs that have up
-to ten items (<code>line-color</code> only)</a></strong><br />
-</li>
+to ten items (<code>line-color</code> only)</a></strong>
+
 <pre>
                    one                   two                 three
                   four                  five                   six
                  seven                 eight                  nine
                    ten</pre>
 <li><strong><a name="item_graphing">Symbolic names for combinatorial graphing (<code>line-style</code>,
-<code>line-color</code>)</a></strong><br />
-</li>
+<code>line-color</code>)</a></strong>
+
 <pre>
                   red1                  red2                  red3
                   red4                green1                green2
                 green3                green4                 blue1
                  blue2                 blue3                 blue4</pre>
-<li><strong><a name="item_set">Color definitions from the TT2 rgb example set (<code>line-color</code> only)</a></strong><br />
-</li>
-Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em>
+<li><strong><a name="item_set">Color definitions from the TT2 rgb example set (<code>line-color</code> only)</a></strong>
+
+<p>Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em></p>
 <pre>
                  black                grey25                grey50
                 grey75                 white                   red
@@ -84,10 +86,10 @@ Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em>
                   leaf                   bud                  mint
                 marine                   sky                 mauve
                  lilac</pre>
-<p></p>
-<li><strong><a name="item_colors">Color definitions for web html colors (<code>line-color</code> only)</a></strong><br />
 </li>
-Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em>
+<li><strong><a name="item_colors">Color definitions for web html colors (<code>line-color</code> only)</a></strong>
+
+<p>Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em></p>
 <pre>
              aliceblue          antiquewhite                  aqua
             aquamarine                 azure                 beige
@@ -133,7 +135,8 @@ Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em>
                    tan                  teal               thistle
                 tomato             turquoise                violet
                  wheat            whitesmoke                yellow</pre>
-<p></p></ul>
+</li>
+</ul>
 <p>
 </p>
 <h3><a name="schema_overlay">Schema Overlay</a></h3>
@@ -142,11 +145,11 @@ Defined in <em>/usr/local/torrus/sup/styling/colornames.pl</em>
 default schema.  The schema overlays are formatted in the form of a hash of
 hashes.</p>
 <ul>
-<li><strong><a name="item_extending_the_schema_3a">Extending the schema:</a></strong><br />
-</li>
-To add the styles, <code>##onefish</code>, <code>##twofish</code>, <code>##redfish</code>, <code>##bluefish</code>
+<li><strong><a name="item_extending_the_schema_3a">Extending the schema:</a></strong>
+
+<p>To add the styles, <code>##onefish</code>, <code>##twofish</code>, <code>##redfish</code>, <code>##bluefish</code>
 the following entries should be created in a descriptive file located
-in the <code>styling</code> directory.
+in the <code>styling</code> directory.</p>
 <p><code>fish-schema.pl</code></p>
 <pre>
   $Torrus::Renderer::graphStyles{'onefish'}{'color'} = '##darkred';
@@ -159,29 +162,30 @@ in the <code>styling</code> directory.
 <pre>
   $Torrus::Renderer::graphStyles{'bluefish'}{'color'} = '##deeppink';</pre>
 <p>Other methods of adding to the hash of hashes are also acceptable.</p>
-<p></p>
-<li><strong><a name="item_overriding_styles_3a">Overriding Styles:</a></strong><br />
 </li>
-To override specific styles in the existing schema, <code>##in</code>, <code>##out</code>,
+<li><strong><a name="item_overriding_styles_3a">Overriding Styles:</a></strong>
+
+<p>To override specific styles in the existing schema, <code>##in</code>, <code>##out</code>,
 entries similar to the following should be created in a Perl file,
-preferably located in the local configuration directory.
+preferably located in the local configuration directory.</p>
 <p><code>in_out-override-schema.pl</code></p>
 <pre>
   $Torrus::Renderer::graphStyles{'in'}{'color'} = '##yellow';
   $Torrus::Renderer::graphStyles{'out'}{'color'} = '##maroon';</pre>
 <p>Other methods of adding to the hash of hashes are also acceptable.</p>
-<p></p>
-<li><strong><a name="item_applying_your_overlay">Applying your Overlay</a></strong><br />
 </li>
+<li><strong><a name="item_applying_your_overlay">Applying your Overlay</a></strong>
+
 <ol>
-<li></li>
-In the torrus-siteconfig.pl file, add the variable
+<li>
+<p>In the torrus-siteconfig.pl file, add the variable</p>
 <p>$Torrus::Renderer::stylingProfileOverlay = 
     $Torrus::Global::cfgSiteDir . '/in_out-override-schema.pl';</p>
-<p></p>
-<li></li>
-Restart apache
-<p></p></ol>
+</li>
+<li>
+<p>Restart apache</p>
+</li>
+</ol>
 <p>You may have to wait for the image cache to clear before the changes
 take effect.</p>
 </ul>
@@ -191,14 +195,14 @@ take effect.</p>
 <p>To replace a schema, create a new schema using torrus-schema.pl as a guide.
 Remember some styles are mandatory.</p>
 <ul>
-<li><strong><a name="item_applying_your_schema">Applying your Schema</a></strong><br />
-</li>
-In the <em>torrus-siteconfig.pl</em> file, add the variable
+<li><strong><a name="item_applying_your_schema">Applying your Schema</a></strong>
+
+<p>In the <em>torrus-siteconfig.pl</em> file, add the variable</p>
 <pre>
   $Torrus::Renderer::stylingProfile = &quot;Your-schema&quot;;</pre>
-<p></p>
-<li><strong><a name="item_restart_apache">Restart apache</a></strong><br />
 </li>
+<li><strong><a name="item_restart_apache">Restart apache</a></strong>
+
 </ul>
 <p>You may have to wait for the image cache to clear before the changes
 take effect.</p>

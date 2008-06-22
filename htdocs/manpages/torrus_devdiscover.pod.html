@@ -1,10 +1,12 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>devdiscover - Performs SNMP discovery and generates Torrus XML
 configuration file.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -56,73 +58,75 @@ option, or simply as arguments.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dmkdir"><strong>--mkdir</strong></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dmkdir"><strong>--mkdir</strong></a></strong>
+
 <dd>
-Creates <code>data-dir</code> directories.
+<p>Creates <code>data-dir</code> directories.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dlimit_3dregexp"><strong>--limit</strong>=<em>REGEXP</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dlimit_3dregexp"><strong>--limit</strong>=<em>REGEXP</em></a></strong>
+
 <dd>
-Limits the discovery to the output files matching the regular expression
-<em>REGEXP</em>.
+<p>Limits the discovery to the output files matching the regular expression
+<em>REGEXP</em>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dforcebundle"><strong>--forcebundle</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dforcebundle"><strong>--forcebundle</strong></a></strong>
+
 <dd>
-With this option enabled, <code>devdiscover</code> will write the bundle
-file even if some of the bundle members were not created because of errors.
+<p>With this option enabled, <code>devdiscover</code> will write the bundle
+file even if some of the bundle members were not created because of errors.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dfallback_3dinteger"><strong>--fallback</strong>=<em>INTEGER</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dfallback_3dinteger"><strong>--fallback</strong>=<em>INTEGER</em></a></strong>
+
 <dd>
-Requires <strong>--forcebundle</strong>. In case if an SNMP device is not available,
+<p>Requires <strong>--forcebundle</strong>. In case if an SNMP device is not available,
 the bundle file will include an older version of the XML output file,
-provided that it exists and it is not older than the specified number of days.
+provided that it exists and it is not older than the specified number of days.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dthreads_3dinteger"><strong>--threads</strong>=<em>INTEGER</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dthreads_3dinteger"><strong>--threads</strong>=<em>INTEGER</em></a></strong>
+
 <dd>
-If the threads are enabled in the local Perl, this option determins
+<p>If the threads are enabled in the local Perl, this option determins
 how many parallel discovery threads are to be executed.
 The discovery jobs are distributed per output files, thus it makes
 sence to use threads only when there are many output files defined in
-a single DDX file.
+a single DDX file.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>
+
 <dd>
-Prints extra information.
+<p>Prints extra information.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong>
+
 <dd>
-Prints debugging information.
+<p>Prints debugging information.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dsnmpdebug"><strong>--snmpdebug</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dsnmpdebug"><strong>--snmpdebug</strong></a></strong>
+
 <dd>
-Prints SNMP protocol details
+<p>Prints SNMP protocol details</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2fdevdiscover"><em>/usr/local/etc/torrus/conf/devdiscover-siteconfig.pl</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2fdevdiscover"><em>/usr/local/etc/torrus/conf/devdiscover-siteconfig.pl</em></a></strong>
+
 <dd>
-<strong>devdiscover</strong> site configuration file.
+<p><strong>devdiscover</strong> site configuration file.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

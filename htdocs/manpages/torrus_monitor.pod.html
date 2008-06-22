@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>monitor - Torrus Monitor.</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -49,63 +51,65 @@ can be reopened by sending it a SIGHUP signal.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2d_2dnodaemon"><strong>--nodaemon</strong></a></strong><br />
-</dt>
+<dt><strong><a name="item__2d_2dnodaemon"><strong>--nodaemon</strong></a></strong>
+
 <dd>
-Prevents the process from becoming a daemon and sets the log to STDERR.
+<p>Prevents the process from becoming a daemon and sets the log to STDERR.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2drunonce"><strong>--runonce</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2drunonce"><strong>--runonce</strong></a></strong>
+
 <dd>
-Instructs the script to run once and exit. Implies <strong>--nodaemon</strong>.
+<p>Instructs the script to run once and exit. Implies <strong>--nodaemon</strong>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddelay_3dn"><strong>--delay=N</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddelay_3dn"><strong>--delay=N</strong></a></strong>
+
 <dd>
-Makes the daemon sleep for N minutes before starting the first cycle.
+<p>Makes the daemon sleep for N minutes before starting the first cycle.
 This would happen on the daemon startup and also after each configuration
 recompilation.
 For example, when monitor and collector start simultaneously, the collector
-needs some time to retrieve the data being monitored.
+needs some time to retrieve the data being monitored.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong>
+
 <dd>
-Sets the log level to debug.
+<p>Sets the log level to debug.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>
+
 <dd>
-Sets the debug level to info.
+<p>Sets the debug level to info.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong>
+
 <dd>
-Displays a help message.
+<p>Displays a help message.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="files">FILES</a></h1>
 <dl>
-<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2ftorrus_2dsi"><em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em></a></strong><br />
-</dt>
+<dt><strong><a name="item__2fusr_2flocal_2fetc_2ftorrus_2fconf_2ftorrus_2dsi"><em>/usr/local/etc/torrus/conf/torrus-siteconfig.pl</em></a></strong>
+
 <dd>
-Torrus site configuration script.
+<p>Torrus site configuration script.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__2fvar_2flog_2ftorrus_2fmonitor_2etreename_2elog"><em>/var/log/torrus/monitor.TREENAME.log</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="item__2fvar_2flog_2ftorrus_2fmonitor_2etreename_2elog"><em>/var/log/torrus/monitor.TREENAME.log</em></a></strong>
+
 <dd>
-Monitor's log for the tree <em>TREENAME</em>.
+<p>Monitor's log for the tree <em>TREENAME</em>.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />

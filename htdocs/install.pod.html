@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Torrus Installation Instructions</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -43,12 +45,12 @@
 </p>
 <h2><a name="required_software">Required Software</a></h2>
 <ul>
-<li><strong><a name="item_operating_system">Operating System</a></strong><br />
-</li>
-Any UNIX-like operation system where the required components are working.
+<li><strong><a name="item_operating_system">Operating System</a></strong>
+
+<p>Any UNIX-like operation system where the required components are working.
 The author's primary development platform is Cygwin
 &lt;<a href="http://www.cygwin.com">http://www.cygwin.com</a>&gt;,
-and the primary testing environments are Sun Solaris/SPARC and FreeBSD.
+and the primary testing environments are Sun Solaris/SPARC and FreeBSD.</p>
 <p>Note to <strong>VmWare</strong> users: as recommended by Gord Philpott, Linux kernel for
 guest machine needs to be compiled with the following feature enabled:
 <code>Character devices ---&gt; Enhanced Real Time Clock Support</code>.
@@ -60,13 +62,13 @@ lines to your <em>torrus-siteconfig.pl</em>:</p>
   $Torrus::Scheduler::ignoreClockSkew = 1;</pre>
 <p># <strong>Debian</strong> package is maintained by Jurij Smakov and is available at
 # &lt;<a href="http://pkg-torrus.alioth.debian.org">http://pkg-torrus.alioth.debian.org</a>&gt;.</p>
-<p></p>
-<li><strong><a name="item_perl">Perl</a></strong><br />
 </li>
-Perl version <code>5.8.1</code> or higher is required. <strong>Version <code>5.8.0</code> is not
+<li><strong><a name="item_perl">Perl</a></strong>
+
+<p>Perl version <code>5.8.1</code> or higher is required. <strong>Version <code>5.8.0</code> is not
 recommended</strong> because of memory access bugs and unpredictable behaviour.
 Perl interpreter should be in PATH environment variable when
-running <code>./configure</code>, otherwise use
+running <code>./configure</code>, otherwise use</p>
 <pre>
   ./configure PERL=/path/to/perl</pre>
 <p>Torrus also supports Perl multithreading in Device Discovery engine and
@@ -77,31 +79,31 @@ severe memory leaks and instability. After installing Perl 5.8.8,
 you need to upgrade the <code>threads</code> and <code>threads::shared</code> modules manually
 from CPAN. If any of the requirements is not met, the installer will
 automatically disable the threads support in Torrus.</p>
-<p></p>
-<li><strong><a name="item_rrdtool">RRDtool</a></strong><br />
 </li>
-Round Robin Database Tool is available at:
+<li><strong><a name="item_rrdtool">RRDtool</a></strong>
+
+<p>Round Robin Database Tool is available at:
 &lt;<a href="http://ee-staff.ethz.ch/~oetiker/webtools/rrdtool/">http://ee-staff.ethz.ch/~oetiker/webtools/rrdtool/</a>&gt;.
 Both stable version <code>1.0.x</code> and the development version <code>1.1.x</code>
-are supported.
+are supported.</p>
 <p>As of this writing, rrdtool version <code>1.1.x</code> is still in its development
 stage, but it is quite ready for using in production environments.
 There's a small glitch in legend text alignment, and it will
 hopefully be fixed.</p>
-<p></p>
-<li><strong><a name="item_libxml2">libxml2</a></strong><br />
 </li>
-libxml2 is the XML parser library from Gnome
+<li><strong><a name="item_libxml2">libxml2</a></strong>
+
+<p>libxml2 is the XML parser library from Gnome
 project &lt;<a href="http://www.gnome.org">http://www.gnome.org</a>&gt;,
 available as a standalone package.
-Versions <code>2.4.23</code> and above were tested.
-<p></p>
-<li><strong><a name="item_berkeley_db_version_4_2e2_2e52_or_later">Berkeley DB version 4.2.52 or later</a></strong><br />
+Versions <code>2.4.23</code> and above were tested.</p>
 </li>
-There are two distinct packages with slightly conflicting names:
+<li><strong><a name="item_berkeley_db_version_4_2e2_2e52_or_later">Berkeley DB version 4.2.52 or later</a></strong>
+
+<p>There are two distinct packages with slightly conflicting names:
 The Berkeley DB from Sleepycat Software &lt;<a href="http://www.sleepycat.com">http://www.sleepycat.com</a>&gt;,
 and <code>BerkeleyDB</code> Perl module available from CPAN. We will always refer
-the latter as <em>BerkeleyDB Perl module</em>.
+the latter as <em>BerkeleyDB Perl module</em>.</p>
 <p>The Berkeley DB database engine is used for all data storage.
 Versions <code>4.2.52</code> and above are recommended.
 Older versions of Berkeley DB had problems with database integrity
@@ -111,102 +113,105 @@ into <em>/usr/local/BerkeleyDB.4.2/</em>.</p>
 library files in that directory. Thus either configure Berkeley DB
 with the option <code>--prefix=/usr/local</code>, or you need to edit
 <em>config.in</em> in BerkeleyDB Perl module distribution.</p>
-<p></p>
-<li><strong><a name="item_http_server">HTTP Server</a></strong><br />
 </li>
-Torrus requires Apache HTTP server (&lt;<a href="http://httpd.apache.org">http://httpd.apache.org</a>&gt;)
-and mod_perl (&lt;<a href="http://perl.apache.org">http://perl.apache.org</a>&gt;).
+<li><strong><a name="item_http_server">HTTP Server</a></strong>
+
+<p>Torrus requires Apache HTTP server (&lt;<a href="http://httpd.apache.org">http://httpd.apache.org</a>&gt;)
+and mod_perl (&lt;<a href="http://perl.apache.org">http://perl.apache.org</a>&gt;).</p>
 <p>Apache version 1.3 and mod_perl version 1.0 are supported by ApacheHandler.</p>
 <p>Apache version 2.0 and mod_perl 2.0 are supported by Apache2Handler.
 Minimum supported mod_perl 2.0 version is <strong>2.0.0</strong>. The handler also requires
 <code>libapreq2</code> library, see the note below.</p>
 <p>See <em>Torrus Web Interface Reference</em> for details on mod_perl configuration.</p>
-<p></p>
-<li><strong><a name="item_perl_modules">Perl Modules</a></strong><br />
 </li>
-The Perl modules required are listed below. They are all available at
+<li><strong><a name="item_perl_modules">Perl Modules</a></strong>
+
+<p>The Perl modules required are listed below. They are all available at
 CPAN &lt;<a href="http://www.cpan.org">http://www.cpan.org</a>&gt;.
 Some of them require other modules to be installed.
 You can install all required modules with the following command,
-executed from within the distribution directory:
+executed from within the distribution directory:</p>
 <pre>
   perl -I `pwd`/setup_tools -MCPAN -e 'install Bundle::Torrus'</pre>
 <ul>
-<li><strong><a name="item_xml_3a_3alibxml">XML::LibXML</a></strong><br />
+<li><strong><a name="item_xml_3a_3alibxml">XML::LibXML</a></strong>
+
+<p>This is a Perl interface for libxml2, providing DOM standards compliant
+interface. It is recommended that you use version <code>1.54_3</code> or higher.</p>
 </li>
-This is a Perl interface for libxml2, providing DOM standards compliant
-interface. It is recommended that you use version <code>1.54_3</code> or higher.
-<p></p>
-<li><strong><a name="item_berkeleydb_perl_module">BerkeleyDB perl module</a></strong><br />
+<li><strong><a name="item_berkeleydb_perl_module">BerkeleyDB perl module</a></strong>
+
+<p>Perl interface to the database software.
+Version <code>0.19</code> or higher is required.</p>
 </li>
-Perl interface to the database software.
-Version <code>0.19</code> or higher is required.
-<p></p>
-<li><strong><a name="item_template_2dtoolkit">Template-Toolkit</a></strong><br />
-</li>
-This is a powerful set of tools for text template processing.
+<li><strong><a name="item_template_2dtoolkit">Template-Toolkit</a></strong>
+
+<p>This is a powerful set of tools for text template processing.
 Torrus uses it for HTML files output.
-See also the project homepage: &lt;<a href="http://www.template-toolkit.org">http://www.template-toolkit.org</a>&gt;
-<p></p>
-<li><strong><a name="item_proc_3a_3adaemon">Proc::Daemon</a></strong><br />
+See also the project homepage: &lt;<a href="http://www.template-toolkit.org">http://www.template-toolkit.org</a>&gt;</p>
 </li>
-Daemon invocation routines.
-<p></p>
-<li><strong><a name="item_net_3a_3asnmp">Net::SNMP</a></strong><br />
+<li><strong><a name="item_proc_3a_3adaemon">Proc::Daemon</a></strong>
+
+<p>Daemon invocation routines.</p>
 </li>
-SNMP queries and traps interface. Version <code>4.0.3</code> or higher is required.
-<p></p>
-<li><strong><a name="item_uri_3a_3aescape">URI::Escape</a></strong><br />
+<li><strong><a name="item_net_3a_3asnmp">Net::SNMP</a></strong>
+
+<p>SNMP queries and traps interface. Version <code>4.0.3</code> or higher is required.</p>
 </li>
-Escape and unescape unsafe characters
-<p></p>
-<li><strong><a name="item_apache">Apache (mod_perl version 1.0)</a></strong><br />
+<li><strong><a name="item_uri_3a_3aescape">URI::Escape</a></strong>
+
+<p>Escape and unescape unsafe characters</p>
 </li>
-Mod_perl is a Perl runtime environment integrated into Apache HTTP server.
-<p></p>
-<li><strong><a name="item_apache_3a_3asession">Apache::Session</a></strong><br />
+<li><strong><a name="item_apache">Apache (mod_perl version 1.0)</a></strong>
+
+<p>Mod_perl is a Perl runtime environment integrated into Apache HTTP server.</p>
 </li>
-User session tracking helper
-<p></p>
-<li><strong><a name="item_date_3a_3aparse_and_date_3a_3aformat">Date::Parse and Date::Format</a></strong><br />
+<li><strong><a name="item_apache_3a_3asession">Apache::Session</a></strong>
+
+<p>User session tracking helper</p>
 </li>
-Module for parsing the user input for date and time.
-<p></p></ul>
-<li><strong><a name="item_libapreq2_perl_library"><code>libapreq2</code> Perl library</a></strong><br />
+<li><strong><a name="item_date_3a_3aparse_and_date_3a_3aformat">Date::Parse and Date::Format</a></strong>
+
+<p>Module for parsing the user input for date and time.</p>
 </li>
-Apache 2.0 handler requires an additional Perl library, <code>libapreq2</code>.
+</ul>
+<li><strong><a name="item_libapreq2_perl_library"><code>libapreq2</code> Perl library</a></strong>
+
+<p>Apache 2.0 handler requires an additional Perl library, <code>libapreq2</code>.
 It is available from CPAN &lt;<a href="http://search.cpan.org/">http://search.cpan.org/</a>&gt;, and currently
 only in development version. You need to download and install it manually
-in order for Apache2Handler to work. Minimum version required: libapreq2-2.05.
-<p></p>
-<li><strong><a name="item_http_browser_requirements">HTTP Browser requirements</a></strong><br />
+in order for Apache2Handler to work. Minimum version required: libapreq2-2.05.</p>
 </li>
-The HTTP browser must be compatible with <em>HTML 4.01 Strict</em> and <em>CSS2</em>
+<li><strong><a name="item_http_browser_requirements">HTTP Browser requirements</a></strong>
+
+<p>The HTTP browser must be compatible with <em>HTML 4.01 Strict</em> and <em>CSS2</em>
 specifications. The tests were made with the following browsers:
-IE 5.5, Opera 6.12B1/Solaris, Opera 7.03/Win2K, Netscape 7.02.
-<p></p></ul>
+IE 5.5, Opera 6.12B1/Solaris, Opera 7.03/Win2K, Netscape 7.02.</p>
+</li>
+</ul>
 <p>
 </p>
 <h2><a name="recommended_software">Recommended Software</a></h2>
 <ul>
-<li><strong><a name="item_xml_3a_3axupdate_3a_3alibxml_by_petr_pajas"><code>XML::XUpdate::LibXML</code> by Petr Pajas</a></strong><br />
+<li><strong><a name="item_xml_3a_3axupdate_3a_3alibxml_by_petr_pajas"><code>XML::XUpdate::LibXML</code> by Petr Pajas</a></strong>
+
+<p>This Perl module implements XUpdate specification
+&lt;<a href="http://www.xmldb.org/xupdate/">http://www.xmldb.org/xupdate/</a>&gt;. See Torrus User Guide for details.</p>
 </li>
-This Perl module implements XUpdate specification
-&lt;<a href="http://www.xmldb.org/xupdate/">http://www.xmldb.org/xupdate/</a>&gt;. See Torrus User Guide for details.
-<p></p>
-<li><strong><a name="item_xsh_by_petr_pajas">XSH by Petr Pajas</a></strong><br />
-</li>
-Available at &lt;<a href="http://xsh.sourceforge.net">http://xsh.sourceforge.net</a>&gt;.
+<li><strong><a name="item_xsh_by_petr_pajas">XSH by Petr Pajas</a></strong>
+
+<p>Available at &lt;<a href="http://xsh.sourceforge.net">http://xsh.sourceforge.net</a>&gt;.
 This is a shell wrapper for a set of utilities for XML extraction, browsing,
-and editing.
-<p></p>
-<li><strong><a name="item_libxslt_from_gnome_project">libxslt from Gnome project</a></strong><br />
+and editing.</p>
 </li>
-<code>libxslt</code> is the XSLT stranslation library from Gnome
+<li><strong><a name="item_libxslt_from_gnome_project">libxslt from Gnome project</a></strong>
+
+<p><code>libxslt</code> is the XSLT stranslation library from Gnome
 project &lt;<a href="http://www.gnome.org">http://www.gnome.org</a>&gt;, available as a standalone package.
 It includes a binary executable, <code>xsltproc</code>. See Torrus User Guide for
-examples of its usage.
-<p></p></ul>
+examples of its usage.</p>
+</li>
+</ul>
 <p>
 </p>
 <h2><a name="installation_procedure">Installation Procedure</a></h2>
@@ -321,7 +326,7 @@ enough, for example:</p>
   /usr/local/etc/torrus/xmlconfig/
         User XML configuration files</pre>
 <pre>
-  /usr/local/share/man
+  /usr/local/man
         Place for man pages. All articles have the prefix C&lt;torrus_&gt;</pre>
 <pre>
   /var/log/torrus/
@@ -393,40 +398,41 @@ Torrus distribution. Only <em>site-global.xml</em> is installed in the directory
 for user-configurable files, all others are placed in the distribution
 directory.</p>
 <ul>
-<li><strong><a name="item_defaults_2exml">defaults.xml</a></strong><br />
-</li>
-Default parameters for the root of the datasources tree.
+<li><strong><a name="item_defaults_2exml">defaults.xml</a></strong>
+
+<p>Default parameters for the root of the datasources tree.
 Default view definitions. <strong>Note:</strong> this file is automatically
-overwritten by <code>make install</code>.
-<p></p>
-<li><strong><a name="item_site_2dglobal_2exml">site-global.xml</a></strong><br />
+overwritten by <code>make install</code>.</p>
 </li>
-Parameters that you want to change or define for your site.
+<li><strong><a name="item_site_2dglobal_2exml">site-global.xml</a></strong>
+
+<p>Parameters that you want to change or define for your site.
 This file will be compiled for every tree after <em>defaults.xml</em>,
 and this is the place to override the defaults. The file that is supplied
 with the Torrus distribution has some useful parameters that you may simply
 uncomment.
-<strong>Note:</strong> this file is never overwritten by <code>make install</code>.
-<p></p>
-<li><strong><a name="item_snmp_2ddefs_2exml">snmp-defs.xml</a></strong><br />
+<strong>Note:</strong> this file is never overwritten by <code>make install</code>.</p>
 </li>
-SNMP collector defaults. The file defines several templates
+<li><strong><a name="item_snmp_2ddefs_2exml">snmp-defs.xml</a></strong>
+
+<p>SNMP collector defaults. The file defines several templates
 used for collecting SNMP data.
 Do not change this file.
 You may redefine the needed parameters in your site-specific files
-and templates.
-<p></p>
-<li><strong><a name="item_vendor_2f_3cvendor_3e_2e_3cproduct_3e_5b_2e_3csubs">vendor/&lt;vendor&gt;.&lt;product&gt;[.&lt;subsystem&gt;].xml</a></strong><br />
+and templates.</p>
 </li>
-SNMP collector definitions and templates for various hardware vendors and
+<li><strong><a name="item_vendor_2f_3cvendor_3e_2e_3cproduct_3e_5b_2e_3csubs">vendor/&lt;vendor&gt;.&lt;product&gt;[.&lt;subsystem&gt;].xml</a></strong>
+
+<p>SNMP collector definitions and templates for various hardware vendors and
 products. <code>devdiscover</code> includes some of these files automatically in the
-configuration.
-<p></p>
-<li><strong><a name="item_generic_2f_2a_2exml">generic/*.xml</a></strong><br />
+configuration.</p>
 </li>
-SNMP collector definitions and templates for vendor-independent MIBs. Most
-files are named after corresponding RFC numbers.
-<p></p></ul>
+<li><strong><a name="item_generic_2f_2a_2exml">generic/*.xml</a></strong>
+
+<p>SNMP collector definitions and templates for vendor-independent MIBs. Most
+files are named after corresponding RFC numbers.</p>
+</li>
+</ul>
 <p>In addition, the distribution package contains several example files.</p>
 <p>For more details about XML configuration, see <em>Torrus User Guide</em>
 and <em>Torrus XML Configuration Guide</em>.</p>
@@ -440,16 +446,17 @@ some other parameters in your site configuration file
 of varaibes that you may override in your site config. Among them,
 most interesting are:</p>
 <ul>
-<li><strong><a name="item__24torrus_3a_3arenderer_3a_3acompanyname"><code>$Torrus::Renderer::companyName</code></a></strong><br />
+<li><strong><a name="item__torrus__renderer__companyname"><code>$Torrus::Renderer::companyName</code></a></strong>
+
+<p>The text that you specify here will appear in the top left corner
+of all HTML pages.</p>
 </li>
-The text that you specify here will appear in the top left corner
-of all HTML pages.
-<p></p>
-<li><strong><a name="item__24torrus_3a_3arenderer_3a_3acompanyurl"><code>$Torrus::Renderer::companyURL</code></a></strong><br />
+<li><strong><a name="item__torrus__renderer__companyurl"><code>$Torrus::Renderer::companyURL</code></a></strong>
+
+<p>The company name text will be clickable with the URL specified in
+this variable.</p>
 </li>
-The company name text will be clickable with the URL specified in
-this variable.
-<p></p></ul>
+</ul>
 <p>
 </p>
 <h2><a name="apache_http_server_configuration">Apache HTTP server configuration</a></h2>

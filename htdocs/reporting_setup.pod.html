@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Torrus Reporting Setup Guide</title>
 <link rel="stylesheet" href="torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -68,6 +70,12 @@ text, this program is provided ``as is'' and <strong>without warranty of any kin
 It is up to the users of Torrus software to rely or not to rely on
 the generated numeric data, and the Torrus software developers disclaim
 any responsibility for the data accuracy and usability.</p>
+<p><strong>New in version 1.0.7:</strong> You can assign the list of trees where the reports
+should be generated and shown. <strong>Warning:</strong> after changing the destination tree,
+the compiler may complain about <em>duplicate service IDs</em>. Then you need to
+stop all the torrus processes, including Apache, and then remove the file
+<em>serviceid_params.db</em> from Torrus database directory, then recompile the
+trees and start the processes.</p>
 <p>
 </p>
 <h2><a name="install_perl_modules">Install Perl modules</a></h2>
@@ -181,31 +189,46 @@ if it causes problems with your RDBMS.</p>
 input and output traffic counters. Other types of datasources may be
 implemented in the future.</p>
 <ul>
-<li><strong><a name="item_rfc2863_if_mib_3a_3aexternal_2dserviceid"><code>RFC2863_IF_MIB::external-serviceid</code></a></strong><br />
-</li>
-This discovery parameter specifies which service IDs are assigned to which
+<li><strong><a name="item_rfc2863_if_mib_3a_3aexternal_2dserviceid"><code>RFC2863_IF_MIB::external-serviceid</code></a></strong>
+
+<p>This discovery parameter specifies which service IDs are assigned to which
 interface names. The interface names whould be specified in the form of
 their subtree names in Torrus configuration. The example below is
 typical for a Cisco IOS router. The value of the parameter consists of
-comma-separated triples. The values in each triple are separated by colons,
-and they correspond to the service ID, interface name, and the counter type.
+comma-separated strings. The values in each string are separated by colons,
+and they correspond to the service ID, interface name, counter type,
+and optional destination tree names separated by the pipe symbol (|).
+The interface name can be prefixed by hostname and slash (/),
+the same way as in <code>RFC2863_IF_MIB::tokenset-members</code>. 
 All strings are case-sensitive. Three counter types are supported: <code>In</code>,
 <code>Out</code>, and <code>Both</code>. When set to <code>Both</code>, the service ID is appended with
-<code>_IN</code> or <code>_OUT</code> postfix accordingly, for input and output byte counters.
+<code>_IN</code> or <code>_OUT</code> postfix accordingly, for input and output byte counters.</p>
 <pre>
+ &lt;!-- global parameter that will match specific routers --&gt;
  &lt;param name=&quot;RFC2863_IF_MIB::external-serviceid&quot;&gt;
-  UPSTREAM1_IN:FastEthernet0_0_0:In,
-  UPSTREAM1_OUT:FastEthernet0_0_0:Out,
-  UPSTREAM2:GigabitEthernet0_1_1:Both,
+  CUSTOMERONE:nyc01br01/GigabitEthernet9_2_1:Both,
+  CUSTOMERTWO:wdc01br02/GigabitEthernet6_3_1:Both,
  &lt;/param&gt;</pre>
-<p></p>
-<li><strong><a name="item_ciscoios_macaccounting_3a_3aexternal_2dserviceid"><code>CiscoIOS_MacAccounting::external-serviceid</code></a></strong><br />
+<pre>
+ &lt;host&gt;
+   &lt;param name=&quot;snmp-host&quot; value=&quot;lsn01br01&quot;/&gt;
+   &lt;!-- host-specfic parameter  --&gt;
+   &lt;param name=&quot;RFC2863_IF_MIB::external-serviceid&quot;&gt;
+     UPSTREAM1_IN:FastEthernet0_0_0:In:upstreams,
+     UPSTREAM1_OUT:FastEthernet0_0_0:Out:upstreams,
+     UPSTREAM2:GigabitEthernet0_1_1:Both:upstreams,
+     CUST1:GigabitEthernet0_2_2:Both:customers|cust1,
+   &lt;/param&gt;
+ &lt;/host&gt;</pre>
 </li>
-The same format as for the parameter listed above, but instead of
+<li><strong><a name="item_ciscoios_macaccounting_3a_3aexternal_2dserviceid"><code>CiscoIOS_MacAccounting::external-serviceid</code></a></strong>
+
+<p>The same format as for the parameter listed above, but instead of
 interface names, you can specify the MAC accounting peer, in one
 of the following formats: AS number (<em>AS12345</em>), IP address, or peer's MAC
-address (<em>0x0003319c4200</em>).
-<p></p></ul>
+address (<em>0x0003319c4200</em>).</p>
+</li>
+</ul>
 <p>
 </p>
 <h2><a name="torrus_xml_configuration_parameters">Torrus XML configuration parameters</a></h2>
@@ -216,27 +239,34 @@ Configuration Guide</em>.</p>
 a generic external storage, and the default external storage is the SQL
 database.</p>
 <ul>
-<li><strong><a name="item_storage_2dtype"><code>storage-type</code></a></strong><br />
-</li>
-Mandatory parameter for datasource type <code>collector</code>. Comma-separated list
+<li><strong><a name="item_storage_2dtype"><code>storage-type</code></a></strong>
+
+<p>Mandatory parameter for datasource type <code>collector</code>. Comma-separated list
 of storage types. The collected value is duplicated on every storage listed.
 Supported values are: <code>rrd</code>, <code>ext</code>. For <code>ext</code> (external storage),
-see the <em>Reporting Setup Guide</em>.
-<p></p>
-<li><strong><a name="item_ext_2ddstype"><code>ext-dstype</code></a></strong><br />
+see the <em>Reporting Setup Guide</em>.</p>
 </li>
-Mandatory datasource type to be used in external storage. Accepted
-values are: <code>GAUGE</code>, <code>COUNTER32</code>, <code>COUNTER64</code>.
-<p></p>
-<li><strong><a name="item_ext_2dservice_2did"><code>ext-service-id</code></a></strong><br />
+<li><strong><a name="item_ext_2ddstype"><code>ext-dstype</code></a></strong>
+
+<p>Mandatory datasource type to be used in external storage. Accepted
+values are: <code>GAUGE</code>, <code>COUNTER32</code>, <code>COUNTER64</code>.</p>
 </li>
-Mandatory service ID for the external storage.
-<p></p>
-<li><strong><a name="item_ext_2dservice_2dunits"><code>ext-service-units</code></a></strong><br />
+<li><strong><a name="item_ext_2dservice_2did"><code>ext-service-id</code></a></strong>
+
+<p>Mandatory service ID for the external storage.</p>
 </li>
-Optional units for the collected value. The only supported value is
-<code>bytes</code>.
-<p></p></ul>
+<li><strong><a name="item_ext_2dservice_2dunits"><code>ext-service-units</code></a></strong>
+
+<p>Optional units for the collected value. The only supported value is
+<code>bytes</code>.</p>
+</li>
+<li><strong><a name="item_ext_2dservice_2dtrees"><code>ext-service-trees</code></a></strong>
+
+<p>(<strong>New in version 1.0.7</strong>) Optional list of comma-separated tree names.
+If specified, the report generator will produce report in corresponding trees.
+By default it's the tree which runs the collector process.</p>
+</li>
+</ul>
 <p>
 </p>
 <h2><a name="enable_displaying_of_the_reports_in_the_web_interface">Enable displaying of the reports in the web interface</a></h2>
@@ -268,7 +298,7 @@ available.</p>
 <p>The next example generates HTML output for all reports that are found
 in the database:</p>
 <pre>
- nice torrus report --genhtml --tree=mytree</pre>
+ nice torrus report --genhtml --tree=customers</pre>
 <p>It makes sence to set up a monthly cron job and generate the reports on
 the first day of every month, with the command like follows:</p>
 <pre>
@@ -285,7 +315,7 @@ maximum rate throughout the month, unavailable samples (how many 5-minutes
 intervals are missed in the collected data), and monthly volume (which
 is roughly less than the actual volume by the percentage of missed samples).
 Also clicking a service ID leads to its monthly report throughout the year.</p>
-<p>Copyright (c) 2005-2006 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+<p>Copyright (c) 2005-2008 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

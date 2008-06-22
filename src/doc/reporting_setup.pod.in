@@ -274,6 +274,12 @@ Mandatory service ID for the external storage.
 Optional units for the collected value. The only supported value is
 C<bytes>.
 
+=item * C<ext-service-trees>
+
+(B<New in version 1.0.7>) Optional list of comma-separated tree names.
+If specified, the report generator will produce report in corresponding trees.
+By default it's the tree which runs the collector process.
+
 =back
 
 

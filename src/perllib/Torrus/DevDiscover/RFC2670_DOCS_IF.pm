@@ -137,6 +137,12 @@ sub discover
             }
         }
     }
+    
+    if( $devdetails->param('RFC2670_DOCS_IF::upstreams-only') eq 'yes' )
+    {
+        $data->{'docsCableMaclayer'} = [];
+        $data->{'docsCableDownstream'} = [];
+    }
 
     $data->{'docsConfig'} = {
         'docsCableMaclayer' => {

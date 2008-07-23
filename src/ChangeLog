@@ -1,3 +1,8 @@
+2008-07-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2670_DOCS_IF.pm (discover):
+	new discovery parameter: RFC2670_DOCS_IF::upstreams-only
+
 2008-06-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Tree names can be specified in the External

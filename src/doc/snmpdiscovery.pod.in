@@ -704,6 +704,11 @@ accounting peers to tokensets.
 When set to C<yes>, the Committed Access Rate statistics are disabled
 from discovery.
 
+=item * C<CiscoIOS::disable-vpdn-stats>
+
+When set to C<yes>, the VPDN (Virtual Private Dial-up Network) statistics
+are disabled from discovery.
+
 =item * C<CiscoSCE::disable-disk>, C<CiscoSCE::disable-gc>,
     C<CiscoSCE::disable-qos>, C<CiscoSCE::disable-rdr>,
     C<CiscoSCE::disable-subs>, C<CiscoSCE::disable-tp>

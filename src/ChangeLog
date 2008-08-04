@@ -1,3 +1,8 @@
+2008-08-04  Jon Nistor <nistor@snickers.org>
+
+        * perllib/Torrus/DevDiscover/CiscoIOS.pm (discover):
+        new discovery parameter: CiscoIOS::disable-vpdn-stats
+
 2008-07-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2670_DOCS_IF.pm (discover):

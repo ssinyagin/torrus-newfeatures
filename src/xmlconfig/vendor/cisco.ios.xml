@@ -111,6 +111,20 @@
   <def name="ccarStatHCFilteredBytes"
           value="1.3.6.1.4.1.9.9.113.1.2.1.1.13"/>
 
+  <!-- CISCO-VPDN-MGMT-MIB -->
+  <def name="cvpdnTunnelTotal" 
+          value="1.3.6.1.4.1.9.10.24.1.1.1.0"/>
+  <def name="cvpdnSessionTotal"
+          value="1.3.6.1.4.1.9.10.24.1.1.2.0"/>
+  <def name="cvpdnDeniedUsersTotal"
+          value="1.3.6.1.4.1.9.10.24.1.1.3.0"/>
+  <def name="cvpdnSystemTunnelTotal"
+          value="1.3.6.1.4.1.9.10.24.1.1.4.1.2.2"/>
+  <def name="cvpdnSystemSessionTotal"
+          value="1.3.6.1.4.1.9.10.24.1.1.4.1.3.2"/>
+  <def name="cvpdnSystemDeniedUsersTotal"
+          value="1.3.6.1.4.1.9.10.24.1.1.4.1.4.2"/>
+
 </definitions>
 
 <datasources>
@@ -852,6 +866,82 @@
       <param name="line-color-bytes"    value="##SingleGraph" />
       <param name="line-order-bytes"    value="1" />      
     </leaf>            
+  </template>
+
+
+  <template name="cisco-vpdn">
+    <subtree name="VPDN_Statistics">
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="rrd-hwpredict"     value="disabled" />
+      <param name="data-file"         value="%system-id%_cisco-vpdn.rrd" />
+      <param name="comment"           value="VPDN statistics" />
+      <param name="precedence"        value="-200" />
+
+      <leaf name="Tunnel_Total">
+        <param name="snmp-object"       value="$cvpdnTunnelTotal" />
+        <param name="rrd-ds"            value="cvpdnTunnelTotal" />
+        <param name="comment"           value="Total number of VPDN tunnels" />
+        <param name="graph-legend"      value="Total Active tunnels" />
+        <param name="vertical-label"    value="" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="999" />
+      </leaf>
+
+      <leaf name="Session_Total">
+        <param name="snmp-object"       value="$cvpdnSessionTotal" />
+        <param name="rrd-ds"            value="cvpdnSessionTotal" />
+        <param name="comment" 
+                value="Total number of active users in all tunnels" />
+        <param name="graph-legend"      value="Total Active users in tunnels" />
+        <param name="vertical-label"    value="" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="998" />
+      </leaf>
+
+      <leaf name="Denied_Users">
+        <param name="snmp-object"       value="$cvpdnDeniedUsersTotal" />
+        <param name="rrd-ds"            value="cvpdnDenyTotal" />
+        <param name="comment" 
+                value="Total number of denied user attempts in all tunnels" />
+        <param name="graph-legend"      value="Total denied user attempts" />
+        <param name="vertical-label"    value="" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="997" />
+      </leaf>
+
+      <leaf name="System_Tunnel_Total">
+        <param name="snmp-object"       value="$cvpdnSystemTunnelTotal" />
+        <param name="rrd-ds"            value="cvpdnSysTunTotal" />
+        <param name="comment"   
+               value="Total number of active VPDN tunnels" />
+        <param name="graph-legend"      value="Number of VPDN tunnels" />
+        <param name="vertical-label"    value="" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="899" />
+      </leaf>
+
+      <leaf name="System_Session_Total">
+        <param name="snmp-object"       value="$cvpdnSystemSessionTotal" />
+        <param name="rrd-ds"            value="cvpdnSysSessTotal" />
+        <param name="comment"   
+               value="Total number of active sessions in active VPDN tunnels" />
+        <param name="graph-legend"      value="Number of sessions" />
+        <param name="vertical-label"    value="" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="898" />
+      </leaf>
+
+      <leaf name="System_Denied_Users">
+        <param name="snmp-object"       value="$cvpdnSystemDeniedUsersTotal" />
+        <param name="rrd-ds"            value="cvpdnSysDenyUsers" />
+        <param name="comment"   
+               value="Total number of denied users to all VPDN tunnels "/>
+        <param name="graph-legend"      value="Number of denied users" />
+        <param name="vertical-label"    value="" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="897" />
+      </leaf>
+    </subtree>
   </template>
     
 </datasources>

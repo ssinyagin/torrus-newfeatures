@@ -63,6 +63,8 @@ our %oiddef =
      'ccarConfigExtLimit'                => '1.3.6.1.4.1.9.9.113.1.1.1.1.7',
      'ccarConfigConformAction'           => '1.3.6.1.4.1.9.9.113.1.1.1.1.8',
      'ccarConfigExceedAction'            => '1.3.6.1.4.1.9.9.113.1.1.1.1.9',
+     # CISCO-VPDN-MGMT-MIB
+     'cvpdnTunnelTotal'                  => '1.3.6.1.4.1.9.10.24.1.1.1.0',
      );
 
 
@@ -485,6 +487,20 @@ sub discover
 
                 $data->{'ccar'}{$INDEX} = $car;
             }
+        }
+    }
+
+    # Section assumes all tunnels are L2TP since L2F is pretty much
+    # deprecated and noone uses it (saves from auto-discovery indexing)
+    if( $devdetails->param('CiscoIOS::disable-vpdn-stats') ne 'yes' )
+    {
+        $session->get_request( -varbindlist =>
+                               [ $dd->oiddef('cvpdnTunnelTotal') ] );
+        if( $session->error_status() == 0 )
+        {
+            $devdetails->setCap('ciscoVPDN');
+            push( @{$data->{'templates'}},
+                  'CiscoIOS::cisco-vpdn' );
         }
     }
 

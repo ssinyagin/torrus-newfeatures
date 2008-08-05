@@ -1,3 +1,28 @@
+05-AUG-2008: Torrus release 1.0.7
+
+In this release:
+
+-- Added and improved vendor support for Symmetricom, Juniper JunOS,
+   Cisco SCE, 
+
+-- New discovery parameters, selectors and selector actions.
+
+-- Default value for "collector-timeoffset-step" increased from 30 to 60
+   seconds. 30 seconds is too short for many installations.
+
+-- Support for PostgreSQL in reports generator.
+
+-- Support for IPv6 in SNMP discovery and collector.
+
+-- New collector plugin: "tp-rawexport" for plaintext export of collector data.
+
+-- Cisco QoS monitoring plugin "tp-cisco-cbqos" upgraded to version 1.6.
+   It fixes an old bug in RRD file naming, thus all the QoS-related RRD files
+   would have to be renamed or started from scratch.
+
+-- Other minor enhancements and bugfixes (see ChangeLog for details).
+
+
 03-AUG-2007: Torrus release 1.0.6
 
 In this release:

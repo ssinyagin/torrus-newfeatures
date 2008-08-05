@@ -25,7 +25,6 @@ use strict;
 use threads;
 use threads::shared;
 use Thread::Queue;
-use IO::File;
 use Date::Format;
 use Math::BigInt lib => 'GMP';
 use Math::BigFloat;
@@ -295,10 +294,8 @@ sub rawUpdateThread
         my $filejob = $thrUpdateQueue->dequeue();
 
         my $fname = time2str( $filejob->{'filename'}, time() );
-        
-        my $fh = new IO::File( $fname, O_WRONLY|O_CREAT|O_APPEND );
 
-        if( not defined($fh) )
+        if( not open(RAWOUT, '>> ' . $fname) )
         {
             Error('Cannot open ' . $fname . ' for writing: ' . $!);
             next;
@@ -309,14 +306,14 @@ sub rawUpdateThread
 
         foreach my $rowentry ( @{$filejob->{'values'}} )
         {
-            print $fh ( join( $separator,
-                              time2str( $ts_format, $rowentry->{'time'} ),
-                              $rowentry->{'rowid'},
-                              $rowentry->{'value'} ),
-                        "\n");
+            print RAWOUT ( join( $separator,
+                                 time2str( $ts_format, $rowentry->{'time'} ),
+                                 $rowentry->{'rowid'},
+                                 $rowentry->{'value'} ),
+                           "\n");
         }
 
-        $fh->close();
+        close(RAWOUT);
         
         Debug('RawExport: wrote ' . $fname);
     }

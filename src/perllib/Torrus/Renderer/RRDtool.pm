@@ -584,7 +584,14 @@ sub rrd_make_opts
     my @args = ();
     foreach my $param ( keys %{$opthash} )
     {
-        my $value = $config_tree->getParam( $view, $param );
+        my $value =
+            $self->{'options'}->{'variables'}->{'G' . $param};
+        
+        if( not defined( $value ) )
+        {
+            $value = $config_tree->getParam( $view, $param );
+        }
+        
         if( defined( $value ) )
         {
             if( ( $param eq 'start' or $param eq 'end' ) and

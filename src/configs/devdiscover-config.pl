@@ -36,6 +36,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
 
 @Torrus::DevDiscover::loadModules =
     (
+     'Torrus::DevDiscover::RFC1628_UPS_MIB',
      'Torrus::DevDiscover::RFC1657_BGP4_MIB',
      'Torrus::DevDiscover::RFC2011_IP_MIB',
      'Torrus::DevDiscover::RFC2863_IF_MIB',
@@ -102,7 +103,38 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cdef-collector-defaults',
          'source' => 'cdef-collector-defs.xml'
          },
-     
+
+     #### UPS-MIB
+
+     'RFC1628_UPS_MIB::battery-subtree' => {
+         'name'   => 'battery-subtree',
+         'source' => 'generic/rfc1628.ups.xml'
+         },
+     'RFC1628_UPS_MIB::ups-input-subtree' => {
+         'name'   => 'ups-input-subtree',
+         'source' => 'generic/rfc1628.ups.xml'
+         },
+     'RFC1628_UPS::ups-input-leaf' => {
+         'name'   => 'ups-input-leaf',
+         'source' => 'generic/rfc1628.ups.xml'
+         },
+     'RFC1628_UPS_MIB::ups-output-subtree' => {
+         'name'   => 'ups-output-subtree',
+         'source' => 'generic/rfc1628.ups.xml'
+         },
+     'RFC1628_UPS::ups-output-leaf' => {
+         'name'   => 'ups-output-leaf',
+         'source' => 'generic/rfc1628.ups.xml'
+         },
+     'RFC1628_UPS_MIB::ups-bypass-subtree' => {
+         'name'   => 'ups-bypass-subtree',
+         'source' => 'generic/rfc1628.ups.xml'
+         },
+     'RFC1628_UPS::ups-bypass-leaf' => {
+         'name'   => 'ups-bypass-leaf',
+         'source' => 'generic/rfc1628.ups.xml'
+         },
+
      #### IF-MIB
 
      'RFC2863_IF_MIB::rfc2863-ifmib-hostlevel' => {

@@ -140,6 +140,16 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 127,                    # docsCableMaclayer
          'ifDescr' => '^Bundle'
          },
+
+     'EOBCN/N' => {
+         'ifType'  => 53,                     # propVirtual
+         'ifDescr' => '^EOBC'
+         },
+
+     'FIFON/N' => {
+         'ifType'  => 53,                     # propVirtual
+         'ifDescr' => '^FIFO'
+         },
      );
 
 our %tunnelType =

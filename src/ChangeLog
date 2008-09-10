@@ -1,3 +1,11 @@
+2008-09-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS.pm: Filtered out EOBC and FIFO
+	virtual interfaces
+
+	* xmlconfig/vendor/cisco.ios.mac-accounting.xml:
+	Bugfix in the RRD filename
+
 2008-08-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_opts):

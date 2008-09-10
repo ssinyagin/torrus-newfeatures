@@ -49,7 +49,7 @@
     <param name="ext-dstype"        value="COUNTER64" />
 
     <param name="data-file">
-      %system-id%_%interface-nick%_%peer-macaddr%_macacc.rrd"
+      %system-id%_%interface-nick%_%peer-macaddr%_macacc.rrd
     </param>
 
     <param name="rrd-ds" value="%direction%" />

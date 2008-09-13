@@ -85,9 +85,26 @@ structure and definitions.
 
 =over 4
 
+=item B<--tree>=I<TREE>
+
+Mandatory parameter specifying the tree name.
+
 =item B<--out>=I<FILE>
 
 Sets the output file to I<FILE>. Default is F<snapshot.xml>.
+
+=item B<--param>=I<PARAM>  B<--value>=I<VALUE>
+
+Sets the filter on datasource leaves that have to be included in the snapshot.
+I<PARAM> specifies the name of the datasource parameter, and I<VALUE>
+sets the matching value. By default the numeric comparison is performed.
+
+=item B<--op>=I<OPERATOR>
+
+Sets the fiter comparison operator. Accepted values: B<=> (numeric),
+B<eq> (text string comparison), and B<re> (regular expression match). Default
+is numeric comparison.
+
 
 =item B<--verbose>
 

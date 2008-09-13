@@ -1,6 +1,7 @@
 2008-09-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/configsnapshot.in: Bugfix in root subtree parameters
+	* bin/configsnapshot.in: added parameter filtering option
 
 2008-09-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 

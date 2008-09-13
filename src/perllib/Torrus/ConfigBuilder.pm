@@ -288,6 +288,12 @@ sub getElementPath
 }
 
 
+sub getTopSubtree
+{
+    my $self = shift;
+    return $self->{'datasources'};
+}
+
 
 sub addTemplateApplication
 {

@@ -110,7 +110,7 @@ $cb->addCreatorInfo( $creator );
 collect_monitors( $config_tree, $cb );
 collect_tokensets( $config_tree, $cb );
 collect_definitions( $config_tree, $cb );
-collect_subtrees( $config_tree, $cb, $config_tree->token('/') );
+collect_datasources( $config_tree, $cb );
 
 my $ok = $cb->toFile( $outfile );
 if( $ok )
@@ -186,6 +186,22 @@ sub collect_definitions
     }
 }
 
+
+sub collect_datasources
+{
+    my $config_tree = shift;
+    my $cb = shift;
+
+    my $topNode = $cb->getTopSubtree();
+    my $topToken = $config_tree->token('/');
+    
+    my $params = prepare_params( $config_tree, $topToken );
+    $cb->addParams( $topNode, $params );
+
+    collect_subtrees( $config_tree, $cb, $topToken, $topNode );
+}
+        
+
 sub collect_subtrees
 {
     my $config_tree = shift;
@@ -196,15 +212,8 @@ sub collect_subtrees
     foreach my $ctoken ( $config_tree->getChildren( $token ) )
     {
         my $childName = $config_tree->nodeName( $config_tree->path($ctoken) );
-        my $params = $config_tree->getParams( $ctoken, 1 );
-
-        # Remove linebreaks
-        while( my( $param, $value ) = each %{$params} )
-        {
-            $value =~ s/\s+/ /gm;
-            $params->{$param} = $value;
-        }
-
+        my $params = prepare_params( $config_tree, $ctoken );
+        
         if( $config_tree->isSubtree( $ctoken ) )
         {
             my $subtreeNode =
@@ -224,6 +233,22 @@ sub collect_subtrees
 }
 
 
+sub prepare_params
+{
+    my $config_tree = shift;
+    my $token = shift;
+    
+    my $params = $config_tree->getParams( $token, 1 );
+
+    # Remove linebreaks
+    while( my( $param, $value ) = each %{$params} )
+    {
+        $value =~ s/\s+/ /gm;
+        $params->{$param} = $value;
+    }
+
+    return $params;
+}
 
 # Local Variables:
 # mode: perl

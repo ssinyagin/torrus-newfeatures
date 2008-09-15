@@ -594,12 +594,12 @@ sub mapLookupCallback
     my $result = $session->var_bind_list();
     if( defined $result )
     {
-        while( my( $val, $key ) = each %{$result} )
+        my $preflen = length($map) + 1;
+        
+        while( my( $oid, $key ) = each %{$result} )
         {
-            my $quoted = quotemeta( $map );
-            $val =~ s/^$quoted\.//;
-            $maps{$hosthash}{$map}{$key} =
-                $val;
+            my $val = substr($oid, $preflen);
+            $maps{$hosthash}{$map}{$key} = $val;
             # Debug("Map $map discovered: '$key' -> '$val'");
         }
     }

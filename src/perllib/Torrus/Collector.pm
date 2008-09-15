@@ -590,40 +590,39 @@ sub beforeRun
     my $known_ts = Torrus::TimeStamp::get( $timestamp_key );
     my $actual_ts = $config_tree->getTimestamp();
     
-    if( $actual_ts >= $known_ts or not defined($data->{'targets'}) )
+    if( $actual_ts >= $known_ts or not $data->{'targets_initialized'} )
     {
         Info('Initializing tasks for collector instance ' . $instance);
         Debug("Config TS: $actual_ts, Collector TS: $known_ts");
         my $init_start = time();
 
-        undef $data->{'targets'};
+        my $targets = {};
 
-        $data->{'db_tokens'} =
-            new Torrus::DB('collector_tokens' . '_' . $instance,
-                           -Subdir => $tree);
+        my $db_tokens = new Torrus::DB('collector_tokens' . '_' . $instance,
+                                       -Subdir => $tree);
         
-        my $cursor = $data->{'db_tokens'}->cursor();
-        while( my ($token, $schedule) = $data->{'db_tokens'}->next($cursor) )
+        my $cursor = $db_tokens->cursor();
+        while( my ($token, $schedule) = $db_tokens->next($cursor) )
         {
             my ($period, $offset) = split(/:/o, $schedule);
-            if( not exists( $data->{'targets'}{$period}{$offset} ) )
+            if( not exists( $targets->{$period}{$offset} ) )
             {
-                $data->{'targets'}{$period}{$offset} = [];
+                $targets->{$period}{$offset} = [];
             }
-            push( @{$data->{'targets'}{$period}{$offset}}, $token );
+            push( @{$targets->{$period}{$offset}}, $token );
         }
         undef $cursor;
-        $data->{'db_tokens'}->closeNow();
-        undef $data->{'db_tokens'};
+        $db_tokens->closeNow();
+        undef $db_tokens;
 
         # Set the timestamp
         &Torrus::TimeStamp::setNow( $timestamp_key );
         
         $self->flushTasks();
 
-        foreach my $period ( keys %{$data->{'targets'}} )
+        foreach my $period ( keys %{$targets} )
         {
-            foreach my $offset ( keys %{$data->{'targets'}{$period}} )
+            foreach my $offset ( keys %{$targets->{$period}} )
             {
                 my $collector =
                     new Torrus::Collector( -Period => $period,
@@ -631,7 +630,7 @@ sub beforeRun
                                            -TreeName => $tree,
                                            -Instance => $instance );
 
-                foreach my $token ( @{$data->{'targets'}{$period}{$offset}} )
+                foreach my $token ( @{$targets->{$period}{$offset}} )
                 {
                     $collector->addTarget( $config_tree, $token );
                 }
@@ -642,7 +641,10 @@ sub beforeRun
         Verbose(sprintf("Tasks initialization finished in %d seconds",
                         time() - $init_start));
 
+        $data->{'targets_initialized'} = 1;
+
     }
+    
     Torrus::TimeStamp::release();
     
     return 1;

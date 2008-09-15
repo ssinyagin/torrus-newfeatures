@@ -500,6 +500,7 @@ sub updateRRD
 # A background thread that updates RRD files
 sub rrdUpdateThread
 {
+    $| = 1;
     &Torrus::Log::setTID( threads->tid() );
     my $cmdlist;
     &threads::shared::share( \$cmdlist );

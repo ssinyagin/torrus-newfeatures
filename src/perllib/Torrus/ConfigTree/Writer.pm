@@ -67,7 +67,17 @@ sub new
 
     $self->{'collectorInstances'} =
         Torrus::SiteConfig::collectorInstances( $self->treeName() );
-    
+
+    $self->{'db_collectortokens'} = [];
+    foreach my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
+    {
+        $self->{'db_collectortokens'}->[$instance] =
+            new Torrus::DB( 'collector_tokens' . '_' . $instance,
+                            -Subdir => $self->treeName(),
+                            -WriteAccess => 1,
+                            -Truncate    => 1 );
+    }
+        
     return $self;
 }
 
@@ -546,6 +556,9 @@ sub postProcessNodes
                                          'collector-timeoffset',
                                          $newOffset );
                 }
+
+                $self->{'db_collectortokens'}->[$instance]->put
+                    ( $token, sprintf('%d:%d', $period, $newOffset) );
 
                 my $storagetypes =
                     $self->getNodeParam( $token, 'storage-type' );

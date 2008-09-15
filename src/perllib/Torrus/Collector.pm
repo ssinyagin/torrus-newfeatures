@@ -69,11 +69,13 @@ sub new
     foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
     {
         $self->{'types'}{$collector_type} = {};
+        $self->{'types_in_use'}{$collector_type} = 0;
     }
 
     foreach my $storage_type ( keys %Torrus::Collector::storageTypes )
     {
         $self->{'storage'}{$storage_type} = {};
+        $self->{'storage_in_use'}{$storage_type} = 0;
         
         my $storage_string = $storage_type . '-storage';
         if( ref( $Torrus::Collector::initStorage{$storage_string} ) )
@@ -107,7 +109,8 @@ sub addTarget
     $self->fetchParams($config_tree, $token, $collector_type);
 
     $self->{'targets'}{$token}{'type'} = $collector_type;
-
+    $self->{'types_in_use'}{$collector_type} = 1;
+    
     my $storage_types = $config_tree->getNodeParam($token, 'storage-type');
     foreach my $storage_type ( split( ',', $storage_types ) )
     {
@@ -126,6 +129,7 @@ sub addTarget
                   $storage_type );
             
             $self->fetchParams($config_tree, $token, $storage_string);
+            $self->{'storage_in_use'}{$storage_type} = 1;
         }
     }
 
@@ -390,6 +394,8 @@ sub run
 
     while( my ($collector_type, $ref) = each %{$self->{'types'}} )
     {
+        next unless $self->{'types_in_use'}{$collector_type};
+        
         if( $Torrus::Collector::needsConfigTree
             {$collector_type}{'runCollector'} )
         {
@@ -399,7 +405,7 @@ sub run
         }
         
         &{$Torrus::Collector::runCollector{$collector_type}}( $self, $ref );
-
+        
         if( defined( $self->{'config_tree'} ) )
         {
             undef $self->{'config_tree'};
@@ -408,6 +414,8 @@ sub run
 
     while( my ($storage_type, $ref) = each %{$self->{'storage'}} )
     {
+        next unless $self->{'storage_in_use'}{$storage_type};
+        
         if( $Torrus::Collector::needsConfigTree
             {$storage_type}{'storeData'} )
         {
@@ -426,6 +434,8 @@ sub run
     
     while( my ($collector_type, $ref) = each %{$self->{'types'}} )
     {
+        next unless $self->{'types_in_use'}{$collector_type};
+        
         if( ref( $Torrus::Collector::postProcess{$collector_type} ) )
         {
             if( $Torrus::Collector::needsConfigTree
@@ -579,34 +589,14 @@ sub beforeRun
     my $timestamp_key = $tree . ':' . $instance . ':collector_cache';
     my $known_ts = Torrus::TimeStamp::get( $timestamp_key );
     my $actual_ts = $config_tree->getTimestamp();
-    if( $actual_ts >= $known_ts )
+    
+    if( $actual_ts >= $known_ts or not defined($data->{'targets'}) )
     {
-        Info("Rebuilding collector information");
+        Info('Initializing tasks for collector instance ' . $instance);
         Debug("Config TS: $actual_ts, Collector TS: $known_ts");
+        my $init_start = time();
 
         undef $data->{'targets'};
-        $need_new_tasks = 1;
-
-        $data->{'db_tokens'} =
-            new Torrus::DB( 'collector_tokens' . '_' . $instance,
-                            -Subdir => $tree,
-                            -WriteAccess => 1,
-                            -Truncate    => 1 );
-        $self->cacheCollectors( $config_tree, $instance,
-                                $config_tree->token('/') );
-        # explicitly close, since we don't need it often, and sometimes
-        # open it in read-only mode
-        $data->{'db_tokens'}->closeNow();
-        undef $data->{'db_tokens'};
-
-        # Set the timestamp
-        &Torrus::TimeStamp::setNow( $timestamp_key );
-    }
-    Torrus::TimeStamp::release();
-
-    if( not $need_new_tasks and not defined $data->{'targets'} )
-    {
-        $need_new_tasks = 1;
 
         $data->{'db_tokens'} =
             new Torrus::DB('collector_tokens' . '_' . $instance,
@@ -615,7 +605,7 @@ sub beforeRun
         my $cursor = $data->{'db_tokens'}->cursor();
         while( my ($token, $schedule) = $data->{'db_tokens'}->next($cursor) )
         {
-            my ($period, $offset) = split(':', $schedule);
+            my ($period, $offset) = split(/:/o, $schedule);
             if( not exists( $data->{'targets'}{$period}{$offset} ) )
             {
                 $data->{'targets'}{$period}{$offset} = [];
@@ -625,14 +615,10 @@ sub beforeRun
         undef $cursor;
         $data->{'db_tokens'}->closeNow();
         undef $data->{'db_tokens'};
-    }
 
-    # Now fill in Scheduler's task list, if needed
-
-    if( $need_new_tasks )
-    {
-        Verbose("Initializing tasks");
-        my $init_start = time();
+        # Set the timestamp
+        &Torrus::TimeStamp::setNow( $timestamp_key );
+        
         $self->flushTasks();
 
         foreach my $period ( keys %{$data->{'targets'}} )
@@ -655,48 +641,11 @@ sub beforeRun
         }
         Verbose(sprintf("Tasks initialization finished in %d seconds",
                         time() - $init_start));
-    }
 
+    }
+    Torrus::TimeStamp::release();
+    
     return 1;
-}
-
-
-sub cacheCollectors
-{
-    my $self = shift;
-    my $config_tree = shift;
-    my $instance = shift;
-    my $ptoken = shift;
-
-    my $data = $self->data();
-
-    foreach my $ctoken ( $config_tree->getChildren( $ptoken ) )
-    {
-        if( $config_tree->isSubtree( $ctoken ) )
-        {
-            $self->cacheCollectors( $config_tree, $instance, $ctoken );
-        }
-        elsif( $config_tree->isLeaf( $ctoken ) and
-               ( $config_tree->getNodeParam( $ctoken, 'ds-type' )
-                 eq 'collector' ) and
-               ( $config_tree->getNodeParam( $ctoken, 'collector-instance' )
-                 == $instance ) )
-        {
-            my $period = sprintf('%d',
-                                 $config_tree->getNodeParam
-                                 ( $ctoken, 'collector-period' ) );
-            my $offset = sprintf('%d',
-                                 $config_tree->getNodeParam
-                                 ( $ctoken, 'collector-timeoffset' ) );
-
-            $data->{'db_tokens'}->put( $ctoken, $period.':'.$offset );
-            if( not exists( $data->{'targets'}{$period}{$offset} ) )
-            {
-                $data->{'targets'}{$period}{$offset} = [];
-            }
-            push( @{$data->{'targets'}{$period}{$offset}}, $ctoken );
-        }
-    }
 }
 
 

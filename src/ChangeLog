@@ -1,3 +1,9 @@
+2008-09-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector.pm: Now the collector cache is filled by
+	the compiler. This optimizes the collector startup. Need to re-compile
+	after upgrade.
+
 2008-09-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/configsnapshot.in: Bugfix in root subtree parameters

@@ -1,3 +1,8 @@
+2008-09-16  Jon Nistor <nistor@snickers.org>
+
+	* perllib/Torrus/DevDiscover/Arbor_E.pm:
+	New discovery module for Arbor E series devices
+
 2008-09-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector.pm: Now the collector cache is filled by

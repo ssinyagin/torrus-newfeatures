@@ -30,6 +30,7 @@ dist_vendor_DATA = \
 	vendor/alteon.xml \
 	vendor/apc.ups.xml  \
 	vendor/apple.ae.xml \
+	vendor/arbor_e.xml \
 	vendor/ascend.max.xml \
 	vendor/atmel.xml \
 	vendor/betternetworks.xml \

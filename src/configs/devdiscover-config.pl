@@ -47,6 +47,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::Alteon',
      'Torrus::DevDiscover::AlliedTelesyn_PBC18',
      'Torrus::DevDiscover::Apple_AE',
+     'Torrus::DevDiscover::Arbor_E',
      'Torrus::DevDiscover::AscendMax',
      'Torrus::DevDiscover::ATMEL',
      'Torrus::DevDiscover::AxxessIT',
@@ -84,7 +85,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
 %Torrus::ConfigBuilder::templateRegistry =
     (
      ####  SNMP defaults
-
      '::holt-winters-defaults' => {
          'name'   => 'holt-winters-defaults',
          'source' => 'snmp-defs.xml'
@@ -105,7 +105,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
 
      #### UPS-MIB
-
      'RFC1628_UPS_MIB::battery-subtree' => {
          'name'   => 'battery-subtree',
          'source' => 'generic/rfc1628.ups.xml'
@@ -136,7 +135,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
 
      #### IF-MIB
-
      'RFC2863_IF_MIB::rfc2863-ifmib-hostlevel' => {
          'name'   => 'rfc2863-ifmib-hostlevel',
          'source' => 'generic/rfc2863.if-mib.xml'
@@ -189,7 +187,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      },
      
      #### DOCSIS MIB
-
      'RFC2670_DOCS_IF::docsis-downstream-subtree' => {
          'name'   => 'docsis-downstream-subtree',
          'source' => 'generic/rfc2670.docsis-if.xml'
@@ -208,7 +205,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
 
      #### RFC2790_HOST_RESOURCES
-
      'RFC2790_HOST_RESOURCES::hr-system-performance-subtree' => {
          'name'   => 'hr-system-performance-subtree',
          'source' => 'generic/rfc2790.host-resources.xml'
@@ -235,7 +231,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
 
      #### ADSL-LINE-MIB
-
      'RFC2662_ADSL_LINE::adsl-line-interface' => {
          'name'   => 'adsl-line-interface',
          'source' => 'generic/rfc2662.adsl-line.xml'
@@ -276,7 +271,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },     
      
      #### Apple Airport Extreme
-
      'Apple_AE::ae-wireless-clients-subtree' => {
          'name'   => 'ae-wireless-clients-subtree',
          'source' => 'vendor/apple.ae.xml'
@@ -290,8 +284,78 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source' => 'vendor/apple.ae.xml'
          },
      
-     #### ATMEL smartbridges
+     #### Arbor Networks E Series
+     'Arbor_E::e30-buffers' => {
+         'name'   => 'e30-buffers',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-bundle-subtree' => {
+         'name'   => 'e30-bundle-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-bundle' => {
+         'name'   => 'e30-bundle',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-cpu' => {
+         'name'   => 'e30-cpu',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-fwdTable' => {
+         'name'   => 'e30-fwdTable',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-hdd-subtree' => {
+         'name'   => 'e30-hdd-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-hdd' => {
+         'name'   => 'e30-hdd',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-hdd-errors' => {
+         'name'   => 'e30-hdd-errors',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-l2tp-subtree' => {
+         'name'   => 'e30-l2tp-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-l2tp' => {
+         'name'   => 'e30-l2tp',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-l2tp-secure-endpoints-subtree' => {
+         'name'   => 'e30-l2tp-secure-endpoints-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-l2tp-secure-endpoints-leaf' => {
+         'name'   => 'e30-l2tp-secure-endpoints-leaf',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-mem' => {
+         'name'   => 'e30-mem',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-flowlkup-subtree' => {
+         'name'   => 'e30-flowlkup-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-flowlkup' => {
+         'name'   => 'e30-flowlkup',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-flowlkup-leaf' => {
+         'name'   => 'e30-flowlkup-leaf',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-slowpath' => {
+         'name'   => 'e30-slowpath',
+         'source' => 'vendor/arbor_e.xml'
+         },
 
+
+     #### ATMEL smartbridges
      'ATMEL::atmel-device-subtree' => {
          'name'   => 'atmel-device-subtree',
          'source' => 'vendor/atmel.xml'
@@ -306,7 +370,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
 
      #### AscendMax
-
      'AscendMax::ascend-totalcalls' => {
          'name'   => 'ascend-totalcalls',
          'source' => 'vendor/ascend.max.xml'
@@ -753,6 +816,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'      => 'empire-disk-stats-nt50Intel',
          'source'    => 'vendor/empire.systemedge.xml',
      },
+
      #### MicrosoftWindows
      'MicrosoftWindows::microsoft-iis-ftp-stats' => {
          'name'     => 'microsoft-iis-ftp-stats',
@@ -970,6 +1034,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'ucdsnmp-load-average',
          'source'   => 'vendor/ucd.ucd-snmp.xml',
      },
+
      #### NetApp (Network Appliance)
      'NetApp::CPU' => {
          'name'     => 'netapp-cpu',
@@ -991,6 +1056,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'netapp-cifs',
          'source'   => 'vendor/netapp.filer.xml',
      },
+
      #### NetScreen
      'NetScreen::netscreen-cpu-stats' => {
          'name'     => 'netscreen-cpu-stats',
@@ -1004,6 +1070,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'netscreen-sessions-stats',
          'source'   => 'vendor/netscreen.xml',
      },
+
      #### OracleDatabase
      'OracleDatabase::Sys' => {
          'name'     => 'oracle-database-sys',
@@ -1029,11 +1096,13 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'oracle-library-cache',
          'source'   => 'vendor/oracle.database.xml',
      },
+
      #### Paradyne
      'Paradyne::paradyne-xdsl-interface' => {
          'name'   => 'paradyne-xdsl-interface',
          'source' => 'vendor/paradyne.xdsl.xml'
          },
+
      #### Symmetricom
      'Symmetricom::ntp-stats' => {
          'name'   => 'ntp-stats',

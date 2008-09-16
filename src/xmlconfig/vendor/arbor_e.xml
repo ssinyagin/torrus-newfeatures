@@ -1,0 +1,1050 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2008 Jon Nistor
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+  $Id$
+  Jon Nistor <nistor at snickers dot org>
+
+-->
+<!--
+     Arbor e-Series specific definitions
+     Former Ellacoya devices
+ -->
+
+<configuration>
+
+<definitions>
+  <!-- ELLACOYA-MIB::hostMemory -->
+  <def name="sdramSize"           value="1.3.6.1.4.1.3813.1.4.2.1.0" />
+  <def name="sdramUsage"          value="1.3.6.1.4.1.3813.1.4.2.2.0" />
+  <def name="mBufPoolSize"        value="1.3.6.1.4.1.3813.1.4.2.3.0" />
+  <def name="mBufUsage"           value="1.3.6.1.4.1.3813.1.4.2.4.0" />
+
+  <def name="hDriveHd0Size"       value="1.3.6.1.4.1.3813.1.4.2.6.0" />
+  <def name="hDriveHd0Usage"      value="1.3.6.1.4.1.3813.1.4.2.7.0" />
+  <def name="hDriveHd1Size"       value="1.3.6.1.4.1.3813.1.4.2.8.0" />
+  <def name="hDriveHd1Usage"      value="1.3.6.1.4.1.3813.1.4.2.9.0" />
+
+  <def name="hDriveErrBlockRW"    value="1.3.6.1.4.1.3813.1.4.2.10.1.0" />
+  <def name="hDriveErrCommand"    value="1.3.6.1.4.1.3813.1.4.2.10.2.0" />
+  <def name="hDriveErrReadWrite"  value="1.3.6.1.4.1.3813.1.4.2.10.3.0" />
+  <def name="hDriveErrWriteOnly"  value="1.3.6.1.4.1.3813.1.4.2.10.4.0" />
+  <def name="hDriveErrReady"      value="1.3.6.1.4.1.3813.1.4.2.10.5.0" />
+  <def name="hDriveErrBusy"       value="1.3.6.1.4.1.3813.1.4.2.10.6.0" />
+  <def name="hDriveErrDataReq"    value="1.3.6.1.4.1.3813.1.4.2.10.7.0" />
+  <def name="hDriveErrSeek"       value="1.3.6.1.4.1.3813.1.4.2.10.8.0" />
+  <def name="hDriveErrDataReqNS"  value="1.3.6.1.4.1.3813.1.4.2.10.9.0" />
+  <def name="hDriveErrInterfCRC"  value="1.3.6.1.4.1.3813.1.4.2.10.10.0" />
+  <def name="hDriveErrUncorrData" value="1.3.6.1.4.1.3813.1.4.2.10.11.0" />
+  <def name="hDriveErrIdNotFound" value="1.3.6.1.4.1.3813.1.4.2.10.12.0" />
+  <def name="hDriveErrAbortedCmd" value="1.3.6.1.4.1.3813.1.4.2.10.13.0" />
+  <def name="hDriveErrTrack0NF"   value="1.3.6.1.4.1.3813.1.4.2.10.14.0" />
+  <def name="hDriveErrAddrMarkNF" value="1.3.6.1.4.1.3813.1.4.2.10.15.0" />
+
+  <!-- ELLACOYA-MIB::fwdTables -->
+  <def name="l3UserTblCapacity"          value="1.3.6.1.4.1.3813.1.4.3.1.0" />
+  <def name="l3UserTblUsage"             value="1.3.6.1.4.1.3813.1.4.3.2.0" />
+  <def name="macTblCapacity"             value="1.3.6.1.4.1.3813.1.4.3.3.0" />
+  <def name="macTblUsage"                value="1.3.6.1.4.1.3813.1.4.3.4.0" />
+  <def name="polGroupSysCapacity"        value="1.3.6.1.4.1.3813.1.4.3.5.0" />
+  <def name="polGroupSysUsage"           value="1.3.6.1.4.1.3813.1.4.3.6.0" />
+  <def name="subscriberSysCapacity"      value="1.3.6.1.4.1.3813.1.4.3.9.0" />
+  <def name="subscriberSysUsage"         value="1.3.6.1.4.1.3813.1.4.3.10.0" />
+  <def name="activeL3UserTblUsage"       value="1.3.6.1.4.1.3813.1.4.3.11.0" />
+  <def name="authenticatedL3UserCount"   value="1.3.6.1.4.1.3813.1.4.3.12.0" />
+  <def name="unauthenticatedL3UserCount" value="1.3.6.1.4.1.3813.1.4.3.13.0" />
+
+  <!-- ELLACOYA-MIB::flow -->
+  <def name="flowPoolName"        value="1.3.6.1.4.1.3813.1.4.5"/>
+
+  <!-- ELLACOYA-MIB::cpu -->
+  <def name="cpuUtilization"      value="1.3.6.1.4.1.3813.1.4.4.1.0"/>
+
+  <!-- ELLACOYA-MIB::slowpathCounters -->
+  <def name="allPackets"          value="1.3.6.1.4.1.3813.1.4.4.10.1.1.0" />
+  <def name="ipPackets"           value="1.3.6.1.4.1.3813.1.4.4.10.1.2.0" />
+  <def name="tcpPackets"          value="1.3.6.1.4.1.3813.1.4.4.10.1.3.0" />
+  <def name="udpPackets"          value="1.3.6.1.4.1.3813.1.4.4.10.1.4.0" />
+  <def name="icmpPackets"         value="1.3.6.1.4.1.3813.1.4.4.10.1.5.0" />
+  <def name="igmpPackets"         value="1.3.6.1.4.1.3813.1.4.4.10.1.6.0" />
+  <def name="ipFragmentPackets"   value="1.3.6.1.4.1.3813.1.4.4.10.1.7.0" />
+  <def name="dhcpPacketsToServer" value="1.3.6.1.4.1.3813.1.4.4.10.1.8.0" />
+  <def name="dhcpPacketsToClient" value="1.3.6.1.4.1.3813.1.4.4.10.1.9.0" />
+  <def name="ipInIpPackets"       value="1.3.6.1.4.1.3813.1.4.4.10.1.10.0" />
+  <def name="l2tpControlPackets"  value="1.3.6.1.4.1.3813.1.4.4.10.1.11.0" />
+  <def name="l2tpDataPackets"     value="1.3.6.1.4.1.3813.1.4.4.10.1.12.0" />
+
+  <!-- ELLACOYA-MIB::sigCounters -->
+  <def name="allSigPackets"       value="1.3.6.1.4.1.3813.1.4.4.10.2.1" />
+  <def name="fakeForwardPackets"  value="1.3.6.1.4.1.3813.1.4.4.10.2.2" />
+  <def name="fakeReversePackets"  value="1.3.6.1.4.1.3813.1.4.4.10.2.3" />
+
+  <!-- ELLACOYA-MIB::ldap -->
+  <def name="ldapDeltaCount"      value="1.3.6.1.4.1.3813.1.4.7.16.0" />
+
+  <!-- ELLACOYA-MIB::bundleStatsTable -->
+  <def name="bundleBytesSent"     value="1.3.6.1.4.1.3813.1.4.12.1.1.3" />
+  <def name="bundleBytesReceived" value="1.3.6.1.4.1.3813.1.4.12.1.1.4" />
+  <def name="bundleSubCount"      value="1.3.6.1.4.1.3813.1.4.12.1.1.5" />
+
+  <!-- ELLACOYA-MIB::l2tp -->
+  <def name="l2tpAllocTags"       value="1.3.6.1.4.1.3813.1.4.18.3.1.1.0" />
+  <def name="l2tpIPDefaultTags"   value="1.3.6.1.4.1.3813.1.4.18.3.1.2.0" />
+  <def name="l2tpSecureEPSess"    value="1.3.6.1.4.1.3813.1.4.18.3.2.1.1.2" />
+  <def name="l2tpSecureEPOver"    value="1.3.6.1.4.1.3813.1.4.18.3.2.1.1.3" />
+
+</definitions>
+<datasources>
+
+  <template name="e30-buffers">
+    <subtree name="Buffer_Usage">
+        <param name="comment"           value="Buffer Usage"/>
+        <param name="data-file"         value="%system-id%_membuf.rrd"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+
+        <leaf name="Usage">
+          <param name="precedence"         value="1000"/>
+          <param name="comment"            value="Total vs Used"/>
+          <param name="graph-title"        value="Total vs Used"/>
+          <param name="vertical-label"     value="blocks"/>
+          <param name="ds-type"            value="rrd-multigraph"/>
+          <param name="ds-names"           value="total,used"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <!-- Total Buffers -->
+          <param name="ds-expr-total"      value="{Total}"/>
+          <param name="graph-legend-total" value="Total"/>
+          <param name="line-style-total"   value="##totalresource"/>
+          <param name="line-color-total"   value="##totalresource"/>
+          <param name="line-order-total"   value="1"/>
+          <!-- Used Memory -->
+          <param name="ds-expr-used"       value="{Used}"/>
+          <param name="graph-legend-used"  value="Used"/>
+          <param name="line-style-used"    value="##resourceusage"/>
+          <param name="line-color-used"    value="##resourceusage"/>
+          <param name="line-order-used"    value="2"/>
+        </leaf>
+
+        <leaf name="Total">
+          <param name="precedence"        value="902"/>
+          <param name="comment"           value="Total Buffer Pool Size"/>
+          <param name="graph-title"       value="Total Buffer Pool Size"/>
+          <param name="vertical-label"    value="memory blocks"/>
+          <param name="rrd-ds"            value="mBufPoolSize"/>
+          <param name="snmp-object"       value="$mBufPoolSize"/>
+        </leaf>
+
+        <leaf name="Used">
+          <param name="precedence"        value="901"/>
+          <param name="comment"           value="Used Buffer Pool Size"/>
+          <param name="graph-title"       value="Used Buffer Pool Size"/>
+          <param name="vertical-label"    value="KBytes"/>
+          <param name="rrd-ds"            value="mBufUsage"/>
+          <param name="snmp-object"       value="$mBufUsage"/>
+        </leaf>
+    </subtree>
+  </template>
+
+
+  <template name="e30-cpu">
+    <param name="comment"           value="CPU Usage"/>
+    <param name="data-file"         value="%system-id%_cpu.rrd"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+
+    <leaf name="CPU_Utilization">
+      <param name="comment"           value="Utilization of CPU"/>
+      <param name="graph-legend"      value="Util"/>
+      <param name="vertical-label"    value="percent"/>
+      <param name="rrd-ds"            value="cpu_0"/>
+      <param name="snmp-object"       value="$cpuUtilization"/>
+      <param name="line-style"        value="##resourceusage" />
+      <param name="line-color"        value="##resourceusage" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="graph-upper-limit" value="100" />
+    </leaf>
+  </template>
+
+
+  <template name="e30-flowlkup-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="usage,max,curr"/>
+    <!-- Usage -->
+    <param name="overview-subleave-name-usage" value="Usage"/>
+    <param name="overview-shortcut-text-usage"
+           value="All Flow Usage summary"/>
+    <param name="overview-shortcut-title-usage"
+           value="Show flow usage summary for all pools on one page"/>
+    <param name="overview-page-title-usage"
+           value="Flow usage"/>
+    <!-- Maximum -->
+    <param name="overview-subleave-name-max" value="Maximum"/>
+    <param name="overview-shortcut-text-max"
+           value="All Max cap. of the flow pool summary"/>
+    <param name="overview-shortcut-title-max"
+           value="Show maximum capacity of the flow pools on one page"/>
+    <param name="overview-page-title-max"
+           value="Flow maximum usage"/>
+    <!-- Current -->
+    <param name="overview-subleave-name-curr" value="Current"/>
+    <param name="overview-shortcut-text-curr"
+           value="All Curr cap. of the flow pool summary"/>
+    <param name="overview-shortcut-title-curr"
+           value="Show current capacity of the flow pools on one page"/>
+    <param name="overview-page-title-curr"
+           value="Flow current usage"/>
+  </template>
+
+
+  <template name="e30-flowlkup-leaf">
+    <param name="comment"    value="FlowLookup device %e30-flowdevidx%"/>
+    <param name="data-file"  value="%system-id%_flowlkup_%e30-flowdevidx%.rrd"/>
+    <param name="graph-title"
+          value="FlowLkup device %e30-flowdevidx%: %e30-flowpoolname%"/>
+    <param name="graph-lower-limit" value="0"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+
+    <leaf name="Usage">
+      <param name="precedence"         value="1000"/>
+      <param name="comment"            value="Maximum vs Current"/>
+      <param name="graph-title"        value="Maximum vs Current"/>
+      <param name="vertical-label"     value="nodes"/>
+      <param name="ds-type"            value="rrd-multigraph"/>
+      <param name="ds-names"           value="total,used"/>
+      <param name="graph-lower-limit"  value="0"/>
+      <!-- Maximum Capacity -->
+      <param name="ds-expr-total"      value="{Maximum}"/>
+      <param name="graph-legend-total" value="Maximum"/>
+      <param name="line-style-total"   value="##totalresource"/>
+      <param name="line-color-total"   value="##totalresource"/>
+      <param name="line-order-total"   value="1"/>
+      <!-- Current Capacity -->
+      <param name="ds-expr-used"       value="{Current}"/>
+      <param name="graph-legend-used"  value="Current"/>
+      <param name="line-style-used"    value="##resourceusage"/>
+      <param name="line-color-used"    value="##resourceusage"/>
+      <param name="line-order-used"    value="2"/>
+    </leaf>
+
+    <leaf name="Maximum">
+      <param name="comment"      value="Maximum capacity of the pool"/>
+      <param name="graph-legend" value="nodes"/>
+      <param name="precedence"   value="902"/>
+      <param name="rrd-ds"       value="maxCapacity_%e30-flowpoolidx%"/>
+      <param name="snmp-object"
+            value="$flowPoolName.%e30-flowdevidx%.1.1.3.%e30-flowpoolidx%"/>
+    </leaf>
+
+    <leaf name="Current">
+      <param name="comment"      value="Current capacity of the pool"/>
+      <param name="graph-legend" value="nodes"/>
+      <param name="precedence"   value="901"/>
+      <param name="rrd-ds"       value="currentCapacity_%e30-flowpoolidx%"/>
+      <param name="snmp-object"
+            value="$flowPoolName.%e30-flowdevidx%.1.1.4.%e30-flowpoolidx%"/>
+    </leaf>
+  </template>
+  
+
+  <template name="e30-fwdTable">
+    <subtree name="Forwarding_Table">
+        <param name="comment"           value="Forwarding Table Stats"/>
+        <param name="data-file"         value="%system-id%_fwdTable.rrd"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+
+        <subtree name="L3_user_table">
+          <param name="comment" value="L3 User Table (Layer 3)"/>
+
+          <leaf name="Usage">
+            <param name="precedence"         value="1000"/>
+            <param name="comment"            value="Total vs Used"/>
+            <param name="graph-title"        value="Total vs Used"/>
+            <param name="vertical-label"     value="entries"/>
+            <param name="ds-type"            value="rrd-multigraph"/>
+            <param name="ds-names"           value="total,used"/>
+            <param name="graph-lower-limit"  value="0"/>
+
+            <!-- Total L3 User Table Entries -->
+            <param name="ds-expr-total"      value="{Total}"/>
+            <param name="graph-legend-total" value="Total"/>
+            <param name="line-style-total"   value="##totalresource"/>
+            <param name="line-color-total"   value="##totalresource"/>
+            <param name="line-order-total"   value="1"/>
+            <!-- Used L3 User Table Entries -->
+            <param name="ds-expr-used"       value="{Used}"/>
+            <param name="graph-legend-used"  value="Used"/>
+            <param name="line-style-used"    value="##resourceusage"/>
+            <param name="line-color-used"    value="##resourceusage"/>
+            <param name="line-order-used"    value="2"/>
+          </leaf>
+
+          <leaf name="Total">
+            <param name="precedence"        value="902"/>
+            <param name="comment"           value="Total L3 UserTable entries"/>
+            <param name="graph-title"       value="Total L3 UserTable entries"/>
+            <param name="vertical-label"    value="entries"/>
+            <param name="rrd-ds"            value="l3UserTblCapacity"/>
+            <param name="snmp-object"       value="$l3UserTblCapacity"/>
+          </leaf>
+
+          <leaf name="Used">
+            <param name="precedence"        value="901"/>
+            <param name="comment"           value="Used L3 UserTable entries"/>
+            <param name="graph-title"       value="Used L3 UserTable entries"/>
+            <param name="vertical-label"    value="entries"/>
+            <param name="rrd-ds"            value="l3UserTblUsage"/>
+            <param name="snmp-object"       value="$l3UserTblUsage"/>
+          </leaf>
+        </subtree>
+
+        <subtree name="MAC_table">
+          <param name="comment" value="MAC Table (Layer 2)"/>
+
+          <leaf name="Usage">
+            <param name="precedence"         value="1000"/>
+            <param name="comment"            value="Total vs Used"/>
+            <param name="graph-title"        value="Total vs Used"/>
+            <param name="vertical-label"     value="entries"/>
+            <param name="ds-type"            value="rrd-multigraph"/>
+            <param name="ds-names"           value="total,used"/>
+            <param name="graph-lower-limit"  value="0"/>
+
+            <!-- Total Mac Table Entries -->
+            <param name="ds-expr-total"      value="{Total}"/>
+            <param name="graph-legend-total" value="Total"/>
+            <param name="line-style-total"   value="##totalresource"/>
+            <param name="line-color-total"   value="##totalresource"/>
+            <param name="line-order-total"   value="1"/>
+            <!-- Used MAC Table Entries -->
+            <param name="ds-expr-used"       value="{Used}"/>
+            <param name="graph-legend-used"  value="Used"/>
+            <param name="line-style-used"    value="##resourceusage"/>
+            <param name="line-color-used"    value="##resourceusage"/>
+            <param name="line-order-used"    value="2"/>
+          </leaf>
+
+          <leaf name="Total">
+            <param name="precedence"        value="902"/>
+            <param name="comment"           value="Total MAC table entries"/>
+            <param name="graph-title"       value="Total MAC table entries"/>
+            <param name="vertical-label"    value="entries"/>
+            <param name="rrd-ds"            value="macTblCapacity"/>
+            <param name="snmp-object"       value="$macTblCapacity"/>
+          </leaf>
+
+          <leaf name="Used">
+            <param name="precedence"        value="901"/>
+            <param name="comment"           value="Used MAC table entries"/>
+            <param name="graph-title"       value="Used MAC table entries"/>
+            <param name="vertical-label"    value="entries"/>
+            <param name="rrd-ds"            value="macTblUsage"/>
+            <param name="snmp-object"       value="$macTblUsage"/>
+          </leaf>
+        </subtree>
+
+        <subtree name="PolicyGroup">
+          <param name="comment" value="Policy Groups (service bundles)"/>
+
+          <leaf name="Usage">
+            <param name="precedence"         value="1000"/>
+            <param name="comment"            value="Total vs Used"/>
+            <param name="graph-title"        value="Total vs Used"/>
+            <param name="vertical-label"     value="entries"/>
+            <param name="ds-type"            value="rrd-multigraph"/>
+            <param name="ds-names"           value="total,used"/>
+            <param name="graph-lower-limit"  value="0"/>
+
+            <!-- Total Policy Group Entries -->
+            <param name="ds-expr-total"      value="{Total}"/>
+            <param name="graph-legend-total" value="Total"/>
+            <param name="line-style-total"   value="##totalresource"/>
+            <param name="line-color-total"   value="##totalresource"/>
+            <param name="line-order-total"   value="1"/>
+            <!-- Used Policy Group Entries -->
+            <param name="ds-expr-used"       value="{Used}"/>
+            <param name="graph-legend-used"  value="Used"/>
+            <param name="line-style-used"    value="##resourceusage"/>
+            <param name="line-color-used"    value="##resourceusage"/>
+            <param name="line-order-used"    value="2"/>
+          </leaf>
+
+          <leaf name="Total">
+            <param name="precedence"        value="902"/>
+            <param name="comment"           value="Total policy group entries"/>
+            <param name="graph-title"       value="Total policy group entries"/>
+            <param name="vertical-label"    value="entries"/>
+            <param name="rrd-ds"            value="polGroupSysCapacity"/>
+            <param name="snmp-object"       value="$polGroupSysCapacity"/>
+          </leaf>
+
+          <leaf name="Used">
+            <param name="precedence"        value="901"/>
+            <param name="comment"           value="Used policy group entries"/>
+            <param name="graph-title"       value="Used policy group entries"/>
+            <param name="vertical-label"    value="entries"/>
+            <param name="rrd-ds"            value="polGroupSysUsage"/>
+            <param name="snmp-object"       value="$polGroupSysUsage"/>
+          </leaf>
+        </subtree>
+ 
+        <subtree name="Subscriber_Capacity">
+          <param name="comment" value="Subscriber System"/>
+
+          <leaf name="Usage">
+            <param name="precedence"         value="1000"/>
+            <param name="comment"            value="Total vs Used"/>
+            <param name="graph-title"        value="Total vs Used"/>
+            <param name="vertical-label"     value="entries"/>
+            <param name="ds-type"            value="rrd-multigraph"/>
+            <param name="ds-names"           value="total,used"/>
+            <param name="graph-lower-limit"  value="0"/>
+
+            <!-- Total Subscriber Capacity -->
+            <param name="ds-expr-total"      value="{Total}"/>
+            <param name="graph-legend-total" value="Total"/>
+            <param name="line-style-total"   value="##totalresource"/>
+            <param name="line-color-total"   value="##totalresource"/>
+            <param name="line-order-total"   value="1"/>
+            <!-- Used Subscriber Capacity -->
+            <param name="ds-expr-used"       value="{Used}"/>
+            <param name="graph-legend-used"  value="Used"/>
+            <param name="line-style-used"    value="##resourceusage"/>
+            <param name="line-color-used"    value="##resourceusage"/>
+            <param name="line-order-used"    value="2"/>
+          </leaf>
+
+          <leaf name="Total">
+            <param name="precedence"        value="902"/>
+            <param name="comment"           value="Total subscriber capacity"/>
+            <param name="graph-title"       value="Total subscriber capacity"/>
+            <param name="vertical-label"    value="entries"/>
+            <param name="rrd-ds"            value="subscriberSysCap"/>
+            <param name="snmp-object"       value="$subscriberSysCapacity"/>
+          </leaf>
+
+          <leaf name="Used">
+            <param name="precedence"        value="901"/>
+            <param name="comment"           value="Used subscriber capacity"/>
+            <param name="graph-title"       value="Used subscriber capacity"/>
+            <param name="vertical-label"    value="entries"/>
+            <param name="rrd-ds"            value="subscriberSysUsage"/>
+            <param name="snmp-object"       value="$subscriberSysUsage"/>
+          </leaf>
+        </subtree>
+    </subtree>
+  </template>
+
+
+  <template name="e30-bundle-subtree">
+    <param name="data-file" 
+                     value="%system-id%_bundle_%e30-bundle-rrd%.rrd"/>
+    <param name="graph-lower-limit"  value="0" />
+    <param name="graph-title"        value="%e30-bundle-name%"/>
+
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts"     value="up,down,volume,subcount"/>
+    <!-- Up Volume -->
+    <param name="overview-subleave-name-up"      value="Up_bps"/>
+    <param name="overview-direct-link-up"        value="yes"/>
+    <param name="overview-direct-link-view-up"   value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-up"
+           value="Upstream Usage"/>
+    <param name="overview-shortcut-title-up"
+           value="Show upstream bandwidth usage for all bundles"/>
+    <param name="overview-page-title-up"
+           value="Upstream Usage"/>
+    <!-- Down Volume -->
+    <param name="overview-subleave-name-down"    value="Down_bps"/>
+    <param name="overview-direct-link-down"      value="yes"/>
+    <param name="overview-direct-link-view-down" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-down"
+           value="Downstream Usage"/>
+    <param name="overview-shortcut-title-down"
+           value="Show downstream bandwidth usage for all bundles"/>
+    <param name="overview-page-title-down"
+           value="Downstream Usage"/>
+    <!-- InOut Volume -->
+    <param name="overview-subleave-name-volume"    value="Volume"/>
+    <param name="overview-direct-link-volume"      value="yes"/>
+    <param name="overview-direct-link-view-volume" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-volume"
+           value="InOut Usage"/>
+    <param name="overview-shortcut-title-volume"
+           value="Show InOut bandwidth usage for all bundles"/>
+    <param name="overview-page-title-volume"
+           value="Volume Usage"/>
+    <!-- Subscriber Count -->
+    <param name="overview-subleave-name-subcount"    value="Subscriber_Count"/>
+    <param name="overview-direct-link-subcount"      value="yes"/>
+    <param name="overview-direct-link-view-subcount" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-subcount"
+           value="Subscriber Count"/>
+    <param name="overview-shortcut-title-subcount"
+           value="Show subscriber count for all bundles"/>
+    <param name="overview-page-title-subcount"
+           value="Subscriber Count"/>
+  </template>
+
+  <template name="e30-bundle">
+    <leaf name="Volume">
+      <param name="comment"
+                     value="InOut volume in kilobytes/s"/>
+      <param name="precedence"          value="1000"/>
+      <param name="ds-type"             value="rrd-multigraph"/>
+      <param name="ds-names"            value="down,up"/>
+      <!-- Volume Download -->
+      <param name="ds-expr-down"        value="{DownVolume},8,*"/>
+      <param name="graph-legend-down"   value="Bits per second in"/>
+      <param name="line-style-down"     value="##BpsIn"/>
+      <param name="line-color-down"     value="##BpsIn"/>
+      <param name="line-order-down"     value="1"/>
+      <!-- Volume Upload -->
+      <param name="ds-expr-up"          value="{UpVolume},8,*"/>
+      <param name="graph-legend-up"     value="Bits per second out"/>
+      <param name="line-style-up"       value="##BpsOut"/>
+      <param name="line-color-up"       value="##BpsOut"/>
+      <param name="line-order-up"       value="2"/>
+    </leaf>
+
+    <leaf name="UpVolume">
+      <param name="comment"         value="Upstream volume in kilobytes/s"/>
+      <param name="hidden"          value="yes"/>
+      <param name="rrd-ds"          value="UpVolume"/>
+      <param name="snmp-object"
+            value="$bundleBytesSent.%e30-bundle-index%"/>
+      <param name="precedence"        value="90"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+    </leaf>
+
+    <leaf name="DownVolume">
+      <param name="comment"         value="Downstream volume in kilobytes/s"/>
+      <param name="hidden"          value="yes"/>
+      <param name="rrd-ds"          value="DownVolume"/>
+      <param name="snmp-object"
+            value="$bundleBytesReceived.%e30-bundle-index%"/>
+      <param name="precedence"        value="85"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+    </leaf>
+
+    <leaf name="Up_bps">
+      <param name="comment" value="Upstream bandwidth usage per service"/>
+      <param name="graph-legend"   value="Upstream BW"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{UpVolume},8,*" />
+      <param name="precedence"     value="70"/>
+    </leaf>
+
+    <leaf name="Down_bps">
+      <param name="comment" value="Downstream bandwidth usage per service"/>
+      <param name="graph-legend"   value="Downstream BW"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{DownVolume},8,*" />
+      <param name="precedence"     value="65"/>
+    </leaf>
+
+    <leaf name="Subscriber_Count">
+      <param name="comment"        value="Number of subs using bundle"/>
+      <param name="graph-legend"   value="subscriber count"/>
+      <param name="vertical-label" value="subs"/>
+      <param name="rrd-ds"         value="subCount"/>
+      <param name="snmp-object"    value="$bundleSubCount.%e30-bundle-index%"/>
+      <param name="precedence"     value="50"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+    </leaf>
+  </template>
+
+
+  <template name="e30-hdd-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="usage,total,used"/>
+    <!-- Usage -->
+    <param name="overview-subleave-name-usage" value="Usage"/>
+    <param name="overview-shortcut-text-usage"
+           value="All HDD Parition usage summary"/>
+    <param name="overview-shortcut-title-usage"
+           value="Show hdd usage summary for all partitions on one page"/>
+    <param name="overview-page-title-usage"
+           value="Parition usage"/>
+    <!-- Total -->
+    <param name="overview-subleave-name-total" value="Total"/>
+    <param name="overview-shortcut-text-total"
+           value="All HDD Parition total size summary"/>
+    <param name="overview-shortcut-title-total"
+           value="Show hdd total size summary for all partitions on one page"/>
+    <param name="overview-page-title-total"
+           value="Parition Size Total"/>
+    <!-- Used -->
+    <param name="overview-subleave-name-used" value="Used"/>
+    <param name="overview-shortcut-text-used"
+           value="All HDD Parition used size summary"/>
+    <param name="overview-shortcut-title-used"
+           value="Show hdd used size summary for all partitions on one page"/>
+    <param name="overview-page-title-used"
+           value="Parition Size Used"/>
+  </template>
+
+
+  <template name="e30-hdd">
+        <param name="comment"           value="Hard Drive information"/>
+        <param name="data-file"         value="%system-id%_hdd.rrd"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+
+        <subtree name="Parition_0">
+          <param name="comment"         value="Firmware images"/>
+          <leaf name="Usage">
+            <param name="precedence"         value="1000"/>
+            <param name="comment"            value="Hd0: Total vs Used"/>
+            <param name="graph-title"        value="Hd0: Total vs Used"/>
+            <param name="vertical-label"     value="KBytes"/>
+            <param name="ds-type"            value="rrd-multigraph"/>
+            <param name="ds-names"           value="total,used"/>
+            <param name="graph-lower-limit"  value="0"/>
+            <!-- Total Parition Size -->
+            <param name="ds-expr-total"      value="{Total}"/>
+            <param name="graph-legend-total" value="Total"/>
+            <param name="line-style-total"   value="##totalresource"/>
+            <param name="line-color-total"   value="##totalresource"/>
+            <param name="line-order-total"   value="1"/>
+            <!-- Used Partition Size -->
+            <param name="ds-expr-used"       value="{Used}"/>
+            <param name="graph-legend-used"  value="Used"/>
+            <param name="line-style-used"    value="##resourceusage"/>
+            <param name="line-color-used"    value="##resourceusage"/>
+            <param name="line-order-used"    value="2"/>
+          </leaf>
+
+          <leaf name="Total">
+            <param name="precedence"        value="902"/>
+            <param name="comment"           value="Size of hd0 partition"/>
+            <param name="graph-title"       value="Size of hd0 partition"/>
+            <param name="vertical-label"    value="KBytes"/>
+            <param name="rrd-ds"            value="hDriveHd0Size"/>
+            <param name="snmp-object"       value="$hDriveHd0Size"/>
+          </leaf>
+
+          <leaf name="Used">
+            <param name="precedence"        value="901"/>
+            <param name="comment"           value="Usage of hd0 partition"/>
+            <param name="graph-title"       value="Usage of hd0 partition"/>
+            <param name="vertical-label"    value="KBytes"/>
+            <param name="rrd-ds"            value="hDriveHd0Usage"/>
+            <param name="snmp-object"       value="$hDriveHd0Usage"/>
+          </leaf>
+        </subtree>
+
+        <subtree name="Parition_1">
+          <param name="comment"             value="Logs, Usage files, etc"/>
+          <leaf name="Usage">
+            <param name="precedence"         value="1000"/>
+            <param name="comment"            value="Hd1: Total vs Used"/>
+            <param name="graph-title"        value="Hd1: Total vs Used"/>
+            <param name="vertical-label"     value="KBytes"/>
+            <param name="ds-type"            value="rrd-multigraph"/>
+            <param name="ds-names"           value="total,used"/>
+            <param name="graph-lower-limit"  value="0"/>
+            <!-- Total Parition Size -->
+            <param name="ds-expr-total"      value="{Total}"/>
+            <param name="graph-legend-total" value="Total"/>
+            <param name="line-style-total"   value="##totalresource"/>
+            <param name="line-color-total"   value="##totalresource"/>
+            <param name="line-order-total"   value="1"/>
+            <!-- Used Partition Size -->
+            <param name="ds-expr-used"       value="{Used}"/>
+            <param name="graph-legend-used"  value="Used"/>
+            <param name="line-style-used"    value="##resourceusage"/>
+            <param name="line-color-used"    value="##resourceusage"/>
+            <param name="line-order-used"    value="2"/>
+          </leaf>
+
+          <leaf name="Total">
+            <param name="precedence"        value="902"/>
+            <param name="comment"           value="Size of hd1 partition"/>
+            <param name="graph-title"       value="Size of hd1 partition"/>
+            <param name="vertical-label"    value="KBytes"/>
+            <param name="rrd-ds"            value="hDriveHd1Size"/>
+            <param name="snmp-object"       value="$hDriveHd1Size"/>
+          </leaf>
+
+          <leaf name="Used">
+            <param name="precedence"        value="901"/>
+            <param name="comment"           value="Usage of hd1 partition"/>
+            <param name="graph-title"       value="Usage of hd1 partition"/>
+            <param name="vertical-label"    value="KBytes"/>
+            <param name="rrd-ds"            value="hDriveHd1Usage"/>
+            <param name="snmp-object"       value="$hDriveHd1Usage"/>
+          </leaf>
+        </subtree>
+  </template>
+
+  <template name="e30-hdd-errors">
+    <subtree name="HDD_Errors">
+        <param name="comment"           value="Hard Drive errors"/>
+        <param name="data-file"         value="%system-id%_hdd_err.rrd"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+
+        <leaf name="hDriveErrBlockRW">
+          <param name="precedence"        value="917"/>
+          <param name="comment"           value="Number of Block R/W errors"/>
+          <param name="graph-title"       value="Block R/W errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrBlockRW"/>
+          <param name="snmp-object"       value="$hDriveErrBlockRW"/>
+        </leaf>
+        <leaf name="hDriveErrCommand">
+          <param name="precedence"        value="916"/>
+          <param name="comment"           value="Number of Command errors"/>
+          <param name="graph-title"       value="Command errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrCommand"/>
+          <param name="snmp-object"       value="$hDriveErrCommand"/>
+        </leaf>
+        <leaf name="hDriveErrReadWrite">
+          <param name="precedence"        value="915"/>
+          <param name="comment"           value="Number of Read/Write errors"/>
+          <param name="graph-title"       value="R/W errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrReadWrite"/>
+          <param name="snmp-object"       value="$hDriveErrReadWrite"/>
+        </leaf>
+        <leaf name="hDriveErrWriteOnly">
+          <param name="precedence"        value="914"/>
+          <param name="comment"           value="Number of WriteOnly errors"/>
+          <param name="graph-title"       value="Write errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrWriteOnly"/>
+          <param name="snmp-object"       value="$hDriveErrWriteOnly"/>
+        </leaf>
+        <leaf name="hDriveErrReady">
+          <param name="precedence"        value="913"/>
+          <param name="comment"           value="Number of Ready errors"/>
+          <param name="graph-title"       value="Ready errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrReady"/>
+          <param name="snmp-object"       value="$hDriveErrReady"/>
+        </leaf>
+        <leaf name="hDriveErrBusy">
+          <param name="precedence"        value="912"/>
+          <param name="comment"           value="Number of Busy errors"/>
+          <param name="graph-title"       value="Busy errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrBusy"/>
+          <param name="snmp-object"       value="$hDriveErrBusy"/>
+        </leaf>
+        <leaf name="hDriveErrDataReq">
+          <param name="precedence"        value="911"/>
+          <param name="comment"           value="Number of DataReq errors"/>
+          <param name="graph-title"       value="DataReq errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrDataReq"/>
+          <param name="snmp-object"       value="$hDriveErrDataReq"/>
+        </leaf>
+        <leaf name="hDriveErrSeek">
+          <param name="precedence"        value="910"/>
+          <param name="comment"           value="Number of Seek errors"/>
+          <param name="graph-title"       value="Seek errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrSeek"/>
+          <param name="snmp-object"       value="$hDriveErrSeek"/>
+        </leaf>
+        <leaf name="hDriveErrDataReqNS">
+          <param name="precedence"        value="909"/>
+          <param name="comment"           value="Number of DataReqNS errors"/>
+          <param name="graph-title"       value="DataReqNS errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrDataReqNS"/>
+          <param name="snmp-object"       value="$hDriveErrDataReqNS"/>
+        </leaf>
+        <leaf name="hDriveErrInterfCRC">
+          <param name="precedence"        value="908"/>
+          <param name="comment"           value="Number of InterfCRC errors"/>
+          <param name="graph-title"       value="InterfCRC errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrInterfCRC"/>
+          <param name="snmp-object"       value="$hDriveErrInterfCRC"/>
+        </leaf>
+        <leaf name="hDriveErrUncorrData">
+          <param name="precedence"        value="907"/>
+          <param name="comment"           value="Number of UncorrData errors"/>
+          <param name="graph-title"       value="UncorrData errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrUncorrData"/>
+          <param name="snmp-object"       value="$hDriveErrUncorrData"/>
+        </leaf>
+        <leaf name="hDriveErrIdNotFound">
+          <param name="precedence"        value="906"/>
+          <param name="comment"           value="Number of IdNotFound errors"/>
+          <param name="graph-title"       value="IdNotFound errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrIdNotFound"/>
+          <param name="snmp-object"       value="$hDriveErrIdNotFound"/>
+        </leaf>
+        <leaf name="hDriveErrAbortedCmd">
+          <param name="precedence"        value="905"/>
+          <param name="comment"           value="Number of AbortedCmd errors"/>
+          <param name="graph-title"       value="AbortedCmd errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrAbortedCmd"/>
+          <param name="snmp-object"       value="$hDriveErrAbortedCmd"/>
+        </leaf>
+        <leaf name="hDriveErrTrack0NF">
+          <param name="precedence"        value="904"/>
+          <param name="comment"           value="Number of TrackONF errors"/>
+          <param name="graph-title"       value="TrackONF errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrTrack0NF"/>
+          <param name="snmp-object"       value="$hDriveErrTrack0NF"/>
+        </leaf>
+        <leaf name="hDriveErrAddrMarkNF">
+          <param name="precedence"        value="903"/>
+          <param name="comment"           value="Number of AddrMarkNF errors"/>
+          <param name="graph-title"       value="AddrMarkNF errors"/>
+          <param name="vertical-label"    value="errors"/>
+          <param name="rrd-ds"            value="ErrAddrMarkNF"/>
+          <param name="snmp-object"       value="$hDriveErrAddrMarkNF"/>
+        </leaf>
+    </subtree>
+  </template>
+
+  <template name="e30-l2tp-subtree">
+    <param name="comment"           value="L2TP information"/>
+    <param name="data-file"         value="%system-id%_l2tp.rrd"/>
+    <param name="graph-lower-limit" value="0"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+
+    <leaf name="Allocated_Tags">
+      <param name="precedence"     value="1000"/>
+      <param name="comment"        value="Number of L2TP sessions"/>
+      <param name="graph-title"    value="L2TP sessions"/>
+      <param name="vertical-label" value="sessions"/>
+      <param name="rrd-ds"         value="l2tpAllocTags"/>
+      <param name="snmp-object"    value="$l2tpAllocTags"/>
+    </leaf>
+
+    <leaf name="Default_tags">
+      <param name="precedence"     value="999"/>
+      <param name="comment"        value="IP addresses using default tags"/>
+      <param name="graph-title"    value="L2TP sessions"/>
+      <param name="vertical-label" value="sessions"/>
+      <param name="rrd-ds"         value="l2tpIPDefaultTags"/>
+      <param name="snmp-object"    value="$l2tpIPDefaultTags"/>
+    </leaf>
+  </template>
+
+  <template name="e30-l2tp-secure-endpoints-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts"     value="sessions,overlap"/>
+    <!-- Sessions -->
+    <param name="overview-subleave-name-sessions" value="Sessions"/>
+    <param name="overview-shortcut-text-sessions"
+           value="All L2TP sessions summary"/>
+    <param name="overview-shortcut-title-sessions"
+           value="Show L2TP session summary for all endpoints"/>
+    <param name="overview-page-title-sessions"
+           value="L2TP session usage"/>
+    <!-- Overlap -->
+    <param name="overview-subleave-name-overlap" value="Overlap"/>
+    <param name="overview-shortcut-text-overlap"
+           value="All L2TP overlapping session summary"/>
+    <param name="overview-shortcut-title-overlap"
+           value="Show L2TP overlapping session summary for all endpoints"/>
+    <param name="overview-page-title-overlap"
+           value="L2TP session usage"/>
+  </template>
+
+  <template name="e30-l2tp-secure-endpoints-leaf">
+    <param name="comment"           value="Secure endpoint: %e30-l2tp-ep%"/>
+    <param name="data-file"    
+                value="%system-id%_l2tp_endpoint_%e30-l2tp-file%.rrd"/>
+    <param name="graph-lower-limit" value="0"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+
+    <leaf name="Sessions">
+      <param name="comment"      value="L2TP sessions on endpoint"/>
+      <param name="graph-legend" value="sessions"/>
+      <param name="graph-title"  value="Sessions on %e30-l2tp-ep%"/>
+      <param name="line-style"   value="##resourceusage"/>
+      <param name="precedence"   value="999"/>
+      <param name="rrd-ds"       value="l2tpSecureEPSess"/>
+      <param name="snmp-object"  value="$l2tpSecureEPSess.%e30-l2tp-ep%"/>
+    </leaf>
+      
+    <leaf name="Overlap">
+      <param name="comment"      value="L2TP sessions on endpoint overlapping"/>
+      <param name="graph-legend" value="overlap sessions"/>
+      <param name="graph-title"  value="Sessions overlap on %e30-l2tp-ep%"/>
+      <param name="line-style"   value="##resourceusage"/>
+      <param name="precedence"   value="998"/>
+      <param name="rrd-ds"       value="l2tpSecureEPOver"/>
+      <param name="snmp-object"  value="$l2tpSecureEPOver.%e30-l2tp-ep%"/>
+    </leaf>
+  </template>
+
+  <template name="e30-mem">
+    <subtree name="Memory">
+        <param name="comment"           value="Memory Usage"/>
+        <param name="data-file"         value="%system-id%_mem.rrd"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+
+        <leaf name="Usage">
+          <param name="precedence"         value="1000"/>
+          <param name="comment"            value="Total vs Used"/>
+          <param name="graph-title"        value="Total vs Used"/>
+          <param name="vertical-label"     value="KBytes"/>
+          <param name="ds-type"            value="rrd-multigraph"/>
+          <param name="ds-names"           value="total,used"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <!-- Total Memory -->
+          <param name="ds-expr-total"      value="{Total}"/>
+          <param name="graph-legend-total" value="Total"/>
+          <param name="line-style-total"   value="##totalresource"/>
+          <param name="line-color-total"   value="##totalresource"/>
+          <param name="line-order-total"   value="1"/>
+          <!-- Used Memory -->
+          <param name="ds-expr-used"       value="{Used}"/>
+          <param name="graph-legend-used"  value="Used"/>
+          <param name="line-style-used"    value="##resourceusage"/>
+          <param name="line-color-used"    value="##resourceusage"/>
+          <param name="line-order-used"    value="2"/>
+        </leaf>
+
+        <leaf name="Total">
+          <param name="precedence"        value="902"/>
+          <param name="comment"           value="Total memory"/>
+          <param name="graph-title"       value="Total memory"/>
+          <param name="vertical-label"    value="KBytes"/>
+          <param name="rrd-ds"            value="sdramSize"/>
+          <param name="snmp-object"       value="$sdramSize"/>
+        </leaf>
+
+        <leaf name="Used">
+          <param name="precedence"        value="901"/>
+          <param name="comment"           value="Used memory"/>
+          <param name="graph-title"       value="Used memory"/>
+          <param name="vertical-label"    value="KBytes"/>
+          <param name="rrd-ds"            value="sdramUsage"/>
+          <param name="snmp-object"       value="$sdramUsage"/>
+        </leaf>
+    </subtree>
+  </template>
+
+  <template name="e30-slowpath">
+    <param name="comment"                value="SlowPath Counters"/>
+    <param name="data-file"              value="%system-id%_slowpath.rrd"/>
+    <param name="graph-lower-limit"      value="0"/>
+    <param name="rrd-create-dstype"      value="GAUGE"/>
+
+    <leaf name="allPackets">
+      <param name="precdence"            value="912"/>
+      <param name="comment"              value="Total packets"/>
+      <param name="graph-title"          value="All packets received by CPU"/>
+      <param name="rrd-ds"               value="allPackets"/>
+      <param name="snmp-object"          value="$allPackets"/>
+    </leaf>
+    <leaf name="ipPackets">
+      <param name="precdence"            value="911"/>
+      <param name="comment"              value="Total IP packets"/>
+      <param name="graph-title"          value="IP packets received by CPU"/>
+      <param name="rrd-ds"               value="ipPackets"/>
+      <param name="snmp-object"          value="$ipPackets"/>
+    </leaf>
+    <leaf name="tcpPackets">
+      <param name="precdence"            value="910"/>
+      <param name="comment"              value="Total TCP packets"/>
+      <param name="graph-title"          value="TCP packets received by CPU"/>
+      <param name="rrd-ds"               value="tcpPackets"/>
+      <param name="snmp-object"          value="$tcpPackets"/>
+    </leaf>
+    <leaf name="udpPackets">
+      <param name="precdence"            value="909"/>
+      <param name="comment"              value="Total UDP packets"/>
+      <param name="graph-title"          value="UDP packets received by CPU"/>
+      <param name="rrd-ds"               value="udpPackets"/>
+      <param name="snmp-object"          value="$udpPackets"/>
+    </leaf>
+    <leaf name="icmpPackets">
+      <param name="precdence"            value="908"/>
+      <param name="comment"              value="Total ICMP packets"/>
+      <param name="graph-title"          value="ICMP packets received by CPU"/>
+      <param name="rrd-ds"               value="icmpPackets"/>
+      <param name="snmp-object"          value="$icmpPackets"/>
+    </leaf>
+    <leaf name="igmpPackets">
+      <param name="precdence"            value="907"/>
+      <param name="comment"              value="Total IGMP packets"/>
+      <param name="graph-title"          value="IGMP packets received by CPU"/>
+      <param name="rrd-ds"               value="igmpPackets"/>
+      <param name="snmp-object"          value="$igmpPackets"/>
+    </leaf>
+    <leaf name="ipFramentPackets">
+      <param name="precdence"            value="906"/>
+      <param name="comment"              value="Total IP Fragment packets"/>
+      <param name="graph-title"  
+            value="IP Fragment packets received by CPU"/>
+      <param name="rrd-ds"               value="ipFragPkts"/>
+      <param name="snmp-object"          value="$ipFragmentPackets"/>
+    </leaf>
+    <leaf name="dhcpPacketsToServer">
+      <param name="precdence"            value="905"/>
+      <param name="comment"
+            value="Total DHCP packets destined to a DHCP server"/>
+      <param name="graph-title"  
+            value="DHCP packets client --> server received by CPU"/>
+      <param name="rrd-ds"               value="dhcpPktsToServ"/>
+      <param name="snmp-object"          value="$dhcpPacketsToServer"/>
+    </leaf>
+    <leaf name="dhcpPacketsToClient">
+      <param name="precdence"            value="904"/>
+      <param name="comment"
+            value="Total DHCP packets destined to DHCP Client"/>
+      <param name="graph-title"  
+            value="DHCP packets server --> client received by CPU"/>
+      <param name="rrd-ds"               value="dhcpPktsToClient"/>
+      <param name="snmp-object"          value="$dhcpPacketsToClient"/>
+    </leaf>
+    <leaf name="ipInIpPackets">
+      <param name="precdence"            value="903"/>
+      <param name="comment"              value="IP-in-IP packets"/>
+      <param name="graph-title"  
+            value="IP-in-IP packets received by CPU"/>
+      <param name="rrd-ds"               value="ipInIpPackets"/>
+      <param name="snmp-object"          value="$ipInIpPackets"/>
+    </leaf>
+    <leaf name="l2tpControlPackets">
+      <param name="precdence"            value="902"/>
+      <param name="comment"              value="L2TP control packets"/>
+      <param name="graph-title"  
+            value="L2TP control packets received by CPU"/>
+      <param name="rrd-ds"               value="l2tpControlPackets"/>
+      <param name="snmp-object"          value="$l2tpControlPackets"/>
+    </leaf>
+    <leaf name="ipInIpPackets">
+      <param name="precdence"            value="901"/>
+      <param name="comment"              value="L2TP data packets"/>
+      <param name="graph-title"  
+            value="L2TP Data packets received by CPU"/>
+      <param name="rrd-ds"               value="l2tpDataPackets"/>
+      <param name="snmp-object"          value="$l2tpDataPackets"/>
+    </leaf>
+  </template>
+
+
+</datasources>
+
+</configuration>
+

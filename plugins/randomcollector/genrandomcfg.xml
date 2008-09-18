@@ -80,10 +80,17 @@
 
     <param name="ds-type" value="collector" />
     <param name="collector-type" value="random" />
-    <param name="collector-period" value="180" />
-    <param name="collector-timeoffset" value="3" />
+    <param name="collector-period" value="180" />    
+    <param name="collector-timeoffset" value="0" />
+    
+    <param name="collector-timeoffset-hashstring" value="%data-file%" />
+    <param name="collector-timeoffset-min" value="0" />
+    <param name="collector-timeoffset-max" value="180" />
+    <param name="collector-timeoffset-step" value="60" />
+  
+    <param name="collector-instance-hashstring" value="%data-file%" />
 
-    <!-- Default schedule for the monitor -->
+        <!-- Default schedule for the monitor -->
     <param name="monitor-period"     value="300" />
     <param name="monitor-timeoffset" value="75" />
     

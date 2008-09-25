@@ -250,6 +250,8 @@ sub handler : method
         }
     }
 
+    $Torrus::ApacheHandler::renderer = undef;
+    
     &Torrus::DB::cleanupEnvironment();
 
     if( defined( $options{'acl'} ) )

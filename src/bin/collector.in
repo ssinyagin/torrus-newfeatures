@@ -146,6 +146,7 @@ if( not $nodaemon and not $runonce )
     }
 }
 
+
 &Torrus::DB::setSafeSignalHandlers();
 
 Torrus::Collector::initThreads();
@@ -182,6 +183,14 @@ if( not $options{'-RunOnce'} )
 
 exit;
 
+
+END
+{
+    if( -r $pidfile )
+    {
+        unlink $pidfile;
+    }
+}
 
 # Local Variables:
 # mode: perl

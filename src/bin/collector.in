@@ -118,36 +118,6 @@ my $rotateLogs = sub
     $| = 1;
 };
 
-# This will ensure that all databases get closed correctly
-$SIG{'TERM'} = sub
-{
-    Warn('Collector process terminated');
-    unlink $pidfile;
-    exit 1;
-};
-
-$SIG{'INT'} = sub
-{
-    Warn('Collector process interrupted');
-    unlink $pidfile;
-    exit 1;
-};
-
-$SIG{'PIPE'} = sub
-{
-    Warn('Collector process terminated due to SIGPIPE');
-    unlink $pidfile;
-    exit 1;
-};
-
-$SIG{'QUIT'} = sub
-{
-    Warn('Collector process terminated due to SIGQUIT');
-    unlink $pidfile;
-    exit 1;
-};
-
-
 if( not $nodaemon and not $runonce )
 {
     if( -r $pidfile )
@@ -175,6 +145,8 @@ if( not $nodaemon and not $runonce )
         Error("Cannot open $pidfile for writing: $!");
     }
 }
+
+&Torrus::DB::setSafeSignalHandlers();
 
 Torrus::Collector::initThreads();
 

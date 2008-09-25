@@ -79,6 +79,8 @@ sub runCollector
     
     foreach my $token ( @{$cref->{'crefTokens'}} )
     {
+        &Torrus::DB::checkInterrupted();
+        
         my $accessTime = $defaultAccessTime -
             ( $collector->period() *
               $collector->param( $token, 'cdef-collector-delay' ) );

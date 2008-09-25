@@ -71,18 +71,7 @@ if( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-# This will ensure that all databases get closed correctly
-$SIG{'TERM'} = sub
-{
-    Warn($0 . ' process terminated');
-    exit 1;
-};
-
-$SIG{'INT'} = sub
-{
-    Warn($0 . ' process interrupted');
-    exit 1;
-};
+&Torrus::DB::setSafeSignalHandlers();
 
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
@@ -100,6 +89,8 @@ foreach my $tree ( @trees )
         Error("Tree named \"" . $tree . "\" does not exist");
         exit(1);
     }
+
+    &Torrus::DB::checkInterrupted();
 
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
     if( not defined($config_tree) )
@@ -131,6 +122,8 @@ sub walkSubtree
     
     foreach my $token ( $config_tree->getChildren( $ptoken ) )
     {
+        &Torrus::DB::checkInterrupted();
+        
         if( $config_tree->isSubtree( $token ) )
         {
             walkSubtree( $config_tree, $search, $token );

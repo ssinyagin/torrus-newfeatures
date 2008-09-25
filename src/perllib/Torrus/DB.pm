@@ -176,6 +176,79 @@ sub new
 }
 
 
+# It is strongly inadvisable to do anything inside a signal handler when DB
+# operation is in progress
+
+our $interrupted = 0;
+
+sub setSafeSignalHandlers
+{
+    $SIG{'TERM'} = sub
+    {
+        Warn('Received SIGTERM. Scheduling to exit.');
+        $interrupted = 1;
+    };
+
+    $SIG{'INT'} = sub
+    {
+        Warn('Received SIGINT. Scheduling to exit.');
+        $interrupted = 1;
+    };
+
+    $SIG{'PIPE'} = sub
+    {
+        Warn('Received SIGPIPE. Scheduling to exit.');
+        $interrupted = 1;
+    };
+
+    $SIG{'QUIT'} = sub
+    {
+        Warn('Received SIGQUIT. Scheduling to exit.');
+        $interrupted = 1;
+    };
+}
+
+
+sub setUnsafeSignalHandlers
+{
+    $SIG{'TERM'} = sub
+    {
+        Warn('Received SIGTERM. Exiting.');
+        exit(1);
+    };
+
+    $SIG{'INT'} = sub
+    {
+        Warn('Received SIGINT. Exiting.');
+        exit(1);
+    };
+
+    $SIG{'PIPE'} = sub
+    {
+        Warn('Received SIGPIPE. Exiting.');
+        exit(1);
+    };
+
+    $SIG{'QUIT'} = sub
+    {
+        Warn('Received SIGQUIT. Exiting.');
+        exit(1);
+    };
+}
+    
+
+# If we were previously interrupted, gracefully exit now
+
+sub checkInterrupted
+{
+    if( $interrupted )
+    {
+        Warn('Exiting the process');
+        exit(1);
+    }
+}
+
+
 sub closeNow
 {
     my $self = shift;
@@ -199,7 +272,8 @@ sub cleanupEnvironment
         }
         
         Debug("Destroying BerkeleyDB::Env");
-        undef $Torrus::DB::env;
+        $Torrus::DB::env->close();
+        $Torrus::DB::env = undef;
 
         if( -z $Torrus::DB::dbEnvErrFile )
         {
@@ -207,6 +281,7 @@ sub cleanupEnvironment
         }
     }
 }
+
 
 sub trunc
 {

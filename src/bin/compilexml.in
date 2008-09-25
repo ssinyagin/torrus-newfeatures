@@ -79,18 +79,8 @@ elsif( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-# This will ensure that all databases get closed correctly
-$SIG{'TERM'} = sub
-{
-    Warn('Compiler process terminated');
-    exit 1;
-};
 
-$SIG{'INT'} = sub
-{
-    Warn('Compiler process interrupted');
-    exit 1;
-};
+&Torrus::DB::setSafeSignalHandlers();
 
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
@@ -104,6 +94,8 @@ foreach my $tree ( @trees )
         exit(1);
     }
 
+    &Torrus::DB::checkInterrupted();
+    
     Verbose("Compiling tree: $tree");
 
     my $ok = 1;

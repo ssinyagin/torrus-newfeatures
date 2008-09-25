@@ -250,6 +250,8 @@ sub handler : method
         }
     }
 
+    &Torrus::DB::cleanupEnvironment();
+
     if( defined( $options{'acl'} ) )
     {
         undef $options{'acl'};

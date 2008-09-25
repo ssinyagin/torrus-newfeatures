@@ -164,6 +164,9 @@ sub validateNode
 {
     my $config_tree = shift;
     my $token = shift;
+
+    &Torrus::DB::checkInterrupted();
+
     my $ok = 1;
 
     if( $config_tree->isLeaf($token) )
@@ -468,6 +471,8 @@ sub validateRPN
     my $config_tree = shift;
     my $timeoffset_supported = shift;
 
+    &Torrus::DB::checkInterrupted();
+    
     my $ok = 1;
 
     # There must be at least one DS reference
@@ -551,6 +556,8 @@ sub validateViews
 
     foreach my $view ($config_tree->getViewNames())
     {
+        &Torrus::DB::checkInterrupted();
+        
         $ok = validateInstanceParams($config_tree, $view,
                                      'view', \%view_params) ? $ok:0;
         if( $ok and $config_tree->getParam($view, 'view-type') eq 'rrgraph' )
@@ -694,7 +701,7 @@ sub validateMonitors
     my $ok = 1;
 
     foreach my $action ($config_tree->getActionNames())
-    {
+    {        
         $ok = validateInstanceParams($config_tree, $action,
                                      'action', \%action_params) ? $ok:0;
         my $atype = $config_tree->getParam($action, 'action-type');
@@ -818,6 +825,8 @@ sub validateTokensets
 
     foreach my $tset ($config_tree->getTsets())
     {
+        &Torrus::DB::checkInterrupted();
+        
         $view = $config_tree->getParam($tset, 'default-tset-view');
         if( not defined( $view ) )
         {
@@ -848,6 +857,8 @@ sub validateInstanceParams
     my $inst_type = shift;
     my $mapref = shift;
 
+    &Torrus::DB::checkInterrupted();
+    
     # Debug("Validating $inst_type $inst_name");
 
     my $ok = 1;

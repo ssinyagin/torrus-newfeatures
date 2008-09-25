@@ -133,6 +133,8 @@ sub initTargetAttributes
     my $collector = shift;
     my $token = shift;
 
+    &Torrus::DB::checkInterrupted();
+
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
 
@@ -880,6 +882,8 @@ sub runCollector
         }
     }
     
+    &Torrus::DB::checkInterrupted();
+    
     snmp_dispatcher();
 
     # Check if there were pending map lookup sessions
@@ -899,6 +903,8 @@ sub callback
     my $pdu_tokens = shift;
     my $hosthash = shift;
 
+    &Torrus::DB::checkInterrupted();
+    
     my $cref = $collector->collectorData( 'snmp' );
 
     Debug('SNMP Callback executed for ' . $hosthash);

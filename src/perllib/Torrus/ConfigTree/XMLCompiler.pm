@@ -64,6 +64,8 @@ sub compile
     my $self = shift;
     my $filename = shift;
 
+    &Torrus::DB::checkInterrupted();
+    
     $filename = Torrus::SiteConfig::findXMLFile($filename);
     if( not defined( $filename ) )
     {
@@ -159,6 +161,8 @@ sub compile_definitions
 
     foreach my $def ( $node->getChildrenByTagName('def') )
     {
+        &Torrus::DB::checkInterrupted();
+        
         my $name = $def->getAttribute('name');
         my $value = $def->getAttribute('value');
         if( not $name )
@@ -190,6 +194,8 @@ sub compile_paramprops
 
     foreach my $def ( $node->getChildrenByTagName('prop') )
     {
+        &Torrus::DB::checkInterrupted();
+          
         my $param = $def->getAttribute('param'); 
         my $prop = $def->getAttribute('prop');
         my $value = $def->getAttribute('value');
@@ -217,6 +223,8 @@ sub compile_params
     my $name = shift;
     my $isDS = shift;
 
+    &Torrus::DB::checkInterrupted();
+          
     my $ok = 1;
     foreach my $p_node ( $node->getChildrenByTagName('param') )
     {

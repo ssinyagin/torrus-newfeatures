@@ -68,8 +68,7 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 }
 
 
-# This will ensure that all databases get closed correctly
-$SIG{'INT'} = $SIG{'TERM'} = sub { exit 1; };
+&Torrus::DB::setSafeSignalHandlers();
 
 if( $clear_treestats )
 {
@@ -122,6 +121,8 @@ if( $report_config )
     {
         if( $stats->{'collectorLeaves'}{$instance} > 0 )
         {
+            &Torrus::DB::checkInterrupted();
+            
             printf("Collector execution timeline for instance #%d:\n",
                    $instance);
             reportTimeline( $stats->{'collectorSchedule'}{$instance} );
@@ -206,6 +207,8 @@ if( $report_runtime )
                     ( sort {$a<=>$b}
                       keys %{$periodicTasks->{$taskName}{$instance}{$period}} )
                 {
+                    &Torrus::DB::checkInterrupted();
+                    
                     my $taskId =
                         $periodicTasks->{$taskName}{$instance}{
                             $period}{$offset};
@@ -270,6 +273,8 @@ sub collectStats
 
     foreach my $ctoken ( @children )
     {
+        &Torrus::DB::checkInterrupted();
+        
         if( $config_tree->isSubtree( $ctoken ) )
         {
             collectStats( $config_tree, $stats, $ctoken );

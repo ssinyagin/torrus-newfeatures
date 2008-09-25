@@ -92,20 +92,6 @@ my $rotateLogs = sub
     open( STDERR, ">>$logfile" );
 };
 
-# This will ensure that all databases get closed correctly
-$SIG{'TERM'} = sub
-{
-    Warn("Monitor process terminated");
-    unlink $pidfile;
-    exit 1;
-};
-
-$SIG{'INT'} = sub
-{
-    Warn('Monitor process interrupted');
-    exit 1;
-};
-
 if( not $nodaemon and not $runonce )
 {
     if( -r $pidfile )
@@ -143,6 +129,8 @@ if( $delay > 0 )
     Info(sprintf('Delaying for %d minutes', $delay));
     sleep($delay * 60);
 }
+
+&Torrus::DB::setSafeSignalHandlers();
 
 my %options =
     (

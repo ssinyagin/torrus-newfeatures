@@ -1,3 +1,9 @@
+2008-09-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Added safe signal handlers to all components. Also Apache handlers
+	close the BDB environment at the end of each execution.
+	BDB should now be much more stable.
+
 2008-09-16  Jon Nistor <nistor@snickers.org>
 
 	* perllib/Torrus/DevDiscover/Arbor_E.pm:

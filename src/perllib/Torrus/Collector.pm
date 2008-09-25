@@ -212,6 +212,8 @@ sub fetchParams
 
     while( scalar( @maps ) > 0 )
     {
+        &Torrus::DB::checkInterrupted();
+        
         my @next_maps = ();
         foreach my $map ( @maps )
         {
@@ -264,6 +266,8 @@ sub fetchMoreParams
     my $config_tree = shift;
     my $token = shift;
     my @params = @_;
+
+    &Torrus::DB::checkInterrupted();
 
     my $ref = \$self->{'targets'}{$token}{'params'};
 
@@ -342,6 +346,8 @@ sub deleteTarget
     my $self = shift;
     my $token = shift;
 
+    &Torrus::DB::checkInterrupted();
+
     Info('Deleting target: ' . $self->path($token));
     
     if( ref( $self->{'targets'}{$token}{'deleteProc'} ) )
@@ -395,6 +401,8 @@ sub run
     while( my ($collector_type, $ref) = each %{$self->{'types'}} )
     {
         next unless $self->{'types_in_use'}{$collector_type};
+
+        &Torrus::DB::checkInterrupted();
         
         if( $Torrus::Collector::needsConfigTree
             {$collector_type}{'runCollector'} )
@@ -415,6 +423,8 @@ sub run
     while( my ($storage_type, $ref) = each %{$self->{'storage'}} )
     {
         next unless $self->{'storage_in_use'}{$storage_type};
+        
+        &Torrus::DB::checkInterrupted();
         
         if( $Torrus::Collector::needsConfigTree
             {$storage_type}{'storeData'} )
@@ -438,6 +448,8 @@ sub run
         
         if( ref( $Torrus::Collector::postProcess{$collector_type} ) )
         {
+            &Torrus::DB::checkInterrupted();
+            
             if( $Torrus::Collector::needsConfigTree
                 {$collector_type}{'postProcess'} )
             {
@@ -569,6 +581,8 @@ sub beforeRun
 {
     my $self = shift;
 
+    &Torrus::DB::checkInterrupted();
+
     my $tree = $self->treeName();
     my $config_tree = new Torrus::ConfigTree(-TreeName => $tree, -Wait => 1);
     if( not defined( $config_tree ) )
@@ -615,6 +629,8 @@ sub beforeRun
         $db_tokens->closeNow();
         undef $db_tokens;
 
+        &Torrus::DB::checkInterrupted();
+
         # Set the timestamp
         &Torrus::TimeStamp::setNow( $timestamp_key );
         
@@ -632,6 +648,7 @@ sub beforeRun
 
                 foreach my $token ( @{$targets->{$period}{$offset}} )
                 {
+                    &Torrus::DB::checkInterrupted();
                     $collector->addTarget( $config_tree, $token );
                 }
 
@@ -642,7 +659,6 @@ sub beforeRun
                         time() - $init_start));
 
         $data->{'targets_initialized'} = 1;
-
     }
     
     Torrus::TimeStamp::release();

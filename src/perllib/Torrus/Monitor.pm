@@ -72,7 +72,7 @@ sub addTarget
 sub run
 {
     my $self = shift;
-
+    
     my $config_tree =
         new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
                                 -Wait => 1 );
@@ -89,6 +89,8 @@ sub run
 
     foreach my $token ( @{$self->{'targets'}} )
     {
+        &Torrus::DB::checkInterrupted();
+        
         my $mlist = $self->{'sched_data'}{'mlist'}{$token};
         
         foreach my $mname ( @{$mlist} )
@@ -304,6 +306,8 @@ sub setAlarm
         foreach my $aname (split(',',
                                  $config_tree->getParam($mname, 'action')))
         {
+            &Torrus::DB::checkInterrupted();
+            
             Debug("Running action: $aname");
             my $method = 'run_event_' .
                 $config_tree->getParam($aname, 'action-type');
@@ -548,6 +552,8 @@ sub beforeRun
     }
     Torrus::TimeStamp::release();
 
+    &Torrus::DB::checkInterrupted();
+
     if( not $need_new_tasks and not defined $data->{'targets'} )
     {
         $need_new_tasks = 1;
@@ -571,6 +577,8 @@ sub beforeRun
         undef $data->{'db_tokens'};
     }
 
+    &Torrus::DB::checkInterrupted();
+
     # Now fill in Scheduler's task list, if needed
 
     if( $need_new_tasks )
@@ -590,6 +598,8 @@ sub beforeRun
 
                 foreach my $token ( @{$data->{'targets'}{$period}{$offset}} )
                 {
+                    &Torrus::DB::checkInterrupted();
+                    
                     $monitor->addTarget( $config_tree, $token );
                 }
 
@@ -616,6 +626,8 @@ sub cacheMonitors
 
     foreach my $ctoken ( $config_tree->getChildren( $ptoken ) )
     {
+        &Torrus::DB::checkInterrupted();
+
         if( $config_tree->isSubtree( $ctoken ) )
         {
             $self->cacheMonitors( $config_tree, $ctoken );

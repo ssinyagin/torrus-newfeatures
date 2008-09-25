@@ -136,9 +136,14 @@ sub run
         $self->setProcessStatus('initializing scheduler');
         while( not $self->beforeRun() )
         {
+            &Torrus::DB::checkInterrupted();
+            
             Error('Scheduler initialization error. Sleeping ' .
                   $Torrus::Scheduler::failedInitSleep . ' seconds');
+
+            &Torrus::DB::setUnsafeSignalHandlers();
             sleep($Torrus::Scheduler::failedInitSleep);
+            &Torrus::DB::setSafeSignalHandlers();
         }
         $self->setProcessStatus('');
         my $nextRun = time() + 3600;
@@ -149,6 +154,8 @@ sub run
             {
                 foreach my $task ( @{$self->{'tasks'}{$when}} )
                 {
+                    &Torrus::DB::checkInterrupted();
+                    
                     my $startTime = time();
 
                     $self->beforeTaskRun( $task, $startTime, $when );
@@ -196,8 +203,11 @@ sub run
                 Info('Tasks list is empty. Will sleep until ' .
                      scalar(localtime($nextRun)));
             }
+
             $self->setProcessStatus('sleeping');
+            &Torrus::DB::setUnsafeSignalHandlers();            
             Debug('We will sleep until ' . scalar(localtime($nextRun)));
+            
             if( $Torrus::Scheduler::maxSleepTime > 0 )
             {
                 Debug('This is a VmWare-like clock. We devide the sleep ' .
@@ -221,6 +231,8 @@ sub run
                     sleep( $sleep );
                 }
             }
+
+            &Torrus::DB::setSafeSignalHandlers();
         }
     }
 }

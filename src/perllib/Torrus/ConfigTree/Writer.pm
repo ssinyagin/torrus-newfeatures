@@ -381,6 +381,8 @@ sub postProcess
     $self->{'viewParamsProcessed'} = {};
     foreach my $vname ( $self->getViewNames() )
     {
+        &Torrus::DB::checkInterrupted();
+        
         $self->propagateViewParams( $vname );
     }
     return $ok;
@@ -390,6 +392,8 @@ sub postProcessNodes
 {
     my $self = shift;
     my $token = shift;
+
+    &Torrus::DB::checkInterrupted();
 
     my $ok = 1;
 

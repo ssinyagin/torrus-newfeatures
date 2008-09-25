@@ -92,19 +92,7 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
     exit 1;
 }
 
-
-# This will ensure that all databases get closed correctly
-$SIG{'TERM'} = sub
-{
-    Warn($0 . ' process terminated');
-    exit 1;
-};
-
-$SIG{'INT'} = sub
-{
-    Warn($0 . ' process interrupted');
-    exit 1;
-};
+&Torrus::DB::setSafeSignalHandlers();
 
 my $config_tree = new Torrus::ConfigTree( -TreeName => $tree, -Wait => 1 );
 if( not defined( $config_tree ) )
@@ -162,12 +150,16 @@ sub collect_monitors
 
     foreach my $action ( $config_tree->getActionNames() )
     {
+        &Torrus::DB::checkInterrupted();
+        
         my $params = $config_tree->getParams( $action );
         $cb->addMonitorAction( $monitorsNode, $action, $params );
     }
 
     foreach my $monitor ( $config_tree->getMonitorNames() )
     {
+        &Torrus::DB::checkInterrupted();
+        
         my $params = $config_tree->getParams( $monitor );
         $cb->addMonitor( $monitorsNode, $monitor, $params );
     }
@@ -182,6 +174,8 @@ sub collect_tokensets
 
     foreach my $tset ( $config_tree->getTsets() )
     {
+        &Torrus::DB::checkInterrupted();
+        
         my $params = $config_tree->getParams( $tset );
         my $name = $tset;
         $name =~ s/^S//;
@@ -199,12 +193,17 @@ sub collect_definitions
 
     foreach my $defName ( sort $config_tree->getDefinitionNames() )
     {
+        &Torrus::DB::checkInterrupted();
+
         my $value = $config_tree->getDefinition( $defName );
         $cb->addDefinition( $definitionsNode, $defName, $value );
     }
 
     my $propsNode = $cb->startParamProps();
     my $props = $config_tree->getParamProperties();
+
+    &Torrus::DB::checkInterrupted();
+
     foreach my $prop ( sort keys %{$props} )
     {
         foreach my $param ( sort keys %{$props->{$prop}} )
@@ -249,6 +248,8 @@ sub apply_filter
     
     foreach my $ctoken ( $config_tree->getChildren( $token ) )
     {
+        &Torrus::DB::checkInterrupted();
+        
         if( $config_tree->isSubtree( $ctoken ) )
         {
             $filterTokens{$token} += apply_filter( $config_tree, $ctoken );
@@ -275,9 +276,11 @@ sub collect_subtrees
     my $cb = shift;
     my $token = shift;
     my $parentNode = shift;
-
+    
     foreach my $ctoken ( $config_tree->getChildren( $token ) )
     {
+        &Torrus::DB::checkInterrupted();
+        
         if( not defined($filter_param) or $filterTokens{$ctoken} )
         {
             my $childName =

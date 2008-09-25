@@ -30,13 +30,12 @@ use Torrus::Log;
 
 exit(1) if not Torrus::SiteConfig::verify();
 
+&Torrus::DB::setSafeSignalHandlers();
+
 Torrus::TimeStamp::init();
 
 my @tree_names = Torrus::SiteConfig::listTreeNames();
 
-
-# This will ensure that all databases get closed correctly
-$SIG{'INT'} = $SIG{'TERM'} = sub { exit 1; };
 
 printf("Torrus version %s\n", '@VERSION@');
 printf("%s\n", DB_VERSION_STRING);
@@ -49,6 +48,8 @@ printf("\n");
 
 foreach my $tree ( @tree_names )
 {
+    &Torrus::DB::checkInterrupted();
+    
     printf("Tree: %s\n", $tree );
 
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
@@ -92,6 +93,8 @@ sub collectStats
     my $config_tree = shift;
     my $stats = shift;
     my $token = shift;
+
+    &Torrus::DB::checkInterrupted();
 
     if( not defined( $token ) )
     {

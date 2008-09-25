@@ -24,6 +24,8 @@ use Torrus::Log;
 
 use Torrus::Renderer;
 
+&Torrus::DB::setSafeSignalHandlers();
+
 my $renderer = new Torrus::Renderer;
 $renderer->clearcache();
 undef $renderer;

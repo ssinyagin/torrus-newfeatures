@@ -605,6 +605,11 @@ level in the form <code>name, name, ...</code> or at the global level in the for
 <p>Defines the child subtree name within host-level subtree where system CPU
 and memory statistics are located. Default: <code>System_Performance</code>.</p>
 </li>
+<li><strong><a name="item_rfc2670_docs_if_3a_3aupstreams_2donly"><code>RFC2670_DOCS_IF::upstreams-only</code></a></strong>
+
+<p>If set to <code>yes</code>, only the DOCSIS upstream statistics are enabled, and
+downstream and MAC layer stats are skipped.</p>
+</li>
 </ul>
 <p>
 </p>
@@ -693,6 +698,11 @@ accounting peers to tokensets.</p>
 
 <p>When set to <code>yes</code>, the Committed Access Rate statistics are disabled
 from discovery.</p>
+</li>
+<li><strong><a name="item_ciscoios_3a_3adisable_2dvpdn_2dstats"><code>CiscoIOS::disable-vpdn-stats</code></a></strong>
+
+<p>When set to <code>yes</code>, the VPDN (Virtual Private Dial-up Network) statistics
+are disabled from discovery.</p>
 </li>
 <li><strong><a name="item_ciscosce_3a_3adisable_2ddisk_2c_ciscosce_3a_3adisa"><code>CiscoSCE::disable-disk</code>, <code>CiscoSCE::disable-gc</code>,
     <code>CiscoSCE::disable-qos</code>, <code>CiscoSCE::disable-rdr</code>,

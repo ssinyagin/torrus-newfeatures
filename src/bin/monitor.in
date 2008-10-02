@@ -83,7 +83,7 @@ elsif( $verbose )
 }
 
 my $logfile = $Torrus::Global::logDir . '/monitor.' . $tree . '.log';
-my $pidfile = $Torrus::Global::pidDir . '/monitor.' . $tree . '.pid';
+my $pidfile;
 
 my $rotateLogs = sub
 {
@@ -94,10 +94,13 @@ my $rotateLogs = sub
 
 if( not $nodaemon and not $runonce )
 {
-    if( -r $pidfile )
+    my $pidfilename =
+        $Torrus::Global::pidDir . '/monitor.' . $tree . '.pid';
+    
+    if( -r $pidfilename )
     {
         Error("Another monitor daemon is running, pid=",
-              `cat $pidfile`);
+              `cat $pidfilename`);
         exit 1;
     }
 
@@ -109,6 +112,8 @@ if( not $nodaemon and not $runonce )
     # At this point, we cannot tell anyone if "open" fails
     open(STDERR, ">>$logfile");
 
+    $pidfile = $pidfilename;
+    
     if( open( PID, ">$pidfile" ) )
     {
         printf PID ( "%d", $$ );
@@ -157,7 +162,7 @@ exit;
 
 END
 {
-    if( -r $pidfile )
+    if( defined($pidfile) and -r $pidfile )
     {
         unlink $pidfile;
     }

@@ -25,5 +25,6 @@ prepviews
 render
 rrddir2xml
 schedulerinfo
+srvderive
 torrus
 ttproclist

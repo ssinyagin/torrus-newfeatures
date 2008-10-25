@@ -45,6 +45,7 @@ SRCPOD = \
 	torrus_monitor.pod.in \
 	torrus_rrddir2xml.pod.in \
 	torrus_schedulerinfo.pod.in \
+	torrus_srvderive.pod.in \
 	torrus_ttproclist.pod.in
 
 POD_FILES = \
@@ -68,6 +69,7 @@ POD_FILES = \
 	torrus_monitor.pod \
 	torrus_rrddir2xml.pod \
 	torrus_schedulerinfo.pod \
+	torrus_srvderive.pod \
 	torrus_ttproclist.pod
 
 PODMAN = \
@@ -91,6 +93,7 @@ PODMAN = \
 	torrus_monitor.@mansec_usercmd@ \
 	torrus_rrddir2xml.@mansec_usercmd@ \
 	torrus_schedulerinfo.@mansec_usercmd@ \
+	torrus_srvderive.@mansec_usercmd@ \
 	torrus_ttproclist.@mansec_usercmd@
 
 

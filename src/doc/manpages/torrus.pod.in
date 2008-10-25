@@ -64,6 +64,8 @@ Accepted commands:
 
 =item B<schedulerinfo>
 
+=item B<srvderive>
+
 =back
 
 =head1 OPTIONS
@@ -85,6 +87,7 @@ L<torrus_genddx(@mansec_usercmd@)>,
 L<torrus_monitor(@mansec_usercmd@)>,
 L<torrus_rrddir2xml(@mansec_usercmd@)>,
 L<torrus_schedulerinfo(@mansec_usercmd@)>
+L<torrus_srvderive(@mansec_usercmd@)>
 
 =head1 NOTES
 

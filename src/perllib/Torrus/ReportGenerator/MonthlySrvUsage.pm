@@ -79,7 +79,7 @@ sub generate
         my $params = $srvIDParams->getParams( $serviceid );
         
         my @aligned = ();
-        $#aligned= floor( $self->{'RangeSeconds'} / $step );
+        $#aligned = floor( $self->{'RangeSeconds'} / $step );
         my $nDatapoints = scalar( @aligned );
             
         # Fill in the aligned array. For each interval by modulo(step),

@@ -39,6 +39,7 @@ commands="acl=acledit acledit=acledit \
           monitor=monitor \
           rrddir=rrddir2xml rrddir2xml=rrddir2xml \
           schedulerinfo=schedulerinfo si=schedulerinfo \
+          srvderive=srvderive derive=srvderive \
           ttproclist=ttproclist"
 
 for f in `ls -1 @plugwrapperdir@`; do

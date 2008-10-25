@@ -63,7 +63,12 @@ sub idExists
     my $serviceid = shift;
     my $tree = shift;
 
-    return $self->{'db_params'}->searchList( 't:'.$tree, $serviceid );
+    if( defined($tree) )
+    {
+        return $self->{'db_params'}->searchList( 't:'.$tree, $serviceid );
+    }
+
+    return $self->{'db_params'}->searchList( 'a:', $serviceid );
 }    
     
 

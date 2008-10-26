@@ -303,25 +303,28 @@ for( my $pos = 0; $pos < $n_points; $pos++ )
             push( @args, $val );
         }
     }
-    
-    my $value = &{$known_functions{$function}}(@args);
 
-    my $timestamp = $starttime + $pos * $step;
-    my $datestr = time2str('%Y-%m-%d', $timestamp);
-    my $timestr = time2str('%H:%M:%S', $timestamp);
+    if( scalar( @args ) > 0 )
+    {
+        my $value = &{$known_functions{$function}}(@args);
 
-    if( isDebug() )
-    {
-        Debug('Updating SQL database: ' .
-              join(', ', $datestr, $timestr,
-                   $output, $value, $step ));
-    }
+        my $timestamp = $starttime + $pos * $step;
+        my $datestr = time2str('%Y-%m-%d', $timestamp);
+        my $timestr = time2str('%H:%M:%S', $timestamp);
+        
+        if( isDebug() )
+        {
+            Debug('Updating SQL database: ' .
+                  join(', ', $datestr, $timestr,
+                       $output, $value, $step ));
+        }
     
-    if( not $sth->execute( $datestr, $timestr,
-                           $output, $value, $step ) )
-    {
-        Error('Error executing SQL: ' . $dbh->errstr);
-        exit 1;
+        if( not $sth->execute( $datestr, $timestr,
+                               $output, $value, $step ) )
+        {
+            Error('Error executing SQL: ' . $dbh->errstr);
+            exit 1;
+        }
     }
 }
 

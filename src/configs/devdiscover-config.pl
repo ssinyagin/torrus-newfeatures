@@ -65,6 +65,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
      'Torrus::DevDiscover::JunOS',
+     'Torrus::DevDiscover::Liebert',
      'Torrus::DevDiscover::MicrosoftWindows',
      'Torrus::DevDiscover::MotorolaBSR',
      'Torrus::DevDiscover::NetApp',
@@ -956,6 +957,34 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'junos-temperature-sensor',
          'source'   => 'vendor/junos.xml',
      },
+
+
+     ##### Liebert
+     'Liebert::humidity-sensor' => {
+         'name'     => 'humidity-sensor',
+         'source'   => 'vendor/liebert.xml',
+     },
+     'Liebert::humidity-subtree' => {
+         'name'     => 'humidity-subtree',
+         'source'   => 'vendor/liebert.xml',
+     },
+     'Liebert::state-subtree' => {
+         'name'     => 'state-subtree',
+         'source'   => 'vendor/liebert.xml',
+     },
+     'Liebert::temperature-subtree' => {
+         'name'     => 'temperature-subtree',
+         'source'   => 'vendor/liebert.xml',
+     },
+     'Liebert::temperature-sensor' => {
+         'name'     => 'temperature-sensor',
+         'source'   => 'vendor/liebert.xml',
+     },
+     'Liebert::temperature-sensor-fahrenheit' => {
+         'name'     => 'temperature-sensor-fahrenheit',
+         'source'   => 'vendor/liebert.xml',
+     },
+
      
      ##### Ucd Snmp
      'UcdSnmp::ucdsnmp-memory-real' => {

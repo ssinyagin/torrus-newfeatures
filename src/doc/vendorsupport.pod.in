@@ -148,6 +148,10 @@ In-detail traffic statistics.
 
 CoS statistics. More stats in the future.
 
+=item * Liebert HVAC systems
+
+Temperature, humidity and system state sensors
+
 =item * Microsoft Windows 2000/XP
 
 Sets up proper interface indexing and provides FTP and HTTP server statistics.

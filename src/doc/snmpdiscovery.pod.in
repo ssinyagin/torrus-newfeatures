@@ -620,6 +620,26 @@ downstream and MAC layer stats are skipped.
 
 =over 4
 
+=item * C<Arbor_E::disable-e30-bundle>, C<Arbor_E::disable-e30-buffers>,
+    C<Arbor_E::disable-e30-cpu>, C<Arbor_E::disable-e30-flowdev>,
+    C<Arbor_E::disable-e30-fwdTable>, C<Arbor_E::disable-e30-hdd>,
+    C<Arbor_E::disable-e30-mem>
+
+When set to C<yes>, the corresponding statistics are excluded from the graphs.
+
+=item * C<Arbor_E::enable-e30-bundle-name-rrd>
+
+When set to C<yes>, the data will be written to filenames based on the name
+bundle instead of by the ID of the bundle.
+
+=item * C<Arbor_E::enable-e30-hdd-errors>
+
+When set to C<yes>, gather information regarding harddrive errors.
+
+=item * C<Apple_AE::disable-clients-stats>
+
+When set to C<yes>, wireless client machines are not tracked.
+
 =item * C<CiscoGeneric::disable-cpu-stats>
 
 When set to C<yes>, Cisco CPU usage statistics are excluded from discovery.
@@ -720,8 +740,18 @@ graphs.
     C<JunOS::disable-cos-tail>, C<JunOS::disable-firewall>,
     C<JunOS::disable-operating>, C<JunOS::disable-rpf>
 
-When set to C<yes>, disables the correspoding statistics category for JunOS
-devices
+When set to C<yes>, disables the corresponding statistics category for JunOS
+devices.
+
+=item * C<Liebert::disable-temperature>, C<Liebert::disable-humidity>,
+    C<Liebert::disable-state>, C<Liebert::disable-stats>
+
+When set to C<yes>, disable the corresponding statistics category for Liebert
+devices.
+
+=item * C<Liebert::use-fahrenheit>
+
+When set to C<yes>, the temperature readings will be in fahrenheit.
 
 =item * C<Paradyne::slot-name>
 

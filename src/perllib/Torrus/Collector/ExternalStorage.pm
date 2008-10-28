@@ -23,7 +23,7 @@ use Torrus::ConfigTree;
 use Torrus::Log;
 
 use strict;
-use Math::BigInt lib => 'GMP';
+use Math::BigInt;
 use Math::BigFloat;
 
 # Pluggable backend module implements all storage-specific tasks

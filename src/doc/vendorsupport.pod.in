@@ -36,6 +36,11 @@ and interface descriptions are copied to the generated Torrus configuration.
 
 =over 4
 
+=item * RFC1628 (UPS-MIB)
+
+Generic statistics covered by most UPS manufactures, including input, output,
+and bypass group information.
+
 =item * RFC1697 (RDBMS-MIB)
 
 Provides the database engine performance statistics. Tested with Oracle only.

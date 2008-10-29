@@ -78,6 +78,10 @@ Application switching and performance statistics.
 
 Reports the line status for the manageable modular media converter.
 
+=item * Arbor Networks
+
+Provide statistics for Arbor eSeries devices.
+
 =item * Ascend MAX
 
 Provides statistics for analog and ISDN interfaces, and the total number
@@ -146,7 +150,8 @@ In-detail traffic statistics.
 
 =item * Juniper JunOS
 
-CoS statistics. More stats in the future.
+Class of service, firewall, operating environment, reverse path forwarding,
+and interface statistics.
 
 =item * Liebert HVAC systems
 

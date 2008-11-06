@@ -44,6 +44,11 @@ and interface descriptions are copied to the generated Torrus configuration.</p>
 </p>
 <h2><a name="generic_snmp_mibs">Generic SNMP MIBs</a></h2>
 <ul>
+<li><strong><a name="item_rfc1628">RFC1628 (UPS-MIB)</a></strong>
+
+<p>Generic statistics covered by most UPS manufactures, including input, output,
+and bypass group information.</p>
+</li>
 <li><strong><a name="item_rfc1697">RFC1697 (RDBMS-MIB)</a></strong>
 
 <p>Provides the database engine performance statistics. Tested with Oracle only.</p>
@@ -85,6 +90,10 @@ Tested with many different vendors.</p>
 
 <p>Reports the line status for the manageable modular media converter.</p>
 </li>
+<li><strong><a name="item_arbor_networks">Arbor Networks</a></strong>
+
+<p>Provide statistics for Arbor eSeries devices.</p>
+</li>
 <li><strong><a name="item_ascend_max">Ascend MAX</a></strong>
 
 <p>Provides statistics for analog and ISDN interfaces, and the total number
@@ -121,7 +130,7 @@ DOCSIS uBR-specific variables (modem quantities and channel utilization);
 CISCO-ENHANCED-MEMPOOL-MIB (linecards and VIP modules memory, see notes below);
 MAC accounting statistics (associated with BGP AS numbers when applicable); LRE
 and VDSL line statistics; BGP prefix counts (http://tinyurl.com/y3ganv);
-CAR statistics.</p>
+CAR statistics; VPDN Statistics.</p>
 <p><strong>Note:</strong> On Cisco 7500, IOS version 12.0(26)S2 or 12.0(26)S3,
 CISCO-ENHANCED-MEMPOOL-MIB polling causes memory leak and leads to the router
 crash (Bug ID CSCef53395). The problem is fixed in IOS versions
@@ -150,7 +159,12 @@ may provide about the server health and performance.</p>
 </li>
 <li><strong><a name="item_juniper_junos">Juniper JunOS</a></strong>
 
-<p>CoS statistics. More stats in the future.</p>
+<p>Class of service, firewall, operating environment, reverse path forwarding,
+and interface statistics.</p>
+</li>
+<li><strong><a name="item_liebert_hvac_systems">Liebert HVAC systems</a></strong>
+
+<p>Temperature, humidity and system state sensors</p>
 </li>
 <li><strong><a name="item_microsoft_windows_2000_2fxp">Microsoft Windows 2000/XP</a></strong>
 

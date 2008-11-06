@@ -615,6 +615,26 @@ downstream and MAC layer stats are skipped.</p>
 </p>
 <h3><a name="vendor_parameters">Vendor parameters</a></h3>
 <ul>
+<li><strong><a name="item_arbor_e_3a_3adisable_2de30_2dbundle_2c_arbor_e_3a_"><code>Arbor_E::disable-e30-bundle</code>, <code>Arbor_E::disable-e30-buffers</code>,
+    <code>Arbor_E::disable-e30-cpu</code>, <code>Arbor_E::disable-e30-flowdev</code>,
+    <code>Arbor_E::disable-e30-fwdTable</code>, <code>Arbor_E::disable-e30-hdd</code>,
+    <code>Arbor_E::disable-e30-mem</code></a></strong>
+
+<p>When set to <code>yes</code>, the corresponding statistics are excluded from the graphs.</p>
+</li>
+<li><strong><a name="item_arbor_e_3a_3aenable_2de30_2dbundle_2dname_2drrd"><code>Arbor_E::enable-e30-bundle-name-rrd</code></a></strong>
+
+<p>When set to <code>yes</code>, the data will be written to filenames based on the name
+bundle instead of by the ID of the bundle.</p>
+</li>
+<li><strong><a name="item_arbor_e_3a_3aenable_2de30_2dhdd_2derrors"><code>Arbor_E::enable-e30-hdd-errors</code></a></strong>
+
+<p>When set to <code>yes</code>, gather information regarding harddrive errors.</p>
+</li>
+<li><strong><a name="item_apple_ae_3a_3adisable_2dclients_2dstats"><code>Apple_AE::disable-clients-stats</code></a></strong>
+
+<p>When set to <code>yes</code>, wireless client machines are not tracked.</p>
+</li>
 <li><strong><a name="item_ciscogeneric_3a_3adisable_2dcpu_2dstats"><code>CiscoGeneric::disable-cpu-stats</code></a></strong>
 
 <p>When set to <code>yes</code>, Cisco CPU usage statistics are excluded from discovery.</p>
@@ -715,8 +735,18 @@ graphs.</p>
     <code>JunOS::disable-cos-tail</code>, <code>JunOS::disable-firewall</code>,
     <code>JunOS::disable-operating</code>, <code>JunOS::disable-rpf</code></a></strong>
 
-<p>When set to <code>yes</code>, disables the correspoding statistics category for JunOS
-devices</p>
+<p>When set to <code>yes</code>, disables the corresponding statistics category for JunOS
+devices.</p>
+</li>
+<li><strong><a name="item_liebert_3a_3adisable_2dtemperature_2c_liebert_3a_3"><code>Liebert::disable-temperature</code>, <code>Liebert::disable-humidity</code>,
+    <code>Liebert::disable-state</code>, <code>Liebert::disable-stats</code></a></strong>
+
+<p>When set to <code>yes</code>, disable the corresponding statistics category for Liebert
+devices.</p>
+</li>
+<li><strong><a name="item_liebert_3a_3ause_2dfahrenheit"><code>Liebert::use-fahrenheit</code></a></strong>
+
+<p>When set to <code>yes</code>, the temperature readings will be in fahrenheit.</p>
 </li>
 <li><strong><a name="item_paradyne_3a_3aslot_2dname"><code>Paradyne::slot-name</code></a></strong>
 

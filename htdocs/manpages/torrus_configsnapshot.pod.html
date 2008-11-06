@@ -87,10 +87,32 @@ structure and definitions.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
+<dt><strong><a name="item__2d_2dtree_3dtree"><strong>--tree</strong>=<em>TREE</em></a></strong>
+
+<dd>
+<p>Mandatory parameter specifying the tree name.</p>
+</dd>
+</li>
 <dt><strong><a name="item__2d_2dout_3dfile"><strong>--out</strong>=<em>FILE</em></a></strong>
 
 <dd>
 <p>Sets the output file to <em>FILE</em>. Default is <em>snapshot.xml</em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d_2dparam_3dparam__2d_2dvalue_3dvalue"><strong>--param</strong>=<em>PARAM</em>  <strong>--value</strong>=<em>VALUE</em></a></strong>
+
+<dd>
+<p>Sets the filter on datasource leaves that have to be included in the snapshot.
+<em>PARAM</em> specifies the name of the datasource parameter, and <em>VALUE</em>
+sets the matching value. By default the numeric comparison is performed.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d_2dop_3doperator"><strong>--op</strong>=<em>OPERATOR</em></a></strong>
+
+<dd>
+<p>Sets the fiter comparison operator. Accepted values: <strong>=</strong> (numeric),
+<strong>eq</strong> (text string comparison), and <strong>re</strong> (regular expression match). Default
+is numeric comparison.</p>
 </dd>
 </li>
 <dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>

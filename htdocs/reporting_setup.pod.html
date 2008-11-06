@@ -26,6 +26,7 @@
 		<li><a href="#torrus_xml_configuration_parameters">Torrus XML configuration parameters</a></li>
 		<li><a href="#enable_displaying_of_the_reports_in_the_web_interface">Enable displaying of the reports in the web interface</a></li>
 		<li><a href="#generate_reports">Generate reports</a></li>
+		<li><a href="#getting_the_sum_or_maximum_value_from_several_service_ids">Getting the sum or maximum value from several service IDs</a></li>
 	</ul>
 
 </ul>
@@ -315,6 +316,20 @@ maximum rate throughout the month, unavailable samples (how many 5-minutes
 intervals are missed in the collected data), and monthly volume (which
 is roughly less than the actual volume by the percentage of missed samples).
 Also clicking a service ID leads to its monthly report throughout the year.</p>
+<p>
+</p>
+<h2><a name="getting_the_sum_or_maximum_value_from_several_service_ids">Getting the sum or maximum value from several service IDs</a></h2>
+<p>A new utility has been sponsored by Nexellent.ch, a managed hosting solution
+provider near Zurich. The utility <code>srvderive</code> can be used to generate a
+new service ID which would contain sum or maximum of values of other
+service IDs. You would usually run this utlity monthly, just before generating
+the monthly reports:</p>
+<pre>
+  torrus srvderive --verbose --start=20080801 --month \
+    --out=JSMITH_SUM_OUT --func=SUM JSMITH01_OUT JSMITH02_OUT</pre>
+<pre>
+  torrus srvderive --verbose --start=20080801 --month \
+    --out=JSMITH_SUM_IN --func=SUM JSMITH01_IN JSMITH02_IN</pre>
 <p>Copyright (c) 2005-2008 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>

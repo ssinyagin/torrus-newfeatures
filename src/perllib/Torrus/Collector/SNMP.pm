@@ -516,7 +516,15 @@ sub lookupMap
         {
             return undef;
         }
-        
+
+        if( scalar(@mappingSessions) >=
+            $Torrus::Collector::SNMP::maxSessionsPerDispatcher )
+        {
+            snmp_dispatcher();
+            @mappingSessions = ();
+            %mapLookupScheduled = ();
+        }
+
         # Retrieve map from host
         Debug("Retrieving map $map from $hosthash");
 
@@ -784,114 +792,145 @@ sub runCollector
 {
     my $collector = shift;
     my $cref = shift;
-        
+
+    Info(sprintf('runCollector() Offset: %d, active hosts: %d, maps: %d',
+                 $collector->offset(),
+                 scalar( keys %{$cref->{'activehosts'}} ),
+                 scalar(keys %maps)));
+    
     # Create one SNMP session per host address.
     # We assume that version, timeout and retries are the same
     # within one address
 
-    my @sessions;
+    # We limit the number of sessions per snmp_dispatcher run
+    # because of some strange bugs: with more than 400 sessions per
+    # dispatcher, some requests are not sent out
 
-    foreach my $hosthash ( keys %{$cref->{'activehosts'}} )
+    my @hosts = keys %{$cref->{'activehosts'}};
+    
+    while( scalar(@mappingSessions) + scalar(@hosts) > 0 )
     {
-        my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
-        
-        # Find one representative token for the host
-        
-        if( scalar( @oids ) == 0 )
+        my @batch = ();
+        while( ( scalar(@mappingSessions) + scalar(@batch) <
+                 $Torrus::Collector::SNMP::maxSessionsPerDispatcher )
+               and
+               scalar(@hosts) > 0 )
         {
-            next;
+            push( @batch, pop( @hosts ) );
         }
-        
-        my @reptokens = keys %{$cref->{'targets'}{$hosthash}{$oids[0]}};
-        if( scalar( @reptokens ) == 0 )
-        {
-            next;
-        }
-        my $reptoken = $reptokens[0];
-                    
-        my $session =
-            openNonblockingSession( $collector, $reptoken, $hosthash );
-        
-        if( not defined($session) )
-        {
-            return 0;
-        }
-        else
-        {
-            Debug('Created SNMP session for ' . $hosthash);
-            push( @sessions, $session );
-        }
-        
-        my $oids_per_pdu = $cref->{'oids_per_pdu'}{$hosthash};
 
-        my @pdu_oids = ();
-        my $delay = 0;
-        
-        while( scalar( @oids ) > 0 )
-        {
-            my $oid = shift @oids;
-            push( @pdu_oids, $oid );
+        &Torrus::DB::checkInterrupted();
 
-            if( scalar( @oids ) == 0 or
-                ( scalar( @pdu_oids ) >= $oids_per_pdu ) )
+        my @sessions;
+
+        foreach my $hosthash ( @batch )
+        {
+            my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
+
+            Info(sprintf('Host %s: %d OIDs',
+                         $hosthash,
+                         scalar(@oids)));
+            
+            # Find one representative token for the host
+            
+            if( scalar( @oids ) == 0 )
             {
-                if( not $cref->{'nosysuptime'}{$hosthash} )
-                {
-                    # We insert sysUpTime into every PDU, because
-                    # we need it in further processing
-                    push( @pdu_oids, $sysUpTime );
-                }
-                
-                if( Torrus::Log::isDebug() )
-                {
-                    Debug("Sending SNMP PDU to $hosthash:");
-                    foreach my $oid ( @pdu_oids )
-                    {
-                        Debug($oid);
-                    }
-                }
+                next;
+            }
+        
+            my @reptokens = keys %{$cref->{'targets'}{$hosthash}{$oids[0]}};
+            if( scalar( @reptokens ) == 0 )
+            {
+                next;
+            }
+            my $reptoken = $reptokens[0];
+            
+            my $session =
+                openNonblockingSession( $collector, $reptoken, $hosthash );
+            
+            &Torrus::DB::checkInterrupted();
+            
+            if( not defined($session) )
+            {
+                return 0;
+            }
+            else
+            {
+                Debug('Created SNMP session for ' . $hosthash);
+                push( @sessions, $session );
+            }
+            
+            my $oids_per_pdu = $cref->{'oids_per_pdu'}{$hosthash};
 
-                # Generate the list of tokens that form this PDU
-                my $pdu_tokens = {};
-                foreach my $oid ( @pdu_oids )
+            my @pdu_oids = ();
+            my $delay = 0;
+            
+            while( scalar( @oids ) > 0 )
+            {
+                my $oid = shift @oids;
+                push( @pdu_oids, $oid );
+
+                if( scalar( @oids ) == 0 or
+                    ( scalar( @pdu_oids ) >= $oids_per_pdu ) )
                 {
-                    if( defined( $cref->{'targets'}{$hosthash}{$oid} ) )
+                    if( not $cref->{'nosysuptime'}{$hosthash} )
                     {
-                        foreach my $token
-                            ( keys %{$cref->{'targets'}{$hosthash}{$oid}} )
+                        # We insert sysUpTime into every PDU, because
+                        # we need it in further processing
+                        push( @pdu_oids, $sysUpTime );
+                    }
+                    
+                    if( Torrus::Log::isDebug() )
+                    {
+                        Debug("Sending SNMP PDU to $hosthash:");
+                        foreach my $oid ( @pdu_oids )
                         {
-                            $pdu_tokens->{$oid}{$token} = 1;
+                            Debug($oid);
                         }
                     }
+
+                    # Generate the list of tokens that form this PDU
+                    my $pdu_tokens = {};
+                    foreach my $oid ( @pdu_oids )
+                    {
+                        if( defined( $cref->{'targets'}{$hosthash}{$oid} ) )
+                        {
+                            foreach my $token
+                                ( keys %{$cref->{'targets'}{$hosthash}{$oid}} )
+                            {
+                                $pdu_tokens->{$oid}{$token} = 1;
+                            }
+                        }
+                    }
+                    my $result =
+                        $session->
+                        get_request( -delay => $delay,
+                                     -callback =>
+                                     [ \&Torrus::Collector::SNMP::callback,
+                                       $collector, $pdu_tokens, $hosthash ],
+                                     -varbindlist => \@pdu_oids );
+                    if( not defined $result )
+                    {
+                        Error("Cannot create SNMP request: " .
+                              $session->error);
+                    }
+                    @pdu_oids = ();
+                    $delay += 0.01;
                 }
-                my $result =
-                    $session->
-                    get_request( -delay => $delay,
-                                 -callback =>
-                                 [ \&Torrus::Collector::SNMP::callback,
-                                   $collector, $pdu_tokens, $hosthash ],
-                                 -varbindlist => \@pdu_oids );
-                if( not defined $result )
-                {
-                    Error("Cannot create SNMP request: " .
-                          $session->error);
-                }
-                @pdu_oids = ();
-                $delay += 0.01;
             }
         }
-    }
-    
-    &Torrus::DB::checkInterrupted();
-    
-    snmp_dispatcher();
+        
+        &Torrus::DB::checkInterrupted();
+        
+        snmp_dispatcher();
 
-    # Check if there were pending map lookup sessions
-    
-    if( scalar( @mappingSessions ) > 0 )
-    {
-        @mappingSessions = ();
-        %mapLookupScheduled = ();
+        # Check if there were pending map lookup sessions
+        
+        if( scalar( @mappingSessions ) > 0 )
+        {
+            @mappingSessions = ();
+            %mapLookupScheduled = ();
+        }
     }
 }
 

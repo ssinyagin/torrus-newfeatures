@@ -100,6 +100,10 @@ $Torrus::Collector::SNMP::mapsRefreshRandom = 0.40;
 # Wait 10min between refresh checkups
 $Torrus::Collector::SNMP::mapsExpireCheckPeriod = 600;
 
+# There is a strange bug that with more than 400 sessions per SNMP
+# dispatcher some requests are not sent at all
+$Torrus::Collector::SNMP::maxSessionsPerDispatcher = 100;
+
 # When enabled, the collector starts a background thread that
 # writes to RRD files
 $Torrus::Collector::RRDStorage::useThreads = $Torrus::Global::threadsEnabled;

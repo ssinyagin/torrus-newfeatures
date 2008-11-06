@@ -1,3 +1,9 @@
+2008-11-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm (runCollector):
+	Number of SNMP sessions per snmp_dispatcher is limited to 100
+	because of some strange bugs (found on SPARC/Solaris platform)
+
 2008-10-28  Jon Nistor <nistor@snickers.org>
 
         * perllib/Torrus/DevDiscover/Liebert.pm:

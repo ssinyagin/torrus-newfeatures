@@ -12,7 +12,7 @@
 2008-10-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/srvderive.in: new utility that combines several services
-	and combines them as MAX or SUM
+	and combines them as MAX or SUM (sponsored by Nexellent.ch)
 
 2008-09-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 

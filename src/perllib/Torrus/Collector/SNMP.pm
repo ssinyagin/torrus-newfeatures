@@ -793,10 +793,10 @@ sub runCollector
     my $collector = shift;
     my $cref = shift;
 
-    Info(sprintf('runCollector() Offset: %d, active hosts: %d, maps: %d',
-                 $collector->offset(),
-                 scalar( keys %{$cref->{'activehosts'}} ),
-                 scalar(keys %maps)));
+    # Info(sprintf('runCollector() Offset: %d, active hosts: %d, maps: %d',
+    #              $collector->offset(),
+    #              scalar( keys %{$cref->{'activehosts'}} ),
+    #              scalar(keys %maps)));
     
     # Create one SNMP session per host address.
     # We assume that version, timeout and retries are the same
@@ -827,9 +827,9 @@ sub runCollector
         {
             my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
 
-            Info(sprintf('Host %s: %d OIDs',
-                         $hosthash,
-                         scalar(@oids)));
+            # Info(sprintf('Host %s: %d OIDs',
+            #              $hosthash,
+            #              scalar(@oids)));
             
             # Find one representative token for the host
             

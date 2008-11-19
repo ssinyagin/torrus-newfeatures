@@ -599,6 +599,8 @@ sub mapLookupCallback
     my $hosthash = shift;
     my $map = shift;
 
+    &Torrus::DB::checkInterrupted();
+    
     Debug('Received mapping PDU from ' . $hosthash);
 
     my $result = $session->var_bind_list();
@@ -1104,7 +1106,9 @@ sub postProcess
         while( my ( $maphash, $expire ) = each %mapsExpire )
         {
             if( $expire <= $now and not $mapLookupScheduled{$maphash} )
-            {                
+            {
+                &Torrus::DB::checkInterrupted();
+
                 my ( $hosthash, $map ) = split( /\#/o, $maphash );
 
                 if( $unreachableHostDeleted{$hosthash} )
@@ -1144,6 +1148,8 @@ sub postProcess
     
     foreach my $token ( keys %{$cref->{'needsRemapping'}} )
     {
+        &Torrus::DB::checkInterrupted();
+
         delete $cref->{'needsRemapping'}{$token};
         if( not Torrus::Collector::SNMP::initTargetAttributes
             ( $collector, $token ) )

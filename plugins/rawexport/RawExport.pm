@@ -26,7 +26,7 @@ use threads;
 use threads::shared;
 use Thread::Queue;
 use Date::Format;
-use Math::BigInt lib => 'GMP';
+use Math::BigInt;
 use Math::BigFloat;
 
 

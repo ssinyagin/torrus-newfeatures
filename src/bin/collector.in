@@ -152,9 +152,10 @@ if( not $nodaemon and not $runonce )
 }
 
 
+Torrus::Collector::initThreads();
+
 &Torrus::DB::setSafeSignalHandlers();
 
-Torrus::Collector::initThreads();
 
 Info(sprintf("Torrus version %s", '@VERSION@'));
 Info(sprintf("%s started for tree %s, instance #%d", $0, $tree, $instance));

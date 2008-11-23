@@ -624,6 +624,8 @@ sub beforeRun
                 $targets->{$period}{$offset} = [];
             }
             push( @{$targets->{$period}{$offset}}, $token );
+
+            &Torrus::DB::checkInterrupted();
         }
         undef $cursor;
         $db_tokens->closeNow();

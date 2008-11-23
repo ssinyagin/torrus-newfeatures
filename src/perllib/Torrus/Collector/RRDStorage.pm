@@ -510,13 +510,17 @@ sub updateRRD
 # A background thread that updates RRD files
 sub rrdUpdateThread
 {
+    &Torrus::DB::setSafeSignalHandlers();
     $| = 1;
     &Torrus::Log::setTID( threads->tid() );
+    
     my $cmdlist;
     &threads::shared::share( \$cmdlist );
     
     while(1)
     {
+        &Torrus::DB::checkInterrupted();
+        
         $cmdlist = $thrUpdateQueue->dequeue();
         
         if( isDebug )

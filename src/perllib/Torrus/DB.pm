@@ -181,59 +181,88 @@ sub new
 
 our $interrupted = 0;
 
+my $signalHandlersSet = 0;
+my $safeSignals = 0;
+
+
+
+
+
+sub setSignalHandlers
+{
+    if( $signalHandlersSet )
+    {
+        return;
+    }
+    
+    $SIG{'TERM'} = sub {
+        if( $safeSignals )
+        {
+            Warn('Received SIGTERM. Scheduling to exit.');
+            $interrupted = 1;
+        }
+        else
+        {
+            Warn('Received SIGTERM. Stopping the process.');
+            exit(1);
+        }            
+    };
+
+    $SIG{'INT'} = sub {
+        if( $safeSignals )
+        {
+            Warn('Received SIGINT. Scheduling to exit.');
+            $interrupted = 1;
+        }
+        else
+        {
+            Warn('Received SIGINT. Stopping the process');
+            exit(1);
+        }            
+    };
+    
+
+    $SIG{'PIPE'} = sub {
+        if( $safeSignals )
+        {
+            Warn('Received SIGPIPE. Scheduling to exit.');
+            $interrupted = 1;
+        }
+        else
+        {
+            Warn('Received SIGPIPE. Stopping the process');
+            exit(1);
+        }            
+    };
+    
+    $SIG{'QUIT'} = sub {
+        if( $safeSignals )
+        {
+            Warn('Received SIGQUIT. Scheduling to exit.');
+            $interrupted = 1;
+        }
+        else
+        {
+            Warn('Received SIGQUIT. Stopping the process');
+            exit(1);
+        }            
+    };
+
+    $signalHandlersSet = 1;
+}
+
+
 sub setSafeSignalHandlers
 {
-    $SIG{'TERM'} = sub
-    {
-        Warn('Received SIGTERM. Scheduling to exit.');
-        $interrupted = 1;
-    };
-
-    $SIG{'INT'} = sub
-    {
-        Warn('Received SIGINT. Scheduling to exit.');
-        $interrupted = 1;
-    };
-
-    $SIG{'PIPE'} = sub
-    {
-        Warn('Received SIGPIPE. Scheduling to exit.');
-        $interrupted = 1;
-    };
-
-    $SIG{'QUIT'} = sub
-    {
-        Warn('Received SIGQUIT. Scheduling to exit.');
-        $interrupted = 1;
-    };
+    setSignalHandlers();
+    $safeSignals = 1;
 }
 
 
 sub setUnsafeSignalHandlers
 {
-    $SIG{'TERM'} = sub
-    {
-        Warn('Received SIGTERM. Exiting.');
-        exit(1);
-    };
-
-    $SIG{'INT'} = sub
-    {
-        Warn('Received SIGINT. Exiting.');
-        exit(1);
-    };
-
-    $SIG{'PIPE'} = sub
-    {
-        Warn('Received SIGPIPE. Exiting.');
-        exit(1);
-    };
-
-    $SIG{'QUIT'} = sub
-    {
-        Warn('Received SIGQUIT. Exiting.');
-        exit(1);
-    };
+    setSignalHandlers();
+    $safeSignals = 0;
 }
     
 
@@ -243,10 +272,11 @@ sub checkInterrupted
 {
     if( $interrupted )
     {
-        Warn('Exiting the process');
+        Warn('Stopping the process');
         exit(1);
     }
 }
+
 
 
 sub closeNow

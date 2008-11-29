@@ -535,6 +535,14 @@ sub discover
         }
     }
 
+    if( $devdetails->param('CiscoIOS::short-device-comment') eq 'yes' )
+    {
+        # Remove serials from device comment
+        # 1841 chassis, Hw Serial#: 3625140487, Hw Revision: 6.0
+        
+        $data->{'param'}{'comment'} =~ s/, Hw.*//o;        
+    }
+
     return 1;
 }
 

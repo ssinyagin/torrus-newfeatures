@@ -1,3 +1,8 @@
+2008-11-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS.pm (discover):
+	New discovery parameter: CiscoIOS::short-device-comment
+
 2008-11-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/SNMP.pm (runCollector):

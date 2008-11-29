@@ -729,6 +729,11 @@ from discovery.
 When set to C<yes>, the VPDN (Virtual Private Dial-up Network) statistics
 are disabled from discovery.
 
+=item * C<CiscoIOS::short-device-comment>
+
+If set to C<yes>, the Hw Serial and Revision strings are not shown in
+device comment.
+
 =item * C<CiscoSCE::disable-disk>, C<CiscoSCE::disable-gc>,
     C<CiscoSCE::disable-qos>, C<CiscoSCE::disable-rdr>,
     C<CiscoSCE::disable-subs>, C<CiscoSCE::disable-tp>

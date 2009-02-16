@@ -362,7 +362,7 @@ sub setupPrivileges
                     }
                 }
             }
-            elsif( $knownPrivileges{$priv} eq '*' )
+            elsif( $knownPrivileges{$priv} eq 'global' )
             {
                 foreach my $obj ( @{$objects} )
                 {

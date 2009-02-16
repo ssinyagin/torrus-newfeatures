@@ -442,6 +442,11 @@ sub may_display_reports
 
     if( $Torrus::Renderer::displayReports )
     {
+        if( not $Torrus::ApacheHandler::authorizeUsers )
+        {
+            return 1;
+        }
+        
         my $tree = $config_tree->treeName();
         if( $self->hasPrivilege( $tree, 'DisplayReports' ) and
             -r $Torrus::Global::reportsDir . '/' . $tree .

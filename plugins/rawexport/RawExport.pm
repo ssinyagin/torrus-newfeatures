@@ -127,7 +127,7 @@ sub deleteTarget
     my $collector = shift;
     my $token = shift;
 
-    my $sref = $collector->storageData( 'rrd' );
+    my $sref = $collector->storageData( 'raw' );
     my $filename = $sref->{'filename'}{$token};
 
     delete $sref->{'filename'}{$token};

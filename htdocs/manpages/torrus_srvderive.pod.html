@@ -1,0 +1,167 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>srvderive - Derive a new service ID from sum or maximum of other service values</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#timespan">TIMESPAN</a></li>
+	<li><a href="#output">OUTPUT</a></li>
+	<li><a href="#function">FUNCTION</a></li>
+	<li><a href="#sources">SOURCES</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>srvderive - Derive a new service ID from sum or maximum of other service values</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><strong>torrus srvderive</strong> <em>TIMESPAN</em> <em>OUTPUT</em> <em>FUNCTION</em> <em>SOURCES</em>...</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>When the Torrus Reporting engine is set up, this command is used
+to combine several services data into a new service ID. The output data
+is either the maximum or the sum of input services.</p>
+<p>See <em>Torrus Reporting Setup Guide</em> for more information.</p>
+<p>
+</p>
+<hr />
+<h1><a name="timespan">TIMESPAN</a></h1>
+<p>Either --month or --end option must be defined</p>
+<dl>
+<dt><strong><a name="item__2d_2dstart_3dyyyy_2dmm_2ddd"><strong>--start</strong>=<em>YYYY-MM-DD</em></a></strong>
+
+<dd>
+<p>Sets the start date of the calculation.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d_2dend_3dyyyy_2dmm_2ddd"><strong>--end</strong>=<em>YYYY-MM-DD</em></a></strong>
+
+<dd>
+<p>Sets the next day after the eond of the period.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d_2dmonth"><strong>--month</strong></a></strong>
+
+<dd>
+<p>Instead of setting the end data, it is convenient to use this option. It sets
+the end data in one calendar month after the start date.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="output">OUTPUT</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dout_3dserviceid"><strong>--out</strong>=<em>SERVICEID</em></a></strong>
+
+<dd>
+<p>Sets the output service ID. This should not be a service ID used in the
+Torrus datasource trees. <strong>Note:</strong> if <em>srvderive</em> command is run twice
+with the same arguments, the produced data is doubled for the output
+service ID.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="function">FUNCTION</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dfunc_3dmax_7csum"><strong>--func</strong>=<code>MAX</code>|<code>SUM</code></a></strong>
+
+<dd>
+<p>Sets the function to be used when combining the input service data.
+Currently only <code>MAX</code> and <code>SUM</code> are supportted.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="sources">SOURCES</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2din_3dserviceid__2e_2e_2e"><strong>--in</strong>=<em>SERVICEID</em> ...</a></strong>
+
+<dd>
+<p>Input service IDs are specified either by <strong>--in</strong> option, or as command line
+arguments. At least 2 input service IDs should be specified.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2d_2dstep"><strong>--step</strong></a></strong>
+
+<dd>
+<p>Default: 300. Sets the data interval for derived service ID. It is recommended
+to leave this option at default value.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d_2dverbose"><strong>--verbose</strong></a></strong>
+
+<dd>
+<p>Prints extra informatgion.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d_2ddebug"><strong>--debug</strong></a></strong>
+
+<dd>
+<p>Prints debugging information.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d_2dhelp"><strong>--help</strong></a></strong>
+
+<dd>
+<p>Prints command usage information.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>torrus(1)</em></p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>See more documentation at Torrus home page: <a href="http://torrus.org">http://torrus.org</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

@@ -29,13 +29,13 @@ use Getopt::Long;
 
 use Torrus::Log;
 
-my $depth   = 2;
 my $leaves  = 1000;
 my $bunch   = 10;
 
 my $template = 'genrandomcfg.xml';
 my $outfile  = 'random.xml';
 
+my $fnameprefix = '';
 my $subtree = 'RandomTest';
 my $datadir = '@defrrddir@';
 
@@ -53,13 +53,13 @@ foreach my $arg ( @ARGV )
 }
 
 my $ok = GetOptions(
-                    'depth=i'     => \$depth,
                     'leaves=i'    => \$leaves,
                     'bunch=i'     => \$bunch,
                     'template=s'  => \$template,
                     'out=s'       => \$outfile,
                     'subtree=s'   => \$subtree,
-                    'datadir=s'   => \$datadir
+                    'datadir=s'   => \$datadir,
+                    'prefix=s'    => \$fnameprefix,
                     );
 
 if( not $ok or
@@ -68,12 +68,12 @@ if( not $ok or
     print STDERR "Usage: $0 options...\n",
     "Options:\n",
     " --leaves=N              number of datasources. [1000]\n",
-    " --depth=N               tree depth.            [3]\n",
     " --bunch=N               leaves per subtree     [10]\n",
     " --template              template filename      [genrandomcfg.xml]\n",
     " --out=filename          output file.           [random.xml]\n",
     " --subtree=name          Torrus Subtree name      [RandomTest]\n",
-    " --datadir=path          data-dir parameter     [@defrrddir@]\n";
+    " --datadir=path          data-dir parameter     [@defrrddir@]\n",
+    " --prefix=string         RRD file name prefix   []\n";
     exit 1;
 }
 
@@ -111,11 +111,11 @@ my $tt = new Template(INCLUDE_PATH => $Torrus::Global::templateDirs);
 my $vars = {
     'T'          => \%treedata,
     'leaves'     => $leaves,
-    'depth'      => $depth,
     'timestamp'  => scalar(localtime(time())),
     'creator'    => $creator,
     'subtree'    => $subtree,
     'datadir'    => $datadir,
+    'fnameprefix' => $fnameprefix,
     'color'      => \&gencolor,
     'order'      => sub{ my $l = shift; $l =~ s/^B//; return $l; }
 };

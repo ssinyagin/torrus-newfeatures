@@ -112,16 +112,13 @@
     <param name="rrd-create-dstype" value="GAUGE" />
 
 [% FOREACH sname = T.keys.sort %]
-[%   FOREACH s = [1 .. depth] %]
     <subtree name="[% sname %]">
       <param name="comment">
         bl-height=[%T.$sname.params.rnd_baseline_height%],
         bl-period=[%T.$sname.params.rnd_baseline_period%],
         bl-offset=[%T.$sname.params.rnd_baseline_offset%]
       </param>
-[%   END %]
 
-      <alias>/Aliases_A/[%sname%]/</alias>
       <param name="rnd-baseline-type" value="sin" />
       <param name="rnd-baseline-height"
              value="[%T.$sname.params.rnd_baseline_height%]" />
@@ -130,7 +127,7 @@
       <param name="rnd-baseline-offset"
              value="[%T.$sname.params.rnd_baseline_offset%]" />
 
-      <param name="data-file" value="[% sname %].rrd" />
+      <param name="data-file" value="[% fnameprefix _ sname %].rrd" />
 
 [%   FOREACH lname = T.$sname.leaves.keys.sort %]
 
@@ -139,8 +136,6 @@
  baseline-amplitude=[%T.$sname.leaves.$lname.params.rnd_baseline_amplitude%],
  amplitude=[%T.$sname.leaves.$lname.params.rnd_amplitude%]
         </param>
-
-        <alias>/Aliases_B/[%sname _ '_' _ lname%]</alias>
 
         <param name="legend">
           baseline-height: [%T.$sname.params.rnd_baseline_height%];
@@ -189,10 +184,8 @@
 [%   END %]
      </leaf>
 
-[%   FOREACH s = [1 .. depth] %]
     </subtree>
-[%   END %]
-
+    
 [% END %]
 
   </subtree>

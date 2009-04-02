@@ -343,8 +343,10 @@ Also clicking a service ID leads to its monthly report throughout the year.
 
 =head2 Getting the sum or maximum value from several service IDs
 
-A new utility has been sponsored by Nexellent.ch, a managed hosting solution
-provider near Zurich. The utility C<srvderive> can be used to generate a
+A new utility has been sponsored by nexellent ag (www.nexellent.ch), a
+managed hosting solution provider near Zurich.
+
+The utility C<srvderive> can be used to generate a
 new service ID which would contain sum or maximum of values of other
 service IDs. You would usually run this utlity monthly, just before generating
 the monthly reports:

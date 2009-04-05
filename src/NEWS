@@ -1,3 +1,26 @@
+05-APR-2009: Torrus release 1.0.9
+
+Note: a complete re-compile of the XML is required after upgrading.
+
+In this release:
+
+-- BerkeleyDB stability has significantly improved due to new signal handlers.
+
+-- View parameters can be overridden with URL variables "Gstart",
+   "Gend" and so on.
+
+-- Collector initialization time is improved by shifting some work
+   to the XML compiler.
+
+-- New command-line utility: srvderive. It combines several serviceIDs into
+   a single report by calculating their sum or maximum value
+   (sponsored by nexellent ag, www.nexellent.ch)
+
+-- A number of bugfixes and minor imprvements.
+
+-- Added SNMP discovery support for Arbor E series and Liebert HVAC
+
+
 05-AUG-2008: Torrus release 1.0.7
 
 In this release:

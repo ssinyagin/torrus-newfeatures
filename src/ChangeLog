@@ -1,3 +1,8 @@
+2009-05-07  Jon Nistor <nistor@snickers.org>
+
+       * perllib/Torrus/DevDiscover/FTOS.pm
+       New discovery module for Force10 Networks devices
+
 2009-04-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Release 1.0.8

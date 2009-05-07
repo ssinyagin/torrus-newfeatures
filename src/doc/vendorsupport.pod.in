@@ -85,7 +85,7 @@ Reports the line status for the manageable modular media converter.
 
 =item * Arbor Networks
 
-Provide statistics for Arbor eSeries devices.
+Provide statistics for Arbor eSeries devices. (e30)
 
 =item * Ascend MAX
 
@@ -152,6 +152,10 @@ may provide about the server health and performance.
 =item * F5 BigIp Load Balancer
 
 In-detail traffic statistics.
+
+=item * Force10 Networks
+
+CPU, Temperature and Power supply statistics.
 
 =item * Juniper JunOS
 

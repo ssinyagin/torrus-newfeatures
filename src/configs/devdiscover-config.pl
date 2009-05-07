@@ -64,6 +64,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
+     'Torrus::DevDiscover::FTOS',
      'Torrus::DevDiscover::JunOS',
      'Torrus::DevDiscover::Liebert',
      'Torrus::DevDiscover::MicrosoftWindows',
@@ -883,7 +884,33 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'BigIp_3.x',
          'source'   => 'vendor/f5.bigip.xml',
      },
-     
+
+     ##### Force10 networks (by Jon Nistor)
+     'FTOS::ftos-cpu-subtree' => {
+         'name'     => 'ftos-cpu-subtree',
+         'source'   => 'vendor/ftos.xml',
+     },
+     'FTOS::ftos-cpu' => {
+         'name'     => 'ftos-cpu',
+         'source'   => 'vendor/ftos.xml',
+     },
+     'FTOS::ftos-power-supply-leaf' => {
+         'name'     => 'ftos-power-supply-leaf',
+         'source'   => 'vendor/ftos.xml',
+     },
+     'FTOS::ftos-temperature-subtree' => {
+         'name'     => 'ftos-temperature-subtree',
+         'source'   => 'vendor/ftos.xml',
+     },
+     'FTOS::ftos-temperature-sensor' => {
+         'name'     => 'ftos-temperature-sensor',
+         'source'   => 'vendor/ftos.xml',
+     },
+     'FTOS::ftos-temperature-sensor-fahrenheit' => {
+         'name'     => 'ftos-temperature-sensor-fahrenheit',
+         'source'   => 'vendor/ftos.xml',
+     },
+
      ##### Juniper JunOS (by Jon Nistor)
      'JunOS::junos-cos-subtree' => {
          'name'     => 'junos-cos-subtree',

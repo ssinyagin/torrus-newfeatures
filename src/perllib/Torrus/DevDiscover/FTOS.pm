@@ -36,7 +36,7 @@ $Torrus::DevDiscover::registry{'FTOS'} = {
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig
-};
+    };
 
 
 our %oiddef =
@@ -54,7 +54,7 @@ our %oiddef =
 
      # FORCE10-SYSTEM-COMPONENT-MIB
      'camUsagePartDesc'      => '1.3.6.1.4.1.6027.3.7.1.1.1.1.4'
-    );
+     );
 
 
 our %f10ChassisType =
@@ -78,14 +78,14 @@ our %f10ChassisType =
      '17'  => 'Force10 S25pac access switch',
      '18'  => 'Force10 S25v access switch',
      '19'  => 'Force10 S25n access switch'
-    );
+     );
 
 our %f10CPU =
     (
      '1'   => 'Control Processor',
      '2'   => 'Routing Processor #1',
      '3'   => 'Routing Processor #2'
-    );
+     );
 
 
 # Not all interfaces are normally needed to monitor.
@@ -115,7 +115,7 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 24,                    # softwareLoopback
      },
      
-    );
+     );
 
 
 sub checkdevtype
@@ -127,10 +127,9 @@ sub checkdevtype
     my $chassisType = $dd->retrieveSnmpOIDs( 'chType' );
 
     if( not $dd->oidBaseMatch
-        ( 'f10Products',
-          $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) )
-        && $chassisType->{'chType'}
-      )
+        ( 'f10Products', $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) )
+        and $chassisType->{'chType'}
+        )
     {
         return 0;
     }
@@ -166,7 +165,9 @@ sub discover
         $data->{'param'}{'comment'} =
             %f10ChassisType->{$chassisSerial->{'chType'}} .
             ', Hw Serial#: ' . $chassisSerial->{'chSerialNumber'};
-    } else {
+    }
+    else
+    {
         $data->{'param'}{'comment'} = "Force10 Networks switch/router";
     }
 
@@ -195,7 +196,9 @@ sub discover
                 # Construct the data ...
                 $data->{'ftosCPU'}{$ftosCPUidx} = $cpuName;
             }
-        } else {
+        }
+        else
+        {
             Debug("FTOS::CPU No CPU information found, old sw?");
         }
     } # END: CPU
@@ -205,12 +208,13 @@ sub discover
     if( $devdetails->param('FTOS::disable-power') ne 'yes' )
     {
         # Poll table of power supplies
-        my $ftosPSUTable = $session->get_table(
-                             -baseoid => $dd->oiddef('chSysPowerSupplyIndex') );
+        my $ftosPSUTable =
+            $session->get_table( -baseoid =>
+                                 $dd->oiddef('chSysPowerSupplyIndex') );
 
         $devdetails->storeSnmpVars( $ftosPSUTable );
 
-	if( defined( $ftosPSUTable ) )
+        if( defined( $ftosPSUTable ) )
         {
             $devdetails->setCap('ftosPSU');
 
@@ -220,7 +224,7 @@ sub discover
             {
                 Debug("FTOS::PSU index $ftosPSUidx");
 
-		push( @{$data->{'ftosPSU'}}, $ftosPSUidx );
+                push( @{$data->{'ftosPSU'}}, $ftosPSUidx );
             }
         }
     } # END: PSU
@@ -230,25 +234,26 @@ sub discover
     if( $devdetails->param('FTOS::disable-sensors') ne 'yes' )
     {
         # Check if temperature sensors are supported
-        my $sensorTable = $session->get_table(
-                             -baseoid => $dd->oiddef('chSysCardSlotIndex') );
+        my $sensorTable =
+            $session->get_table( -baseoid =>
+                                 $dd->oiddef('chSysCardSlotIndex') );
         $devdetails->storeSnmpVars( $sensorTable );
 
-        my $sensorCard = $session->get_table(
-                             -baseoid => $dd->oiddef('chSysCardNumber') );
+        my $sensorCard =
+            $session->get_table( -baseoid => $dd->oiddef('chSysCardNumber') );
         $devdetails->storeSnmpVars( $sensorCard );
 
 
         if( defined( $sensorTable ) )
         {
             $devdetails->setCap('ftosSensor');
-       
+            
             foreach my $sensorIdx ( $devdetails->getSnmpIndices
-                                     ( $dd->oiddef('chSysCardSlotIndex') ) )
+                                    ( $dd->oiddef('chSysCardSlotIndex') ) )
             {
-                my $sensorCard = $devdetails->snmpVar(
-                                $dd->oiddef('chSysCardNumber') . '.' .
-                                $sensorIdx );
+                my $sensorCard =
+                    $devdetails->snmpVar( $dd->oiddef('chSysCardNumber') .
+                                          '.' . $sensorIdx );
 
                 $data->{'ftosSensor'}{$sensorIdx} = $sensorCard;
 
@@ -297,12 +302,12 @@ sub buildConfig
         my $param       = { 'comment'    => 'Power supplies status',
                             'precedence' => -600 };
         my $filePerSensor 
-                        = $devdetails->param('FTOS::file-per-sensor') eq 'yes';
+            = $devdetails->param('FTOS::file-per-sensor') eq 'yes';
         my $templates   = [];
 
         $param->{'data-file'} = '%snmp-host%_power' .
-                                ($filePerSensor ? '_%power-index%':'') .
-                                '.rrd';
+            ($filePerSensor ? '_%power-index%':'') .
+            '.rrd';
 
         my $nodeTop = $cb->addSubtree( $devNode, $subtreeName,
                                        $param, $templates );
@@ -326,12 +331,12 @@ sub buildConfig
         my $param       = {};
         my $fahrenheit  = $devdetails->param('FTOS::use-fahrenheit') eq 'yes';
         my $filePerSensor 
-                        = $devdetails->param('FTOS::file-per-sensor') eq 'yes';
+            = $devdetails->param('FTOS::file-per-sensor') eq 'yes';
         my $templates   = [ 'FTOS::ftos-temperature-subtree' ];
 
         $param->{'data-file'} = '%snmp-host%_sensors' .
-                                ($filePerSensor ? '_%sensor-index%':'') .
-                                ($fahrenheit ? '_fahrenheit':'') . '.rrd';
+            ($filePerSensor ? '_%sensor-index%':'') .
+            ($fahrenheit ? '_fahrenheit':'') . '.rrd';
 
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, $templates );
@@ -353,10 +358,10 @@ sub buildConfig
                 'upper-limit'        => $threshold
                 };
 
-             my $templates = ['FTOS::ftos-temperature-sensor' .
-                              ($fahrenheit ? '-fahrenheit':'')];
+            my $templates = ['FTOS::ftos-temperature-sensor' .
+                             ($fahrenheit ? '-fahrenheit':'')];
 
-             $cb->addLeaf( $subtreeNode, $leafName, $param, $templates );
+            $cb->addLeaf( $subtreeNode, $leafName, $param, $templates );
         } 
     }
 }

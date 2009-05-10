@@ -127,13 +127,17 @@ sub checkdevtype
     my $chassisType = $dd->retrieveSnmpOIDs( 'chType' );
 
     if( not $dd->oidBaseMatch
-        ( 'f10Products', $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) )
-        and $chassisType->{'chType'}
-        )
+        ( 'f10Products',
+          $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
     {
         return 0;
     }
-
+    
+    if( not defined( $chassisType->{'chType'} ) )
+    {
+        return 0;
+    }
+    
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
     

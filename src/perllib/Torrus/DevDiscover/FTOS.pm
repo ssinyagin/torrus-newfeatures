@@ -123,15 +123,15 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    # Systems running FTOS will have chassisType, SFTOS will not.
-    my $chassisType = $dd->retrieveSnmpOIDs( 'chType' );
-
     if( not $dd->oidBaseMatch
         ( 'f10Products',
           $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
     {
         return 0;
     }
+    
+    # Systems running FTOS will have chassisType, SFTOS will not.
+    my $chassisType = $dd->retrieveSnmpOIDs( 'chType' );
     
     if( not defined( $chassisType->{'chType'} ) )
     {

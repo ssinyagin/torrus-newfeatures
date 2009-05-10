@@ -1,3 +1,8 @@
+2009-05-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/NetBotz.pm: new discovery module
+	for NetBotz modular sensors
+
 2009-05-07  Jon Nistor <nistor@snickers.org>
 
        * perllib/Torrus/DevDiscover/FTOS.pm

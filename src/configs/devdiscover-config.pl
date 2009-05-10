@@ -71,6 +71,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::MotorolaBSR',
      'Torrus::DevDiscover::NetApp',
      'Torrus::DevDiscover::NetScreen',
+     'Torrus::DevDiscover::NetBotz',
      'Torrus::DevDiscover::OracleDatabase',
      'Torrus::DevDiscover::Paradyne',          # needs testing
      'Torrus::DevDiscover::RFC1697_RDBMS',
@@ -1111,6 +1112,32 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'NetApp::cifs' => {
          'name'     => 'netapp-cifs',
          'source'   => 'vendor/netapp.filer.xml',
+     },
+
+     #### NetBotz
+     'NetBotz::netbotz-temp-sensor' => {
+         'name'     => 'netbotz-temp-sensor',
+         'source'   => 'vendor/netbotz.xml',
+     },
+     'NetBotz::netbotz-humi-sensor' => {
+         'name'     => 'netbotz-humi-sensor',
+         'source'   => 'vendor/netbotz.xml',
+     },
+     'NetBotz::netbotz-dew-sensor' => {
+         'name'     => 'netbotz-dew-sensor',
+         'source'   => 'vendor/netbotz.xml',
+     },
+     'NetBotz::netbotz-audio-sensor' => {
+         'name'     => 'netbotz-audio-sensor',
+         'source'   => 'vendor/netbotz.xml',
+     },
+     'NetBotz::netbotz-air-sensor' => {
+         'name'     => 'netbotz-air-sensor',
+         'source'   => 'vendor/netbotz.xml',
+     },
+     'NetBotz::netbotz-door-sensor' => {
+         'name'     => 'netbotz-door-sensor',
+         'source'   => 'vendor/netbotz.xml',
      },
 
      #### NetScreen

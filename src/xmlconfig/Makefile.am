@@ -52,6 +52,7 @@ dist_vendor_DATA = \
 	vendor/microsoft.windows.xml \
 	vendor/motorola.bsr.xml \
 	vendor/netapp.filer.xml \
+	vendor/netbotz.xml \
 	vendor/netscreen.xml \
 	vendor/paradyne.xdsl.xml \
 	vendor/symmetricom.xml \

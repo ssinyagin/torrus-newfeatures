@@ -41,15 +41,18 @@ our %oiddef =
 our %sensor_types =
     ('temp'   => {
         'oid' => '1.3.6.1.4.1.5528.100.4.1.1.1',
-        'template' => 'NetBotz::netbotz-temp-sensor'
+        'template' => 'NetBotz::netbotz-temp-sensor',
+        'max' => 'NetBotz::temp-max',
         },
      'humi'   => {
          'oid' => '1.3.6.1.4.1.5528.100.4.1.2.1',
-         'template' => 'NetBotz::netbotz-humi-sensor'
+         'template' => 'NetBotz::netbotz-humi-sensor',
+         'max' => 'NetBotz::humi-max',
          },
      'dew'    => {
          'oid' => '1.3.6.1.4.1.5528.100.4.1.3.1',
-         'template' => 'NetBotz::netbotz-dew-sensor'
+         'template' => 'NetBotz::netbotz-dew-sensor',
+         'max' => 'NetBotz::dew-max',
          },
      'audio'  => {
          'oid' => '1.3.6.1.4.1.5528.100.4.1.4.1',
@@ -93,13 +96,12 @@ sub discover
     my $data = $devdetails->data();
     my $session = $dd->session();
 
-
     foreach my $stype (sort keys %sensor_types)
     {
         my $oid = $sensor_types{$stype}{'oid'};
         
         my $sensorTable = $session->get_table( -baseoid => $oid );
-
+        
         if( defined( $sensorTable ) )
         {
             $devdetails->storeSnmpVars( $sensorTable );
@@ -116,7 +118,19 @@ sub discover
                     'graph-title' => $label,
                     'precedence' => sprintf('%d', 1000 - $INDEX)
                 };
-            
+
+                if( defined( $sensor_types{$stype}{'max'} ) )
+                {
+                    my $max =
+                        $devdetails->param($sensor_types{$stype}{'max'});
+                    
+                    if( defined($max) and $max > 0 )
+                    {
+                        $param->{'upper-limit'} = $max;
+                    }
+                }
+                
+
                 $data->{'NetBotz'}{$INDEX} = {
                     'param'    => $param,
                     'leafName' => $leafName,
@@ -125,6 +139,12 @@ sub discover
         }        
     }
     
+    if( not defined($data->{'param'}{'comment'}) or
+        length($data->{'param'}{'comment'}) == 0 )
+    {
+        $data->{'param'}{'comment'} = 'NetBotz environment sensors';
+    }
+
     return 1;
 }
 

@@ -1,3 +1,9 @@
+2009-05-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/NetBotz.pm (discover):
+	Discovery parameters: NetBotz::temp-max, NetBotz::humi-max,
+	NetBotz::dew-max
+
 2009-05-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/NetBotz.pm: new discovery module

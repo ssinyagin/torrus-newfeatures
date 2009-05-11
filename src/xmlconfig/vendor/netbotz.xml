@@ -58,9 +58,10 @@
                value="$netbotz_tempSensorValue.%netbotz-sensor-index%"/>
       <param name="collector-scale"   value="10,/" />
       <param name="graph-lower-limit" value="0" />
-      <param name="graph-upper-limit" value="100" />
-      <param name="upper-limit" value="50" />
+      <param name="graph-upper-limit" value="50" />
+      <param name="upper-limit" value="35" />
       <param name="vertical-label" value="Degrees Celsius" />
+      <param name="comment" value="Temperature sensor" />
     </template>
 
 
@@ -71,8 +72,9 @@
       <param name="collector-scale"   value="10,/" />
       <param name="graph-lower-limit" value="0" />
       <param name="graph-upper-limit" value="100" />
-      <param name="upper-limit" value="95" />
+      <param name="upper-limit" value="90" />
       <param name="vertical-label" value="Percent" />
+      <param name="comment" value="Humidity sensor" />
     </template>
 
     <template name="netbotz-dew-sensor">
@@ -81,8 +83,9 @@
                value="$netbotz_dewPointSensorValue.%netbotz-sensor-index%"/>
       <param name="collector-scale"   value="10,/" />
       <param name="graph-lower-limit" value="0" />
-      <param name="graph-upper-limit" value="100" />
+      <param name="graph-upper-limit" value="30" />
       <param name="vertical-label" value="Degrees Celsius" />
+      <param name="comment" value="Dew point sensor" />
     </template>
 
     <template name="netbotz-audio-sensor">
@@ -92,6 +95,7 @@
       <param name="collector-scale"   value="10,/" />
       <param name="graph-lower-limit" value="0" />
       <param name="graph-upper-limit" value="100" />
+      <param name="comment" value="Audio level sensor" />
     </template>
 
     <template name="netbotz-air-sensor">
@@ -101,6 +105,7 @@
       <param name="collector-scale"   value="10,/" />
       <param name="graph-lower-limit" value="0" />
       <param name="vertical-label" value="m/min" />
+      <param name="comment" value="Air flow sensor" />
     </template>
 
     <template name="netbotz-door-sensor">
@@ -109,6 +114,7 @@
                value="$netbotz_doorSwitchSensorValue.%netbotz-sensor-index%"/>
       <param name="graph-lower-limit" value="0" />
       <param name="vertical-label" value="0=open 1=closed" />
+      <param name="comment" value="Door switch sensor" />
     </template>
         
   </datasources>

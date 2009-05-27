@@ -33,6 +33,11 @@
   <def name="sdramUsage"          value="1.3.6.1.4.1.3813.1.4.2.2.0" />
   <def name="mBufPoolSize"        value="1.3.6.1.4.1.3813.1.4.2.3.0" />
   <def name="mBufUsage"           value="1.3.6.1.4.1.3813.1.4.2.4.0" />
+  <def name="blkSize"             value="1.3.6.1.4.1.3813.1.4.2.5.1.2" />
+  <def name="sysMal"              value="1.3.6.1.4.1.3813.1.4.2.5.1.4" />
+  <def name="sysBlks"             value="1.3.6.1.4.1.3813.1.4.2.5.1.6" />
+  <def name="usedBlks"            value="1.3.6.1.4.1.3813.1.4.2.5.1.7" />
+  <def name="freeBlks"            value="1.3.6.1.4.1.3813.1.4.2.5.1.8" />
 
   <def name="hDriveHd0Size"       value="1.3.6.1.4.1.3813.1.4.2.6.0" />
   <def name="hDriveHd0Usage"      value="1.3.6.1.4.1.3813.1.4.2.7.0" />
@@ -54,6 +59,9 @@
   <def name="hDriveErrAbortedCmd" value="1.3.6.1.4.1.3813.1.4.2.10.13.0" />
   <def name="hDriveErrTrack0NF"   value="1.3.6.1.4.1.3813.1.4.2.10.14.0" />
   <def name="hDriveErrAddrMarkNF" value="1.3.6.1.4.1.3813.1.4.2.10.15.0" />
+
+  <def name="hDriveDailyLogSize"  value="1.3.6.1.4.1.3813.1.4.2.13.0" />
+  <def name="hDriveDailyLogUsage" value="1.3.6.1.4.1.3813.1.4.2.14.0" />
 
   <!-- ELLACOYA-MIB::fwdTables -->
   <def name="l3UserTblCapacity"          value="1.3.6.1.4.1.3813.1.4.3.1.0" />
@@ -114,6 +122,7 @@
     <subtree name="Buffer_Usage">
         <param name="comment"           value="Buffer Usage"/>
         <param name="data-file"         value="%system-id%_membuf.rrd"/>
+        <param name="graph-title"       value="%system-id%: Buffers"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
 
         <leaf name="Usage">
@@ -141,7 +150,7 @@
         <leaf name="Total">
           <param name="precedence"        value="902"/>
           <param name="comment"           value="Total Buffer Pool Size"/>
-          <param name="graph-title"       value="Total Buffer Pool Size"/>
+          <param name="graph-legend"      value="Total Buffer Pool Size"/>
           <param name="vertical-label"    value="memory blocks"/>
           <param name="rrd-ds"            value="mBufPoolSize"/>
           <param name="snmp-object"       value="$mBufPoolSize"/>
@@ -150,7 +159,7 @@
         <leaf name="Used">
           <param name="precedence"        value="901"/>
           <param name="comment"           value="Used Buffer Pool Size"/>
-          <param name="graph-title"       value="Used Buffer Pool Size"/>
+          <param name="graph-legend"      value="Used Buffer Pool Size"/>
           <param name="vertical-label"    value="KBytes"/>
           <param name="rrd-ds"            value="mBufUsage"/>
           <param name="snmp-object"       value="$mBufUsage"/>
@@ -262,10 +271,11 @@
     <subtree name="Forwarding_Table">
         <param name="comment"           value="Forwarding Table Stats"/>
         <param name="data-file"         value="%system-id%_fwdTable.rrd"/>
+        <param name="graph-title"       value="%system-id%: Forwarding Table"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
 
         <subtree name="L3_user_table">
-          <param name="comment" value="L3 User Table (Layer 3)"/>
+          <param name="comment"     value="L3 User Table (Layer 3)"/>
 
           <leaf name="Usage">
             <param name="precedence"         value="1000"/>
@@ -293,7 +303,7 @@
           <leaf name="Total">
             <param name="precedence"        value="902"/>
             <param name="comment"           value="Total L3 UserTable entries"/>
-            <param name="graph-title"       value="Total L3 UserTable entries"/>
+            <param name="graph-legend"      value="Total L3 UserTable entries"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="l3UserTblCapacity"/>
             <param name="snmp-object"       value="$l3UserTblCapacity"/>
@@ -302,7 +312,7 @@
           <leaf name="Used">
             <param name="precedence"        value="901"/>
             <param name="comment"           value="Used L3 UserTable entries"/>
-            <param name="graph-title"       value="Used L3 UserTable entries"/>
+            <param name="graph-legend"      value="Used L3 UserTable entries"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="l3UserTblUsage"/>
             <param name="snmp-object"       value="$l3UserTblUsage"/>
@@ -315,7 +325,7 @@
           <leaf name="Usage">
             <param name="precedence"         value="1000"/>
             <param name="comment"            value="Total vs Used"/>
-            <param name="graph-title"        value="Total vs Used"/>
+            <param name="graph-legend"       value="Total vs Used"/>
             <param name="vertical-label"     value="entries"/>
             <param name="ds-type"            value="rrd-multigraph"/>
             <param name="ds-names"           value="total,used"/>
@@ -338,7 +348,7 @@
           <leaf name="Total">
             <param name="precedence"        value="902"/>
             <param name="comment"           value="Total MAC table entries"/>
-            <param name="graph-title"       value="Total MAC table entries"/>
+            <param name="graph-legend"      value="Total MAC table entries"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="macTblCapacity"/>
             <param name="snmp-object"       value="$macTblCapacity"/>
@@ -347,7 +357,7 @@
           <leaf name="Used">
             <param name="precedence"        value="901"/>
             <param name="comment"           value="Used MAC table entries"/>
-            <param name="graph-title"       value="Used MAC table entries"/>
+            <param name="graph-legend"      value="Used MAC table entries"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="macTblUsage"/>
             <param name="snmp-object"       value="$macTblUsage"/>
@@ -383,7 +393,7 @@
           <leaf name="Total">
             <param name="precedence"        value="902"/>
             <param name="comment"           value="Total policy group entries"/>
-            <param name="graph-title"       value="Total policy group entries"/>
+            <param name="graph-legend"      value="Total policy group entries"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="polGroupSysCapacity"/>
             <param name="snmp-object"       value="$polGroupSysCapacity"/>
@@ -392,7 +402,7 @@
           <leaf name="Used">
             <param name="precedence"        value="901"/>
             <param name="comment"           value="Used policy group entries"/>
-            <param name="graph-title"       value="Used policy group entries"/>
+            <param name="graph-legend"      value="Used policy group entries"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="polGroupSysUsage"/>
             <param name="snmp-object"       value="$polGroupSysUsage"/>
@@ -428,7 +438,7 @@
           <leaf name="Total">
             <param name="precedence"        value="902"/>
             <param name="comment"           value="Total subscriber capacity"/>
-            <param name="graph-title"       value="Total subscriber capacity"/>
+            <param name="graph-legend"      value="Total subscriber capacity"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="subscriberSysCap"/>
             <param name="snmp-object"       value="$subscriberSysCapacity"/>
@@ -437,7 +447,7 @@
           <leaf name="Used">
             <param name="precedence"        value="901"/>
             <param name="comment"           value="Used subscriber capacity"/>
-            <param name="graph-title"       value="Used subscriber capacity"/>
+            <param name="graph-legend"      value="Used subscriber capacity"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="subscriberSysUsage"/>
             <param name="snmp-object"       value="$subscriberSysUsage"/>
@@ -605,24 +615,24 @@
         <param name="data-file"         value="%system-id%_hdd.rrd"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
 
-        <subtree name="Parition_0">
+        <subtree name="Partition_0">
           <param name="comment"         value="Firmware images"/>
           <leaf name="Usage">
             <param name="precedence"         value="1000"/>
             <param name="comment"            value="Hd0: Total vs Used"/>
             <param name="graph-title"        value="Hd0: Total vs Used"/>
-            <param name="vertical-label"     value="KBytes"/>
+            <param name="vertical-label"     value="Bytes"/>
             <param name="ds-type"            value="rrd-multigraph"/>
             <param name="ds-names"           value="total,used"/>
             <param name="graph-lower-limit"  value="0"/>
             <!-- Total Parition Size -->
-            <param name="ds-expr-total"      value="{Total}"/>
+            <param name="ds-expr-total"      value="{Total_Raw},1024,*"/>
             <param name="graph-legend-total" value="Total"/>
             <param name="line-style-total"   value="##totalresource"/>
             <param name="line-color-total"   value="##totalresource"/>
             <param name="line-order-total"   value="1"/>
             <!-- Used Partition Size -->
-            <param name="ds-expr-used"       value="{Used}"/>
+            <param name="ds-expr-used"       value="{Used_Raw},1024,*"/>
             <param name="graph-legend-used"  value="Used"/>
             <param name="line-style-used"    value="##resourceusage"/>
             <param name="line-color-used"    value="##resourceusage"/>
@@ -632,40 +642,67 @@
           <leaf name="Total">
             <param name="precedence"        value="902"/>
             <param name="comment"           value="Size of hd0 partition"/>
+            <param name="ds-type"           value="rrd-file"/>
+            <param name="leaf-type"         value="rrd-cdef"/>
+            <param name="rpn-expr"          value="{Total_Raw},1024,*"/>
+            <param name="graph-legend"      value="Size of hd0 partition"/>
             <param name="graph-title"       value="Size of hd0 partition"/>
-            <param name="vertical-label"    value="KBytes"/>
+            <param name="vertical-label"    value="Bytes"/>
+          </leaf>
+
+          <leaf name="Used">
+            <param name="precedence"        value="902"/>
+            <param name="comment"           value="Usage of hd0 partition"/>
+            <param name="ds-type"           value="rrd-file"/>
+            <param name="leaf-type"         value="rrd-cdef"/>
+            <param name="rpn-expr"          value="{Used_Raw},1024,*"/>
+            <param name="graph-legend"      value="Usage of hd0 partition"/>
+            <param name="graph-title"       value="Usage of hd0 partition"/>
+            <param name="vertical-label"    value="Bytes"/>
+          </leaf>
+
+          <leaf name="Total_Raw">
+            <param name="hidden"            value="yes"/>
+            <param name="precedence"        value="102"/>
+            <param name="comment"           value="Size of hd0 partition"/>
+            <param name="graph-legend"      value="Size of hd0 partition"/>
+            <param name="graph-title"       value="Size of hd0 partition"/>
+            <param name="vertical-label"    value="Bytes"/>
             <param name="rrd-ds"            value="hDriveHd0Size"/>
             <param name="snmp-object"       value="$hDriveHd0Size"/>
           </leaf>
 
-          <leaf name="Used">
-            <param name="precedence"        value="901"/>
+          <leaf name="Used_Raw">
+            <param name="hidden"            value="yes"/>
+            <param name="precedence"        value="101"/>
             <param name="comment"           value="Usage of hd0 partition"/>
+            <param name="graph-legend"      value="Usage of hd0 partition"/>
             <param name="graph-title"       value="Usage of hd0 partition"/>
-            <param name="vertical-label"    value="KBytes"/>
+            <param name="vertical-label"    value="Bytes"/>
             <param name="rrd-ds"            value="hDriveHd0Usage"/>
             <param name="snmp-object"       value="$hDriveHd0Usage"/>
           </leaf>
         </subtree>
 
-        <subtree name="Parition_1">
+        <subtree name="Partition_1">
           <param name="comment"             value="Logs, Usage files, etc"/>
           <leaf name="Usage">
             <param name="precedence"         value="1000"/>
             <param name="comment"            value="Hd1: Total vs Used"/>
+            <param name="graph-legend"       value="Hd1: Total vs Used"/>
             <param name="graph-title"        value="Hd1: Total vs Used"/>
-            <param name="vertical-label"     value="KBytes"/>
+            <param name="vertical-label"     value="Bytes"/>
             <param name="ds-type"            value="rrd-multigraph"/>
             <param name="ds-names"           value="total,used"/>
             <param name="graph-lower-limit"  value="0"/>
             <!-- Total Parition Size -->
-            <param name="ds-expr-total"      value="{Total}"/>
+            <param name="ds-expr-total"      value="{Total_Raw},1024,*"/>
             <param name="graph-legend-total" value="Total"/>
             <param name="line-style-total"   value="##totalresource"/>
             <param name="line-color-total"   value="##totalresource"/>
             <param name="line-order-total"   value="1"/>
             <!-- Used Partition Size -->
-            <param name="ds-expr-used"       value="{Used}"/>
+            <param name="ds-expr-used"       value="{Used_Raw},1024,*"/>
             <param name="graph-legend-used"  value="Used"/>
             <param name="line-style-used"    value="##resourceusage"/>
             <param name="line-color-used"    value="##resourceusage"/>
@@ -675,20 +712,47 @@
           <leaf name="Total">
             <param name="precedence"        value="902"/>
             <param name="comment"           value="Size of hd1 partition"/>
+            <param name="ds-type"           value="rrd-file"/>
+            <param name="leaf-type"         value="rrd-cdef"/>
+            <param name="rpn-expr"          value="{Total_Raw},1024,*"/>
+            <param name="graph-legend"      value="Size of hd1 partition"/>
+            <param name="graph-title"       value="Size of hd1 partition"/>
+            <param name="vertical-label"    value="Bytes"/>
+          </leaf>
+
+          <leaf name="Used">
+            <param name="precedence"        value="902"/>
+            <param name="comment"           value="Usage of hd1 partition"/>
+            <param name="ds-type"           value="rrd-file"/>
+            <param name="leaf-type"         value="rrd-cdef"/>
+            <param name="rpn-expr"          value="{Used_Raw},1024,*"/>
+            <param name="graph-legend"      value="Usage of hd1 partition"/>
+            <param name="graph-title"       value="Usage of hd1 partition"/>
+            <param name="vertical-label"    value="Bytes"/>
+          </leaf>
+
+          <leaf name="Total_Raw">
+            <param name="hidden"            value="yes"/>
+            <param name="precedence"        value="102"/>
+            <param name="comment"           value="Size of hd1 partition"/>
+            <param name="graph-legend"      value="Size of hd1 partition"/>
             <param name="graph-title"       value="Size of hd1 partition"/>
             <param name="vertical-label"    value="KBytes"/>
             <param name="rrd-ds"            value="hDriveHd1Size"/>
             <param name="snmp-object"       value="$hDriveHd1Size"/>
           </leaf>
 
-          <leaf name="Used">
-            <param name="precedence"        value="901"/>
+          <leaf name="Used_Raw">
+            <param name="hidden"            value="yes"/>
+            <param name="precedence"        value="101"/>
             <param name="comment"           value="Usage of hd1 partition"/>
+            <param name="graph-legend"      value="Usage of hd1 partition"/>
             <param name="graph-title"       value="Usage of hd1 partition"/>
             <param name="vertical-label"    value="KBytes"/>
             <param name="rrd-ds"            value="hDriveHd1Usage"/>
             <param name="snmp-object"       value="$hDriveHd1Usage"/>
           </leaf>
+
         </subtree>
   </template>
 
@@ -696,12 +760,13 @@
     <subtree name="HDD_Errors">
         <param name="comment"           value="Hard Drive errors"/>
         <param name="data-file"         value="%system-id%_hdd_err.rrd"/>
+        <param name="graph-title"       value="%system-id%: Hdd errors"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
 
         <leaf name="hDriveErrBlockRW">
           <param name="precedence"        value="917"/>
           <param name="comment"           value="Number of Block R/W errors"/>
-          <param name="graph-title"       value="Block R/W errors"/>
+          <param name="graph-legend"      value="Block R/W errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrBlockRW"/>
           <param name="snmp-object"       value="$hDriveErrBlockRW"/>
@@ -709,7 +774,7 @@
         <leaf name="hDriveErrCommand">
           <param name="precedence"        value="916"/>
           <param name="comment"           value="Number of Command errors"/>
-          <param name="graph-title"       value="Command errors"/>
+          <param name="graph-legend"      value="Command errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrCommand"/>
           <param name="snmp-object"       value="$hDriveErrCommand"/>
@@ -717,7 +782,7 @@
         <leaf name="hDriveErrReadWrite">
           <param name="precedence"        value="915"/>
           <param name="comment"           value="Number of Read/Write errors"/>
-          <param name="graph-title"       value="R/W errors"/>
+          <param name="graph-legend"      value="R/W errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrReadWrite"/>
           <param name="snmp-object"       value="$hDriveErrReadWrite"/>
@@ -725,7 +790,7 @@
         <leaf name="hDriveErrWriteOnly">
           <param name="precedence"        value="914"/>
           <param name="comment"           value="Number of WriteOnly errors"/>
-          <param name="graph-title"       value="Write errors"/>
+          <param name="graph-legend"      value="Write errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrWriteOnly"/>
           <param name="snmp-object"       value="$hDriveErrWriteOnly"/>
@@ -733,7 +798,7 @@
         <leaf name="hDriveErrReady">
           <param name="precedence"        value="913"/>
           <param name="comment"           value="Number of Ready errors"/>
-          <param name="graph-title"       value="Ready errors"/>
+          <param name="graph-legend"      value="Ready errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrReady"/>
           <param name="snmp-object"       value="$hDriveErrReady"/>
@@ -741,7 +806,7 @@
         <leaf name="hDriveErrBusy">
           <param name="precedence"        value="912"/>
           <param name="comment"           value="Number of Busy errors"/>
-          <param name="graph-title"       value="Busy errors"/>
+          <param name="graph-legend"      value="Busy errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrBusy"/>
           <param name="snmp-object"       value="$hDriveErrBusy"/>
@@ -749,7 +814,7 @@
         <leaf name="hDriveErrDataReq">
           <param name="precedence"        value="911"/>
           <param name="comment"           value="Number of DataReq errors"/>
-          <param name="graph-title"       value="DataReq errors"/>
+          <param name="graph-legend"      value="DataReq errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrDataReq"/>
           <param name="snmp-object"       value="$hDriveErrDataReq"/>
@@ -757,7 +822,7 @@
         <leaf name="hDriveErrSeek">
           <param name="precedence"        value="910"/>
           <param name="comment"           value="Number of Seek errors"/>
-          <param name="graph-title"       value="Seek errors"/>
+          <param name="graph-legend"      value="Seek errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrSeek"/>
           <param name="snmp-object"       value="$hDriveErrSeek"/>
@@ -765,7 +830,7 @@
         <leaf name="hDriveErrDataReqNS">
           <param name="precedence"        value="909"/>
           <param name="comment"           value="Number of DataReqNS errors"/>
-          <param name="graph-title"       value="DataReqNS errors"/>
+          <param name="graph-legend"      value="DataReqNS errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrDataReqNS"/>
           <param name="snmp-object"       value="$hDriveErrDataReqNS"/>
@@ -773,7 +838,7 @@
         <leaf name="hDriveErrInterfCRC">
           <param name="precedence"        value="908"/>
           <param name="comment"           value="Number of InterfCRC errors"/>
-          <param name="graph-title"       value="InterfCRC errors"/>
+          <param name="graph-legend"      value="InterfCRC errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrInterfCRC"/>
           <param name="snmp-object"       value="$hDriveErrInterfCRC"/>
@@ -781,7 +846,7 @@
         <leaf name="hDriveErrUncorrData">
           <param name="precedence"        value="907"/>
           <param name="comment"           value="Number of UncorrData errors"/>
-          <param name="graph-title"       value="UncorrData errors"/>
+          <param name="graph-legend"      value="UncorrData errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrUncorrData"/>
           <param name="snmp-object"       value="$hDriveErrUncorrData"/>
@@ -789,7 +854,7 @@
         <leaf name="hDriveErrIdNotFound">
           <param name="precedence"        value="906"/>
           <param name="comment"           value="Number of IdNotFound errors"/>
-          <param name="graph-title"       value="IdNotFound errors"/>
+          <param name="graph-legend"      value="IdNotFound errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrIdNotFound"/>
           <param name="snmp-object"       value="$hDriveErrIdNotFound"/>
@@ -797,7 +862,7 @@
         <leaf name="hDriveErrAbortedCmd">
           <param name="precedence"        value="905"/>
           <param name="comment"           value="Number of AbortedCmd errors"/>
-          <param name="graph-title"       value="AbortedCmd errors"/>
+          <param name="graph-legend"      value="AbortedCmd errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrAbortedCmd"/>
           <param name="snmp-object"       value="$hDriveErrAbortedCmd"/>
@@ -805,7 +870,7 @@
         <leaf name="hDriveErrTrack0NF">
           <param name="precedence"        value="904"/>
           <param name="comment"           value="Number of TrackONF errors"/>
-          <param name="graph-title"       value="TrackONF errors"/>
+          <param name="graph-legend"      value="TrackONF errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrTrack0NF"/>
           <param name="snmp-object"       value="$hDriveErrTrack0NF"/>
@@ -813,10 +878,64 @@
         <leaf name="hDriveErrAddrMarkNF">
           <param name="precedence"        value="903"/>
           <param name="comment"           value="Number of AddrMarkNF errors"/>
-          <param name="graph-title"       value="AddrMarkNF errors"/>
+          <param name="graph-legend"      value="AddrMarkNF errors"/>
           <param name="vertical-label"    value="errors"/>
           <param name="rrd-ds"            value="ErrAddrMarkNF"/>
           <param name="snmp-object"       value="$hDriveErrAddrMarkNF"/>
+        </leaf>
+    </subtree>
+  </template>
+
+  <template name="e30-hdd-logs">
+    <subtree name="Daily_Logs">
+        <param name="comment"           value="Daily log directory"/>
+        <param name="data-file"         value="%system-id%_hdd_logs.rrd"/>
+        <param name="graph-title"       value="%system-id%: Hdd logs"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+
+
+        <leaf name="Daily_Log_Size">
+          <param name="comment"           value="Size of daily log directory"/>
+          <param name="graph-legend"      value="Size of daily log directory"/>
+          <param name="rrd-ds"            value="DailyLogSize"/>
+          <param name="ds-type"           value="rrd-file"/>
+          <param name="leaf-type"         value="rrd-cdef"/>
+          <param name="rpn-expr"          value="{Daily_Log_Size_Raw},1024,*"/>
+          <param name="vertical-label"    value="Bytes"/>
+        </leaf>
+
+        <leaf name="Daily_Log_Usage">
+          <param name="comment"
+                      value="Current usage of daily log directory"/>
+          <param name="graph-legend"      value="Usage of daily log dir"/>
+          <param name="line-style"        value="##resourceusage" />
+          <param name="line-color"        value="##resourceusage" />
+          <param name="rrd-ds"            value="DailyLogUsage"/>
+          <param name="ds-type"           value="rrd-file"/>
+          <param name="leaf-type"         value="rrd-cdef"/>
+          <param name="rpn-expr"          value="{Daily_Log_Usage_Raw},1024,*"/>
+          <param name="vertical-label"    value="Bytes"/>
+        </leaf>
+
+        <leaf name="Daily_Log_Size_Raw">
+          <param name="hidden"            value="yes"/>
+          <param name="comment"           value="Size of daily log directory"/>
+          <param name="graph-legend"      value="Size of daily log directory"/>
+          <param name="rrd-ds"            value="DailyLogSize"/>
+          <param name="snmp-object"       value="$hDriveDailyLogSize"/>
+          <param name="vertical-label"    value="Bytes"/>
+        </leaf>
+
+        <leaf name="Daily_Log_Usage_Raw">
+          <param name="hidden"            value="yes"/>
+          <param name="comment"
+                      value="Current usage of daily log directory"/>
+          <param name="graph-legend"      value="Usage of daily log dir"/>
+          <param name="line-style"        value="##resourceusage" />
+          <param name="line-color"        value="##resourceusage" />
+          <param name="rrd-ds"            value="DailyLogUsage"/>
+          <param name="snmp-object"       value="$hDriveDailyLogUsage"/>
+          <param name="vertical-label"    value="Bytes"/>
         </leaf>
     </subtree>
   </template>
@@ -825,12 +944,13 @@
     <param name="comment"           value="L2TP information"/>
     <param name="data-file"         value="%system-id%_l2tp.rrd"/>
     <param name="graph-lower-limit" value="0"/>
+    <param name="graph-title"       value="%system-id%: L2TP"/>
     <param name="rrd-create-dstype" value="GAUGE"/>
 
     <leaf name="Allocated_Tags">
       <param name="precedence"     value="1000"/>
       <param name="comment"        value="Number of L2TP sessions"/>
-      <param name="graph-title"    value="L2TP sessions"/>
+      <param name="graph-legend"   value="L2TP sessions"/>
       <param name="vertical-label" value="sessions"/>
       <param name="rrd-ds"         value="l2tpAllocTags"/>
       <param name="snmp-object"    value="$l2tpAllocTags"/>
@@ -839,8 +959,8 @@
     <leaf name="Default_tags">
       <param name="precedence"     value="999"/>
       <param name="comment"        value="IP addresses using default tags"/>
-      <param name="graph-title"    value="L2TP sessions"/>
-      <param name="vertical-label" value="sessions"/>
+      <param name="graph-legend"   value="IP addresses using default tags"/>
+      <param name="vertical-label" value="IP Addresses"/>
       <param name="rrd-ds"         value="l2tpIPDefaultTags"/>
       <param name="snmp-object"    value="$l2tpIPDefaultTags"/>
     </leaf>
@@ -886,7 +1006,7 @@
       
     <leaf name="Overlap">
       <param name="comment"      value="L2TP sessions on endpoint overlapping"/>
-      <param name="graph-legend" value="overlap sessions"/>
+      <param name="graph-legend" value="sessions overlapping"/>
       <param name="graph-title"  value="Sessions overlap on %e30-l2tp-ep%"/>
       <param name="line-style"   value="##resourceusage"/>
       <param name="precedence"   value="998"/>
@@ -926,7 +1046,7 @@
         <leaf name="Total">
           <param name="precedence"        value="902"/>
           <param name="comment"           value="Total memory"/>
-          <param name="graph-title"       value="Total memory"/>
+          <param name="graph-legend"      value="Total memory"/>
           <param name="vertical-label"    value="KBytes"/>
           <param name="rrd-ds"            value="sdramSize"/>
           <param name="snmp-object"       value="$sdramSize"/>
@@ -935,13 +1055,129 @@
         <leaf name="Used">
           <param name="precedence"        value="901"/>
           <param name="comment"           value="Used memory"/>
-          <param name="graph-title"       value="Used memory"/>
+          <param name="graph-legend"      value="Used memory"/>
           <param name="vertical-label"    value="KBytes"/>
           <param name="rrd-ds"            value="sdramUsage"/>
           <param name="snmp-object"       value="$sdramUsage"/>
         </leaf>
     </subtree>
   </template>
+
+
+  <template name="e30-mempool-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts"
+                 value="used,sysMal,sysBlks,usedBlks,freeBlks"/>
+
+    <!-- Percent Used -->
+    <param name="overview-subleave-name-used" value="Percentage_used"/>
+    <param name="overview-shortcut-text-used"
+           value="Percent Used"/>
+    <param name="overview-shortcut-title-used"
+           value="Show percentage used of all pools on one page"/>
+    <param name="overview-page-title-used"
+           value="Percentage used"/>
+    <!-- Memory Allocation -->
+    <param name="overview-subleave-name-sysMal" value="Memory_Alloc"/>
+    <param name="overview-shortcut-text-sysMal"
+           value="Memory Alloc"/>
+    <param name="overview-shortcut-title-sysMal"
+           value="Show memory allocation size usage of all pools on one page"/>
+    <param name="overview-page-title-sysMal"
+           value="Memory Allocation"/>
+    <!-- System Blocks -->
+    <param name="overview-subleave-name-sysBlks" value="System_Blocks"/>
+    <param name="overview-shortcut-text-sysBlks"
+           value="System Blocks"/>
+    <param name="overview-shortcut-title-sysBlks"
+           value="Show system block usage of all pools on one page"/>
+    <param name="overview-page-title-sysBlks"
+           value="System Blocks"/>
+    <!-- System Blocks Used -->
+    <param name="overview-subleave-name-usedBlks" value="System_Blocks_Used"/>
+    <param name="overview-shortcut-text-usedBlks"
+           value="System Blocks Used"/>
+    <param name="overview-shortcut-title-usedBlks"
+           value="Show system block usage of all pools on one page"/>
+    <param name="overview-page-title-usedBlks"
+           value="System Blocks used"/>
+    <!-- System Blocks Free -->
+    <param name="overview-subleave-name-freeBlks" value="System_Blocks_Free"/>
+    <param name="overview-shortcut-text-freeBlks"
+           value="System Blocks Free"/>
+    <param name="overview-shortcut-title-freeBlks"
+           value="Show system block free of all pools on one page"/>
+    <param name="overview-page-title-freeBlks"
+           value="System Blocks free"/>
+  </template>
+
+  <template name="e30-mempool">
+    <param name="graph-title"       value="%e30-mempool-name%"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+
+        <leaf name="Percentage_used">
+          <param name="comment"         valu="Percent of blocks used (rpn: sysBlks, usedBlks, /"/>
+          <param name="graph-legend"    value="Percentage Used"/>
+          <param name="vertical-label"  value="percent"/>
+          <param name="ds-type"         value="rrd-file" />
+          <param name="leaf-type"       value="rrd-cdef" />
+          <param name="rpn-expr"
+                          value="{System_Blocks_Used},{System_Blocks},/"/>
+          <param name="precedence"      value="1000"/>
+        </leaf>
+
+        <leaf name="Block_Size">
+          <param name="precedence"      value="100"/>
+          <!-- <param name="hidden"          value="yes"/> -->
+          <param name="comment"         value="Size of a single memory block"/>
+          <param name="graph-legend"    value="Size of a single memory block"/>
+          <param name="graph-title"     value="%e30-mempool-name%"/>
+          <param name="vertical-label"  value="KBytes"/>
+          <param name="rrd-ds"          value="blkSize"/>
+          <param name="snmp-object"     value="$blkSize.%e30-mempool-index%"/>
+        </leaf>
+
+        <leaf name="Memory_Alloc">
+          <param name="precedence"      value="90"/>
+          <param name="comment"         value="memory chunk allocations"/>
+          <param name="graph-legend"    value="memory chunk allocations"/>
+          <param name="graph-title"     value="%e30-mempool-name%"/>
+          <param name="vertical-label"  value="number of malloc"/>
+          <param name="rrd-ds"          value="sysMal"/>
+          <param name="snmp-object"     value="$sysMal.%e30-mempool-index%"/>
+        </leaf>
+
+        <leaf name="System_Blocks">
+          <param name="precedence"      value="70"/>
+          <param name="comment"         value="memory blocks in the system"/>
+          <param name="graph-legend"    value="memory blocks in the system"/>
+          <param name="graph-title"     value="%e30-mempool-name%"/>
+          <param name="vertical-label"  value="memory blocks"/>
+          <param name="rrd-ds"          value="sysBlks"/>
+          <param name="snmp-object"     value="$sysBlks.%e30-mempool-index%"/>
+        </leaf>
+
+        <leaf name="System_Blocks_Used">
+          <param name="precedence"      value="60"/>
+          <param name="comment"         value="memory blocks in use"/>
+          <param name="graph-legend"    value="memory blocks in use"/>
+          <param name="graph-title"     value="%e30-mempool-name%"/>
+          <param name="vertical-label"  value="memory blocks in use"/>
+          <param name="rrd-ds"          value="usedBlks"/>
+          <param name="snmp-object"     value="$usedBlks.%e30-mempool-index%"/>
+        </leaf>
+
+        <leaf name="System_Blocks_Free">
+          <param name="precedence"      value="50"/>
+          <param name="comment"         value="memory blocks unused"/>
+          <param name="graph-legend"    value="memory blocks unused"/>
+          <param name="graph-title"     value="%e30-mempool-name%"/>
+          <param name="vertical-label"  value="memory blocks"/>
+          <param name="rrd-ds"          value="freeBlks"/>
+          <param name="snmp-object"     value="$freeBlks.%e30-mempool-index%"/>
+        </leaf>
+  </template>
+
 
   <template name="e30-slowpath">
     <param name="comment"                value="SlowPath Counters"/>
@@ -950,96 +1186,90 @@
     <param name="rrd-create-dstype"      value="GAUGE"/>
 
     <leaf name="allPackets">
-      <param name="precdence"            value="912"/>
-      <param name="comment"              value="Total packets"/>
-      <param name="graph-title"          value="All packets received by CPU"/>
-      <param name="rrd-ds"               value="allPackets"/>
-      <param name="snmp-object"          value="$allPackets"/>
+      <param name="precedence"         value="912"/>
+      <param name="comment"            value="Total packets"/>
+      <param name="graph-legend"       value="All packets received by CPU"/>
+      <param name="rrd-ds"             value="allPackets"/>
+      <param name="snmp-object"        value="$allPackets"/>
     </leaf>
     <leaf name="ipPackets">
-      <param name="precdence"            value="911"/>
-      <param name="comment"              value="Total IP packets"/>
-      <param name="graph-title"          value="IP packets received by CPU"/>
-      <param name="rrd-ds"               value="ipPackets"/>
-      <param name="snmp-object"          value="$ipPackets"/>
+      <param name="precedence"         value="911"/>
+      <param name="comment"            value="Total IP packets"/>
+      <param name="graph-legend"       value="IP packets received by CPU"/>
+      <param name="rrd-ds"             value="ipPackets"/>
+      <param name="snmp-object"        value="$ipPackets"/>
     </leaf>
     <leaf name="tcpPackets">
-      <param name="precdence"            value="910"/>
-      <param name="comment"              value="Total TCP packets"/>
-      <param name="graph-title"          value="TCP packets received by CPU"/>
-      <param name="rrd-ds"               value="tcpPackets"/>
-      <param name="snmp-object"          value="$tcpPackets"/>
+      <param name="precedence"         value="910"/>
+      <param name="comment"            value="Total TCP packets"/>
+      <param name="graph-legend"       value="TCP packets received by CPU"/>
+      <param name="rrd-ds"             value="tcpPackets"/>
+      <param name="snmp-object"        value="$tcpPackets"/>
     </leaf>
     <leaf name="udpPackets">
-      <param name="precdence"            value="909"/>
-      <param name="comment"              value="Total UDP packets"/>
-      <param name="graph-title"          value="UDP packets received by CPU"/>
-      <param name="rrd-ds"               value="udpPackets"/>
-      <param name="snmp-object"          value="$udpPackets"/>
+      <param name="precedence"         value="909"/>
+      <param name="comment"            value="Total UDP packets"/>
+      <param name="graph-legend"       value="UDP packets received by CPU"/>
+      <param name="rrd-ds"             value="udpPackets"/>
+      <param name="snmp-object"        value="$udpPackets"/>
     </leaf>
     <leaf name="icmpPackets">
-      <param name="precdence"            value="908"/>
-      <param name="comment"              value="Total ICMP packets"/>
-      <param name="graph-title"          value="ICMP packets received by CPU"/>
-      <param name="rrd-ds"               value="icmpPackets"/>
-      <param name="snmp-object"          value="$icmpPackets"/>
+      <param name="precedence"         value="908"/>
+      <param name="comment"            value="Total ICMP packets"/>
+      <param name="graph-legend"       value="ICMP packets received by CPU"/>
+      <param name="rrd-ds"             value="icmpPackets"/>
+      <param name="snmp-object"        value="$icmpPackets"/>
     </leaf>
     <leaf name="igmpPackets">
-      <param name="precdence"            value="907"/>
-      <param name="comment"              value="Total IGMP packets"/>
-      <param name="graph-title"          value="IGMP packets received by CPU"/>
-      <param name="rrd-ds"               value="igmpPackets"/>
-      <param name="snmp-object"          value="$igmpPackets"/>
+      <param name="precedence"         value="907"/>
+      <param name="comment"            value="Total IGMP packets"/>
+      <param name="graph-legend"       value="IGMP packets received by CPU"/>
+      <param name="rrd-ds"             value="igmpPackets"/>
+      <param name="snmp-object"        value="$igmpPackets"/>
     </leaf>
     <leaf name="ipFramentPackets">
-      <param name="precdence"            value="906"/>
-      <param name="comment"              value="Total IP Fragment packets"/>
-      <param name="graph-title"  
-            value="IP Fragment packets received by CPU"/>
-      <param name="rrd-ds"               value="ipFragPkts"/>
-      <param name="snmp-object"          value="$ipFragmentPackets"/>
+      <param name="precedence"         value="906"/>
+      <param name="comment"            value="Total IP Fragment packets"/>
+      <param name="graph-legend"       value="IP Fragment packets received"/>
+      <param name="rrd-ds"             value="ipFragPkts"/>
+      <param name="snmp-object"        value="$ipFragmentPackets"/>
     </leaf>
     <leaf name="dhcpPacketsToServer">
-      <param name="precdence"            value="905"/>
+      <param name="precedence"         value="905"/>
       <param name="comment"
             value="Total DHCP packets destined to a DHCP server"/>
-      <param name="graph-title"  
-            value="DHCP packets client --> server received by CPU"/>
-      <param name="rrd-ds"               value="dhcpPktsToServ"/>
-      <param name="snmp-object"          value="$dhcpPacketsToServer"/>
+      <param name="graph-legend"       value="DHCP packets client to server"/>
+      <param name="rrd-ds"             value="dhcpPktsToServ"/>
+      <param name="snmp-object"        value="$dhcpPacketsToServer"/>
     </leaf>
     <leaf name="dhcpPacketsToClient">
-      <param name="precdence"            value="904"/>
+      <param name="precedence"         value="904"/>
       <param name="comment"
             value="Total DHCP packets destined to DHCP Client"/>
-      <param name="graph-title"  
-            value="DHCP packets server --> client received by CPU"/>
-      <param name="rrd-ds"               value="dhcpPktsToClient"/>
-      <param name="snmp-object"          value="$dhcpPacketsToClient"/>
+      <param name="graph-legend"       value="DHCP packets server to client"/>
+      <param name="rrd-ds"             value="dhcpPktsToClient"/>
+      <param name="snmp-object"        value="$dhcpPacketsToClient"/>
     </leaf>
     <leaf name="ipInIpPackets">
-      <param name="precdence"            value="903"/>
-      <param name="comment"              value="IP-in-IP packets"/>
-      <param name="graph-title"  
-            value="IP-in-IP packets received by CPU"/>
-      <param name="rrd-ds"               value="ipInIpPackets"/>
-      <param name="snmp-object"          value="$ipInIpPackets"/>
+      <param name="precedence"         value="903"/>
+      <param name="comment"            value="IP-in-IP packets"/>
+      <param name="graph-legend"       value="IP-in-IP packets received"/>
+      <param name="rrd-ds"             value="ipInIpPackets"/>
+      <param name="snmp-object"        value="$ipInIpPackets"/>
     </leaf>
     <leaf name="l2tpControlPackets">
-      <param name="precdence"            value="902"/>
-      <param name="comment"              value="L2TP control packets"/>
-      <param name="graph-title"  
-            value="L2TP control packets received by CPU"/>
-      <param name="rrd-ds"               value="l2tpControlPackets"/>
-      <param name="snmp-object"          value="$l2tpControlPackets"/>
+      <param name="precedence"         value="902"/>
+      <param name="comment"            value="L2TP control packets"/>
+      <param name="graph-legend"       value="L2TP control packets received"/>
+      <param name="rrd-ds"             value="l2tpControlPackets"/>
+      <param name="snmp-object"        value="$l2tpControlPackets"/>
     </leaf>
     <leaf name="ipInIpPackets">
-      <param name="precdence"            value="901"/>
-      <param name="comment"              value="L2TP data packets"/>
-      <param name="graph-title"  
-            value="L2TP Data packets received by CPU"/>
-      <param name="rrd-ds"               value="l2tpDataPackets"/>
-      <param name="snmp-object"          value="$l2tpDataPackets"/>
+      <param name="precedence"         value="901"/>
+      <param name="comment"            value="L2TP data packets"/>
+      <param name="graph-legend"       value="L2TP Data packets received"/>
+      <param name="rrd-ds"             value="l2tpDataPackets"/>
+      <param name="snmp-object"        value="$l2tpDataPackets"/>
     </leaf>
   </template>
 

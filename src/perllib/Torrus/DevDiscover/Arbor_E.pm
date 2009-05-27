@@ -22,7 +22,7 @@
 # Jon Nistor <nistor at snickers.org>
 #
 # NOTE: Options for this module
-#	Arbor_E::disable-e30-bundle
+#	Arbor_E::disable-bundle
 #	Arbor_E::enable-e30-bundle-name-rrd
 #       Arbor_E::disable-e30-buffers
 #       Arbor_E::disable-e30-cpu
@@ -30,7 +30,10 @@
 #	Arbor_E::disable-e30-fwdTable
 #	Arbor_E::disable-e30-hdd
 #	Arbor_E::enable-e30-hdd-errors
+#       Arbor_E::disable-e30-hdd-logs
 #	Arbor_E::disable-e30-mem
+#       Arbor_E::enable-e30-mempool
+#       Arbor_E::disable-e30-slowpath
 #
 
 # Arbor_E devices discovery
@@ -50,25 +53,28 @@ $Torrus::DevDiscover::registry{'Arbor_E'} = {
 our %oiddef =
     (
      # ELLACOYA-MIB
-     'eProducts'	  => '1.3.6.1.4.1.3813.2',
-     'codeVer'            => '1.3.6.1.4.1.3813.1.4.1.1.0',
-     'sysIdSerialNum'	  => '1.3.6.1.4.1.3813.1.4.1.5.2.0',
-     'hDriveErrModel'     => '1.3.6.1.4.1.3813.1.4.2.10.16.0',
-     'hDriveErrSerialNum' => '1.3.6.1.4.1.3813.1.4.2.10.17.0',
-     'cpuUtilization'	  => '1.3.6.1.4.1.3813.1.4.4.1.0',
-     'cpuIndex'		  => '1.3.6.1.4.1.3813.1.4.4.2.1.1', # e100
+     'eProducts'	     => '1.3.6.1.4.1.3813.2',
+     'codeVer'               => '1.3.6.1.4.1.3813.1.4.1.1.0',
+     'sysIdSerialNum'	     => '1.3.6.1.4.1.3813.1.4.1.5.2.0',
+     'memPoolNameIndex'      => '1.3.6.1.4.1.3813.1.4.2.5.1.1',
+     'hDriveErrModel'        => '1.3.6.1.4.1.3813.1.4.2.10.16.0',
+     'hDriveErrSerialNum'    => '1.3.6.1.4.1.3813.1.4.2.10.17.0',
+     'hDriveDailyLogSize'    => '1.3.6.1.4.1.3813.1.4.2.13.0',
+     'cpuUtilization'	     => '1.3.6.1.4.1.3813.1.4.4.1.0',
+     'cpuIndex'		     => '1.3.6.1.4.1.3813.1.4.4.2.1.1', # e100
+     'loginRespOkStatsIndex' => '1.3.6.1.4.1.3813.1.4.3.15.1.1',
 
      # ELLACOYA-MIB::cpuCounters (available in 7.5.x -- slowpath counters)
-     'cpuCounters'        => '1.3.6.1.4.1.3813.1.4.4.10',
-     'slowpathCounters'   => '1.3.6.1.4.1.3813.1.4.4.10.1',
-     'sigCounters'        => '1.3.6.1.4.1.3813.1.4.4.10.2',
+     'cpuCounters'           => '1.3.6.1.4.1.3813.1.4.4.10',
+     'slowpathCounters'      => '1.3.6.1.4.1.3813.1.4.4.10.1',
+     'sigCounters'           => '1.3.6.1.4.1.3813.1.4.4.10.2',
 
      # ELLACOYA-MIB::flow
-     'flowPoolNameD1'     => '1.3.6.1.4.1.3813.1.4.5.1.1.1.2',
-     'flowPoolNameD2'     => '1.3.6.1.4.1.3813.1.4.5.2.1.1.2',
+     'flowPoolNameD1'        => '1.3.6.1.4.1.3813.1.4.5.1.1.1.2',
+     'flowPoolNameD2'        => '1.3.6.1.4.1.3813.1.4.5.2.1.1.2',
 
      # ELLACOYA-MIB::bundleStatsTable
-     'bundleName'         => '1.3.6.1.4.1.3813.1.4.12.1.1.2',
+     'bundleName'            => '1.3.6.1.4.1.3813.1.4.12.1.1.2',
 
      # ELLACOYA-MIB::l2tp (available in 7.5.x)
      'l2tpConfigEnabled'             => '1.3.6.1.4.1.3813.1.4.18.1.1.0',
@@ -132,23 +138,23 @@ sub discover
     if( $eInfo->{'modelNum'} < 8 )
     {
         # PROG: Set Capability to be the e30 device
-        $devdetails->setCap("e30");
+        $devdetails->setCap('e30');
         Debug("Arbor_E: Found " . $eChassisName{$eInfo->{'modelNum'}} );
 
         # PROG: See if some of the options are disabled
         if( $devdetails->param('Arbor_E::disable-e30-buffers') ne 'yes' )
 	{
-            $devdetails->setCap("e30-buffers");
+            $devdetails->setCap('e30-buffers');
         }
 
         if( $devdetails->param('Arbor_E::disable-e30-cpu') ne 'yes' )
         {
-            $devdetails->setCap("e30-cpu");
+            $devdetails->setCap('e30-cpu');
         }
 
         if( $devdetails->param('Arbor_E::disable-e30-flowdev') ne 'yes' )
         {
-            $devdetails->setCap("e30-flowLookup");
+            $devdetails->setCap('e30-flowLookup');
 
             # Flow Lookup Device information
             # Figure out what pools exist for the 2 flow switching modules
@@ -183,12 +189,27 @@ sub discover
 
         if( $devdetails->param('Arbor_E::disable-e30-fwdTable') ne 'yes' )
         {
-            $devdetails->setCap("e30-fwdTable");
+            $devdetails->setCap('e30-fwdTable');
+
+            my $loginTable = $session->get_table(
+                       -baseoid => $dd->oiddef('loginRespOkStatsIndex') );
+            $devdetails->storeSnmpVars( $loginTable );
+
+            if( defined( $loginTable ) )
+            {
+                $devdetails->setCap('e30-fwdTable-login');
+
+                foreach my $statsIdx ( $devdetails->getSnmpIndices(
+                                      $dd->oiddef('loginRespOkStatsIndex') ) )
+                {
+                    push(@{$data->{'e30'}{'loginResp'}}, $statsIdx);
+                }
+            }
         }
 
         if( $devdetails->param('Arbor_E::disable-e30-hdd') ne 'yes' )
         {
-            $devdetails->setCap("e30-hdd");
+            $devdetails->setCap('e30-hdd');
 
             # SNMP: Add harddrive comment information
             $eInfo = $dd->retrieveSnmpOIDs( 'hDriveErrModel',
@@ -198,11 +219,22 @@ sub discover
             $data->{'e30'}{'hddSerial'} = $eInfo->{'hDriveErrSerialNum'};
 
             # PROG: Do we want errors as well?
-            if( $devdetails->param('Arbor_E::enable-e30-hdd-errors') ne 'yes' )
+            if( $devdetails->param('Arbor_E::enable-e30-hdd-errors') eq 'yes' )
             {
-                $devdetails->setCap("e30-hdd-errors");
+                $devdetails->setCap('e30-hdd-errors');
             }
-        }
+
+            # PROG: Do we want to look at daily log files? (New in 7.6)
+            if( $devdetails->param('Arbor_E::disable-e30-hdd-logs') ne 'yes' )
+            {
+                $eInfo = $dd->retrieveSnmpOIDs( 'hDriveDailyLogSize' );
+
+                if( $eInfo->{'hDriveDailyLogSize'} )
+                {
+                    $devdetails->setCap('e30-hdd-logs');
+                }
+            }
+        } # END: if disable-e30-hdd
 
         if( $devdetails->param('Arbor_E::disable-e30-l2tp') ne 'yes' )
         {
@@ -211,7 +243,7 @@ sub discover
 
             if( $eInfo->{'l2tpConfigEnabled'} > 1 )
             {
-                $devdetails->setCap("e30-l2tp");
+                $devdetails->setCap('e30-l2tp');
 
                 my $l2tpSecEndTable = $session->get_table(
                        -baseoid => $dd->oiddef('l2tpSecureEndpointIpAddress') );
@@ -231,14 +263,38 @@ sub discover
         # Memory usage on system
         if( $devdetails->param('Arbor_E::disable-e30-mem') ne 'yes' )
         {
-            $devdetails->setCap("e30-mem");
+            $devdetails->setCap('e30-mem');
+        }
+
+        # Memory usage / individual blocks
+        if( $devdetails->param('Arbor_E::enable-e30-mempool') eq 'yes' )
+        {
+            my $mempoolTable = $session->get_table(
+                                 -baseoid => $dd->oiddef('memPoolNameIndex') );
+            $devdetails->storeSnmpVars( $mempoolTable );
+
+            if( defined( $mempoolTable ) )
+            {
+                $devdetails->setCap('e30-mempool');
+
+                foreach my $memOID (
+                           $devdetails->getSnmpIndices(
+                                $dd->oiddef('memPoolNameIndex') ) )
+                {
+                    my $memName = $mempoolTable->{
+                               $dd->oiddef('memPoolNameIndex') . '.' . $memOID};
+
+                    Debug("e30:  Mempool: $memName");
+                    $data->{'e30'}{'mempool'}{$memOID} = $memName;
+                }
+            }
         }
 
         # Traffic statistics per Bundle
         if( $devdetails->param('Arbor_E::disable-bundle') ne 'yes' )
         {
             # Set capability 
-            $devdetails->setCap("e30-bundle");
+            $devdetails->setCap('e30-bundle');
 
             # Pull table information
             my $bundleTable = $session->get_table(
@@ -265,9 +321,9 @@ sub discover
                             -baseoid => $dd->oiddef('slowpathCounters') );
             $devdetails->storeSnmpVars( $counters );
 
-            if( $counters )
+            if( defined( $counters ) )
             {
-                $devdetails->setCap("e30-slowpath");
+                $devdetails->setCap('e30-slowpath');
             }
         }
     }
@@ -278,6 +334,7 @@ sub discover
     {
         Debug("Arbor_E: Found " . $eChassisName{$eInfo->{'modelNum'}} );
         Debug("Arbor_E: Currently e100 has no supported extras...");
+        return 0;
     }
 
     # ------------------------------------------------------------------------
@@ -300,22 +357,23 @@ sub buildConfig
     my $data = $devdetails->data();
 
     # PROG: Lets do e30 first ...
-    if( $devdetails->hasCap("e30") )
+    if( $devdetails->hasCap('e30') )
     {
-        if( $devdetails->hasCap("e30-buffers") )
+        # e30 buffer information
+        if( $devdetails->hasCap('e30-buffers') )
         {
             $cb->addTemplateApplication($devNode, 'Arbor_E::e30-buffers');
         }
 
-        if( $devdetails->hasCap("e30-bundle") )
+        if( $devdetails->hasCap('e30-bundle') )
         {
             # Create topLevel subtree
             my $bundleNode = $cb->addSubtree( $devNode, 'Bundle_Stats',
                                     { 'comment' => 'Bundle statistics' },
-                                    [ 'Arbor_E::e30-bundle-subtree' ]);
+                                    [ 'Arbor_E::e30-bundle-subtree' ] );
 
             foreach my $bundleID
-                ( sort {$a <=> $b} keys %{$data->{'e30'}{'bundleID'}} )
+                ( sort {$a <=> $b} keys %{$data->{'e30'}{'bundleID'} } )
             {
                 my $srvName     =  $data->{'e30'}{'bundleID'}{$bundleID};
                 my $subtreeName =  $srvName;
@@ -335,32 +393,52 @@ sub buildConfig
                                    'e30-bundle-name'  => $srvName,
                                    'e30-bundle-rrd'   => $bundleRRD,
                                    'precedence'       => 1000 - $bundleID },
-                                 [ 'Arbor_E::e30-bundle' ]);
+                                 [ 'Arbor_E::e30-bundle' ] );
             } # END foreach my $bundleID
         }
 
-        if( $devdetails->hasCap("e30-cpu") )
+        # e30 cpu
+        if( $devdetails->hasCap('e30-cpu') )
         {
             $cb->addTemplateApplication($devNode, 'Arbor_E::e30-cpu');
         }
 
-        if( $devdetails->hasCap("e30-fwdTable") )
+        # e30 forwarding table
+        # NOTE: for future devel
+        if( $devdetails->hasCap('e30-fwdTable') )
         {
             $cb->addTemplateApplication($devNode, 'Arbor_E::e30-fwdTable');
+
+            if( $devdetails->hasCap('e30-fwdTable-login') )
+            {
+                foreach my $sindex ( sort { $a <=> $b } 
+                                     @{$data->{'e30'}{'loginResp'}} )
+                {
+                    Debug("  loginReps: $sindex");
+                }
+            }
         }
 
-        if( $devdetails->hasCap("e30-hdd") )
+        # e30 hard drive
+        if( $devdetails->hasCap('e30-hdd') )
         {
             my $comment = "Model: "  . $data->{'e30'}{'hddModel'} . ", " .
                           "Serial: " . $data->{'e30'}{'hddSerial'};
             my $subtree = "Hard_Drive";
             my @templates;
-            push( @templates, 'Arbor_E::e30-hdd-subtree');
-            push( @templates, 'Arbor_E::e30-hdd');
+            push( @templates, 'Arbor_E::e30-hdd-subtree' );
+            push( @templates, 'Arbor_E::e30-hdd' );
 
-            if( $devdetails->hasCap("e30-hdd-errors") )
+            # PROG: Process hdd errors
+            if( $devdetails->hasCap('e30-hdd-errors') )
             {
-                push( @templates, 'Arbor_E::e30-hdd-errors');
+                push( @templates, 'Arbor_E::e30-hdd-errors' );
+            }
+
+            # PROG: Process hdd daily logs
+            if( $devdetails->hasCap('e30-hdd-logs') )
+            {
+                push( @templates, 'Arbor_E::e30-hdd-logs' );
             }
 
             my $hdNode = $cb->addSubtree($devNode, $subtree,
@@ -368,7 +446,8 @@ sub buildConfig
                                         \@templates);
         }
 
-        if( $devdetails->hasCap("e30-l2tp") )
+        # e30 L2TP tunnel information
+        if( $devdetails->hasCap('e30-l2tp') )
         {
             # PROG: First add the appropriate template
             my $l2tpNode = $cb->addSubtree( $devNode, 'L2TP', undef,
@@ -380,7 +459,7 @@ sub buildConfig
                 # PROG: Add the assisting template first
                 my $l2tpEndNode = $cb->addSubtree( $l2tpNode, 'Secure_Endpoint',
                              { 'comment' => 'Secure endpoint parties' },
-                             [ 'Arbor_E::e30-l2tp-secure-endpoints-subtree' ]);
+                             [ 'Arbor_E::e30-l2tp-secure-endpoints-subtree' ] );
 
                 foreach my $SEP ( keys %{$data->{'e30'}{'l2tpSEP'}} )
                 {
@@ -395,12 +474,39 @@ sub buildConfig
             }
         }
 
-        if( $devdetails->hasCap("e30-mem") )
+        # e30 memory
+        if( $devdetails->hasCap('e30-mem') )
         {
             $cb->addTemplateApplication($devNode, 'Arbor_E::e30-mem');
         }
 
-        if( $devdetails->hasCap("e30-flowLookup") )
+        # e30 Memory pool
+        if( $devdetails->hasCap('e30-mempool') )
+        {
+            my $subtreeName = "Memory_Pool";
+            my $param       = { 'comment'    => 'Memory Pool Statistics' };
+            my $templates   = [ 'Arbor_E::e30-mempool-subtree' ];
+            my $memIndex    = $data->{'e30'}{'mempool'};
+
+            my $nodeTop     = $cb->addSubtree( $devNode, $subtreeName,
+                                               $param, $templates );
+
+            foreach my $memIDX ( keys %{$memIndex} )
+            {
+                my $leafName = $memIndex->{$memIDX};
+                my $dataFile = "%snmp-host%_mempool_" . $leafName . '.rrd';
+
+                my $nodeMem = $cb->addSubtree( $nodeTop, $leafName, 
+                                            { 'data-file'         => $dataFile,
+                                              'e30-mempool-index' => $memIDX,
+                                              'e30-mempool-name'  => $leafName
+                                            },
+                                            [ 'Arbor_E::e30-mempool' ] );
+            }
+        }
+
+        # e30 flow device lookups
+        if( $devdetails->hasCap('e30-flowLookup') )
         {
             # PROG: Flow Lookup Device (pool names)
             my $flowNode = $cb->addSubtree( $devNode, 'Flow_Lookup',
@@ -428,21 +534,21 @@ sub buildConfig
                                      'e30-flowpoolidx'  => $flowPoolIdx,
                                      'e30-flowpoolname' => $poolName,
                                      'precedence'       => 1000 - $flowPoolIdx},
-                                   [ 'Arbor_E::e30-flowlkup-leaf' ]);
+                                   [ 'Arbor_E::e30-flowlkup-leaf' ] );
                 } # END: foreach my $flowPoolIdx
             } # END: foreach my $flowDevIdx
         } # END: hasCap e30-flowLookup
 
-        if( $devdetails->hasCap("e30-slowpath") )
+        # e30 slowpath counters
+        if( $devdetails->hasCap('e30-slowpath') )
         {
             my $slowNode = $cb->addSubtree( $devNode, 'SlowPath', undef,
-                                          [ 'Arbor_E::e30-slowpath' ]);
+                                          [ 'Arbor_E::e30-slowpath' ] );
         }
     } # END: if e30 device
 
     # -----------------------------------------------------
-    # E100 series...
-
+    # E100 series... future
 }
 
 1;

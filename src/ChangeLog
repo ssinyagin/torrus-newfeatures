@@ -1,3 +1,9 @@
+2009-05-26  Jon Nistor  <nistor@snickrs.org>
+
+	* perllib/Torrus/DevDiscover/Arbor_E.pm (discover):
+	New discovery parameter: Arbor_E::disable-e30-hdd-logs,
+        Arbor_E::enable-e30-mempool
+
 2009-05-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/NetBotz.pm (discover):

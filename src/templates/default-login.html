@@ -11,14 +11,14 @@
 <P>Please authenticate yourself</P>
 
 <FORM CLASS="LoginForm" METHOD="POST" ACTION="[%url%]">
-  [% IF urlPassParams.token.length > 0 %]
+  [% IF urlPassParams.token.defined AND urlPassParams.token.length > 0 %]
     <INPUT TYPE="HIDDEN" NAME="token" VALUE="[%urlPassParams.token%]"/>
   [% ELSE;
-      IF urlPassParams.path.length > 0 %]
+      IF urlPassParams.path.defined AND urlPassParams.path.length > 0 %]
        <INPUT TYPE="HIDDEN" NAME="path" VALUE="[%urlPassParams.path%]"/>
   [%  END;
      END %]
-  [% IF urlPassParams.view.length > 0 %]
+  [% IF urlPassParams.view.defined AND urlPassParams.view.length > 0 %]
     <INPUT TYPE="HIDDEN" NAME="view" VALUE="[% urlPassParams.view %]"/>
   [% END %]
   <DIV CLASS="LoginRow">

@@ -1282,6 +1282,12 @@ separated by colon (:).
 
 =back
 
+=item * C<disable-legend>, C<disable-title>, C<disable-vertical-label>
+
+When set to C<yes>, the corresponding elements of the graph are not displayed.
+
+
+
 =head3 Styling Profiles
 
 Styling profiles allow symbolic names to be used for line type

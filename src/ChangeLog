@@ -1,3 +1,9 @@
+2009-05-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/RRDtool.pm:
+	new view parameters:
+	disable-legend, disable-title, disable-vertical-label
+
 2009-05-26  Jon Nistor  <nistor@snickrs.org>
 
 	* perllib/Torrus/DevDiscover/Arbor_E.pm (discover):

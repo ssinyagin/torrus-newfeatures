@@ -259,12 +259,21 @@ sub rrd_make_multigraph
         $dsOrder{$dname} = defined( $order ) ? $order : 100;
     }
 
+    my $disable_legend = $config_tree->getParam($view, 'disable-legend');    
+    $disable_legend =
+        (defined($disable_legend) and $disable_legend eq 'yes') ? 1:0;
+    
     # make DEFs and Line instructions
 
-    my $do_gprint = $self->rrd_if_gprint( $config_tree, $token );
-    if( $do_gprint )
+    my $do_gprint = 0;
+
+    if( not $disable_legend )
     {
-        $self->rrd_make_gprint_header( $config_tree, $token, $view, $obj );
+        $do_gprint = $self->rrd_if_gprint( $config_tree, $token );
+        if( $do_gprint )
+        {
+            $self->rrd_make_gprint_header( $config_tree, $token, $view, $obj );
+        }
     }
 
     foreach my $dname ( sort {$dsOrder{$a} <=> $dsOrder{$b}} @dsNames )
@@ -297,7 +306,6 @@ sub rrd_make_multigraph
             push( @{$obj->{'args'}{'defs'}},
                   $self->rrd_make_cdef($config_tree, $token, $dname, $expr) );
 
-            
             $legend =
                 $config_tree->getNodeParam($token, 'graph-legend-'.$dname);
             if( defined( $legend ) )
@@ -441,16 +449,23 @@ sub rrd_make_graphline
     my $view = shift;
     my $obj = shift;
 
-    my $legend = $config_tree->getNodeParam($token, 'graph-legend');
-    if( defined( $legend ) )
+    my $legend;
+    
+    my $disable_legend = $config_tree->getParam($view, 'disable-legend');
+    if( not defined($disable_legend) or $disable_legend ne 'yes' )
     {
-        $legend =~ s/:/\\:/g;
+        $legend = $config_tree->getNodeParam($token, 'graph-legend');
+        if( defined( $legend ) )
+        {
+            $legend =~ s/:/\\:/g;
+        }
     }
-    else
+
+    if( not defined( $legend ) )
     {
         $legend = '';
     }
-
+    
     my $styleval = $config_tree->getNodeParam($token, 'line-style');
     if( not defined( $styleval ) or length( $styleval ) == 0 )
     {
@@ -641,19 +656,29 @@ sub rrd_make_graph_opts
         push( @args, '--logarithmic' );
     }
 
-    my $title = $config_tree->getNodeParam($token, 'graph-title');
-    if( not defined( $title ) or length( $title ) == 0 )
+    my $disable_title =
+        $config_tree->getParam($view, 'disable-title');
+    if( not defined( $disable_title ) or $disable_title ne 'yes' )
     {
-        $title = ' ';
+        my $title = $config_tree->getNodeParam($token, 'graph-title');
+        if( not defined( $title ) or length( $title ) == 0 )
+        {
+            $title = ' ';
+        }
+        push( @args, '--title', $title );
     }
-    push( @args, '--title', $title );
-    
-    my $vertical_label = $config_tree->getNodeParam($token, 'vertical-label');
-    if( not defined( $vertical_label ) or length( $vertical_label ) == 0 )
+
+    my $disable_vlabel =
+        $config_tree->getParam($view, 'disable-vertical-label');
+    if( not defined( $disable_vlabel ) or $disable_vlabel ne 'yes' )
     {
-        $vertical_label = ' ';
+        my $vertical_label =
+            $config_tree->getNodeParam($token, 'vertical-label');
+        if( defined( $vertical_label ) and length( $vertical_label ) > 0 )
+        {
+            push( @args, '--vertical-label', $vertical_label );
+        }
     }
-    push( @args, '--vertical-label', $vertical_label );
 
     if( $config_tree->getParam($view, 'ignore-limits') ne 'yes' )
     {

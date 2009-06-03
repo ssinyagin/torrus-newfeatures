@@ -1,5 +1,5 @@
 #
-#  Discovery module for Arbor|E Series devices
+#  Discovery module for Arbor|e Series devices
 #  Formerly Ellacoya Networks
 #
 #  Copyright (C) 2008 Jon Nistor
@@ -17,23 +17,35 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+#
 # $Id$
 # Jon Nistor <nistor at snickers.org>
 #
-# NOTE: Options for this module
-#	Arbor_E::disable-bundle
-#	Arbor_E::enable-e30-bundle-name-rrd
-#       Arbor_E::disable-e30-buffers
-#       Arbor_E::disable-e30-cpu
-#       Arbor_E::disable-e30-flowdev
-#	Arbor_E::disable-e30-fwdTable
-#	Arbor_E::disable-e30-hdd
-#	Arbor_E::enable-e30-hdd-errors
-#       Arbor_E::disable-e30-hdd-logs
-#	Arbor_E::disable-e30-mem
-#       Arbor_E::enable-e30-mempool
-#       Arbor_E::disable-e30-slowpath
+# NOTE: This module has been tested against v7.5.x, v7.6.x
+#
+# -- Common
+#      Arbor_E::disable-bundle-offer
+#      Arbor_E::disable-bundle-offer-deny
+#      Arbor_E::disable-bundle-offer-pktsize
+#      Arbor_E::disable-bundle-offer-rate
+#      Arbor_E::disable-bundle-offer-subcount
+#
+# -- e30 specific
+#      Arbor_E::disable-e30-buffers
+#      Arbor_E::disable-e30-cpu
+#      Arbor_E::disable-e30-flowdev
+#      Arbor_E::disable-e30-fwdTable
+#      Arbor_E::disable-e30-fwdTable-login
+#      Arbor_E::disable-e30-hdd
+#      Arbor_E::enable-e30-hdd-errors
+#      Arbor_E::disable-e30-hdd-logs
+#      Arbor_E::disable-e30-l2tp
+#      Arbor_E::disable-e30-mem
+#      Arbor_E::enable-e30-mempool
+#      Arbor_E::disable-e30-bundle
+#      Arbor_E::disable-e30-bundle-deny
+#      Arbor_E::disable-e30-bundle-rate
+#      Arbor_E::disable-e30-slowpath 
 #
 
 # Arbor_E devices discovery
@@ -74,7 +86,16 @@ our %oiddef =
      'flowPoolNameD2'        => '1.3.6.1.4.1.3813.1.4.5.2.1.1.2',
 
      # ELLACOYA-MIB::bundleStatsTable
-     'bundleName'            => '1.3.6.1.4.1.3813.1.4.12.1.1.2',
+     'bundleName'                    => '1.3.6.1.4.1.3813.1.4.12.1.1.2',
+     'bundleBytesSentDenyPolicyDrop' => '1.3.6.1.4.1.3813.1.4.12.1.1.6',
+     'bundleBytesSentRateLimitDrop'  => '1.3.6.1.4.1.3813.1.4.12.1.1.8',
+     'boBundleID'                    => '1.3.6.1.4.1.3813.1.4.12.2.1.1',
+     'boBundleName'                  => '1.3.6.1.4.1.3813.1.4.12.2.1.3',
+     'boOfferName'                   => '1.3.6.1.4.1.3813.1.4.12.2.1.4',
+     'boBundleSubCount'              => '1.3.6.1.4.1.3813.1.4.12.2.1.7',
+     'boPacketsSent64'               => '1.3.6.1.4.1.3813.1.4.12.2.1.8',
+     'boBundleBytesSentDenyPolicyDrop' => '1.3.6.1.4.1.3813.1.4.12.2.1.22',
+     'boBundleBytesSentRateLimitDrop'  => '1.3.6.1.4.1.3813.1.4.12.2.1.24',
 
      # ELLACOYA-MIB::l2tp (available in 7.5.x)
      'l2tpConfigEnabled'             => '1.3.6.1.4.1.3813.1.4.18.1.1.0',
@@ -92,7 +113,8 @@ our %eChassisName =
         '5'  => 'e30 Revision: T',
         '6'  => 'e30 Revision: U',
         '7'  => 'e30 Revision: V',
-	'8'  => 'e100',
+	'8'  => 'Ellacoya e100',
+        '9'  => 'e100'
     );
 
 sub checkdevtype
@@ -137,11 +159,12 @@ sub discover
     # Arbor_E e30 related material here
     if( $eInfo->{'modelNum'} < 8 )
     {
-        # PROG: Set Capability to be the e30 device
-        $devdetails->setCap('e30');
         Debug("Arbor_E: Found " . $eChassisName{$eInfo->{'modelNum'}} );
 
-        # PROG: See if some of the options are disabled
+        # PROG: Set Capability to be the e30 device
+        $devdetails->setCap('e30');
+
+        # PROG: Check status oids
         if( $devdetails->param('Arbor_E::disable-e30-buffers') ne 'yes' )
 	{
             $devdetails->setCap('e30-buffers');
@@ -191,20 +214,24 @@ sub discover
         {
             $devdetails->setCap('e30-fwdTable');
 
-            my $loginTable = $session->get_table(
-                       -baseoid => $dd->oiddef('loginRespOkStatsIndex') );
-            $devdetails->storeSnmpVars( $loginTable );
-
-            if( defined( $loginTable ) )
+            if( $devdetails->param('Arbor_E::disable-e30-fwdTable-login')
+                ne 'yes' )
             {
-                $devdetails->setCap('e30-fwdTable-login');
+                my $loginTable = $session->get_table(
+                       -baseoid => $dd->oiddef('loginRespOkStatsIndex') );
+                $devdetails->storeSnmpVars( $loginTable );
 
-                foreach my $statsIdx ( $devdetails->getSnmpIndices(
-                                      $dd->oiddef('loginRespOkStatsIndex') ) )
+                if( defined( $loginTable ) )
                 {
-                    push(@{$data->{'e30'}{'loginResp'}}, $statsIdx);
+                    $devdetails->setCap('e30-fwdTable-login');
+
+                    foreach my $statsIdx ( $devdetails->getSnmpIndices(
+                                      $dd->oiddef('loginRespOkStatsIndex') ) )
+                    {
+                        push(@{$data->{'e30'}{'loginResp'}}, $statsIdx);
+                    }
                 }
-            }
+            } # END hasCap disable-e30-fwdTable-login
         }
 
         if( $devdetails->param('Arbor_E::disable-e30-hdd') ne 'yes' )
@@ -291,7 +318,7 @@ sub discover
         }
 
         # Traffic statistics per Bundle
-        if( $devdetails->param('Arbor_E::disable-bundle') ne 'yes' )
+        if( $devdetails->param('Arbor_E::disable-e30-bundle') ne 'yes' )
         {
             # Set capability 
             $devdetails->setCap('e30-bundle');
@@ -311,7 +338,32 @@ sub discover
 	
                     Debug("e30:    $bundleID $bundleName");
             } # END foreache my $bundleID
-        } # END if Arbor_E::disable-bundle
+
+            if( $devdetails->param('Arbor_E::disable-e30-bundle-deny') ne 'yes')
+            {
+                my $bundleDenyTable = $session->get_table(
+                     -baseoid => $dd->oiddef('bundleBytesSentDenyPolicyDrop') );
+                $devdetails->storeSnmpVars( $bundleDenyTable );
+
+                if( $bundleDenyTable )
+                {
+                    $devdetails->setCap('e30-bundle-denyStats');
+                }
+            }
+
+            if( $devdetails->param('Arbor_E::disable-e30-bundle-rate') ne 'yes')
+            {
+                my $bundleRateLimitTable = $session->get_table(
+                     -baseoid => $dd->oiddef('bundleBytesSentRateLimitDrop') );
+                $devdetails->storeSnmpVars( $bundleRateLimitTable );
+
+                if( $bundleRateLimitTable )
+                {
+                    $devdetails->setCap('e30-bundle-rateLimitStats');
+                }
+            }
+
+        } # END if Arbor_E::disable-e30-bundle
 
         # PROG: Counters
         if( $devdetails->param('Arbor_E::disable-e30-slowpath') ne 'yes' )
@@ -330,20 +382,100 @@ sub discover
 
     # ------------------------------------------------------------------------
     # Arbor E100 related material here
-    if( $eInfo->{'modelNum'} == 8 )
+    if( $eInfo->{'modelNum'} >= 8 )
     {
         Debug("Arbor_E: Found " . $eChassisName{$eInfo->{'modelNum'}} );
         Debug("Arbor_E: Currently e100 has no supported extras...");
-        return 0;
+        # return 0;
     }
 
     # ------------------------------------------------------------------------
-    # Arbor Unsupported devices
-    if( $eInfo->{'modelNum'} > 8 )
+    # Common Bundle Offer byte count, send and receiver counters for each
+    # bundle to offer pair they are in.
+
+    if( $devdetails->param('Arbor_E::disable-bundle-offer') ne 'yes' )
     {
-        Debug("Arbor_E: unsupported device found!");
-        return 0;
+        my $boOfferNameTable = $session->get_table(
+                            -baseoid => $dd->oiddef('boOfferName') );
+        $devdetails->storeSnmpVars( $boOfferNameTable );
+
+        my $boBundleNameTable = $session->get_table(
+                            -baseoid => $dd->oiddef('boBundleName') );
+        $devdetails->storeSnmpVars( $boBundleNameTable );
+
+        if( defined( $boOfferNameTable ) )
+        {
+            $devdetails->setCap('arbor-bundle');
+
+            foreach my $boOfferNameID ( $devdetails->getSnmpIndices(
+                                $dd->oiddef('boOfferName') ) )
+            {
+		my ($bundleID,$offerNameID) = split( /\./, $boOfferNameID );
+
+                my $offerName = $boOfferNameTable->{
+                                    $dd->oiddef('boOfferName')
+                                    . '.' . $boOfferNameID };
+                my $bundleName = $boBundleNameTable->{
+                                    $dd->oiddef('boBundleName')
+                                    . '.' . $boOfferNameID };
+
+                $data->{'arbor_e'}{'offerName'}{$offerNameID} = $offerName;
+                $data->{'arbor_e'}{'bundleName'}{$bundleID}   = $bundleName;
+
+                push( @{$data->{'arbor_e'}{'boOfferBundle'}{$offerNameID}},
+                      $bundleID );
+            }
+        }
+
+        # PROG: Subscribers using the bundle
+        if( $devdetails->param('Arbor_E::disable-bundle-offer-subcount')
+            ne 'yes' )
+        {
+            my $oidSubcount = $dd->oiddef('boBundleSubCount');
+
+            if( defined $session->get_table( -baseoid => $oidSubcount ) )
+            {
+                $devdetails->setCap('arbor-bundle-subcount');
+            }
+        }
+
+        # PROG: Packets sent on this bundle with a size
+        if( $devdetails->param('Arbor_E::disable-bundle-offer-pktsize')
+            ne 'yes' )
+        {
+            my $oidPktsize = $dd->oiddef('boPacketsSent64');
+
+            if( defined $session->get_table( -baseoid => $oidPktsize ) )
+            {
+                $devdetails->setCap('arbor-bundle-pktsize');
+            }
+        }
+
+        # PROG: Bytes sent on this bundle for deny policy drop
+        if( $devdetails->param('Arbor_E::disable-bundle-offer-deny')
+            ne 'yes' )
+        {
+            my $oidDenypolicy = $dd->oiddef('boBundleBytesSentDenyPolicyDrop');
+
+            if( defined $session->get_table( -baseoid => $oidDenypolicy ) )
+            {
+                $devdetails->setCap('arbor-bundle-deny');
+            }
+        }
+
+        # PROG: Bytes sent on this bundle for rate limit drop
+        if( $devdetails->param('Arbor_E::disable-bundle-offer-rate')
+            ne 'yes' )
+        {
+            my $oidRatelimit = $dd->oiddef('boBundleBytesSentRateLimitDrop');
+
+            if( defined $session->get_table( -baseoid => $oidRatelimit ) )
+            {
+                $devdetails->setCap('arbor-bundle-ratelimit');
+            }
+        }
     }
+
 
     return 1;
 }
@@ -379,6 +511,8 @@ sub buildConfig
                 my $subtreeName =  $srvName;
                    $subtreeName =~ s/\W/_/g; 
                 my $bundleRRD	= $bundleID;
+                my @templates   = ( 'Arbor_E::e30-bundle' );
+
                 if( $devdetails->param('Arbor_E::enable-e30-bundle-name-rrd')
                     eq 'yes' )
                 {
@@ -387,13 +521,23 @@ sub buildConfig
                     $bundleRRD =~ s/\W/_/g;
                 }
 
+                if( $devdetails->hasCap('e30-bundle-denyStats') )
+                {
+                    push( @templates, 'Arbor_E::e30-bundle-deny' );
+                }
+
+                if( $devdetails->hasCap('e30-bundle-rateLimitStats') )
+                {
+                    push( @templates, 'Arbor_E::e30-bundle-ratelimit' );
+                }
+
                 $cb->addSubtree( $bundleNode, $subtreeName,
                                  { 'comment'          => $srvName,
                                    'e30-bundle-index' => $bundleID,
                                    'e30-bundle-name'  => $srvName,
                                    'e30-bundle-rrd'   => $bundleRRD,
                                    'precedence'       => 1000 - $bundleID },
-                                 [ 'Arbor_E::e30-bundle' ] );
+                                 \@templates );
             } # END foreach my $bundleID
         }
 
@@ -411,13 +555,25 @@ sub buildConfig
 
             if( $devdetails->hasCap('e30-fwdTable-login') )
             {
+                my $subtree  = "Forwarding_Table_Login_Stats";
+                my $comment  = "Discovery attempts statistics";
+                my $nodeTree = $cb->addSubtree( $devNode, $subtree, 
+                                              { 'comment' => $comment },
+                                                undef );
+
                 foreach my $sindex ( sort { $a <=> $b } 
                                      @{$data->{'e30'}{'loginResp'}} )
                 {
                     Debug("  loginReps: $sindex");
-                }
-            }
-        }
+		
+                    $cb->addLeaf( $nodeTree, 'Login_' . $sindex,
+                                   { 'comment'   => 'Login #' . $sindex,
+                                     'login-idx' => $sindex,
+                                     'precednce' => 100 - $sindex },
+                                   [ 'Arbor_E::e30-fwdTable-login' ] );
+                } # END: foreach $sindex
+            } # END: hasCap e30-fwdTable-login
+        } # END: hasCap e30-fwdTable
 
         # e30 hard drive
         if( $devdetails->hasCap('e30-hdd') )
@@ -480,11 +636,11 @@ sub buildConfig
             $cb->addTemplateApplication($devNode, 'Arbor_E::e30-mem');
         }
 
-        # e30 Memory pool
+        # e30 memory pool
         if( $devdetails->hasCap('e30-mempool') )
         {
             my $subtreeName = "Memory_Pool";
-            my $param       = { 'comment'    => 'Memory Pool Statistics' };
+            my $param       = { 'comment' => 'Memory Pool Statistics' };
             my $templates   = [ 'Arbor_E::e30-mempool-subtree' ];
             my $memIndex    = $data->{'e30'}{'mempool'};
 
@@ -549,6 +705,98 @@ sub buildConfig
 
     # -----------------------------------------------------
     # E100 series... future
+
+    # -------------------------------------------------------------------------
+    # Common information between e30 and e100 (bundle/offer stats)
+    if( $devdetails->hasCap('arbor-bundle') )
+    {
+        
+        my $subtreeName = "Bundle_Offer_Stats";
+        my $param       = { 'comment'    => 'byte counts for each bundle ' . 
+                                            'per Offer' };
+        my $templates   = [ ];
+        my $nodeTop     = $cb->addSubtree( $devNode, $subtreeName,
+                                           $param, $templates );
+
+        foreach my $offerNameID ( keys %{$data->{'arbor_e'}{'offerName'}} )
+        {
+            my $offerName   =  $data->{'arbor_e'}{'offerName'}{$offerNameID};
+               $offerName   =~ s/\W/_/g;
+            my $offerBundle =  $data->{'arbor_e'}{'boOfferBundle'};
+            my $offerRRD    =  $offerNameID;
+
+            if( $devdetails->param('Arbor_E::enable-arbor-bundle-name-rrd')
+                eq 'yes' )
+            {
+                # Filename will now be written as offer name
+                $offerRRD = lc($offerName);
+            }
+
+            # Build tree
+            my $oparam = { 'comment'   => 'Offer: ' . $offerName,
+                           'offer-id'  => $offerNameID,
+                           'offer-rrd' => $offerRRD };
+            my $otemplates = [ 'Arbor_E::arbor-bundle-subtree' ];
+            my $offerTop = $cb->addSubtree( $nodeTop, $offerName, $oparam,
+                                            $otemplates );
+
+            Debug("    Offer: $offerName");
+
+            foreach my $bundleID ( @{%{$offerBundle}->{$offerNameID}} )
+            {
+                my @btemplates;
+                my $bundleName =  $data->{'arbor_e'}{'bundleName'}{$bundleID};
+                   $bundleName =~ s/\W/_/g;
+                my $bundleRRD  =  $bundleID;
+
+                Debug("      $bundleID: $bundleName");
+
+                if( $devdetails->param('Arbor_E::enable-arbor-bundle-name-rrd')
+                    eq 'yes' )
+                {
+                    # Filename will now be written as bundle name
+                    $bundleRRD = lc($bundleName);
+                }
+
+                my $bparam     = { 'comment'     => 'Bundle ID: ' . $bundleID,
+                                   'data-file'   => '%system-id%_bo_' .
+                                                    '%offer-rrd%_' .
+                                                    '%bundle-rrd%.rrd',
+                                   'bundle-id'   => $bundleID,
+                                   'bundle-name' => $bundleName,
+                                   'bundle-rrd'  => $bundleRRD };
+                push( @btemplates, 'Arbor_E::arbor-bundle' );
+
+                # PROG: Subscribers using the bundle
+                if( $devdetails->hasCap('arbor-bundle-subcount') )
+                {
+                    push( @btemplates, 'Arbor_E::arbor-bundle-subcount' );
+                }
+
+                # PROG: Packets sent on this bundle per size
+                if( $devdetails->hasCap('arbor-bundle-pktsize') )
+                {
+                    push( @btemplates, 'Arbor_E::arbor-bundle-pktsize' );
+                }
+
+                # PROG: Bytes sent on this bundle for deny policy drop
+                if( $devdetails->hasCap('arbor-bundle-deny') )
+                {
+                    push( @btemplates, 'Arbor_E::arbor-bundle-deny' );
+                }
+
+                # PROG: Bytes sent on this bundle for rate limit drop
+                if( $devdetails->hasCap('arbor-bundle-ratelimit') )
+                {
+                    push( @btemplates, 'Arbor_E::arbor-bundle-ratelimit' );
+                }
+
+                # Build tree
+                $cb->addSubtree( $offerTop, $bundleName,
+                                 $bparam, \@btemplates );
+            } # END: foreach $bundleID
+        } # END: foreach $offerNameID
+    } # END: hasCap arbor-bundle
 }
 
 1;

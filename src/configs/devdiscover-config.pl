@@ -288,6 +288,30 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
      
      #### Arbor Networks E Series
+     'Arbor_E::arbor-bundle-subtree' => {
+         'name'   => 'arbor-bundle-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::arbor-bundle' => {
+         'name'   => 'arbor-bundle',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::arbor-bundle-deny' => {
+         'name'   => 'arbor-bundle-deny',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::arbor-bundle-pktsize' => {
+         'name'   => 'arbor-bundle-pktsize',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::arbor-bundle-ratelimit' => {
+         'name'   => 'arbor-bundle-ratelimit',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::arbor-bundle-subcount' => {
+         'name'   => 'arbor-bundle-subcount',
+         'source' => 'vendor/arbor_e.xml'
+         },
      'Arbor_E::e30-buffers' => {
          'name'   => 'e30-buffers',
          'source' => 'vendor/arbor_e.xml'
@@ -300,12 +324,24 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'e30-bundle',
          'source' => 'vendor/arbor_e.xml'
          },
+     'Arbor_E::e30-bundle-deny' => {
+         'name'   => 'e30-bundle-deny',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-bundle-ratelimit' => {
+         'name'   => 'e30-bundle-ratelimit',
+         'source' => 'vendor/arbor_e.xml'
+         },
      'Arbor_E::e30-cpu' => {
          'name'   => 'e30-cpu',
          'source' => 'vendor/arbor_e.xml'
          },
      'Arbor_E::e30-fwdTable' => {
          'name'   => 'e30-fwdTable',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-fwdTable-login' => {
+         'name'   => 'e30-fwdTable-login',
          'source' => 'vendor/arbor_e.xml'
          },
      'Arbor_E::e30-hdd-subtree' => {
@@ -318,6 +354,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
      'Arbor_E::e30-hdd-errors' => {
          'name'   => 'e30-hdd-errors',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-hdd-logs' => {
+         'name'   => 'e30-hdd-logs',
          'source' => 'vendor/arbor_e.xml'
          },
      'Arbor_E::e30-l2tp-subtree' => {
@@ -338,6 +378,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
      'Arbor_E::e30-mem' => {
          'name'   => 'e30-mem',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-mempool-subtree' => {
+         'name'   => 'e30-mempool-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e30-mempool' => {
+         'name'   => 'e30-mempool',
          'source' => 'vendor/arbor_e.xml'
          },
      'Arbor_E::e30-flowlkup-subtree' => {

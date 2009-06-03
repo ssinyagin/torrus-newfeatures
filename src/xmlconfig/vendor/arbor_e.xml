@@ -21,8 +21,8 @@
 
 -->
 <!--
-     Arbor e-Series specific definitions
-     Former Ellacoya devices
+     Arbor e-Series specific definitions (former Ellacoya)
+     Devices include: e30, e100
  -->
 
 <configuration>
@@ -76,6 +76,8 @@
   <def name="authenticatedL3UserCount"   value="1.3.6.1.4.1.3813.1.4.3.12.0" />
   <def name="unauthenticatedL3UserCount" value="1.3.6.1.4.1.3813.1.4.3.13.0" />
 
+  <def name="loginRespOkStatsCount"      value="1.3.6.1.4.1.3813.1.4.3.15.1.2"/>
+
   <!-- ELLACOYA-MIB::flow -->
   <def name="flowPoolName"        value="1.3.6.1.4.1.3813.1.4.5"/>
 
@@ -108,6 +110,42 @@
   <def name="bundleBytesSent"     value="1.3.6.1.4.1.3813.1.4.12.1.1.3" />
   <def name="bundleBytesReceived" value="1.3.6.1.4.1.3813.1.4.12.1.1.4" />
   <def name="bundleSubCount"      value="1.3.6.1.4.1.3813.1.4.12.1.1.5" />
+  <def name="bundleBytesSentDenyPolicyDrop" 
+                                  value="1.3.6.1.4.1.3813.1.4.12.1.1.6" />
+  <def name="bundleBytesReceivedDenyPolicyDrop"
+                                  value="1.3.6.1.4.1.3813.1.4.12.1.1.7" />
+  <def name="bundleBytesSentRateLimitDrop"
+                                  value="1.3.6.1.4.1.3813.1.4.12.1.1.8" />
+  <def name="bundleBytesReceivedRateLimitDrop"
+                                        value="1.3.6.1.4.1.3813.1.4.12.1.1.9"/>
+  <!-- ELLACOYA-MIB::bundleOfferStatsEntry -->
+  <def name="boBundleBytesSent"         value="1.3.6.1.4.1.3813.1.4.12.2.1.5"/>
+  <def name="boBundleBytesReceived"     value="1.3.6.1.4.1.3813.1.4.12.2.1.6"/>
+  <def name="boBundleSubCount"          value="1.3.6.1.4.1.3813.1.4.12.2.1.7"/>
+  <def name="boPacketsSent64"           value="1.3.6.1.4.1.3813.1.4.12.2.1.8"/>
+  <def name="boPacketsReceived64"       value="1.3.6.1.4.1.3813.1.4.12.2.1.9"/>
+  <def name="boPacketsSent65to127"      value="1.3.6.1.4.1.3813.1.4.12.2.1.10"/>
+  <def name="boPacketsReceived65to127"  value="1.3.6.1.4.1.3813.1.4.12.2.1.11"/>
+  <def name="boPacketsSent128to255"     value="1.3.6.1.4.1.3813.1.4.12.2.1.12"/>
+  <def name="boPacketsReceived128to255" value="1.3.6.1.4.1.3813.1.4.12.2.1.13"/>
+  <def name="boPacketsSent256to511"     value="1.3.6.1.4.1.3813.1.4.12.2.1.14"/>
+  <def name="boPacketsReceived256to511" value="1.3.6.1.4.1.3813.1.4.12.2.1.15"/>
+  <def name="boPacketsSent512to1023"    value="1.3.6.1.4.1.3813.1.4.12.2.1.16"/>
+  <def name="boPacketsReceived512to1023"
+                                        value="1.3.6.1.4.1.3813.1.4.12.2.1.17"/>
+  <def name="boPacketsSent1024to1518"   value="1.3.6.1.4.1.3813.1.4.12.2.1.18"/>
+  <def name="boPacketsReceived1024to1518"
+                                        value="1.3.6.1.4.1.3813.1.4.12.2.1.19"/>
+  <def name="boPacketsSent1519up"       value="1.3.6.1.4.1.3813.1.4.12.2.1.20"/>
+  <def name="boPacketsReceived1519up"   value="1.3.6.1.4.1.3813.1.4.12.2.1.21"/>
+  <def name="boBundleBytesSentDenyPolicyDrop"
+                                        value="1.3.6.1.4.1.3813.1.4.12.2.1.22"/>
+  <def name="boBundleBytesReceivedDenyPolicyDrop"
+                                        value="1.3.6.1.4.1.3813.1.4.12.2.1.23"/>
+  <def name="boBundleBytesSentRateLimitDrop"
+                                        value="1.3.6.1.4.1.3813.1.4.12.2.1.24"/>
+  <def name="boBundleBytesReceivedRateLimitDrop" 
+                                        value="1.3.6.1.4.1.3813.1.4.12.2.1.25"/>
 
   <!-- ELLACOYA-MIB::l2tp -->
   <def name="l2tpAllocTags"       value="1.3.6.1.4.1.3813.1.4.18.3.1.1.0" />
@@ -169,20 +207,19 @@
 
 
   <template name="e30-cpu">
-    <param name="comment"           value="CPU Usage"/>
+    <param name="comment"           value="Overall CPU busy percentage"/>
     <param name="data-file"         value="%system-id%_cpu.rrd"/>
     <param name="rrd-create-dstype" value="GAUGE"/>
 
     <leaf name="CPU_Utilization">
-      <param name="comment"           value="Utilization of CPU"/>
-      <param name="graph-legend"      value="Util"/>
-      <param name="vertical-label"    value="percent"/>
+      <param name="comment"           value="CPU Utilization"/>
       <param name="rrd-ds"            value="cpu_0"/>
       <param name="snmp-object"       value="$cpuUtilization"/>
-      <param name="line-style"        value="##resourceusage" />
-      <param name="line-color"        value="##resourceusage" />
+      <param name="graph-legend"      value="CPU usage"/>
       <param name="graph-lower-limit" value="0" />
       <param name="graph-upper-limit" value="100" />
+      <param name="upper-limit"       value="80" />
+      <param name="vertical-label"    value="Percent"/>
     </leaf>
   </template>
 
@@ -193,27 +230,27 @@
     <!-- Usage -->
     <param name="overview-subleave-name-usage" value="Usage"/>
     <param name="overview-shortcut-text-usage"
-           value="All Flow Usage summary"/>
+          value="Flow Usage summary"/>
     <param name="overview-shortcut-title-usage"
-           value="Show flow usage summary for all pools on one page"/>
+          value="Show flow usage summary for all pools on one page"/>
     <param name="overview-page-title-usage"
-           value="Flow usage"/>
+          value="Flow usage"/>
     <!-- Maximum -->
     <param name="overview-subleave-name-max" value="Maximum"/>
     <param name="overview-shortcut-text-max"
-           value="All Max cap. of the flow pool summary"/>
+          value="Max cap. of the flow pool summary"/>
     <param name="overview-shortcut-title-max"
-           value="Show maximum capacity of the flow pools on one page"/>
+          value="Show maximum capacity of the flow pools on one page"/>
     <param name="overview-page-title-max"
-           value="Flow maximum usage"/>
+          value="Flow maximum usage"/>
     <!-- Current -->
     <param name="overview-subleave-name-curr" value="Current"/>
     <param name="overview-shortcut-text-curr"
-           value="All Curr cap. of the flow pool summary"/>
+          value="Curr cap. of the flow pool summary"/>
     <param name="overview-shortcut-title-curr"
-           value="Show current capacity of the flow pools on one page"/>
+          value="Show current capacity of the flow pools on one page"/>
     <param name="overview-page-title-curr"
-           value="Flow current usage"/>
+          value="Flow current usage"/>
   </template>
 
 
@@ -457,6 +494,16 @@
   </template>
 
 
+  <template name="e30-fwdTable-login">
+    <param name="comment"       value="Login OK attempt counter: %login-idx%"/>
+    <param name="data-file"     value="%system-id%_fwdTable_login.rrd"/>
+    <param name="graph-title"   value="%system-id%: Login attempt %login-idx%"/>
+    <param name="graph-legend"  value="Num of attempts"/>
+    <param name="rrd-ds"        value="login_%login-idx%"/>
+    <param name="snmp-object"   value="$loginRespOkStatsCount.%login-idx%"/>
+  </template>
+
+
   <template name="e30-bundle-subtree">
     <param name="data-file" 
                      value="%system-id%_bundle_%e30-bundle-rrd%.rrd"/>
@@ -507,6 +554,7 @@
            value="Subscriber Count"/>
   </template>
 
+
   <template name="e30-bundle">
     <leaf name="Volume">
       <param name="comment"
@@ -534,7 +582,7 @@
       <param name="rrd-ds"          value="UpVolume"/>
       <param name="snmp-object"
             value="$bundleBytesSent.%e30-bundle-index%"/>
-      <param name="precedence"        value="90"/>
+      <param name="precedence"        value="902"/>
       <param name="rrd-create-dstype" value="COUNTER"/>
     </leaf>
 
@@ -544,7 +592,7 @@
       <param name="rrd-ds"          value="DownVolume"/>
       <param name="snmp-object"
             value="$bundleBytesReceived.%e30-bundle-index%"/>
-      <param name="precedence"        value="85"/>
+      <param name="precedence"        value="901"/>
       <param name="rrd-create-dstype" value="COUNTER"/>
     </leaf>
 
@@ -555,7 +603,7 @@
       <param name="ds-type"        value="rrd-file" />
       <param name="leaf-type"      value="rrd-cdef" />
       <param name="rpn-expr"       value="{UpVolume},8,*" />
-      <param name="precedence"     value="70"/>
+      <param name="precedence"     value="802"/>
     </leaf>
 
     <leaf name="Down_bps">
@@ -565,7 +613,7 @@
       <param name="ds-type"        value="rrd-file" />
       <param name="leaf-type"      value="rrd-cdef" />
       <param name="rpn-expr"       value="{DownVolume},8,*" />
-      <param name="precedence"     value="65"/>
+      <param name="precedence"     value="801"/>
     </leaf>
 
     <leaf name="Subscriber_Count">
@@ -574,8 +622,154 @@
       <param name="vertical-label" value="subs"/>
       <param name="rrd-ds"         value="subCount"/>
       <param name="snmp-object"    value="$bundleSubCount.%e30-bundle-index%"/>
-      <param name="precedence"     value="50"/>
+      <param name="precedence"     value="700"/>
       <param name="rrd-create-dstype" value="GAUGE"/>
+    </leaf>
+  </template>
+
+
+  <template name="e30-bundle-deny">
+    <leaf name="Volume_Denied">
+      <param name="comment"
+                     value="InOut of denied volume in kilobytes/s"/>
+      <param name="precedence"          value="1000"/>
+      <param name="ds-type"             value="rrd-multigraph"/>
+      <param name="ds-names"            value="down,up"/>
+      <!-- Volume Download -->
+      <param name="ds-expr-down"        value="{DownDenyVolume},8,*"/>
+      <param name="graph-legend-down"   value="Denied Bits per second in"/>
+      <param name="line-style-down"     value="##BpsIn"/>
+      <param name="line-color-down"     value="##BpsIn"/>
+      <param name="line-order-down"     value="1"/>
+      <!-- Volume Upload -->
+      <param name="ds-expr-up"          value="{UpDenyVolume},8,*"/>
+      <param name="graph-legend-up"     value="Denied Bits per second out"/>
+      <param name="line-style-up"       value="##BpsOut"/>
+      <param name="line-color-up"       value="##BpsOut"/>
+      <param name="line-order-up"       value="2"/>
+    </leaf>
+
+    <leaf name="UpDenyVolume">
+      <param name="data-file" 
+                     value="%system-id%_bundle_%e30-bundle-rrd%_deny.rrd"/>
+      <param name="comment"    value="Upstream denied volume in kilobytes/s"/>
+      <param name="hidden"     value="yes"/>
+      <param name="rrd-ds"     value="UpDenyVolume"/>
+      <param name="snmp-object"
+            value="$bundleBytesSentDenyPolicyDrop.%e30-bundle-index%"/>
+      <param name="precedence"        value="602"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="snmp-object-type" value="COUNTER64"/>
+    </leaf>
+
+    <leaf name="DownDenyVolume">
+      <param name="data-file" 
+                     value="%system-id%_bundle_%e30-bundle-rrd%_deny.rrd"/>
+      <param name="comment"    value="Downstream denied volume in kilobytes/s"/>
+      <param name="hidden"     value="yes"/>
+      <param name="rrd-ds"     value="DownVolume"/>
+      <param name="snmp-object"
+            value="$bundleBytesReceivedDenyPolicyDrop.%e30-bundle-index%"/>
+      <param name="precedence"        value="601"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="snmp-object-type" value="COUNTER64"/>
+    </leaf>
+
+    <leaf name="Up_Deny_bps">
+      <param name="comment"
+            value="Upstream denied bandwidth usage per service"/>
+      <param name="graph-legend"   value="Upstream Denied BW"/>
+      <param name="line-style"     value="##BpsOut"/>
+      <param name="line-color"     value="##BpsOut"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{UpDenyVolume},8,*" />
+      <param name="precedence"        value="502"/>
+    </leaf>
+
+    <leaf name="Down_Deny_bps">
+      <param name="comment"
+            value="Downstream denied bandwidth usage per service"/>
+      <param name="graph-legend"   value="Downstream denied BW"/>
+      <param name="line-style"     value="##BpsIn"/>
+      <param name="line-color"     value="##BpsIn"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{DownDenyVolume},8,*" />
+      <param name="precedence"        value="501"/>
+    </leaf>
+  </template>
+
+
+  <template name="e30-bundle-ratelimit">
+    <leaf name="Volume_RateLimit">
+      <param name="comment"
+                     value="InOut of ratelimit volume in kilobytes/s"/>
+      <param name="precedence"          value="1000"/>
+      <param name="ds-type"             value="rrd-multigraph"/>
+      <param name="ds-names"            value="down,up"/>
+      <!-- Volume Download -->
+      <param name="ds-expr-down"        value="{DownRateVolume},8,*"/>
+      <param name="graph-legend-down"   value="Rate limit Bits per second in"/>
+      <param name="line-style-down"     value="##BpsIn"/>
+      <param name="line-color-down"     value="##BpsIn"/>
+      <param name="line-order-down"     value="1"/>
+      <!-- Volume Upload -->
+      <param name="ds-expr-up"          value="{UpRateVolume},8,*"/>
+      <param name="graph-legend-up"     value="Rate limit Bits per second out"/>
+      <param name="line-style-up"       value="##BpsOut"/>
+      <param name="line-color-up"       value="##BpsOut"/>
+      <param name="line-order-up"       value="2"/>
+    </leaf>
+
+    <leaf name="UpRateVolume">
+      <param name="data-file" 
+                     value="%system-id%_bundle_%e30-bundle-rrd%_ratelimit.rrd"/>
+      <param name="comment"   value="Upstream ratelimit volume in kilobytes/s"/>
+      <param name="hidden"    value="yes"/>
+      <param name="rrd-ds"    value="UpDenyVolume"/>
+      <param name="snmp-object"
+            value="$bundleBytesSentRateLimitDrop.%e30-bundle-index%"/>
+      <param name="precedence"        value="402"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="snmp-object-type" value="COUNTER64"/>
+    </leaf>
+
+    <leaf name="DownRateVolume">
+      <param name="data-file" 
+                     value="%system-id%_bundle_%e30-bundle-rrd%_ratelimit.rrd"/>
+      <param name="comment" value="Downstream ratelimit volume in kilobytes/s"/>
+      <param name="hidden"  value="yes"/>
+      <param name="rrd-ds"  value="DownVolume"/>
+      <param name="snmp-object"
+            value="$bundleBytesReceivedRateLimitDrop.%e30-bundle-index%"/>
+      <param name="precedence"        value="401"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="snmp-object-type" value="COUNTER64"/>
+    </leaf>
+
+    <leaf name="Up_Rate_bps">
+      <param name="comment"
+            value="Upstream rate limit bandwidth usage per service"/>
+      <param name="graph-legend"   value="Upstream rate limited in Bps"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{UpRateVolume},8,*" />
+      <param name="precedence"        value="302"/>
+    </leaf>
+
+    <leaf name="Down_Rate_bps">
+      <param name="comment"
+            value="Downstream rate limit bandwidth usage per service"/>
+      <param name="graph-legend"   value="Downstream rate limited in Bps"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{DownRateVolume},8,*" />
+      <param name="precedence"        value="301"/>
     </leaf>
   </template>
 
@@ -586,27 +780,27 @@
     <!-- Usage -->
     <param name="overview-subleave-name-usage" value="Usage"/>
     <param name="overview-shortcut-text-usage"
-           value="All HDD Parition usage summary"/>
+          value="All HDD Parition usage summary"/>
     <param name="overview-shortcut-title-usage"
-           value="Show hdd usage summary for all partitions on one page"/>
+          value="Show hdd usage summary for all partitions on one page"/>
     <param name="overview-page-title-usage"
-           value="Parition usage"/>
+          value="Parition usage"/>
     <!-- Total -->
     <param name="overview-subleave-name-total" value="Total"/>
     <param name="overview-shortcut-text-total"
-           value="All HDD Parition total size summary"/>
+          value="All HDD Parition total size summary"/>
     <param name="overview-shortcut-title-total"
-           value="Show hdd total size summary for all partitions on one page"/>
+          value="Show hdd total size summary for all partitions on one page"/>
     <param name="overview-page-title-total"
-           value="Parition Size Total"/>
+          value="Parition Size Total"/>
     <!-- Used -->
     <param name="overview-subleave-name-used" value="Used"/>
     <param name="overview-shortcut-text-used"
-           value="All HDD Parition used size summary"/>
+          value="All HDD Parition used size summary"/>
     <param name="overview-shortcut-title-used"
-           value="Show hdd used size summary for all partitions on one page"/>
+          value="Show hdd used size summary for all partitions on one page"/>
     <param name="overview-page-title-used"
-           value="Parition Size Used"/>
+          value="Parition Size Used"/>
   </template>
 
 
@@ -695,6 +889,7 @@
             <param name="ds-type"            value="rrd-multigraph"/>
             <param name="ds-names"           value="total,used"/>
             <param name="graph-lower-limit"  value="0"/>
+
             <!-- Total Parition Size -->
             <param name="ds-expr-total"      value="{Total_Raw},1024,*"/>
             <param name="graph-legend-total" value="Total"/>
@@ -752,9 +947,9 @@
             <param name="rrd-ds"            value="hDriveHd1Usage"/>
             <param name="snmp-object"       value="$hDriveHd1Usage"/>
           </leaf>
-
         </subtree>
   </template>
+
 
   <template name="e30-hdd-errors">
     <subtree name="HDD_Errors">
@@ -886,6 +1081,7 @@
     </subtree>
   </template>
 
+
   <template name="e30-hdd-logs">
     <subtree name="Daily_Logs">
         <param name="comment"           value="Daily log directory"/>
@@ -940,8 +1136,9 @@
     </subtree>
   </template>
 
+
   <template name="e30-l2tp-subtree">
-    <param name="comment"           value="L2TP information"/>
+    <param name="comment"           value="L2TP statistics"/>
     <param name="data-file"         value="%system-id%_l2tp.rrd"/>
     <param name="graph-lower-limit" value="0"/>
     <param name="graph-title"       value="%system-id%: L2TP"/>
@@ -966,6 +1163,7 @@
     </leaf>
   </template>
 
+
   <template name="e30-l2tp-secure-endpoints-subtree">
     <param name="has-overview-shortcuts" value="yes"/>
     <param name="overview-shortcuts"     value="sessions,overlap"/>
@@ -986,6 +1184,7 @@
     <param name="overview-page-title-overlap"
            value="L2TP session usage"/>
   </template>
+
 
   <template name="e30-l2tp-secure-endpoints-leaf">
     <param name="comment"           value="Secure endpoint: %e30-l2tp-ep%"/>
@@ -1015,9 +1214,10 @@
     </leaf>
   </template>
 
+
   <template name="e30-mem">
     <subtree name="Memory">
-        <param name="comment"           value="Memory Usage"/>
+        <param name="comment"           value="Memory usage statistics"/>
         <param name="data-file"         value="%system-id%_mem.rrd"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
 
@@ -1111,12 +1311,13 @@
            value="System Blocks free"/>
   </template>
 
+
   <template name="e30-mempool">
     <param name="graph-title"       value="%e30-mempool-name%"/>
     <param name="rrd-create-dstype" value="GAUGE"/>
 
         <leaf name="Percentage_used">
-          <param name="comment"         valu="Percent of blocks used (rpn: sysBlks, usedBlks, /"/>
+          <param name="comment"         value="Percent of blocks used"/>
           <param name="graph-legend"    value="Percentage Used"/>
           <param name="vertical-label"  value="percent"/>
           <param name="ds-type"         value="rrd-file" />
@@ -1128,7 +1329,7 @@
 
         <leaf name="Block_Size">
           <param name="precedence"      value="100"/>
-          <!-- <param name="hidden"          value="yes"/> -->
+          <param name="hidden"          value="yes"/>
           <param name="comment"         value="Size of a single memory block"/>
           <param name="graph-legend"    value="Size of a single memory block"/>
           <param name="graph-title"     value="%e30-mempool-name%"/>
@@ -1273,6 +1474,588 @@
     </leaf>
   </template>
 
+  <!-- 
+    COMMON: Bundle Offer statistics are common between the e30 and e100
+      NOTE: PacketSize information is only available for the e100
+  -->
+ 
+  <template name="arbor-bundle-subtree">
+    <param name="graph-lower-limit"  value="0" />
+    <param name="graph-title"        value="%bundle-name%"/>
+
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts"     value="up,down,volume"/>
+    <!-- Up Volume -->
+    <param name="overview-subleave-name-up"      value="Up_bps"/>
+    <param name="overview-direct-link-up"        value="yes"/>
+    <param name="overview-direct-link-view-up"   value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-up"
+           value="Upstream Usage"/>
+    <param name="overview-shortcut-title-up"
+           value="Show upstream bandwidth usage for all bundles"/>
+    <param name="overview-page-title-up"
+           value="Upstream Usage"/>
+    <!-- Down Volume -->
+    <param name="overview-subleave-name-down"    value="Down_bps"/>
+    <param name="overview-direct-link-down"      value="yes"/>
+    <param name="overview-direct-link-view-down" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-down"
+           value="Downstream Usage"/>
+    <param name="overview-shortcut-title-down"
+           value="Show downstream bandwidth usage for all bundles"/>
+    <param name="overview-page-title-down"
+           value="Downstream Usage"/>
+    <!-- InOut Volume -->
+    <param name="overview-subleave-name-volume"    value="Volume"/>
+    <param name="overview-direct-link-volume"      value="yes"/>
+    <param name="overview-direct-link-view-volume" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-volume"
+           value="InOut Usage"/>
+    <param name="overview-shortcut-title-volume"
+           value="Show InOut bandwidth usage for all bundles"/>
+    <param name="overview-page-title-volume"
+           value="Volume Usage"/>
+  </template>
+
+
+  <template name="arbor-bundle">
+    <leaf name="Volume">
+      <param name="comment"
+                     value="InOut volume in kilobytes/s"/>
+      <param name="precedence"          value="1000"/>
+      <param name="ds-type"             value="rrd-multigraph"/>
+      <param name="ds-names"            value="down,up"/>
+      <!-- Volume Download -->
+      <param name="ds-expr-down"        value="{DownVolume},8,*"/>
+      <param name="graph-legend-down"   value="Bits per second in"/>
+      <param name="line-style-down"     value="##BpsIn"/>
+      <param name="line-color-down"     value="##BpsIn"/>
+      <param name="line-order-down"     value="1"/>
+      <!-- Volume Upload -->
+      <param name="ds-expr-up"          value="{UpVolume},8,*"/>
+      <param name="graph-legend-up"     value="Bits per second out"/>
+      <param name="line-style-up"       value="##BpsOut"/>
+      <param name="line-color-up"       value="##BpsOut"/>
+      <param name="line-order-up"       value="2"/>
+    </leaf>
+
+    <leaf name="UpVolume">
+      <param name="comment"           value="Upstream volume in kilobytes/s"/>
+      <param name="hidden"            value="yes"/>
+      <param name="rrd-ds"            value="UpVolume"/>
+      <param name="snmp-object"
+            value="$boBundleBytesSent.%bundle-id%.%offer-id%"/>
+      <param name="precedence"        value="902"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+    </leaf>
+
+    <leaf name="DownVolume">
+      <param name="comment"           value="Downstream volume in kilobytes/s"/>
+      <param name="hidden"            value="yes"/>
+      <param name="rrd-ds"            value="DownVolume"/>
+      <param name="snmp-object"
+            value="$boBundleBytesReceived.%bundle-id%.%offer-id%"/>
+      <param name="precedence"        value="901"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+    </leaf>
+
+    <leaf name="Up_bps">
+      <param name="comment" value="Upstream bandwidth usage per service"/>
+      <param name="graph-legend"   value="Upstream BW"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{UpVolume},8,*" />
+      <param name="precedence"     value="802"/>
+    </leaf>
+
+    <leaf name="Down_bps">
+      <param name="comment" value="Downstream bandwidth usage per service"/>
+      <param name="graph-legend"   value="Downstream BW"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{DownVolume},8,*" />
+      <param name="precedence"     value="801"/>
+    </leaf>
+  </template>
+
+
+  <template name="arbor-bundle-deny">
+    <leaf name="Volume_Denied">
+      <param name="comment"
+                     value="InOut of denied volume in kilobytes/s"/>
+      <param name="precedence"          value="1000"/>
+      <param name="ds-type"             value="rrd-multigraph"/>
+      <param name="ds-names"            value="down,up"/>
+      <!-- Volume Download -->
+      <param name="ds-expr-down"        value="{Deny_DownVolume},8,*"/>
+      <param name="graph-legend-down"   value="Denied Bits per second in"/>
+      <param name="line-style-down"     value="##BpsIn"/>
+      <param name="line-color-down"     value="##BpsIn"/>
+      <param name="line-order-down"     value="1"/>
+      <!-- Volume Upload -->
+      <param name="ds-expr-up"          value="{Deny_UpVolume},8,*"/>
+      <param name="graph-legend-up"     value="Denied Bits per second out"/>
+      <param name="line-style-up"       value="##BpsOut"/>
+      <param name="line-color-up"       value="##BpsOut"/>
+      <param name="line-order-up"       value="2"/>
+    </leaf>
+
+    <leaf name="Deny_UpVolume">
+      <param name="data-file" 
+            value="%system-id%_bo_%offer-rrd%_%bundle-rrd%_deny.rrd"/>
+      <param name="comment"    value="Upstream denied volume in kilobytes/s"/>
+      <param name="hidden"     value="yes"/>
+      <param name="rrd-ds"     value="UpVolumeDeny"/>
+      <param name="snmp-object"
+           value="$boBundleBytesSentDenyPolicyDrop.%bundle-id%.%offer-id%"/>
+      <param name="precedence"        value="602"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="snmp-object-type"  value="COUNTER64"/>
+    </leaf>
+
+    <leaf name="Deny_DownVolume">
+      <param name="data-file" 
+            value="%system-id%_bo_%offer-rrd%_%bundle-rrd%_deny.rrd"/>
+      <param name="comment"    value="Downstream denied volume in kilobytes/s"/>
+      <param name="hidden"     value="yes"/>
+      <param name="rrd-ds"     value="DownVolumeDeny"/>
+      <param name="snmp-object"
+           value="$boBundleBytesReceivedDenyPolicyDrop.%bundle-id%.%offer-id%"/>
+      <param name="precedence"        value="601"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="snmp-object-type"  value="COUNTER64"/>
+    </leaf>
+
+    <leaf name="Denied_Up_bps">
+      <param name="comment"
+            value="Upstream denied bandwidth usage per service"/>
+      <param name="graph-legend"   value="Upstream Denied BW"/>
+      <param name="line-style"     value="##BpsOut"/>
+      <param name="line-color"     value="##BpsOut"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{Deny_UpVolume},8,*" />
+      <param name="precedence"     value="502"/>
+    </leaf>
+
+    <leaf name="Denied_Down_bps">
+      <param name="comment"
+            value="Downstream denied bandwidth usage per service"/>
+      <param name="graph-legend"   value="Downstream denied BW"/>
+      <param name="line-style"     value="##BpsIn"/>
+      <param name="line-color"     value="##BpsIn"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{Deny_DownVolume},8,*" />
+      <param name="precedence"     value="501"/>
+    </leaf>
+  </template>
+
+
+  <template name="arbor-bundle-ratelimit">
+    <leaf name="Volume_RateLimit">
+      <param name="comment"
+                     value="InOut of ratelimit volume in kilobytes/s"/>
+      <param name="precedence"          value="1000"/>
+      <param name="ds-type"             value="rrd-multigraph"/>
+      <param name="ds-names"            value="down,up"/>
+      <!-- Volume Download -->
+      <param name="ds-expr-down"        value="{Rate_DownVolume},8,*"/>
+      <param name="graph-legend-down"   value="Rate limit Bits per second in"/>
+      <param name="line-style-down"     value="##BpsIn"/>
+      <param name="line-color-down"     value="##BpsIn"/>
+      <param name="line-order-down"     value="1"/>
+      <!-- Volume Upload -->
+      <param name="ds-expr-up"          value="{Rate_UpVolume},8,*"/>
+      <param name="graph-legend-up"     value="Rate limit Bits per second out"/>
+      <param name="line-style-up"       value="##BpsOut"/>
+      <param name="line-color-up"       value="##BpsOut"/>
+      <param name="line-order-up"       value="2"/>
+    </leaf>
+
+    <leaf name="Rate_UpVolume">
+      <param name="data-file" 
+            value="%system-id%_bo_%offer-rrd%_%bundle-rrd%_ratelimit.rrd"/>
+      <param name="comment"
+            value="Upstream ratelimit volume in kilobytes/s"/>
+      <param name="hidden"            value="yes"/>
+      <param name="rrd-ds"            value="UpVolumeRate"/>
+      <param name="snmp-object"
+            value="$boBundleBytesSentRateLimitDrop.%bundle-id%.%offer-id%"/>
+      <param name="precedence"        value="402"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="snmp-object-type"  value="COUNTER64"/>
+    </leaf>
+
+    <leaf name="Rate_DownVolume">
+      <param name="data-file" 
+            value="%system-id%_bo_%offer-rrd%_%bundle-rrd%_ratelimit.rrd"/>
+      <param name="comment"
+            value="Downstream ratelimit volume in kilobytes/s"/>
+      <param name="hidden"            value="yes"/>
+      <param name="rrd-ds"            value="DownVolumeRate"/>
+      <param name="snmp-object"
+            value="$boBundleBytesReceivedRateLimitDrop.%bundle-id%.%offer-id%"/>
+      <param name="precedence"        value="401"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="snmp-object-type"  value="COUNTER64"/>
+    </leaf>
+
+    <leaf name="Ratelimit_Up_bps">
+      <param name="comment"
+            value="Upstream rate limit bandwidth usage per service"/>
+      <param name="graph-legend"   value="Upstream rate limited in Bps"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{Rate_UpVolume},8,*" />
+      <param name="precedence"     value="302"/>
+    </leaf>
+
+    <leaf name="Ratelimit_Down_bps">
+      <param name="comment"
+            value="Downstream rate limit bandwidth usage per service"/>
+      <param name="graph-legend"   value="Downstream rate limited in Bps"/>
+      <param name="vertical-label" value="bps"/>
+      <param name="ds-type"        value="rrd-file" />
+      <param name="leaf-type"      value="rrd-cdef" />
+      <param name="rpn-expr"       value="{Rate_DownVolume},8,*" />
+      <param name="precedence"     value="301"/>
+    </leaf>
+  </template>
+
+
+  <template name="arbor-bundle-subcount">
+    <leaf name="Subscriber_Count">
+      <param name="comment"           value="Subscribers using this bundle"/>
+      <param name="data-file"
+            value="%system-id%_bo_%offer-rrd%_%bundle-rrd%_subcount.rrd"/>
+      <param name="graph-legend"      value="subscribers"/>
+      <param name="rrd-ds"            value="subCount"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="snmp-object"
+            value="$boBundleSubCount.%bundle-id%.%offer-id%"/>
+    </leaf>
+  </template>
+
+
+  <template name="arbor-bundle-pktsize">
+    <subtree name="Packet_Sizes">
+      <param name="comment"
+            value="Number of packets sent per grouped packet size"/>
+      <param name="data-file"
+            value="%system-id%_bo_%offer-rrd%_%bundle-rrd%_pktsize.rrd"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+
+      <!-- SUMMARY OF BYTE SIZES -->
+      <leaf name="64Byte">
+        <param name="comment"      value="InOut volume in kbps for 64Byte"/>
+        <param name="precedence"   value="999"/>
+        <param name="ds-type"      value="rrd-multigraph"/>
+        <param name="ds-names"     value="down,up"/>
+        <!-- 64 Byte Volume down -->
+        <!-- 221 (num of packets) * 64 bytes * 8 bits / 300 secs  -->
+        <param name="ds-expr-down"      value="{64Byte_Down},64,*,8,*,300,/"/>
+        <param name="graph-legend-down" value="Approx Bits per second in"/>
+        <param name="line-style-down"   value="##BpsIn"/>
+        <param name="line-color-down"   value="##BpsIn"/>
+        <param name="line-order-down"   value="1"/>
+        <!-- 64 Byte Volume up -->
+        <param name="ds-expr-up"        value="{64Byte_Up},,64,*,8,*,300,/"/>
+        <param name="graph-legend-up"   value="Approx Bits per second out"/>
+        <param name="line-style-up"     value="##BpsOut"/>
+        <param name="line-color-up"     value="##BpsOut"/>
+        <param name="line-order-up"     value="1"/>
+      </leaf>
+
+      <leaf name="65Byte_to_127Byte">
+        <param name="comment"
+              value="Approx InOut volume in kbps for 65 to 127Byte"/>
+        <param name="precedence"   value="998"/>
+        <param name="ds-type"      value="rrd-multigraph"/>
+        <param name="ds-names"     value="down,up"/>
+        <!-- 65Byte_to_127Byte Volume down -->
+        <param name="ds-expr-down"
+              value="{65Byte_to_127Byte_Down},64,*,8,*,300,/"/>
+        <param name="graph-legend-down" value="Approx Bits per second in"/>
+        <param name="line-style-down"   value="##BpsIn"/>
+        <param name="line-color-down"   value="##BpsIn"/>
+        <param name="line-order-down"   value="1"/>
+        <!-- 65Byte_to_127Byte Volume up -->
+        <param name="ds-expr-up"
+              value="{65Byte_to_127Byte_Up},64,*,8,*,300,/"/>
+        <param name="graph-legend-up"   value="Approx Bits per second out"/>
+        <param name="line-style-up"     value="##BpsOut"/>
+        <param name="line-color-up"     value="##BpsOut"/>
+        <param name="line-order-up"     value="1"/>
+      </leaf>
+
+      <leaf name="128Byte_to_255Byte">
+        <param name="comment"
+              value="Approx InOut volume in kbps for 128 to 255Byte"/>
+        <param name="precedence"   value="997"/>
+        <param name="ds-type"      value="rrd-multigraph"/>
+        <param name="ds-names"     value="down,up"/>
+        <!-- 128Byte_to_255Byte Volume down -->
+        <param name="ds-expr-down"
+              value="{128Byte_to_255Byte_Down},64,*,8,*,300,/"/>
+        <param name="graph-legend-down" value="Approx Bits per second in"/>
+        <param name="line-style-down"   value="##BpsIn"/>
+        <param name="line-color-down"   value="##BpsIn"/>
+        <param name="line-order-down"   value="1"/>
+        <!-- 128Byte_to_255Byte Volume up -->
+        <param name="ds-expr-up"
+              value="{128Byte_to_255Byte_Up},64,*,8,*,300,/"/>
+        <param name="graph-legend-up"   value="Approx Bits per second out"/>
+        <param name="line-style-up"     value="##BpsOut"/>
+        <param name="line-color-up"     value="##BpsOut"/>
+        <param name="line-order-up"     value="1"/>
+      </leaf>
+
+      <leaf name="256Byte_to_511Byte">
+        <param name="comment"
+              value="Approx InOut volume in kbps for 256 to 511Byte"/>
+        <param name="precedence"   value="996"/>
+        <param name="ds-type"      value="rrd-multigraph"/>
+        <param name="ds-names"     value="down,up"/>
+        <!-- 256Byte_to_511Byte Volume down -->
+        <param name="ds-expr-down"
+              value="{256Byte_to_511Byte_Down},64,*,8,*,300,/"/>
+        <param name="graph-legend-down" value="Approx Bits per second in"/>
+        <param name="line-style-down"   value="##BpsIn"/>
+        <param name="line-color-down"   value="##BpsIn"/>
+        <param name="line-order-down"   value="1"/>
+        <!-- 256Byte_to_511Byte Volume up -->
+        <param name="ds-expr-up"
+              value="{256Byte_to_511Byte_Up},64,*,8,*,300,/"/>
+        <param name="graph-legend-up"   value="Approx Bits per second out"/>
+        <param name="line-style-up"     value="##BpsOut"/>
+        <param name="line-color-up"     value="##BpsOut"/>
+        <param name="line-order-up"     value="1"/>
+      </leaf>
+
+      <leaf name="512Byte_to_1023Byte">
+        <param name="comment"
+              value="Approx InOut volume in kbps for 512 to 1023Byte"/>
+        <param name="precedence"   value="995"/>
+        <param name="ds-type"      value="rrd-multigraph"/>
+        <param name="ds-names"     value="down,up"/>
+        <!-- 512Byte_to_1023Byte Volume down -->
+        <param name="ds-expr-down"
+              value="{512Byte_to_1023Byte_Down},64,*,8,*,300,/"/>
+        <param name="graph-legend-down" value="Approx Bits per second in"/>
+        <param name="line-style-down"   value="##BpsIn"/>
+        <param name="line-color-down"   value="##BpsIn"/>
+        <param name="line-order-down"   value="1"/>
+        <!-- 512Byte_to_1023Byte Volume up -->
+        <param name="ds-expr-up"
+              value="{512Byte_to_1023Byte_Up},64,*,8,*,300,/"/>
+        <param name="graph-legend-up"   value="Approx Bits per second out"/>
+        <param name="line-style-up"     value="##BpsOut"/>
+        <param name="line-color-up"     value="##BpsOut"/>
+        <param name="line-order-up"     value="1"/>
+      </leaf>
+
+      <leaf name="1024Byte_to_1518Byte">
+        <param name="comment"
+              value="Approx InOut volume in kbps for 1024 to 1518Byte"/>
+        <param name="precedence"   value="994"/>
+        <param name="ds-type"      value="rrd-multigraph"/>
+        <param name="ds-names"     value="down,up"/>
+        <!-- 1024Byte_to_1518Byte Volume down -->
+        <param name="ds-expr-down"
+              value="{1024Byte_to_1518Byte_Down},64,*,8,*,300,/"/>
+        <param name="graph-legend-down" value="Approx Bits per second in"/>
+        <param name="line-style-down"   value="##BpsIn"/>
+        <param name="line-color-down"   value="##BpsIn"/>
+        <param name="line-order-down"   value="1"/>
+        <!-- 1024Byte_to_1518Byte Volume up -->
+        <param name="ds-expr-up"
+              value="{1024Byte_to_1518Byte_Up},64,*,8,*,300,/"/>
+        <param name="graph-legend-up"   value="Approx Bits per second out"/>
+        <param name="line-style-up"     value="##BpsOut"/>
+        <param name="line-color-up"     value="##BpsOut"/>
+        <param name="line-order-up"     value="1"/>
+      </leaf>
+
+      <leaf name="1519Byte_and_higher">
+        <param name="comment"
+              value="Approx InOut volume in kbps for 1519 and higher Byte"/>
+        <param name="precedence"   value="993"/>
+        <param name="ds-type"      value="rrd-multigraph"/>
+        <param name="ds-names"     value="down,up"/>
+        <!-- 1519Byte_and_higher Volume down -->
+        <param name="ds-expr-down"
+              value="{1519Byte_and_higher_Down},64,*,8,*,300,/"/>
+        <param name="graph-legend-down" value="Approx Bits per second in"/>
+        <param name="line-style-down"   value="##BpsIn"/>
+        <param name="line-color-down"   value="##BpsIn"/>
+        <param name="line-order-down"   value="1"/>
+        <!-- 1519Byte_and_higher Volume up -->
+        <param name="ds-expr-up"
+              value="{1519Byte_and_higher_Up},64,*,8,*,300,/"/>
+        <param name="graph-legend-up"   value="Bits per second out"/>
+        <param name="line-style-up"     value="##BpsOut"/>
+        <param name="line-color-up"     value="##BpsOut"/>
+        <param name="line-order-up"     value="1"/>
+      </leaf>
+
+      <!--
+        PER PACKET SIZES
+           only      64
+           65   to  127 
+           128  to  255
+           256  to  511
+           512  to 1023
+           1024 to 1518
+           1519 to higher
+       --> 
+
+      <leaf name="64Byte_Up">
+        <param name="comment"      value="64 Byte packets"/>
+        <param name="graph-legend" value="64 byte"/>
+        <param name="precedence"   value="92"/>
+        <param name="rrd-ds"       value="Sent64"/>
+        <param name="snmp-object"
+              value="$boPacketsSent64.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="64Byte_Down">
+        <param name="comment"      value="64 Byte packets"/>
+        <param name="graph-legend" value="64 byte"/>
+        <param name="precedence"   value="91"/>
+        <param name="rrd-ds"       value="Recv64"/>
+        <param name="snmp-object"
+              value="$boPacketsSent64.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="65Byte_to_127Byte_Up">
+        <param name="comment"      value="65 byte to 127 byte packets"/>
+        <param name="graph-legend" value="65 to 127 byte"/>
+        <param name="precedence"   value="82"/>
+        <param name="rrd-ds"       value="Sent65to127"/>
+        <param name="snmp-object"
+              value="$boPacketsSent65to127.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="65Byte_to_127Byte_Down">
+        <param name="comment"      value="65 byte to 127 byte packets"/>
+        <param name="graph-legend" value="65 to 127 byte"/>
+        <param name="precedence"   value="81"/>
+        <param name="rrd-ds"       value="Recv65to127"/>
+        <param name="snmp-object"
+              value="$boPacketsReceived65to127.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="128Byte_to_255Byte_Up">
+        <param name="comment"      value="128 byte to 255 byte packets"/>
+        <param name="graph-legend" value="128 to 255 byte"/>
+        <param name="precedence"   value="72"/>
+        <param name="rrd-ds"       value="Sent128to255"/>
+        <param name="snmp-object"
+              value="$boPacketsSent128to255.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="128Byte_to_255Byte_Down">
+        <param name="comment"      value="128 byte to 255 byte packets"/>
+        <param name="graph-legend" value="128 to 255 byte"/>
+        <param name="precedence"   value="71"/>
+        <param name="rrd-ds"       value="Recv128to255"/>
+        <param name="snmp-object"
+              value="$boPacketsReceived128to255.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="256Byte_to_511Byte_Up">
+        <param name="comment"      value="256 byte to 511 byte packets"/>
+        <param name="graph-legend" value="256 to 511 byte"/>
+        <param name="precedence"   value="62"/>
+        <param name="rrd-ds"       value="Sent256to511"/>
+        <param name="snmp-object"
+              value="$boPacketsSent256to511.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="256Byte_to_511Byte_Down">
+        <param name="comment"      value="256 byte to 511 byte packets"/>
+        <param name="graph-legend" value="256 to 511 byte"/>
+        <param name="precedence"   value="61"/>
+        <param name="rrd-ds"       value="Recv256to511"/>
+        <param name="snmp-object"
+              value="$boPacketsReceived256to511.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="512Byte_to_1023Byte_Up">
+        <param name="comment"      value="512 byte to 1023 byte packets"/>
+        <param name="graph-legend" value="512 to 1023 byte"/>
+        <param name="precedence"   value="52"/>
+        <param name="rrd-ds"       value="Sent512to1023"/>
+        <param name="snmp-object"
+              value="$boPacketsSent512to1023.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="512Byte_to_1023Byte_Down">
+        <param name="comment"      value="512 byte to 1023 byte packets"/>
+        <param name="graph-legend" value="512 to 1023 byte"/>
+        <param name="precedence"   value="51"/>
+        <param name="rrd-ds"       value="Recv512to1023"/>
+        <param name="snmp-object"
+              value="$boPacketsReceived512to1023.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="1024Byte_to_1518Byte_Up">
+        <param name="comment"      value="1024 byte to 1518 byte packets"/>
+        <param name="graph-legend" value="1024 to 1518 byte"/>
+        <param name="precedence"   value="42"/>
+        <param name="rrd-ds"       value="Sent1024to1518"/>
+        <param name="snmp-object"
+              value="$boPacketsSent1024to1518.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="1024Byte_to_1518Byte_Down">
+        <param name="comment"      value="1024 byte to 1518 byte packets"/>
+        <param name="graph-legend" value="1024 to 1518 byte"/>
+        <param name="precedence"   value="41"/>
+        <param name="rrd-ds"       value="Recv1024to1518"/>
+        <param name="snmp-object"
+              value="$boPacketsSent1024to1518.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="1519Byte_and_higher_Up">
+        <param name="comment"      value="1519 byte higher byte packets"/>
+        <param name="graph-legend" value="1519 and higher byte"/>
+        <param name="precedence"   value="32"/>
+        <param name="rrd-ds"       value="Sent1519up"/>
+        <param name="snmp-object"
+              value="$boPacketsSent1519up.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+  
+      <leaf name="1519Byte_and_higher_Down">
+        <param name="comment"      value="1519 byte higher byte packets"/>
+        <param name="graph-legend" value="1519 and higher byte"/>
+        <param name="precedence"   value="31"/>
+        <param name="rrd-ds"       value="Recv1519up"/>
+        <param name="snmp-object"
+              value="$boPacketsReceived1519up.%bundle-id%.%offer-id%"/>
+        <param name="vertical-label" value="packets"/>
+      </leaf>
+    </subtree>
+  </template>
 
 </datasources>
 

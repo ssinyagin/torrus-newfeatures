@@ -312,6 +312,18 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'arbor-bundle-subcount',
          'source' => 'vendor/arbor_e.xml'
          },
+     'Arbor_E::arbor-flowlkup-subtree' => {
+         'name'   => 'arbor-flowlkup-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::arbor-flowlkup' => {
+         'name'   => 'arbor-flowlkup',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::arbor-flowlkup-leaf' => {
+         'name'   => 'arbor-flowlkup-leaf',
+         'source' => 'vendor/arbor_e.xml'
+         },
      'Arbor_E::e30-buffers' => {
          'name'   => 'e30-buffers',
          'source' => 'vendor/arbor_e.xml'
@@ -386,18 +398,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
      'Arbor_E::e30-mempool' => {
          'name'   => 'e30-mempool',
-         'source' => 'vendor/arbor_e.xml'
-         },
-     'Arbor_E::e30-flowlkup-subtree' => {
-         'name'   => 'e30-flowlkup-subtree',
-         'source' => 'vendor/arbor_e.xml'
-         },
-     'Arbor_E::e30-flowlkup' => {
-         'name'   => 'e30-flowlkup',
-         'source' => 'vendor/arbor_e.xml'
-         },
-     'Arbor_E::e30-flowlkup-leaf' => {
-         'name'   => 'e30-flowlkup-leaf',
          'source' => 'vendor/arbor_e.xml'
          },
      'Arbor_E::e30-slowpath' => {

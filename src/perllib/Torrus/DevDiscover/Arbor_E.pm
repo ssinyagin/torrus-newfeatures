@@ -29,11 +29,13 @@
 #      Arbor_E::disable-bundle-offer-pktsize
 #      Arbor_E::disable-bundle-offer-rate
 #      Arbor_E::disable-bundle-offer-subcount
+#      Arbor_E::enable-bundle-name-rrd
+#      Arbor_E::disable-flowdev
 #
 # -- e30 specific
 #      Arbor_E::disable-e30-buffers
+#      Arbor_E::disable-e30-bundle
 #      Arbor_E::disable-e30-cpu
-#      Arbor_E::disable-e30-flowdev
 #      Arbor_E::disable-e30-fwdTable
 #      Arbor_E::disable-e30-fwdTable-login
 #      Arbor_E::disable-e30-hdd
@@ -46,6 +48,9 @@
 #      Arbor_E::disable-e30-bundle-deny
 #      Arbor_E::disable-e30-bundle-rate
 #      Arbor_E::disable-e30-slowpath 
+#
+# -- e100 specific
+#      Arbor_E::disable-e100-cpu
 #
 
 # Arbor_E devices discovery
@@ -73,7 +78,9 @@ our %oiddef =
      'hDriveErrSerialNum'    => '1.3.6.1.4.1.3813.1.4.2.10.17.0',
      'hDriveDailyLogSize'    => '1.3.6.1.4.1.3813.1.4.2.13.0',
      'cpuUtilization'	     => '1.3.6.1.4.1.3813.1.4.4.1.0',
+     'cpuUtilTable'          => '1.3.6.1.4.1.3813.1.4.4.2',     # e100
      'cpuIndex'		     => '1.3.6.1.4.1.3813.1.4.4.2.1.1', # e100
+     'cpuName'               => '1.3.6.1.4.1.3813.1.4.4.2.1.2', # e100
      'loginRespOkStatsIndex' => '1.3.6.1.4.1.3813.1.4.3.15.1.1',
 
      # ELLACOYA-MIB::cpuCounters (available in 7.5.x -- slowpath counters)
@@ -173,41 +180,6 @@ sub discover
         if( $devdetails->param('Arbor_E::disable-e30-cpu') ne 'yes' )
         {
             $devdetails->setCap('e30-cpu');
-        }
-
-        if( $devdetails->param('Arbor_E::disable-e30-flowdev') ne 'yes' )
-        {
-            $devdetails->setCap('e30-flowLookup');
-
-            # Flow Lookup Device information
-            # Figure out what pools exist for the 2 flow switching modules
-	    # ------------------------------------------------------------
-            my $switchingModules = 2; # Hard coded, 2 on the e30 device
-
-            foreach my $flowModule (1 .. $switchingModules) {
-                Debug("e30:  Flow Lookup Device " . $flowModule);
-
-                my $flowPoolOid  = 'flowPoolNameD' . $flowModule;
-                my $flowModTable = $session->get_table (
-                                  -baseoid => $dd->oiddef($flowPoolOid) );
-                $devdetails->storeSnmpVars ( $flowModTable );
-
-                # PROG: Look for pool names and indexes and store them.
-                if( $flowModTable ) {
-                    foreach my $flowPoolIDX ( $devdetails->getSnmpIndices(
-                                                $dd->oiddef($flowPoolOid) ) )
-                    {
-                        my $flowPoolName = $flowModTable->{
-                               $dd->oiddef($flowPoolOid) . '.' . $flowPoolIDX};
-
-                        $data->{'e30'}{'flowModule'}{$flowModule}{$flowPoolIDX}
-                              = $flowPoolName;
-
-                        Debug("e30:    IDX: $flowPoolIDX  Pool: $flowPoolName");
-
-                    } # END: foreach my $flowPoolIDX
-                } # END: if $flowModTable
-            } # END: foreach my $flowModule
         }
 
         if( $devdetails->param('Arbor_E::disable-e30-fwdTable') ne 'yes' )
@@ -385,13 +357,76 @@ sub discover
     if( $eInfo->{'modelNum'} >= 8 )
     {
         Debug("Arbor_E: Found " . $eChassisName{$eInfo->{'modelNum'}} );
-        Debug("Arbor_E: Currently e100 has no supported extras...");
+
+        # PROG: Set Capability to be the e100 device
+        $devdetails->setCap('e100');
+
+        # CPU parameters ...
+        if( $devdetails->param('Arbor_E::disable-e100-cpu') ne 'yes' )
+        {
+          my $cpuNameTable = $session->get_table(
+                            -baseoid => $dd->oiddef('cpuName') );
+          $devdetails->storeSnmpVars( $cpuNameTable );
+
+          if( defined( $cpuNameTable ) )
+          {
+            $devdetails->setCap('e100-cpu');
+
+            # PROG: Find all the CPU's ..
+            foreach my $cpuIndex ( $devdetails->getSnmpIndices(
+                                   $dd->oiddef('cpuName') ) )
+            {
+              my $cpuName = $cpuNameTable->{$dd->oiddef('cpuName') .
+                                                   '.' . $cpuIndex};
+
+              Debug("CPU found: $cpuIndex, $cpuName");
+              $data->{'e100'}{'cpu'}{$cpuIndex} = $cpuName;
+            }
+          }
+        }
         # return 0;
     }
 
+
     # ------------------------------------------------------------------------
-    # Common Bundle Offer byte count, send and receiver counters for each
-    # bundle to offer pair they are in.
+    #
+    # Common information between e30 and e100
+
+    if( $devdetails->param('Arbor_E::disable-flowdev') ne 'yes' )
+    {
+        $devdetails->setCap('arbor-flowLookup');
+
+        # Flow Lookup Device information
+        # Figure out what pools exist for the 2 flow switching modules
+        # ------------------------------------------------------------
+        my $switchingModules = 2;
+
+        foreach my $flowModule (1 .. $switchingModules) {
+            Debug("common:  Flow Lookup Device " . $flowModule);
+
+            my $flowPoolOid  = 'flowPoolNameD' . $flowModule;
+            my $flowModTable = $session->get_table (
+                              -baseoid => $dd->oiddef($flowPoolOid) );
+            $devdetails->storeSnmpVars ( $flowModTable );
+
+            # PROG: Look for pool names and indexes and store them.
+            if( $flowModTable ) {
+                foreach my $flowPoolIDX ( $devdetails->getSnmpIndices(
+                                            $dd->oiddef($flowPoolOid) ) )
+                {
+                    my $flowPoolName = $flowModTable->{
+                           $dd->oiddef($flowPoolOid) . '.' . $flowPoolIDX};
+
+                    $data->{'arbor_e'}{'flowModule'}{$flowModule}{$flowPoolIDX}
+                          = $flowPoolName;
+
+                    Debug("common:    IDX: $flowPoolIDX  Pool: $flowPoolName");
+
+                } # END: foreach my $flowPoolIDX
+            } # END: if $flowModTable
+        } # END: foreach my $flowModule
+    }
+
 
     if( $devdetails->param('Arbor_E::disable-bundle-offer') ne 'yes' )
     {
@@ -661,40 +696,6 @@ sub buildConfig
             }
         }
 
-        # e30 flow device lookups
-        if( $devdetails->hasCap('e30-flowLookup') )
-        {
-            # PROG: Flow Lookup Device (pool names)
-            my $flowNode = $cb->addSubtree( $devNode, 'Flow_Lookup',
-                                          { 'comment' => 'Switching modules' },
-                                            undef );
-
-            my $flowLookup = $data->{'e30'}{'flowModule'};
-
-            foreach my $flowDevIdx ( keys %{$flowLookup} )
-            {
-                my $flowNodeDev = $cb->addSubtree( $flowNode,
-                                  'Flow_Lookup_' .  $flowDevIdx,
-                                  { 'comment' => 'Switching module '
-                                                  . $flowDevIdx },
-                                  [ 'Arbor_E::e30-flowlkup-subtree' ] );
-
-                # PROG: Find all the pool names and add Subtree
-                foreach my $flowPoolIdx ( keys %{$flowLookup->{$flowDevIdx}} )
-                {
-                    my $poolName = $flowLookup->{$flowDevIdx}{$flowPoolIdx};
-
-                    my $poolNode = $cb->addSubtree( $flowNodeDev, $poolName,
-                                   { 'comment' => 'Flow Pool: ' . $poolName,
-                                     'e30-flowdevidx'   => $flowDevIdx,
-                                     'e30-flowpoolidx'  => $flowPoolIdx,
-                                     'e30-flowpoolname' => $poolName,
-                                     'precedence'       => 1000 - $flowPoolIdx},
-                                   [ 'Arbor_E::e30-flowlkup-leaf' ] );
-                } # END: foreach my $flowPoolIdx
-            } # END: foreach my $flowDevIdx
-        } # END: hasCap e30-flowLookup
-
         # e30 slowpath counters
         if( $devdetails->hasCap('e30-slowpath') )
         {
@@ -704,7 +705,28 @@ sub buildConfig
     } # END: if e30 device
 
     # -----------------------------------------------------
-    # E100 series... future
+    # E100 series...
+    if( $devdetails->hasCap('e100') )
+    {
+        # CPU: per-cpu information
+        if( $devdetails->hasCap('e100-cpu') )
+        {
+            my $subtree = "CPU_Usage";
+            my $cpuTree = $cb->addSubtree( $devNode, $subtree, undef,
+                                         [ 'Arbor_E::e100-cpu-subtree' ] );
+
+            foreach my $cpuIndex ( sort keys %{$data->{'e100'}{'cpu'}} )
+            {
+              my $cpuName = $data->{'e100'}{'cpu'}{$cpuIndex};
+              $cb->addLeaf( $cpuTree, $cpuName,
+                          { 'comment'    => 'CPU: ' . $cpuName,
+                            'cpu-index'  => $cpuIndex,
+                            'cpu-name'   => $cpuName,
+                            'precedence' => 1000 - $cpuIndex },
+                          [ 'Arbor_E::e100-cpu' ] );
+            }
+        }
+    }
 
     # -------------------------------------------------------------------------
     # Common information between e30 and e100 (bundle/offer stats)
@@ -725,7 +747,7 @@ sub buildConfig
             my $offerBundle =  $data->{'arbor_e'}{'boOfferBundle'};
             my $offerRRD    =  $offerNameID;
 
-            if( $devdetails->param('Arbor_E::enable-arbor-bundle-name-rrd')
+            if( $devdetails->param('Arbor_E::enable-bundle-name-rrd')
                 eq 'yes' )
             {
                 # Filename will now be written as offer name
@@ -751,7 +773,7 @@ sub buildConfig
 
                 Debug("      $bundleID: $bundleName");
 
-                if( $devdetails->param('Arbor_E::enable-arbor-bundle-name-rrd')
+                if( $devdetails->param('Arbor_E::enable-bundle-name-rrd')
                     eq 'yes' )
                 {
                     # Filename will now be written as bundle name
@@ -797,6 +819,41 @@ sub buildConfig
             } # END: foreach $bundleID
         } # END: foreach $offerNameID
     } # END: hasCap arbor-bundle
+
+    # e30 flow device lookups
+    if( $devdetails->hasCap('arbor-flowLookup') )
+    {
+        # PROG: Flow Lookup Device (pool names)
+        my $flowNode = $cb->addSubtree( $devNode, 'Flow_Lookup',
+                                      { 'comment' => 'Switching modules' },
+                                        undef );
+
+        my $flowLookup = $data->{'arbor_e'}{'flowModule'};
+
+        foreach my $flowDevIdx ( keys %{$flowLookup} )
+        {
+            my $flowNodeDev = $cb->addSubtree( $flowNode,
+                              'Flow_Lookup_' .  $flowDevIdx,
+                              { 'comment' => 'Switching module '
+                                              . $flowDevIdx },
+                              [ 'Arbor_E::arbor-flowlkup-subtree' ] );
+
+            # PROG: Find all the pool names and add Subtree
+            foreach my $flowPoolIdx ( keys %{$flowLookup->{$flowDevIdx}} )
+            {
+                my $poolName = $flowLookup->{$flowDevIdx}{$flowPoolIdx};
+
+                my $poolNode = $cb->addSubtree( $flowNodeDev, $poolName,
+                               { 'comment'        => 'Flow Pool: ' . $poolName,
+                                 'flowdev-index'  => $flowDevIdx,
+                                 'flowpool-index' => $flowPoolIdx,
+                                 'flowpool-name'  => $poolName,
+                                 'precedence'     => 1000 - $flowPoolIdx},
+                               [ 'Arbor_E::arbor-flowlkup-leaf' ] );
+            } # END: foreach my $flowPoolIdx
+        } # END: foreach my $flowDevIdx
+    } # END: hasCap arbor-flowLookup
+
 }
 
 1;

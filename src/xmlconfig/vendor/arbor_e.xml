@@ -78,11 +78,12 @@
 
   <def name="loginRespOkStatsCount"      value="1.3.6.1.4.1.3813.1.4.3.15.1.2"/>
 
-  <!-- ELLACOYA-MIB::flow -->
-  <def name="flowPoolName"        value="1.3.6.1.4.1.3813.1.4.5"/>
-
   <!-- ELLACOYA-MIB::cpu -->
   <def name="cpuUtilization"      value="1.3.6.1.4.1.3813.1.4.4.1.0"/>
+  <def name="cpuUtil"             value="1.3.6.1.4.1.3813.1.4.4.2.1.3"/>
+
+  <!-- ELLACOYA-MIB::flow -->
+  <def name="flowPoolName"        value="1.3.6.1.4.1.3813.1.4.5"/>
 
   <!-- ELLACOYA-MIB::slowpathCounters -->
   <def name="allPackets"          value="1.3.6.1.4.1.3813.1.4.4.10.1.1.0" />
@@ -156,6 +157,14 @@
 </definitions>
 <datasources>
 
+  <!--
+   **************************************************************************
+
+    e30 Series templates
+
+   **************************************************************************
+  -->
+
   <template name="e30-buffers">
     <subtree name="Buffer_Usage">
         <param name="comment"           value="Buffer Usage"/>
@@ -223,86 +232,6 @@
     </leaf>
   </template>
 
-
-  <template name="e30-flowlkup-subtree">
-    <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="usage,max,curr"/>
-    <!-- Usage -->
-    <param name="overview-subleave-name-usage" value="Usage"/>
-    <param name="overview-shortcut-text-usage"
-          value="Flow Usage summary"/>
-    <param name="overview-shortcut-title-usage"
-          value="Show flow usage summary for all pools on one page"/>
-    <param name="overview-page-title-usage"
-          value="Flow usage"/>
-    <!-- Maximum -->
-    <param name="overview-subleave-name-max" value="Maximum"/>
-    <param name="overview-shortcut-text-max"
-          value="Max cap. of the flow pool summary"/>
-    <param name="overview-shortcut-title-max"
-          value="Show maximum capacity of the flow pools on one page"/>
-    <param name="overview-page-title-max"
-          value="Flow maximum usage"/>
-    <!-- Current -->
-    <param name="overview-subleave-name-curr" value="Current"/>
-    <param name="overview-shortcut-text-curr"
-          value="Curr cap. of the flow pool summary"/>
-    <param name="overview-shortcut-title-curr"
-          value="Show current capacity of the flow pools on one page"/>
-    <param name="overview-page-title-curr"
-          value="Flow current usage"/>
-  </template>
-
-
-  <template name="e30-flowlkup-leaf">
-    <param name="comment"    value="FlowLookup device %e30-flowdevidx%"/>
-    <param name="data-file"  value="%system-id%_flowlkup_%e30-flowdevidx%.rrd"/>
-    <param name="graph-title"
-          value="FlowLkup device %e30-flowdevidx%: %e30-flowpoolname%"/>
-    <param name="graph-lower-limit" value="0"/>
-    <param name="rrd-create-dstype" value="GAUGE"/>
-
-    <leaf name="Usage">
-      <param name="precedence"         value="1000"/>
-      <param name="comment"            value="Maximum vs Current"/>
-      <param name="graph-title"        value="Maximum vs Current"/>
-      <param name="vertical-label"     value="nodes"/>
-      <param name="ds-type"            value="rrd-multigraph"/>
-      <param name="ds-names"           value="total,used"/>
-      <param name="graph-lower-limit"  value="0"/>
-      <!-- Maximum Capacity -->
-      <param name="ds-expr-total"      value="{Maximum}"/>
-      <param name="graph-legend-total" value="Maximum"/>
-      <param name="line-style-total"   value="##totalresource"/>
-      <param name="line-color-total"   value="##totalresource"/>
-      <param name="line-order-total"   value="1"/>
-      <!-- Current Capacity -->
-      <param name="ds-expr-used"       value="{Current}"/>
-      <param name="graph-legend-used"  value="Current"/>
-      <param name="line-style-used"    value="##resourceusage"/>
-      <param name="line-color-used"    value="##resourceusage"/>
-      <param name="line-order-used"    value="2"/>
-    </leaf>
-
-    <leaf name="Maximum">
-      <param name="comment"      value="Maximum capacity of the pool"/>
-      <param name="graph-legend" value="nodes"/>
-      <param name="precedence"   value="902"/>
-      <param name="rrd-ds"       value="maxCapacity_%e30-flowpoolidx%"/>
-      <param name="snmp-object"
-            value="$flowPoolName.%e30-flowdevidx%.1.1.3.%e30-flowpoolidx%"/>
-    </leaf>
-
-    <leaf name="Current">
-      <param name="comment"      value="Current capacity of the pool"/>
-      <param name="graph-legend" value="nodes"/>
-      <param name="precedence"   value="901"/>
-      <param name="rrd-ds"       value="currentCapacity_%e30-flowpoolidx%"/>
-      <param name="snmp-object"
-            value="$flowPoolName.%e30-flowdevidx%.1.1.4.%e30-flowpoolidx%"/>
-    </leaf>
-  </template>
-  
 
   <template name="e30-fwdTable">
     <subtree name="Forwarding_Table">
@@ -1474,9 +1403,40 @@
     </leaf>
   </template>
 
-  <!-- 
+  <!--
+   **************************************************************************
+
+    e100 Series templates
+
+   **************************************************************************
+  -->
+
+  <template name="e100-cpu-subtree">
+    <param name="comment"           value="Overall CPU busy percentage"/>
+    <param name="data-file"         value="%system-id%_cpu.rrd"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+    <param name="rrd-hwpredict"     value="disabled"/>
+    <param name="graph-lower-limit" value="0"/>
+    <param name="graph-upper-limit" value="100"/>
+    <param name="upper-limit"       value="80"/>
+    <param name="vertical-label"    value="Percent"/>
+  </template>
+
+  <template name="e100-cpu">
+    <param name="comment"           value="CPU Utilization on %cpu-name%"/>
+    <param name="rrd-ds"            value="%cpu-name%"/>
+    <param name="snmp-object"       value="$cpuUtil.%cpu-index%"/>
+    <param name="graph-legend"      value="CPU usage"/>
+  </template>
+  
+
+  <!--
+   **************************************************************************
+
     COMMON: Bundle Offer statistics are common between the e30 and e100
       NOTE: PacketSize information is only available for the e100
+
+   **************************************************************************
   -->
  
   <template name="arbor-bundle-subtree">
@@ -2056,6 +2016,88 @@
       </leaf>
     </subtree>
   </template>
+
+
+  <template name="arbor-flowlkup-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="usage,max,curr"/>
+    <!-- Usage -->
+    <param name="overview-subleave-name-usage" value="Usage"/>
+    <param name="overview-shortcut-text-usage"
+          value="Flow Usage summary"/>
+    <param name="overview-shortcut-title-usage"
+          value="Show flow usage summary for all pools on one page"/>
+    <param name="overview-page-title-usage"
+          value="Flow usage"/>
+    <!-- Maximum -->
+    <param name="overview-subleave-name-max" value="Maximum"/>
+    <param name="overview-shortcut-text-max"
+          value="Max cap. of the flow pool summary"/>
+    <param name="overview-shortcut-title-max"
+          value="Show maximum capacity of the flow pools on one page"/>
+    <param name="overview-page-title-max"
+          value="Flow maximum usage"/>
+    <!-- Current -->
+    <param name="overview-subleave-name-curr" value="Current"/>
+    <param name="overview-shortcut-text-curr"
+          value="Curr cap. of the flow pool summary"/>
+    <param name="overview-shortcut-title-curr"
+          value="Show current capacity of the flow pools on one page"/>
+    <param name="overview-page-title-curr"
+          value="Flow current usage"/>
+  </template>
+
+
+  <template name="arbor-flowlkup-leaf">
+    <param name="comment"    value="FlowLookup device %flowdev-index%"/>
+    <param name="data-file"  value="%system-id%_flowlkup_%flowdev-index%.rrd"/>
+    <param name="graph-title"
+          value="FlowLkup device %flowdev-index%: %flowpool-name%"/>
+    <param name="graph-lower-limit" value="0"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+
+    <leaf name="Usage">
+      <param name="precedence"         value="1000"/>
+      <param name="comment"            value="Maximum vs Current"/>
+      <param name="graph-title"        value="Maximum vs Current"/>
+      <param name="vertical-label"     value="nodes"/>
+      <param name="ds-type"            value="rrd-multigraph"/>
+      <param name="ds-names"           value="total,used"/>
+      <param name="graph-lower-limit"  value="0"/>
+      <!-- Maximum Capacity -->
+      <param name="ds-expr-total"      value="{Maximum}"/>
+      <param name="graph-legend-total" value="Maximum"/>
+      <param name="line-style-total"   value="##totalresource"/>
+      <param name="line-color-total"   value="##totalresource"/>
+      <param name="line-order-total"   value="1"/>
+      <!-- Current Capacity -->
+      <param name="ds-expr-used"       value="{Current}"/>
+      <param name="graph-legend-used"  value="Current"/>
+      <param name="line-style-used"    value="##resourceusage"/>
+      <param name="line-color-used"    value="##resourceusage"/>
+      <param name="line-order-used"    value="2"/>
+    </leaf>
+
+    <leaf name="Maximum">
+      <param name="comment"      value="Maximum capacity of the pool"/>
+      <param name="graph-legend" value="nodes"/>
+      <param name="precedence"   value="902"/>
+      <param name="rrd-ds"       value="maxCapacity_%flowpool-index%"/>
+      <param name="snmp-object"
+            value="$flowPoolName.%flowdev-index%.1.1.3.%flowpool-index%"/>
+    </leaf>
+
+    <leaf name="Current">
+      <param name="comment"      value="Current capacity of the pool"/>
+      <param name="graph-legend" value="nodes"/>
+      <param name="precedence"   value="901"/>
+      <param name="rrd-ds"       value="currentCapacity_%flowpool-index%"/>
+      <param name="snmp-object"
+            value="$flowPoolName.%flowdev-index%.1.1.4.%flowpool-index%"/>
+    </leaf>
+  </template>
+  
+
 
 </datasources>
 

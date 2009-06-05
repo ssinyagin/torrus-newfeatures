@@ -620,21 +620,28 @@ downstream and MAC layer stats are skipped.
 
 =over 4
 
-=item * C<Arbor_E::disable-e30-bundle>, C<Arbor_E::disable-e30-buffers>,
-    C<Arbor_E::disable-e30-cpu>, C<Arbor_E::disable-e30-flowdev>,
-    C<Arbor_E::disable-e30-fwdTable>, C<Arbor_E::disable-e30-hdd>,
-    C<Arbor_E::disable-e30-mem>
+=item * C<Arbor_E::disable-bundle-offer>, C<Arbor_E::disable-bundle-offer-deny>,
+    C<Arbor_E::disable-bundle-offer-pktsize>,
+    C<Arbor_E::disable-bundle-offer-rate>,
+    C<Arbor_E::disable-bundle-offer-subcount>, C<Arbor_E::disable-flowdev>,
+    C<Arbor_E::enable-bundle-name-rrd>,
+    C<Arbor_E::disable-e30-buffers>, C<Arbor_E::disable-e30-bundle>,
+    C<Arbor_E::disable-e30-cpu>,
+    C<Arbor_E::disable-e30-fwdTable>,
+    C<Arbor_E::disable-e30-fwdTable-login>,
+    C<Arbor_E::disable-e30-hdd>, C<Arbor_E::enable-e30-hdd-errors>,
+    C<Arbor_E::disable-e30-hdd-logs>, C<Arbor_E::disable-e30-l2tp>,
+    C<Arbor_E::disable-e30-mem>, C<Arbor_E::enable-e30-mempool>,
+    C<Arbor_E::disable-e30-bundle>, C<Arbor_E::disable-e30-bundle-deny>, 
+    C<Arbor_E::disable-e30-bundle-rate>, C<Arbor_E::disable-e30-slowpath>
 
-When set to C<yes>, the corresponding statistics are excluded from the graphs.
+When set to C<yes>, the corresponding statistics are included or excluded from
+the graphs.
 
 =item * C<Arbor_E::enable-e30-bundle-name-rrd>
 
 When set to C<yes>, the data will be written to filenames based on the name
 bundle instead of by the ID of the bundle.
-
-=item * C<Arbor_E::enable-e30-hdd-errors>
-
-When set to C<yes>, gather information regarding harddrive errors.
 
 =item * C<Apple_AE::disable-clients-stats>
 

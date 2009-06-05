@@ -85,7 +85,7 @@ Reports the line status for the manageable modular media converter.
 
 =item * Arbor Networks
 
-Provide statistics for Arbor eSeries devices. (e30)
+Provide statistics for Arbor eSeries devices. (e30, e100)
 
 =item * Ascend MAX
 

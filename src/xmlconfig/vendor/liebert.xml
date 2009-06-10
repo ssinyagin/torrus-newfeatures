@@ -66,6 +66,10 @@
   <def name="StateHumidifying"    value="1.3.6.1.4.1.476.1.42.3.4.3.4.0"/>
   <def name="StateDehumidifying"  value="1.3.6.1.4.1.476.1.42.3.4.3.5.0"/>
   <def name="StateEconoCycle"     value="1.3.6.1.4.1.476.1.42.3.4.3.6.0"/>
+  <def name="lgpEnvStateCoolingCapacity"
+                                  value="1.3.6.1.4.1.476.1.42.3.4.3.9.0"/>
+  <def name="lgpEnvStateHeatingCapacity" 
+                                  value="1.3.6.1.4.1.476.1.42.3.4.3.10.0"/>
 
   <!-- Statistics -->
   <def name="StatsComp1RunHr"     value="1.3.6.1.4.1.476.1.42.3.4.6.1.0"/>
@@ -368,6 +372,30 @@
       <param name="graph-title"  value="Econ-o-cycle State"/>
       <param name="rrd-ds"       value="StateEconoCycle"/>
       <param name="snmp-object"  value="$StateEconoCycle"/>
+    </leaf>
+  </template>
+
+
+  <template name="state-capacity">
+    <leaf name="Cooling">
+      <param name="data-file"    value="%system-id%_state_capacity.rrd"/>
+      <param name="precedence"   value="993"/>
+      <param name="comment"      value="cooling capacity presently in use"/>
+      <param name="graph-legend" value="percent"/>
+      <param name="graph-title"  value="Cooling Capacity"/>
+      <param name="rrd-ds"       value="cooling"/>
+      <param name="snmp-object"  value="$lgpEnvStateCoolingCapacity"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+    </leaf>
+    <leaf name="Heating">
+      <param name="data-file"    value="%system-id%_state_capacity.rrd"/>
+      <param name="precedence"   value="992"/>
+      <param name="comment"      value="heating capacity presently in use"/>
+      <param name="graph-legend" value="percent"/>
+      <param name="graph-title"  value="Heating Capacity"/>
+      <param name="rrd-ds"       value="heating"/>
+      <param name="snmp-object"  value="$lgpEnvStateHeatingCapacity"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
     </leaf>
   </template>
 

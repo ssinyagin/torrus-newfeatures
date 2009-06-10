@@ -1048,6 +1048,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'state-subtree',
          'source'   => 'vendor/liebert.xml',
      },
+     'Liebert::state-capacity' => {
+         'name'     => 'state-capacity',
+         'source'   => 'vendor/liebert.xml',
+     },
      'Liebert::temperature-subtree' => {
          'name'     => 'temperature-subtree',
          'source'   => 'vendor/liebert.xml',

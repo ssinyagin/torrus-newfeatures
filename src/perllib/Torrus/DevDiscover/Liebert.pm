@@ -62,6 +62,10 @@ our %oiddef =
      'TemperatureIdDegC'  => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.1',
      'HumidityIdRel'      => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.1',
 
+     'lgpEnvState'                => '1.3.6.1.4.1.476.1.42.3.4.3',
+     'lgpEnvStateCoolingCapacity' => '1.3.6.1.4.1.476.1.42.3.4.3.9.0',
+     'lgpEnvStatistics'           => '1.3.6.1.4.1.476.1.42.3.4.6',
+
      );
 
 sub checkdevtype
@@ -106,67 +110,94 @@ sub discover
     if( $devdetails->param('Liebert::disable-temperature') ne 'yes' ) 
     {
         $devdetails->setCap("env-temperature");
+
         if( $devdetails->param('Liebert::use-fahrenheit') ne 'yes' )
         {
-            # Temperature in Celcius
+            # ENV: Temperature in Celcius
             my $idTable = $session->get_table(
                  -baseoid => $dd->oiddef('TemperatureIdDegC') );
             $devdetails->storeSnmpVars( $idTable );
 
-            foreach my $index ( $devdetails->getSnmpIndices(
-                                $dd->oiddef('TemperatureIdDegC') ) )
+            if( defined( $idTable ) )
             {
-                Debug("Liebert: Temp (degC) index: $index");
-                $data->{'liebert'}{'tempidx'}{$index} = "celcius";
+                $devdetails->setCap("env-temperature-celcius");
+
+                foreach my $index ( $devdetails->getSnmpIndices(
+                                    $dd->oiddef('TemperatureIdDegC') ) )
+                {
+                    Debug("Liebert: Temp (degC) index: $index");
+                    $data->{'liebert'}{'tempidx'}{$index} = "celcius";
+                }
             }
-
-            $devdetails->setCap("env-temperature-celcius");
-
         } else {
-            # Temperature in Fahrenheit
+            # ENV: Temperature in Fahrenheit
             my $idTable = $session->get_table(
                  -baseoid => $dd->oiddef('TemperatureIdDegF') );
             $devdetails->storeSnmpVars( $idTable );
 
-            foreach my $index ( $devdetails->getSnmpIndices(
-                                $dd->oiddef('TemperatureIdDegF') ) )
+            if( defined( $idTable ) )
             {
-                Debug("Liebert: Temp (degF) index: $index");
-                $data->{'liebert'}{'tempidx'}{$index} = "fahrenheit";
-            }
+                $devdetails->setCap("env-temperature-fahrenheit");
 
-            $devdetails->setCap("env-temperature-fahrenheit");
+                foreach my $index ( $devdetails->getSnmpIndices(
+                                    $dd->oiddef('TemperatureIdDegF') ) )
+                {
+                    Debug("Liebert: Temp (degF) index: $index");
+                    $data->{'liebert'}{'tempidx'}{$index} = "fahrenheit";
+                }
+            }
         }
     }
 
-    # Humidity
+    # ENV: Humidity
     if( $devdetails->param('Liebert::disable-humidity') ne 'yes' )
     {
-        $devdetails->setCap("env-humidity");
-
-        # Relative humidity index sensor table
         my $idTable = $session->get_table(
                  -baseoid => $dd->oiddef('HumidityIdRel') );
         $devdetails->storeSnmpVars( $idTable );
 
-        foreach my $index ( $devdetails->getSnmpIndices(
-                            $dd->oiddef('HumidityIdRel') ) )
+        if( defined( $idTable ) )
         {
-            Debug("Liebert: humidity index: $index");
-            $data->{'liebert'}{'humididx'}{$index} = "humidity";
+            $devdetails->setCap("env-humidity");
+            foreach my $index ( $devdetails->getSnmpIndices(
+                                $dd->oiddef('HumidityIdRel') ) )
+            {
+                Debug("Liebert: humidity index: $index");
+                $data->{'liebert'}{'humididx'}{$index} = "humidity";
+            }
         }
     }
 
-    # State
+    # ENV: State
     if( $devdetails->param('Liebert::disable-state') ne 'yes' )
     {
-        $devdetails->setCap("env-state");
+        my $stateTable = $session->get_table(
+                 -baseoid => $dd->oiddef('lgpEnvState') );
+        $devdetails->storeSnmpVars( $stateTable );
+
+        if( defined( $stateTable ) )
+        {
+            $devdetails->setCap("env-state");
+
+            # PROG: Check to see if Firmware is new enough for Capacity
+            if( $dd->checkSnmpOID('lgpEnvStateCoolingCapacity') )
+            {
+                $devdetails->setCap("env-state-capacity");
+            }
+        }
     }
 
     # Statistics
     if( $devdetails->param('Liebert::disable-stats') ne 'yes' )
     {
-        $devdetails->setCap("env-stats");
+        my $statsTable = $session->get_table(
+                 -baseoid => $dd->oiddef('lgpEnvStatistics') );
+        $devdetails->storeSnmpVars( $statsTable );
+
+        if( defined( $statsTable ) )
+        {
+            $devdetails->setCap("env-stats");
+        }
     }
 
     return 1;
@@ -262,8 +293,14 @@ sub buildConfig
     # State of the system
     if( $devdetails->hasCap("env-state") )
     {
-        $cb->addSubtree( $devNode, 'State', undef,
-                       [ 'Liebert::state-subtree' ] );
+        my $nodeState = $cb->addSubtree( $devNode, 'State', undef,
+                                       [ 'Liebert::state-subtree' ] );
+
+        if( $devdetails->hasCap("env-state-capacity") )
+        {
+            $cb->addSubtree( $devNode, 'State', undef,
+                           [ 'Liebert::state-capacity' ] );
+        }
     }
 }
 

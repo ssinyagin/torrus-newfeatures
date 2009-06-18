@@ -1725,7 +1725,7 @@
         <param name="line-color-down"   value="##BpsIn"/>
         <param name="line-order-down"   value="1"/>
         <!-- 64 Byte Volume up -->
-        <param name="ds-expr-up"        value="{64Byte_Up},,64,*,8,*,300,/"/>
+        <param name="ds-expr-up"        value="{64Byte_Up},64,*,8,*,300,/"/>
         <param name="graph-legend-up"   value="Approx Bits per second out"/>
         <param name="line-style-up"     value="##BpsOut"/>
         <param name="line-color-up"     value="##BpsOut"/>

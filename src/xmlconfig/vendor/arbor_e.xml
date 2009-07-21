@@ -60,6 +60,9 @@
   <def name="hDriveErrTrack0NF"   value="1.3.6.1.4.1.3813.1.4.2.10.14.0" />
   <def name="hDriveErrAddrMarkNF" value="1.3.6.1.4.1.3813.1.4.2.10.15.0" />
 
+  <def name="partitionSize"       value="1.3.6.1.4.1.3813.1.4.2.11.1.3" />
+  <def name="partitionUsage"      value="1.3.6.1.4.1.3813.1.4.2.11.1.4" />
+
   <def name="hDriveDailyLogSize"  value="1.3.6.1.4.1.3813.1.4.2.13.0" />
   <def name="hDriveDailyLogUsage" value="1.3.6.1.4.1.3813.1.4.2.14.0" />
 
@@ -1428,7 +1431,73 @@
     <param name="snmp-object"       value="$cpuUtil.%cpu-index%"/>
     <param name="graph-legend"      value="CPU usage"/>
   </template>
-  
+
+  <template name="e100-hdd-subtree">
+    <param name="comment"           value="Storage statistics"/>
+    <param name="data-file"         value="%system-id%_hdd.rrd"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="size,usage"/>
+
+    <!-- Total Size -->
+    <param name="overview-subleave-name-size" value="Size"/>
+    <param name="overview-shortcut-text-size" value="Total"/>
+    <param name="overview-shortcut-title-size"
+          value="Show size of HDD's on one page"/>
+    <param name="overview-page-title-size" value="Total Size"/>
+    <!-- Usage -->
+    <param name="overview-subleave-name-usage" value="Usage"/>
+    <param name="overview-shortcut-text-usage" value="Used"/>
+    <param name="overview-shortcut-title-usage"
+          value="Show usage consumed of HDD's on one page"/>
+    <param name="overview-page-title-usage" value="Total Used"/>
+  </template>
+
+  <template name="e100-hdd">
+    <param name="comment"           value="HDD: %hdd-name%"/>
+    <param name="graph-title"       value="%system-id%: HDD %hdd-name%"/>
+
+    <leaf name="Usage">
+      <param name="precedence"         value="1000"/>
+      <param name="comment"            value="Hdd: Total vs Used"/>
+      <param name="graph-title"        value="%hdd-name%: Total vs Used"/>
+      <param name="vertical-label"     value="MBytes"/>
+      <param name="ds-type"            value="rrd-multigraph"/>
+      <param name="ds-names"           value="size,used"/>
+      <param name="graph-lower-limit"  value="0"/>
+      <!-- Total Parition Size -->
+      <param name="ds-expr-size"      value="{Size}"/>
+      <param name="graph-legend-size" value="Size"/>
+      <param name="line-style-size"   value="##totalresource"/>
+      <param name="line-color-size"   value="##totalresource"/>
+      <param name="line-order-size"   value="1"/>
+      <!-- Used Partition Size -->
+      <param name="ds-expr-used"      value="{Used}"/>
+      <param name="graph-legend-used" value="Used"/>
+      <param name="line-style-used"   value="##resourceusage"/>
+      <param name="line-color-used"   value="##resourceusage"/>
+      <param name="line-order-used"   value="2"/>
+    </leaf>
+
+    <leaf name="Size">
+      <param name="graph-legend"      value="Size of %hdd-name%"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="rrd-ds"            value="hdd_%hdd-name%_size"/>
+      <param name="snmp-object"       value="$partitionSize.%hdd-index%"/>
+      <param name="vertical-label"    value="MBytes"/>
+    </leaf>
+
+    <leaf name="Used">
+      <param name="graph-legend"      value="Size of %hdd-name%"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="rrd-ds"            value="hdd_%hdd-name%_usage"/>
+      <param name="snmp-object"       value="$partitionUsage.%hdd-index%"/>
+      <param name="vertical-label"    value="MBytes"/>
+    </leaf>
+  </template>
+
+
 
   <!--
    **************************************************************************

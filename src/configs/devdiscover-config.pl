@@ -404,7 +404,22 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'e30-slowpath',
          'source' => 'vendor/arbor_e.xml'
          },
-
+     'Arbor_E::e100-cpu-subtree' => {
+         'name'   => 'e100-cpu-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e100-cpu' => {
+         'name'   => 'e100-cpu',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e100-hdd-subtree' => {
+         'name'   => 'e100-hdd-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e100-hdd' => {
+         'name'   => 'e100-hdd',
+         'source' => 'vendor/arbor_e.xml'
+         },
 
      #### ATMEL smartbridges
      'ATMEL::atmel-device-subtree' => {

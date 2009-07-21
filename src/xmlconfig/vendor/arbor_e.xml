@@ -1891,7 +1891,7 @@
         <param name="precedence"   value="91"/>
         <param name="rrd-ds"       value="Recv64"/>
         <param name="snmp-object"
-              value="$boPacketsSent64.%bundle-id%.%offer-id%"/>
+              value="$boPacketsReceived64.%bundle-id%.%offer-id%"/>
         <param name="vertical-label" value="packets"/>
       </leaf>
   
@@ -1991,7 +1991,7 @@
         <param name="precedence"   value="41"/>
         <param name="rrd-ds"       value="Recv1024to1518"/>
         <param name="snmp-object"
-              value="$boPacketsSent1024to1518.%bundle-id%.%offer-id%"/>
+              value="$boPacketsReceived1024to1518.%bundle-id%.%offer-id%"/>
         <param name="vertical-label" value="packets"/>
       </leaf>
   

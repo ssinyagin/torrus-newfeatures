@@ -51,6 +51,7 @@
 #
 # -- e100 specific
 #      Arbor_E::disable-e100-cpu
+#      Arbor_E::disable-e100-hdd
 #
 
 # Arbor_E devices discovery
@@ -76,11 +77,12 @@ our %oiddef =
      'memPoolNameIndex'      => '1.3.6.1.4.1.3813.1.4.2.5.1.1',
      'hDriveErrModel'        => '1.3.6.1.4.1.3813.1.4.2.10.16.0',
      'hDriveErrSerialNum'    => '1.3.6.1.4.1.3813.1.4.2.10.17.0',
+     'partitionName'         => '1.3.6.1.4.1.3813.1.4.2.11.1.2', # e100
      'hDriveDailyLogSize'    => '1.3.6.1.4.1.3813.1.4.2.13.0',
      'cpuUtilization'	     => '1.3.6.1.4.1.3813.1.4.4.1.0',
-     'cpuUtilTable'          => '1.3.6.1.4.1.3813.1.4.4.2',     # e100
-     'cpuIndex'		     => '1.3.6.1.4.1.3813.1.4.4.2.1.1', # e100
-     'cpuName'               => '1.3.6.1.4.1.3813.1.4.4.2.1.2', # e100
+     'cpuUtilTable'          => '1.3.6.1.4.1.3813.1.4.4.2',      # e100
+     'cpuIndex'		     => '1.3.6.1.4.1.3813.1.4.4.2.1.1',  # e100
+     'cpuName'               => '1.3.6.1.4.1.3813.1.4.4.2.1.2',  # e100
      'loginRespOkStatsIndex' => '1.3.6.1.4.1.3813.1.4.3.15.1.1',
 
      # ELLACOYA-MIB::cpuCounters (available in 7.5.x -- slowpath counters)
@@ -124,6 +126,16 @@ our %eChassisName =
         '9'  => 'e100'
     );
 
+our %eCpuName =
+    (
+        '1'  => 'Control Module',
+        '3'  => 'DPI Module 1 CPU 1',
+        '4'  => 'DPI Module 1 CPU 2',
+        '5'  => 'DPI Module 2 CPU 1',
+        '6'  => 'DPI Module 2 CPU 2',
+        '7'  => 'I/O Module'
+    );
+
 sub checkdevtype
 {
     my $dd = shift;
@@ -160,7 +172,6 @@ sub discover
             "Arbor " . $eChassisName{$eInfo->{'modelNum'}} .
             ", Hw Serial#: " . $eInfo->{'sysIdSerialNum'} .
             ", Version: " .  $eInfo->{'codeVer'};
-
 
     # ------------------------------------------------------------------------
     # Arbor_E e30 related material here
@@ -352,8 +363,11 @@ sub discover
         }
     }
 
+
     # ------------------------------------------------------------------------
+    #
     # Arbor E100 related material here
+
     if( $eInfo->{'modelNum'} >= 8 )
     {
         Debug("Arbor_E: Found " . $eChassisName{$eInfo->{'modelNum'}} );
@@ -384,7 +398,29 @@ sub discover
             }
           }
         }
-        # return 0;
+
+        # HDD Parameters
+        if( $devdetails->param('Arbor_E::disable-e100-hdd') ne 'yes' )
+        {
+          my $hddTable = $session->get_table(
+                           -baseoid => $dd->oiddef('partitionName') );
+          $devdetails->storeSnmpVars( $hddTable );
+
+          if( defined( $hddTable ) )
+          {
+            $devdetails->setCap('e100-hdd');
+
+            # PROG: Find all the paritions and names ..
+            foreach my $hddIndex ( $devdetails->getSnmpIndices(
+                                   $dd->oiddef('partitionName') ) )
+            {
+              my $partitionName = $hddTable->{$dd->oiddef('partitionName') .
+                                              '.' . $hddIndex};
+              Debug("HDD Partition: $hddIndex, $partitionName");
+              $data->{'e100'}{'hdd'}{$hddIndex} = $partitionName;
+            }
+          }
+        }
     }
 
 
@@ -510,7 +546,6 @@ sub discover
             }
         }
     }
-
 
     return 1;
 }
@@ -704,8 +739,11 @@ sub buildConfig
         }
     } # END: if e30 device
 
+
     # -----------------------------------------------------
+    #
     # E100 series...
+
     if( $devdetails->hasCap('e100') )
     {
         # CPU: per-cpu information
@@ -718,21 +756,51 @@ sub buildConfig
             foreach my $cpuIndex ( sort keys %{$data->{'e100'}{'cpu'}} )
             {
               my $cpuName = $data->{'e100'}{'cpu'}{$cpuIndex};
+
+              # Is there proper desc for the CPU index?
+              my $comment;
+              if( $eCpuName{$cpuIndex} )
+              {
+                  $comment = $eCpuName{$cpuIndex};
+              } else {
+                  $comment = "CPU: $cpuName";
+              }
+
               $cb->addLeaf( $cpuTree, $cpuName,
-                          { 'comment'    => 'CPU: ' . $cpuName,
+                          { 'comment'    => $comment,
                             'cpu-index'  => $cpuIndex,
                             'cpu-name'   => $cpuName,
                             'precedence' => 1000 - $cpuIndex },
                           [ 'Arbor_E::e100-cpu' ] );
             }
         }
+
+        # HDD: Partition sizes / usage
+        if( $devdetails->hasCap('e100-hdd') )
+        {
+            my $subtree = "HDD_Usage";
+            my $hddTree = $cb->addSubtree( $devNode, $subtree, undef,
+                                         [ 'Arbor_E::e100-hdd-subtree' ] );
+
+            foreach my $hddIndex ( sort keys %{$data->{'e100'}{'hdd'}} )
+            {
+              my $hddName = $data->{'e100'}{'hdd'}{$hddIndex};
+              $cb->addSubtree( $hddTree, $hddName,
+                             { 'comment'    => 'HDD: ' . $hddName,
+                               'hdd-index'  => $hddIndex,
+                               'hdd-name'   => $hddName,
+                               'precedence' => 1000 - $hddIndex },
+                             [ 'Arbor_E::e100-hdd' ] );
+            }
+        }
     }
 
     # -------------------------------------------------------------------------
-    # Common information between e30 and e100 (bundle/offer stats)
+    #
+    # Common information between e30 and e100
+
     if( $devdetails->hasCap('arbor-bundle') )
     {
-        
         my $subtreeName = "Bundle_Offer_Stats";
         my $param       = { 'comment'    => 'byte counts for each bundle ' . 
                                             'per Offer' };
@@ -820,7 +888,7 @@ sub buildConfig
         } # END: foreach $offerNameID
     } # END: hasCap arbor-bundle
 
-    # e30 flow device lookups
+    # Flow device lookups
     if( $devdetails->hasCap('arbor-flowLookup') )
     {
         # PROG: Flow Lookup Device (pool names)

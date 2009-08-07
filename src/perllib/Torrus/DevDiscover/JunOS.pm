@@ -373,21 +373,24 @@ sub discover
                                    ($dd->oiddef('jnxRpfStatsPackets')) )
             {
                 my ($ifIndex,$addrFamily) = split('\.',$rpfIndex);
-                my $ifAddrFam = $addrFamily == 1 ? 'ipv4' : 'ipv6';
-                my $intName   = $data->{'interfaces'}{$ifIndex}{'ifName'};
-                my $intNameT  = $data->{'interfaces'}{$ifIndex}{'ifNameT'};
-
-                # Construct data
-                $data->{'jnxRPF'}{$ifIndex}{'ifName'}  = $intName;
-                $data->{'jnxRPF'}{$ifIndex}{'ifNameT'} = $intNameT;
-
-                if( $addrFamily == 1 )
+                if( defined( $data->{'interfaces'}{$ifIndex} ) )
                 {
-                    $data->{'jnxRPF'}{$ifIndex}{'ipv4'} = 1;
-                }
-                if( $addrFamily == 2 )
-                {
-                    $data->{'jnxRPF'}{$ifIndex}{'ipv6'} = 2;
+                    my $ifAddrFam = $addrFamily == 1 ? 'ipv4' : 'ipv6';
+                    my $intName   = $data->{'interfaces'}{$ifIndex}{'ifName'};
+                    my $intNameT  = $data->{'interfaces'}{$ifIndex}{'ifNameT'};
+                    
+                    # Construct data
+                    $data->{'jnxRPF'}{$ifIndex}{'ifName'}  = $intName;
+                    $data->{'jnxRPF'}{$ifIndex}{'ifNameT'} = $intNameT;
+                    
+                    if( $addrFamily == 1 )
+                    {
+                        $data->{'jnxRPF'}{$ifIndex}{'ipv4'} = 1;
+                    }
+                    if( $addrFamily == 2 )
+                    {
+                        $data->{'jnxRPF'}{$ifIndex}{'ipv6'} = 2;
+                    }                    
                 }
             }
         }

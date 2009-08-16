@@ -1,3 +1,10 @@
+2009-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* As of IOS 12.2(33)SRD1 and 12.2(33)SRD2, the object indexes
+	are no longer unique across the whole router, but only within
+	the policy map. The patch adapts the discovery module and collector
+	to this change.
+
 2008-08-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Plugin release 1.6

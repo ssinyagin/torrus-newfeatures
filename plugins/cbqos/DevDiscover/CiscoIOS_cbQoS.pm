@@ -138,6 +138,9 @@ my %cfgTablesForType =
      'police'          => ['cbQosPoliceCfgTable']
      );
 
+my %cfgTablesOptional =
+    ('cbQosREDClassCfgTable' => 1);
+
 my %objTypeMap  =
     (
      'policymap'      => 1,
@@ -266,15 +269,22 @@ sub discover
 
             if( $takeit )
             {
-                $data->{'cbqos_objects'}{$objectIndex} = $object;
+                $data->{'cbqos_objects'}{$policyIndex .'.'. $objectIndex} =
+                    $object;
 
                 # Store the hierarchy information
                 my $parent = $object->{'cbQosParentObjectsIndex'};
+                if( $parent ne '0' )
+                {
+                    $parent = $policyIndex .'.'. $parent;
+                }
+                
                 if( not exists( $data->{'cbqos_children'}{$parent} ) )
                 {
                     $data->{'cbqos_children'}{$parent} = [];
                 }
-                push( @{$data->{'cbqos_children'}{$parent}}, $objectIndex );
+                push( @{$data->{'cbqos_children'}{$parent}},
+                      $policyIndex .'.'. $objectIndex );
 
                 foreach my $tableName
                     ( @{$cfgTablesForType{$object->{'cbQosObjectsType'}}} )
@@ -295,7 +305,7 @@ sub discover
         {
             $devdetails->storeSnmpVars( $table );
         }
-        else
+        elsif( not $cfgTablesOptional{$tableName} )
         {
             Error('Error retrieving ' . $tableName);
             return 0;
@@ -317,7 +327,8 @@ sub discover
     # Process cbQosxxxCfgTable
     $data->{'cbqos_objcfg'} = {};
 
-    while( my( $objectIndex, $objectRef ) =  each %{$data->{'cbqos_objects'}} )
+    while( my( $policyObjectIndex, $objectRef ) =
+           each %{$data->{'cbqos_objects'}} )
     {
         my $objConfIndex = $objectRef->{'cbQosConfigIndex'};
 
@@ -413,8 +424,8 @@ sub discover
             {
                 Warn('Object with missing mandatory configuration: ' .
                      'cbQosPolicyIndex=' . $objectRef->{'cbQosPolicyIndex'} .
-                     ', cbQosObjectsIndex=' . $objectIndex);
-                delete $data->{'cbqos_objects'}{$objectIndex};
+                     ', cbQosObjectsIndex=' . $policyObjectIndex);
+                delete $data->{'cbqos_objects'}{$policyObjectIndex};
                 $objType = 'DELETED';
             }
         }
@@ -491,10 +502,10 @@ sub buildChildrenConfigs
 
     my $precedence = 10000;
     
-    foreach my $objectIndex ( sort { $a <=> $b }
-                              @{$data->{'cbqos_children'}{$parentObjIndex}} )
+    foreach my $policyObjectIndex
+        ( sort { $a <=> $b } @{$data->{'cbqos_children'}{$parentObjIndex}} )
     {
-        my $objectRef     = $data->{'cbqos_objects'}{$objectIndex};
+        my $objectRef     = $data->{'cbqos_objects'}{$policyObjectIndex};
         my $objConfIndex  = $objectRef->{'cbQosConfigIndex'};
         my $objType       = $objectRef->{'cbQosObjectsType'};
         my $configRef     = $data->{'cbqos_objcfg'}{$objConfIndex};
@@ -518,9 +529,17 @@ sub buildChildrenConfigs
         {
             $objectName = $configRef->{'cbQosPolicyMapName'};
 
-            my $policyRef = $data->{'cbqos_policies'}{$objectIndex};
-            if( ref( $policyRef ) )
+            if( $parentObjIndex eq '0' )
             {
+                my $policyIndex = substr($policyObjectIndex, 0,
+                                         index($policyObjectIndex, '.'));
+            
+                my $policyRef = $data->{'cbqos_policies'}{$policyIndex};
+                if( not ref( $policyRef ) )
+                {
+                    next;
+                }
+                
                 my $ifIndex    = $policyRef->{'cbQosIfIndex'};
                 my $interface  = $data->{'interfaces'}{$ifIndex};
 
@@ -865,7 +884,8 @@ sub buildChildrenConfigs
             else
             {
                 # Recursivery build children
-                buildChildrenConfigs( $data, $cb, $objectNode, $objectIndex,
+                buildChildrenConfigs( $data, $cb, $objectNode,
+                                      $policyObjectIndex,
                                       $objType, $objectName, $objectNick,
                                       $fullName);
             }

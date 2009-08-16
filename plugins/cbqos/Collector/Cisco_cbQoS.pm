@@ -240,7 +240,7 @@ sub initTarget
 
 sub make_full_name
 {
-    my $objects = shift;
+    my $objhash = shift;
     my $hosthash = shift;
     my $attr = shift;
     my $cref = shift;
@@ -253,8 +253,8 @@ sub make_full_name
     if( $parentIndex > 0 )
     {
 	$objectID =
-            make_full_name($objects, $hosthash,
-                           $objects->{$parentIndex}, $cref);
+            make_full_name($objhash, $hosthash,
+                           $objhash->{$parentIndex}, $cref);
     }
 
     if( $objectID ) {
@@ -481,7 +481,6 @@ sub initTargetAttributes
         my $objTypeOid = $oiddef{'cbQosObjectsType'};
 
         my %objects;
-        my %objPolicyIdx;
 
         while( my( $oid, $val ) = each %{$result} )
         {
@@ -495,21 +494,21 @@ sub initTargetAttributes
 
             my $entryName = $oidrev{$prefixOid};
 
-            $objects{$objIndex}{$entryName} = $val;
-            $objPolicyIdx{$objIndex} = $policyIndex;
+            $objects{$policyIndex}{$objIndex}{$entryName} = $val;
         }
 
-        while( my( $objIndex, $attr ) = each %objects )
+        while( my( $policyIndex, $objhash ) = each %objects )
         {
-            my $policyIndex = $objPolicyIdx{$objIndex};
+            while( my( $objIndex, $attr ) = each %{$objhash} )
+            {
+                my $objType = $attr->{'cbQosObjectsType'};
+                next if not defined( $objTypeAttributes{$objType} );
 
-            my $objType = $attr->{'cbQosObjectsType'};
-            next if not defined( $objTypeAttributes{$objType} );
+                my $objectID =
+                    make_full_name( $objhash, $hosthash, $attr, $cref );
 
-	    my $objectID =
-                make_full_name( \%objects, $hosthash, $attr, $cref );
-
-            $ref->{$policyIndex}{$objectID} = $objIndex;
+                $ref->{$policyIndex}{$objectID} = $objIndex;
+            }
         }
     }
 

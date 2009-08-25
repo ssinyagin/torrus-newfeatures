@@ -109,7 +109,7 @@ sub discover
     # Temperature
     if( $devdetails->param('Liebert::disable-temperature') ne 'yes' ) 
     {
-        $devdetails->setCap("env-temperature");
+        $devdetails->setCap('env-temperature');
 
         if( $devdetails->param('Liebert::use-fahrenheit') ne 'yes' )
         {
@@ -120,7 +120,7 @@ sub discover
 
             if( defined( $idTable ) )
             {
-                $devdetails->setCap("env-temperature-celcius");
+                $devdetails->setCap('env-temperature-celcius');
 
                 foreach my $index ( $devdetails->getSnmpIndices(
                                     $dd->oiddef('TemperatureIdDegC') ) )
@@ -137,7 +137,7 @@ sub discover
 
             if( defined( $idTable ) )
             {
-                $devdetails->setCap("env-temperature-fahrenheit");
+                $devdetails->setCap('env-temperature-fahrenheit');
 
                 foreach my $index ( $devdetails->getSnmpIndices(
                                     $dd->oiddef('TemperatureIdDegF') ) )
@@ -158,7 +158,7 @@ sub discover
 
         if( defined( $idTable ) )
         {
-            $devdetails->setCap("env-humidity");
+            $devdetails->setCap('env-humidity');
             foreach my $index ( $devdetails->getSnmpIndices(
                                 $dd->oiddef('HumidityIdRel') ) )
             {
@@ -177,12 +177,12 @@ sub discover
 
         if( defined( $stateTable ) )
         {
-            $devdetails->setCap("env-state");
+            $devdetails->setCap('env-state');
 
             # PROG: Check to see if Firmware is new enough for Capacity
             if( $dd->checkSnmpOID('lgpEnvStateCoolingCapacity') )
             {
-                $devdetails->setCap("env-state-capacity");
+                $devdetails->setCap('env-state-capacity');
             }
         }
     }
@@ -196,7 +196,7 @@ sub discover
 
         if( defined( $statsTable ) )
         {
-            $devdetails->setCap("env-stats");
+            $devdetails->setCap('env-stats');
         }
     }
 
@@ -211,7 +211,7 @@ sub buildConfig
     my $devNode = shift;
     my $data = $devdetails->data();
 
-    if( $devdetails->hasCap("env-temperature") )
+    if( $devdetails->hasCap('env-temperature') )
     {
         # All place-setting variables default to Celcius
         my @template;
@@ -223,7 +223,7 @@ sub buildConfig
         my $tempLowLim = 15;
         my $tempUppLim = 70;
 
-        if( $devdetails->hasCap("env-temperature-fahrenheit") )
+        if( $devdetails->hasCap('env-temperature-fahrenheit') )
         {
             $dataFile   = "%system-id%_temperature_f.rrd";
             $fahrenheit	= 1;
@@ -268,7 +268,7 @@ sub buildConfig
 
 
     # Humidity
-    if( $devdetails->hasCap("env-humidity") )
+    if( $devdetails->hasCap('env-humidity') )
     {
         my $nodeHumidity = $cb->addSubtree( $devNode, "Humidity", undef,
                                           [ 'Liebert::humidity-subtree' ] );
@@ -291,12 +291,12 @@ sub buildConfig
 
 
     # State of the system
-    if( $devdetails->hasCap("env-state") )
+    if( $devdetails->hasCap('env-state') )
     {
         my $nodeState = $cb->addSubtree( $devNode, 'State', undef,
                                        [ 'Liebert::state-subtree' ] );
 
-        if( $devdetails->hasCap("env-state-capacity") )
+        if( $devdetails->hasCap('env-state-capacity') )
         {
             $cb->addSubtree( $devNode, 'State', undef,
                            [ 'Liebert::state-capacity' ] );

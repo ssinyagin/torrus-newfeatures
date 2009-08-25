@@ -517,7 +517,7 @@ sub discover
 
             if( $tableTun )
             {
-                $devdetails->setCap("ciscoVPDN");
+                $devdetails->setCap('ciscoVPDN');
 
                 $devdetails->storeSnmpVars( $tableTun );
 

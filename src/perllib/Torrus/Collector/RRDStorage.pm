@@ -385,10 +385,16 @@ sub updateRRD
 
     if( $ds_conflict and $moveConflictRRD )
     {
+        if( not -f $filename )
+        {
+            Error($filename . 'is not a regular file');
+            return;
+        }
+        
         my( $sec, $min, $hour, $mday, $mon, $year) = localtime( time() );
         my $destfile = sprintf('%s_%04d%02d%02d%02d%02d',
                                $filename,
-                               $year + 1900, $mon, $mday, $hour, $min);
+                               $year + 1900, $mon+1, $mday, $hour, $min);
         
         my $destdir = $conflictRRDPath;
         if( defined( $destdir ) and -d $destdir )
@@ -397,6 +403,7 @@ sub updateRRD
             my $fname = pop( @fpath );
             $destfile = $destdir . '/' . $fname;
         }
+
         Warn('Moving the conflicted RRD file ' . $filename .
              ' to ' . $destfile);
         rename( $filename, $destfile ) or

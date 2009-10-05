@@ -871,7 +871,7 @@ information).
 Optional. If set to C<yes>, the SNMP errors C<noSuchObject>, C<noSuchInstance>,
 C<endOfMibView> are ignored, and no action is performed when such errors
 occur.
-    
+
 =item * C<system-id>
 
 Mandatory for every collector type.

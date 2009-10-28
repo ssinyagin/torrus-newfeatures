@@ -1,3 +1,8 @@
+2009-10-28  Jon Nistor  <nistor@snickers.org>
+
+        * perllib/Torrus/DevDiscover/Arista.pm (discover):
+        New discovery module: Arista Networks
+
 2009-05-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm:

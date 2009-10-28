@@ -48,6 +48,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::AlliedTelesyn_PBC18',
      'Torrus::DevDiscover::Apple_AE',
      'Torrus::DevDiscover::Arbor_E',
+     'Torrus::DevDiscover::Arista',
      'Torrus::DevDiscover::AscendMax',
      'Torrus::DevDiscover::ATMEL',
      'Torrus::DevDiscover::AxxessIT',

@@ -1,3 +1,8 @@
+2010-01-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm (discover):
+	snmp-max-msg-size is used now in discivery, not only in collector
+
 2009-10-28  Jon Nistor  <nistor@snickers.org>
 
         * perllib/Torrus/DevDiscover/Arista.pm (discover):

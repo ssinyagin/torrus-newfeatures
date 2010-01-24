@@ -244,6 +244,12 @@ sub discover
         return undef;
     }
 
+    my $maxmsgsize = $devdetails->param('snmp-max-msg-size');
+    if( defined( $maxmsgsize ) and $maxmsgsize > 0 )
+    {
+        $session->max_msg_size( $maxmsgsize );
+    }    
+    
     my @oids = ();
     foreach my $var ( @systemOIDs )
     {

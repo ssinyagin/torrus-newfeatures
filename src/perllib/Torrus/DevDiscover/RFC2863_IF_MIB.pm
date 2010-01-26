@@ -26,7 +26,7 @@ use Torrus::Log;
 
 
 $Torrus::DevDiscover::registry{'RFC2863_IF_MIB'} = {
-    'sequence'     => 10,
+    'sequence'     => 50,
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig,
@@ -238,12 +238,6 @@ sub discover
                       $hint);
             }
         }
-
-        if( $devdetails->hasCap('interfaceIndexingPersistent') )
-        {
-            $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
-            storeIfIndexParams( $devdetails );
-        }
             
         $hint =
             $devdetails->param('RFC2863_IF_MIB::subtree-name-hint');
@@ -259,6 +253,12 @@ sub discover
                       $hint);
             }
         }
+    }
+
+    if( $devdetails->hasCap('interfaceIndexingPersistent') )
+    {
+        $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
+        storeIfIndexParams( $devdetails );
     }
 
     # Filter out the interfaces if needed

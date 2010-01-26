@@ -166,8 +166,14 @@ Dependencies deeper than one level may exist, but it's recommended
 to avoid them. For most cases this should be enough.
 
 Exception is made for C<RFC2863_IF_MIB> module, which has the sequence
-number 10. That is because it provides the basic interface discovery,
+number 50. That is because it provides the basic interface discovery,
 and many other modules depend on its results.
+
+Another exception is vendor-specific modules where the SNMP session parameters
+must be set earliest possible. One of such parameters is C<snmp-max-msg-size>.
+Some vendor SNMP agents would not be walked properly without this setting.
+In these occasions, the sequence number is below 50. The recommended value
+is 30.
 
 =item * C<checkdevtype>
 

@@ -615,21 +615,34 @@ downstream and MAC layer stats are skipped.</p>
 </p>
 <h3><a name="vendor_parameters">Vendor parameters</a></h3>
 <ul>
-<li><strong><a name="item_arbor_e_3a_3adisable_2de30_2dbundle_2c_arbor_e_3a_"><code>Arbor_E::disable-e30-bundle</code>, <code>Arbor_E::disable-e30-buffers</code>,
-    <code>Arbor_E::disable-e30-cpu</code>, <code>Arbor_E::disable-e30-flowdev</code>,
-    <code>Arbor_E::disable-e30-fwdTable</code>, <code>Arbor_E::disable-e30-hdd</code>,
-    <code>Arbor_E::disable-e30-mem</code></a></strong>
+<li><strong><a name="item_alcatellucent_3a_3afull_2difdescr"><code>AlcatelLucent::full-ifdescr</code></a></strong>
 
-<p>When set to <code>yes</code>, the corresponding statistics are excluded from the graphs.</p>
+<p>If set to <code>yes</code>, the interface comments for ALU ESS-7450 are taken
+as-is from ifDescr. By default, port name and SFP type are stripped.</p>
+</li>
+<li><strong><a name="item_arbor_e_3a_3adisable_2dbundle_2doffer_2c_c_3carbor"><code>Arbor_E::disable-bundle-offer</code>,
+    <code>Arbor_E::disable-bundle-offer-deny</code>,
+    <code>Arbor_E::disable-bundle-offer-pktsize</code>,
+    <code>Arbor_E::disable-bundle-offer-rate</code>,
+    <code>Arbor_E::disable-bundle-offer-subcount</code>, <code>Arbor_E::disable-flowdev</code>,
+    <code>Arbor_E::enable-bundle-name-rrd</code>,
+    <code>Arbor_E::disable-e30-buffers</code>, <code>Arbor_E::disable-e30-bundle</code>,
+    <code>Arbor_E::disable-e30-cpu</code>,
+    <code>Arbor_E::disable-e30-fwdTable</code>,
+    <code>Arbor_E::disable-e30-fwdTable-login</code>,
+    <code>Arbor_E::disable-e30-hdd</code>, <code>Arbor_E::enable-e30-hdd-errors</code>,
+    <code>Arbor_E::disable-e30-hdd-logs</code>, <code>Arbor_E::disable-e30-l2tp</code>,
+    <code>Arbor_E::disable-e30-mem</code>, <code>Arbor_E::enable-e30-mempool</code>,
+    <code>Arbor_E::disable-e30-bundle</code>, <code>Arbor_E::disable-e30-bundle-deny</code>, 
+    <code>Arbor_E::disable-e30-bundle-rate</code>, <code>Arbor_E::disable-e30-slowpath</code></a></strong>
+
+<p>When set to <code>yes</code>, the corresponding statistics are included or excluded from
+the graphs.</p>
 </li>
 <li><strong><a name="item_arbor_e_3a_3aenable_2de30_2dbundle_2dname_2drrd"><code>Arbor_E::enable-e30-bundle-name-rrd</code></a></strong>
 
 <p>When set to <code>yes</code>, the data will be written to filenames based on the name
 bundle instead of by the ID of the bundle.</p>
-</li>
-<li><strong><a name="item_arbor_e_3a_3aenable_2de30_2dhdd_2derrors"><code>Arbor_E::enable-e30-hdd-errors</code></a></strong>
-
-<p>When set to <code>yes</code>, gather information regarding harddrive errors.</p>
 </li>
 <li><strong><a name="item_apple_ae_3a_3adisable_2dclients_2dstats"><code>Apple_AE::disable-clients-stats</code></a></strong>
 
@@ -762,6 +775,11 @@ devices.</p>
 <li><strong><a name="item_liebert_3a_3ause_2dfahrenheit"><code>Liebert::use-fahrenheit</code></a></strong>
 
 <p>When set to <code>yes</code>, the temperature readings will be in fahrenheit.</p>
+</li>
+<li><strong><a name="item_netbotz_3a_3atemp_2dmax_2c_netbotz_3a_3ahumi_2dmax"><code>NetBotz::temp-max</code>, <code>NetBotz::humi-max</code>, <code>NetBotz::dew-max</code></a></strong>
+
+<p>Set a numeric value for the maximum temperature, humidity, or dew point
+on NetBotz sensor graphs. The maximum is displayed with a dark red line.</p>
 </li>
 <li><strong><a name="item_paradyne_3a_3aslot_2dname"><code>Paradyne::slot-name</code></a></strong>
 

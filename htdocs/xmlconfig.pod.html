@@ -862,11 +862,10 @@ information).</p>
 
 <p>Optional. If set to <code>yes</code>, the SNMP errors <code>noSuchObject</code>, <code>noSuchInstance</code>,
 <code>endOfMibView</code> are ignored, and no action is performed when such errors
-occur.
-</p>
-<pre>
+occur.</p>
+</li>
+<li><strong><a name="item_system_2did"><code>system-id</code></a></strong>
 
-=item * C&lt;system-id&gt;</pre>
 <p>Mandatory for every collector type.
 Default value for SNMP collector: <code>%snmp-host%</code>.
 Unique identifier of the host.
@@ -1249,6 +1248,12 @@ The result of the rendering is the text line with the output values
 separated by colon (:).</p>
 </li>
 </ul>
+<ul>
+<li><strong><a name="item_disable_2dlegend_2c_disable_2dtitle_2c_disable_2dv"><code>disable-legend</code>, <code>disable-title</code>, <code>disable-vertical-label</code></a></strong>
+
+<p>When set to <code>yes</code>, the corresponding elements of the graph are not displayed.</p>
+</li>
+</ul>
 <p>
 </p>
 <h3><a name="styling_profiles">Styling Profiles</a></h3>
@@ -1627,8 +1632,7 @@ in the environment variable.</p>
 </p>
 <hr />
 <h1><a name="author">Author</a></h1>
-<p>Copyright (c) 2002-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;
-</p>
+<p>Copyright (c) 2002-2005 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
 
 </body>
 

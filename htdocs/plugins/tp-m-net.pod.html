@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Torrus plugin for M-net Telekommunikations</title>
+<link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#torrus_plugin_for_mnet_telekommunikations">Torrus plugin for M-net Telekommunikations</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#installation">Installation</a></li>
+		<li><a href="#usage">Usage</a></li>
+	</ul>
+
+	<li><a href="#author">Author</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="torrus_plugin_for_mnet_telekommunikations">Torrus plugin for M-net Telekommunikations</a></h1>
+<p>Status: Pre-alpha; Last modified: 02-FEB-2010</p>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<p>This plugin is aiming the automation requirements at M-net Telekommunikations
+(www.m-net.de).</p>
+<p>The interface descriptions of the form ``key1=val1;key2=val2;...'' are
+interpreted by the plugin and corresponding actions are performed.</p>
+<p>
+</p>
+<h2><a name="installation">Installation</a></h2>
+<p>Follow the Torrus installation guide for the main software installation.</p>
+<p>Unpack the plugin distribution package in some directory:</p>
+<pre>
+  gzip -dc tp-m-net-1.X.tar.gz | tar xvf -</pre>
+<p>Then run the Torrus plugin installation utility:</p>
+<pre>
+  torrus install_plugin tp-m-net-1.X</pre>
+<p>No restarting is needed.</p>
+<p>
+</p>
+<h2><a name="usage">Usage</a></h2>
+<p>Out of the interface description string of format ``key1=val1;key2=val2;...''
+the following key values are interpreted:</p>
+<dl>
+<dt><strong><a name="item_bw"><code>bw</code></a></strong>
+
+<dd>
+<p>Indicates the interface bandwidth in bits/second.
+Scale suffixes (T, G, M, K) are supported (i.e. 5G is equal to 5.0e9).
+The limits are used in graph display and also for setting up
+threshold monitors.</p>
+</dd>
+</li>
+</dl>
+<p>Discovery parameters:</p>
+<dl>
+<dt><strong><a name="item_m_net_3a_3askip_2dhost"><code>M_net::skip-host</code></a></strong>
+
+<dd>
+<p>If set to <code>yes</code>, the corresponding host is skipped from plugin processing.</p>
+</dd>
+</li>
+<dt><strong><a name="item_m_net_3a_3askip_2dinterfaces"><code>M_net::skip-interfaces</code></a></strong>
+
+<dd>
+<p>Comma-separated list of interface names (their correspomnding subtree names).
+These interfaces are skipped from plugin processing.</p>
+</dd>
+</li>
+</dl>
+<pre>
+  TODO:
+    -- Interpret the interface function and assign a corrsponding
+       threshold monitor</pre>
+<p>Development of this plugin was sponsored by M-net Telekommunikations GmbH.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<p>Copyright (c) 2010 Stanislav Sinyagin &lt;<a href="mailto:ssinyagin@yahoo.com">ssinyagin@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>

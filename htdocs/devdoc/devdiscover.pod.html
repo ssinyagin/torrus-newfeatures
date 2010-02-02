@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Torrus SNMP Device Discovery Developer's Guide</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gp@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -46,55 +48,56 @@ files, based on SNMP discovery results and templates.</p>
 <p>In general, <code>devdiscover</code> consists of the following files and functional
 parts:</p>
 <ul>
-<li><strong><a name="item_bin_2fdevdiscover_2ein"><code>bin/devdiscover.in</code></a></strong><br />
-</li>
-This file is installed as <code>bin/devdiscover</code> in Torrus installation directory,
+<li><strong><a name="item_bin_2fdevdiscover_2ein"><code>bin/devdiscover.in</code></a></strong>
+
+<p>This file is installed as <code>bin/devdiscover</code> in Torrus installation directory,
 with certain variables substituted. The program provides all the commandline
 functionality and options processing. Once the CLI options are processed and
-verified, the control is passed to the <a href="#item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a> object.
-<p></p>
-<li><strong><a name="item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a></strong><br />
+verified, the control is passed to the <a href="#item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a> object.</p>
 </li>
-This Perl module is responsible for the SNMP discovery process organization:
+<li><strong><a name="item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a></strong>
+
+<p>This Perl module is responsible for the SNMP discovery process organization:</p>
 <ul>
-<li></li>
-it registers the discovery modules;
-<p></p>
-<li></li>
-establishes an SNMP session to the target host;
-<p></p>
-<li></li>
-initiates a new <a href="#item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a> object for the target host;
-<p></p>
-<li></li>
-stores the connection-specific parameters to the device object;
-<p></p>
-<li></li>
-for each registered discovery module, executes <a href="#item_checkdevtype"><code>checkdevtype()</code></a> in
-<em>sequential</em> order;
-<p></p>
-<li></li>
-for those discovery modules which paid interest in this target host,
-executes <a href="#item_discover"><code>discover()</code></a> in <em>sequential</em> order;
-<p></p>
-<li></li>
-upon request from <code>bin/devdiscover</code>, builds the configuration
+<li>
+<p>it registers the discovery modules;</p>
+</li>
+<li>
+<p>establishes an SNMP session to the target host;</p>
+</li>
+<li>
+<p>initiates a new <a href="#item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a> object for the target host;</p>
+</li>
+<li>
+<p>stores the connection-specific parameters to the device object;</p>
+</li>
+<li>
+<p>for each registered discovery module, executes <a href="#item_checkdevtype"><code>checkdevtype()</code></a> in
+<em>sequential</em> order;</p>
+</li>
+<li>
+<p>for those discovery modules which paid interest in this target host,
+executes <a href="#item_discover"><code>discover()</code></a> in <em>sequential</em> order;</p>
+</li>
+<li>
+<p>upon request from <code>bin/devdiscover</code>, builds the configuration
 XML tree, by calling <a href="#item_buildconfig"><code>buildConfig()</code></a> in <em>sequential</em> order for each
-relevant discovery module for each target host.
-<p></p></ul>
-<li><strong><a name="item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a></strong><br />
+relevant discovery module for each target host.</p>
 </li>
-This Perl module is defined in <em>perllib/Torrus/DevDiscover.pm</em>, and provides
-the functionality to store the results of SNMP device discovery.
-<p></p>
-<li><strong><a name="item_torrus_3a_3aconfigbuilder"><code>Torrus::ConfigBuilder</code></a></strong><br />
+</ul>
+<li><strong><a name="item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a></strong>
+
+<p>This Perl module is defined in <em>perllib/Torrus/DevDiscover.pm</em>, and provides
+the functionality to store the results of SNMP device discovery.</p>
 </li>
-This module is an encapsulation wrapper for XML configuration builder.
-It provides methods for every element of Torrus configuration.
-<p></p>
-<li><strong><a name="item_discovery_modules">Discovery Modules</a></strong><br />
+<li><strong><a name="item_torrus_3a_3aconfigbuilder"><code>Torrus::ConfigBuilder</code></a></strong>
+
+<p>This module is an encapsulation wrapper for XML configuration builder.
+It provides methods for every element of Torrus configuration.</p>
 </li>
-These provide all the functionality for SNMP discovery. Normally
+<li><strong><a name="item_discovery_modules">Discovery Modules</a></strong>
+
+<p>These provide all the functionality for SNMP discovery. Normally
 one module covers one MIB, or sometimes several vendor-specific MIBs,
 and it is responsible for finding out the device details necessary
 for Torrus configuration building. Usually a discovery module refers to one or
@@ -102,17 +105,18 @@ several <em>template definition files</em>. A module may depend on
 other modules' discovery results. This is controlled by its
 <code>sequence number</code>. Vendor-independent discovery modules are normally named
 as <code>Torrus::DevDiscover::RFCXXXX_SOME_HUMAN_NAME</code>, and vendor-specific
-ones are named as <code>Torrus::DevDiscover::Vendor[Product[Subsystem]]</code>.
-<p></p>
-<li><strong><a name="item_template_definition_files">Template definition files</a></strong><br />
+ones are named as <code>Torrus::DevDiscover::Vendor[Product[Subsystem]]</code>.</p>
 </li>
-These are XML documents residing in <em>xmlconfig/vendor</em> and
+<li><strong><a name="item_template_definition_files">Template definition files</a></strong>
+
+<p>These are XML documents residing in <em>xmlconfig/vendor</em> and
 <em>xmlconfig/generic</em> directories. Each file is a piece of Torrus configuration,
 and contains definitions and templates for particular MIB or vendor.
 Generic template definition files are for vendor-independent MIBs,
 and normally they are named as <em>rfcXXXX.some-human-name.xml</em>.
-Vendor-specific files are named as <em>vendor.product[.subsystem].xml</em>.
-<p></p></ul>
+Vendor-specific files are named as <em>vendor.product[.subsystem].xml</em>.</p>
+</li>
+</ul>
 <p>
 </p>
 <h2><a name="discovery_module_internals">Discovery Module Internals</a></h2>
@@ -141,11 +145,11 @@ name, which normally repeats the module name.</p>
         };</pre>
 <p>Each registry entry must contain 4 fields:</p>
 <ul>
-<li><strong><a name="item_sequence"><code>sequence</code></a></strong><br />
-</li>
-The sequence number determines the order in which every discovery module's
+<li><strong><a name="item_sequence"><code>sequence</code></a></strong>
+
+<p>The sequence number determines the order in which every discovery module's
 procedure is executed. Sequence numbers of dependant modules must
-be higher than those of their dependencies.
+be higher than those of their dependencies.</p>
 <p>Generic MIB discovery modules should have the sequence number 100. If
 a particular generic module depends on other generic modules, its sequence
 number may be 110.</p>
@@ -155,42 +159,48 @@ should have sequence number 510.</p>
 <p>Dependencies deeper than one level may exist, but it's recommended
 to avoid them. For most cases this should be enough.</p>
 <p>Exception is made for <code>RFC2863_IF_MIB</code> module, which has the sequence
-number 10. That is because it provides the basic interface discovery,
+number 50. That is because it provides the basic interface discovery,
 and many other modules depend on its results.</p>
-<p></p>
-<li><strong><a name="item_checkdevtype"><code>checkdevtype</code></a></strong><br />
+<p>Another exception is vendor-specific modules where the SNMP session parameters
+must be set earliest possible. One of such parameters is <code>snmp-max-msg-size</code>.
+Some vendor SNMP agents would not be walked properly without this setting.
+In these occasions, the sequence number is below 50. The recommended value
+is 30.</p>
 </li>
-Must be a subroutine reference. This subroutine is called with two object
+<li><strong><a name="item_checkdevtype"><code>checkdevtype</code></a></strong>
+
+<p>Must be a subroutine reference. This subroutine is called with two object
 references as arguments: <a href="#item_torrus_3a_3adevdiscover"><code>Torrus::DevDiscover</code></a> and
 <a href="#item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a>.
 The purpose of this subroutine is to determine if the target host is
 of required type, or if it supports the required MIB.
 The subroutine should return true if and only if the target host
-supports the MIB variables this module is supposed to discover.
+supports the MIB variables this module is supposed to discover.</p>
 <p>In general, <a href="#item_checkdevtype"><code>checkdevtype</code></a> subroutine is small, and checks one or several
 OIDs presence on the host, or their values, e.g. the value of <em>sysObjectID</em>
 variable. It should perform as less as possible SNMP requests, in order to
 speed up the pre-discovery process.</p>
-<p></p>
-<li><strong><a name="item_discover"><code>discover</code></a></strong><br />
 </li>
-Must be a subroutine reference. This subroutine is called with the same
+<li><strong><a name="item_discover"><code>discover</code></a></strong>
+
+<p>Must be a subroutine reference. This subroutine is called with the same
 two arguments as <a href="#item_checkdevtype"><code>checkdevtype()</code></a>. It is called for those modules only,
 whose <a href="#item_checkdevtype"><code>checkdevtype()</code></a> has returned true. The subroutine should return true
-if no errors occured during the discovery.
+if no errors occured during the discovery.</p>
 <p>The purpose of <a href="#item_discover"><code>discover()</code></a> is to perform the actual SNMP discovery,
 and prepare the parameter values for future XML configuration.</p>
-<p></p>
-<li><strong><a name="item_buildconfig"><code>buildConfig</code></a></strong><br />
 </li>
-Must be a subroutine reference. This subroutine is called with three object
+<li><strong><a name="item_buildconfig"><code>buildConfig</code></a></strong>
+
+<p>Must be a subroutine reference. This subroutine is called with three object
 references as arguments: <a href="#item_torrus_3a_3adevdiscover_3a_3adevdetails"><code>Torrus::DevDiscover::DevDetails</code></a>,
 <a href="#item_torrus_3a_3aconfigbuilder"><code>Torrus::ConfigBuilder</code></a>, and an XML element object, which should be used only
-to pass data to ConfigBuilder methods.
+to pass data to ConfigBuilder methods.</p>
 <p>This subroutine is designed to construct the resulting XML configuration
 subtree as a child of a given XML element. Upper level subtrees
 are handled by CLI options processing code.</p>
-<p></p></ul>
+</li>
+</ul>
 <p>
 </p>
 <h3><a name="oid_definitions">OID Definitions</a></h3>

@@ -1,0 +1,95 @@
+#  Copyright (C) 2010  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 Torrus plugin for M-net Telekommunikations
+
+Status: Pre-alpha; Last modified: 02-FEB-2010
+
+=head2 Introduction
+
+This plugin is aiming the automation requirements at M-net Telekommunikations
+(www.m-net.de). 
+
+The interface descriptions of the form "key1=val1;key2=val2;..." are
+interpreted by the plugin and corresponding actions are performed.
+
+=back
+
+
+=head2 Installation
+
+Follow the Torrus installation guide for the main software installation.
+
+Unpack the plugin distribution package in some directory:
+
+  gzip -dc tp-m-net-1.X.tar.gz | tar xvf -
+
+Then run the Torrus plugin installation utility:
+
+  torrus install_plugin tp-m-net-1.X
+
+No restarting is needed.
+
+=head2 Usage
+
+Out of the interface description string of format "key1=val1;key2=val2;..."
+the following key values are interpreted:
+
+=over 4
+
+=item C<bw>
+
+Indicates the interface bandwidth in bits/second.
+Scale suffixes (T, G, M, K) are supported (i.e. 5G is equal to 5.0e9).
+The limits are used in graph display and also for setting up
+threshold monitors.
+
+=back
+
+Discovery parameters:
+
+=over 4
+
+=item C<M_net::skip-host>
+
+If set to C<yes>, the corresponding host is skipped from plugin processing.
+
+
+=item C<M_net::skip-interfaces>
+
+Comma-separated list of interface names (their correspomnding subtree names).
+These interfaces are skipped from plugin processing.
+
+=back
+
+
+  TODO:
+    -- Interpret the interface function and assign a corrsponding
+       threshold monitor
+
+
+
+
+Development of this plugin was sponsored by M-net Telekommunikations GmbH.
+
+=head1 Author
+
+Copyright (c) 2010 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

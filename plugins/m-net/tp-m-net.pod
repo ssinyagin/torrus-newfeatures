@@ -31,7 +31,6 @@ This plugin is aiming the automation requirements at M-net Telekommunikations
 The interface descriptions of the form "key1=val1;key2=val2;..." are
 interpreted by the plugin and corresponding actions are performed.
 
-=back
 
 
 =head2 Installation

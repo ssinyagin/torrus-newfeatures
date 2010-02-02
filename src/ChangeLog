@@ -1,3 +1,8 @@
+2010-02-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/AlcatelLucent.pm:
+	new discovery parameter: AlcatelLucent::full-ifdescr
+
 2010-01-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/AlcatelLucent.pm: new discovery module

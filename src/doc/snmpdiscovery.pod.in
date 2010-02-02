@@ -620,7 +620,14 @@ downstream and MAC layer stats are skipped.
 
 =over 4
 
-=item * C<Arbor_E::disable-bundle-offer>, C<Arbor_E::disable-bundle-offer-deny>,
+=item * C<AlcatelLucent::full-ifdescr>
+
+If set to C<yes>, the interface comments for ALU ESS-7450 are taken
+as-is from ifDescr. By default, port name and SFP type are stripped.
+
+
+=item * C<Arbor_E::disable-bundle-offer>,
+    C<Arbor_E::disable-bundle-offer-deny>,
     C<Arbor_E::disable-bundle-offer-pktsize>,
     C<Arbor_E::disable-bundle-offer-rate>,
     C<Arbor_E::disable-bundle-offer-subcount>, C<Arbor_E::disable-flowdev>,

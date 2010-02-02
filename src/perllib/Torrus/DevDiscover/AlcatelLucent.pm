@@ -137,6 +137,28 @@ sub discover
         $data->{'nameref'}{'ifReferenceName'}  = 'ifName';
         $data->{'nameref'}{'ifNick'} = 'ifNameT';
         $data->{'nameref'}{'ifComment'} = 'ifDescr';
+
+        if( $devdetails->param('AlcatelLucent::full-ifdescr') ne 'yes' )
+        { 
+            $data->{'nameref'}{'ifComment'} = 'ifStrippedDescr';
+
+            foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+            {
+                my $interface = $data->{'interfaces'}{$ifIndex};
+                my $descr = $interface->{'ifDescr'};
+
+                # in 7450, ifdescr is 3 comma-separated values:
+                # STRING: 1/1/1, 10/100/Gig Ethernet SFP, "COMMENT"
+                # Strip everything except the actual comment.
+                
+                if( $descr =~ /\"(.+)\"/ )
+                {
+                    $descr = $1;
+                }
+
+                $interface->{'ifStrippedDescr'} = $descr;
+            }
+        }
     }
 
     return 1;

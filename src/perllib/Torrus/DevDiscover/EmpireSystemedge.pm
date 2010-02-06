@@ -267,7 +267,7 @@ sub discover
         $devdetails->storeSnmpVars( $empireDiskStatsTable );
         $devdetails->storeSnmpVars( $hrDeviceDescr );
 
-        my $ref= {};
+        my $ref= {'indices' => []};
         $data->{'empireDiskStats'} = $ref;
 
         foreach my $INDEX

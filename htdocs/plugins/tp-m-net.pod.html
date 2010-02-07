@@ -21,6 +21,7 @@
 		<li><a href="#introduction">Introduction</a></li>
 		<li><a href="#installation">Installation</a></li>
 		<li><a href="#usage">Usage</a></li>
+		<li><a href="#selectors">Selectors</a></li>
 	</ul>
 
 	<li><a href="#author">Author</a></li>
@@ -62,7 +63,9 @@ the following key values are interpreted:</p>
 <p>Indicates the interface bandwidth in bits/second.
 Scale suffixes (T, G, M, K) are supported (i.e. 5G is equal to 5.0e9).
 The limits are used in graph display and also for setting up
-threshold monitors.</p>
+threshold monitors. The following interface parameters are set to the
+correspomding numbers: <code>bandwidth-limit-in</code>, <code>bandwidth-limit-out</code>,
+<code>upper-limit</code>, <code>mnet-bw</code></p>
 </dd>
 </li>
 </dl>
@@ -82,10 +85,31 @@ These interfaces are skipped from plugin processing.</p>
 </dd>
 </li>
 </dl>
+<p>
+</p>
+<h2><a name="selectors">Selectors</a></h2>
+<p>The M-net selectors extend the functionality of RFC2863_IF_MIB selectors.
+The selectors of the type <code>M_net</code> act upon the device interfaces in the same
+manner as the  RFC2863_IF_MIB selectors. The only difference is that the
+selector attributes are the keys used in interface descriptions.</p>
+<p>The following example sets up the monitors on all interfaces which have
+<code>ct=UPSTREAM</code> and <code>st=act</code>. It also illustrates how 3 levels of threshold
+monitoring can be set up for input and output bandwidth usage:</p>
 <pre>
-  TODO:
-    -- Interpret the interface function and assign a corrsponding
-       threshold monitor</pre>
+  &lt;param name=&quot;selectors&quot; value=&quot;mymon&quot;/&gt;
+  &lt;param name=&quot;mymon-selector-type&quot; value=&quot;M_net&quot;/&gt;
+  &lt;param name=&quot;mymon-selector-expr&quot;  value=&quot;{ct},{st},AND&quot;/&gt;
+  &lt;param name=&quot;mymon-ct&quot;  value=&quot;^UPSTREAM$&quot;/&gt;
+  &lt;param name=&quot;mymon-st&quot;  value=&quot;^act$&quot;/&gt;
+  &lt;param name=&quot;mymon-selector-actions&quot;&gt;
+     InBytesMonitor, OutBytesMonitor, NotifyPolicy
+  &lt;/param&gt;
+  &lt;param name=&quot;mymon-InBytesMonitor-arg&quot; 
+     value=&quot;bwin-warn,bwin-major,bwin-crit&quot;/&gt;
+  &lt;param name=&quot;mymon-OutBytesMonitor-arg&quot; 
+     value=&quot;bwout-warn,bwout-major,bwout-crit&quot;/&gt;
+  &lt;param name=&quot;mymon-NotifyPolicy-arg&quot; 
+     value=&quot;high-impact&quot;/&gt;</pre>
 <p>Development of this plugin was sponsored by M-net Telekommunikations GmbH.</p>
 <p>
 </p>

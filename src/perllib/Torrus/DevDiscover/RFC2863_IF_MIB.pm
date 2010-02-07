@@ -732,6 +732,12 @@ sub buildConfig
             {
                 push( @templates, '::holt-winters-defaults' );
             }
+
+            if( defined( $interface->{'selectorActions'}{'NotifyPolicy'} ) )
+            {
+                $interface->{'param'}{'notify-policy'} =
+                    $interface->{'selectorActions'}{'NotifyPolicy'};
+            }
         }
 
         if( not $interface->{'selectorActions'}{'NoPacketCounters'} )
@@ -1240,6 +1246,7 @@ our %knownSelectorActions =
       'OutBytesMonitor'   => 'RFC2863_IF_MIB',
       'InErrorsMonitor'   => 'RFC2863_IF_MIB',
       'OutErrorsMonitor'  => 'RFC2863_IF_MIB',
+      'NotifyPolicy'      => 'RFC2863_IF_MIB',
       'HoltWinters'       => 'RFC2863_IF_MIB',
       'NoPacketCounters'  => 'RFC2863_IF_MIB',
       'NoErrorCounters'   => 'RFC2863_IF_MIB',

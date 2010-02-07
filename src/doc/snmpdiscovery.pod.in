@@ -902,6 +902,11 @@ or output bytes counter.
 The argument defines the monitor name to be applied to error and discard
 counters that are discovered for a given interface.
 
+=item * C<NotifyPolicy>
+
+The argument defines the value for C<notify-policy> parameter. See the manual
+for F<action_notify> for more details.
+
 =item * C<HoltWinters>
 
 No argument needed. This action enables Holt-Winters prediction

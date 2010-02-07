@@ -107,20 +107,20 @@ sub discover
             next;
         }
 
-        my %comment_param;
+        my $mnet_attr = {};
         foreach my $pair ( split( /\s*;\s*/, $comment ) )
         {
             my ($key, $val) = split( /\s*=\s*/, $pair );
 
             if( defined( $key ) and defined( $val ) )
             {
-                $comment_param{$key} = $val;
+                $mnet_attr->{lc $key} = $val;
             }
         }
 
-        if( defined( $comment_param{'bw'} ) )
+        if( defined( $mnet_attr->{'bw'} ) )
         {
-            my $bw = uc $comment_param{'bw'};
+            my $bw = uc $mnet_attr->{'bw'};
             if( $bw =~ /([A-Z])$/ )
             {
                 my $scale = $bw_scale{$1};
@@ -138,9 +138,11 @@ sub discover
                     'upper-limit'} = $bw / 8;
                 $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
                     'upper-limit'} = $bw / 8;
+                $interface->{'param'}{'mnet-bw'} = $bw;
             }
         }
 
+        $interface->{'mnet-attributes'} = $mnet_attr;
     }
     
     return 1;
@@ -156,6 +158,63 @@ sub buildConfig
     my $data = $devdetails->data();
 
 }
+
+
+#######################################
+# Selectors interface
+#
+
+$Torrus::DevDiscover::selectorsRegistry{'M_net'} = {
+    'getObjects'      => \&getSelectorObjects,
+    'getObjectName'   => \&getSelectorObjectName,
+    'checkAttribute'  => \&checkSelectorAttribute,
+    'applyAction'     => \&applySelectorAction,
+};
+
+
+## Objects are interface indexes
+
+sub getSelectorObjects
+{
+    return &Torrus::DevDiscover::RFC2863_IF_MIB::getSelectorObjects( @_ );
+}
+
+
+sub checkSelectorAttribute
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $attr = shift;
+    my $checkval = shift;
+
+    my $data = $devdetails->data();
+    my $interface = $data->{'interfaces'}{$object};
+
+    my $value =  $interface->{'mnet-attributes'}{lc $attr};
+    
+    if( defined( $value ) )
+    {
+        return ( $value =~ $checkval ) ? 1:0;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+sub getSelectorObjectName
+{
+    return &Torrus::DevDiscover::RFC2863_IF_MIB::getSelectorObjectName( @_ );
+}
+
+
+sub applySelectorAction
+{
+    return &Torrus::DevDiscover::RFC2863_IF_MIB::applySelectorAction( @_ );
+}
+   
 
 
 

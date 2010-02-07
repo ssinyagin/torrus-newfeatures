@@ -59,7 +59,10 @@ the following key values are interpreted:
 Indicates the interface bandwidth in bits/second.
 Scale suffixes (T, G, M, K) are supported (i.e. 5G is equal to 5.0e9).
 The limits are used in graph display and also for setting up
-threshold monitors.
+threshold monitors. The following interface parameters are set to the
+correspomding numbers: C<bandwidth-limit-in>, C<bandwidth-limit-out>,
+C<upper-limit>, C<mnet-bw>
+
 
 =back
 
@@ -80,9 +83,34 @@ These interfaces are skipped from plugin processing.
 =back
 
 
-  TODO:
-    -- Interpret the interface function and assign a corrsponding
-       threshold monitor
+=head2 Selectors
+
+The M-net selectors extend the functionality of RFC2863_IF_MIB selectors.
+The selectors of the type C<M_net> act upon the device interfaces in the same
+manner as the  RFC2863_IF_MIB selectors. The only difference is that the
+selector attributes are the keys used in interface descriptions.
+
+The following example sets up the monitors on all interfaces which have
+C<ct=UPSTREAM> and C<st=act>. It also illustrates how 3 levels of threshold
+monitoring can be set up for input and output bandwidth usage:
+
+  <param name="selectors" value="mymon"/>
+  <param name="mymon-selector-type" value="M_net"/>
+  <param name="mymon-selector-expr"  value="{ct},{st},AND"/>
+  <param name="mymon-ct"  value="^UPSTREAM$"/>
+  <param name="mymon-st"  value="^act$"/>
+  <param name="mymon-selector-actions">
+     InBytesMonitor, OutBytesMonitor, NotifyPolicy
+  </param>
+  <param name="mymon-InBytesMonitor-arg" 
+     value="bwin-warn,bwin-major,bwin-crit"/>
+  <param name="mymon-OutBytesMonitor-arg" 
+     value="bwout-warn,bwout-major,bwout-crit"/>
+  <param name="mymon-NotifyPolicy-arg" 
+     value="high-impact"/>
+
+
+
 
 
 

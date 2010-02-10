@@ -1,3 +1,8 @@
+2010-02-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm (discover):
+	Default snmp-max-msg-size is set to 65535 for SNMP v1 and v2
+
 2010-02-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):

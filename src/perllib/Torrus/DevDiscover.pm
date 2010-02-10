@@ -198,6 +198,17 @@ sub discover
             return 0;
         }
         $snmpargs{'-community'} = $community;
+
+        # set maxMsgSize to a maximum value for better compatibility
+        
+        my $maxmsgsize = $devdetails->param('snmp-max-msg-size');
+        if( not defined( $maxmsgsize ) )
+        {
+            $maxmsgsize = 65535;
+            $devdetails->setParam('snmp-max-msg-size', $maxmsgsize);
+        }
+        
+        $snmpargs{'-maxmsgsize'} = $maxmsgsize;
     }
     elsif( $version eq '3' )        
     {
@@ -243,12 +254,6 @@ sub discover
         Error('Cannot create SNMP session: ' . $error);
         return undef;
     }
-
-    my $maxmsgsize = $devdetails->param('snmp-max-msg-size');
-    if( defined( $maxmsgsize ) and $maxmsgsize > 0 )
-    {
-        $session->max_msg_size( $maxmsgsize );
-    }    
     
     my @oids = ();
     foreach my $var ( @systemOIDs )

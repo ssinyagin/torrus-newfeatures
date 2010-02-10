@@ -31,19 +31,6 @@ use strict;
 use Torrus::Log;
 
 
-# We must set snmp-max-msg-size to some big value, otherwise
-# ESS 7450 in SNMPv2 would fail to walk the tables.
-# set up two registries: sequence 50 does only minimal tuning, and the rest
-# is done at standard sequence 500
-
-$Torrus::DevDiscover::registry{'AlcatelLucent30'} = {
-    'sequence'     => 30,
-    'checkdevtype' => \&checkdevtype30,
-    'discover'     => \&discover30,
-    'buildConfig'  => \&buildConfig30
-    };
-
-
 $Torrus::DevDiscover::registry{'AlcatelLucent'} = {
     'sequence'     => 500,
     'checkdevtype' => \&checkdevtype,
@@ -59,37 +46,6 @@ our %oiddef =
      'alcatellucent'             => '1.3.6.1.4.1.637',
      'ess7450'                   => '1.3.6.1.4.1.6527.1.6.1',
      );
-
-sub checkdevtype30
-{
-    my $dd = shift;
-    my $devdetails = shift;
-
-    my $objectID = $devdetails->snmpVar( $dd->oiddef('sysObjectID') );
-    
-    if( $dd->oidBaseMatch( 'pantheranetworks', $objectID ) )
-    {
-        if( $dd->oidBaseMatch( 'ess7450', $objectID ) )
-        {
-            $devdetails->setCap('AlcatelLucent_ESS7450');
-
-            my $data = $devdetails->data();
-            $data->{'param'}{'snmp-max-msg-size'} = '32768';
-            $dd->session()->max_msg_size( 32768 );
-        }
-        return 1;
-    }
-    elsif( $dd->oidBaseMatch( 'alcatellucent', $objectID ) )
-    {
-        # placeholder for future developments
-        return 1;
-    }
-    
-    return 0;
-}
-
-sub discover30 { return 1; };
-sub buildConfig30 {};
 
 
 my %essInterfaceFilter =
@@ -107,19 +63,33 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    if( $devdetails->isDevType( 'AlcatelLucent30' ) )
+    my $objectID = $devdetails->snmpVar( $dd->oiddef('sysObjectID') );
+    
+    if( $dd->oidBaseMatch( 'pantheranetworks', $objectID ) )
     {
-        $devdetails->setCap('interfaceIndexingManaged');
-        $devdetails->setCap('interfaceIndexingPersistent');
+        if( $dd->oidBaseMatch( 'ess7450', $objectID ) )
+        {
+            $devdetails->setCap('AlcatelLucent_ESS7450');
 
-        &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
-            ($devdetails, \%essInterfaceFilter);
-        
+            $devdetails->setCap('interfaceIndexingManaged');
+            $devdetails->setCap('interfaceIndexingPersistent');
+            
+            &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+                ($devdetails, \%essInterfaceFilter);
+        }
+        return 1;
+    }
+    elsif( $dd->oidBaseMatch( 'alcatellucent', $objectID ) )
+    {
+        # placeholder for future developments
+        Warn('This model of Alcatel-Lucent equipment is not yet supported');
         return 1;
     }
     
     return 0;
 }
+
+
 
 
 sub discover

@@ -10,12 +10,12 @@
 
 2010-02-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* perllib/Torrus/DevDiscover/AlcatelLucent.pm:
-	new discovery parameter: AlcatelLucent::full-ifdescr
+	* perllib/Torrus/DevDiscover/ALU_Timetra.pm:
+	new discovery parameter: ALU_Timetra::full-ifdescr
 
 2010-01-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* perllib/Torrus/DevDiscover/AlcatelLucent.pm: new discovery module
+	* perllib/Torrus/DevDiscover/ALU_Timetra.pm: new discovery module
 
 2010-01-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 

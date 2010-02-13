@@ -619,7 +619,7 @@ downstream and MAC layer stats are skipped.
 
 =over 4
 
-=item * C<AlcatelLucent::full-ifdescr>
+=item * C<ALU_Timetra::full-ifdescr>
 
 If set to C<yes>, the interface comments for ALU ESS-7450 are taken
 as-is from ifDescr. By default, port name and SFP type are stripped.

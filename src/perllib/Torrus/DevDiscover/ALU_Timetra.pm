@@ -239,17 +239,18 @@ sub discover
                 next;
             }
 
-            my $encap = $data->{'interfaces'}{$ifIndex}{'tmnxPortEncapType'};
-            if( not defined( $encap ) )
+            if( not defined( $data->{'interfaces'}{$ifIndex} ) )
             {
                 Warn('IfIndex ' . $ifIndex . ' is not in interfaces table, ' .
                      'skipping SAP');
                 next;
             }
+            
+            my $encap = $data->{'interfaces'}{$ifIndex}{'tmnxPortEncapType'};
 
             # Compose the SAP name depending on port encapsulation.
             
-            my $sapName = $data->{'nameref'}{'ifName'}{$ifIndex};
+            my $sapName = $data->{'interfaces'}{$ifIndex}{'ifName'};
 
             if( $encap == 1 )  # nullEncap
             {
@@ -288,7 +289,7 @@ sub discover
                 
             $ref->{$sapFullID} = {
                 'description' => $descr,
-                'port' => $sapPortId,
+                'port' => $ifIndex,
                 'name' => $sapName,
                 'encval' => $sapEncapValue
                 };
@@ -350,7 +351,7 @@ sub buildConfig
                         ( sort {sapCompare($ref->{$a}, $ref->{$b})}
                           keys %{$ref} )
                     {                        
-                        my $sapDescr = $ref->{$sapID}{'description'}
+                        my $sapDescr = $ref->{$sapID}{'description'};
                         if( length( $sapDescr ) == 0 )
                         {
                             $sapDescr = $data->{'timetraSvc'}{$svcId}->{
@@ -358,7 +359,7 @@ sub buildConfig
                         }
 
                         my $subtreeName = $ref->{$sapID}{'name'};
-                        $subtreeName =~ s/\W/_/;
+                        $subtreeName =~ s/\W/_/go;
 
                         my $comment = $ref->{$sapID}{'name'};
                         if( length( $sapDescr ) > 0 )

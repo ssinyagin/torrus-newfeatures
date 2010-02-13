@@ -1,5 +1,5 @@
 
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2010  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ dist_xml_DATA  = defaults.xml snmp-defs.xml cdef-collector-defs.xml
 vendordir      = $(distxmldir)/vendor
 dist_vendor_DATA = \
 	vendor/alteon.xml \
+	vendor/alu-timetra.xml \
 	vendor/apc.ups.xml  \
 	vendor/apple.ae.xml \
 	vendor/arbor_e.xml \

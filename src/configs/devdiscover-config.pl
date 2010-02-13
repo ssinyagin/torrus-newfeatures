@@ -44,8 +44,8 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::RFC2670_DOCS_IF',
      'Torrus::DevDiscover::RFC2737_ENTITY_MIB',
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
-     'Torrus::DevDiscover::ALU_Timetra',
      'Torrus::DevDiscover::Alteon',
+     'Torrus::DevDiscover::ALU_Timetra',
      'Torrus::DevDiscover::AlliedTelesyn_PBC18',
      'Torrus::DevDiscover::Apple_AE',
      'Torrus::DevDiscover::Arbor_E',
@@ -273,6 +273,12 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Alteon::alteon-maint' => {
          'name'   => 'alteon-maint',
          'source' => 'vendor/alteon.xml'
+         },     
+
+     #### Alcatel-Lucent ESS and SR
+     'ALU_Timetra::alu-timetra-sap' => {
+         'name'   => 'alu-timetra-sap',
+         'source' => 'vendor/alu-timetra.xml'
          },     
      
      #### Apple Airport Extreme

@@ -328,7 +328,7 @@ sub discover
         my $text = $legendValues{$key}{'value'};
         if( length( $text ) > 0 )
         {
-            $text = $self->screenSpecialChars( $text );
+            $text = $devdetails->screenSpecialChars( $text );
             $legend .= $legendValues{$key}{'name'} . ':' . $text . ';';
         }
     }
@@ -765,17 +765,6 @@ sub oidBaseMatch
 }
 
 
-sub screenSpecialChars
-{
-    my $self = shift;
-    my $txt = shift;
-
-    $txt =~ s/:/{COLON}/gm;
-    $txt =~ s/;/{SEMICOL}/gm;
-    $txt =~ s/%/{PERCENT}/gm;
-
-    return $txt;
-}
 
 
 ###########################################################################
@@ -997,6 +986,19 @@ sub data
 {
     my $self = shift;
     return $self->{'data'};
+}
+
+
+sub screenSpecialChars
+{
+    my $self = shift;
+    my $txt = shift;
+
+    $txt =~ s/:/{COLON}/gm;
+    $txt =~ s/;/{SEMICOL}/gm;
+    $txt =~ s/%/{PERCENT}/gm;
+
+    return $txt;
 }
 
 

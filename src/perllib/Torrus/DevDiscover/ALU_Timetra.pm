@@ -286,7 +286,7 @@ sub discover
                 Warn('Encapsulation type ' . $encap . ' is not supported yet');
                 $sapName .= ':' . $sapEncapValue;
             }
-                
+            
             $ref->{$sapFullID} = {
                 'description' => $descr,
                 'port' => $ifIndex,
@@ -332,7 +332,7 @@ sub buildConfig
             
             my $param = {
                 'precedence' => 100000 - $custId,
-                'comment'    => $data->{'timetraCustDescr'}{$custId}
+                'comment'    => $data->{'timetraCustDescr'}{$custId},
             };
             
             my $custNode = $cb->addSubtree( $customersNode,
@@ -366,11 +366,36 @@ sub buildConfig
                         {
                             $comment .= ': ' . $sapDescr;
                         }
+
+                        my $legend = '';                        
+                        
+                        if( length($data->{'timetraCustDescr'}{$custId}) > 0 )
+                        {
+                            $legend .= 'Customer:' .
+                                $devdetails->screenSpecialChars
+                                ( $data->{'timetraCustDescr'}{$custId} ) . ';';
+                        }
+                        
+                        if( length($data->{'timetraSvc'}{$svcId}->{
+                            'description'}) > 0 )
+                        {
+                            $legend .= 'Service:' .
+                                $devdetails->screenSpecialChars
+                                ( $data->{'timetraSvc'}{$svcId}->{
+                                    'description'} ) . ';';
+                        }
+                        
+                        $legend .= 'SAP: ' .
+                            $devdetails->screenSpecialChars
+                            ( $ref->{$sapID}{'name'} );
+                        
                         
                         my $param = {
-                            'comment'        => $comment,
-                            'timetra-sap-id' => $sapID,
-                            'precedence'     => $precedence--,
+                            'comment'          => $comment,
+                            'timetra-sap-id'   => $sapID,
+                            'timetra-sap-name' => $ref->{$sapID}{'name'},
+                            'precedence'       => $precedence--,
+                            'legend'           => $legend,
                         };
 
                         $cb->addSubtree( $custNode, $subtreeName, $param,

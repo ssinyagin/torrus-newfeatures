@@ -92,7 +92,10 @@
            value="Show egress traffic for all SAPs on one page"/>
     <param name="overview-page-title-egress"
            value="Egress traffic graphs"/>
-
+    <param name="overview-direct-link-egress"      value="yes"/>
+    <param name="overview-direct-link-view-egress"
+           value="expanded-dir-html"/>
+    
     <param name="overview-subleave-name-discards">
       IngressQchipDroppedHiPrioPackets,
       IngressQchipDroppedLoPrioPackets,
@@ -105,6 +108,9 @@
            value="Show all packet discards for all SAPs on one page"/>
     <param name="overview-page-title-discards"
            value="Packet Discards"/>
+    <param name="overview-direct-link-discards"      value="yes"/>
+    <param name="overview-direct-link-view-discards"
+           value="expanded-dir-html"/>
   </template>
 
   

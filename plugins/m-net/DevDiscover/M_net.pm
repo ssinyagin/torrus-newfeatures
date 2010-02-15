@@ -50,13 +50,10 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    if( $devdetails->isDevType('CiscoIOS') or
-        $devdetails->isDevType('AlcatelLucent') )
+    if( $devdetails->isDevType('RFC2863_IF_MIB') and
+        $devdetails->param('M_net::skip-host') ne 'yes' )
     {
-        if( $devdetails->param('M_net::skip-host') ne 'yes' )
-        {
-            return 1;
-        }
+        return 1;
     }
 
     return 0;

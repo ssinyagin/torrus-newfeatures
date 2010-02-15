@@ -276,6 +276,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },     
 
      #### Alcatel-Lucent ESS and SR
+     'ALU_Timetra::alu-timetra-customer' => {
+         'name'   => 'alu-timetra-customer',
+         'source' => 'vendor/alu-timetra.xml'
+         },     
      'ALU_Timetra::alu-timetra-sap' => {
          'name'   => 'alu-timetra-sap',
          'source' => 'vendor/alu-timetra.xml'

@@ -39,6 +39,7 @@ our %oiddef =
      'ifTable'          => '1.3.6.1.2.1.2.2',
      'ifDescr'          => '1.3.6.1.2.1.2.2.1.2',
      'ifType'           => '1.3.6.1.2.1.2.2.1.3',
+     'ifSpeed'          => '1.3.6.1.2.1.2.2.1.5',
      'ifPhysAddress'    => '1.3.6.1.2.1.2.2.1.6',
      'ifAdminStatus'    => '1.3.6.1.2.1.2.2.1.7',
      'ifOperStatus'     => '1.3.6.1.2.1.2.2.1.8',
@@ -56,6 +57,7 @@ our %oiddef =
      'ifHCInUcastPkts'  => '1.3.6.1.2.1.31.1.1.1.7',
      'ifHCOutOctets'    => '1.3.6.1.2.1.31.1.1.1.10',
      'ifHCOutUcastPkts' => '1.3.6.1.2.1.31.1.1.1.11',
+     'ifHighSpeed'      => '1.3.6.1.2.1.31.1.1.1.15',     
      'ifAlias'          => '1.3.6.1.2.1.31.1.1.1.18'
      );
 
@@ -103,6 +105,11 @@ sub discover
         if( $devdetails->hasOID( $dd->oiddef('ifAlias') ) )
         {
             $devdetails->setCap('ifAlias');
+        }
+        
+        if( $devdetails->hasOID( $dd->oiddef('ifHighSpeed') ) )
+        {
+            $devdetails->setCap('ifHighSpeed');
         }
     }
 
@@ -194,6 +201,30 @@ sub discover
                 $interface->{'ifAlias'} =
                     $devdetails->snmpVar($dd->oiddef('ifAlias') .
                                          '.' . $ifIndex);
+            }
+
+            my $bw = 0;
+            if( $devdetails->hasCap('ifHighSpeed') )
+            {
+                my $hiBW = 
+                    $devdetails->snmpVar($dd->oiddef('ifHighSpeed') . '.' .
+                                         $ifIndex);
+                if( $hiBW >= 10 )
+                {
+                    $bw = 1e6 * $hiBW;
+                }
+            }
+
+            if( $bw == 0 )
+            {
+                $bw = 
+                    $devdetails->snmpVar($dd->oiddef('ifSpeed') . '.' .
+                                         $ifIndex);
+            }
+            
+            if( $bw > 0 )
+            {
+                $interface->{'ifSpeed'} = $bw;
             }
         }
     }

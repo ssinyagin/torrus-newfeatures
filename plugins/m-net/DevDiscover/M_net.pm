@@ -118,29 +118,38 @@ sub discover
             }
         }
 
+        my $bw = 0;
+        
         if( defined( $mnet_attr->{'bw'} ) )
         {
-            my $bw = uc $mnet_attr->{'bw'};
+            $bw = uc $mnet_attr->{'bw'};
             if( $bw =~ /([A-Z])$/ )
             {
                 my $scale = $bw_scale{$1};
                 $bw =~ s/([A-Z])$//;
                 $bw *= $scale;
             }
-
-            if( $bw > 0 )
+        }
+        else
+        {
+            if( defined( $interface->{'ifSpeed'} ) )
             {
-                $interface->{'param'}{'bandwidth-limit-in'} = $bw / 1e6;
-                $interface->{'param'}{'bandwidth-limit-out'} = $bw / 1e6;
-                $interface->{'childCustomizations'}->{'InOut_bps'}->{
-                    'upper-limit'} = $bw;
-                $interface->{'childCustomizations'}->{'Bytes_In'} ->{
-                    'upper-limit'} = $bw / 8;
-                $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
-                    'upper-limit'} = $bw / 8;
-                $interface->{'param'}{'mnet-bw'} = $bw;
+                $bw = $interface->{'ifSpeed'};
             }
         }
+        
+        if( $bw > 0 )
+        {
+            $interface->{'param'}{'bandwidth-limit-in'} = $bw / 1e6;
+            $interface->{'param'}{'bandwidth-limit-out'} = $bw / 1e6;
+            $interface->{'childCustomizations'}->{'InOut_bps'}->{
+                'upper-limit'} = $bw;
+            $interface->{'childCustomizations'}->{'Bytes_In'} ->{
+                'upper-limit'} = $bw / 8;
+            $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
+                'upper-limit'} = $bw / 8;
+            $interface->{'param'}{'mnet-bw'} = $bw;
+        }        
 
         $interface->{'mnet-attributes'} = $mnet_attr;
     }

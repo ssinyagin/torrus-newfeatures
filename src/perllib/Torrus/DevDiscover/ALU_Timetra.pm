@@ -58,7 +58,8 @@ our %oiddef =
      'sapDescription'   => '1.3.6.1.4.1.6527.3.1.2.4.3.2.1.5',
 
      # TIMETRA-PORT-MIB (chassis ID hardcoded to 1)
-     'tmnxPortEncapType' => '1.3.6.1.4.1.6527.3.1.2.2.4.2.1.12.1',     
+     'tmnxPortDescription' => '1.3.6.1.4.1.6527.3.1.2.2.4.2.1.5.1',
+     'tmnxPortEncapType'   => '1.3.6.1.4.1.6527.3.1.2.2.4.2.1.12.1',     
      );
 
 
@@ -126,35 +127,31 @@ sub discover
     my $data = $devdetails->data();
 
     # WARNING: This code is tested only with ESS7450
+
+    # Get port descriptions
+    {
+        my $oid = $dd->oiddef('tmnxPortDescription');
+        
+        my $portDescrTable = $session->get_table( -baseoid => $oid );        
+        my $prefixLen = length( $oid ) + 1;
+
+        while( my( $oid, $descr ) = each %{$portDescrTable} )
+        {
+            my $ifIndex = substr( $oid, $prefixLen );
+            if( defined( $data->{'interfaces'}{$ifIndex} ) )
+            {
+                $data->{'interfaces'}{$ifIndex}{'tmnxPortDescription'} =
+                    $descr;
+            }
+        }
+    }
     
     # Amend RFC2863_IF_MIB references
     $data->{'nameref'}{'ifSubtreeName'}    = 'ifNameT';
     $data->{'nameref'}{'ifReferenceName'}  = 'ifName';
     $data->{'nameref'}{'ifNick'} = 'ifNameT';
-    $data->{'nameref'}{'ifComment'} = 'ifDescr';
+    $data->{'nameref'}{'ifComment'} = 'tmnxPortDescription';
     
-    if( $devdetails->param('ALU_Timetra::full-ifdescr') ne 'yes' )
-    { 
-        $data->{'nameref'}{'ifComment'} = 'ifStrippedDescr';
-        
-        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
-        {
-            my $interface = $data->{'interfaces'}{$ifIndex};
-            my $descr = $interface->{'ifDescr'};
-            
-            # in 7450, ifdescr is 3 comma-separated values:
-            # STRING: 1/1/1, 10/100/Gig Ethernet SFP, "COMMENT"
-            # Strip everything except the actual comment.
-            
-            if( $descr =~ /\"(.+)\"/ )
-            {
-                $descr = $1;
-            }
-            
-            $interface->{'ifStrippedDescr'} = $descr;
-        }
-    }
-
     # Get customers
     {
         my $oid = $dd->oiddef('custDescription');
@@ -335,8 +332,9 @@ sub buildConfig
                 'comment'    => $data->{'timetraCustDescr'}{$custId},
             };
             
-            my $custNode = $cb->addSubtree( $customersNode,
-                                            $custId, $param );
+            my $custNode =
+                $cb->addSubtree( $customersNode, $custId, $param,
+                                 ['ALU_Timetra::alu-timetra-customer']);
             
             my $precedence = 10000;
             

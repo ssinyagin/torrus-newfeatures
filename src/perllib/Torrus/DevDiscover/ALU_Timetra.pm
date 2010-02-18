@@ -177,8 +177,8 @@ sub discover
             my $svcId = substr( $oid, $prefixLen );
             $data->{'timetraSvc'}{$svcId} = {
                 'description' => $descr,
-                'sap' => {}
-                };
+                'sap' => [],
+            };
         }
     }
 
@@ -193,6 +193,7 @@ sub discover
             my $svcId = substr( $oid, $prefixLen );
             
             $data->{'timetraCustSvc'}{$custId}{$svcId} = 1;
+            $data->{'timetraSvcCust'}{$svcId} = $custId;
         }
     }
 
@@ -229,8 +230,8 @@ sub discover
             my ($svcId, $ifIndex, $sapEncapValue) =
                 split(/\./o, $sapFullID);
 
-            my $ref = $data->{'timetraSvc'}{$svcId}{'sap'};
-            if( not defined( $ref ) )
+            my $svcSaps = $data->{'timetraSvc'}{$svcId}{'sap'};
+            if( not defined( $svcSaps ) )
             {
                 Error('Cannot find Service ID ' . $svcId);
                 next;
@@ -283,13 +284,16 @@ sub discover
                 Warn('Encapsulation type ' . $encap . ' is not supported yet');
                 $sapName .= ':' . $sapEncapValue;
             }
-            
-            $ref->{$sapFullID} = {
+
+            $data->{'timetraSap'}{$sapFullID} =  {
                 'description' => $descr,
                 'port' => $ifIndex,
                 'name' => $sapName,
-                'encval' => $sapEncapValue
-                };
+                'encval' => $sapEncapValue,
+                'svc' => $svcId,
+            };
+
+            push( @{$svcSaps}, $sapFullID );
         }
     }
     
@@ -315,10 +319,16 @@ sub buildConfig
             my $nSaps = 0;
             foreach my $svcId ( keys %{$data->{'timetraCustSvc'}{$custId}} )
             {
-                my $ref = $data->{'timetraSvc'}{$svcId}{'sap'};
-                if( defined( $ref ) )
+                my $svcSaps = $data->{'timetraSvc'}{$svcId}{'sap'};
+                if( defined( $svcSaps ) )
                 {
-                    $nSaps += scalar( keys %{$ref} );
+                    foreach my $sapID ( @{$svcSaps} )
+                    {
+                        if( not $data->{'timetraSap'}{$sapID}{'excluded'} )
+                        {               
+                            $nSaps++;
+                        }
+                    }
                 }
             }
 
@@ -341,25 +351,33 @@ sub buildConfig
             foreach my $svcId
                 ( keys %{$data->{'timetraCustSvc'}{$custId}} )
             {
-                my $ref = $data->{'timetraSvc'}{$svcId}{'sap'};
+                my $svcSaps = $data->{'timetraSvc'}{$svcId}{'sap'};
                 
-                if( defined($ref ) )
+                if( defined($svcSaps ) )
                 {                    
                     foreach my $sapID
-                        ( sort {sapCompare($ref->{$a}, $ref->{$b})}
-                          keys %{$ref} )
-                    {                        
-                        my $sapDescr = $ref->{$sapID}{'description'};
+                        ( sort {sapCompare($data->{'timetraSap'}{$a},
+                                           $data->{'timetraSap'}{$b})}
+                          @{$svcSaps} )
+                    {
+                        my $sap = $data->{'timetraSap'}{$sapID};
+
+                        if( $sap->{'excluded'} )
+                        {
+                            next;
+                        }
+                        
+                        my $sapDescr = $sap->{'description'};
                         if( length( $sapDescr ) == 0 )
                         {
                             $sapDescr = $data->{'timetraSvc'}{$svcId}->{
                                 'description'};
                         }
 
-                        my $subtreeName = $ref->{$sapID}{'name'};
+                        my $subtreeName = $sap->{'name'};
                         $subtreeName =~ s/\W/_/go;
 
-                        my $comment = $ref->{$sapID}{'name'};
+                        my $comment = $sap->{'name'};
                         if( length( $sapDescr ) > 0 )
                         {
                             $comment .= ': ' . $sapDescr;
@@ -384,14 +402,13 @@ sub buildConfig
                         }
                         
                         $legend .= 'SAP: ' .
-                            $devdetails->screenSpecialChars
-                            ( $ref->{$sapID}{'name'} );
+                            $devdetails->screenSpecialChars( $sap->{'name'} );
                         
                         
                         my $param = {
                             'comment'          => $comment,
                             'timetra-sap-id'   => $sapID,
-                            'timetra-sap-name' => $ref->{$sapID}{'name'},
+                            'timetra-sap-name' => $sap->{'name'},
                             'precedence'       => $precedence--,
                             'legend'           => $legend,
                         };
@@ -422,6 +439,120 @@ sub sapCompare
 }
       
 
+
+#######################################
+# Selectors interface
+#
+
+
+$Torrus::DevDiscover::selectorsRegistry{'ALU_SAP'} = {
+    'getObjects'      => \&getSelectorObjects,
+    'getObjectName'   => \&getSelectorObjectName,
+    'checkAttribute'  => \&checkSelectorAttribute,
+    'applyAction'     => \&applySelectorAction,
+};
+
+## Objects are full SAP indexes: svcId.sapPortId.sapEncapValue
+
+sub getSelectorObjects
+{
+    my $devdetails = shift;
+    my $objType = shift;
+
+    my $data = $devdetails->data();
+    my @ret = keys %{$data->{'timetraSap'}};
+
+    return( sort {$a<=>$b} @ret );
+}
+
+
+sub checkSelectorAttribute
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $attr = shift;
+    my $checkval = shift;
+
+    my $data = $devdetails->data();
+    
+    my $value;
+    my $operator = '=~';
+    
+    my $sap = $data->{'timetraSap'}{$object};
+    
+    if( $attr eq 'sapDescr' )
+    {
+        $value = $sap->{'description'};
+    }
+    elsif( $attr eq 'custDescr' )
+    {
+        my $svcId = $sap->{'svc'};
+        my $custId = $data->{'timetraSvcCust'}{$svcId};
+        $value = $data->{'timetraCustDescr'}{$custId};
+    }
+    elsif( $attr eq 'sapName' )
+    {
+        $value = $sap->{'name'};
+        $operator = 'eq';
+    }
+    elsif( $attr eq 'sapPort' )
+    {
+        my $ifIndex = $sap->{'port'};
+        $value = $data->{'interfaces'}{$ifIndex}{'ifName'};
+        $operator = 'eq';
+    }    
+    else
+    {
+        Error('Unknown ALU_SAP selector attribute: ' . $attr);
+        $value = '';
+    }        
+        
+    
+    return eval( '$value' . ' ' . $operator . '$checkval' ) ? 1:0;
+}
+
+
+sub getSelectorObjectName
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    
+    my $data = $devdetails->data();
+
+    return $data->{'timetraSap'}{$object}{'name'};
+}
+
+
+my %knownSelectorActions =
+    (
+     'RemoveSAP' => 1,
+     );
+
+                            
+sub applySelectorAction
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $action = shift;
+    my $arg = shift;
+
+    my $data = $devdetails->data();
+    my $objref;
+    
+    if( not $knownSelectorActions{$action} )
+    {
+        Error('Unknown ALU_SAP selector action: ' . $action);
+        return;
+    }
+
+    if( $action eq 'RemoveSAP' )
+    {
+        $data->{'timetraSap'}{$object}{'excluded'} = 1;
+    }
+}   
 
 1;
 

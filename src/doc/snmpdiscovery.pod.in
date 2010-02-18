@@ -992,6 +992,16 @@ by C<devdiscover>.
 Actions supported: C<Monitor>, C<TokensetMember>.
 
 
+=head3 ALU_SAP selector
+
+This selector type is designed for SAP entries in Alcatel-Lucent ESS and SR
+routers.
+
+Attributes supported: C<sapDescr> (regexp), C<custDescr> (regexp),
+C<sapName> (exact match), C<sapPort> (exact match).
+
+Actions supported: C<RemoveSAP> (excludes a selected SAP from the datasources).
+
 
 
 =head3 Examples

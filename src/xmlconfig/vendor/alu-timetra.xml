@@ -83,17 +83,17 @@
 
   <template name="alu-timetra-customer">
     <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="egress,discards"/>
+    <param name="overview-shortcuts" value="traffic,discards"/>
     
-    <param name="overview-subleave-name-egress" value="Egress_bps"/>
-    <param name="overview-shortcut-text-egress"
-           value="Egress traffic"/>
-    <param name="overview-shortcut-title-egress"
-           value="Show egress traffic for all SAPs on one page"/>
-    <param name="overview-page-title-egress"
-           value="Egress traffic graphs"/>
-    <param name="overview-direct-link-egress"      value="yes"/>
-    <param name="overview-direct-link-view-egress"
+    <param name="overview-subleave-name-traffic" value="InOut_bps"/>
+    <param name="overview-shortcut-text-traffic"
+           value="Traffic"/>
+    <param name="overview-shortcut-title-traffic"
+           value="Show egress and ingress traffic for all SAPs on one page"/>
+    <param name="overview-page-title-traffic"
+           value="Egress/ingress traffic graphs"/>
+    <param name="overview-direct-link-traffic"      value="yes"/>
+    <param name="overview-direct-link-view-traffic"
            value="expanded-dir-html"/>
     
     <param name="overview-subleave-name-discards">
@@ -103,7 +103,7 @@
       EgressQchipDroppedOutProfPackets
     </param>
     <param name="overview-shortcut-text-discards"
-           value="All discards"/>
+           value="Discards"/>
     <param name="overview-shortcut-title-discards"
            value="Show all packet discards for all SAPs on one page"/>
     <param name="overview-page-title-discards"
@@ -132,30 +132,53 @@
       <param name="graph-lower-limit" value="0" />
 
 
-      <leaf name="Egress_bps">
-        <param name="comment" value="Egress bits per second graph"/>
+      <leaf name="InOut_bps">
+        <param name="comment"
+          value="Egress and Ingress bits per second graph"/>
         <param name="vertical-label"   value="bps" />
         <param name="graph-lower-limit" value="0" />
         <param name="rrd-hwpredict"    value="disabled" />
         <param name="precedence"       value="5000" />
         <param name="ds-type"          value="rrd-multigraph" />
-        <param name="ds-names"         value="inp,op" />
+        <param name="ds-names"         value="ingrinp,ingrop,egrinp,egrop" />
 
-        <param name="ds-expr-inp"
+        <param name="ds-expr-ingrinp"
+          value="{IngressQchipForwardedInProfOctets},8,*" />
+        <param name="graph-legend-ingrinp"
+          value="Ingress bps in-profile" />
+        <param name="line-style-ingrinp"    value="AREA" />
+        <param name="line-color-ingrinp"    value="##green" />
+        <param name="line-order-ingrinp"    value="1" />
+
+        <param name="ds-expr-ingrop"
+          value="{IngressQchipForwardedOutProfOctets},8,*" />
+        <param name="graph-legend-ingrop"
+          value="Ingress bps out-of-profile" />
+        <param name="line-style-ingrop"   value="AREA" />
+        <param name="line-stack-ingrop"   value="yes" />
+        <param name="line-color-ingrop"   value="##green75" />
+        <param name="line-order-ingrop"   value="2" />
+
+        <param name="ds-expr-egrinp"
           value="{EgressQchipForwardedInProfOctets},8,*" />
-        <param name="graph-legend-inp"  value="Bit per second in-profile" />
-        <param name="line-style-inp"    value="##green1" />
-        <param name="line-color-inp"    value="##green1" />
-        <param name="line-order-inp"    value="1" />
+        <param name="graph-legend-egrinp"
+          value="Egress bps in-profile" />
+        <param name="line-style-egrinp"    value="LINE2" />        
+        <param name="line-color-egrinp"    value="##blue" />
+        <param name="line-order-egrinp"    value="11" />
 
-        <param name="ds-expr-op"
+        <param name="ds-expr-egrop"
           value="{EgressQchipForwardedOutProfOctets},8,*" />
-        <param name="graph-legend-op" value="Bit per second out-of-profile" />
-        <param name="line-style-op"   value="##green2" />
-        <param name="line-color-op"   value="##green2" />
-        <param name="line-order-op"   value="2" />
+        <param name="graph-legend-egrop"
+           value="Egress bps out-of-profile" />
+        <param name="line-style-egrop"   value="LINE1.5" />
+        <param name="line-color-egrop"   value="##blue75" />
+        <param name="line-stack-egrop"   value="yes" />
+        <param name="line-order-egrop"   value="12" />
       </leaf>
-      
+
+            
+
       <leaf name="IngressQchipDroppedHiPrioPackets">
         <param name="timetra-stat-category"  value="IngressQchip" />        
         <param name="snmp-object">

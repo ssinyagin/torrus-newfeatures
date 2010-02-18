@@ -972,6 +972,18 @@ Numerical order of line drawing. The lines are drawn in accending order.
 If omitted, the XML compiler issues warning, and Renderer conciders
 the order of 100.
 
+=item * C<line-stack-X>
+
+Optional. When set to C<yes>, the line is stacked on top of a previous line.
+Both areas and lines are stackable.
+
+=item * C<line-alpha-X>
+
+Optional. If specified, must be two hexademical, uppercase digits. This
+parameter defines the line (or area) transparency. Value C<FF> is
+equivalent to solid colour. Value C<7F> gives 50% transparency which should
+be suitable for most applications.
+
 =item * C<ignore-views-X>
 
 Optional comma-separated list of view names. The graph for this DS name

@@ -345,10 +345,29 @@ sub rrd_make_multigraph
                 $self->mkcolor( $config_tree->getNodeParam
                                 ($token, 'line-color-'.$dname) );
             
+            my $alpha =
+                $config_tree->getNodeParam($token, 'line-alpha-'.$dname);
+            if( defined( $alpha ) )
+            {
+                $linecolor .= $alpha;
+            }
+
+            my $stack =
+                $config_tree->getNodeParam($token, 'line-stack-'.$dname);
+            if( defined( $stack ) and $stack eq 'yes' )
+            {
+                $stack = ':STACK';
+            }
+            else
+            {
+                $stack = '';
+            }
+                
             push( @{$obj->{'args'}{'line'}},
-                  sprintf( '%s:%s%s%s', $linestyle, $dname,
+                  sprintf( '%s:%s%s%s%s', $linestyle, $dname,
                            $linecolor,
-                           length($legend) > 0 ? ':'.$legend.'\l' : '' ) );
+                           length($legend) > 0 ? ':'.$legend.'\l' : '',
+                           $stack ) );
             
         }
     }

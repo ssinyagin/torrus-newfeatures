@@ -148,14 +148,23 @@ sub discover
         'docsCableMaclayer' => {
             'subtreeName' => 'Docsis_MAC_Layer',
             'templates' => [],
+            'param' => {
+                'node-display-name' => 'DOCSIS MAC Layer',
+            },            
         },
         'docsCableDownstream' => {
             'subtreeName' => 'Docsis_Downstream',
             'templates' => [],
+            'param' => {
+                'node-display-name' => 'DOCSIS Downstream',
+            },            
         },
         'docsCableUpstream' => {
             'subtreeName' => 'Docsis_Upstream',
             'templates' => ['RFC2670_DOCS_IF::docsis-upstream-subtree'],
+            'param' => {
+                'node-display-name' => 'DOCSIS Upstream',
+            },            
         },
     };
 
@@ -198,7 +207,8 @@ sub buildConfig
                 $cb->addSubtree( $devNode,
                                  $data->{'docsConfig'}{$category}{
                                      'subtreeName'},
-                                 {},
+                                 $data->{'docsConfig'}{$category}{
+                                     'param'},
                                  $data->{'docsConfig'}{$category}{
                                      'templates'});
 
@@ -213,7 +223,10 @@ sub buildConfig
                 $param->{'interface-name'} =
                     $interface->{'param'}{'interface-name'};            
                 $param->{'interface-nick'} =
-                    $interface->{'param'}{'interface-nick'};            
+                    $interface->{'param'}{'interface-nick'};
+                $param->{'node-display-name'} =
+                    $interface->{$data->{'nameref'}{'ifReferenceName'}};
+                
                 $param->{'comment'} =
                     $interface->{'param'}{'comment'};        
         

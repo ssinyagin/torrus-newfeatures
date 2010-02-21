@@ -635,6 +635,7 @@
   
   <template name="cisco-ipsec-flow-globals">
     <subtree name="IPSec_Statistics">
+      <param name="node-display-name" value="IPSec Statistics" />
       <param name="rrd-create-dstype" value="COUNTER" />
       <param name="rrd-hwpredict"     value="disabled" />
       <param name="data-file"  value="%system-id%_cisco-ipsec-globals.rrd" />

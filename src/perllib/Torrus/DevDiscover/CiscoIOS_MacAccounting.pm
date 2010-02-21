@@ -289,7 +289,7 @@ sub buildConfig
 
     my $countersNode =
         $cb->addSubtree( $devNode, 'MAC_Accounting',
-                         { 'comment' => 'MAC accounting statistics'},
+                         {'node-display-name' => 'MAC Accounting'},
                          ['CiscoIOS_MacAccounting::cisco-macacc-subtree']);
     
     foreach my $INDEX ( sort { $data->{'cipMac'}{$a}{'subtreeName'} <=>

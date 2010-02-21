@@ -555,6 +555,9 @@ sub buildChildrenConfigs
                     $subtreeName =
                         $interface->{$data->{'nameref'}{'ifSubtreeName'}};
                     
+                    $param->{'node-display-name'} =
+                        $interface->{$data->{'nameref'}{'ifReferenceName'}};
+                    
                     $subtreeComment = $interfaceName;
                     
                     my $ifType = $policyRef->{'cbQosIfType'};

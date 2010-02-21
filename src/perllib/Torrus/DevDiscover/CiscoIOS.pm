@@ -559,7 +559,10 @@ sub buildConfig
     {
         my $countersNode =
             $cb->addSubtree( $devNode, 'BGP_Prefixes',
-                             { 'comment' => 'Accepted prefixes'} );
+                             {
+                                 'node-display-name' => 'BGP Prefixes',
+                                 'comment' => 'Accepted prefixes',
+                             } );
 
         foreach my $INDEX ( sort
                             { $data->{'cbgpPeers'}{$a}{'subtreeName'} <=>
@@ -593,9 +596,9 @@ sub buildConfig
     if( $devdetails->hasCap('CiscoCAR') )
     {
         my $countersNode =
-            $cb->addSubtree( $devNode, 'CAR_Stats',
-                             { 'comment' =>
-                                   'Committed Access Rate statistics'},
+            $cb->addSubtree( $devNode, 'CAR_Stats', {
+                'comment' => 'Committed Access Rate statistics',
+                'node-display-name' => 'CAR', },
                              ['CiscoIOS::cisco-car-subtree']);
         
         foreach my $INDEX ( sort keys %{$data->{'ccar'}} )
@@ -652,9 +655,10 @@ sub buildConfig
 
     if( $devdetails->hasCap('ciscoVPDN') )
     { 
-        my $tunnelNode = $cb->addSubtree( $devNode, 'VPDN_Statistics',
-                             { 'comment' => 'VPDN statistics' },
-                             [ 'CiscoIOS::cisco-vpdn-subtree' ] );
+        my $tunnelNode = $cb->addSubtree
+            ( $devNode, 'VPDN_Statistics',
+              {'node-display-name' => 'VPDN statistics'},
+              [ 'CiscoIOS::cisco-vpdn-subtree' ] );
 
         foreach my $INDEX ( sort keys %{$data->{'ciscoVPDN'}} )
         {

@@ -331,7 +331,9 @@ sub buildConfig
         my $fahrenheit =
             $devdetails->param('CiscoGeneric::use-fahrenheit') eq 'yes';
 
-        my $param = {};
+        my $param = {
+            'node-display-name' => 'Temperature Sensors',
+        };
         my $templates = [ 'CiscoGeneric::cisco-temperature-subtree' ];
         
         my $filePerSensor =
@@ -393,8 +395,11 @@ sub buildConfig
         # Create a subtree for the power supplies
         my $subtreeName = 'Power_Supplies';
 
-        my $param = {'comment' => 'Power supplies status',
-                     'precedence' => -600};
+        my $param = {
+            'node-display-name' => 'Power Supplies',
+            'comment' => 'Power supplies status',
+            'precedence' => -600,
+        };
         my $templates = [];
                 
         $param->{'data-file'} = '%system-id%_power.rrd';
@@ -431,8 +436,9 @@ sub buildConfig
         my $subtreeName = 'Memory_Usage';
 
         my $param = {
+            'node-display-name' => 'Memory Usage',
             'precedence'        => '-100',
-            'comment'           => 'Memory usage statistics'
+            'comment'           => 'Router memory utilization'
             };
 
         my $subtreeNode =
@@ -520,6 +526,7 @@ sub buildConfig
     {
         my $subtreeName = 'CPU_Usage';
         my $param = {
+            'node-display-name' => 'CPU Usage',
             'precedence'         => '-500',
             'comment'            => 'Overall CPU busy percentage'
             };

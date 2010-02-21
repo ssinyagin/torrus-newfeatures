@@ -67,14 +67,15 @@
        ==                  Bandwidth monitors                  ==
        ========================================================== -->
 
-  <!-- Warning: 85% <= Utilization < 95% -->
+  <!-- Warning: 85% <= Utilization < 95%
+       removed from tokenset after 24 hours -->
   
   <monitor name="mnet-bwoctets-1">
     <param name="monitor-type"  value="expression" />
     <param name="rpn-expr"
              value="8,*,#bw,/,DUP,0.85,GE,EXC,0.95,LT,AND" />
     <param name="action"        value="tset-warnings, mnet-notify" />
-    <param name="expires"       value="3600" />
+    <param name="expires"       value="86400" />
     <param name="comment">
       Bandwidth utilization is between 85% and 95%
     </param>
@@ -83,14 +84,15 @@
   </monitor>
 
   
-  <!-- Critical: Utilization >= 95% -->
+  <!-- Critical: Utilization >= 95%
+   removed from tokenset after 5 days -->
   
   <monitor name="mnet-bwoctets-2">
     <param name="monitor-type"  value="expression" />
     <param name="rpn-expr"
              value="8,*,#bw,/,0.95,GE" />
     <param name="action"        value="tset-critical, mnet-notify" />
-    <param name="expires"       value="3600" />
+    <param name="expires"       value="432000" />
     <param name="comment">
       Bandwidth utilization is 95% or higher
     </param>

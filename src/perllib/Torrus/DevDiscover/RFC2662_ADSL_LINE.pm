@@ -117,6 +117,8 @@ sub buildConfig
 
         my $param = {
             'interface-name' => $interface->{'param'}{'interface-name'},
+            'node-display-name' =>
+                $interface->{$data->{'nameref'}{'ifReferenceName'}};
             'interface-nick' => $interface->{'param'}{'interface-nick'},
             'collector-timeoffset-hashstring' =>
                 '%system-id%:%interface-nick%',

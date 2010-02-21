@@ -39,7 +39,7 @@
     <SPAN CLASS="NodeName">
       [% thisIsAlias ? '<EM CLASS="Alias">':'';
          hidden ? '<EM CLASS="ShowHidden">':'' %]
-      <A HREF="[%url(child)%]"[%urlTitle%]>[% nodeName(path(child)) %]</A>
+      <A HREF="[%url(child)%]"[%urlTitle%]>[% nodeName(child) %]</A>
       [% hidden ? '</EM>':'';
          thisIsAlias ? '</EM>':''; %]
     </SPAN>

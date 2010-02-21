@@ -79,6 +79,7 @@
 
   <!-- Parameters for interfaces parent subtree -->
   <template name="rfc2863-ifmib-subtree">
+    <param name="node-display-name"  value="Interfaces"/>
     <param name="comment" value="Interface traffic and error counters"/>
     
     <param name="has-overview-shortcuts" value="yes"/>

@@ -26,7 +26,7 @@
     [% thisIsAlias ? '<EM CLASS="Alias">':'';
        hidden ? '<EM CLASS="ShowHidden">':'' %]
     <A HREF="[%url(child)%]"
-       TITLE="[%urlTitle%]">[% nodeName(path(child)) %]</A>
+       TITLE="[%urlTitle%]">[% nodeName(child) %]</A>
     [% hidden ? '</EM>':'';  thisIsAlias ? '</EM>':''; %]
   </SPAN>
   [% INCLUDE recursiveChildren token=child %]

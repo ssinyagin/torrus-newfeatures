@@ -377,10 +377,10 @@ sub buildConfig
                         my $subtreeName = $sap->{'name'};
                         $subtreeName =~ s/\W/_/go;
 
-                        my $comment = $sap->{'name'};
+                        my $comment = '';
                         if( length( $sapDescr ) > 0 )
                         {
-                            $comment .= ': ' . $sapDescr;
+                            $comment = $sapDescr;
                         }
 
                         my $legend = '';                        
@@ -409,6 +409,7 @@ sub buildConfig
                             'comment'          => $comment,
                             'timetra-sap-id'   => $sapID,
                             'timetra-sap-name' => $sap->{'name'},
+                            'node-display-name' => $sap->{'name'},
                             'precedence'       => $precedence--,
                             'legend'           => $legend,
                         };

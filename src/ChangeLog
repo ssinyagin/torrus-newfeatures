@@ -1,3 +1,10 @@
+2010-02-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/HTML.pm:
+	New parameter: node-display-name. Now interface names are not
+	underscored
+	
+
 2010-02-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_multigraph):

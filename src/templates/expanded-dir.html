@@ -15,14 +15,14 @@
     IF isLeaf(child);
       INCLUDE shortgraph
         token=child
-        nodename=nodeName(path(child))
+        nodename=nodeName(child)
         comment=nodeParam(child,'comment',1);
     ELSIF isAlias(child);
       atoken=isAlias(child);
       IF isLeaf(atoken);
         INCLUDE shortgraph
           token=atoken
-          nodename=nodeName(path(atoken))
+          nodename=nodeName(atoken)
           comment=path(atoken);
       END;
     END;

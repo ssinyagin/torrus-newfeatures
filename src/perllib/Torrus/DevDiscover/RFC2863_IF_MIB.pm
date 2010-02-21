@@ -445,6 +445,9 @@ sub buildConfig
         $interface->{'param'}{'interface-name'} =
             $interface->{$data->{'nameref'}{'ifReferenceName'}};
 
+        $interface->{'param'}{'node-display-name'} =
+            $interface->{$data->{'nameref'}{'ifReferenceName'}};
+
         $interface->{'param'}{'interface-nick'} =
             $interface->{$data->{'nameref'}{'ifNick'}};
 

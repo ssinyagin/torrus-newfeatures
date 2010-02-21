@@ -358,6 +358,14 @@ other purpose, because there's no numeric value associated with it.
 
 =back
 
+=item * C<node-display-name>
+
+Optional. If defined, it overrides the subtree or leaf name for displaying.
+The subtree and leaf names are not allowed to have spaces and special
+characters, and this parameter helps to display strings as they are, such as
+router interface names.
+
+
 =item * C<comment>
 
 Optional. This is a string of text which is displayed when browsing through

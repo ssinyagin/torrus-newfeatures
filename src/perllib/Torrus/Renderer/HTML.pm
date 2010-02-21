@@ -67,7 +67,7 @@ sub render_html
         'isAlias'    => sub { return $config_tree->isAlias($_[0]); },
         'sortTokens' => sub { return $self->sortTokens($config_tree,
                                                        $_[0]); },
-        'nodeName'   => sub { return $config_tree->nodeName($_[0]); },
+        'nodeName'   => sub { return $self->nodeName($config_tree, $_[0]); },
         'parent'     => sub { return $config_tree->getParent($_[0]); },
         'nodeParam'  => sub { return $config_tree->getNodeParam(@_); },
         'param'      => sub { return $config_tree->getParam(@_); },
@@ -141,6 +141,22 @@ sub render_html
 
     return ($config_tree->getParam($view, 'expires')+time(),
             'text/html; charset=UTF-8');
+}
+
+
+sub nodeName
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $token = shift;
+
+    my $n = $config_tree->getNodeParam($token, 'node-display-name', 1);
+    if( defined( $n ) and length( $n ) > 0 )
+    {
+        return $n;
+    }
+    
+    return $config_tree->nodeName($config_tree->path($token));
 }
 
 
@@ -266,7 +282,7 @@ sub makeSplitURLs
             $ret .= '<SPAN CLASS="PathElement">';
             $ret .= sprintf('<A HREF="%s">%s</A>',
                             $self->makeURL($config_tree, 0, $currtoken, $view),
-                            $node);
+                            $self->nodeName($config_tree, $currtoken));
             $ret .= "</SPAN>\n";
         }
     }

@@ -146,9 +146,18 @@ sub discover
             $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
                 'upper-limit'} = $bw / 8;
             $interface->{'param'}{'mnet-bw'} = $bw;
+            $interface->{'param'}{'monitor-vars'} = sprintf('bw=%g', $bw);
         }        
 
         $interface->{'mnet-attributes'} = $mnet_attr;
+
+        # Populate the rest of interface attributes as parameters.
+        # They can be used in monitor notifications.
+
+        while( my ($key, $val) = each %{$mnet_attr} )
+        {
+            $interface->{'param'}{'mnet-attr-' . $key} = $val;
+        }        
     }
     
     return 1;
@@ -163,6 +172,7 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
+    $cb->addFileInclusion('m-net/m-net-monitors.xml');
 }
 
 
@@ -197,6 +207,9 @@ sub checkSelectorAttribute
     my $data = $devdetails->data();
     my $interface = $data->{'interfaces'}{$object};
 
+    # Chop off trailing digits, if any
+    $attr =~ s/\d+$//;
+    
     my $value =  $interface->{'mnet-attributes'}{lc $attr};
     
     if( defined( $value ) )

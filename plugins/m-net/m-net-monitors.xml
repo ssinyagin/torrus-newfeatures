@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2010  Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+  $Id$
+  Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+   Bandwidth monitors for M-net Telekommunikations
+  
+-->
+
+
+<configuration>
+
+<token-sets>
+
+  <token-set name="warnings">
+    <param name="comment" value="Warnings" />
+  </token-set>
+
+  <token-set name="critical">
+    <param name="comment" value="Critical events" />
+  </token-set>
+
+</token-sets>
+
+<monitors>
+
+  <!-- **********************************************************
+        Two levels of actions
+       ********************************************************** -->
+  <action name="tset-warnings">
+    <param name="action-type" value="tset" />
+    <param name="tset-name" value="warnings" />
+  </action>
+
+  <action name="tset-critical">
+    <param name="action-type" value="tset" />
+    <param name="tset-name" value="critical" />
+  </action>
+
+  <!-- Active notifications. The notify policy can depend on severity and
+  $TORRUS_P_mnet-attr-ct, which identifies the interface category -->
+  
+  <action name="mnet-notify">
+    <param name="action-type" value="exec" />
+    <param name="command" value="$TORRUS_BIN/action_notify" />
+    <param name="setenv-params" value="mnet-attr-ct" />   
+  </action>
+
+  
+  <!-- ==========================================================
+       ==                  Bandwidth monitors                  ==
+       ========================================================== -->
+
+  <!-- Warning: 85% <= Utilization < 95% -->
+  
+  <monitor name="mnet-bwoctets-1">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr"
+             value="8,*,#bw,/,DUP,0.85,GE,EXC,0.95,LT,AND" />
+    <param name="action"        value="tset-warnings, mnet-notify" />
+    <param name="expires"       value="3600" />
+    <param name="comment">
+      Bandwidth utilization is between 85% and 95%
+    </param>
+    <param name="display-rpn-expr"  value="800,*,#bw,/" />
+    <param name="severity"  value="5" />
+  </monitor>
+
+  
+  <!-- Critical: Utilization >= 95% -->
+  
+  <monitor name="mnet-bwoctets-2">
+    <param name="monitor-type"  value="expression" />
+    <param name="rpn-expr"
+             value="8,*,#bw,/,0.95,GE" />
+    <param name="action"        value="tset-critical, mnet-notify" />
+    <param name="expires"       value="3600" />
+    <param name="comment">
+      Bandwidth utilization is 95% or higher
+    </param>
+    <param name="display-rpn-expr"  value="800,*,#bw,/" />
+    <param name="severity"  value="10" />
+  </monitor>
+
+       
+</monitors>
+
+</configuration>

@@ -35,7 +35,7 @@ dist_devdisccfg_DATA = m-net-ddcfg.pl
 
 #####   XML configuration   #####
 myxmldir = $(distxmldir)/m-net
-dist_myxml_DATA = 
+dist_myxml_DATA = m-net-monitors.xml
 
 
 #####   Documentation files   #####

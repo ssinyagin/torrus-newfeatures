@@ -266,26 +266,25 @@ sub makeSplitURLs
     my $token = shift;
     my $view = shift;
 
-    my $path = $config_tree->path($token);
-
     my $ret = '';
-    my $currpath = '';
-    foreach my $node ($config_tree->splitPath($path))
+    while( defined( $token ) )
     {
-        $currpath .= $node;
-        if( not defined(my $currtoken = $config_tree->token($currpath)) )
-        {
-            Error("Cannot find token for $currpath");
-        }
-        else
-        {
-            $ret .= '<SPAN CLASS="PathElement">';
-            $ret .= sprintf('<A HREF="%s">%s</A>',
-                            $self->makeURL($config_tree, 0, $currtoken, $view),
-                            $self->nodeName($config_tree, $currtoken));
-            $ret .= "</SPAN>\n";
-        }
+        my $path = $config_tree->path($token);
+        
+        my $str = '<SPAN CLASS="PathElement">';
+        $str .=
+            sprintf('<A HREF="%s">%s%s</A>',
+                    $self->makeURL($config_tree, 0, $token, $view),
+                    $config_tree->nodeName($path),
+                    ( $config_tree->isSubtree($token) and
+                      $path ne '/') ? '/':'' );
+        $str .= "</SPAN>\n";
+        
+        $ret = $str . $ret;
+                
+        $token = $config_tree->getParent( $token );
     }
+    
     return $ret;
 }
 

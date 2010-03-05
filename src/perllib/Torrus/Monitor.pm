@@ -258,12 +258,13 @@ sub setAlarm
 
     my $event;
 
+    $t_last_change = time();
+    
     if( $alarm )
     {
         if( not $prev_status )
         {
             $t_set = $timestamp;
-            $t_last_change = time();
             $event = 'set';
         }
         else
@@ -275,7 +276,6 @@ sub setAlarm
     {
         if( $prev_status )
         {
-            $t_last_change = time();
             $t_expires = $t_last_change +
                 $config_tree->getParam($mname, 'expires');
             $event = 'clear';
@@ -345,8 +345,10 @@ sub cleanupExpired
         my ($t_set, $t_expires, $prev_status, $t_last_change) =
             split(':', $timers);
         
-        if( defined($t_expires) and time() > $t_expires )
-        {
+        if( $t_last_change and
+            time() > ( $t_last_change + $Torrus::Monitor::alarmTimeout ) and
+            ( (not $t_expires) or (time() > $t_expires) ) )
+        {            
             my ($mname, $path) = split(':', $key);
             
             Info('Cleaned up an orphaned alarm: monitor=' . $mname .

@@ -174,8 +174,8 @@ foreach my $tree ( @trees )
                         {
                             my $token = $compiler->token( $path );
                             $compiler->tsetAddMember( $ts, $token, $origin );
-                            Info('Preserved dynamic tokenset member: ' .
-                                 $path . ' in ' . $ts);
+                            Verbose('Preserved dynamic tokenset member: ' .
+                                    $path . ' in ' . $ts);
                         }
                     }
                 }

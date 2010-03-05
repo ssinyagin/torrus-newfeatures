@@ -199,7 +199,7 @@ searchable, etc.:
 B<aliases_DSINST.db> is a I<Btree> database with alias paths as keys
 and target tokens as values. It is used for quick alias expansion.
 
-B<tokensets.db> is a I<Hash> database containing the token sets.
+B<tokensets_DSINST.db> is a I<Hash> database containing the token sets.
 The keys and values are as follows:
 
 =over 4

@@ -155,6 +155,11 @@ $Torrus::Scheduler::ignoreClockSkew = 0;
 #
 $Torrus::Scheduler::statsExpDecayAlpha = 0.63;
 
+# Monitor alarms may become orphaned if the configuration changes
+# in the middle of an event. Events older than this time are cleaned up
+# default: 2 weeks
+$Torrus::Monitor::alarmTimeout = 1209600; 
+
 # The default CSS stylesheet and other details for HTML output.
 # These settings may optionally be overwritten by the styling profile below.
 # Additional CSS overlay may be specified with 'cssoverlay' property,

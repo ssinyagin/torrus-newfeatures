@@ -216,7 +216,7 @@ sub new
 
     
     $self->{'db_sets'} =
-        new Torrus::DB('tokensets',
+        new Torrus::DB('tokensets_' . $dsConfInstance,
                        -Subdir => $self->{'treename'}, -Btree => 0,
                        -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
     defined( $self->{'db_sets'} ) or return( undef );

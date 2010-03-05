@@ -661,6 +661,7 @@ sub beforeRun
                         time() - $init_start));
 
         $data->{'targets_initialized'} = 1;
+        Info('Tasks for collector instance ' . $instance . ' initialized');
     }
     
     Torrus::TimeStamp::release();

@@ -114,6 +114,8 @@ sub run
             undef $obj;
         }
     }
+
+    $self->cleanupExpired();
     
     undef $self->{'db_alarms'};
 }
@@ -242,7 +244,9 @@ sub setAlarm
     my $alarm = $obj->{'alarm'};
     my $timestamp = $obj->{'timestamp'};
 
-    my $prev_values = $self->{'db_alarms'}->get( $token.':'.$mname );
+    my $key = $mname . ':' . $config_tree->path($token);
+    
+    my $prev_values = $self->{'db_alarms'}->get( $key );
     my ($t_set, $t_expires, $prev_status, $t_last_change);
     if( defined($prev_values) )
     {
@@ -280,7 +284,7 @@ sub setAlarm
         {
             if( defined($t_expires) and time() > $t_expires )
             {
-                $self->{'db_alarms'}->del( $token.':'.$mname );
+                $self->{'db_alarms'}->del( $key );
                 $event = 'forget';
             }
         }
@@ -316,7 +320,7 @@ sub setAlarm
 
         if( $event ne 'forget' )
         {
-            $self->{'db_alarms'}->put( $token.':'.$mname,
+            $self->{'db_alarms'}->put( $key,
                                        join(':', ($t_set,
                                                   $t_expires,
                                                   ($alarm ? 1:0),
@@ -325,6 +329,39 @@ sub setAlarm
     }
 }
 
+
+# If an alarm is no longer in ConfigTree, it is not cleaned by setAlarm.
+# We clean them up explicitly after they expire
+
+sub cleanupExpired
+{
+    my $self = shift;
+
+    &Torrus::DB::checkInterrupted();
+    
+    my $cursor = $self->{'db_alarms'}->cursor(-Write => 1);
+    while( my ($key, $timers) = $self->{'db_alarms'}->next($cursor) )
+    {
+        my ($t_set, $t_expires, $prev_status, $t_last_change) =
+            split(':', $timers);
+        
+        if( defined($t_expires) and time() > $t_expires )
+        {
+            my ($mname, $path) = split(':', $key);
+            
+            Info('Cleaned up an orphaned alarm: monitor=' . $mname .
+                 ', path=' . $path);
+            $self->{'db_alarms'}->c_del( $cursor );            
+        }
+    }
+    undef $cursor;
+    
+    &Torrus::DB::checkInterrupted();
+}
+    
+
+
+    
 
 sub run_event_tset
 {
@@ -342,7 +379,7 @@ sub run_event_tset
 
         if( $event eq 'set' )
         {
-            $config_tree->tsetAddMember($tset, $token);
+            $config_tree->tsetAddMember($tset, $token, 'monitor');
         }
         else
         {
@@ -524,7 +561,7 @@ sub beforeRun
             sleep( $self->{'delay'} );
         }
 
-        Info("Rebuilding monitor cache and clearing alarms");
+        Info("Rebuilding monitor cache");
         Debug("Config TS: $actual_ts, Monitor TS: $known_ts");
 
         undef $data->{'targets'};
@@ -540,13 +577,6 @@ sub beforeRun
         $data->{'db_tokens'}->closeNow();
         undef $data->{'db_tokens'};
 
-        # Remove the alarms state information
-        $self->{'db_alarms'} = new Torrus::DB('monitor_alarms',
-                                              -Subdir => $tree,
-                                              -WriteAccess => 1);
-        $self->{'db_alarms'}->trunc();
-        
-        undef $self->{'db_alarms'};
         # Set the timestamp
         &Torrus::TimeStamp::setNow($tree . ':monitor_cache');
     }

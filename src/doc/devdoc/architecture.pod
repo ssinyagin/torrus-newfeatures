@@ -212,6 +212,11 @@ Keeps the list of all known token sets.
 
 For given tokenset, keeps its contents.
 
+=item * o:E<lt>tokensetE<gt>:E<lt>tokenE<gt> -- E<lt>originE<gt>
+
+Defines the origin of the member. Currently two types of origin are known:
+C<static> and C<monitor>
+
 =back
 
 B<nodepcache_DSINST.db> is a I<Btree> database containing the cached
@@ -266,11 +271,11 @@ from previous runs of Monitor, with the keys and values as follows:
 
 =over 4
 
-=item * E<lt>tokenE<gt>:E<lt>mnameE<gt> --
+=item * E<lt>mnameE<gt>:E<lt>pathE<gt> --
 E<lt>t_setE<gt>:E<lt>t_expiresE<gt>:E<lt>statusE<gt>:
 E<lt>t_last_changeE<gt>
 
-Key consists of the leaf token and monitor name. In the value, B<t_set>
+Key consists of the monitor name and leaf path. In the value, B<t_set>
 is the time when the alarm was raised. If two subsequent runs of Monitor
 raise the same alarm, B<t_set> does not change. B<t_expires> is the
 timestamp that shows when it's still important to keep the entry after the

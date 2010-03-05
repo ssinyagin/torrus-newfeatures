@@ -1045,13 +1045,24 @@ sub tsetMembers
     return defined($list) ? split(/,/o, $list) : ();
 }
 
+sub tsetMemberOrigin
+{
+    my $self = shift;
+    my $tset = shift;
+    my $token = shift;
+    
+    return $self->{'db_sets'}->get('o:'.$tset.':'.$token);
+}
+
 sub tsetAddMember
 {
     my $self = shift;
     my $tset = shift;
     my $token = shift;
+    my $origin = shift;
 
     $self->{'db_sets'}->addToList('s:'.$tset, $token);
+    $self->{'db_sets'}->put('o:'.$tset.':'.$token, $origin);
 }
 
 
@@ -1062,6 +1073,7 @@ sub tsetDelMember
     my $token = shift;
 
     $self->{'db_sets'}->delFromList('s:'.$tset, $token);
+    $self->{'db_sets'}->del('o:'.$tset.':'.$token);
 }
 
 # Definitions manipulation

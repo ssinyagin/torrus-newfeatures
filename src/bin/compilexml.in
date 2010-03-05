@@ -153,6 +153,40 @@ foreach my $tree ( @trees )
         }
     }
 
+    &Torrus::DB::checkInterrupted();
+    
+    # Preserve the dynamic tokenset members
+    my @members;
+    my $oldConfig = new Torrus::ConfigTree( -TreeName => $tree );
+    if( defined( $oldConfig ) )
+    {
+        foreach my $ts ( $oldConfig->getTsets() )
+        {
+            if( $compiler->tsetExists( $ts ) )
+            {
+                foreach my $member ( $oldConfig->tsetMembers( $ts ) )
+                {
+                    my $origin = $oldConfig->tsetMembers( $ts, $member );
+                    if( defined( $origin ) and $origin ne 'static' )
+                    {
+                        my $path = $oldConfig->path($member);
+                        if( $compiler->nodeExists( $path ) )
+                        {
+                            my $token = $compiler->token( $path );
+                            $compiler->tsetAddMember( $ts, $token, $origin );
+                            Info('Preserved dynamic tokenset member: ' .
+                                 $path . ' in ' . $ts);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    undef $oldConfig;
+                    
+    &Torrus::DB::checkInterrupted();
+                             
     $compiler->finalize( $ok );
     undef $compiler;
     &Torrus::DB::cleanupEnvironment();

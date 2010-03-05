@@ -420,7 +420,7 @@ sub postProcessNodes
                 }
                 else
                 {
-                    $self->tsetAddMember( $tsetName, $token );
+                    $self->tsetAddMember( $tsetName, $token, 'static' );
                 }
             }
         }

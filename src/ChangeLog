@@ -1,3 +1,14 @@
+2010-03-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/compilexml.in: Dynamic tokenset members are preserved between
+	compilations
+
+	* perllib/Torrus/ConfigTree.pm (tsetAddMember): Tokenset members
+	have now an indicated origin (monitor/static)
+
+	* perllib/Torrus/Monitor.pm: Alarms are now persistent between
+	config re-compilations
+
 2010-02-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/HTML.pm:

@@ -38,6 +38,7 @@ SRCPOD = \
 	torrus_configinfo.pod.in \
 	torrus_configsnapshot.pod.in \
 	torrus_devdiscover.pod.in \
+	torrus_flushmonitors.pod.in \
 	torrus_genddx.pod.in \
 	torrus_genlist.pod.in \
 	torrus_genreport.pod.in \
@@ -62,6 +63,7 @@ POD_FILES = \
 	torrus_configinfo.pod \
 	torrus_configsnapshot.pod \
 	torrus_devdiscover.pod \
+	torrus_flushmonitors.pod \
 	torrus_genddx.pod \
 	torrus_genlist.pod \
 	torrus_genreport.pod \
@@ -86,6 +88,7 @@ PODMAN = \
 	torrus_configinfo.@mansec_usercmd@ \
 	torrus_configsnapshot.@mansec_usercmd@ \
 	torrus_devdiscover.@mansec_usercmd@ \
+	torrus_flushmonitors.@mansec_usercmd@ \
 	torrus_genddx.@mansec_usercmd@ \
 	torrus_genlist.@mansec_usercmd@ \
 	torrus_genreport.@mansec_usercmd@ \

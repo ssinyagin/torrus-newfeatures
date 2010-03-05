@@ -15,6 +15,7 @@ compilexml
 configinfo
 configsnapshot
 devdiscover
+flushmonitors
 genddx
 genlist
 genreport

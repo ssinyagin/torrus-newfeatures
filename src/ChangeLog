@@ -1,5 +1,7 @@
 2010-03-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/flushmonitors.in: new utility
+
 	* bin/compilexml.in: Dynamic tokenset members are preserved between
 	compilations
 

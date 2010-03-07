@@ -24,6 +24,7 @@
 		<li><a href="#site_configuration_options">Site configuration options</a></li>
 		<li><a href="#mod_perl_1_0_handler__torrus__apachehandler">mod_perl 1.0 handler: Torrus::ApacheHandler</a></li>
 		<li><a href="#mod_perl_2_0_handler__torrus__apache2handler">mod_perl 2.0 handler: Torrus::Apache2Handler</a></li>
+		<li><a href="#lighttpd_with_fastcgi_handler">lighttpd with FastCGI handler</a></li>
 		<li><a href="#known_cgi_parameters">Known CGI parameters</a></li>
 	</ul>
 
@@ -35,6 +36,8 @@
 <p>
 </p>
 <h1><a name="torrus_web_interface_reference">Torrus Web Interface Reference</a></h1>
+<p><strong>Warning:</strong> This documentation is relevant to Torrus version 1.0.9.
+It is incompatible with previous versions.</p>
 <p>
 </p>
 <h2><a name="directory_structure">Directory structure</a></h2>
@@ -100,15 +103,10 @@ However, you still need access to the <em>plain</em> directory where your CSS
 resides. Typical Apache configuration would look like follows. Make sure
 your configuration does not contain tab characters:</p>
 <pre>
-  Alias /torrus/plain &quot;/usr/local/torrus/sup/webplain&quot;
   PerlRequire &quot;/usr/local/torrus/conf_defaults/webmux.pl&quot;
   &lt;Location /torrus&gt;
     SetHandler perl-script
     PerlHandler Torrus::ApacheHandler
-  &lt;/Location&gt;
-  &lt;Location /torrus/plain/&gt;
-    SetHandler default-handler
-    Options None
   &lt;/Location&gt;</pre>
 <p>The base URL would be in this case:</p>
 <pre>
@@ -130,19 +128,41 @@ than <code>SetHandler perl-script</code>. Both Perl handlers work the same way
 with Torrus.</p>
 <p>Typical Apache 2.0 configuration follows:</p>
 <pre>
-  Alias /torrus/plain &quot;/usr/local/torrus/sup/webplain&quot;
   PerlRequire &quot;/usr/local/torrus/conf_defaults/webmux2.pl&quot;
   &lt;Location /torrus&gt;
     SetHandler perl-script
     PerlResponseHandler Torrus::Apache2Handler
-  &lt;/Location&gt;
-  &lt;Location /torrus/plain/&gt;
-    SetHandler default-handler
-    Options None
   &lt;/Location&gt;</pre>
 <p>The base URL would be in this case:</p>
 <pre>
   <a href="http://yourhost/torrus/">http://yourhost/torrus/</a></pre>
+<p>
+</p>
+<h2><a name="lighttpd_with_fastcgi_handler">lighttpd with FastCGI handler</a></h2>
+<p>As of version 1.0.9, Torrus supports FastCGI server module. It is also often
+used together with <strong>lighttpd</strong> HTTP server.</p>
+<p>The following configuration creates a virtual host, so that any URL which
+starts with ``tor'' would result in Torrus display:</p>
+<pre>
+  # Uncomment mod_redirect and mod_fastcgi. Other modules might be needed too.
+  server.modules              = (
+                                  &quot;mod_redirect&quot;,
+                                  &quot;mod_fastcgi&quot;,
+                                )
+  # virtual server configuration
+  $HTTP[&quot;host&quot;] =~ &quot;^tor&quot; {
+    url.redirect = ( &quot;^/$&quot; =&gt; &quot;/torrus&quot; )
+    fastcgi.server = (
+            &quot;/torrus&quot; =&gt; (
+                &quot;Torrus&quot; =&gt; (
+                    &quot;socket&quot;       =&gt; &quot;/tmp/Torrus_FCGI.socket&quot;,
+                    &quot;check-local&quot;  =&gt; &quot;disable&quot;,
+                    &quot;bin-path&quot;     =&gt; &quot;/usr/local/bin/torrus.fcgi&quot;,
+                    &quot;max-procs&quot;    =&gt; 2,
+                )
+            )
+        )
+  }</pre>
 <p>
 </p>
 <h2><a name="known_cgi_parameters">Known CGI parameters</a></h2>

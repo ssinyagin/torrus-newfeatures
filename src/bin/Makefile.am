@@ -46,6 +46,7 @@ pkgbin_SCRIPTS = \
 	rrddir2xml		\
 	schedulerinfo		\
 	srvderive		\
+	torrus.fcgi		\
 	ttproclist
 
 wrapperdir = @wrapperdir@
@@ -78,6 +79,7 @@ EXTRA_DIST = \
 	rrddir2xml.in		\
 	schedulerinfo.in	\
 	srvderive.in		\
+	torrus.fcgi.in		\
 	torrus.in		\
 	ttproclist.in
 
@@ -157,6 +159,9 @@ srvderive: srvderive.in
 
 torrus: torrus.in
 	$(SUBST) torrus.in > torrus
+
+torrus.fcgi: torrus.fcgi.in
+	$(SUBST) torrus.fcgi.in > torrus.fcgi
 
 ttproclist: ttproclist.in
 	$(SUBST) ttproclist.in > ttproclist

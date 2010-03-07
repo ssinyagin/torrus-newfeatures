@@ -22,6 +22,9 @@
 
 =head1 Torrus Web Interface Reference
 
+B<Warning:> This documentation is relevant to Torrus version 1.0.9.
+It is incompatible with previous versions.
+
 =head2 Directory structure
 
 By default, the directory F<@webplaindir@/> is the place
@@ -93,15 +96,10 @@ However, you still need access to the F<plain> directory where your CSS
 resides. Typical Apache configuration would look like follows. Make sure
 your configuration does not contain tab characters:
 
-  Alias /torrus/plain "@webplaindir@"
   PerlRequire "@cfgdefdir@/webmux.pl"
   <Location /torrus>
     SetHandler perl-script
     PerlHandler Torrus::ApacheHandler
-  </Location>
-  <Location /torrus/plain/>
-    SetHandler default-handler
-    Options None
   </Location>
 
 The base URL would be in this case:
@@ -130,20 +128,47 @@ with Torrus.
 
 Typical Apache 2.0 configuration follows:
 
-  Alias /torrus/plain "@webplaindir@"
   PerlRequire "@cfgdefdir@/webmux2.pl"
   <Location /torrus>
     SetHandler perl-script
     PerlResponseHandler Torrus::Apache2Handler
   </Location>
-  <Location /torrus/plain/>
-    SetHandler default-handler
-    Options None
-  </Location>
 
 The base URL would be in this case:
 
   http://yourhost/torrus/
+
+
+=head2 lighttpd with FastCGI handler
+
+As of version 1.0.9, Torrus supports FastCGI server module. It is also often
+used together with B<lighttpd> HTTP server.
+
+The following configuration creates a virtual host, so that any URL which
+starts with "tor" would result in Torrus display:
+
+  # Uncomment mod_redirect and mod_fastcgi. Other modules might be needed too.
+  server.modules              = (
+                                  "mod_redirect",
+                                  "mod_fastcgi",
+                                )
+  # virtual server configuration
+  $HTTP["host"] =~ "^tor" {
+    url.redirect = ( "^/$" => "/torrus" )
+    fastcgi.server = (
+            "/torrus" => (
+                "Torrus" => (
+                    "socket"       => "/tmp/Torrus_FCGI.socket",
+                    "check-local"  => "disable",
+                    "bin-path"     => "@bindir@/torrus.fcgi",
+                    "max-procs"    => 2,
+                )
+            )
+        )
+  }
+
+
+
 
 
 =head2 Known CGI parameters

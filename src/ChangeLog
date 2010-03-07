@@ -1,5 +1,7 @@
 2010-03-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* bin/torrus.fcgi.in: FastCGI support
+
 	* templates/default-login.html: Added "remember me"
 
 	* perllib/Torrus/ApacheHandler.pm: Changed to Torrus::CGI

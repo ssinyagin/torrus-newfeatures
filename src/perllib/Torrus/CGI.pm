@@ -41,11 +41,60 @@ sub process
 {
     my($class, $q) = @_;
 
-    if( $Torrus::Renderer::globalDebug )
+    my $path_info = $q->url(-path => 1);
+
+    # quickly give plaintext file contents
     {
-        print STDERR $q->Dump();
+        my $pos = index( $path_info, $Torrus::Renderer::plainURL );
+        if( $pos >= 0 )
+        {
+            my $fname = $Torrus::Global::webPlainDir . '/' .
+                substr( $path_info,
+                        $pos + length($Torrus::Renderer::plainURL) );
+
+            my $ok = 0;
+
+            my $type;
+            if( $path_info =~ /\.css$/o )
+            {
+                $type = 'text/css';
+            }
+            else
+            {
+                $type = 'text/html';
+            }
+            
+            if( -r $fname )
+            {
+                my $fh = new IO::File( $fname );
+                if( defined( $fh ) )
+                {
+                    print $q->header('-type' => $type,
+                                     '-expires' => '+1h');
+                    
+                    $fh->binmode(':raw');
+                    my $buffer;           
+                    while( $fh->read( $buffer, 65536 ) )
+                    {
+                        print( $buffer );
+                    }
+                    $fh->close();
+                    $ok = 1;
+                }
+            }
+
+            if( not $ok )
+            {
+                print $q->header(-status=>400),
+                $q->start_html('Error'),
+                $q->h2('Error'),
+                $q->strong('Cannot retrieve file: ' . $fname);
+            }
+            
+            return;
+        }
     }
-    
+        
     my @paramNames = $q->param();
 
     if( $q->param('DEBUG') and not $Torrus::Renderer::globalDebug ) 
@@ -71,7 +120,7 @@ sub process
         return report_error($q, 'Error initializing Renderer');
     }
 
-    my $tree = $q->url(-path => 1);
+    my $tree = $path_info;
     $tree =~ s/^.*\/(.*)$/$1/;
 
     if( $Torrus::ApacheHandler::authorizeUsers )

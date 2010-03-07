@@ -38,6 +38,7 @@ $Torrus::Global::logDir         = '@logdir@';
 $Torrus::Global::reportsDir     = '@reportsdir@';
 $Torrus::Global::sesStoreDir    = '@sesstordir@';
 $Torrus::Global::sesLockDir     = '@seslockdir@';
+$Torrus::Global::webPlainDir    = '@webplaindir@';
 
 @Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
 

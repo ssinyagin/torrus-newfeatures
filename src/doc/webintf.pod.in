@@ -133,7 +133,7 @@ Typical Apache 2.0 configuration follows:
   Alias /torrus/plain "@webplaindir@"
   PerlRequire "@cfgdefdir@/webmux2.pl"
   <Location /torrus>
-    SetHandler modperl
+    SetHandler perl-script
     PerlResponseHandler Torrus::Apache2Handler
   </Location>
   <Location /torrus/plain/>

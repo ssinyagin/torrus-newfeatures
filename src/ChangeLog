@@ -1,3 +1,15 @@
+2010-03-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/default-login.html: Added "remember me"
+
+	* perllib/Torrus/ApacheHandler.pm: Changed to Torrus::CGI
+
+	* perllib/Torrus/Apache2Handler.pm: Changed to Torrus::CGI.
+	Now incompatible with "SetHandler modperl"
+
+	* perllib/Torrus/CGI.pm: New HTTP handler instead of two different
+	Apache handlers.
+
 2010-03-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/flushmonitors.in: new utility

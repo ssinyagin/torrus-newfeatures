@@ -352,6 +352,10 @@ SPAN.LoginInput INPUT {
   width : 30%;
 }
 
+SPAN.LoginInput INPUT.Remember {
+ width : 0;
+}
+
 
 *.BottomShortcuts {
   clear : both;

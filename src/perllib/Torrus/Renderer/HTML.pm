@@ -45,6 +45,8 @@ sub render_html
 
     my $tmplfile = $config_tree->getParam($view, 'html-template');
 
+    my $expires = $config_tree->getParam($view, 'expires');
+    
     # Create the Template Toolkit processor once, and reuse
     # it in subsequent render() calls
 
@@ -59,6 +61,7 @@ sub render_html
         'treeName'   => $config_tree->treeName(),
         'token'      => $token,
         'view'       => $view,
+        'expires'    => $expires,
         'path'       => sub { return $config_tree->path($_[0]); },
         'pathToken'  => sub { return $config_tree->token($_[0]); },
         'nodeExists' => sub { return $config_tree->nodeExists($_[0]); },
@@ -139,8 +142,7 @@ sub render_html
         return undef;
     }
 
-    return ($config_tree->getParam($view, 'expires')+time(),
-            'text/html; charset=UTF-8');
+    return ($expires+time(), 'text/html; charset=UTF-8');
 }
 
 

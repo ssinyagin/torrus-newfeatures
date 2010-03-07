@@ -269,7 +269,7 @@ $Torrus::ACL::userAuthModule = 'Torrus::ACL::AuthLocalMD5';
 # Minimum allowed password length
 $Torrus::ACL::minPasswordLength = 6;
 
-# The page that lets you choose the tree from the list
+# The login page
 $Torrus::Renderer::LoginScreen::mimeType = 'text/html; charset=UTF-8';
 $Torrus::Renderer::LoginScreen::template = 'default-login.html';
 

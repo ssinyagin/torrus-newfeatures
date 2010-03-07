@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>RRFW Working Draft: Distributed collector architecture</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -59,49 +61,50 @@ Spoke for some other Hubs simultaneousely.</p>
 <p>We call <em>Association</em> a set of attributes that describe a single connection
 between Hub and Spoke servers. These attributes are:</p>
 <ul>
-<li><strong><a name="item_association_id">Association ID</a></strong><br />
+<li><strong><a name="item_association_id">Association ID</a></strong>
+
+<p>Unique symbolic name across the whole range of interconnected servers.</p>
 </li>
-Unique symbolic name across the whole range of interconnected servers.
-<p></p>
-<li><strong><a name="item_hub_server_id_2c_spoke_server_id">Hub server ID, Spoke server ID</a></strong><br />
+<li><strong><a name="item_hub_server_id_2c_spoke_server_id">Hub server ID, Spoke server ID</a></strong>
+
+<p>Names of the servers, usually hostnames.</p>
 </li>
-Names of the servers, usually hostnames.
-<p></p>
-<li><strong><a name="item_transport_type">Transport type</a></strong><br />
+<li><strong><a name="item_transport_type">Transport type</a></strong>
+
+<p>One of SSH, RSH, HTTP, etc.</p>
 </li>
-One of SSH, RSH, HTTP, etc.
-<p></p>
-<li><strong><a name="item_transport_mode">Transport mode</a></strong><br />
+<li><strong><a name="item_transport_mode">Transport mode</a></strong>
+
+<p>PUSH or PULL</p>
 </li>
-PUSH or PULL
-<p></p>
-<li><strong><a name="item_transport_parameters">Transport parameters</a></strong><br />
+<li><strong><a name="item_transport_parameters">Transport parameters</a></strong>
+
+<p>Parameters needed for this transport connection, like login name, password,
+URL, etc.</p>
 </li>
-Parameters needed for this transport connection, like login name, password,
-URL, etc.
-<p></p>
-<li><strong><a name="item_compression_type_and_level">Compression type and level</a></strong><br />
+<li><strong><a name="item_compression_type_and_level">Compression type and level</a></strong>
+
+<p>Optional, gzip or bzip2 or something else, with compression levels from 1 to 9.</p>
 </li>
-Optional, gzip or bzip2 or something else, with compression levels from 1 to 9.
-<p></p>
-<li><strong><a name="item_tree_name_on_hub_server">Tree name on Hub server</a></strong><br />
+<li><strong><a name="item_tree_name_on_hub_server">Tree name on Hub server</a></strong>
+
+<p>Target datasource tree that will receive data from Spokes</p>
 </li>
-Target datasource tree that will receive data from Spokes
-<p></p>
-<li><strong><a name="item_subtree_path_on_hub_server">Subtree path on Hub server</a></strong><br />
+<li><strong><a name="item_subtree_path_on_hub_server">Subtree path on Hub server</a></strong>
+
+<p>The data updates from this association will be placed in a subtree
+under the specified path.</p>
 </li>
-The data updates from this association will be placed in a subtree
-under the specified path.
-<p></p>
-<li><strong><a name="item_tree_name_on_spoke_server">Tree name on Spoke server</a></strong><br />
+<li><strong><a name="item_tree_name_on_spoke_server">Tree name on Spoke server</a></strong>
+
+<p>The tree where a collector runs and stores data into this association.</p>
 </li>
-The tree where a collector runs and stores data into this association.
-<p></p>
-<li><strong><a name="item_path_translation_rules">Path translation rules</a></strong><br />
+<li><strong><a name="item_path_translation_rules">Path translation rules</a></strong>
+
+<p>Datasource paths from Spoke server may be changed to look different
+in the tree of Hub server.</p>
 </li>
-Datasource paths from Spoke server may be changed to look different
-in the tree of Hub server.
-<p></p></ul>
+</ul>
 <p>
 </p>
 <h2><a name="transport">Transport</a></h2>

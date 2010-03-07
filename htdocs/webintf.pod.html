@@ -133,7 +133,7 @@ with Torrus.</p>
   Alias /torrus/plain &quot;/usr/local/torrus/sup/webplain&quot;
   PerlRequire &quot;/usr/local/torrus/conf_defaults/webmux2.pl&quot;
   &lt;Location /torrus&gt;
-    SetHandler modperl
+    SetHandler perl-script
     PerlResponseHandler Torrus::Apache2Handler
   &lt;/Location&gt;
   &lt;Location /torrus/plain/&gt;

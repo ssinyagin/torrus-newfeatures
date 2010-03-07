@@ -37,6 +37,7 @@
 			<li><a href="#rfc2863_if_mib_selector">RFC2863_IF_MIB selector</a></li>
 			<li><a href="#ciscocpu_selector">CiscoCPU selector</a></li>
 			<li><a href="#ciscosensor_selector">CiscoSensor selector</a></li>
+			<li><a href="#alu_sap_selector">ALU_SAP selector</a></li>
 			<li><a href="#examples">Examples</a></li>
 		</ul>
 
@@ -312,8 +313,7 @@ finds SNMPv2-MIB::sysUpTime variable unavailable in the device.</p>
 <li><strong><a name="item_snmp_2dmax_2dmsg_2dsize"><code>snmp-max-msg-size</code></a></strong>
 
 <p>Optional. If defined, it sets the SNMP maximum message size different from
-default 1472 octets (true for UDP/IPv4, see Net::SNMP documentation for more
-information).</p>
+default. The default value is 65535 for SNMP versions 1 and 2c.</p>
 </li>
 <li><strong><a name="item_host_2dsubtree"><code>host-subtree</code></a></strong>
 
@@ -615,11 +615,6 @@ downstream and MAC layer stats are skipped.</p>
 </p>
 <h3><a name="vendor_parameters">Vendor parameters</a></h3>
 <ul>
-<li><strong><a name="item_alcatellucent_3a_3afull_2difdescr"><code>AlcatelLucent::full-ifdescr</code></a></strong>
-
-<p>If set to <code>yes</code>, the interface comments for ALU ESS-7450 are taken
-as-is from ifDescr. By default, port name and SFP type are stripped.</p>
-</li>
 <li><strong><a name="item_arbor_e_3a_3adisable_2dbundle_2doffer_2c_c_3carbor"><code>Arbor_E::disable-bundle-offer</code>,
     <code>Arbor_E::disable-bundle-offer-deny</code>,
     <code>Arbor_E::disable-bundle-offer-pktsize</code>,
@@ -881,6 +876,11 @@ or output bytes counter.</p>
 <p>The argument defines the monitor name to be applied to error and discard
 counters that are discovered for a given interface.</p>
 </li>
+<li><strong><a name="item_notifypolicy"><code>NotifyPolicy</code></a></strong>
+
+<p>The argument defines the value for <code>notify-policy</code> parameter. See the manual
+for <em>action_notify</em> for more details.</p>
+</li>
 <li><strong><a name="item_holtwinters"><code>HoltWinters</code></a></strong>
 
 <p>No argument needed. This action enables Holt-Winters prediction
@@ -965,6 +965,14 @@ switch.</p>
 expression that should match the sensor description, as discovered
 by <code>devdiscover</code>.</p>
 <p>Actions supported: <code>Monitor</code>, <a href="#item_tokensetmember"><code>TokensetMember</code></a>.</p>
+<p>
+</p>
+<h3><a name="alu_sap_selector">ALU_SAP selector</a></h3>
+<p>This selector type is designed for SAP entries in Alcatel-Lucent ESS and SR
+routers.</p>
+<p>Attributes supported: <code>sapDescr</code> (regexp), <code>custDescr</code> (regexp),
+<code>sapName</code> (exact match), <code>sapPort</code> (exact match).</p>
+<p>Actions supported: <code>RemoveSAP</code> (excludes a selected SAP from the datasources).</p>
 <p>
 </p>
 <h3><a name="examples">Examples</a></h3>

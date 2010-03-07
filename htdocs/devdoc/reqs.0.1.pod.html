@@ -1,9 +1,11 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>RRFW Requirements Version 0.1</title>
 <link rel="stylesheet" href="../torrusdoc.css" type="text/css" />
-<link rev="made" href="mailto:gerrit@familiehaase.de" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -97,14 +99,15 @@ of a subdirectory of <em>dbhome</em>.</p>
 <p>All relevant command-line executables will support the following
 options:</p>
 <ul>
-<li><strong><a name="item__2d_2dtree__3ctree_name_3e">--tree &lt;tree_name&gt;</a></strong><br />
+<li><strong><a name="item__2d_2dtree__3ctree_name_3e">--tree &lt;tree_name&gt;</a></strong>
+
+<p>Specifies the datasource tree for processing;</p>
 </li>
-Specifies the datasource tree for processing;
-<p></p>
-<li><strong><a name="item__2d_2dall">--all</a></strong><br />
+<li><strong><a name="item__2d_2dall">--all</a></strong>
+
+<p>If applicable, performs the operation on all available trees.</p>
 </li>
-If applicable, performs the operation on all available trees.
-<p></p></ul>
+</ul>
 <p>When in verbose mode (<strong>--verbose</strong>), the command-line programs must
 print the tree names they operate with.</p>
 <p>The web interface will take the PATH_INFO string as the tree name.
@@ -162,26 +165,26 @@ In the future, a web interface is also possible. In this case, a new
 privilege will be added: <em>EditPrivileges</em>.</p>
 <p>Privileges editor will include the following functions:</p>
 <ul>
-<li><strong><a name="item_add_2fdelete_group">add/delete group</a></strong><br />
-</li>
-<li><strong><a name="item_add_2fdelete_user">add/delete user</a></strong><br />
-</li>
-<li><strong><a name="item_change_user_password">change user password</a></strong><br />
-</li>
-<li><strong><a name="item_add_2fdelete_user_membership_in_a_group">add/delete user membership in a group</a></strong><br />
-</li>
-<li><strong><a name="item_edit_privileges_for_groups_and_trees">edit privileges for groups and trees</a></strong><br />
-</li>
-<li><strong><a name="item_list_group_members">list group members</a></strong><br />
-</li>
-<li><strong><a name="item_list_groups_a_user_belongs_to">list groups a user belongs to</a></strong><br />
-</li>
-<li><strong><a name="item_list_privileges_for_a_given_group_or_user">list privileges for a given group or user</a></strong><br />
-</li>
-<li><strong><a name="item_groups">list privileges and groups (or users) for a given tree</a></strong><br />
-</li>
-<li><strong><a name="item_export_2fimport_the_privileges_database_to_2ffrom_">export/import the privileges database to/from XML</a></strong><br />
-</li>
+<li><strong><a name="item_add_2fdelete_group">add/delete group</a></strong>
+
+<li><strong><a name="item_add_2fdelete_user">add/delete user</a></strong>
+
+<li><strong><a name="item_change_user_password">change user password</a></strong>
+
+<li><strong><a name="item_add_2fdelete_user_membership_in_a_group">add/delete user membership in a group</a></strong>
+
+<li><strong><a name="item_edit_privileges_for_groups_and_trees">edit privileges for groups and trees</a></strong>
+
+<li><strong><a name="item_list_group_members">list group members</a></strong>
+
+<li><strong><a name="item_list_groups_a_user_belongs_to">list groups a user belongs to</a></strong>
+
+<li><strong><a name="item_list_privileges_for_a_given_group_or_user">list privileges for a given group or user</a></strong>
+
+<li><strong><a name="item_groups">list privileges and groups (or users) for a given tree</a></strong>
+
+<li><strong><a name="item_export_2fimport_the_privileges_database_to_2ffrom_">export/import the privileges database to/from XML</a></strong>
+
 </ul>
 <p>Privileges logics implementation must be separate from the database backend.
 At first, BerkeleyDB backend will be supported. In the future, LDAP

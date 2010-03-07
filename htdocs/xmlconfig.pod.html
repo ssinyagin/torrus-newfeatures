@@ -364,6 +364,13 @@ other datasources in one graph. It cannot be referenced for any
 other purpose, because there's no numeric value associated with it.</p>
 </li>
 </ul>
+<li><strong><a name="item_node_2ddisplay_2dname"><code>node-display-name</code></a></strong>
+
+<p>Optional. If defined, it overrides the subtree or leaf name for displaying.
+The subtree and leaf names are not allowed to have spaces and special
+characters, and this parameter helps to display strings as they are, such as
+router interface names.</p>
+</li>
 <li><strong><a name="item_comment"><code>comment</code></a></strong>
 
 <p>Optional. This is a string of text which is displayed when browsing through
@@ -958,6 +965,18 @@ the styling profile, e.g. <code>##BpsIn</code>.</p>
 <p>Numerical order of line drawing. The lines are drawn in accending order.
 If omitted, the XML compiler issues warning, and Renderer conciders
 the order of 100.</p>
+</li>
+<li><strong><a name="item_line_2dstack_2dx"><code>line-stack-X</code></a></strong>
+
+<p>Optional. When set to <code>yes</code>, the line is stacked on top of a previous line.
+Both areas and lines are stackable.</p>
+</li>
+<li><strong><a name="item_line_2dalpha_2dx"><code>line-alpha-X</code></a></strong>
+
+<p>Optional. If specified, must be two hexademical, uppercase digits. This
+parameter defines the line (or area) transparency. Value <code>FF</code> is
+equivalent to solid colour. Value <code>7F</code> gives 50% transparency which should
+be suitable for most applications.</p>
 </li>
 <li><strong><a name="item_ignore_2dviews_2dx"><code>ignore-views-X</code></a></strong>
 

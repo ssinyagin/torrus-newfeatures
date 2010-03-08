@@ -116,13 +116,22 @@ with the option <code>--prefix=/usr/local</code>, or you need to edit
 </li>
 <li><strong><a name="item_http_server">HTTP Server</a></strong>
 
-<p>Torrus requires an HTTP server. It is compatible with
-Apache 1.3 or 2.0 and mod_perl, as well as FastCGI (Torrus version 1.0.9
-or later) which can be used under Lighttpd or Apache.</p>
+<p>Torrus requires an HTTP server. It is compatible with the following
+combinations:</p>
+<ul>
+<li><strong><a name="item_apache_1_2e3_with_mod_perl_1_2e0">Apache 1.3 with mod_perl 1.0</a></strong>
+
+<li><strong><a name="item_apache_2_2ex_with_mod_perl_2_2e0">Apache 2.x with mod_perl 2.0</a></strong>
+
+<li><strong><a name="item_lighttpd_with_fastcgi">lighttpd with FastCGI</a></strong>
+
+<li><strong><a name="item_apache_with_fastcgi">Apache with FastCGI</a></strong>
+
+</ul>
+<p>FastCGI is supported in Torrus version 1.0.9 or higher.</p>
 <p><strong>Note:</strong> Starting from Torrus version 1.0.9, <code>libapreq2</code> is no longer
 required.</p>
 <p>See <em>Torrus Web Interface Reference</em> for details on HTTP server configuration.</p>
-</li>
 <li><strong><a name="item_perl_modules">Perl Modules</a></strong>
 
 <p>The Perl modules required are listed below. They are all available at

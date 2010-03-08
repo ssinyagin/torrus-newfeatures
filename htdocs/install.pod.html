@@ -116,13 +116,12 @@ with the option <code>--prefix=/usr/local</code>, or you need to edit
 </li>
 <li><strong><a name="item_http_server">HTTP Server</a></strong>
 
-<p>Torrus requires Apache HTTP server (&lt;<a href="http://httpd.apache.org">http://httpd.apache.org</a>&gt;)
-and mod_perl (&lt;<a href="http://perl.apache.org">http://perl.apache.org</a>&gt;).</p>
-<p>Apache version 1.3 and mod_perl version 1.0 are supported by ApacheHandler.</p>
-<p>Apache version 2.0 and mod_perl 2.0 are supported by Apache2Handler.
-Minimum supported mod_perl 2.0 version is <strong>2.0.0</strong>. The handler also requires
-<code>libapreq2</code> library, see the note below.</p>
-<p>See <em>Torrus Web Interface Reference</em> for details on mod_perl configuration.</p>
+<p>Torrus requires an HTTP server. It is compatible with
+Apache 1.3 or 2.0 and mod_perl, as well as FastCGI (Torrus version 1.0.9
+or later) which can be used under Lighttpd or Apache.</p>
+<p><strong>Note:</strong> Starting from Torrus version 1.0.9, <code>libapreq2</code> is no longer
+required.</p>
+<p>See <em>Torrus Web Interface Reference</em> for details on HTTP server configuration.</p>
 </li>
 <li><strong><a name="item_perl_modules">Perl Modules</a></strong>
 
@@ -175,13 +174,6 @@ See also the project homepage: &lt;<a href="http://www.template-toolkit.org">htt
 <p>Module for parsing the user input for date and time.</p>
 </li>
 </ul>
-<li><strong><a name="item_libapreq2_perl_library"><code>libapreq2</code> Perl library</a></strong>
-
-<p>Apache 2.0 handler requires an additional Perl library, <code>libapreq2</code>.
-It is available from CPAN &lt;<a href="http://search.cpan.org/">http://search.cpan.org/</a>&gt;, and currently
-only in development version. You need to download and install it manually
-in order for Apache2Handler to work. Minimum version required: libapreq2-2.05.</p>
-</li>
 <li><strong><a name="item_http_browser_requirements">HTTP Browser requirements</a></strong>
 
 <p>The HTTP browser must be compatible with <em>HTML 4.01 Strict</em> and <em>CSS2</em>

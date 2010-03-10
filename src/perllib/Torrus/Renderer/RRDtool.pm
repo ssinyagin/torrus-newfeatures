@@ -384,12 +384,13 @@ sub rrd_check_hw
 
     my $use_hw = 0;
     my $nodeHW = $config_tree->getNodeParam($token, 'rrd-hwpredict');
-    if( $nodeHW eq 'enabled' )
+    if( defined($nodeHW) and $nodeHW eq 'enabled' )
     {
         my $viewHW = $config_tree->getParam($view, 'rrd-hwpredict');
         my $varNoHW = $self->{'options'}->{'variables'}->{'NOHW'};
-
-        if( ($viewHW ne 'disabled') and (not $varNoHW) )
+        
+        if( (not defined($viewHW) or $viewHW ne 'disabled') and
+            (not $varNoHW) )
         {
             $use_hw = 1;
         }
@@ -566,9 +567,10 @@ sub rrd_make_decorations
     my $obj = shift;
 
     my $decorList = $config_tree->getParam($view, 'decorations');
+    my $ignore_decor =
+        $config_tree->getNodeParam($token, 'graph-ignore-decorations');
     if( defined( $decorList ) and
-        $config_tree->getNodeParam($token, 'graph-ignore-decorations')
-        ne 'yes' )
+        (not defined($ignore_decor) or $ignore_decor ne 'yes') )
     {
         my $decor = {};
         foreach my $decorName ( split(',', $decorList ) )
@@ -670,7 +672,8 @@ sub rrd_make_graph_opts
 
     my @args = ( '--imgformat', 'PNG' );
 
-    if( $config_tree->getNodeParam($token, 'graph-logarithmic') eq 'yes' )
+    my $graph_log = $config_tree->getNodeParam($token, 'graph-logarithmic');
+    if( defined($graph_log) and $graph_log eq 'yes' )
     {
         push( @args, '--logarithmic' );
     }
@@ -699,30 +702,34 @@ sub rrd_make_graph_opts
         }
     }
 
-    if( $config_tree->getParam($view, 'ignore-limits') ne 'yes' )
+    my $ignore_limits = $config_tree->getParam($view, 'ignore-limits');
+    if( not defined($ignore_limits) or $ignore_limits ne 'yes' )
     {
-        if( $config_tree->getParam($view, 'ignore-lower-limit') ne 'yes' )
+        my $ignore_lower = $config_tree->getParam($view, 'ignore-lower-limit');
+        if( not defined($ignore_lower) or $ignore_lower ne 'yes' )
         {
             my $limit =
                 $config_tree->getNodeParam($token, 'graph-lower-limit');
-            if( length( $limit ) > 0 )
+            if( defined($limit) and length( $limit ) > 0 )
             {
                 push( @args, '--lower-limit', $limit );
             }
         }
 
-        if( $config_tree->getParam($view, 'ignore-upper-limit') ne 'yes' )
+        my $ignore_upper = $config_tree->getParam($view, 'ignore-upper-limit');
+        if( not defined($ignore_upper) or $ignore_upper ne 'yes' )
         {
             my $limit =
                 $config_tree->getNodeParam($token, 'graph-upper-limit');
-            if( length( $limit ) > 0 )
+            if( defined($limit) and length( $limit ) > 0 )
             {
                 push( @args, '--upper-limit', $limit );
             }
         }
 
-        if( $config_tree->getNodeParam($token, 'graph-rigid-boundaries') eq
-            'yes' )
+        my $rigid_boundaries =
+            $config_tree->getNodeParam($token, 'graph-rigid-boundaries');
+        if( defined($rigid_boundaries) and $rigid_boundaries eq 'yes' )
         {
             push( @args, '--rigid' );
         }

@@ -224,18 +224,15 @@ sub makeURL
     }
 
     my %vars = ();
-    if( scalar( @add_vars ) )
+    # This could be array or a reference to array
+    my $add_vars_size = scalar( @add_vars );
+    if( $add_vars_size == 1 and ref( $add_vars[0] ) )
     {
-        # This could be array or a reference to array
-        my $rvars;
-        if( ref( $add_vars[0] ) )
-        {
-            %vars = @{$add_vars[0]};
-        }
-        else
-        {
-            %vars = @add_vars;
-        }
+        %vars = @{$add_vars[0]};
+    }
+    elsif( $add_vars_size > 0 and ($add_vars_size % 2 == 0) )
+    {
+        %vars = @add_vars;
     }
 
     if( ref( $self->{'options'}->{'variables'} ) )

@@ -25,6 +25,7 @@
 		<li><a href="#mod_perl_1_0_handler__torrus__apachehandler">mod_perl 1.0 handler: Torrus::ApacheHandler</a></li>
 		<li><a href="#mod_perl_2_0_handler__torrus__apache2handler">mod_perl 2.0 handler: Torrus::Apache2Handler</a></li>
 		<li><a href="#lighttpd_with_fastcgi_handler">lighttpd with FastCGI handler</a></li>
+		<li><a href="#apache20_with_fastcgi_handler">Apache 2.0.x with FastCGI handler</a></li>
 		<li><a href="#known_cgi_parameters">Known CGI parameters</a></li>
 	</ul>
 
@@ -165,6 +166,25 @@ starts with ``tor'' would result in Torrus display:</p>
   }</pre>
 <p>
 </p>
+
+
+<h2>
+  <a name="apache20_with_fastcgi_handler">Apache 2.0.x with FastCGI handler</a>
+</h2>
+<p>As of version 1.0.9, Torrus supports FastCGI server module.  It is also often used together with <strong>Apache 2.0.x</strong> HTTP server.</p>
+<p>The following configuration can reside within a virtual host</p>
+<pre>
+  ScriptAlias /torrus "/usr/local/torrus/bin/torrus.fcgi"
+  <Directory "/usr/local/torrus/bin/">
+	SetHandler	fcgid-script
+	Options		+ExecCGI
+	Order		Allow,Deny
+	Allow		from all
+  </Directory>
+</pre>
+<p>
+</p>
+
 <h2><a name="known_cgi_parameters">Known CGI parameters</a></h2>
 <p>The following CGI parameters are recognized by mod_perl handler:</p>
 <dl>

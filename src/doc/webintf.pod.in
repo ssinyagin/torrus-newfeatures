@@ -144,6 +144,10 @@ The base URL would be in this case:
 As of version 1.0.9, Torrus supports FastCGI server module. It is also often
 used together with B<lighttpd> HTTP server.
 
+Install FastCGI on your server, and also F<FCGI> module from CPAN.
+
+Add user "lighttpd" to group "torrus".
+
 The following configuration creates a virtual host, so that any URL which
 starts with "tor" would result in Torrus display:
 
@@ -160,7 +164,7 @@ starts with "tor" would result in Torrus display:
                 "Torrus" => (
                     "socket"       => "/tmp/Torrus_FCGI.socket",
                     "check-local"  => "disable",
-                    "bin-path"     => "@bindir@/torrus.fcgi",
+                    "bin-path"     => "@pkgbindir@/torrus.fcgi",
                     "max-procs"    => 2,
                 )
             )

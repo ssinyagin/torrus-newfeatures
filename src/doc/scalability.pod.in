@@ -145,17 +145,39 @@ and 5 HTTP daemon processes:
    set_lk_max_lockers	6000
    set_lk_max_locks	3000
 
-After updating DB_CONFIG, stop all Torrus processes, including Apache server,
-then run
+It is also recommended to increase the cache size from default 256KB to some
+bigger amount. Especially if the database has to hold large Torrus trees
+(hundreds or thousands monitored devices). The following line in
+F<DB_CONFIG> sets the cache size to 16MB:
+
+   set_cachesize        0 16777216 1
+
+After updating F<DB_CONFIG>, stop all Torrus processes,
+including HTTP server, then run
 
   db_recover -h @dbhome@
 
 Then start the processes again. Futher info is available at:
 
-   http://www.sleepycat.com/docs/ref/env/db_config.html
-   http://www.sleepycat.com/docs/ref/lock/max.html
-   http://www.sleepycat.com/docs/api_c/env_set_lk_max_lockers.html
+=over 4
 
+=item * General access method configuration (BDB Reference)
+
+http://tinyurl.com/ybymk7t
+
+=item * DB_CONFIG configuration file (BDB Reference)
+
+http://tinyurl.com/y9qjodv
+
+=item * Configuring locking: sizing the system (BDB Reference)
+
+http://tinyurl.com/ya6dtww
+
+=item * C API reference
+
+http://tinyurl.com/yczgnab
+
+=back
 
 
 =head3 XML compilation time

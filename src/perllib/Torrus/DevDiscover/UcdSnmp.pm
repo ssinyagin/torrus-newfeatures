@@ -14,7 +14,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id $
+# $Id$
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
 
 # Ucd Snmp Discovery
@@ -51,6 +51,7 @@ our %oiddef =
      'ucd_ssCpuRawWait'         => '1.3.6.1.4.1.2021.11.54.0',
      'ucd_ssCpuRawKernel'       => '1.3.6.1.4.1.2021.11.55.0',
      'ucd_ssCpuRawInterrupts'   => '1.3.6.1.4.1.2021.11.56.0',
+     'ucd_ssCpuRawSoftIRQ'      => '1.3.6.1.4.1.2021.11.61.0',
 
      # if we have Sent we assume Received
      'ucd_ssIORawSent'          => '1.3.6.1.4.1.2021.11.57.0',
@@ -96,6 +97,7 @@ sub discover
                      'ucd_ssCpuRawKernel',
                      'ucd_ssCpuRawInterrupts',
                      'ucd_ssCpuRawNice',
+                     'ucd_ssCpuRawSoftIRQ',
                      'ucd_ssIORawSent',
                      'ucd_ssRawInterrupts',
                      );
@@ -225,6 +227,16 @@ sub buildConfig
 
             $cpuMultiParam->{'comment'}  .= ', Interrupts';
             $cpuMultiParam->{'ds-names'} .= ',int';
+        }
+
+        if( $devdetails->hasCap('ucd_ssCpuRawSoftIRQ') )
+        {
+            push( @templates, 'UcdSnmp::ucdsnmp-cpu-softirq' );
+            push( @cpuMultiTemplates,
+                  'UcdSnmp::ucdsnmp-cpu-softirq-multi' );
+
+            $cpuMultiParam->{'comment'}  .= ', SoftIRQs';
+            $cpuMultiParam->{'ds-names'} .= ',softirq';
         }
 
         $cpuMultiParam->{'comment'} =~ s/\,\s+(\w+)$/ and $1/;

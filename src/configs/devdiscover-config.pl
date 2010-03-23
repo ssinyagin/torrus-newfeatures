@@ -1162,6 +1162,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'ucdsnmp-cpu-interrupts-multi',
          'source'   => 'vendor/ucd.ucd-snmp.xml',
      },
+     'UcdSnmp::ucdsnmp-cpu-softirq' => {
+         'name'     => 'ucdsnmp-cpu-softirq',
+         'source'   => 'vendor/ucd.ucd-snmp.xml',
+     },
+     'UcdSnmp::ucdsnmp-cpu-softirq-multi' => {
+         'name'     => 'ucdsnmp-cpu-softirq-multi',
+         'source'   => 'vendor/ucd.ucd-snmp.xml',
+     },
      'UcdSnmp::ucdsnmp-cpu-interrupts' => {
          'name'     => 'ucdsnmp-cpu-interrupts',
          'source'   => 'vendor/ucd.ucd-snmp.xml',

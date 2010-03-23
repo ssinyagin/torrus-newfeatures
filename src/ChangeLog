@@ -1,3 +1,8 @@
+2010-03-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/UcdSnmp.pm:
+	[Bernhard Schmidt] added ssCpuRawSoftIRQ
+
 2010-03-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/torrus.fcgi.in: FastCGI support

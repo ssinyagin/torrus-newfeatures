@@ -52,6 +52,7 @@ Generic definitions and templates for:
     <def name="ucd_ssCpuRawWait"         value="1.3.6.1.4.1.2021.11.54.0"/>
     <def name="ucd_ssCpuRawKernel"       value="1.3.6.1.4.1.2021.11.55.0"/>
     <def name="ucd_ssCpuRawInterrupts"   value="1.3.6.1.4.1.2021.11.56.0"/>
+    <def name="ucd_ssCpuRawSoftIRQ"      value="1.3.6.1.4.1.2021.11.61.0"/>
 
     <!-- Block IO -->
     <def name="ucd_ssIORawSent"          value="1.3.6.1.4.1.2021.11.57.0"/>
@@ -415,6 +416,32 @@ Generic definitions and templates for:
         <param name="graph-legend" value="Interrupts"/>
       </leaf>
     </template>
+
+    <template name="ucdsnmp-cpu-softirq-multi">
+      <param name="ds-expr-softirq" value="{CpuRawSoftIRQ}"/>
+      <param name="graph-legend-softirq" value="SoftIRQ"/>
+      <param name="line-style-softirq" value="STACK"/>
+      <param name="line-color-softirq" value="##seven"/>
+      <param name="line-order-softirq" value="7"/>
+    </template>
+
+    <template name="ucdsnmp-cpu-softirq">
+      <leaf name="CpuRawSoftIRQ">
+        <param name="vertical-label" value="Ticks"/>
+        <param name="data-file" value="%system-id%_ucd_ssCpu.rrd"/>
+        <param name="hidden" value="yes"/>
+        <param name="leaf-type" value="rrd-def"/>
+        <param name="snmp-object" value="$ucd_ssCpuRawSoftIRQ"/>
+        <param name="rrd-ds" value="SoftIRQ"/>
+        <param name="rrd-cf" value="AVERAGE"/>
+        <param name="rrd-create-dstype" value="COUNTER"/>
+        <param name="comment">
+            Time Used for Software Interrupt Processing
+        </param>
+        <param name="graph-legend" value="SoftIRQs"/>
+      </leaf>
+    </template>
+
 
     <!-- LOAD AVERAGE -->
     <template name="ucdsnmp-load-average">

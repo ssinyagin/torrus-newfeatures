@@ -72,16 +72,18 @@ Generic definitions and templates for:
       <template name="ucdsnmp-memory-real">
         <leaf name="Memory_Real">
           <param name="comment" value="Real Memory"/>
+          <param name="vertical-label" value="Bytes"/>
           <param name="ds-type" value="rrd-multigraph"/>
+          <param name="rrd-scaling-base" value="1024"/>
           <param name="ds-names" value="total,avail"/>
           <!-- TOTAL -->
-          <param name="ds-expr-total" value="{ucd_memTotalReal}"/>
+          <param name="ds-expr-total" value="{ucd_memTotalReal},1024,*"/>
           <param name="graph-legend-total" value="Total Real"/>
           <param name="line-style-total" value="##totalresource"/>
           <param name="line-color-total" value="##totalresource"/>
           <param name="line-order-total" value="1"/>
           <!-- AVAIL -->
-          <param name="ds-expr-avail" value="{ucd_memAvailReal}"/>
+          <param name="ds-expr-avail" value="{ucd_memAvailReal},1024,*"/>
           <param name="graph-legend-avail" value="Available Real"/>
           <param name="line-style-avail" value="##resourceusage"/>
           <param name="line-color-avail" value="##resourceusage"/>
@@ -96,6 +98,8 @@ Generic definitions and templates for:
           <param name="rrd-create-dstype" value="GAUGE"/>
           <param name="comment" value="Total Real Space"/>
           <param name="graph-legend" value="Total Real Space"/>
+          <param name="rrd-scaling-base" value="1024"/>
+          <param name="vertical-label" value="Kilobytes"/>
         </leaf>
 
         <leaf name="ucd_memAvailReal">
@@ -106,6 +110,8 @@ Generic definitions and templates for:
           <param name="rrd-create-dstype" value="GAUGE"/>
           <param name="comment" value="Available Real Space"/>
           <param name="graph-legend" value="Available Real Space"/>
+          <param name="rrd-scaling-base" value="1024"/>
+          <param name="vertical-label" value="Kilobytes"/>
         </leaf>
       </template>
 
@@ -115,6 +121,7 @@ Generic definitions and templates for:
         <leaf name="Memory_Swap">
           <param name="comment" value="Swap Space"/>
           <param name="ds-type" value="rrd-multigraph"/>
+          <param name="rrd-scaling-base" value="1024"/>
           <param name="ds-names" value="total,avail"/>
           <!-- TOTAL -->
           <param name="ds-expr-total" value="{ucd_memTotalSwap}"/>
@@ -138,6 +145,7 @@ Generic definitions and templates for:
           <param name="rrd-create-dstype" value="GAUGE"/>
           <param name="comment" value="Available Swap Space"/>
           <param name="graph-legend" value="Available Swap Space"/>
+          <param name="rrd-scaling-base" value="1024"/>
         </leaf>
 
         <leaf name="ucd_memTotalSwap">
@@ -148,6 +156,7 @@ Generic definitions and templates for:
           <param name="rrd-create-dstype" value="GAUGE"/>
           <param name="comment" value="Total Swap Space"/>
           <param name="graph-legend" value="Total Swap Space"/>
+          <param name="rrd-scaling-base" value="1024"/>
         </leaf>
       </template>
 

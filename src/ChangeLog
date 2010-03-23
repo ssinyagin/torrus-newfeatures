@@ -2,6 +2,7 @@
 
 	* xmlconfig/vendor/ucd.ucd-snmp.xml:
 	[Bernhard Schmidt] make Block I/O datasources a COUNTER
+	correct display units for Memory
 
 	* perllib/Torrus/DevDiscover/UcdSnmp.pm:
 	[Bernhard Schmidt] added ssCpuRawSoftIRQ

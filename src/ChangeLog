@@ -1,5 +1,8 @@
 2010-03-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* xmlconfig/generic/rfc2790.host-resources.xml:
+	[Bernhard Schmidt] Simplify the Uptime graph to display only Days
+
 	* xmlconfig/vendor/ucd.ucd-snmp.xml:
 	[Bernhard Schmidt] make Block I/O datasources a COUNTER
 	correct display units for Memory

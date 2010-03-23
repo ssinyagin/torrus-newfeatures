@@ -83,47 +83,18 @@
         <param name="rrd-create-rra"    value="RRA:LAST:0:1:10080"/>
       </leaf>
       <leaf name="Uptime">
-        <param name="vertical-label" value="Time"/>
-        <param name="comment" value="Uptime: Days, Weeks, Months, Years"/>
+        <param name="vertical-label" value="Days"/>
+        <param name="comment" value="Uptime"/>
         <param name="ds-type" value="rrd-multigraph"/>
-        <param name="ds-names" value="Days,Weeks,Months,Years"/>
+        <param name="ds-names" value="Days"/>
         <!-- Days -->
         <param name="ds-expr-Days"> 
-          {hrSystemUptime},100,/,
-          31536000,MOD,
-          2592000,MOD,
-          604800,MOD,
-          86400,/
+          {hrSystemUptime},8640000,/
         </param>
         <param name="graph-legend-Days" value="Days"/>
-        <param name="line-style-Days" value="LINE2"/>
-        <param name="line-color-Days" value="##blue"/>
+        <param name="line-style-Days" value="AREA"/>
+        <param name="line-color-Days" value="##green"/>
         <param name="line-order-Days" value="3"/>
-        <!-- Weeks -->
-        <param name="ds-expr-Weeks">
-          {hrSystemUptime},100,/,
-          31536000,MOD,
-          2592000,MOD,
-          604800,/
-        </param>
-        <param name="graph-legend-Weeks" value="Weeks"/>
-        <param name="line-style-Weeks" value="AREA"/>
-        <param name="line-color-Weeks" value="##green"/>
-        <param name="line-order-Weeks" value="2"/>
-        <!-- Months -->
-        <param name="ds-expr-Months"
-            value="{hrSystemUptime},100,/, 31536000,MOD, 2592000,/"/>
-        <param name="graph-legend-Months" value="Months"/>
-        <param name="line-style-Months" value="AREA"/>
-        <param name="line-color-Months" value="##yellow"/>
-        <param name="line-order-Months" value="1"/>
-        <!-- Years -->
-        <param name="ds-expr-Years"
-            value="{hrSystemUptime},100,/, 31536000,/"/>
-        <param name="graph-legend-Years" value="Years"/>
-        <param name="line-style-Years" value="AREA"/>
-        <param name="line-color-Years" value="##red"/>
-        <param name="line-order-Years" value="4"/>
       </leaf>
     </template>
 

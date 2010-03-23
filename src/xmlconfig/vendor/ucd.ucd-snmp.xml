@@ -178,7 +178,7 @@ Generic definitions and templates for:
           <param name="snmp-object" value="$ucd_ssIORawReceived"/>
           <param name="data-file" value="%system-id%_ucd-blockio.rrd"/>
           <param name="rrd-ds" value="ucd_ssIORawReceived"/>
-          <param name="rrd-create-dstype" value="GAUGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
           <param name="comment" value="Requests Received From a Block Device"/>
           <param name="graph-legend" value="Requests Received"/>
         </leaf>
@@ -188,7 +188,7 @@ Generic definitions and templates for:
           <param name="snmp-object" value="$ucd_ssIORawSent"/>
           <param name="data-file" value="%system-id%_ucd-blockio.rrd"/>
           <param name="rrd-ds" value="ucd_ssIORawSent"/>
-          <param name="rrd-create-dstype" value="GAUGE"/>
+          <param name="rrd-create-dstype" value="COUNTER"/>
           <param name="comment" value="Requests Sent to a Block Device"/>
           <param name="graph-legend" value="Requests Sent"/>
         </leaf>

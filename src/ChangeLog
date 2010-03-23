@@ -1,5 +1,8 @@
 2010-03-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* xmlconfig/vendor/ucd.ucd-snmp.xml:
+	[Bernhard Schmidt] make Block I/O datasources a COUNTER
+
 	* perllib/Torrus/DevDiscover/UcdSnmp.pm:
 	[Bernhard Schmidt] added ssCpuRawSoftIRQ
 

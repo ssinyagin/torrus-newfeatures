@@ -172,7 +172,20 @@ starts with "tor" would result in Torrus display:
   }
 
 
+=head2 Apache 2.0.x with FastCGI handler
 
+As of version 1.0.9, Torrus supports the FastCGI server module.  It is also often
+used together with B<Apache 2.0.x> HTTP server.
+
+The following configuration can reside within the virtualhost configuration directive.
+
+  ScriptAlias /torrus "/usr/local/torrus/bin/torrus.fcgi"
+  <Directory "/usr/local/torrus/bin/">
+      SetHandler      fcgid-script
+      Options         +ExecCGI
+      Order           Allow,Deny
+      Allow           from all
+  </Directory>
 
 
 =head2 Known CGI parameters

@@ -66,6 +66,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
+     'Torrus::DevDiscover::Foundry',
      'Torrus::DevDiscover::FTOS',
      'Torrus::DevDiscover::JunOS',
      'Torrus::DevDiscover::Liebert',
@@ -961,6 +962,28 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source'   => 'vendor/f5.bigip.xml',
      },
 
+     ##### Foundry/Brocade
+     'Foundry::fdry-chass-temperature' => {
+         'name'     => 'fdry-chass-temperature',
+         'source'   => 'vendor/foundry.xml',
+     },
+     'Foundry::fdry-board-subtree' => {
+         'name'     => 'fdry-board-subtree',
+         'source'   => 'vendor/foundry.xml',
+     },
+     'Foundry::fdry-board-memstats' => {
+         'name'     => 'fdry-board-memstats',
+         'source'   => 'vendor/foundry.xml',
+     },     
+     'Foundry::fdry-board-cpustats' => {
+         'name'     => 'fdry-board-cpustats',
+         'source'   => 'vendor/foundry.xml',
+     },
+     'Foundry::fdry-board-temp-sensor-halfcelsius' => {
+         'name'     => 'fdry-board-temp-sensor-halfcelsius',
+         'source'   => 'vendor/foundry.xml',
+     },
+     
      ##### Force10 networks (by Jon Nistor)
      'FTOS::ftos-cpu-subtree' => {
          'name'     => 'ftos-cpu-subtree',

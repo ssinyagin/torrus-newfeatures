@@ -69,17 +69,7 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    my $session = $dd->session();
-
-    my $ifTable =
-        $session->get_table( -baseoid => $dd->oiddef('ifTable') );
-    if( not defined $ifTable )
-    {
-        return 0;
-    }
-    $devdetails->storeSnmpVars( $ifTable );
-
-    return 1;
+    return $dd->checkSnmpTable('ifTable');
 }
 
 
@@ -89,6 +79,15 @@ sub discover
     my $devdetails = shift;
     
     my $session = $dd->session();
+    
+    my $ifTable =
+        $session->get_table( -baseoid => $dd->oiddef('ifTable') );
+    if( not defined $ifTable )
+    {
+        Error('Cannot retrieve ifTable');
+        return 0;
+    }
+    $devdetails->storeSnmpVars( $ifTable );
 
     my $ifXTable =
         $session->get_table( -baseoid => $dd->oiddef('ifXTable') );

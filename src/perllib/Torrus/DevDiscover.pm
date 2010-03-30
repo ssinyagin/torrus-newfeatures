@@ -1,4 +1,4 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2010  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -202,13 +202,11 @@ sub discover
         # set maxMsgSize to a maximum value for better compatibility
         
         my $maxmsgsize = $devdetails->param('snmp-max-msg-size');
-        if( not defined( $maxmsgsize ) )
+        if( defined( $maxmsgsize ) )
         {
-            $maxmsgsize = 65535;
             $devdetails->setParam('snmp-max-msg-size', $maxmsgsize);
-        }
-        
-        $snmpargs{'-maxmsgsize'} = $maxmsgsize;
+            $snmpargs{'-maxmsgsize'} = $maxmsgsize;
+        }        
     }
     elsif( $version eq '3' )        
     {
@@ -764,7 +762,26 @@ sub oidBaseMatch
     return Net::SNMP::oid_base_match( $base_oid, $oid );
 }
 
+##
+# some discovery modules need to adjust max-msg-size
 
+sub setMaxMsgSize
+{
+    my $self = shift;
+    my $devdetails = shift;
+    my $msgsize = shift;
+    my $opt = shift;
+
+    $opt = {} unless defined($opt);
+
+    if( (not $opt->{'only_v1_and_v2'}) or $self->session()->version() != 3 )
+    {
+        $self->session()->max_msg_size($msgsize);
+        $devdetails->data()->{'param'}{'snmp-max-msg-size'} = $msgsize;
+    }
+}
+
+    
 
 
 ###########################################################################

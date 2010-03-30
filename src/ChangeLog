@@ -1,5 +1,8 @@
 2010-03-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover.pm: 
+	Default snmp-max-msg-size is set back to 1470
+	
 	* perllib/Torrus/DevDiscover/Foundry.pm: new discovery module
 
 2010-03-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

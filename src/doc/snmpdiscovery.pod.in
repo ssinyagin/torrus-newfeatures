@@ -305,7 +305,7 @@ finds SNMPv2-MIB::sysUpTime variable unavailable in the device.
 =item * C<snmp-max-msg-size>
 
 Optional. If defined, it sets the SNMP maximum message size different from
-default. The default value is 65535 for SNMP versions 1 and 2c.
+default. The default value is 1470 (defined in Net::SNMP).
 
 =item * C<host-subtree>
 

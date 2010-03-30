@@ -100,6 +100,8 @@ sub checkdevtype
             
             &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
                 ($devdetails, \%essInterfaceFilter);
+
+            $dd->setMaxMsgSize($devdetails, 65535, {'only_v1_and_v2' => 1});
             
             return 1;
         }

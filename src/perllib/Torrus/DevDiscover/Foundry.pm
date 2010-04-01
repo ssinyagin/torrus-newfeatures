@@ -347,7 +347,7 @@ sub discover
             while( my( $oid, $val ) = each %{$table} )
             {
                 my $brdIndex = substr( $oid, $prefixLen );
-                $brdIndex = s/\.(.+)$//;
+                $brdIndex =~ s/\.(.+)$//o;
                 if( $1 eq '1.1' and
                     $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
                 {
@@ -369,7 +369,7 @@ sub discover
             while( my( $oid, $val ) = each %{$table} )
             {
                 my $brdIndex = substr( $oid, $prefixLen );
-                $brdIndex = s/\.(.+)$//;
+                $brdIndex =~ s/\.(.+)$//o;
                 if( $1 eq '1.1' and
                     $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
                 {

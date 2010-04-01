@@ -145,6 +145,7 @@
     <template name="fdry-board-cpustats">
       <param name="comment" value="Linecard-specific cpu statistics"/>
       <param name="fdry-datafile" value="cpustats"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
       <param name="rrd-hwpredict" value="disabled"/>
       
       <leaf name="CPU_Overview">

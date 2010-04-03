@@ -76,10 +76,28 @@
       <param name="upper-limit" value="%fdry-chastemp-warning%"/>
     </template>
     
+    <template name="fdry-board-overview">
+     <param name="has-overview-shortcuts" value="yes"/>
+     <param name="overview-shortcuts" value="all"/>
+
+     <param name="overview-subleave-name-all">
+        Memory_Statistics/Memory_Overview,
+        CPU_Statistics/CPU_Overview,
+        Temperature_Statistics/Temperature_Overview
+     </param>     
+     <param name="overview-shortcut-text-all"
+           value="Overview"/>
+     <param name="overview-shortcut-title-all"
+           value="All important graphs on one page"/>
+     <param name="overview-page-title-all"
+           value="Linecard overview"/>
+     <param name="overview-direct-link-view-all" value="expanded-dir-html"/>
+    </template>
+    
     <template name="fdry-board-subtree">
       <param name="comment" value="%fdry-board-descr%"/>
       <param name="graph-title"
-          value="%system-id%:%fdry-board-index%:%fdry-board-descr%"/>
+          value="%system-id% Linecard %fdry-board-index%"/>
       <param name="data-file"
           value="%system-id%_linecard_%fdry-board-index%_%fdry-datafile%.rrd"/>
     </template>
@@ -226,12 +244,19 @@
       </leaf>
     </template>
 
+
+    <template name="fdry-board-tempstats">
+      <param name="comment" value="Linecard-specific temperature sensors"/>
+      <param name="fdry-datafile" value="tempstats"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="rrd-hwpredict" value="disabled"/>
+    </template>
+      
+
     <template name="fdry-board-temp-sensor-halfcelsius">
       <param name="comment" value="%sensor-description%"/>
       <param name="precedence" value="%sensor-precedence%"/>
-      <param name="fdry-datafile" value="tempstats"/>
       <param name="rrd-ds" value="sensor_%sensor-index%"/>
-      <param name="rrd-create-dstype" value="GAUGE"/>
       <param name="collector-scale" value="2,/"/>
       <param name="snmp-object"
         value="$fdrySnAgentTempValue.%fdry-board-index%.%sensor-index%"/>

@@ -393,6 +393,7 @@ sub discover
                 {
                     $data->{'fdryBoard'}{$brdIndex}{'temperature'}{$sensor} =
                         $descr;
+                    $devdetails->setCap('fdryBoardTemperature'); 
                 }
             }
         }                    
@@ -411,7 +412,8 @@ sub buildConfig
     my $data = $devdetails->data();
 
     # Chassis Temperature Sensors
-    if( $devdetails->hasCap('snChasActualTemperature') )
+    if( $devdetails->hasCap('snChasActualTemperature') and not
+        $devdetails->hasCap('fdryBoardTemperature') )
     {
         my $param = {
             'fdry-chastemp-warning' => $data->{'fdryChasTemp'}{'warning'}/2,
@@ -434,6 +436,10 @@ sub buildConfig
             $brdNode =
                 $cb->addSubtree( $devNode, 'Linecard_Statistics', $param );
         }
+       
+        $cb->addTemplateApplication( $brdNode,
+                                     'Foundry::fdry-board-overview' );
+        
             
         foreach my $brdIndex ( sort {$a <=> $b} keys %{$data->{'fdryBoard'}} )
         {
@@ -469,7 +475,7 @@ sub buildConfig
             if( defined( $cpuOid ) )
             {
                 
-                $cb->addSubtree( $linecardNode, 'CPU_statistics',
+                $cb->addSubtree( $linecardNode, 'CPU_Statistics',
                                  {
                                      'fdry-cpu-base' => $cpuOid,
                                  },
@@ -479,8 +485,22 @@ sub buildConfig
             if( defined( $data->{'fdryBoard'}{$brdIndex}{'temperature'} ) )
             {
                 my $tempNode =
-                    $cb->addSubtree( $linecardNode, 'Temperature_Statistics' );
+                    $cb->addSubtree( $linecardNode, 'Temperature_Statistics',
+                                     {}, ['Foundry::fdry-board-tempstats']);
 
+                # Build a multi-graph for all sensors
+                
+                my @colors =
+                    ('##one', '##two', '##three', '##four', '##five',
+                     '##six', '##seven', '##eight', '##nine', '##ten');
+
+                my $mgParam = {
+                    'comment' => 'Board temperature sensors combined',
+                    'ds-type' => 'rrd-multigraph',
+                };
+
+                my @sensors;
+                
                 foreach my $sensor
                     ( sort {$a <=> $b}
                       keys %{$data->{'fdryBoard'}{$brdIndex}{'temperature'}} )
@@ -497,10 +517,32 @@ sub buildConfig
 
                     my $template =
                         ['Foundry::fdry-board-temp-sensor-halfcelsius'];
-                    
-                    $cb->addLeaf( $tempNode, 'sensor_' . $sensor, 
+
+                    my $sensorName = 'sensor_' . $sensor;
+                    $cb->addLeaf( $tempNode, $sensorName,  
                                   $param, $template );
+
+                    push(@sensors, $sensorName);
+                    
+                    $mgParam->{'ds-expr-' . $sensorName} =
+                        '{' . $sensorName . '}';
+                    $mgParam->{'graph-legend-' . $sensorName} = $descr;
+                    $mgParam->{'line-style-' . $sensorName} = 'LINE2';
+
+                    my $color = shift @colors;
+                    if( not defined( $color ) )
+                    {
+                        Error('Too many sensors on one Foundry board');
+                        $color = '##black';
+                    }                    
+                    $mgParam->{'line-color-' . $sensorName} = $color;
+                    
+                    $mgParam->{'line-order-' . $sensorName} = $sensor;
                 }
+
+                $mgParam->{'ds-names'} = join(',', @sensors);
+
+                $cb->addLeaf( $tempNode, 'Temperature_Overview', $mgParam );
             }
         }
     }

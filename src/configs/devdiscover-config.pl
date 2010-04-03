@@ -967,6 +967,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'fdry-chass-temperature',
          'source'   => 'vendor/foundry.xml',
      },
+     'Foundry::fdry-board-overview' => {
+         'name'     => 'fdry-board-overview',
+         'source'   => 'vendor/foundry.xml',
+     },
      'Foundry::fdry-board-subtree' => {
          'name'     => 'fdry-board-subtree',
          'source'   => 'vendor/foundry.xml',
@@ -977,6 +981,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      },     
      'Foundry::fdry-board-cpustats' => {
          'name'     => 'fdry-board-cpustats',
+         'source'   => 'vendor/foundry.xml',
+     },
+     'Foundry::fdry-board-tempstats' => {
+         'name'     => 'fdry-board-tempstats',
          'source'   => 'vendor/foundry.xml',
      },
      'Foundry::fdry-board-temp-sensor-halfcelsius' => {

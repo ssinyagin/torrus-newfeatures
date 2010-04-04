@@ -16,7 +16,11 @@
   [% ELSE;
       IF urlPassParams.path.defined AND urlPassParams.path.length > 0 %]
        <INPUT TYPE="HIDDEN" NAME="path" VALUE="[%urlPassParams.path%]"/>
-  [%  END;
+  [% ELSE;
+        IF urlPassParams.nodeid.defined AND urlPassParams.nodeid.length > 0 %]
+       <INPUT TYPE="HIDDEN" NAME="nodeid" VALUE="[%urlPassParams.nodeid%]"/>
+  [%    END;
+     END;
      END %]
   [% IF urlPassParams.view.defined AND urlPassParams.view.length > 0 %]
     <INPUT TYPE="HIDDEN" NAME="view" VALUE="[% urlPassParams.view %]"/>

@@ -388,6 +388,8 @@ sub postProcess
     return $ok;
 }
 
+
+
 sub postProcessNodes
 {
     my $self = shift;
@@ -402,6 +404,29 @@ sub postProcessNodes
         $token = $self->token('/');
     }
 
+    my $nodeids = $self->getNodeParam( $token, 'nodeid', 1 );
+    if( defined( $nodeids ) )
+    {
+        foreach my $nodeid ( split(/,/o, $nodeids) )
+        {
+            # verify the uniqueness of nodeid
+        
+            my $oldToken = $self->{'db_nodeid'}->get($nodeid);
+            if( defined($oldToken) )
+            {
+                Error('Non-unique nodeid ' . $nodeid .
+                      ' in ' . $self->path($token) .
+                      ' and ' . $self->path($oldToken));
+                $ok = 0;
+            }
+            else
+            {
+                $self->{'db_nodeid'}->put($nodeid, $token);
+            }
+        }
+    }
+
+    
     if( $self->isLeaf($token) )
     {
         # Process static tokenset members

@@ -203,7 +203,7 @@ sub process
             if( $needsLogin )
             {
                 $options{'urlPassTree'} = $tree;
-                foreach my $param ( 'token', 'path', 'view' )
+                foreach my $param ( 'token', 'path', 'nodeid', 'view' )
                 {
                     my $val = $q->param( $param );
                     if( defined( $val ) and length( $val ) > 0 )
@@ -270,14 +270,33 @@ sub process
                 }
                 
                 my $token = $q->param('token');
-                if( not $token )
+                if( not defined($token) )
                 {
                     my $path = $q->param('path');
-                    $path = '/' unless $path;
-                    $token = $config_tree->token($path);
-                    if( not $token )
+                    if( not defined($path) )
                     {
-                        return report_error($q, 'Invalid path');
+                        my $nodeid = $q->param('nodeid');
+                        if( defined($nodeid) )
+                        {
+                            $token = $config_tree->getNodeByNodeid( $nodeid );
+                            if( not defined($token) )
+                            {
+                                return report_error
+                                    ($q, 'Cannot find nodeid:' . $nodeid);
+                            }
+                        }
+                        else
+                        {
+                            $token = $config_tree->token('/');
+                        }
+                    }
+                    else
+                    {
+                        $token = $config_tree->token($path);
+                        if( not defined($token) )
+                        {
+                            return report_error($q, 'Invalid path');
+                        }
                     }
                 }
                 elsif( $token !~ /^S/ and

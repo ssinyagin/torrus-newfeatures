@@ -232,6 +232,13 @@ C<D> for a parameter with value.
 
 =back
 
+
+B<nodeid_DSINST.db> is a I<Btree> database that stores the mapping between
+NodeID values and tokens. Database keys are NodeID strings, and values
+are tokens. One NodeID corresponds to maximum one token.
+
+
+
 B<config_readers.db> is a I<Hash> database which contains the informaton
 about active processes which read the configuration. The configuration
 compiler waits until all readers finish using the current configuration
@@ -407,7 +414,6 @@ If the node name matches the keyword, the I<param> element
 is omitted. Otherwise it refers to the parameter that matches the keyword.
 
 =back
-
 
 
 

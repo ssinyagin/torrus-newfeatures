@@ -221,6 +221,7 @@ sub new
                        -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
     defined( $self->{'db_sets'} ) or return( undef );
 
+
     $self->{'db_nodepcache'} =
         new Torrus::DB('nodepcache_' . $dsConfInstance,
                        -Subdir => $self->{'treename'}, -Btree => 1,
@@ -228,6 +229,15 @@ sub new
                        -Truncate => ($options{'-Rebuild'} and
                                      not $options{'-NoDSRebuild'}));
     defined( $self->{'db_nodepcache'} ) or return( undef );
+
+
+    $self->{'db_nodeid'} =
+        new Torrus::DB('nodeid_' . $dsConfInstance,
+                       -Subdir => $self->{'treename'}, -Btree => 1,
+                       -WriteAccess => 1,
+                       -Truncate => ($options{'-Rebuild'} and
+                                     not $options{'-NoDSRebuild'}));
+    defined( $self->{'db_nodeid'} ) or return( undef );
 
     return $self;
 }
@@ -886,6 +896,37 @@ sub getRelative
         return $token;
     }
 }
+
+
+sub getNodeByNodeid
+{
+    my $self = shift;
+    my $nodeid = shift;
+
+    return $self->{'db_nodeid'}->get( $nodeid );
+}
+
+# Returns arrayref or undef.
+# Each element is an arrayref to [nodeid, token] pair
+sub searchNodeidPrefix
+{
+    my $self = shift;
+    my $prefix = shift;
+
+    return $self->{'db_nodeid'}->searchPrefix( $prefix );
+}
+
+
+# Returns arrayref or undef.
+# Each element is an arrayref to [nodeid, token] pair
+sub searchNodeidSubstring
+{
+    my $self = shift;
+    my $substring = shift;
+
+    return $self->{'db_nodeid'}->searchSubstring( $substring );
+}
+
 
 
 sub getDefaultView

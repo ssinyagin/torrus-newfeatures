@@ -76,7 +76,8 @@ my %leaf_params =
      'rrd-scaling-base'         => undef,
      'graph-logarithmic'        => undef,
      'graph-rigid-boundaries'   => undef,
-     'graph-ignore-decorations' => undef);
+     'graph-ignore-decorations' => undef,
+     'nodeid'                   => undef);
 
 
 my %param_categories =
@@ -100,6 +101,7 @@ my %param_categories =
      'graph-logarithmic'                 => 'Display',
      'graph-rigid-boundaries'            => 'Display',
      'leaf-type'                         => 'Common Parameters',
+     'nodeid'                            => 'Common Parameters',
      'rpn-expr'                          => 'RRD CDEF Paramters',
      'rrd-cf'                            => 'RRD',
      'rrd-create-dstype'                 => 'RRD',

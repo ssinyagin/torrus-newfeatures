@@ -172,7 +172,8 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
 [% BLOCK bottomline %]
 </DIV><!-- Content -->[% global.contentFinished = 1 %]
 <DIV CLASS="BottomMenu">
-[% INCLUDE shortcut url=pathUrl(token,view,global.bookmarkVars) text="Bookmark"
+[% INCLUDE shortcut url=persistentUrl(token,view,global.bookmarkVars)
+                    text="Bookmark"
                     title="Permanent link to this page"%]
 [% INCLUDE shortcut url=url('SS')           text="Tokensets"
                     title="List of non-empty tokensets"%]

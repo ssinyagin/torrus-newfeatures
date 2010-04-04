@@ -136,6 +136,7 @@
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="990" />
       <param name="monitor-action-target"  value="InOut_bps"/>
+      <param name="nodeid"            value="%nodeid-interface%//inbytes"/>
      </leaf>
 
     <leaf name="Bytes_Out">
@@ -149,6 +150,7 @@
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="980" />
       <param name="monitor-action-target"  value="InOut_bps"/>
+      <param name="nodeid"            value="%nodeid-interface%//outbytes"/>
     </leaf>
 
     <leaf name="InOut_bps">
@@ -157,6 +159,7 @@
       <param name="graph-lower-limit" value="0" />
       <param name="rrd-hwpredict"    value="disabled" />
       <param name="precedence"       value="1000" />
+      <param name="nodeid"           value="%nodeid-interface%//inoutbit"/>
       <param name="ds-type"          value="rrd-multigraph" />
       <param name="ds-names"         value="in,out" />
 
@@ -187,6 +190,7 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="890" />
+      <param name="nodeid"            value="%nodeid-interface%//inpackets"/>
     </leaf>
 
     <leaf name="Packets_Out">
@@ -198,6 +202,7 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="880" />
+      <param name="nodeid"            value="%nodeid-interface%//outpackets"/>
     </leaf>
   </template>
 
@@ -212,6 +217,7 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="790" />
+      <param name="nodeid"            value="%nodeid-interface%//indrops"/>
       <param name="help-text">
       Input discards may occur when the packets arrive from the interface
       media, and the router is not able to process them. This can possibly
@@ -231,6 +237,7 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="780" />
+      <param name="nodeid"            value="%nodeid-interface%//outdrops"/>
       <param name="help-text">
       Output discards may occur when the router has prepared packets for
       transmission, but the interface is not able to send them. This
@@ -251,6 +258,7 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="690" />
+      <param name="nodeid"            value="%nodeid-interface%//inerr"/>
       <param name="help-text">
       Input errors usually mean that the interface receives broken packets
       from the media. This migh be caused by problems with the physical
@@ -270,6 +278,7 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="680" />
+      <param name="nodeid"            value="%nodeid-interface%//outerr"/>
       <param name="help-text">
       Output errors occur when the interface is not able to send packets
       to the media for some reasons.
@@ -293,6 +302,7 @@
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="990" />
       <param name="monitor-action-target"  value="InOut_bps"/>
+      <param name="nodeid"            value="%nodeid-interface%//inbytes"/>
     </leaf>
 
     <leaf name="Bytes_Out">
@@ -309,6 +319,7 @@
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="980" />
       <param name="monitor-action-target"  value="InOut_bps"/>
+      <param name="nodeid"            value="%nodeid-interface%//outbytes"/>
     </leaf>
 
     <leaf name="InOut_bps">
@@ -317,6 +328,7 @@
       <param name="graph-lower-limit" value="0" />
       <param name="rrd-hwpredict"    value="disabled" />
       <param name="precedence"       value="1000" />
+      <param name="nodeid"           value="%nodeid-interface%//inoutbit"/>
       <param name="ds-type"          value="rrd-multigraph" />
       <param name="ds-names"         value="in,out" />
 
@@ -346,6 +358,7 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="890" />
+      <param name="nodeid"            value="%nodeid-interface%//inpackets"/>
     </leaf>
 
     <leaf name="Packets_Out">
@@ -359,6 +372,7 @@
       <param name="vertical-label"    value="pps" />
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="880" />
+      <param name="nodeid"            value="%nodeid-interface%//outpackets"/>
     </leaf>
   </template>
 
@@ -374,6 +388,7 @@
       <param name="upper-limit"      value="100" />
       <param name="rrd-hwpredict"    value="disabled" />
       <param name="precedence"       value="998" />
+      <param name="nodeid"            value="%nodeid-interface%//bw"/>
       <param name="ds-type"          value="rrd-multigraph" />
       <param name="ds-names"         value="in,out" />
 

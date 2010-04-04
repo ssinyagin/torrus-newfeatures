@@ -75,7 +75,7 @@ sub render_html
         'nodeParam'  => sub { return $config_tree->getNodeParam(@_); },
         'param'      => sub { return $config_tree->getParam(@_); },
         'url'        => sub { return $self->makeURL($config_tree, 0, @_); },
-        'pathUrl'    => sub { return $self->makeURL($config_tree, 1, @_); },
+        'persistentUrl' => sub { return $self->makeURL($config_tree, 1, @_); },
         'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
                               return undef;},
         'plainURL'   => $Torrus::Renderer::plainURL,
@@ -197,21 +197,35 @@ sub sortTokens
 }
 
 
+# compose an URL for a node.
+# $persistent defines if the link should be persistent
+# Persistent link is done with nodeid if available, or with path
+
 sub makeURL
 {
     my $self = shift;
     my $config_tree = shift;
-    my $pathref = shift;
+    my $persistent = shift;
     my $token = shift;
     my $view = shift;
     my @add_vars = @_;
 
     my $ret = $Torrus::Renderer::rendererURL . '/' . $config_tree->treeName();
-
-    if( $pathref )
+    
+    if( $persistent )
     {
-        my $path = $config_tree->path($token);
-        $ret .= '?path=' . uri_escape($path);
+        my $nodeid = $config_tree->getNodeParam($token, 'nodeid', 1);
+        if( defined( $nodeid ) )
+        {
+            $ret .= '?nodeid=' .
+                uri_escape($nodeid, $Torrus::Renderer::uriEscapeExceptions);
+        }
+        else
+        {
+            $ret .= '?path=' .
+                uri_escape($config_tree->path($token),
+                           $Torrus::Renderer::uriEscapeExceptions);
+        }
     }
     else
     {
@@ -251,7 +265,9 @@ sub makeURL
     {
         if( $vars{$name} ne '' )
         {
-            $ret .= '&amp;'.$name.'='.uri_escape( $vars{$name} );
+            $ret .= '&amp;' . $name . '=' .
+                uri_escape( $vars{$name},
+                            $Torrus::Renderer::uriEscapeExceptions );
         }
     }
 

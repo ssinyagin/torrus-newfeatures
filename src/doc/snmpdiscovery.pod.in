@@ -292,6 +292,11 @@ not defined.
 Optional. If defined, it overrides the default value of system ID, which
 is equal to the value of C<snmp-host>.
 
+=item * C<nodeid-device>
+
+Optional. Defines the host-specific reference for I<nodeid>. Default value
+is equal to C<system-id>.
+
 =item * C<snmp-oids-per-pdu>
 
 Optional. When defined, these parameters overwrites the value from the
@@ -529,6 +534,14 @@ Optional. By default, per-interface subtrees are named after the values of
 C<ifDescr> SNMP variables. If this option is set to C<ifName>, this
 SNMP variable would be used for subtree naming. This option is ignored if
 the device is supported by a vendor specific discovery module.
+
+=item * C<RFC2863_IF_MIB::nodeid-hint>
+
+Optional. By default, per-interface I<nodeid> is derived from
+C<RFC2863_IF_MIB::ifindex-map-hint>. This parameter can change the
+reference table for nodeid. Valid values are:
+C<ifDescr>, C<ifName>, C<ifAlias>, C<ifIndex>.
+
 
 =item * C<RFC2863_IF_MIB::noout>
 

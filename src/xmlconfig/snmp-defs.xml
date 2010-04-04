@@ -59,6 +59,12 @@
     <!-- Unique host identifier, normally same as hostname -->
     <param name="system-id" value="%snmp-host%" />
 
+    <!-- Host-specific part of nodeid -->
+    <param name="nodeid-device" value="%system-id%" />
+
+    <!-- Host-level nodeid -->
+    <param name="nodeid" value="device//%nodeid-device%" />
+    
     <!-- SNMP Parameters -->
 
     <!--

@@ -76,6 +76,7 @@ our @copyParams =
       'domain-name',
       'monitor-period',
       'monitor-timeoffset',
+      'nodeid-device',
       'show-recursive',
       'snmp-host',
       'snmp-port',

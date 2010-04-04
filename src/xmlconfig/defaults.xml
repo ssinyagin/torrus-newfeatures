@@ -41,6 +41,7 @@
   <prop param="hrules"             prop="remspace" value="1"/>
   <prop param="launch-when"        prop="remspace" value="1"/>
   <prop param="monitor"            prop="remspace" value="1"/>
+  <prop param="nodeid"             prop="remspace" value="1"/>
   <prop param="print-cf"           prop="remspace" value="1"/>
   <prop param="rpn-expr"           prop="remspace" value="1"/>
   <prop param="rrgraph-views"      prop="remspace" value="1"/>
@@ -66,6 +67,7 @@
   <prop param="graph-title"           prop="expand" value="1"/>
   <prop param="lower-limit"           prop="expand" value="1"/>
   <prop param="monitor-vars"          prop="expand" value="1"/>
+  <prop param="nodeid"                prop="expand" value="1"/>
   <prop param="normal-level"          prop="expand" value="1"/>
   <prop param="rpn-expr"              prop="expand" value="1"/>
   <prop param="rrd-create-max"        prop="expand" value="1"/>

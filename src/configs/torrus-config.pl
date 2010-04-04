@@ -205,6 +205,10 @@ $Torrus::Renderer::siteInfo = undef;
 # The time format to print in HTML
 $Torrus::Renderer::timeFormat = '%d-%m-%Y %H:%M';
 
+# Exception characters for URI::Escape
+# By default, slash (/) is escaped, and we don't really want it
+$Torrus::Renderer::uriEscapeExceptions = '^A-Za-z0-9-._~/';
+
 # The page that lets you choose the tree from the list
 $Torrus::Renderer::Chooser::mimeType = 'text/html; charset=UTF-8';
 $Torrus::Renderer::Chooser::expires = '300';

@@ -283,6 +283,19 @@ sub discover
                       $hint);
             }
         }
+        
+        $hint =
+            $devdetails->param('RFC2863_IF_MIB::nodeid-hint');
+        if( defined( $hint ) )
+        {
+            $data->{'nameref'}{'ifNodeid'} = $hint;
+        }
+    }
+    
+    if( not defined( $data->{'nameref'}{'ifNodeid'} ) )
+    {
+        $data->{'nameref'}{'ifNodeid'} =
+            $data->{'nameref'}{'ifReferenceName'};
     }
 
     if( $devdetails->hasCap('interfaceIndexingPersistent') )
@@ -449,6 +462,13 @@ sub buildConfig
 
         $interface->{'param'}{'interface-nick'} =
             $interface->{$data->{'nameref'}{'ifNick'}};
+
+        # A per-interface value which is used by leafs in IF-MIB templates
+        $interface->{'param'}{'nodeid-interface'} =
+            'if//%nodeid-device%//' .
+            $interface->{$data->{'nameref'}{'ifNodeid'}};
+
+        $interface->{'param'}{'nodeid'} = '%nodeid-interface%';        
 
         if( defined $data->{'nameref'}{'ifComment'} and
             not defined( $interface->{'param'}{'comment'} ) and

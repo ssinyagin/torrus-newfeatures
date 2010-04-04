@@ -453,7 +453,8 @@ sub buildConfig
             my $param = {
                 'comment'  => $descr,
                 'fdry-board-index' => $brdIndex,
-                'fdry-board-descr' => $descr, 
+                'fdry-board-descr' => $descr,
+                'nodeid' => 'module//%nodeid-device%//' . $brdIndex,
             };
             
             my $linecardNode =
@@ -481,11 +482,13 @@ sub buildConfig
             if( defined( $cpuOid ) )
             {
                 
-                $cb->addSubtree( $linecardNode, 'CPU_Statistics',
-                                 {
-                                     'fdry-cpu-base' => $cpuOid,
-                                 },
-                                 [ 'Foundry::fdry-board-cpustats' ]);
+                $cb->addSubtree
+                    ( $linecardNode, 'CPU_Statistics',
+                      {
+                          'fdry-cpu-base' => $cpuOid,
+                          'nodeid' => 'cpu//%nodeid-device%//' . $brdIndex,
+                      },
+                      [ 'Foundry::fdry-board-cpustats' ]);
             }
             
             if( defined( $data->{'fdryBoard'}{$brdIndex}{'temperature'} ) )
@@ -504,6 +507,7 @@ sub buildConfig
                     'comment' => 'Board temperature sensors combined',
                     'ds-type' => 'rrd-multigraph',
                     'vertical-label' => 'Degrees Celcius',
+                    'nodeid' => 'temp//%nodeid-device%//' . $brdIndex,
                 };
 
                 my @sensors;

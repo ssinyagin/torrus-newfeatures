@@ -189,7 +189,7 @@ sub renderTreeChooser
         ,
         'url'  => sub { return $Torrus::Renderer::rendererURL . '/' . $_[0] },
         'plainURL'   => $Torrus::Renderer::plainURL,
-        'pathUrl'    => sub { return $Torrus::Renderer::rendererURL . '/' .
+        'persistentUrl'  => sub { return $Torrus::Renderer::rendererURL . '/' .
                                   $_[0] . '?path=' . uri_escape($_[1])}
         ,
         'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};

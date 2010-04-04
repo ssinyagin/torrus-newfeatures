@@ -91,7 +91,7 @@
            value="All important graphs on one page"/>
      <param name="overview-page-title-all"
            value="Linecard overview"/>
-     <param name="overview-direct-link-view-all" value="expanded-dir-html"/>
+     <param name="overview-direct-link-all" value="yes"/>
     </template>
     
     <template name="fdry-board-subtree">
@@ -260,7 +260,7 @@
       <param name="collector-scale" value="2,/"/>
       <param name="snmp-object"
         value="$fdrySnAgentTempValue.%fdry-board-index%.%sensor-index%"/>
-      <param name="graph-legend" value="%sensor-description%"/>
+      <param name="graph-legend" value="%sensor-short%"/>
       <param name="vertical-label" value="Degrees Celcius"/>
     </template>
         

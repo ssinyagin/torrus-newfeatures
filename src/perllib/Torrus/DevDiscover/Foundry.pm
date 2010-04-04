@@ -50,11 +50,10 @@ our %oiddef =
      'fdrySnChasActualTemperature'       => '1.3.6.1.4.1.1991.1.1.1.1.18.0',
      'fdrySnChasWarningTemperature'      => '1.3.6.1.4.1.1991.1.1.1.1.19.0',
      'fdrySnChasShutdownTemperature'     => '1.3.6.1.4.1.1991.1.1.1.1.20.0',
-     'fdrySnAgentTempValue'              => '1.3.6.1.4.1.1991.1.1.2.13.1.1.4',
      'fdrySnAgImgVer'                    => '1.3.6.1.4.1.1991.1.1.2.1.11',
      'fdrySnAgentTempTable'              => '1.3.6.1.4.1.1991.1.1.2.13.1',
      'fdrySnAgentTempSensorDescr'        => '1.3.6.1.4.1.1991.1.1.2.13.1.1.3',
-     'fdrySnAgentTempValues'             => '1.3.6.1.4.1.1991.1.1.2.13.1.1.4',
+     'fdrySnAgentTempValue'              => '1.3.6.1.4.1.1991.1.1.2.13.1.1.4',
 
      # FOUNDRY-SN-AGENT-MIB
      'fdrySnAgGblCpuUtilData'            => '1.3.6.1.4.1.1991.1.1.2.1.35',
@@ -340,7 +339,6 @@ sub discover
         # FOUNDRY-SN-AGENT-MIB::snAgentCpuUtilValue.1.1.300 = Gauge32: 1
         {
             my $base = $dd->oiddef('fdrySnAgentCpuUtilValue');
-            
             my $table = $session->get_table( -baseoid => $base );
             my $prefixLen = length( $base ) + 1;
                 
@@ -362,7 +360,6 @@ sub discover
         # snAgentCpuUtilValue is deprecated in these releases
         {
             my $base = $dd->oiddef('fdrySnAgentCpuUtil100thPercent');
-            
             my $table = $session->get_table( -baseoid => $base );
             my $prefixLen = length( $base ) + 1;
                 
@@ -379,17 +376,22 @@ sub discover
         }        
         
         # check if temperature stats are available
+        # exclude the sensors which show zero
         {
             my $base = $dd->oiddef('fdrySnAgentTempSensorDescr');
             my $table = $session->get_table( -baseoid => $base );        
             my $prefixLen = length( $base ) + 1;
+
+            my $baseVal = $dd->oiddef('fdrySnAgentTempValue');
+            my $values = $session->get_table( -baseoid => $baseVal );
             
             while( my( $oid, $descr ) = each %{$table} )
             {
                 my $index = substr( $oid, $prefixLen );
                 my ($brdIndex, $sensor) = split(/\./, $index);
                 
-                if( $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
+                if( $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} and
+                    $values->{$baseVal . '.' . $index} > 0 )
                 {
                     $data->{'fdryBoard'}{$brdIndex}{'temperature'}{$sensor} =
                         $descr;
@@ -432,7 +434,11 @@ sub buildConfig
         my $brdNode = $devNode;
         if( scalar(keys %{$data->{'fdryBoard'}}) > 1 )
         {
-            my $param = { 'node-display-name' => 'Linecard Statistics' };
+            my $param = {
+                'node-display-name' => 'Linecard Statistics',
+                'comment' => 'CPU, Memory, and Temperature information',
+            };
+            
             $brdNode =
                 $cb->addSubtree( $devNode, 'Linecard_Statistics', $param );
         }
@@ -497,6 +503,7 @@ sub buildConfig
                 my $mgParam = {
                     'comment' => 'Board temperature sensors combined',
                     'ds-type' => 'rrd-multigraph',
+                    'vertical-label' => 'Degrees Celcius',
                 };
 
                 my @sensors;
@@ -505,29 +512,31 @@ sub buildConfig
                     ( sort {$a <=> $b}
                       keys %{$data->{'fdryBoard'}{$brdIndex}{'temperature'}} )
                 {
+                    my $leafName = 'sensor_' . $sensor;
+                    
                     my $descr = $data->{'fdryBoard'}{$brdIndex}{
                         'temperature'}{$sensor};
 
+                    my $short = 'Temperature sensor ' . $sensor;
+                    
                     my $param = {
                         'comment'            => $descr,
                         'precedence'         => 1000 - $sensor,
                         'sensor-index'       => $sensor,
-                        'sensor-description' => $descr,
+                        'sensor-short'       => $short,
+                        'sensor-description' => $descr,                        
                     };
-
-                    my $template =
-                        ['Foundry::fdry-board-temp-sensor-halfcelsius'];
-
-                    my $sensorName = 'sensor_' . $sensor;
-                    $cb->addLeaf( $tempNode, $sensorName,  
-                                  $param, $template );
-
-                    push(@sensors, $sensorName);
                     
-                    $mgParam->{'ds-expr-' . $sensorName} =
-                        '{' . $sensorName . '}';
-                    $mgParam->{'graph-legend-' . $sensorName} = $descr;
-                    $mgParam->{'line-style-' . $sensorName} = 'LINE2';
+                    $cb->addLeaf
+                        ( $tempNode, $leafName, $param,
+                          ['Foundry::fdry-board-temp-sensor-halfcelsius'] );
+                    
+                    push(@sensors, $leafName);
+                    
+                    $mgParam->{'ds-expr-' . $leafName} =
+                        '{' . $leafName . '}';
+                    $mgParam->{'graph-legend-' . $leafName} = $short;
+                    $mgParam->{'line-style-' . $leafName} = 'LINE2';
 
                     my $color = shift @colors;
                     if( not defined( $color ) )
@@ -535,9 +544,9 @@ sub buildConfig
                         Error('Too many sensors on one Foundry board');
                         $color = '##black';
                     }                    
-                    $mgParam->{'line-color-' . $sensorName} = $color;
+                    $mgParam->{'line-color-' . $leafName} = $color;
                     
-                    $mgParam->{'line-order-' . $sensorName} = $sensor;
+                    $mgParam->{'line-order-' . $leafName} = $sensor;
                 }
 
                 $mgParam->{'ds-names'} = join(',', @sensors);

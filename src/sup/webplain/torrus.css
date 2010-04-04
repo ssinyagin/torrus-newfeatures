@@ -353,7 +353,7 @@ SPAN.LoginInput INPUT {
 }
 
 SPAN.LoginInput INPUT.Remember {
- width : 0;
+  width : auto;
 }
 
 

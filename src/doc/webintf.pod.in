@@ -204,6 +204,11 @@ unique identifier. If not given, the root of the tree (C</>) is displayed.
 Optional. Alternatively to token reference, the full path of the tree element
 may be referenced.
 
+=item nodeid
+
+Optional. A subtree which has a unique I<nodeid> can be referred
+with this parameter.
+
 =item view
 
 Optional. Specifies the C<view> name for displaying the tree element.

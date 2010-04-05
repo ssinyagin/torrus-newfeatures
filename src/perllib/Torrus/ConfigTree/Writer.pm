@@ -404,25 +404,22 @@ sub postProcessNodes
         $token = $self->token('/');
     }
 
-    my $nodeids = $self->getNodeParam( $token, 'nodeid', 1 );
-    if( defined( $nodeids ) )
+    my $nodeid = $self->getNodeParam( $token, 'nodeid', 1 );
+    if( defined( $nodeid ) )
     {
-        foreach my $nodeid ( split(/,/o, $nodeids) )
-        {
-            # verify the uniqueness of nodeid
+        # verify the uniqueness of nodeid
         
-            my $oldToken = $self->{'db_nodeid'}->get($nodeid);
-            if( defined($oldToken) )
-            {
-                Error('Non-unique nodeid ' . $nodeid .
-                      ' in ' . $self->path($token) .
-                      ' and ' . $self->path($oldToken));
-                $ok = 0;
-            }
-            else
-            {
-                $self->{'db_nodeid'}->put($nodeid, $token);
-            }
+        my $oldToken = $self->{'db_nodeid'}->get($nodeid);
+        if( defined($oldToken) )
+        {
+            Error('Non-unique nodeid ' . $nodeid .
+                  ' in ' . $self->path($token) .
+                  ' and ' . $self->path($oldToken));
+            $ok = 0;
+        }
+        else
+        {
+            $self->{'db_nodeid'}->put($nodeid, $token);
         }
     }
 

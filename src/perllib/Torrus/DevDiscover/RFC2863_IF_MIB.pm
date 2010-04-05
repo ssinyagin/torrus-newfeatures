@@ -292,12 +292,6 @@ sub discover
         }
     }
     
-    if( not defined( $data->{'nameref'}{'ifNodeid'} ) )
-    {
-        $data->{'nameref'}{'ifNodeid'} =
-            $data->{'nameref'}{'ifReferenceName'};
-    }
-
     if( $devdetails->hasCap('interfaceIndexingPersistent') )
     {
         $data->{'param'}{'ifindex-map'} = '$IFIDX_IFINDEX';
@@ -438,7 +432,16 @@ sub buildConfig
 
     uniqueEntries( $devdetails, $data->{'nameref'}{'ifNick'} );
     uniqueEntries( $devdetails, $data->{'nameref'}{'ifSubtreeName'} );
+
+    # If other discovery modules don't set nodeid reference, fall back to
+    # default interface reference
     
+    if( not defined( $data->{'nameref'}{'ifNodeid'} ) )
+    {
+        $data->{'nameref'}{'ifNodeid'} =
+            $data->{'nameref'}{'ifReferenceName'};
+    }
+
     # Build interface parameters
 
     my $nInterfaces = 0;

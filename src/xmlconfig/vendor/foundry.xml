@@ -71,7 +71,7 @@
       <param name="collector-scale" value="2,/"/>
       <param name="snmp-object"  value="$fdrySnChasActualTemperature"/>
       <param name="graph-legend" value="Chassis temperature"/>
-      <param name="vertical-label" value="Degrees Celcius"/>
+      <param name="vertical-label" value="Degrees Celsius"/>
       <param name="graph-upper-limit" value="%fdry-chastemp-shutdown%"/>
       <param name="upper-limit" value="%fdry-chastemp-warning%"/>
     </template>
@@ -261,7 +261,7 @@
       <param name="snmp-object"
         value="$fdrySnAgentTempValue.%fdry-board-index%.%sensor-index%"/>
       <param name="graph-legend" value="%sensor-short%"/>
-      <param name="vertical-label" value="Degrees Celcius"/>
+      <param name="vertical-label" value="Degrees Celsius"/>
     </template>
         
   </datasources>

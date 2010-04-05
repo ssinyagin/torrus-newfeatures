@@ -109,6 +109,11 @@ such information as slot/port mapping and interface descriptions.
 
 The discovery module detects active sensors in an EthernetBox sensor module.
 
+=item * Brocade (Foundry)
+
+A variety of Foundry switches and routers is supported for memory,
+CPU, and temperature statistics.
+
 =item * Cisco CatOS
 
 Memory, CPU, and temperature information. Per-interface statistics may be

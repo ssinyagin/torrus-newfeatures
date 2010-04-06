@@ -50,18 +50,26 @@ our %oiddef =
 
 our %sensorTypes =
     (
-     1 => { 'comment' => 'Temperature sensor' },
+     1 => {
+         'comment' => 'Temperature sensor',
+     },
      2 => {
          'comment' => 'Brightness sensor',
-         'label' => 'Lux'
-         },
+         'label' => 'Lux',
+     },
      3 => {
          'comment' => 'Humidity sensor',
-         'label' => 'Percent RH'
-         },
+         'label' => 'Percent RH',
+     },
+     4 => {
+         'comment' => 'Switch contact',
+     },
      5 => {
          'comment' => 'Voltage meter',
-         }
+     },
+     6 => {
+         'comment' => 'Smoke sensor',
+     },
      );
 
 our %tempUnits =
@@ -110,6 +118,9 @@ sub discover
     {
         $devdetails->storeSnmpVars( $sensorTable );
 
+        # store the sensor names to guarantee uniqueness
+        my %sensorNames;
+            
         foreach my $INDEX
             ( $devdetails->getSnmpIndices($dd->oiddef('BNEsensorName') ) )
         {
@@ -124,11 +135,27 @@ sub discover
             my $name = $devdetails->snmpVar( $dd->oiddef('BNEsensorName')
                                              . '.' . $INDEX );
 
+            if( $sensorNames{$name} )
+            {
+                Warn('Duplicate sensor names: ' . $name);
+                $sensorNames{$name}++;
+            }
+            else
+            {
+                $sensorNames{$name} = 1;
+            }
+
+            if( $sensorNames{$name} > 1 )
+            {
+                $name .= sprintf(' %d', $sensorNames{$name});
+            }
+            
             my $leafName = $name;
             $leafName =~ s/\W/_/g;
 
             my $param = {
                 'bne-sensor-index' => $INDEX,
+                'node-display-name' => $name,
                 'precedence' => sprintf('%d', 1000 - $INDEX)
                 };
             

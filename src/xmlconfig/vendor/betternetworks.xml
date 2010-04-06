@@ -49,6 +49,8 @@
       <param name="rrd-create-dstype" value="GAUGE"/>
       <param name="graph-lower-limit" value="0" />
       <param name="graph-upper-limit" value="100" />
+      <param name="nodeid"
+               value="sensor//%nodeid-device%//%bne-sensor-index%"/>
     </template>
   </datasources>
 </configuration>

@@ -106,15 +106,34 @@ sub discover
         {
             $devdetails->storeSnmpVars( $sensorTable );
 
+            # store the sensor names to guarantee uniqueness
+            my %sensorNames;
+            
             foreach my $INDEX ($devdetails->getSnmpIndices($oid . '.1'))
             {
                 my $label = $devdetails->snmpVar( $oid . '.4.' . $INDEX );
-
+                
+                if( $sensorNames{$label} )
+                {
+                    Warn('Duplicate sensor names: ' . $label);
+                    $sensorNames{$label}++;
+                }
+                else
+                {
+                    $sensorNames{$label} = 1;
+                }
+                
+                if( $sensorNames{$label} > 1 )
+                {
+                    $label .= sprintf(' %d', $sensorNames{$label});
+                }
+                
                 my $leafName = $label;
                 $leafName =~ s/\W/_/g;
 
                 my $param = {
                     'netbotz-sensor-index' => $INDEX,
+                    'node-display-name' => $label,
                     'graph-title' => $label,
                     'precedence' => sprintf('%d', 1000 - $INDEX)
                 };

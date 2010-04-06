@@ -50,6 +50,8 @@
       <param name="rrd-ds"            value="value"/>
       <param name="rrd-cf"            value="AVERAGE"/>
       <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="nodeid"
+               value="sensor//%nodeid-device%//%netbotz-sensor-index%"/>
     </template>
      
     <template name="netbotz-temp-sensor">

@@ -21,7 +21,7 @@
 # $Id$
 # Jon Nistor <nistor at snickers.org>
 #
-# NOTE: This module has been tested against v7.5.x, v7.6.x
+# NOTE: This module has been tested against v7.5.x, v7.6.x, v9.0.x, v9.1.x
 #
 # -- Common
 #      Arbor_E::disable-bundle-offer
@@ -52,6 +52,7 @@
 # -- e100 specific
 #      Arbor_E::disable-e100-cpu
 #      Arbor_E::disable-e100-hdd
+#      Arbor_E::disable-e100-mem
 #
 
 # Arbor_E devices discovery
@@ -78,6 +79,7 @@ our %oiddef =
      'hDriveErrModel'        => '1.3.6.1.4.1.3813.1.4.2.10.16.0',
      'hDriveErrSerialNum'    => '1.3.6.1.4.1.3813.1.4.2.10.17.0',
      'partitionName'         => '1.3.6.1.4.1.3813.1.4.2.11.1.2', # e100
+     'cpuSdramIndex'         => '1.3.6.1.4.1.3813.1.4.2.12.1.1', # e100
      'hDriveDailyLogSize'    => '1.3.6.1.4.1.3813.1.4.2.13.0',
      'cpuUtilization'	     => '1.3.6.1.4.1.3813.1.4.4.1.0',
      'cpuUtilTable'          => '1.3.6.1.4.1.3813.1.4.4.2',      # e100
@@ -418,6 +420,28 @@ sub discover
                                               '.' . $hddIndex};
               Debug("HDD Partition: $hddIndex, $partitionName");
               $data->{'e100'}{'hdd'}{$hddIndex} = $partitionName;
+            }
+          }
+        }
+
+        # MEM Parameters
+        if( $devdetails->param('Arbor_E::disable-e100-mem') ne 'yes' )
+        {
+          my $cpuSdramTable = $session->get_table(
+                             -baseoid => $dd->oiddef('cpuSdramIndex') );
+          $devdetails->storeSnmpVars( $cpuSdramTable );
+
+          if( defined( $cpuSdramTable ) )
+          {
+            $devdetails->setCap('e100-mem');
+
+            # PROG: Find all memory indexes
+            foreach my $memIndex ( $devdetails->getSnmpIndices(
+                                   $dd->oiddef('cpuSdramIndex') ) )
+            {
+              my $memName = $data->{'e100'}{'cpu'}{$memIndex};
+              Debug("MEM found: $memIndex, $memName");
+              $data->{'e100'}{'mem'}{$memIndex} = $memName;
             }
           }
         }
@@ -791,6 +815,26 @@ sub buildConfig
                                'hdd-name'   => $hddName,
                                'precedence' => 1000 - $hddIndex },
                              [ 'Arbor_E::e100-hdd' ] );
+            }
+        }
+
+        # MEM: per-cpu memory usage
+        if( $devdetails->hasCap('e100-mem') )
+        {
+            my $subtree = "Memory_Usage";
+            my $memTree = $cb->addSubtree( $devNode, $subtree, undef,
+                                         [ 'Arbor_E::e100-mem-subtree' ] );
+            foreach my $memIndex ( sort keys %{$data->{'e100'}{'mem'}} )
+            {
+              my $memName = $data->{'e100'}{'cpu'}{$memIndex};
+
+              my $comment = "Memory for $memName CPU";
+              $cb->addSubtree( $memTree, $memName,
+                             { 'comment'    => $comment,
+                               'mem-index'  => $memIndex,
+                               'mem-name'   => $memName,
+                               'precedence' => 1000 - $memIndex },
+                             [ 'Arbor_E::e100-mem' ] );
             }
         }
     }

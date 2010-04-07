@@ -433,6 +433,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'e100-hdd',
          'source' => 'vendor/arbor_e.xml'
          },
+     'Arbor_E::e100-mem-subtree' => {
+         'name'   => 'e100-mem-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e100-mem' => {
+         'name'   => 'e100-mem',
+         'source' => 'vendor/arbor_e.xml'
+         },
 
      #### ATMEL smartbridges
      'ATMEL::atmel-device-subtree' => {

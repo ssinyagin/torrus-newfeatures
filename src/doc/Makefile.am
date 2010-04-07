@@ -23,7 +23,7 @@ SUBDIRS = . manpages
 
 SUBST = @abs_top_builddir@/setup_tools/substvars.sh
 
-CLEANFILES = $(POD_FILES) $(nodist_doc_DATA)
+CLEANFILES = $(POD_FILES) $(nodist_pkgdoc_DATA)
 EXTRA_DIST = $(SRCPOD)
 
 SRCPOD = \

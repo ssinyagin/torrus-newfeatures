@@ -63,6 +63,10 @@
   <def name="partitionSize"       value="1.3.6.1.4.1.3813.1.4.2.11.1.3" />
   <def name="partitionUsage"      value="1.3.6.1.4.1.3813.1.4.2.11.1.4" />
 
+  <!-- e100 / memPerCpu-->
+  <def name="cpuSdramSize"        value="1.3.6.1.4.1.3813.1.4.2.12.1.2" />
+  <def name="cpuSdramUsage"       value="1.3.6.1.4.1.3813.1.4.2.12.1.3" />
+
   <def name="hDriveDailyLogSize"  value="1.3.6.1.4.1.3813.1.4.2.13.0" />
   <def name="hDriveDailyLogUsage" value="1.3.6.1.4.1.3813.1.4.2.14.0" />
 
@@ -1457,23 +1461,24 @@
   <template name="e100-hdd">
     <param name="comment"           value="HDD: %hdd-name%"/>
     <param name="graph-title"       value="%system-id%: HDD %hdd-name%"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
 
     <leaf name="Usage">
       <param name="precedence"         value="1000"/>
       <param name="comment"            value="Hdd: Total vs Used"/>
       <param name="graph-title"        value="%hdd-name%: Total vs Used"/>
-      <param name="vertical-label"     value="MBytes"/>
+      <param name="vertical-label"     value="Bytes"/>
       <param name="ds-type"            value="rrd-multigraph"/>
       <param name="ds-names"           value="size,used"/>
       <param name="graph-lower-limit"  value="0"/>
       <!-- Total Parition Size -->
-      <param name="ds-expr-size"      value="{Size}"/>
+      <param name="ds-expr-size"      value="{Size_Raw},1024,1024,*,*"/>
       <param name="graph-legend-size" value="Size"/>
       <param name="line-style-size"   value="##totalresource"/>
       <param name="line-color-size"   value="##totalresource"/>
       <param name="line-order-size"   value="1"/>
       <!-- Used Partition Size -->
-      <param name="ds-expr-used"      value="{Used}"/>
+      <param name="ds-expr-used"      value="{Used_Raw},1024,1024,*,*"/>
       <param name="graph-legend-used" value="Used"/>
       <param name="line-style-used"   value="##resourceusage"/>
       <param name="line-color-used"   value="##resourceusage"/>
@@ -1481,22 +1486,123 @@
     </leaf>
 
     <leaf name="Size">
+      <param name="precedence"        value="902"/>
+      <param name="comment"           value="Size of %hdd-name%"/>
+      <param name="ds-type"           value="rrd-file"/>
+      <param name="leaf-type"         value="rrd-cdef"/>
+      <param name="rpn-expr"          value="{Size_Raw},1024,1024,*,*"/>
       <param name="graph-legend"      value="Size of %hdd-name%"/>
-      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="graph-title"       value="Size of %hdd-name%"/>
+      <param name="vertical-label"    value="Bytes"/>
+    </leaf>
+
+    <leaf name="Size_Raw">
+      <param name="hidden"            value="yes"/>
+      <param name="precedence"        value="102"/>
+      <param name="comment"           value="Size of %hdd-name%"/>
+      <param name="graph-legend"      value="Size of %hdd-name%"/>
+      <param name="graph-title"       value="Size of %hdd-name%"/>
+      <param name="vertical-label"    value="Bytes"/>
       <param name="rrd-ds"            value="hdd_%hdd-name%_size"/>
       <param name="snmp-object"       value="$partitionSize.%hdd-index%"/>
-      <param name="vertical-label"    value="MBytes"/>
     </leaf>
 
     <leaf name="Used">
-      <param name="graph-legend"      value="Size of %hdd-name%"/>
-      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="precedence"        value="901"/>
+      <param name="comment"           value="Usage of %hdd-name%"/>
+      <param name="ds-type"           value="rrd-file"/>
+      <param name="leaf-type"         value="rrd-cdef"/>
+      <param name="rpn-expr"          value="{Used_Raw},1024,1024,*,*"/>
+      <param name="graph-legend"      value="Usage of %hdd-name%"/>
+      <param name="graph-title"       value="Usage of %hdd-name%"/>
+      <param name="vertical-label"    value="Bytes"/>
+    </leaf>
+
+    <leaf name="Used_Raw">
+      <param name="hidden"            value="yes"/>
+      <param name="precedence"        value="101"/>
+      <param name="comment"           value="Usage of %hdd-name%"/>
+      <param name="graph-legend"      value="Usage of %hdd-name%"/>
+      <param name="graph-title"       value="Usage of %hdd-name%"/>
+      <param name="vertical-label"    value="Bytes"/>
       <param name="rrd-ds"            value="hdd_%hdd-name%_usage"/>
       <param name="snmp-object"       value="$partitionUsage.%hdd-index%"/>
-      <param name="vertical-label"    value="MBytes"/>
     </leaf>
   </template>
 
+  <template name="e100-mem-subtree">
+    <param name="comment"           value="Memory statistics"/>
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts"     value="usage,total,used"/>
+
+    <!-- Memory Usage (Total vs Used) -->
+    <param name="overview-subleave-name-usage" value="Usage"/>
+    <param name="overview-shortcut-text-usage" value="Memory Usage"/>
+    <param name="overview-shortcut-title-usage"
+           value="Show memory usage of all cpu's on one page"/>
+    <param name="overview-page-title-usage"
+           value="Memory usage"/>
+    <!-- Memory Total -->
+    <param name="overview-subleave-name-total" value="Total"/>
+    <param name="overview-shortcut-text-total" value="Memory Total"/>
+    <param name="overview-shortcut-title-total"
+           value="Show memory total of all cpu's on one page"/>
+    <param name="overview-page-title-total"
+           value="Memory total"/>
+    <!-- Memory Used -->
+    <param name="overview-subleave-name-used" value="Used"/>
+    <param name="overview-shortcut-text-used" value="Memory Used"/>
+    <param name="overview-shortcut-title-used"
+           value="Show memory used of all cpu's on one page"/>
+    <param name="overview-page-title-used"
+           value="Memory used"/>
+  </template>
+
+  <template name="e100-mem">
+    <param name="comment"           value="Memory usage statistics"/>
+    <param name="data-file"         value="%system-id%_mem_%mem-name%.rrd"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+
+    <leaf name="Usage">
+      <param name="precedence"         value="1000"/>
+      <param name="comment"            value="Total vs Used"/>
+      <param name="graph-title"        value="Total vs Used"/>
+      <param name="vertical-label"     value="MBytes"/>
+      <param name="ds-type"            value="rrd-multigraph"/>
+      <param name="ds-names"           value="total,used"/>
+      <param name="graph-lower-limit"  value="0"/>
+      <!-- Total Memory -->
+      <param name="ds-expr-total"      value="{Total}"/>
+      <param name="graph-legend-total" value="Total"/>
+      <param name="line-style-total"   value="##totalresource"/>
+      <param name="line-color-total"   value="##totalresource"/>
+      <param name="line-order-total"   value="1"/>
+      <!-- Used Memory -->
+      <param name="ds-expr-used"       value="{Used}"/>
+      <param name="graph-legend-used"  value="Used"/>
+      <param name="line-style-used"    value="##resourceusage"/>
+      <param name="line-color-used"    value="##resourceusage"/>
+      <param name="line-order-used"    value="2"/>
+    </leaf>
+
+    <leaf name="Total">
+      <param name="precedence"        value="902"/>
+      <param name="comment"           value="Total memory"/>
+      <param name="graph-legend"      value="Total memory"/>
+      <param name="vertical-label"    value="MBytes"/>
+      <param name="rrd-ds"            value="cpuSdramSize"/>
+      <param name="snmp-object"       value="$cpuSdramSize.%mem-index%"/>
+    </leaf>
+
+    <leaf name="Used">
+      <param name="precedence"        value="901"/>
+      <param name="comment"           value="Used memory"/>
+      <param name="graph-legend"      value="Used memory"/>
+      <param name="vertical-label"    value="MBytes"/>
+      <param name="rrd-ds"            value="cpuSdramUsage"/>
+      <param name="snmp-object"       value="$cpuSdramUsage.%mem-index%"/>
+    </leaf>
+  </template>
 
 
   <!--

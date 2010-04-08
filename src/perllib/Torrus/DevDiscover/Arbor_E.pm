@@ -897,27 +897,28 @@ sub buildConfig
         # SubscriberMgmt: Information regarding subscriber counts, states, etc.
         if( $devdetails->hasCap('e100-submgmt') )
         {
-            my $subMgmtTree = $cb->addTemplateApplication($devNode,
-                                             'Arbor_E::e100-submgmt-subtree'
-                              );
-
-            my $mgmtName   = "Subscriber_State";
-            my $stateTree  = $cb->addSubtree( $subMgmtTree, $mgmtName,
-                                    undef,
-                                    [ 'Arbor_E::e100-submgmt-state-subtree' ]
+            my $subMgmtTree = $cb->addSubtree( $devNode, 'Subscribers', undef,
+                                      [ 'Arbor_E::e100-submgmt-subtree' ]
                              );
+
+            my $stateTree  = $cb->addSubtree( $subMgmtTree, 'Subscriber_State',
+                                        undef,
+                                      [ 'Arbor_E::e100-submgmt-state-subtree' ]
+                             );
+
             foreach my $stateIDX ( sort keys %{$data->{'e100'}{'submgmt'}} )
             {
-                next;
-                my $stateName = $data->{'e100'}{'submgmt'}{$stateIDX};
+                my $stateName    =  $data->{'e100'}{'submgmt'}{$stateIDX};
+                my $stateNameRRD =  $stateName;
+                   $stateNameRRD =~ s/[^a-zA-Z_]/_/o;
 
                 my $stateNode = $cb->addLeaf( $stateTree, $stateName,
                                    { 'comment'    => "State: $stateName",
                                      'state-idx'  => $stateIDX,
                                      'state-name' => $stateName,
+                                     'state-rrd'  => $stateNameRRD,
                                      'precedence' => 100 - $stateIDX },
-                                   [ 'Arbor_E::e100-e100-submgmt-state' ] );
-                Debug(" template: $stateIDX, $stateName");
+                                   [ 'Arbor_E::e100-submgmt-state' ] );
             }
         }
     }

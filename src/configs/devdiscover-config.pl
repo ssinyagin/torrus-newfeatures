@@ -441,6 +441,22 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'e100-mem',
          'source' => 'vendor/arbor_e.xml'
          },
+     'Arbor_E::e100-policymgmt' => {
+         'name'   => 'e100-policymgmt',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e100-submgmt-subtree' => {
+         'name'   => 'e100-submgmt-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e100-submgmt-state-subtree' => {
+         'name'   => 'e100-submgmt-state-subtree',
+         'source' => 'vendor/arbor_e.xml'
+         },
+     'Arbor_E::e100-submgmt-state' => {
+         'name'   => 'e100-submgmt-state',
+         'source' => 'vendor/arbor_e.xml'
+         },
 
      #### ATMEL smartbridges
      'ATMEL::atmel-device-subtree' => {

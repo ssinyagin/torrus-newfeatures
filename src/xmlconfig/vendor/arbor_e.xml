@@ -1682,7 +1682,7 @@
 
         <leaf name="Processed">
           <param name="precedence"     value="401"/>
-          <param name="comment"        value="Delta ops processed by e100"/>
+          <param name="comment"        value="Delta ops processed by switch"/>
           <param name="graph-legend"   value="Number of deltas processed"/>
           <param name="graph-title"    value="Delta operations processed"/>
           <param name="vertical-label" value="Deltas"/>
@@ -1838,7 +1838,6 @@
   </template>
 
   <template name="e100-submgmt-subtree">
-    <subtree name="Subscribers">
       <param name="comment"           value="Subscriber Statistics"/>
       <param name="data-file"         value="%system-id%_subs.rrd"/>
       <param name="rrd-create-dstype" value="GAUGE"/>
@@ -1998,9 +1997,24 @@
           <param name="snmp-object"    value="$unidentifiedSubscriberCount"/>
         </leaf>
       </subtree>
-    </subtree>
   </template>
 
+  <template name="e100-submgmt-state-subtree">
+    <param name="comment"           value="Subscriber State Statistics"/>
+    <param name="data-file"         value="%system-id%_subs_state.rrd"/>
+    <param name="precedence"        value="1"/>
+  </template>
+
+  <template name="e100-submgmt-state">
+    <param name="data-file"         value="%system-id%_subs_state.rrd"/>
+    <param name="comment"           value="State: %state-name%"/>
+    <param name="graph-title"       value="State: %state-name%"/>
+    <param name="graph-legend"      value="Subscriber count"/>
+    <param name="vertical-label"    value="Subscribers"/>
+    <param name="rrd-ds"            value="%state-rrd%"/>
+    <param name="rrd-create-dstype" value="GAUGE"/>
+    <param name="snmp-object"       value="$subscriberStateCount.%state-idx%"/>
+  </template>
 
   <!--
    **************************************************************************

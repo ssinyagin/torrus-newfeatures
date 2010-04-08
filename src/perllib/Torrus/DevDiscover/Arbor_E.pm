@@ -53,6 +53,8 @@
 #      Arbor_E::disable-e100-cpu
 #      Arbor_E::disable-e100-hdd
 #      Arbor_E::disable-e100-mem
+#      Arbor_E::disable-e100-policymgmt
+#      Arbor_E::disable-e100-submgmt
 #
 
 # Arbor_E devices discovery
@@ -87,7 +89,7 @@ our %oiddef =
      'cpuName'               => '1.3.6.1.4.1.3813.1.4.4.2.1.2',  # e100
      'loginRespOkStatsIndex' => '1.3.6.1.4.1.3813.1.4.3.15.1.1',
 
-     # ELLACOYA-MIB::cpuCounters (available in 7.5.x -- slowpath counters)
+     # ELLACOYA-MIB::cpuCounters, e30 (available in 7.5.x -- slowpath counters)
      'cpuCounters'           => '1.3.6.1.4.1.3813.1.4.4.10',
      'slowpathCounters'      => '1.3.6.1.4.1.3813.1.4.4.10.1',
      'sigCounters'           => '1.3.6.1.4.1.3813.1.4.4.10.2',
@@ -108,7 +110,14 @@ our %oiddef =
      'boBundleBytesSentDenyPolicyDrop' => '1.3.6.1.4.1.3813.1.4.12.2.1.22',
      'boBundleBytesSentRateLimitDrop'  => '1.3.6.1.4.1.3813.1.4.12.2.1.24',
 
-     # ELLACOYA-MIB::l2tp (available in 7.5.x)
+     # ELLACOYA-MIB::policyMgmt, e100
+     'policyMgmt'                    => '1.3.6.1.4.1.3813.1.4.16',
+
+     # ELLACOYA-MIB::subscriberMgmt, e100
+     'subscriberMgmt'                => '1.3.6.1.4.1.3813.1.4.17',
+     'subscriberStateName'           => '1.3.6.1.4.1.3813.1.4.17.7.1.2',
+
+     # ELLACOYA-MIB::l2tp, e30 (available in 7.5.x)
      'l2tpConfigEnabled'             => '1.3.6.1.4.1.3813.1.4.18.1.1.0',
      'l2tpSecureEndpointIpAddress'   => '1.3.6.1.4.1.3813.1.4.18.3.2.1.1.1',
      'l2tpSecureEndpointOverlapping' => '1.3.6.1.4.1.3813.1.4.18.3.2.1.1.3',
@@ -395,7 +404,7 @@ sub discover
               my $cpuName = $cpuNameTable->{$dd->oiddef('cpuName') .
                                                    '.' . $cpuIndex};
 
-              Debug("CPU found: $cpuIndex, $cpuName");
+              Debug("  CPU found: $cpuIndex, $cpuName");
               $data->{'e100'}{'cpu'}{$cpuIndex} = $cpuName;
             }
           }
@@ -442,6 +451,47 @@ sub discover
               my $memName = $data->{'e100'}{'cpu'}{$memIndex};
               Debug("MEM found: $memIndex, $memName");
               $data->{'e100'}{'mem'}{$memIndex} = $memName;
+            }
+          }
+        }
+
+        # Policy Mgmt parameters
+        if( $devdetails->param('Arbor_E::disable-e100-policymgmt') ne 'yes' )
+        {
+          my $policyTable = $session->get_table(
+                              -baseoid => $dd->oiddef('policyMgmt')
+                            );
+          $devdetails->storeSnmpVars( $policyTable );
+
+          if( defined( $policyTable ) )
+          {
+            $devdetails->setCap('e100-policymgmt');
+          }
+        }
+
+        # Subscriber Mgmt parameters
+        if( $devdetails->param('Arbor_E::disable-e100-submgmt') ne 'yes' )
+        {
+          my $subTable = $session->get_table(
+                            -baseoid => $dd->oiddef('subscriberStateName')
+                         );
+          $devdetails->storeSnmpVars( $subTable );
+
+          if( defined( $subTable ) )
+          {
+            $devdetails->setCap('e100-submgmt');
+
+            # Sub: Find state name entries
+            foreach my $stateIDX ( $devdetails->getSnmpIndices( $dd->oiddef(
+					'subscriberStateName') ) )
+            {
+               my $state = $subTable->{
+                              $dd->oiddef('subscriberStateName') .
+                              '.' .  $stateIDX
+                           };
+               
+               Debug("  State index: $stateIDX, name: $state");
+               $data->{'e100'}{'submgmt'}{$stateIDX} = $state;
             }
           }
         }
@@ -661,9 +711,9 @@ sub buildConfig
                     Debug("  loginReps: $sindex");
 		
                     $cb->addLeaf( $nodeTree, 'Login_' . $sindex,
-                                   { 'comment'   => 'Login #' . $sindex,
-                                     'login-idx' => $sindex,
-                                     'precednce' => 100 - $sindex },
+                                   { 'comment'    => 'Login #' . $sindex,
+                                     'login-idx'  => $sindex,
+                                     'precedence' => 100 - $sindex },
                                    [ 'Arbor_E::e30-fwdTable-login' ] );
                 } # END: foreach $sindex
             } # END: hasCap e30-fwdTable-login
@@ -837,6 +887,39 @@ sub buildConfig
                              [ 'Arbor_E::e100-mem' ] );
             }
         }
+
+        # PolicyMmgt: Information regarding delta, service bundles, subnets
+        if( $devdetails->hasCap('e100-policymgmt') )
+        {
+            $cb->addTemplateApplication($devNode, 'Arbor_E::e100-policymgmt');
+        }
+
+        # SubscriberMgmt: Information regarding subscriber counts, states, etc.
+        if( $devdetails->hasCap('e100-submgmt') )
+        {
+            my $subMgmtTree = $cb->addTemplateApplication($devNode,
+                                             'Arbor_E::e100-submgmt-subtree'
+                              );
+
+            my $mgmtName   = "Subscriber_State";
+            my $stateTree  = $cb->addSubtree( $subMgmtTree, $mgmtName,
+                                    undef,
+                                    [ 'Arbor_E::e100-submgmt-state-subtree' ]
+                             );
+            foreach my $stateIDX ( sort keys %{$data->{'e100'}{'submgmt'}} )
+            {
+                next;
+                my $stateName = $data->{'e100'}{'submgmt'}{$stateIDX};
+
+                my $stateNode = $cb->addLeaf( $stateTree, $stateName,
+                                   { 'comment'    => "State: $stateName",
+                                     'state-idx'  => $stateIDX,
+                                     'state-name' => $stateName,
+                                     'precedence' => 100 - $stateIDX },
+                                   [ 'Arbor_E::e100-e100-submgmt-state' ] );
+                Debug(" template: $stateIDX, $stateName");
+            }
+        }
     }
 
     # -------------------------------------------------------------------------
@@ -846,7 +929,7 @@ sub buildConfig
     if( $devdetails->hasCap('arbor-bundle') )
     {
         my $subtreeName = "Bundle_Offer_Stats";
-        my $param       = { 'comment'    => 'byte counts for each bundle ' . 
+        my $param       = { 'comment'    => 'Byte counts for each bundle ' . 
                                             'per Offer' };
         my $templates   = [ ];
         my $nodeTop     = $cb->addSubtree( $devNode, $subtreeName,

@@ -155,6 +155,29 @@
   <def name="boBundleBytesReceivedRateLimitDrop" 
                                         value="1.3.6.1.4.1.3813.1.4.12.2.1.25"/>
 
+  <!-- ELLACOYA-MIB::policyMgmt -->
+  <def name="deltaOperationsReceived"   value="1.3.6.1.4.1.3813.1.4.16.2.0"/>
+  <def name="deltaOperationsProcessed"  value="1.3.6.1.4.1.3813.1.4.16.3.0"/>
+  <def name="serviceProfileTblCapacity" value="1.3.6.1.4.1.3813.1.4.16.4.0"/>
+  <def name="serviceProfileTblUsage"    value="1.3.6.1.4.1.3813.1.4.16.5.0"/>
+  <def name="serviceBundleTblCapacity"  value="1.3.6.1.4.1.3813.1.4.16.6.0"/>
+  <def name="serviceBundleTblUsage"     value="1.3.6.1.4.1.3813.1.4.16.7.0"/>
+  <def name="policyTblCapacity"         value="1.3.6.1.4.1.3813.1.4.16.8.0"/>
+  <def name="policyTblUsage"            value="1.3.6.1.4.1.3813.1.4.16.9.0"/>
+  <def name="subnetGrpTblCapacity"      value="1.3.6.1.4.1.3813.1.4.16.10.0"/>
+  <def name="subnetGrpTblUsage"         value="1.3.6.1.4.1.3813.1.4.16.11.0"/>
+
+  <!-- ELLACOYA-MIB::subscriberMgmt -->
+  <def name="subscriberMgmtTblCapacity"   value="1.3.6.1.4.1.3813.1.4.17.1.0"/>
+  <def name="subscriberMgmtTblUsage"      value="1.3.6.1.4.1.3813.1.4.17.2.0"/>
+  <def name="subscriberNameTblCapacity"   value="1.3.6.1.4.1.3813.1.4.17.3.0"/>
+  <def name="subscriberNameTblUsage"      value="1.3.6.1.4.1.3813.1.4.17.4.0"/>
+  <def name="identifiedSubscriberCount"   value="1.3.6.1.4.1.3813.1.4.17.5.0"/>
+  <def name="unidentifiedSubscriberCount" value="1.3.6.1.4.1.3813.1.4.17.6.0"/>
+
+  <def name="subscriberStateCount"      value="1.3.6.1.4.1.3813.1.4.17.7.1.3"/>
+  <def name="subscriberIdAttemptsCount" value="1.3.6.1.4.1.3813.1.4.17.9.1.2"/>
+
   <!-- ELLACOYA-MIB::l2tp -->
   <def name="l2tpAllocTags"       value="1.3.6.1.4.1.3813.1.4.18.3.1.1.0" />
   <def name="l2tpIPDefaultTags"   value="1.3.6.1.4.1.3813.1.4.18.3.1.2.0" />
@@ -1602,6 +1625,380 @@
       <param name="rrd-ds"            value="cpuSdramUsage"/>
       <param name="snmp-object"       value="$cpuSdramUsage.%mem-index%"/>
     </leaf>
+  </template>
+
+  <template name="e100-policymgmt">
+    <subtree name="Policy_Management">
+      <param name="comment"           value="Policy Statistics"/>
+      <param name="data-file"         value="%system-id%_policy.rrd"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts"     value="usage"/>
+      <!-- Table usage -->
+      <param name="overview-subleave-name-usage"    value="Usage"/>
+      <param name="overview-direct-link-usage"      value="yes"/>
+      <param name="overview-direct-link-view-usage" value="expanded-dir-html"/>
+      <param name="overview-shortcut-text-usage"    value="Table Usage"/>
+      <param name="overview-shortcut-title-usage"
+             value="Show table usage for all"/>
+      <param name="overview-page-title-usage"       value="Table Usage"/>
+
+      <subtree name="Delta_Operations">
+        <param name="precedence"       value="4"/>
+        <param name="comment"          value="Delta processing"/>
+
+        <leaf name="Usage">
+          <param name="precedence"        value="1000"/>
+          <param name="comment"           value="Delta: Received vs Processed"/>
+          <param name="graph-title"       value="Delta: Received vs Processed"/>
+          <param name="vertical-label"    value="Delta count"/>
+          <param name="ds-type"           value="rrd-multigraph"/>
+          <param name="ds-names"          value="recv,proc"/>
+          <param name="graph-lower-limit" value="0"/>
+          <!-- Total Capacity Size -->
+          <param name="ds-expr-recv"      value="{Received}"/>
+          <param name="graph-legend-recv" value="Received"/>
+          <param name="line-style-recv"   value="##two"/>
+          <param name="line-color-recv"   value="##two"/>
+          <param name="line-order-recv"   value="1"/>
+          <!-- Used Capacity Size -->
+          <param name="ds-expr-proc"      value="{Processed}"/>
+          <param name="graph-legend-proc" value="Processed"/>
+          <param name="line-style-proc"   value="##three"/>
+          <param name="line-color-proc"   value="##three"/>
+          <param name="line-order-proc"   value="2"/>
+        </leaf>
+
+        <leaf name="Received">
+          <param name="precedence"     value="402"/>
+          <param name="comment"        value="Delta ops received from CM"/>
+          <param name="graph-legend"   value="Number of deltas received"/>
+          <param name="graph-title"    value="Delta operations received"/>
+          <param name="vertical-label" value="Deltas"/>
+          <param name="rrd-ds"         value="deltaRecv"/>
+          <param name="snmp-object"    value="$deltaOperationsReceived"/>
+        </leaf>
+
+        <leaf name="Processed">
+          <param name="precedence"     value="401"/>
+          <param name="comment"        value="Delta ops processed by e100"/>
+          <param name="graph-legend"   value="Number of deltas processed"/>
+          <param name="graph-title"    value="Delta operations processed"/>
+          <param name="vertical-label" value="Deltas"/>
+          <param name="rrd-ds"         value="deltaProc"/>
+          <param name="snmp-object"    value="$deltaOperationsProcessed"/>
+        </leaf>
+      </subtree>
+
+      <subtree name="Service_Profile">
+        <param name="precedence"         value="3"/>
+        <param name="comment"            value="Service profile statistics"/>
+        <param name="graph-lower-limit"  value="0"/>
+
+        <leaf name="Usage">
+          <param name="precedence"         value="1000"/>
+          <param name="comment"            value="Profile: Total vs Used"/>
+          <param name="graph-title"        value="Profile: Total vs Used"/>
+          <param name="vertical-label"     value="Number"/>
+          <param name="ds-type"            value="rrd-multigraph"/>
+          <param name="ds-names"           value="cap,use"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <!-- Total Capacity Size -->
+          <param name="ds-expr-cap"        value="{Table_Capacity}"/>
+          <param name="graph-legend-cap"   value="Total"/>
+          <param name="line-style-cap"     value="##totalresource"/>
+          <param name="line-color-cap"     value="##totalresource"/>
+          <param name="line-order-cap"     value="1"/>
+          <!-- Used Capacity Size -->
+          <param name="ds-expr-use"        value="{Table_Usage}"/>
+          <param name="graph-legend-use"   value="Used"/>
+          <param name="line-style-use"     value="##resourceusage"/>
+          <param name="line-color-use"     value="##resourceusage"/>
+          <param name="line-order-use"     value="2"/>
+        </leaf>
+
+        <leaf name="Table_Capacity">
+          <param name="precdecence"    value="302"/>
+          <param name="comment"        value="Number of total entries allowed"/>
+          <param name="graph-legend"   value="Total number of entries"/>
+          <param name="graph-title"    value="Service profile capacity"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="srvProfileTblCap"/>
+          <param name="snmp-object"    value="$serviceProfileTblCapacity"/>
+        </leaf>
+
+        <leaf name="Table_Usage">
+          <param name="precdecence"    value="301"/>
+          <param name="comment"        value="Number of total entries used"/>
+          <param name="graph-legend"   value="current number of entries"/>
+          <param name="graph-title"    value="Service profile usage"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="srvProfileTblUse"/>
+          <param name="snmp-object"    value="$serviceProfileTblUsage"/>
+        </leaf>
+      </subtree>
+
+      <subtree name="Service_Bundle">
+        <param name="precedence"         value="2"/>
+        <param name="comment"            value="Service bundle statistics"/>
+        <param name="graph-lower-limit"  value="0"/>
+
+        <leaf name="Usage">
+          <param name="precedence"         value="1000"/>
+          <param name="comment"            value="Bundles: Total vs Used"/>
+          <param name="graph-title"        value="Bundles: Total vs Used"/>
+          <param name="vertical-label"     value="Number"/>
+          <param name="ds-type"            value="rrd-multigraph"/>
+          <param name="ds-names"           value="cap,use"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <!-- Total Capacity Size -->
+          <param name="ds-expr-cap"        value="{Table_Capacity}"/>
+          <param name="graph-legend-cap"   value="Total"/>
+          <param name="line-style-cap"     value="##totalresource"/>
+          <param name="line-color-cap"     value="##totalresource"/>
+          <param name="line-order-cap"     value="1"/>
+          <!-- Used Capacity Size -->
+          <param name="ds-expr-use"        value="{Table_Usage}"/>
+          <param name="graph-legend-use"   value="Used"/>
+          <param name="line-style-use"     value="##resourceusage"/>
+          <param name="line-color-use"     value="##resourceusage"/>
+          <param name="line-order-use"     value="2"/>
+        </leaf>
+
+        <leaf name="Table_Capacity">
+          <param name="precdecence"    value="202"/>
+          <param name="comment"        value="Number of total entries allowed"/>
+          <param name="graph-legend"   value="Total number of entries"/>
+          <param name="graph-title"    value="Service bundle capacity"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="srvBundleTblCap"/>
+          <param name="snmp-object"    value="$serviceBundleTblCapacity"/>
+        </leaf>
+
+        <leaf name="Table_Usage">
+          <param name="precdecence"    value="201"/>
+          <param name="comment"        value="Number of total entries used"/>
+          <param name="graph-legend"   value="current number of entries"/>
+          <param name="graph-title"    value="Service bundle usage"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="srvBundleTblUse"/>
+          <param name="snmp-object"    value="$serviceBundleTblUsage"/>
+        </leaf>
+      </subtree>
+
+      <subtree name="Subnet_Group">
+        <param name="precedence"         value="1"/>
+        <param name="comment"            value="Subnet group statistics"/>
+        <param name="graph-lower-limit"  value="0"/>
+
+        <leaf name="Usage">
+          <param name="precedence"         value="1000"/>
+          <param name="comment"            value="Subnets: Total vs Used"/>
+          <param name="graph-title"        value="Subnets: Total vs Used"/>
+          <param name="vertical-label"     value="Number"/>
+          <param name="ds-type"            value="rrd-multigraph"/>
+          <param name="ds-names"           value="cap,use"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <!-- Total Capacity Size -->
+          <param name="ds-expr-cap"        value="{Table_Capacity}"/>
+          <param name="graph-legend-cap"   value="Total"/>
+          <param name="line-style-cap"     value="##totalresource"/>
+          <param name="line-color-cap"     value="##totalresource"/>
+          <param name="line-order-cap"     value="1"/>
+          <!-- Used Capacity Size -->
+          <param name="ds-expr-use"        value="{Table_Usage}"/>
+          <param name="graph-legend-use"   value="Used"/>
+          <param name="line-style-use"     value="##resourceusage"/>
+          <param name="line-color-use"     value="##resourceusage"/>
+          <param name="line-order-use"     value="2"/>
+        </leaf>
+
+        <leaf name="Table_Capacity">
+          <param name="precdecence"    value="102"/>
+          <param name="comment"        value="Number of total entries allowed"/>
+          <param name="graph-legend"   value="Total number of entries"/>
+          <param name="graph-title"    value="Subnet group capacity"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="subnetGrpTblCap"/>
+          <param name="snmp-object"    value="$subnetGrpTblCapacity"/>
+        </leaf>
+
+        <leaf name="Table_Usage">
+          <param name="precdecence"    value="101"/>
+          <param name="comment"        value="Number of total entries used"/>
+          <param name="graph-legend"   value="current number of entries"/>
+          <param name="graph-title"    value="Subnet group usage"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="subnetGrpTblUse"/>
+          <param name="snmp-object"    value="$subnetGrpTblUsage"/>
+        </leaf>
+      </subtree>
+    </subtree>
+  </template>
+
+  <template name="e100-submgmt-subtree">
+    <subtree name="Subscribers">
+      <param name="comment"           value="Subscriber Statistics"/>
+      <param name="data-file"         value="%system-id%_subs.rrd"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts"     value="usage"/>
+      <!-- Table usage -->
+      <param name="overview-subleave-name-usage"    value="Usage"/>
+      <param name="overview-direct-link-usage"      value="yes"/>
+      <param name="overview-direct-link-view-usage" value="expanded-dir-html"/>
+      <param name="overview-shortcut-text-usage"    value="Table Usage"/>
+      <param name="overview-shortcut-title-usage"
+             value="Show table usage for all"/>
+      <param name="overview-page-title-usage"       value="Table Usage"/>
+
+      <subtree name="Subscriber_Management">
+        <param name="precedence"         value="3"/>
+        <param name="comment"            value="Subscriber management stats"/>
+        <param name="graph-lower-limit"  value="0"/>
+
+        <leaf name="Usage">
+          <param name="precedence"         value="1000"/>
+          <param name="comment"            value="Sub Mgmt: Total vs Used"/>
+          <param name="graph-title"        value="Sub Mgmt: Total vs Used"/>
+          <param name="vertical-label"     value="Number"/>
+          <param name="ds-type"            value="rrd-multigraph"/>
+          <param name="ds-names"           value="cap,use"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <!-- Total Capacity Size -->
+          <param name="ds-expr-cap"        value="{Table_Capacity}"/>
+          <param name="graph-legend-cap"   value="Total"/>
+          <param name="line-style-cap"     value="##totalresource"/>
+          <param name="line-color-cap"     value="##totalresource"/>
+          <param name="line-order-cap"     value="1"/>
+          <!-- Used Capacity Size -->
+          <param name="ds-expr-use"        value="{Table_Usage}"/>
+          <param name="graph-legend-use"   value="Used"/>
+          <param name="line-style-use"     value="##resourceusage"/>
+          <param name="line-color-use"     value="##resourceusage"/>
+          <param name="line-order-use"     value="2"/>
+        </leaf>
+
+        <leaf name="Table_Capacity">
+          <param name="precdecence"    value="302"/>
+          <param name="comment"        value="Number of total entries allowed"/>
+          <param name="graph-legend"   value="Total number of entries"/>
+          <param name="graph-title"    value="Subscriber management capacity"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="subMgmtTblCap"/>
+          <param name="snmp-object"    value="$subscriberMgmtTblCapacity"/>
+        </leaf>
+
+        <leaf name="Table_Usage">
+          <param name="precdecence"    value="301"/>
+          <param name="comment"        value="Number of total entries used"/>
+          <param name="graph-legend"   value="current number of entries"/>
+          <param name="graph-title"    value="Subscriber management usage"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="subMgmtTblUsage"/>
+          <param name="snmp-object"    value="$subscriberMgmtTblUsage"/>
+        </leaf>
+      </subtree>
+
+      <subtree name="Subscriber_Name">
+        <param name="precedence"         value="2"/>
+        <param name="comment"            value="Subscriber name stats"/>
+        <param name="graph-lower-limit"  value="0"/>
+
+        <leaf name="Usage">
+          <param name="precedence"         value="1000"/>
+          <param name="comment"            value="Sub Mgmt: Total vs Used"/>
+          <param name="graph-title"        value="Sub Mgmt: Total vs Used"/>
+          <param name="vertical-label"     value="Number"/>
+          <param name="ds-type"            value="rrd-multigraph"/>
+          <param name="ds-names"           value="cap,use"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <!-- Total Capacity Size -->
+          <param name="ds-expr-cap"        value="{Table_Capacity}"/>
+          <param name="graph-legend-cap"   value="Total"/>
+          <param name="line-style-cap"     value="##totalresource"/>
+          <param name="line-color-cap"     value="##totalresource"/>
+          <param name="line-order-cap"     value="1"/>
+          <!-- Used Capacity Size -->
+          <param name="ds-expr-use"        value="{Table_Usage}"/>
+          <param name="graph-legend-use"   value="Used"/>
+          <param name="line-style-use"     value="##resourceusage"/>
+          <param name="line-color-use"     value="##resourceusage"/>
+          <param name="line-order-use"     value="2"/>
+        </leaf>
+
+        <leaf name="Table_Capacity">
+          <param name="precdecence"    value="202"/>
+          <param name="comment"        value="Number of total entries allowed"/>
+          <param name="graph-legend"   value="Total number of entries"/>
+          <param name="graph-title"    value="Subscriber name capacity"/>
+          <param name="upper-limt"     value="800000"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="subNameTblCap"/>
+          <param name="snmp-object"    value="$subscriberNameTblCapacity"/>
+        </leaf>
+
+        <leaf name="Table_Usage">
+          <param name="precdecence"    value="201"/>
+          <param name="comment"        value="Number of total entries used"/>
+          <param name="graph-legend"   value="current number of entries"/>
+          <param name="graph-title"    value="Subscriber name usage"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="subNameTblUsage"/>
+          <param name="snmp-object"    value="$subscriberNameTblUsage"/>
+        </leaf>
+      </subtree>
+
+      <subtree name="Subscriber_Count">
+        <param name="precedence"         value="1"/>
+        <param name="comment"            value="Subscriber identification"/>
+        <param name="graph-lower-limit"  value="0"/>
+
+        <leaf name="Usage">
+          <param name="precedence"         value="1000"/>
+          <param name="comment"            value="Sub: Identified vs non"/>
+          <param name="graph-title"        value="Sub: Identified vs non"/>
+          <param name="vertical-label"     value="Subscribers"/>
+          <param name="ds-type"            value="rrd-multigraph"/>
+          <param name="ds-names"           value="id,unid"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <!-- Subscribers Identified -->
+          <param name="ds-expr-id"        value="{Identified}"/>
+          <param name="graph-legend-id"   value="Identified"/>
+          <param name="line-style-id"     value="##totalresource"/>
+          <param name="line-color-id"     value="##totalresource"/>
+          <param name="line-order-id"     value="1"/>
+          <!-- Subscribers unidentified -->
+          <param name="ds-expr-unid"      value="{Unidentified}"/>
+          <param name="graph-legend-unid" value="Unidentified"/>
+          <param name="line-style-unid"   value="##resourceusage"/>
+          <param name="line-color-unid"   value="##resourceusage"/>
+          <param name="line-order-unid"   value="2"/>
+        </leaf>
+
+        <leaf name="Identified">
+          <param name="precdecence"    value="202"/>
+          <param name="comment"        value="Number of identified subs"/>
+          <param name="graph-legend"   value="Identified subscribers"/>
+          <param name="graph-title"    value="Total identified subscribers"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="idSubCount"/>
+          <param name="snmp-object"    value="$identifiedSubscriberCount"/>
+        </leaf>
+
+        <leaf name="Unidentified">
+          <param name="precdecence"    value="201"/>
+          <param name="comment"        value="Number of unidentified subs"/>
+          <param name="graph-legend"   value="Unidentified subscribers"/>
+          <param name="graph-title"    value="Total unidentified subscribers"/>
+          <param name="vertical-label" value="Entries"/>
+          <param name="rrd-ds"         value="unidSubCount"/>
+          <param name="snmp-object"    value="$unidentifiedSubscriberCount"/>
+        </leaf>
+      </subtree>
+    </subtree>
   </template>
 
 

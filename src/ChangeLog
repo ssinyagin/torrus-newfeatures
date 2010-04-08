@@ -1,3 +1,8 @@
+2010-04-08  Jon Nistor  <nistor@snickers.org>
+        * perllib/Torrus/DevDiscover/Arbor_E.pm:
+        New parameter: Arbor_E::disable-e100-policymgmt, disable-e100-submgmt
+        Added policy management and subscriber information
+
 2010-04-07  Jon Nistor  <nistor@snickers.org>
 
         * perllib/Torrus/DevDiscover/Arbor_E.pm:

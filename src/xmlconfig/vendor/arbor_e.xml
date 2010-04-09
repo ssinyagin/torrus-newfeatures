@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-   Copyright (C) 2008 Jon Nistor
+   Copyright (C) 2008-2010 Jon Nistor
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -1049,7 +1049,6 @@
         <param name="graph-title"       value="%system-id%: Hdd logs"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
 
-
         <leaf name="Daily_Log_Size">
           <param name="comment"           value="Size of daily log directory"/>
           <param name="graph-legend"      value="Size of daily log directory"/>
@@ -1661,13 +1660,13 @@
           <!-- Total Capacity Size -->
           <param name="ds-expr-recv"      value="{Received}"/>
           <param name="graph-legend-recv" value="Received"/>
-          <param name="line-style-recv"   value="##two"/>
+          <param name="line-style-recv"   value="LINE1"/>
           <param name="line-color-recv"   value="##two"/>
           <param name="line-order-recv"   value="1"/>
           <!-- Used Capacity Size -->
           <param name="ds-expr-proc"      value="{Processed}"/>
           <param name="graph-legend-proc" value="Processed"/>
-          <param name="line-style-proc"   value="##three"/>
+          <param name="line-style-proc"   value="LINE1"/>
           <param name="line-color-proc"   value="##three"/>
           <param name="line-order-proc"   value="2"/>
         </leaf>
@@ -1722,20 +1721,20 @@
 
         <leaf name="Table_Capacity">
           <param name="precdecence"    value="302"/>
-          <param name="comment"        value="Number of total entries allowed"/>
-          <param name="graph-legend"   value="Total number of entries"/>
+          <param name="comment"       value="Number of total profiles allowed"/>
+          <param name="graph-legend"   value="Total number of profiles"/>
           <param name="graph-title"    value="Service profile capacity"/>
-          <param name="vertical-label" value="Entries"/>
+          <param name="vertical-label" value="Profiles"/>
           <param name="rrd-ds"         value="srvProfileTblCap"/>
           <param name="snmp-object"    value="$serviceProfileTblCapacity"/>
         </leaf>
 
         <leaf name="Table_Usage">
           <param name="precdecence"    value="301"/>
-          <param name="comment"        value="Number of total entries used"/>
-          <param name="graph-legend"   value="current number of entries"/>
+          <param name="comment"        value="Number of total profiles used"/>
+          <param name="graph-legend"   value="current number of profiles"/>
           <param name="graph-title"    value="Service profile usage"/>
-          <param name="vertical-label" value="Entries"/>
+          <param name="vertical-label" value="Profiles"/>
           <param name="rrd-ds"         value="srvProfileTblUse"/>
           <param name="snmp-object"    value="$serviceProfileTblUsage"/>
         </leaf>
@@ -1770,20 +1769,20 @@
 
         <leaf name="Table_Capacity">
           <param name="precdecence"    value="202"/>
-          <param name="comment"        value="Number of total entries allowed"/>
-          <param name="graph-legend"   value="Total number of entries"/>
+          <param name="comment"        value="Number of total bundles allowed"/>
+          <param name="graph-legend"   value="Total number of bundles"/>
           <param name="graph-title"    value="Service bundle capacity"/>
-          <param name="vertical-label" value="Entries"/>
+          <param name="vertical-label" value="Bundles"/>
           <param name="rrd-ds"         value="srvBundleTblCap"/>
           <param name="snmp-object"    value="$serviceBundleTblCapacity"/>
         </leaf>
 
         <leaf name="Table_Usage">
           <param name="precdecence"    value="201"/>
-          <param name="comment"        value="Number of total entries used"/>
-          <param name="graph-legend"   value="current number of entries"/>
+          <param name="comment"        value="Number of total bundles used"/>
+          <param name="graph-legend"   value="current number of bundles"/>
           <param name="graph-title"    value="Service bundle usage"/>
-          <param name="vertical-label" value="Entries"/>
+          <param name="vertical-label" value="Bundles"/>
           <param name="rrd-ds"         value="srvBundleTblUse"/>
           <param name="snmp-object"    value="$serviceBundleTblUsage"/>
         </leaf>
@@ -1818,26 +1817,27 @@
 
         <leaf name="Table_Capacity">
           <param name="precdecence"    value="102"/>
-          <param name="comment"        value="Number of total entries allowed"/>
+          <param name="comment"        value="Number of total subnets allowed"/>
           <param name="graph-legend"   value="Total number of entries"/>
           <param name="graph-title"    value="Subnet group capacity"/>
-          <param name="vertical-label" value="Entries"/>
+          <param name="vertical-label" value="Subnets"/>
           <param name="rrd-ds"         value="subnetGrpTblCap"/>
           <param name="snmp-object"    value="$subnetGrpTblCapacity"/>
         </leaf>
 
         <leaf name="Table_Usage">
           <param name="precdecence"    value="101"/>
-          <param name="comment"        value="Number of total entries used"/>
+          <param name="comment"        value="Number of total subnets used"/>
           <param name="graph-legend"   value="current number of entries"/>
           <param name="graph-title"    value="Subnet group usage"/>
-          <param name="vertical-label" value="Entries"/>
+          <param name="vertical-label" value="Subnets"/>
           <param name="rrd-ds"         value="subnetGrpTblUse"/>
           <param name="snmp-object"    value="$subnetGrpTblUsage"/>
         </leaf>
       </subtree>
     </subtree>
   </template>
+
 
   <template name="e100-submgmt-subtree">
       <param name="comment"           value="Subscriber Statistics"/>
@@ -2001,11 +2001,13 @@
       </subtree>
   </template>
 
+
   <template name="e100-submgmt-state-subtree">
     <param name="comment"           value="Subscriber State Statistics"/>
     <param name="data-file"         value="%system-id%_subs_state.rrd"/>
     <param name="precedence"        value="1"/>
   </template>
+
 
   <template name="e100-submgmt-state">
     <param name="data-file"         value="%system-id%_subs_state.rrd"/>
@@ -2017,6 +2019,7 @@
     <param name="rrd-create-dstype" value="GAUGE"/>
     <param name="snmp-object"       value="$subscriberStateCount.%state-idx%"/>
   </template>
+
 
   <!--
    **************************************************************************
@@ -2068,23 +2071,22 @@
 
   <template name="arbor-bundle">
     <leaf name="Volume">
-      <param name="comment"
-                     value="InOut volume in kilobytes/s"/>
-      <param name="precedence"          value="1000"/>
-      <param name="ds-type"             value="rrd-multigraph"/>
-      <param name="ds-names"            value="down,up"/>
+      <param name="comment"           value="InOut volume in kilobytes/s"/>
+      <param name="precedence"        value="1000"/>
+      <param name="ds-type"           value="rrd-multigraph"/>
+      <param name="ds-names"          value="down,up"/>
       <!-- Volume Download -->
-      <param name="ds-expr-down"        value="{DownVolume},8,*"/>
-      <param name="graph-legend-down"   value="Bits per second in"/>
-      <param name="line-style-down"     value="##BpsIn"/>
-      <param name="line-color-down"     value="##BpsIn"/>
-      <param name="line-order-down"     value="1"/>
+      <param name="ds-expr-down"      value="{DownVolume},8,*"/>
+      <param name="graph-legend-down" value="Bits per second in"/>
+      <param name="line-style-down"   value="##BpsIn"/>
+      <param name="line-color-down"   value="##BpsIn"/>
+      <param name="line-order-down"   value="1"/>
       <!-- Volume Upload -->
-      <param name="ds-expr-up"          value="{UpVolume},8,*"/>
-      <param name="graph-legend-up"     value="Bits per second out"/>
-      <param name="line-style-up"       value="##BpsOut"/>
-      <param name="line-color-up"       value="##BpsOut"/>
-      <param name="line-order-up"       value="2"/>
+      <param name="ds-expr-up"        value="{UpVolume},8,*"/>
+      <param name="graph-legend-up"   value="Bits per second out"/>
+      <param name="line-style-up"     value="##BpsOut"/>
+      <param name="line-color-up"     value="##BpsOut"/>
+      <param name="line-order-up"     value="2"/>
     </leaf>
 
     <leaf name="UpVolume">
@@ -2454,13 +2456,13 @@
 
       <!--
         PER PACKET SIZES
-           only      64
-           65   to  127 
-           128  to  255
-           256  to  511
-           512  to 1023
-           1024 to 1518
-           1519 to higher
+                      64 (only 64byte)
+           65   to   127 
+           128  to   255
+           256  to   511
+           512  to  1023
+           1024 to  1518
+           1519 and higher
        --> 
 
       <leaf name="64Byte_Up">
@@ -2684,7 +2686,6 @@
             value="$flowPoolName.%flowdev-index%.1.1.4.%flowpool-index%"/>
     </leaf>
   </template>
-  
 
 
 </datasources>

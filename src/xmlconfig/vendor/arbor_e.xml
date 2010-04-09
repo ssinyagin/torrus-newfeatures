@@ -458,6 +458,7 @@
     <param name="data-file"     value="%system-id%_fwdTable_login.rrd"/>
     <param name="graph-title"   value="%system-id%: Login attempt %login-idx%"/>
     <param name="graph-legend"  value="Num of attempts"/>
+    <param name="rrd-create-dstype" value="COUNTER"/>
     <param name="rrd-ds"        value="login_%login-idx%"/>
     <param name="snmp-object"   value="$loginRespOkStatsCount.%login-idx%"/>
   </template>
@@ -1454,9 +1455,10 @@
 
   <template name="e100-cpu">
     <param name="comment"           value="CPU Utilization on %cpu-name%"/>
+    <param name="graph-legend"      value="CPU usage"/>
+    <param name="graph-title"       value="CPU: %cpu-name%"/>
     <param name="rrd-ds"            value="%cpu-name%"/>
     <param name="snmp-object"       value="$cpuUtil.%cpu-index%"/>
-    <param name="graph-legend"      value="CPU usage"/>
   </template>
 
   <template name="e100-hdd-subtree">

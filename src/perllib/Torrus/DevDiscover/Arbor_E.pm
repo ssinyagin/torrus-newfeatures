@@ -147,6 +147,11 @@ our %eCpuName =
         '7'  => 'I/O Module'
     );
 
+my @colors =
+    ('##one', '##two', '##three', '##four', '##five',
+     '##six', '##seven', '##eight', '##nine', '##ten'
+    );
+
 sub checkdevtype
 {
     my $dd = shift;
@@ -692,7 +697,6 @@ sub buildConfig
         }
 
         # e30 forwarding table
-        # NOTE: for future devel
         if( $devdetails->hasCap('e30-fwdTable') )
         {
             $cb->addTemplateApplication($devNode, 'Arbor_E::e30-fwdTable');
@@ -705,17 +709,45 @@ sub buildConfig
                                               { 'comment' => $comment },
                                                 undef );
 
+                my $multiParam = {
+                    'precedence'        => 1000,
+                    'comment'           => 'Summary of login attempt responses',
+                    'graph-lower-limit' => 0,
+                    'graph-title'       => 'Summary of login attempt responses',
+                    'rrd-hwpredict'     => 'disabled',
+                    'vertical-label'    => 'Responses',
+                    'ds-type'           => 'rrd-multigraph'
+                    };
+                my $dsList;
+
                 foreach my $sindex ( sort { $a <=> $b } 
                                      @{$data->{'e30'}{'loginResp'}} )
                 {
                     Debug("  loginReps: $sindex");
 		
                     $cb->addLeaf( $nodeTree, 'Login_' . $sindex,
-                                   { 'comment'    => 'Login #' . $sindex,
-                                     'login-idx'  => $sindex,
-                                     'precedence' => 100 - $sindex },
-                                   [ 'Arbor_E::e30-fwdTable-login' ] );
+                                { 'comment'    => 'Login attempt #' . $sindex,
+                                  'login-idx'  => $sindex,
+                                  'precedence' => 100 - $sindex },
+                                [ 'Arbor_E::e30-fwdTable-login' ] );
+
+                    # Addition for multi-graph
+                    my $dsName  = "Login_$sindex";
+                    my $color   = shift @colors;
+                       $dsList .= $dsName . ',';
+
+                    $multiParam->{"ds-expr-$dsName"}      = "{$dsName}";
+                    $multiParam->{"graph-legend-$dsName"} = "Attempt $sindex";
+                    $multiParam->{"line-style-$dsName"}   = "LINE1";
+                    $multiParam->{"line-color-$dsName"}   = $color;
+                    $multiParam->{"line-order-$dsName"}   = $sindex;
                 } # END: foreach $sindex
+
+                $dsList =~ s/,$//o;	# Remove final comma
+                $multiParam->{'ds-names'} = $dsList;
+
+                $cb->addLeaf($nodeTree, 'Summary', $multiParam, undef );
+
             } # END: hasCap e30-fwdTable-login
         } # END: hasCap e30-fwdTable
 
@@ -906,8 +938,22 @@ sub buildConfig
                                       [ 'Arbor_E::e100-submgmt-state-subtree' ]
                              );
 
+            # State: Multigraph display
+
+            my $multiParam = {
+                'precedence'        => 1000,
+                'graph-lower-limit' => 0,
+                'graph-title'       => 'Summary of subscriber states',
+                'rrd-hwpredict'     => 'disabled',
+                'vertical-label'    => 'Subscribers',
+                'comment'           => 'Summary of all states',
+                'ds-type'           => 'rrd-multigraph'
+            };
+            my $dsList;
+
             foreach my $stateIDX ( sort keys %{$data->{'e100'}{'submgmt'}} )
             {
+                my $color        = shift @colors;
                 my $stateName    =  $data->{'e100'}{'submgmt'}{$stateIDX};
                 my $stateNameRRD =  $stateName;
                    $stateNameRRD =~ s/[^a-zA-Z_]/_/o;
@@ -919,7 +965,19 @@ sub buildConfig
                                      'state-rrd'  => $stateNameRRD,
                                      'precedence' => 100 - $stateIDX },
                                    [ 'Arbor_E::e100-submgmt-state' ] );
+                $dsList .= $stateName . ',';
+
+                $multiParam->{"ds-expr-$stateName"}      = "{$stateName}";
+                $multiParam->{"graph-legend-$stateName"} = "$stateName";
+                $multiParam->{"line-style-$stateName"}   = "LINE1";
+                $multiParam->{"line-color-$stateName"}   = $color,
+                $multiParam->{"line-order-$stateName"}   = $stateIDX;
             }
+            $dsList =~ s/,$//o;
+            $multiParam->{'ds-names'} = $dsList;
+
+            $cb->addLeaf($stateTree, 'Summary', $multiParam, undef );
+
         }
     }
 

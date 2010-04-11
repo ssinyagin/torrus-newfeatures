@@ -123,7 +123,7 @@ sub process
     my $tree = $path_info;
     $tree =~ s/^.*\/(.*)$/$1/;
 
-    if( $Torrus::ApacheHandler::authorizeUsers )
+    if( $Torrus::CGI::authorizeUsers )
     {
         my $ses_id = $q->cookie('SESSION_ID');
 
@@ -167,7 +167,7 @@ sub process
 
         if( $q->param('remember') )
         {
-            $cookie{'-expires'} = '+365d';
+            $cookie{'-expires'} = '+1y';
         }
             
         push(@cookies, $q->cookie(%cookie));

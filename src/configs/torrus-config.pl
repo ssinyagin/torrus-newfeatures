@@ -268,10 +268,6 @@ $Torrus::Renderer::globalSearchEnabled = 1;
 # Do we need Web user authentication/authorization ?
 $Torrus::CGI::authorizeUsers = 1;
 
-# Permit anonymous access to some graphs and HTML pages
-$Torrus::CGI::allowAnonym = 1;
-
-
 # User authentication method may be changed locally
 $Torrus::ACL::userAuthModule = 'Torrus::ACL::AuthLocalMD5';
 

@@ -276,7 +276,7 @@
           <leaf name="Usage">
             <param name="precedence"         value="1000"/>
             <param name="comment"            value="Total vs Used"/>
-            <param name="graph-title"        value="Total vs Used"/>
+            <param name="graph-title"        value="Total vs Used: L3 Entries"/>
             <param name="vertical-label"     value="entries"/>
             <param name="ds-type"            value="rrd-multigraph"/>
             <param name="ds-names"           value="total,used"/>
@@ -297,21 +297,23 @@
           </leaf>
 
           <leaf name="Total">
-            <param name="precedence"        value="902"/>
-            <param name="comment"           value="Total L3 UserTable entries"/>
-            <param name="graph-legend"      value="Total L3 UserTable entries"/>
-            <param name="vertical-label"    value="entries"/>
-            <param name="rrd-ds"            value="l3UserTblCapacity"/>
-            <param name="snmp-object"       value="$l3UserTblCapacity"/>
+            <param name="precedence"     value="902"/>
+            <param name="comment"        value="Total L3 User Table"/>
+            <param name="graph-legend"   value="Total L3 User Table"/>
+            <param name="graph-title"    value="Total L3 User Table"/>
+            <param name="vertical-label" value="entries"/>
+            <param name="rrd-ds"         value="l3UserTblCapacity"/>
+            <param name="snmp-object"    value="$l3UserTblCapacity"/>
           </leaf>
 
           <leaf name="Used">
-            <param name="precedence"        value="901"/>
-            <param name="comment"           value="Used L3 UserTable entries"/>
-            <param name="graph-legend"      value="Used L3 UserTable entries"/>
-            <param name="vertical-label"    value="entries"/>
-            <param name="rrd-ds"            value="l3UserTblUsage"/>
-            <param name="snmp-object"       value="$l3UserTblUsage"/>
+            <param name="precedence"     value="901"/>
+            <param name="comment"        value="Used L3 User Table"/>
+            <param name="graph-legend"   value="Used L3 User Table"/>
+            <param name="graph-legend"   value="Used L3 User Table"/>
+            <param name="vertical-label" value="entries"/>
+            <param name="rrd-ds"         value="l3UserTblUsage"/>
+            <param name="snmp-object"    value="$l3UserTblUsage"/>
           </leaf>
         </subtree>
 
@@ -321,7 +323,7 @@
           <leaf name="Usage">
             <param name="precedence"         value="1000"/>
             <param name="comment"            value="Total vs Used"/>
-            <param name="graph-legend"       value="Total vs Used"/>
+            <param name="graph-title"        value="Total vs Used: MAC Table"/>
             <param name="vertical-label"     value="entries"/>
             <param name="ds-type"            value="rrd-multigraph"/>
             <param name="ds-names"           value="total,used"/>
@@ -343,8 +345,9 @@
 
           <leaf name="Total">
             <param name="precedence"        value="902"/>
-            <param name="comment"           value="Total MAC table entries"/>
-            <param name="graph-legend"      value="Total MAC table entries"/>
+            <param name="comment"           value="Total MAC table"/>
+            <param name="graph-legend"      value="Total MAC table"/>
+            <param name="graph-title"       value="Total MAC table"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="macTblCapacity"/>
             <param name="snmp-object"       value="$macTblCapacity"/>
@@ -352,8 +355,9 @@
 
           <leaf name="Used">
             <param name="precedence"        value="901"/>
-            <param name="comment"           value="Used MAC table entries"/>
-            <param name="graph-legend"      value="Used MAC table entries"/>
+            <param name="comment"           value="Used MAC table"/>
+            <param name="graph-legend"      value="Used MAC table"/>
+            <param name="graph-title"       value="Used MAC table"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="macTblUsage"/>
             <param name="snmp-object"       value="$macTblUsage"/>
@@ -364,9 +368,9 @@
           <param name="comment" value="Policy Groups (service bundles)"/>
 
           <leaf name="Usage">
-            <param name="precedence"         value="1000"/>
-            <param name="comment"            value="Total vs Used"/>
-            <param name="graph-title"        value="Total vs Used"/>
+            <param name="precedence"    value="1000"/>
+            <param name="comment"       value="Total vs Used"/>
+            <param name="graph-title"   value="Total vs Used: service bundles"/>
             <param name="vertical-label"     value="entries"/>
             <param name="ds-type"            value="rrd-multigraph"/>
             <param name="ds-names"           value="total,used"/>
@@ -411,7 +415,7 @@
           <leaf name="Usage">
             <param name="precedence"         value="1000"/>
             <param name="comment"            value="Total vs Used"/>
-            <param name="graph-title"        value="Total vs Used"/>
+            <param name="graph-title"        value="Total vs Used: Subscriber"/>
             <param name="vertical-label"     value="entries"/>
             <param name="ds-type"            value="rrd-multigraph"/>
             <param name="ds-names"           value="total,used"/>
@@ -435,6 +439,7 @@
             <param name="precedence"        value="902"/>
             <param name="comment"           value="Total subscriber capacity"/>
             <param name="graph-legend"      value="Total subscriber capacity"/>
+            <param name="graph-title"       value="Total subscriber capacity"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="subscriberSysCap"/>
             <param name="snmp-object"       value="$subscriberSysCapacity"/>
@@ -444,9 +449,57 @@
             <param name="precedence"        value="901"/>
             <param name="comment"           value="Used subscriber capacity"/>
             <param name="graph-legend"      value="Used subscriber capacity"/>
+            <param name="graph-title"       value="Used subscriber capacity"/>
             <param name="vertical-label"    value="entries"/>
             <param name="rrd-ds"            value="subscriberSysUsage"/>
             <param name="snmp-object"       value="$subscriberSysUsage"/>
+          </leaf>
+        </subtree>
+
+        <subtree name="Authenticated_Subscribers">
+          <param name="comment" value="Authentication statistics"/>
+
+          <leaf name="Summary">
+            <param name="precedence"         value="1000"/>
+            <param name="comment"            value="Auth vs Unauth"/>
+            <param name="graph-title"        value="Auth vs Unauth: Subs"/>
+            <param name="vertical-label"     value="subscribers"/>
+            <param name="ds-type"            value="rrd-multigraph"/>
+            <param name="ds-names"           value="auth,unauth"/>
+            <param name="graph-lower-limit"  value="0"/>
+
+            <!-- Authenticated -->
+            <param name="ds-expr-auth"         value="{Auth}"/>
+            <param name="graph-legend-auth"    value="Authenticated"/>
+            <param name="line-style-auth"      value="##totalresource"/>
+            <param name="line-color-auth"      value="##totalresource"/>
+            <param name="line-order-auth"      value="1"/>
+            <!-- Unauthenticated -->
+            <param name="ds-expr-unauth"       value="{Unauth}"/>
+            <param name="graph-legend-unauth"  value="Unauthenticated"/>
+            <param name="line-style-unauth"    value="##resourceusage"/>
+            <param name="line-color-unauth"    value="##resourceusage"/>
+            <param name="line-order-unauth"    value="2"/>
+          </leaf>
+
+          <leaf name="Auth">
+            <param name="precedence"      value="902"/>
+            <param name="comment"         value="Authenticated subscribers"/>
+            <param name="graph-legend"    value="Authenticated"/>
+            <param name="graph-title"     value="Authenticated subscribers"/>
+            <param name="vertical-label"  value="subscribers"/>
+            <param name="rrd-ds"          value="authL3Cnt"/>
+            <param name="snmp-object"     value="$authenticatedL3UserCount"/>
+          </leaf>
+
+          <leaf name="Unauth">
+            <param name="precedence"      value="901"/>
+            <param name="comment"         value="Unauthenticated subscribers"/>
+            <param name="graph-legend"    value="Unauthenticated"/>
+            <param name="graph-title"     value="Unauthenticated subscribers"/>
+            <param name="vertical-label"  value="subscribers"/>
+            <param name="rrd-ds"          value="unauthL3Cnt"/>
+            <param name="snmp-object"     value="$unauthenticatedL3UserCount"/>
           </leaf>
         </subtree>
     </subtree>
@@ -1345,6 +1398,79 @@
     <param name="graph-lower-limit"      value="0"/>
     <param name="rrd-create-dstype"      value="GAUGE"/>
 
+    <leaf name="Summary">
+      <param name="precedence"         value="1000"/>
+      <param name="comment"            value="Summary of slowPath packets"/>
+      <param name="graph-title"        value="Summary of slowPath packets"/>
+      <param name="vertical-label"     value="blocks"/>
+      <param name="ds-type"            value="rrd-multigraph"/>
+      <param name="ds-names"           value="a,b,c,d,e,f,g,h,i,j"/>
+      <param name="graph-lower-limit"  value="0"/>
+      <!-- All packets -->
+      <param name="ds-expr-a"          value="{allPackets}"/>
+      <param name="graph-legend-a"     value="All packets"/>
+      <param name="line-style-a"       value="LINE1"/>
+      <param name="line-color-a"       value="##one"/>
+      <param name="line-order-a"       value="1"/>
+      <!-- IP packets -->
+      <param name="ds-expr-b"          value="{ipPackets}"/>
+      <param name="graph-legend-b"     value="IP packets"/>
+      <param name="line-style-b"       value="LINE1"/>
+      <param name="line-color-b"       value="##two"/>
+      <param name="line-order-b"       value="2"/>
+      <!-- TCP packets -->
+      <param name="ds-expr-c"          value="{tcpPackets}"/>
+      <param name="graph-legend-c"     value="TCP packets"/>
+      <param name="line-style-c"       value="LINE1"/>
+      <param name="line-color-c"       value="##three"/>
+      <param name="line-order-c"       value="3"/>
+      <!-- UDP packets -->
+      <param name="ds-expr-d"          value="{udpPackets}"/>
+      <param name="graph-legend-d"     value="UDP packets"/>
+      <param name="line-style-d"       value="LINE1"/>
+      <param name="line-color-d"       value="##four"/>
+      <param name="line-order-d"       value="4"/>
+      <!-- ICMP packets -->
+      <param name="ds-expr-e"          value="{icmpPackets}"/>
+      <param name="graph-legend-e"     value="ICMP packets"/>
+      <param name="line-style-e"       value="LINE1"/>
+      <param name="line-color-e"       value="##five"/>
+      <param name="line-order-e"       value="5"/>
+      <!-- IGMP packets -->
+      <param name="ds-expr-f"          value="{igmpPackets}"/>
+      <param name="graph-legend-f"     value="IGMP packets"/>
+      <param name="line-style-f"       value="LINE1"/>
+      <param name="line-color-f"       value="##six"/>
+      <param name="line-order-f"       value="6"/>
+      <!-- IP Fragment packets -->
+      <param name="ds-expr-g"          value="{ipFragmentPackets}"/>
+      <param name="graph-legend-g"     value="IP fragment packets"/>
+      <param name="line-style-g"       value="LINE1"/>
+      <param name="line-color-g"       value="##seven"/>
+      <param name="line-order-g"       value="7"/>
+
+      <!-- SKIPPING DHCP packets to Client and server -->
+
+      <!-- IP in IP packets -->
+      <param name="ds-expr-h"          value="{ipInIpPackets}"/>
+      <param name="graph-legend-h"     value="IP in IP packets"/>
+      <param name="line-style-h"       value="LINE1"/>
+      <param name="line-color-h"       value="##eight"/>
+      <param name="line-order-h"       value="8"/>
+      <!-- L2TP control packets -->
+      <param name="ds-expr-i"          value="{l2tpControlPackets}"/>
+      <param name="graph-legend-i"     value="L2TP control packets"/>
+      <param name="line-style-i"       value="LINE1"/>
+      <param name="line-color-i"       value="##nine"/>
+      <param name="line-order-i"       value="9"/>
+      <!-- L2TP data packets -->
+      <param name="ds-expr-j"          value="{l2tpDataPackets}"/>
+      <param name="graph-legend-j"     value="L2TP data packets"/>
+      <param name="line-style-j"       value="LINE1"/>
+      <param name="line-color-j"       value="##ten"/>
+      <param name="line-order-j"       value="10"/>
+    </leaf>
+
     <leaf name="allPackets">
       <param name="precedence"         value="912"/>
       <param name="comment"            value="Total packets"/>
@@ -1387,7 +1513,7 @@
       <param name="rrd-ds"             value="igmpPackets"/>
       <param name="snmp-object"        value="$igmpPackets"/>
     </leaf>
-    <leaf name="ipFramentPackets">
+    <leaf name="ipFragmentPackets">
       <param name="precedence"         value="906"/>
       <param name="comment"            value="Total IP Fragment packets"/>
       <param name="graph-legend"       value="IP Fragment packets received"/>
@@ -1424,7 +1550,7 @@
       <param name="rrd-ds"             value="l2tpControlPackets"/>
       <param name="snmp-object"        value="$l2tpControlPackets"/>
     </leaf>
-    <leaf name="ipInIpPackets">
+    <leaf name="l2tpDataPackets">
       <param name="precedence"         value="901"/>
       <param name="comment"            value="L2TP data packets"/>
       <param name="graph-legend"       value="L2TP Data packets received"/>

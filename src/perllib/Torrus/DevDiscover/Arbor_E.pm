@@ -147,11 +147,6 @@ our %eCpuName =
         '7'  => 'I/O Module'
     );
 
-my @colors =
-    ('##one', '##two', '##three', '##four', '##five',
-     '##six', '##seven', '##eight', '##nine', '##ten'
-    );
-
 sub checkdevtype
 {
     my $dd = shift;
@@ -709,6 +704,11 @@ sub buildConfig
                                               { 'comment' => $comment },
                                                 undef );
 
+                my @colors =
+                    ('##one', '##two', '##three', '##four', '##five',
+                     '##six', '##seven', '##eight', '##nine', '##ten'
+                    );
+
                 my $multiParam = {
                     'precedence'        => 1000,
                     'comment'           => 'Summary of login attempt responses',
@@ -723,7 +723,6 @@ sub buildConfig
                 foreach my $sindex ( sort { $a <=> $b } 
                                      @{$data->{'e30'}{'loginResp'}} )
                 {
-                    Debug("  loginReps: $sindex");
 		
                     $cb->addLeaf( $nodeTree, 'Login_' . $sindex,
                                 { 'comment'    => 'Login attempt #' . $sindex,
@@ -741,6 +740,8 @@ sub buildConfig
                     $multiParam->{"line-style-$dsName"}   = "LINE1";
                     $multiParam->{"line-color-$dsName"}   = $color;
                     $multiParam->{"line-order-$dsName"}   = $sindex;
+
+                    Debug("  loginReps: $sindex, color: $color");
                 } # END: foreach $sindex
 
                 $dsList =~ s/,$//o;	# Remove final comma
@@ -939,7 +940,10 @@ sub buildConfig
                              );
 
             # State: Multigraph display
-
+            my @colors =
+                ('##one', '##two', '##three', '##four', '##five',
+                 '##six', '##seven', '##eight', '##nine', '##ten'
+                );
             my $multiParam = {
                 'precedence'        => 1000,
                 'graph-lower-limit' => 0,
@@ -953,7 +957,7 @@ sub buildConfig
 
             foreach my $stateIDX ( sort keys %{$data->{'e100'}{'submgmt'}} )
             {
-                my $color        = shift @colors;
+                my $color        =  shift @colors;
                 my $stateName    =  $data->{'e100'}{'submgmt'}{$stateIDX};
                 my $stateNameRRD =  $stateName;
                    $stateNameRRD =~ s/[^a-zA-Z_]/_/o;

@@ -1402,7 +1402,7 @@
       <param name="precedence"         value="1000"/>
       <param name="comment"            value="Summary of slowPath packets"/>
       <param name="graph-title"        value="Summary of slowPath packets"/>
-      <param name="vertical-label"     value="blocks"/>
+      <param name="vertical-label"     value="packets"/>
       <param name="ds-type"            value="rrd-multigraph"/>
       <param name="ds-names"           value="a,b,c,d,e,f,g,h,i,j"/>
       <param name="graph-lower-limit"  value="0"/>

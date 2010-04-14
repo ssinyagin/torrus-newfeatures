@@ -856,31 +856,58 @@ sub buildConfig
         # CPU: per-cpu information
         if( $devdetails->hasCap('e100-cpu') )
         {
+            my @colors  = ( '##one', '##two', '##three', '##four', '##five',
+                            '##six', '##seven', '##eight', '##nine', '##ten'
+                          );
             my $subtree = "CPU_Usage";
             my $cpuTree = $cb->addSubtree( $devNode, $subtree, undef,
                                          [ 'Arbor_E::e100-cpu-subtree' ] );
+            my $multiParam = {
+                'precedence'        => 1000,
+                'comment'           => 'Summary of all CPU utilization',
+                'graph-lower-limit' => 0,
+                'graph-title'       => 'Summary of all CPU utilization',
+                'rrd-hwpredict'     => 'disabled',
+                'vertical-label'    => 'Percent',
+                'ds-type'           => 'rrd-multigraph'
+                };
+            my $dsList;
 
             foreach my $cpuIndex ( sort keys %{$data->{'e100'}{'cpu'}} )
             {
-              my $cpuName = $data->{'e100'}{'cpu'}{$cpuIndex};
+                my $cpuName = $data->{'e100'}{'cpu'}{$cpuIndex};
+  
+                # Is there proper desc for the CPU index?
+                my $comment;
+                if( $eCpuName{$cpuIndex} )
+                {
+                    $comment = $eCpuName{$cpuIndex};
+                } else {
+                    $comment = "CPU: $cpuName";
+                }
+  
+                $cb->addLeaf( $cpuTree, $cpuName,
+                            { 'comment'    => $comment,
+                              'cpu-index'  => $cpuIndex,
+                              'cpu-name'   => $cpuName,
+                              'precedence' => 1000 - $cpuIndex },
+                            [ 'Arbor_E::e100-cpu' ] );
+  
+                # Multi-graph additions
+                my $color   = shift @colors;
+                   $dsList .= $cpuName . ',';
+                $multiParam->{"ds-expr-$cpuName"}      = "{$cpuName}";
+                $multiParam->{"graph-legend-$cpuName"} = "$cpuName";
+                $multiParam->{"line-style-$cpuName"}   = "LINE1";
+                $multiParam->{"line-color-$cpuName"}   = $color;
+                $multiParam->{"line-order-$cpuName"}   = $cpuIndex;
+            } # END: foreach $cpuIndex
 
-              # Is there proper desc for the CPU index?
-              my $comment;
-              if( $eCpuName{$cpuIndex} )
-              {
-                  $comment = $eCpuName{$cpuIndex};
-              } else {
-                  $comment = "CPU: $cpuName";
-              }
+            $dsList =~ s/,$//o;     # Remove final comma
+            $multiParam->{'ds-names'} = $dsList;
+            $cb->addLeaf($cpuTree, 'Summary', $multiParam, undef );
 
-              $cb->addLeaf( $cpuTree, $cpuName,
-                          { 'comment'    => $comment,
-                            'cpu-index'  => $cpuIndex,
-                            'cpu-name'   => $cpuName,
-                            'precedence' => 1000 - $cpuIndex },
-                          [ 'Arbor_E::e100-cpu' ] );
-            }
-        }
+        } # END: hasCap e100-cpu
 
         # HDD: Partition sizes / usage
         if( $devdetails->hasCap('e100-hdd') )

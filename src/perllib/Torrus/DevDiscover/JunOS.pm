@@ -555,8 +555,8 @@ sub buildConfig
             my $jnxMem    = $operating->{'mem'};
             my $jnxTemp   = $operating->{'temp'};
             my $jnxTag = $jnxDesc;
-            $jnxTag =~ s/[:\/\*\@\(\), ]+/_/g;
-            $jnxTag =~ s/[_]$//g;
+            $jnxTag =~ s/\W+/_/go;
+            $jnxTag =~ s/_$//go;
             # Fix the .'s into _'s for the RRD-DS and name of leaf
             my $opIndexFix = $opIndex;
             $opIndexFix =~ s/\./_/g;

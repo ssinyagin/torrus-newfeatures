@@ -854,7 +854,7 @@ sub runCollector
             
             if( not defined($session) )
             {
-                return 0;
+                next;
             }
             else
             {

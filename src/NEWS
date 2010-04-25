@@ -1,4 +1,8 @@
-05-APR-2009: Torrus release 1.0.9
+26-APR-2010: Torrus release 1.0.8bf01
+
+Bugfix release. No new features or functionality.
+
+05-APR-2009: Torrus release 1.0.8
 
 Note: a complete re-compile of the XML is required after upgrading.
 

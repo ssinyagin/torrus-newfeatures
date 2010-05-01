@@ -75,6 +75,14 @@
   <template name="rfc2863-ifmib-hostlevel">
     <param name="ifindex-map" value="M(%ifindex-table%, %interface-name%)"/>
     <param name="ifindex-table" value="$ifDescr" />
+    
+    <!-- nodeid-interface is overwritten by devdiscover at the
+         interface level. This definition is here for backward compatibility
+         with older discovery results or for systems which do not use
+         devdiscover -->
+    <param name="nodeid-interface"
+      value="if//%nodeid-device%//%interface-nick%//"/>
+      
   </template>
 
   <!-- Parameters for interfaces parent subtree -->

@@ -20,7 +20,7 @@
 #
 
 # How soon the sessions expire
-EXPIRE=2
+EXPIRE=60
 
 @FIND@ @sesstordir@ -type f -mtime +$EXPIRE -exec @RM@ '{}' ';'
 @FIND@ @seslockdir@ -type f -mtime +$EXPIRE -exec @RM@ '{}' ';'

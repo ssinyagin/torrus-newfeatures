@@ -164,19 +164,16 @@ sub process
 
         my %cookie = (-name  => 'SESSION_ID',
                       -value => $session{'_session_id'});
-
-        if( $q->param('remember') )
-        {
-            $cookie{'-expires'} = '+1y';
-        }
-            
-        push(@cookies, $q->cookie(%cookie));
-
+           
         $options{'acl'} = new Torrus::ACL;
 
         if( $session{'uid'} )
         {
             $options{'uid'} = $session{'uid'};
+            if( $session{'remember_login'} )
+            {
+                $cookie{'-expires'} = '+60d';
+            }
         }
         else
         {
@@ -193,6 +190,12 @@ sub process
                     $session{'uid'} = $options{'uid'} = $uid;
                     $needsLogin = 0;
                     Info('User logged in: ' . $uid);
+                    
+                    if( $q->param('remember') )
+                    {
+                        $cookie{'-expires'} = '+60d';
+                        $session{'remember_login'} = 1;
+                    }
                 }
                 else
                 {
@@ -219,6 +222,8 @@ sub process
             }
         }
         untie %session;
+        
+        push(@cookies, $q->cookie(%cookie));
     }
 
     if( not $fname )

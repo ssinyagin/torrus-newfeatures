@@ -97,7 +97,7 @@ sub render_html
             $config_tree->treeName()}{'info'}; },
         'version'    => $Torrus::Global::version,
         'xmlnorm'    => \&Torrus::Renderer::xmlnormalize,
-        'userAuth'   => $Torrus::ApacheHandler::authorizeUsers,
+        'userAuth'   => $Torrus::CGI::authorizeUsers,
         'uid'        => $self->{'options'}->{'uid'},
         'userAttr'   => sub { return $self->userAttribute( $_[0] ) },
         'mayDisplayAdmInfo' => sub {

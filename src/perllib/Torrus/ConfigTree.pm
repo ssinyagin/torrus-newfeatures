@@ -43,7 +43,11 @@ sub new
     defined( $self->{'db_config_instances'} ) or return( undef );
 
     my $i = $self->{'db_config_instances'}->get('ds:' . $self->{'treename'});
-    $i = 0 unless defined( $i );
+    if( not defined($i) )
+    {
+        $i = 0;
+        $self->{'first_time_created'} = 1;
+    }
 
     my $dsConfInstance = sprintf( '%d', $i );
 

@@ -156,34 +156,37 @@ foreach my $tree ( @trees )
     &Torrus::DB::checkInterrupted();
     
     # Preserve the dynamic tokenset members
-    my @members;
-    my $oldConfig = new Torrus::ConfigTree( -TreeName => $tree );
-    if( defined( $oldConfig ) )
+    if( not $compiler->{'first_time_created'} )
     {
-        foreach my $ts ( $oldConfig->getTsets() )
+        my $oldConfig = new Torrus::ConfigTree( -TreeName => $tree );
+        if( defined( $oldConfig ) )
         {
-            if( $compiler->tsetExists( $ts ) )
+            foreach my $ts ( $oldConfig->getTsets() )
             {
-                foreach my $member ( $oldConfig->tsetMembers( $ts ) )
+                if( $compiler->tsetExists( $ts ) )
                 {
-                    my $origin = $oldConfig->tsetMembers( $ts, $member );
-                    if( defined( $origin ) and $origin ne 'static' )
+                    foreach my $member ( $oldConfig->tsetMembers( $ts ) )
                     {
-                        my $path = $oldConfig->path($member);
-                        if( $compiler->nodeExists( $path ) )
+                        my $origin = $oldConfig->tsetMembers( $ts, $member );
+                        if( defined( $origin ) and $origin ne 'static' )
                         {
-                            my $token = $compiler->token( $path );
-                            $compiler->tsetAddMember( $ts, $token, $origin );
-                            Verbose('Preserved dynamic tokenset member: ' .
-                                    $path . ' in ' . $ts);
+                            my $path = $oldConfig->path($member);
+                            if( $compiler->nodeExists( $path ) )
+                            {
+                                my $token = $compiler->token( $path );
+                                $compiler->tsetAddMember
+                                    ( $ts, $token, $origin );
+                                Verbose('Preserved dynamic tokenset member: ' .
+                                        $path . ' in ' . $ts);
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    undef $oldConfig;
+        undef $oldConfig;
+    }
                     
     &Torrus::DB::checkInterrupted();
                              

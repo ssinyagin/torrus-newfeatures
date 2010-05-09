@@ -15,7 +15,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
+# $Id: flushmonitors.in 782 2010-03-05 14:49:22Z ssinyagin $
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 BEGIN { require '@torrus_config_pl@'; }

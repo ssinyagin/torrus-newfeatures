@@ -15,7 +15,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
+# $Id: acledit.in 711 2009-02-16 12:00:35Z ssinyagin $
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 BEGIN { require '@torrus_config_pl@'; }

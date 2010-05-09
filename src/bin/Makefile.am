@@ -43,6 +43,7 @@ pkgbin_SCRIPTS = \
 	genreport		\
 	install_plugin		\
 	monitor      		\
+	nodeid			\
 	rrddir2xml		\
 	schedulerinfo		\
 	srvderive		\
@@ -147,6 +148,9 @@ install_plugin: install_plugin.in
 
 monitor: monitor.in
 	$(SUBST) monitor.in > monitor
+
+nodeid: nodeid.in
+	$(SUBST) nodeid.in > nodeid
 
 rrddir2xml: rrddir2xml.in
 	$(SUBST) rrddir2xml.in > rrddir2xml

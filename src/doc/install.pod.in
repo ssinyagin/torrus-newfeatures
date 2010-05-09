@@ -179,6 +179,10 @@ User session tracking helper
 
 Module for parsing the user input for date and time.
 
+=item * JSON
+
+JSON data format support
+
 =back
 
 

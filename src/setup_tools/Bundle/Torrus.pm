@@ -76,6 +76,8 @@ Apache::Session
 
 Date::Parse
 
+JSON
+
 =head1 AUTHOR
 
 Stanislav Sinyagin E<lt>F<ssinyagin@yahoo.com>E<gt>

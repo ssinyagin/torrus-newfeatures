@@ -15,7 +15,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
+# $Id: srvderive.in 691 2008-10-26 11:00:06Z ssinyagin $
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # Combine SUM or MAX from several service IDs and create a new one

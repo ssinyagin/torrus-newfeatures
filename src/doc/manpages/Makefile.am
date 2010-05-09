@@ -44,6 +44,7 @@ SRCPOD = \
 	torrus_genreport.pod.in \
 	torrus_install_plugin.pod.in \
 	torrus_monitor.pod.in \
+	torrus_nodeid.pod.in \
 	torrus_rrddir2xml.pod.in \
 	torrus_schedulerinfo.pod.in \
 	torrus_srvderive.pod.in \
@@ -69,6 +70,7 @@ POD_FILES = \
 	torrus_genreport.pod \
 	torrus_install_plugin.pod \
 	torrus_monitor.pod \
+	torrus_nodeid.pod \
 	torrus_rrddir2xml.pod \
 	torrus_schedulerinfo.pod \
 	torrus_srvderive.pod \
@@ -94,6 +96,7 @@ PODMAN = \
 	torrus_genreport.@mansec_usercmd@ \
 	torrus_install_plugin.@mansec_misc@ \
 	torrus_monitor.@mansec_usercmd@ \
+	torrus_nodeid.@mansec_usercmd@ \
 	torrus_rrddir2xml.@mansec_usercmd@ \
 	torrus_schedulerinfo.@mansec_usercmd@ \
 	torrus_srvderive.@mansec_usercmd@ \

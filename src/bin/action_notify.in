@@ -15,7 +15,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id: action_notify.in 393 2006-05-02 16:06:58Z ssinyagin $
+# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # We need this for $Torrus::Global::templateDirs

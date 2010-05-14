@@ -35,6 +35,7 @@ dist_vendor_DATA = \
 	vendor/ascend.max.xml \
 	vendor/atmel.xml \
 	vendor/betternetworks.xml \
+	vendor/casa-cmts.xml \
 	vendor/cisco.firewall.xml \
 	vendor/cisco.generic.xml \
 	vendor/cisco.ios.xml \

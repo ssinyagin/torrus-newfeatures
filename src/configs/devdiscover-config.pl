@@ -54,6 +54,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::ATMEL',
      'Torrus::DevDiscover::AxxessIT',
      'Torrus::DevDiscover::BetterNetworks',
+     'Torrus::DevDiscover::CasaCMTS',
      'Torrus::DevDiscover::CiscoCatOS',
      'Torrus::DevDiscover::CiscoFirewall',
      'Torrus::DevDiscover::CiscoGeneric',
@@ -486,6 +487,24 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'BetterNetworks::betternetworks-sensor' => {
          'name'   => 'betternetworks-sensor',
          'source' => 'vendor/betternetworks.xml'
+         },
+     
+     #### CASA Systems CMTS
+     'CasaCMTS::casa-docsis-mac-subtree' => {
+         'name'   => 'casa-docsis-mac-subtree',
+         'source' => 'vendor/casa-cmts.xml'
+         },
+     'CasaCMTS::casa-docsis-mac-util' => {
+         'name'   => 'casa-docsis-mac-util',
+         'source' => 'vendor/casa-cmts.xml'
+         },
+     'CasaCMTS::casa-docsis-upstream-util' => {
+         'name'   => 'casa-docsis-upstream-util',
+         'source' => 'vendor/casa-cmts.xml'
+         },
+     'CasaCMTS::casa-docsis-downstream-util' => {
+         'name'   => 'casa-docsis-downstream-util',
+         'source' => 'vendor/casa-cmts.xml'
          },
      
      #### Cisco

@@ -1,3 +1,7 @@
+2010-05-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CasaCMTS.pm: new discovery module
+
 2010-05-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/nodeid.in: new command-line utility

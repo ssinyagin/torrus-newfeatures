@@ -351,7 +351,7 @@ sub openNonblockingSession
     {
         Error('Cannot create SNMP session for ' . $hosthash . ': ' . $error);
     }
-    else
+    elsif( $collector->param($token, 'snmp-transport') eq 'udp' )
     {
         # We set SO_RCVBUF only once, because Net::SNMP shares
         # one UDP socket for all sessions.

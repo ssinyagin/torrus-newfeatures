@@ -350,8 +350,10 @@ sub openNonblockingSession
     if( not defined($session) )
     {
         Error('Cannot create SNMP session for ' . $hosthash . ': ' . $error);
+        return undef;
     }
-    elsif( $collector->param($token, 'snmp-transport') eq 'udp' )
+    
+    if( $collector->param($token, 'snmp-transport') eq 'udp' )
     {
         # We set SO_RCVBUF only once, because Net::SNMP shares
         # one UDP socket for all sessions.
@@ -375,12 +377,13 @@ sub openNonblockingSession
                 Debug('Set SO_RCVBUF to ' . $buflen);
             }
         }
+    }
 
-        my $maxmsgsize = $collector->param($token, 'snmp-max-msg-size');
-        if( defined( $maxmsgsize ) and $maxmsgsize > 0 )
-        {
-            $session->max_msg_size( $maxmsgsize );
-        }
+    my $maxmsgsize = $collector->param($token, 'snmp-max-msg-size');
+    if( defined( $maxmsgsize ) and $maxmsgsize > 0 )
+    {
+        $session->max_msg_size( $maxmsgsize );
+        
     }
     
     return $session;

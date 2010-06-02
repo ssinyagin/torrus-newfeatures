@@ -223,13 +223,15 @@ sub discover
                 $session->get_table( -baseoid =>
                                      $dd->oiddef('jnxCosQstatQedPkts') );
             $devdetails->storeSnmpVars( $cosIfIndex );
-            
-            foreach my $INDEX ( $devdetails->getSnmpIndices
-                                ($dd->oiddef('jnxCosQstatQedPkts')) )
+
+	    if( $cosIfIndex )            
             {
-                my( $ifIndex, $cosQueueIndex ) = split( '\.', $INDEX );
-                $data->{'jnxCos'}{'ifIndex'}{$ifIndex} = 1; # 1 = placeholder
-                
+		foreach my $INDEX ( $devdetails->getSnmpIndices
+                                ($dd->oiddef('jnxCosQstatQedPkts')) )
+            	{
+                	my( $ifIndex, $cosQueueIndex ) = split( '\.', $INDEX );
+			$data->{'jnxCos'}{'ifIndex'}{$ifIndex} = 1;
+               	} 
             }
         }
     } # END JunOS::disable-cos
@@ -296,7 +298,6 @@ sub discover
                 $data->{'jnxOperating'}{$opIndex}{'isr'}   = $opISR;
                 $data->{'jnxOperating'}{$opIndex}{'mem'}   = $opMem;
                 $data->{'jnxOperating'}{$opIndex}{'temp'}  = $opTemp;
-
             }
         } # END: if $tableDesc
     } # END: JunOS::disable-operating
@@ -409,10 +410,13 @@ sub buildConfig
 
 
     # PROG: Class of Service information
-    if( $devdetails->hasCap('jnxCoS') )
+    if( $devdetails->hasCap('jnxCoS') &&
+	( keys %{$data->{'jnxCos'}{'ifIndex'}} > 0 )
+       )
     {
-        my $nodeTop = $cb->addSubtree( $devNode, 'CoS', undef,
-                                       [ 'JunOS::junos-cos-subtree']);
+	# PROG: Add CoS information if it exists.
+	my $nodeTop = $cb->addSubtree( $devNode, 'CoS', undef,
+                                  [ 'JunOS::junos-cos-subtree']);
 
         foreach my $ifIndex ( sort {$a <=> $b} keys
                               %{$data->{'jnxCos'}{'ifIndex'}} )
@@ -422,7 +426,7 @@ sub buildConfig
             my $ifDescr   = $interface->{'ifDescr'};
             my $ifName    = $interface->{'ifNameT'};
 
-            next if (!$ifName);  # Skip to next since port is likely 'disabled'
+            next if( not $ifName );  # Skip since port is likely 'disabled'
             # This might be better to match against ifType
             # as well since not all of them support Q's.
 

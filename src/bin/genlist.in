@@ -37,10 +37,17 @@ my $selectType = 'all';
 my $help_needed;
 
 my %listingsSupported =
-    ( 'rrdfiles' => {
-        'collector'  => 1,
-        'readonly'   => 1,
-        'all'        => 1} );
+    (
+     'rrdfiles' => {
+         'collector'  => 1,
+         'readonly'   => 1,
+         'all'        => 1,
+     },
+     
+     'snmphosts' => {
+         'collector'  => 1,
+     },
+     );
 
 my $ok = GetOptions ('tree=s'   => \$tree,
                      'path=s'   => \$initPath,
@@ -58,6 +65,7 @@ if( not $ok or not $tree or $help_needed or
     "  --what=WHAT     [".$listWhat."] what to list\n",
     "    Supported listings:\n",
     "      rrdfiles      List RRD file paths\n",
+    "      snmphosts     List SNMP hosts\n",
     "  --type=TYPE     [".$selectType."] selection type\n",
     "    Supported types:\n",
     "      collector     Collector leaves\n",
@@ -98,16 +106,16 @@ if( $selectType eq 'all' )
     {
         if( $type ne 'all' )
         {
-            $listParams->{$listWhat}{$type} = 1;
+            $listParams->{$type} = 1;
         }
     }
 }
 else
 {
-    $listParams->{$listWhat}{$selectType} = 1;
+    $listParams->{$selectType} = 1;
 }
 
-pickup_data( $config_tree, $initToken, $listing, $listParams );
+pickup_data( $config_tree, $initToken, $listing, $listWhat, $listParams );
 
 foreach my $item ( sort keys %{$listing} )
 {
@@ -121,6 +129,7 @@ sub pickup_data
     my $config_tree = shift;
     my $token = shift;
     my $listing = shift;
+    my $listWhat = shift;
     my $listParams = shift;
 
     foreach my $ctoken ( $config_tree->getChildren( $token ) )
@@ -129,21 +138,22 @@ sub pickup_data
         
         if( $config_tree->isSubtree( $ctoken ) )
         {
-            pickup_data( $config_tree, $ctoken, $listing, $listParams );
+            pickup_data( $config_tree, $ctoken,
+                         $listing, $listWhat, $listParams );
         }
         elsif( $config_tree->isLeaf( $ctoken ) )
         {
-            if( defined( $listParams->{'rrdfiles'} ) and
+            if( $listWhat eq 'rrdfiles' and
                 (
                  (
-                  $listParams->{'rrdfiles'}{'collector'} and
+                  $listParams->{'collector'} and
                   $config_tree->getNodeParam( $ctoken, 'ds-type' ) eq
                   'collector' and
                   $config_tree->getNodeParam( $ctoken, 'storage-type' ) eq
                   'rrd'
                   ) or
                  (
-                  $listParams->{'rrdfiles'}{'readonly'} and
+                  $listParams->{'readonly'} and
                   $config_tree->getNodeParam( $ctoken, 'ds-type' ) eq
                   'rrd-file' and
                   $config_tree->getNodeParam( $ctoken, 'leaf-type' ) eq
@@ -157,6 +167,22 @@ sub pickup_data
                 my $datadir =
                     $config_tree->getNodeParam( $ctoken, 'data-dir' );
                 $listing->{$datadir . '/' . $datafile} = 1;
+            }
+            elsif( $listWhat eq 'snmphosts' and
+                   $listParams->{'collector'} and
+                   $config_tree->getNodeParam( $ctoken, 'ds-type' ) eq
+                   'collector' )
+            {
+                my $host =
+                    $config_tree->getNodeParam( $ctoken, 'snmp-host' );
+                my $oid =
+                    $config_tree->getNodeParam( $ctoken, 'snmp-object' );
+                
+                if( defined( $host ) and length( $host ) > 0 and
+                    defined( $oid ) and length( $oid ) > 0 )
+                {
+                    $listing->{$host} = 1;
+                }                
             }
         }
     }

@@ -1,3 +1,7 @@
+2010-06-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/genlist.in: Added a list of all SNMP hosts
+
 2010-05-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CasaCMTS.pm: new discovery module

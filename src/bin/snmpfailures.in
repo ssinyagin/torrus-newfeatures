@@ -1,0 +1,125 @@
+#!@PERL@ -w
+#  Copyright (C) 2010  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+BEGIN { require '@torrus_config_pl@'; }
+
+use strict;
+use Getopt::Long;
+use JSON;
+    
+use Torrus::SiteConfig;
+use Torrus::DB;
+use Torrus::Log;
+
+exit(1) if not Torrus::SiteConfig::verify();
+
+
+my $tree;
+my $print_details;
+
+my $help_needed;
+
+
+my $ok = GetOptions('tree=s'      => \$tree,
+                    'details'     => \$print_details,
+                    'help'        => \$help_needed);
+
+if( not $ok or not $tree or
+    $help_needed or scalar(@ARGV) > 0 )
+{
+    print STDERR "Usage: $0 --tree=NAME [options...]\n",
+    "Options:\n",
+    "  --tree=NAME      tree name\n",
+    "  --details        print failure details\n",
+    "  --help           this help message\n";
+    exit 1;
+}
+
+
+if( not Torrus::SiteConfig::treeExists( $tree ) )
+{
+    Error('Tree ' . $tree . ' does not exist');
+    exit 1;
+}
+
+
+&Torrus::DB::setSafeSignalHandlers();
+
+my $db_failures =
+    new Torrus::DB( 'snmp_failures',
+                    -Subdir => $tree,
+                    -Btree => 1 );
+
+if( not defined( $db_failures ) )
+{
+    exit(1);
+}
+
+
+my $json = new JSON;
+$json->canonical();
+$json->pretty();
+
+
+my $out = {};
+
+$out->{'total_unreachable'} = $db_failures->get('c:unreachable');
+$out->{'total_deleted'} = $db_failures->get('c:deleted');
+
+if( $print_details )
+{
+    $out->{'details_unreachable'} = {};
+    $out->{'details_deleted'} = {};
+    
+    my $cursor = $db_failures->cursor();
+    while( my ($key, $val) = $db_failures->next($cursor) )
+    {
+        if( $key =~ /^h:(.+)$/o )
+        {
+            my $hosthash = $1;
+            my ($status, $timestamp) = split(/:/o, $val);
+
+            if( $status eq 'unreachable' or
+                $status eq 'deleted' )
+            {
+                $out->{'details_' . $status}{$hosthash} = {
+                    'timestamp' => $timestamp,
+                    'time' => scalar(localtime( $timestamp )),
+                };
+            }
+            
+            &Torrus::DB::checkInterrupted();
+        }
+    }
+    undef $cursor;
+}
+
+$db_failures->closeNow();
+
+print $json->encode($out);
+        
+exit(0);
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:

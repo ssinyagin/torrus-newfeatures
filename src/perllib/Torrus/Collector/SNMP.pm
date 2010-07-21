@@ -29,8 +29,10 @@ use Socket;
 use Net::SNMP qw(:snmp);
 use Math::BigInt;
 
+
 # Register the collector type
 $Torrus::Collector::collectorTypes{'snmp'} = 1;
+
 
 # List of needed parameters and default values
 
@@ -97,6 +99,34 @@ my %hostUnreachableRetry;
 
 # Hosts that were deleted because of unreachability for too long
 my %unreachableHostDeleted;
+
+
+our $db_failures;
+
+# Flush stats after a restart or recompile
+$Torrus::Collector::initCollectorGlobals{'snmp'} =
+    \&Torrus::Collector::SNMP::initCollectorGlobals;
+
+sub initCollectorGlobals
+{
+    my $tree = shift;
+    
+    if( not defined( $db_failures ) )
+    {
+        $db_failures =
+            new Torrus::DB( 'snmp_failures',
+                            -Subdir => $tree,
+                            -Btree => 1,
+                            -WriteAccess => 1 );
+    }
+
+    if( defined( $db_failures ) )
+    {
+        $db_failures->trunc();
+        $db_failures->put('c:unreachable', 0);
+        $db_failures->put('c:deleted', 0);
+    }
+}
 
 
 # This is first executed per target
@@ -661,7 +691,16 @@ sub probablyDead
     }
     else
     {
-        $hostUnreachableSeen{$hosthash} = time();
+        my $now = time();
+        $hostUnreachableSeen{$hosthash} = $now;
+
+        if( defined( $db_failures ) )
+        {
+            $db_failures->put('h:' . $hosthash,
+                              'unreachable:' . $now);
+            $db_failures->put('c:unreachable',
+                              scalar( keys %hostUnreachableSeen));
+        }
     }
 
     if( $probablyAlive )
@@ -693,6 +732,15 @@ sub probablyDead
         delete $hostUnreachableSeen{$hosthash};
         delete $hostUnreachableRetry{$hosthash};
         $unreachableHostDeleted{$hosthash} = 1;
+
+        if( defined( $db_failures ) )
+        {
+            $db_failures->put('h:' . $hosthash, 'deleted:' . time());
+            $db_failures->put('c:unreachable',
+                              scalar( keys %hostUnreachableSeen));
+            $db_failures->put('c:deleted',
+                              scalar( keys %unreachableHostDeleted));
+        }
     }
     
     return $probablyAlive;
@@ -751,6 +799,12 @@ sub hostReachableAgain
     if( exists( $hostUnreachableSeen{$hosthash} ) )
     {
         delete $hostUnreachableSeen{$hosthash};
+        if( defined( $db_failures ) )
+        {
+            $db_failures->del('h:' . $hosthash);
+            $db_failures->put('c:unreachable',
+                              scalar( keys %hostUnreachableSeen));
+        }
     }
 }
 

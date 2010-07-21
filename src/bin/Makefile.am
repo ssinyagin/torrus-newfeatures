@@ -46,6 +46,7 @@ pkgbin_SCRIPTS = \
 	nodeid			\
 	rrddir2xml		\
 	schedulerinfo		\
+	snmpfailures		\
 	srvderive		\
 	torrus.fcgi		\
 	ttproclist
@@ -79,6 +80,7 @@ EXTRA_DIST = \
 	monitor.in      	\
 	rrddir2xml.in		\
 	schedulerinfo.in	\
+	snmpfailures.in		\
 	srvderive.in		\
 	torrus.fcgi.in		\
 	torrus.in		\
@@ -157,6 +159,9 @@ rrddir2xml: rrddir2xml.in
 
 schedulerinfo: schedulerinfo.in
 	$(SUBST) schedulerinfo.in > schedulerinfo
+
+snmpfailures: snmpfailures.in
+	$(SUBST) snmpfailures.in > snmpfailures
 
 srvderive: srvderive.in
 	$(SUBST) srvderive.in > srvderive

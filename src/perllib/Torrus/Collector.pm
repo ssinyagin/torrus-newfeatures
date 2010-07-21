@@ -660,8 +660,21 @@ sub beforeRun
         Verbose(sprintf("Tasks initialization finished in %d seconds",
                         time() - $init_start));
 
-        $data->{'targets_initialized'} = 1;
+        $data->{'targets_initialized'} = 1;        
         Info('Tasks for collector instance ' . $instance . ' initialized');
+
+        foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
+        {
+            if( ref($Torrus::Collector::initCollectorGlobals{
+                $collector_type}) )
+            {
+                &{$Torrus::Collector::initCollectorGlobals{
+                    $collector_type}}($tree);
+                
+                Verbose('Initialized collector globals for type: ' .
+                        $collector_type);
+            }
+        }
     }
     
     Torrus::TimeStamp::release();

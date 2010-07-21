@@ -1,3 +1,9 @@
+2010-07-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/snmpfailures.in: new utility for SNMP failures reporting
+
+	* perllib/Torrus/Collector/SNMP.pm: SNMP failures stored in a database
+
 2010-06-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/genlist.in: Added a list of all SNMP hosts

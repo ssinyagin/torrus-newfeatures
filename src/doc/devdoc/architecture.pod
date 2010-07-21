@@ -416,6 +416,29 @@ is omitted. Otherwise it refers to the parameter that matches the keyword.
 =back
 
 
+B<snmp_failures.db> is a I<Btree> database containing SNMP failures
+information for a tree.
+
+=over 4
+
+=item * c:E<lt>counterE<gt> -- E<lt>NE<gt>
+
+A counter with a name. Known names: I<unreachable>, I<removed>.
+
+
+=item * h:E<lt>hosthashE<gt> -- E<lt>failureE<gt>::E<lt>timestampE<gt>
+
+SNMP host failure information. Hosthash is a concatenation of hostname, UDP
+port, and SNMP community, separated by "|". Known failures: I<unreachable>,
+I<removed>. Timestamp is a UNIX time of the event.
+
+=back
+
+
+
+
+
+
 
 =head2 Modular Structure
 

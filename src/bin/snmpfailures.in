@@ -80,8 +80,8 @@ $json->pretty();
 
 my $out = {};
 
-$out->{'total_unreachable'} = $db_failures->get('c:unreachable');
-$out->{'total_deleted'} = $db_failures->get('c:deleted');
+$out->{'total_unreachable'} = 0 + $db_failures->get('c:unreachable');
+$out->{'total_deleted'} = 0 + $db_failures->get('c:deleted');
 
 if( $print_details )
 {
@@ -100,7 +100,7 @@ if( $print_details )
                 $status eq 'deleted' )
             {
                 $out->{'details_' . $status}{$hosthash} = {
-                    'timestamp' => $timestamp,
+                    'timestamp' => 0 + $timestamp,
                     'time' => scalar(localtime( $timestamp )),
                 };
             }

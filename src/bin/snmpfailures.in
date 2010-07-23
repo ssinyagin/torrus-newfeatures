@@ -27,6 +27,7 @@ use JSON;
 use Torrus::SiteConfig;
 use Torrus::DB;
 use Torrus::Log;
+use Torrus::SNMP_Failures;
 
 exit(1) if not Torrus::SiteConfig::verify();
 
@@ -60,61 +61,33 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 }
 
 
+my $out = {};
+
 &Torrus::DB::setSafeSignalHandlers();
 
-my $db_failures =
-    new Torrus::DB( 'snmp_failures',
-                    -Subdir => $tree,
-                    -Btree => 1 );
-
-if( not defined( $db_failures ) )
+my $nInstances = Torrus::SiteConfig::collectorInstances( $tree );
+for( my $instance = 0; $instance < $nInstances; $instance++ )
 {
-    exit(1);
+    my $db_failures = new Torrus::SNMP_Failures( -Tree => $tree,
+                                                 -Instance => $instance );
+    
+    if( not defined( $db_failures ) )
+    {
+        exit(1);
+    }
+    
+    
+    $db_failures->read( $out, -details => $print_details );
+    undef $db_failures;
 }
 
 
 my $json = new JSON;
 $json->canonical();
 $json->pretty();
-
-
-my $out = {};
-
-$out->{'total_unreachable'} = 0 + $db_failures->get('c:unreachable');
-$out->{'total_deleted'} = 0 + $db_failures->get('c:deleted');
-
-if( $print_details )
-{
-    $out->{'details_unreachable'} = {};
-    $out->{'details_deleted'} = {};
-    
-    my $cursor = $db_failures->cursor();
-    while( my ($key, $val) = $db_failures->next($cursor) )
-    {
-        if( $key =~ /^h:(.+)$/o )
-        {
-            my $hosthash = $1;
-            my ($status, $timestamp) = split(/:/o, $val);
-
-            if( $status eq 'unreachable' or
-                $status eq 'deleted' )
-            {
-                $out->{'details_' . $status}{$hosthash} = {
-                    'timestamp' => 0 + $timestamp,
-                    'time' => scalar(localtime( $timestamp )),
-                };
-            }
-            
-            &Torrus::DB::checkInterrupted();
-        }
-    }
-    undef $cursor;
-}
-
-$db_failures->closeNow();
-
 print $json->encode($out);
-        
+
+
 exit(0);
 
 

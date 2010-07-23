@@ -416,8 +416,8 @@ is omitted. Otherwise it refers to the parameter that matches the keyword.
 =back
 
 
-B<snmp_failures.db> is a I<Btree> database containing SNMP failures
-information for a tree.
+B<snmp_failures_X.db> is a I<Btree> database containing SNMP collector
+failures information for a given collector instance for a tree.
 
 =over 4
 
@@ -426,11 +426,20 @@ information for a tree.
 A counter with a name. Known names: I<unreachable>, I<removed>.
 
 
-=item * h:E<lt>hosthashE<gt> -- E<lt>failureE<gt>::E<lt>timestampE<gt>
+=item * h:E<lt>hosthashE<gt> -- E<lt>failureE<gt>:E<lt>timestampE<gt>
 
 SNMP host failure information. Hosthash is a concatenation of hostname, UDP
 port, and SNMP community, separated by "|". Known failures: I<unreachable>,
 I<removed>. Timestamp is a UNIX time of the event.
+
+=item * m:E<lt>hosthashE<gt> -- E<lt>pathE<gt>:E<lt>timestampE<gt>
+
+MIB failures (I<noSuchObject>, I<noSuchInstance>, and I<endOfMibView>)
+for a given host, with the tree path of their occurence and the UNIX timestamp.
+
+=item * M:E<lt>hosthashE<gt> -- E<lt>NE<gt>
+
+Count of MIB failures per SNMP host.
 
 =back
 

@@ -669,7 +669,7 @@ sub beforeRun
                 $collector_type}) )
             {
                 &{$Torrus::Collector::initCollectorGlobals{
-                    $collector_type}}($tree);
+                    $collector_type}}($tree, $instance);
                 
                 Verbose('Initialized collector globals for type: ' .
                         $collector_type);

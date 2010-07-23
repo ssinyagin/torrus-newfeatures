@@ -22,6 +22,7 @@ package Torrus::Collector::SNMP;
 use Torrus::Collector::SNMP_Params;
 use Torrus::ConfigTree;
 use Torrus::Log;
+use Torrus::SNMP_Failures;
 
 use strict;
 use Net::hostent;
@@ -110,21 +111,19 @@ $Torrus::Collector::initCollectorGlobals{'snmp'} =
 sub initCollectorGlobals
 {
     my $tree = shift;
+    my $instance = shift;
     
     if( not defined( $db_failures ) )
     {
         $db_failures =
-            new Torrus::DB( 'snmp_failures',
-                            -Subdir => $tree,
-                            -Btree => 1,
-                            -WriteAccess => 1 );
+            new Torrus::SNMP_Failures( -Tree => $tree,
+                                       -Instance => $instance,
+                                       -WriteAccess => 1 );
     }
 
     if( defined( $db_failures ) )
     {
-        $db_failures->trunc();
-        $db_failures->put('c:unreachable', 0);
-        $db_failures->put('c:deleted', 0);
+        $db_failures->init();
     }
 }
 
@@ -691,15 +690,13 @@ sub probablyDead
     }
     else
     {
-        my $now = time();
-        $hostUnreachableSeen{$hosthash} = $now;
+        $hostUnreachableSeen{$hosthash} = time();
 
         if( defined( $db_failures ) )
         {
-            $db_failures->put('h:' . $hosthash,
-                              'unreachable:' . $now);
-            $db_failures->put('c:unreachable',
-                              scalar( keys %hostUnreachableSeen));
+            $db_failures->host_failure('unreachable', $hosthash);
+            $db_failures->set_counter('unreachable',
+                                      scalar( keys %hostUnreachableSeen));
         }
     }
 
@@ -735,11 +732,11 @@ sub probablyDead
 
         if( defined( $db_failures ) )
         {
-            $db_failures->put('h:' . $hosthash, 'deleted:' . time());
-            $db_failures->put('c:unreachable',
-                              scalar( keys %hostUnreachableSeen));
-            $db_failures->put('c:deleted',
-                              scalar( keys %unreachableHostDeleted));
+            $db_failures->host_failure('deleted', $hosthash);
+            $db_failures->set_counter('unreachable',
+                                      scalar( keys %hostUnreachableSeen));
+            $db_failures->set_counter('deleted',
+                                      scalar( keys %unreachableHostDeleted));
         }
     }
     
@@ -801,9 +798,9 @@ sub hostReachableAgain
         delete $hostUnreachableSeen{$hosthash};
         if( defined( $db_failures ) )
         {
-            $db_failures->del('h:' . $hosthash);
-            $db_failures->put('c:unreachable',
-                              scalar( keys %hostUnreachableSeen));
+            $db_failures->remove_host($hosthash);            
+            $db_failures->set_counter('unreachable',
+                                      scalar( keys %hostUnreachableSeen));
         }
     }
 }
@@ -1092,6 +1089,12 @@ sub callback
                     
                     foreach my $token ( keys %{$pdu_tokens->{$oid}} )
                     {
+                        if( defined( $db_failures ) )
+                        {
+                            $db_failures->mib_error
+                                ($hosthash, $collector->path($token));
+                        }
+
                         $collector->deleteTarget($token);
                     }
                 }

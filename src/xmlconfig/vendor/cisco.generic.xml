@@ -173,7 +173,7 @@
 
   <template name="cisco-cpu-usage-subtree">
     <param name="cisco-cpu-indexmap" value="$CISCO_CPU_IDX" />
-    <param name="data-file"  value="%system-id%_cpu_%entity-phy-index%.rrd" />
+    <param name="data-file"  value="%system-id%_cpu_%cisco-cpu-ref%.rrd" />
     <param name="rrd-create-dstype"  value="GAUGE" />
     <param name="rrd-hwpredict"      value="disabled" />
     <param name="graph-lower-limit"  value="0" />
@@ -192,7 +192,7 @@
            value="CPU Usage Graphs"/>
            
     <param name="descriptive-nickname"
-           value="%system-id%:CPU #%entity-phy-index%"/>
+           value="%system-id%:CPU #%cisco-cpu-ref%"/>
   </template>
 
   <template name="cisco-cpu">
@@ -222,7 +222,7 @@
     <leaf name="CPU_Total_1min">
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="data-file"
-             value="%system-id%_cpu_%entity-phy-index%.rrd" />
+             value="%system-id%_cpu_%cisco-cpu-ref%.rrd" />
       <param name="precedence"         value="-200" />
       <param name="snmp-object"
              value="$cpmCPUTotal1minRev.%cisco-cpu-indexmap%"/>
@@ -239,7 +239,7 @@
     <leaf name="CPU_Total_5min">
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="data-file"
-             value="%system-id%_cpu_%entity-phy-index%.rrd" />
+             value="%system-id%_cpu_%cisco-cpu-ref%.rrd" />
       <param name="precedence"         value="-200" />
       <param name="snmp-object"
              value="$cpmCPUTotal5minRev.%cisco-cpu-indexmap%"/>

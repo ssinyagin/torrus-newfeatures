@@ -278,6 +278,7 @@ sub discover
                 if( $phyReferers{$phyIndex} > 1 )
                 {
                     $phyDescr .= ' (' . $INDEX . ')';
+                    $cpuNick .= '_' . $INDEX;
                 }
                 
                 $data->{'ciscoCpuStats'}{$INDEX} = {
@@ -549,10 +550,12 @@ sub buildConfig
             if( $cpu->{'phy-referers'} > 1 )
             {
                 $param->{'cisco-cpu-indexmap'} = $INDEX;
+                $param->{'cisco-cpu-ref'} = $INDEX;
             }
             else
             {
                 $param->{'entity-phy-index'} = $cpu->{'phy-index'};
+                $param->{'cisco-cpu-ref'} = '%entity-phy-index%';
             }
             
             my @templates;

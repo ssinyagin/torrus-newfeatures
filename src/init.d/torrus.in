@@ -9,7 +9,7 @@
 #
 #
 ### chkconfig info
-# chkconfig: 2345 90 90
+# chkconfig: 2345 90 10
 # description: Starts/Stops Torrus collectors and monitors
 ###
 #
@@ -50,6 +50,7 @@ fi
 if test x"$2" = x; then
   daemons="collector monitor"
   monitor_cmdopts="$TORRUS_MONITOR_DELAY"
+  all_daemons=yes
 else
   daemons=$2
     # Third and fourth arguments may be the tree name and instance
@@ -102,6 +103,12 @@ start_daemons () {
       fi
     done
   done
+
+  # RHEL based systems (RHEL, CentOS, Fedora) ignore the KXXtorrus script
+  # unless the corresponding lock is present
+  if test -d /var/lock/subsys; then
+    touch /var/lock/subsys/torrus
+  fi
 }
 
 stop_daemons () {
@@ -175,6 +182,11 @@ stop_daemons () {
        echo "${d} for ${t} has stopped"
      fi
    done
+  fi
+
+  # RHEL specifics
+  if test x"$all_daemons" = xyes -a -d /var/lock/subsys; then
+    rm -f /var/lock/subsys/torrus
   fi
 }
 

@@ -1,3 +1,9 @@
+2010-08-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* init.d/torrus.in: bugfix in RHEL compatibility.
+	Do "chkconfig --del torrus", install the new version into /etc/init.d,
+	then "chkconfig --add torrus", then "service torrus restart"	
+
 2010-07-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/snmpfailures.in: new utility for SNMP failures reporting

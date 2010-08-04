@@ -41,6 +41,7 @@ commands="acl=acledit acledit=acledit \
           nodeid=nodeid ni=nodeid \
           rrddir=rrddir2xml rrddir2xml=rrddir2xml \
           schedulerinfo=schedulerinfo si=schedulerinfo \
+          snmpfailures=snmpfailures failures=snmpfailures \
           srvderive=srvderive derive=srvderive \
           ttproclist=ttproclist"
 

@@ -78,6 +78,7 @@ EXTRA_DIST = \
 	genreport.in		\
 	install_plugin.in	\
 	monitor.in      	\
+	nodeid.in		\
 	rrddir2xml.in		\
 	schedulerinfo.in	\
 	snmpfailures.in		\

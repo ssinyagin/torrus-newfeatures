@@ -166,6 +166,7 @@ sub print_nodeid
 
     my $json = new JSON;
     $json->pretty();
+    $json->canonical();
 
     my @all;
 
@@ -180,6 +181,27 @@ sub print_nodeid
             $info->{'path'} = $config_tree->path($token);
             $info->{'is_leaf'} = $config_tree->isLeaf($token) ? 1:0;
             $info->{'tree'} = $config_tree->treeName();
+            if( $info->{'is_leaf'} )
+            {
+                my $dsType = $config_tree->getNodeParam( $token, 'ds-type' );
+                $info->{'param:ds-type'} = $dsType;
+                if( $dsType eq 'collector' )
+                {
+                    foreach my $param
+                        ('collector-type', 'collector-period',
+                         'storage-type', 'data-file', 'data-dir', 'rrd-ds',
+                         'ext-service-id',
+                         'snmp-host', 'domain-name', 'snmp-object')
+                    {
+                        my $val = $config_tree->getNodeParam($token, $param);
+
+                        if( defined( $val ) )
+                        {
+                            $info->{'param:' . $param} = $val;
+                        }
+                    }
+                }
+            }
         }
 
         push(@all, $info);

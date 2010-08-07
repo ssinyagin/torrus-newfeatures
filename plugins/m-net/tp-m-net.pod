@@ -21,7 +21,7 @@
 
 =head1 Torrus plugin for M-net Telekommunikations
 
-Status: Pre-alpha; Last modified: 02-FEB-2010
+Status: Release candidate; Last modified: 7-AUG-2010
 
 =head2 Introduction
 
@@ -84,6 +84,13 @@ If set to C<yes>, the corresponding host is skipped from plugin processing.
 
 Comma-separated list of interface names (their correspomnding subtree names).
 These interfaces are skipped from plugin processing.
+
+=item C<M_net::nodeid-prefix-key>
+
+Defines a key that is used for C<nodeid> prefix instead of default value
+C<if//%nodeid-device%//I<InterfaceName>//>.
+If the interface contains the specified key and
+value, the nodeid prefix is replaced with C<KEY//VALUE//>.
 
 =back
 

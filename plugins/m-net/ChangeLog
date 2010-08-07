@@ -1,0 +1,5 @@
+2010-08-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* DevDiscover/M_net.pm (discover):
+	New discovery parameter: M_net::nodeid-prefix-key
+

@@ -78,6 +78,15 @@ sub discover
         }
     }
 
+    my $nodeid_prefix_key = $devdetails->param('M_net::nodeid-prefix-key');
+    if( defined( $nodeid_prefix_key ) )
+    {
+        $data->{'nameref'}{'ifNodeidDefault'} =
+            $data->{'nameref'}{'ifNodeid'};
+        
+        $data->{'nameref'}{'ifNodeid'} = 'MnetNodeid';
+    }
+    
     
     foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
@@ -157,9 +166,38 @@ sub discover
         while( my ($key, $val) = each %{$mnet_attr} )
         {
             $interface->{'param'}{'mnet-attr-' . $key} = $val;
-        }        
+        }
+
+        # Set the nodeid prefix
+        
+        if( defined( $nodeid_prefix_key ) )
+        {
+            if( defined( $mnet_attr->{$nodeid_prefix_key} ) )
+            {
+                $interface->{'ifNodeidPrefix'} = $nodeid_prefix_key . '//';
+                
+                $interface->{'MnetNodeid'} =
+                    $mnet_attr->{$nodeid_prefix_key};
+            }
+        }
     }
+
+
+    # Fall back to the old nodeid where M-net nodeid is undefined
     
+    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        
+        next if $interface->{'excluded'};
+        
+        if( not defined( $interface->{'MnetNodeid'} ) )
+        {
+            $interface->{'MnetNodeid'} =
+                $interface->{$data->{'nameref'}{'ifNodeidDefault'}};
+        }
+    }
+            
     return 1;
 }
 

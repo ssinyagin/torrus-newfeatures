@@ -298,6 +298,17 @@ sub discover
         storeIfIndexParams( $devdetails );
     }
 
+    if( not defined( $data->{'nameref'}{'ifNodeid'} ) )
+    {
+        $data->{'nameref'}{'ifNodeid'} =
+            $data->{'nameref'}{'ifReferenceName'};
+    }
+    
+    if( not defined( $data->{'nameref'}{'ifNodeidPrefix'} ) )
+    {
+        $data->{'nameref'}{'ifNodeidPrefix'} = 'ifNodeidPrefix';
+    }
+    
     # Filter out the interfaces if needed
 
     if( ref( $data->{'interfaceFilter'} ) )
@@ -436,12 +447,7 @@ sub buildConfig
     # If other discovery modules don't set nodeid reference, fall back to
     # default interface reference
     
-    if( not defined( $data->{'nameref'}{'ifNodeid'} ) )
-    {
-        $data->{'nameref'}{'ifNodeid'} =
-            $data->{'nameref'}{'ifReferenceName'};
-    }
-
+    
     # Build interface parameters
 
     my $nInterfaces = 0;
@@ -466,11 +472,17 @@ sub buildConfig
         $interface->{'param'}{'interface-nick'} =
             $interface->{$data->{'nameref'}{'ifNick'}};
 
+        if( not defined( $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} ) )
+        {
+            $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
+                'if//%nodeid-device%//';
+        }
+
         # A per-interface value which is used by leafs in IF-MIB templates
         $interface->{'param'}{'nodeid-interface'} =
-            'if//%nodeid-device%//' .
+            $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} .
             $interface->{$data->{'nameref'}{'ifNodeid'}};
-
+        
         $interface->{'param'}{'nodeid'} = '%nodeid-interface%';        
 
         if( defined $data->{'nameref'}{'ifComment'} and

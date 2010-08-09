@@ -131,9 +131,7 @@ sub checkdevtype
     }
     
     # Systems running FTOS will have chassisType, SFTOS will not.
-    my $chassisType = $dd->retrieveSnmpOIDs( 'chType' );
-    
-    if( not defined( $chassisType->{'chType'} ) )
+    if( not $dd->checkSnmpOID('chType') )
     {
         return 0;
     }

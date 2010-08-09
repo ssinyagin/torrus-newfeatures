@@ -497,7 +497,7 @@ sub expandOidMappings
 
             my $result = $session->get_request( -varbindlist => [$key] );
             $session->close();
-            if( defined $result )
+            if( defined $result and defined($result->{$key}) )
             {
                 $value = $result->{$key};
                 $cref->{'value-lookups'}{$hosthash}{$key} = $value;

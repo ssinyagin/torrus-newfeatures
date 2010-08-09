@@ -1,3 +1,7 @@
+2010-08-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Updated discovery modules for Net::SNMP 6.0.0 compatibility
+
 2010-08-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* init.d/torrus.in: bugfix in RHEL compatibility.

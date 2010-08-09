@@ -300,9 +300,7 @@ sub discover
             # Although OLD-CISCO-CPU-MIB is implemented in IOS only,
             # it is easier to leave it here in Generic
 
-            $session->get_request( -varbindlist =>
-                                   [ $dd->oiddef('avgBusy1') ] );
-            if( $session->error_status() == 0 )
+            if( $dd->checkSnmpOID('avgBusy1') )
             {
                 $devdetails->setCap('old-ciscoCpuStats');
                 push( @{$data->{'templates'}}, 'CiscoGeneric::old-cisco-cpu' );

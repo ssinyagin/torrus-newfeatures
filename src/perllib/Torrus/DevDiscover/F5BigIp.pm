@@ -149,24 +149,17 @@ sub discover
 
     # this is rather basic, per-capability checking
     # may be required in the future
-    $session->get_request( -varbindlist =>
-                           [ $dd->oiddef('4.x_globalStatUptime') ] );
-    if( $session->error_status() == 0 )
+
+    if( $dd->checkSnmpOID('4.x_globalStatUptime') )
     {
         $devdetails->setCap('BigIp_4.x');
     }
-    else
+    elsif( $dd->checkSnmpOID('3.x_uptime') )
     {
-        $session->get_request( -varbindlist =>
-                        [ $dd->oiddef('3.x_uptime') ] );
-
-        if( $session->error_status() == 0 )
-        {
-            # for v3.x we are not supporting detailed stats, so don't check
-            # anything else
-            $devdetails->setCap('BigIp_3.x');
-            return 1;
-        }
+        # for v3.x we are not supporting detailed stats, so don't check
+        # anything else
+        $devdetails->setCap('BigIp_3.x');
+        return 1;
     }
 
     my $product_name;

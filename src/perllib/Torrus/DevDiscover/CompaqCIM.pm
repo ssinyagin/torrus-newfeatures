@@ -90,9 +90,8 @@ sub discover
 
     foreach my $oid ( @checkOids )
     {
-        $session->get_request( -varbindlist => [ $dd->oiddef($oid) ] );
-        if( $session->error_status() == 0 )
-        {
+        if( $dd->checkSnmpOID($oid) )
+        { 
             $devdetails->setCap( $oid );
         }
     }

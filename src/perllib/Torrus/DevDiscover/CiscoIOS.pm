@@ -284,9 +284,7 @@ sub discover
         # Old Memory Buffers, if we have bufferElFree we assume
         # the rest as they are "required"
 
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('bufferElFree') ] );
-        if( $session->error_status() == 0 )
+        if( $dd->checkSnmpOID('bufferElFree') )
         {
             $devdetails->setCap('old-ciscoMemoryBuffers');
             push( @{$data->{'templates'}},
@@ -296,9 +294,7 @@ sub discover
 
     if( $devdetails->param('CiscoIOS::disable-ipsec-stats') ne 'yes' )
     {
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('cipSecGlobalHcInOctets') ] );
-        if( $session->error_status() == 0 )
+        if( $dd->checkSnmpOID('cipSecGlobalHcInOctets') )
         {
             $devdetails->setCap('ciscoIPSecGlobalStats');
             push( @{$data->{'templates'}},

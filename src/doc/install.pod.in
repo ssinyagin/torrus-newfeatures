@@ -162,6 +162,8 @@ Daemon invocation routines.
 =item * Net::SNMP
 
 SNMP queries and traps interface. Version C<4.0.3> or higher is required.
+I<Note>: Torrus versions prior to 1.0.9 are incompatible with Net::SNMP
+version 6.0.0. You may need to downgrate the module to 5.2.0.
 
 =item * URI::Escape
 

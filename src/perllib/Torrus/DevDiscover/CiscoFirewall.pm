@@ -86,17 +86,13 @@ sub discover
         $data->{'param'}{'snmp-oids-per-pdu'} = $oidsPerPDU;
     }
 
-    $session->get_request( -varbindlist =>
-                           [ $dd->oiddef('cfwConnectionStatMax') ] );
-    if( $session->error_status() == 0 )
+    if( $dd->checkSnmpOID('cfwConnectionStatMax') )
     {
         $devdetails->setCap('CiscoFirewall::connections');
     }
-
+    
     # I have not seen a system that supports this.
-    $session->get_request( -varbindlist =>
-                           [ $dd->oiddef('cfwBasicEventsTableLastRow') ] );
-    if( $session->error_status() == 0 )
+    if( $dd->checkSnmpOID('cfwBasicEventsTableLastRow') )
     {
         $devdetails->setCap('CiscoFirewall::events');
     }

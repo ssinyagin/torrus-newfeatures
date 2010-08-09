@@ -96,25 +96,24 @@ sub discover
         $data->{'param'}{'snmp-oids-per-pdu'} = $oidsPerPDU;
     }
 
-    my $max_sessions =
-        $session->get_request( -varbindlist => [ 
-            $dd->oiddef('nsResSessMaxium') ] );
-
-    if( defined($max_sessions) )
+    my $result = $dd->retrieveSnmpOIDs('nsResSessMaxium');
+    if( defined($result) and $result->{'nsResSessMaxium'} > 0 )
     {
         $devdetails->setCap('NetScreen::SessMax');
 
-        my $ref = { 'param' => {}, };
-        $data->{'netScreenSessions'} = $ref;
-
-        my $param = $ref->{'param'};
-        my $max = $max_sessions->{$dd->oiddef('nsResSessMaxium')};
+        my $param = {};
+        my $max = $result->{'nsResSessMaxium'};
 
         $param->{'hrule-value-max'} = $max;
         $param->{'hrule-legend-max'} = 'Maximum Sessions';
         # upper limit of graph is 5% higher than max sessions
-        $param->{'graph-upper-limit'} = sprintf('%e', 
-            ( $max * 5 / 100 ) + $max );
+        $param->{'graph-upper-limit'} =
+            sprintf('%e', 
+                    ( $max * 5 / 100 ) + $max );
+        
+        $data->{'netScreenSessions'} = {
+            'param' => $param,
+        };        
     }
 
     return 1;

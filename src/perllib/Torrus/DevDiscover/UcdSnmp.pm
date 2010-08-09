@@ -103,13 +103,15 @@ sub discover
                      );
 
 
-    foreach my $oid ( @checkOids )
+    my $result = $dd->retrieveSnmpOIDs( @checkOids );
+    if( defined( $result ) )
     {
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef("$oid") ] );
-        if( $session->error_status() == 0 )
+        foreach my $oid ( @checkOids )
         {
-            $devdetails->setCap($oid);
+            if( defined($result->{$oid}) and length($result->{$oid}) > 0 )
+            {
+                $devdetails->setCap($oid);
+            }
         }
     }
 

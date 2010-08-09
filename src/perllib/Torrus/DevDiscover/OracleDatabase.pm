@@ -163,17 +163,13 @@ sub discover
         my $db = {};
         $dbType->{$dbName} = $db;
 
-        my $db_block_size =
-            $session->get_request( -varbindlist =>
-                                   [ $dd->oiddef('oraDbConfigDbBlockSize')
-                                     . '.' .  $dbIndex ] );
-
-        if( $session->error_status() == 0 )
+        my $oid = $dd->oiddef('oraDbConfigDbBlockSize') . '.' .  $dbIndex;
+        my $result = $session->get_request( -varbindlist => [ $oid ] );
+        
+        
+        if( $session->error_status() == 0 and $result->{$oid} > 0 )
         {
-            $devdetails->storeSnmpVars($db_block_size);
-            my $blocksize = $db_block_size->
-            {$dd->oiddef('oraDbConfigDbBlockSize') . '.' .  $dbIndex};
-
+            my $blocksize = $result->{$oid};
             $dbType->{$dbName}->{'dbBlockSize'} = $blocksize;
             Debug("DB Block Size: $blocksize");
         }

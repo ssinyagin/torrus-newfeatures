@@ -61,7 +61,7 @@ sub checkdevtype
 
     # PROG: Standard sysObject does not work on Airport devices
     #       So we will match on the specific OID
-    if( not $dd->retrieveSnmpOIDs('sysConfName') )
+    if( not $dd->checkSnmpOID('sysConfName') )
     {
         return 0;
     }

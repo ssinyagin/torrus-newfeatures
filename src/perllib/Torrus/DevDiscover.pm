@@ -711,7 +711,9 @@ sub checkSnmpOID
 
     my $result = $session->get_request( -varbindlist => [ $oid ] );
     if( $session->error_status() == 0 and
-        defined( $result ) and defined( $result->{$oid} ) )
+        defined($result) and
+        defined($result->{$oid}) and
+        length($result->{$oid}) > 0 )
     {
         return 1;
     }

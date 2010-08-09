@@ -69,8 +69,6 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    my $session = $dd->session();
-
     return $dd->checkSnmpTable('rdbms');
 }
 
@@ -93,19 +91,6 @@ sub discover
     my $dbTypes = {
         ora => $dd->oiddef('ora'),
     };
-
-    my @checkOids = (
-                     );
-
-    foreach my $oid ( @checkOids )
-    {
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef("$oid") ] );
-        if( $session->error_status() == 0 )
-        {
-            $devdetails->setCap($oid);
-        }
-    }
 
 
     my $rdbmsDbTable = $session->get_table( -baseoid =>

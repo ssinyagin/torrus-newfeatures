@@ -190,7 +190,8 @@ sub checkdevtype
         return 0;
     }
 
-    my $result = $dd->retrieveSnmpOIDs( 'sysedge_opmode' );
+    my $result = $dd->retrieveSnmpOIDs( 'sysedge_opmode',
+                                        'empireSystemType' );
     if( $result->{'sysedge_opmode'} == 2 )
     {
         Error("Sysedge Agent NOT Licensed");
@@ -198,26 +199,23 @@ sub checkdevtype
     }
 
     # Empire OS Type (Needed here for interface filtering)
-    my $empireOsType =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireSystemType') ] );
-
-    if( $session->error_status() == 0 )
+    
+    my $empireOsType = $result->{'empireSystemType'};
+    if( defined($empireOsType) and $empireOsType > 0 )
     {
+        $devdetails->setCap('EmpireSystemedge::' .
+                            $osTranslate{$empireOsType}{ident} );
+        
+        $devdetails->{'os_ident'} = $osTranslate{$empireOsType}{ident};
 
-        $devdetails->setCap('EmpireSystemedge::' . $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{ident} );
-        $devdetails->{'os_ident'} = $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{ident};
+        
+        $devdetails->setCap('EmpireSystemedge::' .
+                            $osTranslate{$empireOsType}{name} );
+        
+        $devdetails->{'os_name'} = $osTranslate{$empireOsType}{name};
 
-        $devdetails->setCap('EmpireSystemedge::' . $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{name} );
-        $devdetails->{'os_name'} = $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{name};
-
-        $devdetails->{'os_name_template'} = $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{template};
-
+        $devdetails->{'os_name_template'} =
+            $osTranslate{$empireOsType}{template};
     }
 
     # Exclude Virtual Interfaces on Solaris
@@ -241,13 +239,7 @@ sub discover
     my $session = $dd->session();
 
 
-
-    # Empire Cpu Totals
-    my $empireCpuTotalWait =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireCpuTotalWait') ] );
-
-    if( $session->error_status() == 0 )
+    if( $dd->checkSnmpOID('empireCpuTotalWait') )
     {
         $devdetails->setCap('EmpireSystemedge::CpuTotal::Wait');
     }
@@ -439,35 +431,21 @@ sub discover
 
     # Empire Load Average
 
-    my $empireLoadAverage =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireLoadAverage') ] );
-
-    if( $session->error_status() == 0 )
+    if( $dd->checkSnmpOID('empireLoadAverage') )
     {
         $devdetails->setCap('EmpireSystemedge::LoadAverage');
-        my $ref = {};
-        $data->{'empireLoadAverage'} = $ref;
     }
 
     # Empire Swap Counters
 
-    my $empireNumPageSwapIns =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireNumPageSwapIns') ] );
-
-    if( $session->error_status() == 0 )
+    if( $dd->checkSnmpOID('empireNumPageSwapIns') )
     {
         $devdetails->setCap('EmpireSystemedge::SwapCounters');
     }
 
     # Empire Counter Traps
 
-    my $empireNumTraps =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireNumTraps') ] );
-
-    if( $session->error_status() == 0 )
+    if( $dd->checkSnmpOID('empireNumTraps') )
     {
         $devdetails->setCap('EmpireSystemedge::CounterTraps');
     }
@@ -479,7 +457,6 @@ sub discover
 
     if( defined( $empirePerformance ) )
     {
-
         $devdetails->setCap('EmpireSystemedge::Performance');
         $devdetails->storeSnmpVars( $empirePerformance );
 
@@ -513,7 +490,6 @@ sub discover
         $session->get_table( -baseoid => $dd->oiddef('empireNTREGPERF') );
     if( defined $empireNTREGPERF )
     {
-        next;
         $devdetails->setCap('empireNTREGPERF');
         $devdetails->storeSnmpVars( $empireNTREGPERF );
 

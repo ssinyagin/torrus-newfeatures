@@ -47,19 +47,11 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    my $session = $dd->session();
-    my $data = $devdetails->data();
-
-    my $deviceInfo =
-        $session->get_request( $dd->oiddef('sysDeviceInfo') );
-    if( $session->error_status() != 0 or
-        not defined( $deviceInfo ) or
-        scalar( %{$deviceInfo} ) == 0 )
+    if( not $dd->checkSnmpOID('sysDeviceInfo') )
     {
         return 0;
     }
-    $devdetails->storeSnmpVars( $deviceInfo );
-
+       
     return 1;
 }
 
@@ -70,29 +62,23 @@ sub discover
 
     my $data = $devdetails->data();
 
-    my $session = $dd->session();
+    my $info = $dd->retrieveSnmpOIDs('sysDeviceInfo',
+                                     'operAccessPointName',
+                                     'bridgeOperationalMode',
+                                     'bridgeRemoteBridgeBSSID',
+                                     );
 
-    my $deviceInfo = 
-        substr($devdetails->snmpVar($dd->oiddef('sysDeviceInfo')),2);
-
-    my $bridgeName = 
-        $session->get_request( $dd->oiddef('operAccessPointName') );
+    my $deviceInfo = substr($info->{'sysDeviceInfo'},2);    
+    my $bridgeName = $info->{'operAccessPointName'};
     
-    $bridgeName = $bridgeName->{$dd->oiddef('operAccessPointName')};
-
     #Get rid of all the nulls returned.
     $bridgeName =~ s/\000//g;
     
     $data->{'param'}{'comment'} = $bridgeName;
 
-    my $bridgeMode =
-        $session->get_request( $dd->oiddef('bridgeOperationalMode') );
+    my $bridgeMode = $info->{'bridgeOperationalMode'};
 
-    my $remoteMac = 
-        $session->get_request( $dd->oiddef('bridgeRemoteBridgeBSSID') );
-    
-    $remoteMac = 
-        substr($remoteMac->{ $dd->oiddef('bridgeRemoteBridgeBSSID') },2);
+    my $remoteMac = substr($info->{'bridgeRemoteBridgeBSSID'},2);
     
     $remoteMac =~ s/(\w\w)/$1-/g;
     $remoteMac = substr($remoteMac,0,-1);
@@ -106,13 +92,12 @@ sub discover
     $macaddr =~ s/(\w\w)/$1-/g;
     $macaddr = substr($macaddr,0,-1);
     
-
     $data->{'param'}{'comment'} = $bridgeName;
-
+    
     if ($productname =~ m/airPoint/)
     {
         #we have an access point
-        if ($bridgeMode->{$dd->oiddef('bridgeOperationalMode')} == 3)
+        if ($bridgeMode == 3)
         {
             #we have an access point in client bridge mode.
             $bridge=1;

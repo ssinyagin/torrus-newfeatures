@@ -1602,7 +1602,7 @@
     <param name="overview-page-title-size" value="Total Size"/>
     <!-- Usage -->
     <param name="overview-subleave-name-usage" value="Usage"/>
-    <param name="overview-shortcut-text-usage" value="Used"/>
+    <param name="overview-shortcut-text-usage" value="Usage"/>
     <param name="overview-shortcut-title-usage"
           value="Show usage consumed of HDD's on one page"/>
     <param name="overview-page-title-usage" value="Total Used"/>

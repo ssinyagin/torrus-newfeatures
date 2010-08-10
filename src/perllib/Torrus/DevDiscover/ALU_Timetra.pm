@@ -342,6 +342,7 @@ sub buildConfig
             my $param = {
                 'precedence' => 100000 - $custId,
                 'comment'    => $data->{'timetraCustDescr'}{$custId},
+                'timetra-customer-id' => $custId,
             };
             
             my $custNode =

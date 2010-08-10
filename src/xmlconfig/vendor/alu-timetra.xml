@@ -131,6 +131,9 @@
       <param name="ext-counter-max"   value="1e15"/>
       <param name="graph-lower-limit" value="0" />
 
+      <param name="nodeid-sap">
+        sap//%nodeid-device%//%timetra-customer-id%//%timetra-sap-name%
+      </param>
 
       <leaf name="InOut_bps">
         <param name="comment"
@@ -139,6 +142,8 @@
         <param name="graph-lower-limit" value="0" />
         <param name="rrd-hwpredict"    value="disabled" />
         <param name="precedence"       value="5000" />
+        <param name="nodeid"           value="%nodeid-sap%//inoutbit"/>
+
         <param name="ds-type"          value="rrd-multigraph" />
         <param name="ds-names"         value="ingrinp,ingrop,egrinp,egrop" />
 

@@ -300,8 +300,7 @@ sub discover
 
     if( not defined( $data->{'nameref'}{'ifNodeid'} ) )
     {
-        $data->{'nameref'}{'ifNodeid'} =
-            $data->{'nameref'}{'ifReferenceName'};
+        $data->{'nameref'}{'ifNodeid'} = 'ifNodeid';
     }
     
     if( not defined( $data->{'nameref'}{'ifNodeidPrefix'} ) )
@@ -476,6 +475,12 @@ sub buildConfig
         {
             $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
                 'if//%nodeid-device%//';
+        }
+        
+        if( not defined( $interface->{$data->{'nameref'}{'ifNodeid'}} ) )
+        {
+            $interface->{$data->{'nameref'}{'ifNodeid'}} =
+                $interface->{$data->{'nameref'}{'ifReferenceName'}};
         }
 
         # A per-interface value which is used by leafs in IF-MIB templates

@@ -154,9 +154,11 @@ sub discover
 
         # Populate the rest of interface attributes as parameters.
         # They can be used in monitor notifications.
+        # all non-alphanumeric symbols in key names are replaced with dashes
 
         while( my ($key, $val) = each %{$mnet_attr} )
         {
+            $key =~ s/[^a-zA-Z0-9]+/-/go;            
             $interface->{'param'}{'mnet-attr-' . $key} = $val;
         }
 

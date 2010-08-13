@@ -73,6 +73,9 @@ my %snmpV1Hosts;
 # SNMP tables lookup maps
 my %maps;
 
+# Old lookup maps, used temporarily during refresh cycle
+my %oldMaps;
+
 # How frequent we refresh the SNMP mapping
 our $mapsRefreshPeriod;
 
@@ -541,12 +544,20 @@ sub lookupMap
 
     my $cref = $collector->collectorData( 'snmp' );
     my $maphash = join('#', $hosthash, $map);
-
+    
     if( not defined( $maps{$hosthash}{$map} ) )
-    {        
+    {
+        my $ret;
+
+        if( defined( $oldMaps{$hosthash}{$map} ) and
+            defined( $key ) )
+        {
+            $ret = $oldMaps{$hosthash}{$map}{$key};
+        }
+        
         if( $mapLookupScheduled{$maphash} )
         {
-            return undef;
+            return $ret;
         }
 
         if( scalar(@mappingSessions) >=
@@ -563,7 +574,7 @@ sub lookupMap
         my $session = openNonblockingSession( $collector, $token, $hosthash );
         if( not defined($session) )
         {
-            return undef;
+            return $ret;
         }
         else
         {
@@ -585,7 +596,7 @@ sub lookupMap
                      rand( $mapsRefreshPeriod * $mapsRefreshRandom ) );
         }
         
-        return undef;
+        return $ret;
     }
 
     if( defined( $key ) )
@@ -1189,6 +1200,8 @@ sub postProcess
                     }
                     my $reptoken = $tokens[0];
 
+                    # save the map for the time of refresh                    
+                    $oldMaps{$hosthash}{$map} = $maps{$hosthash}{$map};
                     delete $maps{$hosthash}{$map};
 
                     # this will schedule the map retrieval for the next

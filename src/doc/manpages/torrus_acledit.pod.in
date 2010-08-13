@@ -88,6 +88,13 @@ name assigns the privilege for all objects.
 
 Creates a new user with the given user ID.
 
+=item B<--addhost>=I<HOST>
+
+Creates a new user for host-based authentication. I<HOST> should be an
+IPv4 or IPv6 address of the HTTP client. The new username is the address
+with all non-alphanumeric characters replaced with underscores.
+Host password is changed by <--hostpassword> option.
+
 =item B<--deluser>=I<UID>
 
 Deletes user with the given user ID.
@@ -107,6 +114,11 @@ Deletes user from the given group.
 =item B<--password>=I<PASSWORD>
 
 Sets user's password.
+
+=item B<--hostpassword>=I<PASSWORD>
+
+Sets the password for host-based authentication. The HTTP client should
+add C<hostauth> parameter with the password as a value.
 
 =item B<--cn>=I<NAME>
 

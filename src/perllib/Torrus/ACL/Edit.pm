@@ -396,6 +396,7 @@ sub setPassword
         {
             my $attrValues = $self->{'auth'}->setPassword( $uid, $password );
             $self->setUserAttributes( $uid, $attrValues );
+            Info('Password set for ' . $uid);
         }
     }
     else

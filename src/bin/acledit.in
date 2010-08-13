@@ -44,11 +44,13 @@ our @denyprivs;
 our @forobjects;
 
 our $adduser;
+our $addhost;
 our $deluser;
 our $moduser;
 our @addtogroups;
 our @delfromgroups;
 our $password;
+our $host_password;
 our $commonname;
 our $exportfile;
 our $exporttemplate = "aclexport.xml";
@@ -71,11 +73,13 @@ my $ok = GetOptions ('addgroup=s'     => \@addgroups,
                      'deny=s'         => \@denyprivs,
                      'for=s'          => \@forobjects,
                      'adduser=s'      => \$adduser,
+                     'addhost=s'      => \$addhost,
                      'deluser=s'      => \$deluser,
                      'moduser=s'      => \$moduser,
                      'addtogroup=s'   => \@addtogroups,
                      'delfromgroup=s' => \@delfromgroups,
                      'password=s'     => \$password,
+                     'hostpassword=s' => \$host_password,
                      'cn=s'           => \$commonname,
                      'export=s'       => \$exportfile,
                      'template=s'     => \$exporttemplate,
@@ -94,8 +98,10 @@ if( not $ok or $help_needed or scalar(@ARGV) > 0 or
     ( ( @permitprivs or @denyprivs ) and not @forobjects ) or
     ( $adduser ? 1:0 ) + ( $deluser ? 1:0 ) + ( $moduser ? 1:0 ) > 1 or
     ( ( @addtogroups or @delfromgroups or
-        length($password) > 0 or length($commonname) > 0 ) and
-      ( length($adduser) == 0 and length($moduser) == 0 ) ) )
+        length($password) > 0 or
+        length($host_password) > 0 or
+        length($commonname) > 0 ) and
+      ( length($adduser) + length($addhost) + length($moduser) == 0 ) ) )
 {
     print STDERR "Usage: $0 [options...]\n",
     "Group Options:\n",
@@ -114,6 +120,7 @@ if( not $ok or $help_needed or scalar(@ARGV) > 0 or
     "  --addtogroup=GROUP      add user to group(s)\n",
     "  --delfromgroup=GROUP    delete user from group(s)\n",
     "  --password=PASSWORD     set the user password\n",
+    "  --hostpassword=PASSWORD set the host password (UID must be a host)\n",
     "  --cn=\"John Smith\"       set the user common name\n",
     "  --showuser=USER         display user details\n",
     "General Options:\n",
@@ -199,6 +206,13 @@ if( $adduser )
     $uid = $adduser;
     $ok = $aclEdit->addUser( $uid, $attrValues ) ? $ok:0;
 }
+elsif( $addhost )
+{
+    $uid = $addhost;
+    $uid =~ s/\W/_/g;
+    $ok = $aclEdit->addUser( $uid, $attrValues ) ? $ok:0;
+}
+
 elsif( $moduser )
 {
     $uid = $moduser;
@@ -212,9 +226,17 @@ elsif( $deluser )
     $ok = $aclEdit->deleteUser( $deluser ) ? $ok:0;
 }
 
-if( $uid and $password )
+if( $uid )
 {
-    $ok = $aclEdit->setPassword( $uid, $password ) ? $ok:0;
+    if( $password )
+    {
+        $ok = $aclEdit->setPassword( $uid, $password ) ? $ok:0;
+    }
+    elsif( $host_password )
+    {
+        $ok = $aclEdit->setPassword( $uid,
+                                     $uid . '//' . $host_password ) ? $ok:0;
+    }
 }
 
 if( $uid and scalar( @addtogroups ) )

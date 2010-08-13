@@ -24,7 +24,7 @@ package Torrus::CGI;
 use strict;
 use CGI;
 use IO::File;
-    
+
 # This modue is not a part of mod_perl
 use Apache::Session::File;
 
@@ -94,7 +94,7 @@ sub process
             return;
         }
     }
-        
+    
     my @paramNames = $q->param();
 
     if( $q->param('DEBUG') and not $Torrus::Renderer::globalDebug ) 
@@ -125,105 +125,130 @@ sub process
 
     if( $Torrus::CGI::authorizeUsers )
     {
-        my $ses_id = $q->cookie('SESSION_ID');
-
-        my $needs_new_session = 1;
-        my %session;
-
-        if( $ses_id )
-        {
-            # create a session object based on the cookie we got from the
-            # browser, or a new session if we got no cookie
-            eval
-            {
-                tie %session, 'Apache::Session::File', $ses_id, {
-                    Directory     => $Torrus::Global::sesStoreDir,
-                    LockDirectory => $Torrus::Global::sesLockDir }
-            };
-            if( not $@ )
-            {
-                if( $options{'variables'}->{'LOGOUT'} )
-                {
-                    tied( %session )->delete();
-                }
-                else
-                {
-                    $needs_new_session = 0;
-                }
-            }
-        }
-
-        if( $needs_new_session )
-        {
-            tie %session, 'Apache::Session::File', undef, {
-                Directory     => $Torrus::Global::sesStoreDir,
-                LockDirectory => $Torrus::Global::sesLockDir };
-        }
-
-        # might be a new session, so lets give them their cookie back
-
-        my %cookie = (-name  => 'SESSION_ID',
-                      -value => $session{'_session_id'});
-           
         $options{'acl'} = new Torrus::ACL;
-
-        if( $session{'uid'} )
+        
+        my $hostauth = $q->param('hostauth');
+        if( defined( $hostauth ) )
         {
-            $options{'uid'} = $session{'uid'};
-            if( $session{'remember_login'} )
+            my $uid = $q->remote_addr();
+            $uid =~ s/\W/_/go;
+            my $password = $uid . '//' . $hostauth;
+
+            Debug('Host-based authentication for ' . $uid);
+            
+            if( not $options{'acl'}->authenticateUser( $uid, $password ) )
             {
-                $cookie{'-expires'} = '+60d';
+                print $q->header(-status=>'403 Forbidden',
+                                 '-type' => 'text/plain');
+                print('Host-based authentication failed for ' . $uid);
+                Info('Host-based authentication failed for ' . $uid);
+                return;
             }
+            
+            Info('Host authenticated: ' . $uid);
+            $options{'uid'} = $uid;
         }
         else
         {
-            my $needsLogin = 1;
+            
+            my $ses_id = $q->cookie('SESSION_ID');
 
-            # POST form parameters
+            my $needs_new_session = 1;
+            my %session;
 
-            my $uid = $q->param('uid');
-            my $password = $q->param('password');
-            if( defined( $uid ) and defined( $password ) )
+            if( $ses_id )
             {
-                if( $options{'acl'}->authenticateUser( $uid, $password ) )
+                # create a session object based on the cookie we got from the
+                # browser, or a new session if we got no cookie
+                eval
                 {
-                    $session{'uid'} = $options{'uid'} = $uid;
-                    $needsLogin = 0;
-                    Info('User logged in: ' . $uid);
+                    tie %session, 'Apache::Session::File', $ses_id, {
+                        Directory     => $Torrus::Global::sesStoreDir,
+                        LockDirectory => $Torrus::Global::sesLockDir }
+                };
+                if( not $@ )
+                {
+                    if( $options{'variables'}->{'LOGOUT'} )
+                    {
+                        tied( %session )->delete();
+                    }
+                    else
+                    {
+                        $needs_new_session = 0;
+                    }
+                }
+            }
+
+            if( $needs_new_session )
+            {
+                tie %session, 'Apache::Session::File', undef, {
+                    Directory     => $Torrus::Global::sesStoreDir,
+                    LockDirectory => $Torrus::Global::sesLockDir };
+            }
+
+            # might be a new session, so lets give them their cookie back
+
+            my %cookie = (-name  => 'SESSION_ID',
+                          -value => $session{'_session_id'});
+            
+            if( $session{'uid'} )
+            {
+                $options{'uid'} = $session{'uid'};
+                if( $session{'remember_login'} )
+                {
+                    $cookie{'-expires'} = '+60d';
+                }
+            }
+            else
+            {
+                my $needsLogin = 1;
+
+                # POST form parameters
+
+                my $uid = $q->param('uid');
+                my $password = $q->param('password');
+                if( defined( $uid ) and defined( $password ) )
+                {
+                    if( $options{'acl'}->authenticateUser( $uid, $password ) )
+                    {
+                        $session{'uid'} = $options{'uid'} = $uid;
+                        $needsLogin = 0;
+                        Info('User logged in: ' . $uid);
+                        
+                        if( $q->param('remember') )
+                        {
+                            $cookie{'-expires'} = '+60d';
+                            $session{'remember_login'} = 1;
+                        }
+                    }
+                    else
+                    {
+                        $options{'authFailed'} = 1;
+                    }
+                }
+
+                if( $needsLogin )
+                {
+                    $options{'urlPassTree'} = $tree;
+                    foreach my $param ( 'token', 'path', 'nodeid', 'view' )
+                    {
+                        my $val = $q->param( $param );
+                        if( defined( $val ) and length( $val ) > 0 )
+                        {
+                            $options{'urlPassParams'}{$param} = $val;
+                        }
+                    }
                     
-                    if( $q->param('remember') )
-                    {
-                        $cookie{'-expires'} = '+60d';
-                        $session{'remember_login'} = 1;
-                    }
-                }
-                else
-                {
-                    $options{'authFailed'} = 1;
+                    ( $fname, $mimetype, $expires ) =
+                        $renderer->renderUserLogin( %options );
+                    
+                    die('renderUserLogin returned undef') unless $fname;
                 }
             }
-
-            if( $needsLogin )
-            {
-                $options{'urlPassTree'} = $tree;
-                foreach my $param ( 'token', 'path', 'nodeid', 'view' )
-                {
-                    my $val = $q->param( $param );
-                    if( defined( $val ) and length( $val ) > 0 )
-                    {
-                        $options{'urlPassParams'}{$param} = $val;
-                    }
-                }
-                
-                ( $fname, $mimetype, $expires ) =
-                    $renderer->renderUserLogin( %options );
-                
-                die('renderUserLogin returned undef') unless $fname;
-            }
+            untie %session;
+            
+            push(@cookies, $q->cookie(%cookie));
         }
-        untie %session;
-        
-        push(@cookies, $q->cookie(%cookie));
     }
 
     if( not $fname )

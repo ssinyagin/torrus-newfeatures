@@ -174,10 +174,11 @@ starts with "tor" would result in Torrus display:
 
 =head2 Apache 2.0.x with FastCGI handler
 
-As of version 1.0.9, Torrus supports the FastCGI server module.  It is also often
-used together with B<Apache 2.0.x> HTTP server.
+As of version 1.0.9, Torrus supports the FastCGI server module.
+It is also often used together with B<Apache 2.0.x> HTTP server.
 
-The following configuration can reside within the virtualhost configuration directive.
+The following configuration can reside within the virtualhost
+configuration directive.
 
   ScriptAlias /torrus "/usr/local/torrus/bin/torrus.fcgi"
   <Directory "/usr/local/torrus/bin/">
@@ -213,6 +214,13 @@ with this parameter.
 
 Optional. Specifies the C<view> name for displaying the tree element.
 If not specified, the defaul view is used.
+
+=item hostauth
+
+Mandatory for host-based authentication. The value is treated as a password
+and the user name is the client's IP address with non-alphanumerics
+replaced with underscores.
+
 
 =item TZ
 

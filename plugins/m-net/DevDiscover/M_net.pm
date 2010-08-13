@@ -188,8 +188,6 @@ sub buildConfig
     my $devNode = shift;
 
     my $data = $devdetails->data();
-
-    $cb->addFileInclusion('m-net/m-net-monitors.xml');
 }
 
 

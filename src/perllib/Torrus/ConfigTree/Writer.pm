@@ -72,7 +72,8 @@ sub new
     foreach my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
     {
         $self->{'db_collectortokens'}->[$instance] =
-            new Torrus::DB( 'collector_tokens' . '_' . $instance,
+            new Torrus::DB( 'collector_tokens' . '_' .
+                            $instance . '_' . $self->{'ds_config_instance'},
                             -Subdir => $self->treeName(),
                             -WriteAccess => 1,
                             -Truncate    => 1 );

@@ -612,8 +612,10 @@ sub beforeRun
 
         my $targets = {};
 
-        my $db_tokens = new Torrus::DB('collector_tokens' . '_' . $instance,
-                                       -Subdir => $tree);
+        my $db_tokens =
+            new Torrus::DB('collector_tokens' . '_' . $instance . '_' .
+                           $config_tree->{'ds_config_instance'},
+                           -Subdir => $tree);
         
         my $cursor = $db_tokens->cursor();
         while( my ($token, $schedule) = $db_tokens->next($cursor) )

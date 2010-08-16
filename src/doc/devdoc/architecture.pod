@@ -295,8 +295,10 @@ the record is not reliable and may be deleted by Monitor.
 
 =back
 
-B<collector_tokens.db> is a I<Hash> database used in order to avoid the
-unneccessary configuration tree walk. Keys and values are as follows:
+B<collector_tokens_X_Y.db> is a I<Hash> database used in order to avoid the
+unneccessary configuration tree walk. X is the collector instance number, and
+Y is the datasource configuration instance number.
+Keys and values are as follows:
 
 =over 4
 

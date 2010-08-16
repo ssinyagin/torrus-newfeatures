@@ -903,9 +903,10 @@ The following actions are supported:
 The argument defines the monitor name to be applied to the input
 or output bytes counter.
 
-=item * C<InErrorsMonitor>, C<OutErrorsMonitor>
+=item * C<InDiscardsMonitor>, C<OutDiscardsMonitor>,
+C<InErrorsMonitor>, C<OutErrorsMonitor>
 
-The argument defines the monitor name to be applied to error and discard
+The argument defines the monitor name to be applied to discard and error 
 counters that are discovered for a given interface.
 
 =item * C<NotifyPolicy>
@@ -918,9 +919,9 @@ for F<action_notify> for more details.
 No argument needed. This action enables Holt-Winters prediction
 for given interface's counters.
 
-=item * C<NoPacketCounters>, C<NoErrorCounters>
+=item * C<NoPacketCounters>, C<NoDiscardCounters>, C<NoErrorCounters>
 
-No argument needed. The action disables the packet or error counters
+No argument needed. The action disables the packet, discard or error counters
 for a given interface to be collected.
 
 =item * C<TokensetMember>

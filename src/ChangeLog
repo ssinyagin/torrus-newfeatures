@@ -1,5 +1,11 @@
 2010-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	Selector actions split: discards moved from NoErrorCounters to
+	NoDiscardCounters;
+	and from InErrorsMonitor/OutErrorsMonitor to
+	InDiscardsMonitor/OutDiscardsMonitor
+
 	* perllib/Torrus/Collector.pm: collector_tokens database now depends
 	on DS configuration instance
 

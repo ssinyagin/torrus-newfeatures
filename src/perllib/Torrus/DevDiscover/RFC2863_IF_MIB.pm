@@ -825,33 +825,38 @@ sub buildConfig
             }
         }
 
-        if( not $interface->{'selectorActions'}{'NoErrorCounters'} )
+        if( not $interface->{'selectorActions'}{'NoDiscardCounters'} )
         {
             if( $interface->{'hasInDiscards'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-discards-in' );
-                if( defined( $interface->{'selectorActions'}->{
-                    'InErrorsMonitor'} ) )
+                if( defined
+                    ($interface->{'selectorActions'}->{'InDiscardsMonitor'}) )
                 {
                     $interface->{'childCustomizations'}->{
                         'Discards_In'}->{'monitor'} =
-                            $interface->{'selectorActions'}{'InErrorsMonitor'};
+                            $interface->{'selectorActions'}{
+                                'InDiscardsMonitor'};
                 }
             }
-
+            
             if( $interface->{'hasOutDiscards'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-discards-out' );
                 if( defined( $interface->{'selectorActions'}->{
-                    'OutErrorsMonitor'} ) )
+                    'OutDiscardsMonitor'} ) )
                 {
                     $interface->{'childCustomizations'}->{
                         'Discards_Out'}->{'monitor'} =
                             $interface->{'selectorActions'}{
-                                'OutErrorsMonitor'};
+                                'OutDiscardsMonitor'};
                 }
             }
+        }
+        
 
+        if( not $interface->{'selectorActions'}{'NoErrorCounters'} )
+        {
             if( $interface->{'hasInErrors'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-errors-in' );
@@ -1317,11 +1322,14 @@ sub getSelectorObjectName
 our %knownSelectorActions =
     ( 'InBytesMonitor'    => 'RFC2863_IF_MIB',
       'OutBytesMonitor'   => 'RFC2863_IF_MIB',
+      'InDiscardsMonitor'  => 'RFC2863_IF_MIB',
+      'OutDiscardsMonitor' => 'RFC2863_IF_MIB',
       'InErrorsMonitor'   => 'RFC2863_IF_MIB',
       'OutErrorsMonitor'  => 'RFC2863_IF_MIB',
       'NotifyPolicy'      => 'RFC2863_IF_MIB',
       'HoltWinters'       => 'RFC2863_IF_MIB',
       'NoPacketCounters'  => 'RFC2863_IF_MIB',
+      'NoDiscardCounters' => 'RFC2863_IF_MIB',
       'NoErrorCounters'   => 'RFC2863_IF_MIB',
       'RemoveInterface'   => 'RFC2863_IF_MIB',
       'TokensetMember'    => 'RFC2863_IF_MIB',

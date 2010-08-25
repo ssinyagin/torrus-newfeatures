@@ -129,30 +129,35 @@ sub buildConfig
             'ds-names'             => 'registered,unregistered,offline',
             'graph-lower-limit'    => '0',
             'precedence'           => '1000',
-            'comment'              =>
-                'Registered, Unregistered and Offline modems on CMTS',
                 
-                'vertical-label'       => 'Modems',
-                'descriptive-nickname'     => '%system-id%: All modems',
-
-                'ds-expr-registered' => '{Modems_Registered}',
-                'graph-legend-registered' => 'Registered',
-                'line-style-registered' => 'AREA',
-                'line-color-registered' => '##blue',
-                'line-order-registered' => '1',
-                
-                'ds-expr-unregistered' => '{Modems_Unregistered}',
-                'graph-legend-unregistered' => 'Unregistered',
-                'line-style-unregistered' => 'STACK',
-                'line-color-unregistered' => '##crimson',
-                'line-order-unregistered' => '2',
-                
-                'ds-expr-offline' => '{Modems_Offline}',
-                'graph-legend-offline' => 'Offline',
-                'line-style-offline' => 'STACK',
-                'line-color-offline' => '##silver',
-                'line-order-offline' => '3',                
-            };
+            'vertical-label'       => 'Modems',
+            'descriptive-nickname'     => '%system-id%: All modems',
+            
+            'ds-expr-registered' => '{Modems_Registered}',
+            'graph-legend-registered' => 'Registered',
+            'line-style-registered' => 'AREA',
+            'line-color-registered' => '##blue',
+            'line-order-registered' => '1',
+            
+            'ds-expr-unregistered' => '{Modems_Unregistered}',
+            'graph-legend-unregistered' => 'Unregistered',
+            'line-style-unregistered' => 'STACK',
+            'line-color-unregistered' => '##crimson',
+            'line-order-unregistered' => '2',
+            
+            'ds-expr-offline' => '{Modems_Offline}',
+            'graph-legend-offline' => 'Offline',
+            'line-style-offline' => 'STACK',
+            'line-color-offline' => '##silver',
+            'line-order-offline' => '3',                
+        };
+        
+        $param->{'comment'} =
+            'Registered, Unregistered and Offline modems on CMTS';
+        
+        $param->{'nodeid'} =
+            $data->{'docsConfig'}{'docsCableUpstream'}{'nodeidCategory'} .
+            '//%nodeid-device%//modems';
         
         my $first = 1;
         foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )

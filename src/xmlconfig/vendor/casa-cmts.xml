@@ -76,12 +76,21 @@
            value="Modem quantities"/>
            
     <param name="rrd-hwpredict"     value="disabled" />
+    
+    <!-- nodeid-docsif is overwritten by devdiscover at the
+         interface level. This definition is here for backward compatibility
+         with older discovery results or for systems which do not use
+         devdiscover -->
+    <param name="nodeid-docsif"
+      value="docs//%nodeid-device%//%interface-nick%//"/>
   </template>
 
   <template name="casa-docsis-modem-quantity">
     <leaf name="Modems">
       <param name="ds-type"           value="rrd-multigraph" />
       <param name="ds-names"          value="total,active,registered" />
+      <param name="nodeid"            value="%nodeid-docsif%//modems"/>
+
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="950" />
       <param name="comment"

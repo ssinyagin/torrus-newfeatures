@@ -113,30 +113,35 @@ sub buildConfig
         # Build All_Modems summary graph
         my $param = {
             'ds-type'              => 'rrd-multigraph',
-            'ds-names'             => 'total,active,registered',
+            'ds-names'             => 'total,active,registered',        
             'graph-lower-limit'    => '0',
-            'precedence'           => '1000',
-            'comment'              =>
-                'Registered, Active and Total modems on CMTS',
+            'precedence'           => '1000',                          
+            'vertical-label'       => 'Modems',
                 
-                'vertical-label'       => 'Modems',
-                
-                'graph-legend-total'   => 'Total',
-                'line-style-total'     => '##totalresource',
-                'line-color-total'     => '##totalresource',
-                'line-order-total'     => '1',
-                
-                'graph-legend-active'  => 'Active',
-                'line-style-active'    => '##resourcepartusage',
-                'line-color-active'    => '##resourcepartusage',
-                'line-order-active'    => '2',
-                
-                'graph-legend-registered'  => 'Registered',
-                'line-style-registered'    => '##resourceusage',
-                'line-color-registered'    => '##resourceusage',
-                'line-order-registered'    => '3',
-                'descriptive-nickname'     => '%system-id%: All modems'
+            'graph-legend-total'   => 'Total',
+            'line-style-total'     => '##totalresource',
+            'line-color-total'     => '##totalresource',
+            'line-order-total'     => '1',
+            
+            'graph-legend-active'  => 'Active',
+            'line-style-active'    => '##resourcepartusage',
+            'line-color-active'    => '##resourcepartusage',
+            'line-order-active'    => '2',
+            
+            'graph-legend-registered'  => 'Registered',
+            'line-style-registered'    => '##resourceusage',
+            'line-color-registered'    => '##resourceusage',
+            'line-order-registered'    => '3',
+            'descriptive-nickname'     => '%system-id%: All modems'
             };
+
+        # for the sake of better Emacs formatting
+        $param->{'comment'} =
+            'Registered, Active and Total modems on CMTS';
+        
+        $param->{'nodeid'} =
+            $data->{'docsConfig'}{'docsCableMaclayer'}{'nodeidCategory'} .
+            '//%nodeid-device%//modems';
         
         my $first = 1;
         foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )

@@ -147,6 +147,7 @@ sub discover
     $data->{'docsConfig'} = {
         'docsCableMaclayer' => {
             'subtreeName' => 'Docsis_MAC_Layer',
+            'nodeidCategory' => 'docsmac',
             'templates' => [],
             'param' => {
                 'node-display-name' => 'DOCSIS MAC Layer',
@@ -154,6 +155,7 @@ sub discover
         },
         'docsCableDownstream' => {
             'subtreeName' => 'Docsis_Downstream',
+            'nodeidCategory' => 'docsds',
             'templates' => [],
             'param' => {
                 'node-display-name' => 'DOCSIS Downstream',
@@ -161,6 +163,7 @@ sub discover
         },
         'docsCableUpstream' => {
             'subtreeName' => 'Docsis_Upstream',
+            'nodeidCategory' => 'docsus',
             'templates' => ['RFC2670_DOCS_IF::docsis-upstream-subtree'],
             'param' => {
                 'node-display-name' => 'DOCSIS Upstream',
@@ -219,17 +222,22 @@ sub buildConfig
                 my $param = $interface->{'docsParams'};
 
                 $param->{'searchable'} = 'yes';
+
+                # Copy some parameters from IF-MIB discovery results
                 
-                $param->{'interface-name'} =
-                    $interface->{'param'}{'interface-name'};            
-                $param->{'interface-nick'} =
-                    $interface->{'param'}{'interface-nick'};
-                $param->{'node-display-name'} =
-                    $interface->{$data->{'nameref'}{'ifReferenceName'}};
+                foreach my $p ('interface-name', 'interface-nick',
+                               'node-display-name', 'comment')
+                {
+                    $param->{$p} = $interface->{'param'}{$p};
+                }
                 
-                $param->{'comment'} =
-                    $interface->{'param'}{'comment'};        
-        
+                $param->{'nodeid-docsif'} =
+                    $data->{'docsConfig'}{$category}{'nodeidCategory'} .
+                    '//%nodeid-device%//' .
+                    $interface->{$data->{'nameref'}{'ifNodeid'}};
+                
+                $param->{'nodeid'} = '%nodeid-docsif%';
+                
                 my $intfNode = $cb->addSubtree
                     ( $subtreeNode,
                       $interface->{$data->{'nameref'}{'ifSubtreeName'}},

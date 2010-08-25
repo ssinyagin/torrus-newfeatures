@@ -45,7 +45,18 @@
 
 <datasources>
 
+  <template name="docsis-subtree-common">
+    <!-- nodeid-docsif is overwritten by devdiscover at the
+         interface level. This definition is here for backward compatibility
+         with older discovery results or for systems which do not use
+         devdiscover -->
+    <param name="nodeid-docsif"
+      value="docs//%nodeid-device%//%interface-nick%//"/>
+  </template>
+
+  
   <template name="docsis-upstream-subtree">
+    <apply-template name="docsis-subtree-common"/>
     <param name="precedence"           value="-500" />
     <param name="comment"        value="DOCSIS upstream channel statistics" />
     <param name="data-file">
@@ -120,11 +131,15 @@
       <!-- This monitor may be redefined by
            DocsisUpSNRMonitor selector action -->
       <param name="monitor"             value="docsis-snr-lower-20db" />
+      
+      <param name="nodeid"            value="%nodeid-docsif%//snr"/>
     </leaf>
 
+    
     <leaf name="FEC_Summary">
       <param name="ds-type"           value="rrd-multigraph" />
       <param name="ds-names"          value="corr,uncorr" />
+      <param name="nodeid"            value="%nodeid-docsif%//fec"/>
 
       <param name="graph-lower-limit"       value="0.01" />
       <param name="graph-upper-limit"       value="100" />
@@ -211,12 +226,14 @@
           value="Upstream frequency"/>
       <param name="graph-legend" value="Frequency" />
       <param name="precedence"   value="600" />
+      <param name="nodeid"            value="%nodeid-docsif%//frequency"/>
     </leaf>
   </template>
 
 
 
   <template name="docsis-downstream-subtree">
+    <apply-template name="docsis-subtree-common"/>
     <param name="precedence"           value="-500" />
     <param name="comment"        value="DOCSIS downstream statistics" />
     <param name="data-file">
@@ -246,6 +263,8 @@
     <leaf name="Utilization">
       <param name="ds-type"           value="rrd-multigraph" />
       <param name="ds-names"          value="util" />
+      <param name="nodeid"            value="%nodeid-docsif%//util"/>
+
       <param name="graph-lower-limit"  value="0" />
       <param name="graph-upper-limit"  value="100" />
 

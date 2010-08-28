@@ -250,10 +250,6 @@ sub compile_params
                 $value =~ s/\s*\:\s*/\:/go;
                 $value =~ s/\s*\;\s*/\;/go;
             }
-            elsif( $param eq 'ds-type' and $value eq 'RRDfile' )
-            {
-                $value = 'rrd-file';
-            }
 
             if( $isDS )
             {

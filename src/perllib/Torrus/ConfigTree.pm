@@ -509,7 +509,7 @@ sub getAliases
     my $self = shift;
     my $token = shift;
 
-    return split( /,/o, $self->{'db_dsconfig'}->get( 'ar:'.$token ) );
+    return $self->{'db_dsconfig'}->getListItems('ar:'.$token);
 }
 
 
@@ -699,6 +699,7 @@ sub getNodeParam
     return $value;
 }
 
+
 sub getParamNames
 {
     my $self = shift;
@@ -707,16 +708,9 @@ sub getParamNames
 
     my $db = $fromDS ? $self->{'db_dsconfig'} : $self->{'db_otherconfig'};
 
-    my $list = $db->get( 'Pl:'.$name );
-    if( defined( $list ) )
-    {
-        return split( /,/o, $list );
-    }
-    else
-    {
-        return ();
-    }
+    return $db->getListItems('Pl:'.$name);
 }
+
 
 sub getParams
 {
@@ -724,12 +718,12 @@ sub getParams
     my $name = shift;
     my $fromDS = shift;
 
-    my %ret = ();
+    my $ret = {};
     foreach my $param ( $self->getParamNames( $name, $fromDS ) )
     {
-        $ret{$param} = $self->getParam( $name, $param, $fromDS );
+        $ret->{$param} = $self->getParam( $name, $param, $fromDS );
     }
-    return \%ret;
+    return $ret;
 }
 
 sub getParent
@@ -760,18 +754,7 @@ sub getChildren
     }
     else
     {
-        my $children = $self->{'db_dsconfig'}->get( 'c:'.$token );
-
-        if( defined $children )
-        {
-            my @clist = split(/,/o, $children);
-            map { $self->{'parentcache'}{$_} = $token; } @clist;
-            return @clist;
-        }
-        else
-        {
-            return ();
-        }
+        return $self->{'db_dsconfig'}->getListItems( 'c:'.$token );
     }
 }
 
@@ -993,9 +976,7 @@ sub getInstanceParam
 sub getViewNames
 {
     my $self = shift;
-    my $vlist = $self->{'db_otherconfig'}->get( 'V:' );
-
-    return defined($vlist) ? split(/,/o, $vlist) : ();
+    return $self->{'db_otherconfig'}->getListItems( 'V:' );
 }
 
 
@@ -1010,9 +991,7 @@ sub viewExists
 sub getMonitorNames
 {
     my $self = shift;
-    my $mlist = $self->{'db_otherconfig'}->get( 'M:' );
-
-    return defined($mlist) ? split(/,/o, $mlist) : ();
+    return $self->{'db_otherconfig'}->getListItems( 'M:' );
 }
 
 sub monitorExists
@@ -1026,9 +1005,7 @@ sub monitorExists
 sub getActionNames
 {
     my $self = shift;
-    my $alist = $self->{'db_otherconfig'}->get( 'A:' );
-
-    return defined($alist) ? split(/,/o, $alist) : ();
+    return $self->{'db_otherconfig'}->getListItems( 'A:' );
 }
 
 
@@ -1077,8 +1054,7 @@ sub tsetExists
 sub getTsets
 {
     my $self = shift;
-    my $list = $self->{'db_sets'}->get('S:');
-    return defined($list) ? split(/,/o, $list) : ();
+    return $self->{'db_sets'}->getListItems('S:');
 }
 
 sub tsetMembers
@@ -1086,8 +1062,7 @@ sub tsetMembers
     my $self = shift;
     my $tset = shift;
 
-    my $list = $self->{'db_sets'}->get('s:'.$tset);
-    return defined($list) ? split(/,/o, $list) : ();
+    return $self->{'db_sets'}->getListItems('s:'.$tset);
 }
 
 sub tsetMemberOrigin
@@ -1133,9 +1108,7 @@ sub getDefinition
 sub getDefinitionNames
 {
     my $self = shift;
-    my $dlist = $self->{'db_dsconfig'}->get( 'D:' );
-
-    return defined($dlist) ? split(/,/o, $dlist) : ();
+    return $self->{'db_dsconfig'}->getListItems( 'D:' );
 }
 
 

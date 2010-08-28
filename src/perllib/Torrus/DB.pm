@@ -172,6 +172,11 @@ sub new
         $self->trunc();
     }
 
+    if( $options{'-Delayed'} )
+    {
+        $self->{'delay_list_commit'} = 1;
+    }
+
     return $self;
 }
 
@@ -312,6 +317,14 @@ sub cleanupEnvironment
     }
 }
 
+
+sub delay
+{
+    my $self = shift;
+    $self->{'delay_list_commit'} = 1;
+}
+
+    
 
 sub trunc
 {
@@ -569,42 +582,50 @@ sub searchSubstring
 
 # Comma-separated list manipulation
 
+sub _populateListCache
+{
+    my $self = shift;
+    my $key = shift;
+
+    if( not exists( $self->{'listcache'}{$key} ) )
+    {
+        my $ref = {};        
+        my $values = $self->get($key);
+        if( defined( $values ) )
+        {
+            foreach my $val (split(/,/o, $values))
+            {
+                $ref->{$val} = 1;
+            }
+        }
+        $self->{'listcache'}{$key} = $ref;
+    }
+}
+
+
+sub _storeListCache
+{
+    my $self = shift;
+    my $key = shift;
+
+    if( not $self->{'delay_list_commit'} )
+    {
+        $self->put($key, join(',', keys %{$self->{'listcache'}{$key}}));
+    }
+}
+
+    
 sub addToList
 {
     my $self = shift;
     my $key = shift;
-    my $newname = shift;
-    my $must_unique = shift;
+    my $newval = shift;
 
-    my $prefix;
-    my $list;
-    if( exists( $self->{'listcache'}{$key} ) )
-    {
-        $list = $self->{'listcache'}{$key};
-    }
-    else
-    {
-        $list = $self->get($key);
-        $self->{'listcache'}{$key} = $list;
-    }
-
-    if( defined($list) and length($list) > 0 )
-    {
-        $prefix = ',';
-        if( grep {$newname eq $_} split(',', $list) )
-        {
-            # This name is already in the list
-            return $must_unique ? 0:1;
-        }
-    }
-    else
-    {
-        $prefix = '';
-    }
-    $list .= $prefix.$newname;
-
-    $self->{'listcache'}{$key} = $list;
-    $self->put($key, $list);
+    $self->_populateListCache($key);
+    
+    $self->{'listcache'}{$key}{$newval} = 1;
+    
+    $self->_storeListCache($key);
 }
 
 
@@ -614,26 +635,10 @@ sub searchList
     my $key = shift;
     my $name = shift;
 
-    my $list;
-    if( exists( $self->{'listcache'}{$key} ) )
-    {
-        $list = $self->{'listcache'}{$key};
-    }
-    else
-    {
-        $list = $self->get($key);
-        $self->{'listcache'}{$key} = $list;
-    }
-
-    if( defined($list) and length($list) > 0 )
-    {
-        if( grep {$name eq $_} split(',', $list) )
-        {
-            return 1;
-        }
-    }
-    return 0;
+    $self->_populateListCache($key);
+    return $self->{'listcache'}{$key}{$name};
 }
+
 
 sub delFromList
 {
@@ -641,54 +646,26 @@ sub delFromList
     my $key = shift;
     my $name = shift;
 
-    my $list;
-    if( exists( $self->{'listcache'}{$key} ) )
+    $self->_populateListCache($key);
+    if( $self->{'listcache'}{$key}{$name} )
     {
-        $list = $self->{'listcache'}{$key};
+        delete $self->{'listcache'}{$key}{$name};
     }
-    else
-    {
-        $list = $self->get($key);
-        $self->{'listcache'}{$key} = $list;
-    }
-
-    if( defined($list) and length($list) > 0 )
-    {
-        my @array = split(',', $list);
-        my $found = 0;
-        foreach my $index (0 .. $#array)
-        {
-            if( $array[$index] eq $name )
-            {
-                splice( @array, $index, 1 );
-                $found = 1;
-                last;
-            }
-        }
-        if( $found )
-        {
-            if( scalar(@array) > 0 )
-            {
-                $list = join(',', @array);
-                $self->{'listcache'}{$key} = $list;
-                $self->put($key, $list);
-            }
-            else
-            {
-                $self->del($key);
-                delete $self->{'listcache'}{$key};
-            }
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    return 0;
+    
+    $self->_storeListCache($key);
 }
 
 
+sub getListItems
+{
+    my $self = shift;
+    my $key = shift;
+
+    $self->_populateListCache($key);
+    return keys %{$self->{'listcache'}{$key}};
+}
+
+    
 
 sub deleteList
 {
@@ -698,6 +675,22 @@ sub deleteList
     delete $self->{'listcache'}{$key};
     $self->del($key);
 }
+
+
+sub commit
+{
+    my $self = shift;
+    
+    if( $self->{'delay_list_commit'} and
+        defined( $self->{'listcache'} ) )
+    {
+        while( my($key, $list) = each %{$self->{'listcache'}} )
+        {
+            $self->put($key, join(',', keys %{$list}));
+        }
+    }
+}
+            
 
 
 1;

@@ -78,7 +78,10 @@ sub new
                             -WriteAccess => 1,
                             -Truncate    => 1 );
     }
-        
+
+    # delay writing of frequently changed values
+    $self->{'db_dsconfig'}->delay();
+    $self->{'db_otherconfig'}->delay();    
     return $self;
 }
 
@@ -348,6 +351,10 @@ sub finalize
 
     if( $status )
     {
+        # write delayed data
+        $self->{'db_dsconfig'}->commit();
+        $self->{'db_otherconfig'}->commit();    
+        
         Verbose('Configuration has compiled successfully. Switching over to ' .
              'DS config instance ' . $self->{'ds_config_instance'} .
              ' and Other config instance ' .

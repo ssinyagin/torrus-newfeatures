@@ -307,10 +307,9 @@ sub compile_subtrees
     my $self = shift;
     my $node = shift;
     my $token = shift;
+    my $iamLeaf = shift;
+    
     my $ok = 1;
-
-    my $path = $self->path($token);
-    my $iamLeaf = $node->nodeName() eq 'leaf';
 
     # Apply templates
 
@@ -319,6 +318,7 @@ sub compile_subtrees
         my $name = $templateapp->getAttribute('name');
         if( not $name )
         {
+            my $path = $self->path($token);
             Error("Template application without a name at $path"); $ok = 0;
         }
         else
@@ -326,11 +326,13 @@ sub compile_subtrees
             my $template = $self->{'Templates'}->{$name};
             if( not defined $template )
             {
+                my $path = $self->path($token);
                 Error("Cannot find template named $name at $path"); $ok = 0;
             }
             else
             {
-                $ok = $self->compile_subtrees( $template, $token ) ? $ok:0;
+                $ok = $self->compile_subtrees
+                    ($template, $token, $iamLeaf) ? $ok:0;
             }
         }
     }
@@ -352,6 +354,7 @@ sub compile_subtrees
         my $value = $setvar->getAttribute('value');
         if( not defined( $name ) or not defined( $value ) )
         {
+            my $path = $self->path($token);
             Error("Setvar statement without name or value in $path"); $ok = 0;
         }
         else
@@ -367,11 +370,12 @@ sub compile_subtrees
         my $var = $iftrue->getAttribute('var');
         if( not defined( $var ) )
         {
+            my $path = $self->path($token);
             Error("Iftrue statement without variable name in $path"); $ok = 0;
         }
         elsif( $self->isTrueVar( $token, $var ) )
         {
-            $ok = $self->compile_subtrees( $iftrue, $token ) ? $ok:0;
+            $ok = $self->compile_subtrees( $iftrue, $token, $iamLeaf ) ? $ok:0;
         }
     }
 
@@ -380,11 +384,13 @@ sub compile_subtrees
         my $var = $iffalse->getAttribute('var');
         if( not defined( $var ) )
         {
+            my $path = $self->path($token);
             Error("Iffalse statement without variable name in $path"); $ok = 0;
         }
         elsif( not $self->isTrueVar( $token, $var ) )
         {
-            $ok = $self->compile_subtrees( $iffalse, $token ) ? $ok:0;
+            $ok = $self->compile_subtrees
+                ( $iffalse, $token, $iamLeaf ) ? $ok:0;
         }
     }
 
@@ -398,6 +404,7 @@ sub compile_subtrees
             my $name = $subtree->getAttribute('name');
             if( not defined( $name ) or length( $name ) == 0 )
             {
+                my $path = $self->path($token);
                 Error("Subtree without a name at $path"); $ok = 0;
             }
             else
@@ -409,6 +416,7 @@ sub compile_subtrees
                 }
                 else
                 {
+                    my $path = $self->path($token);
                     Error("Invalid subtree name: $name at $path"); $ok = 0;
                 }
             }
@@ -419,6 +427,7 @@ sub compile_subtrees
             my $name = $leaf->getAttribute('name');
             if( not defined( $name ) or length( $name ) == 0 )
             {
+                my $path = $self->path($token);
                 Error("Leaf without a name at $path"); $ok = 0;
             }
             else
@@ -426,10 +435,11 @@ sub compile_subtrees
                 if( $self->validate_nodename( $name ) )
                 {
                     my $ltoken = $self->addChild($token, $name);
-                    $ok = $self->compile_subtrees( $leaf, $ltoken ) ? $ok:0;
+                    $ok = $self->compile_subtrees( $leaf, $ltoken, 1 ) ? $ok:0;
                 }
                 else
                 {
+                    my $path = $self->path($token);
                     Error("Invalid leaf name: $name at $path"); $ok = 0;
                 }
             }

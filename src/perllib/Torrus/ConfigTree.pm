@@ -477,20 +477,37 @@ sub nodeExists
     return defined( $self->{'db_dsconfig'}->get( 'pt:'.$path ) );
 }
 
+
+sub nodeType
+{
+    my $self = shift;
+    my $token = shift;
+
+    my $type = $self->{'nodetype_cache'}{$token};
+    if( not defined( $type ) )
+    {
+        $type = $self->{'db_dsconfig'}->get( 'n:'.$token );
+        $self->{'nodetype_cache'}{$token} = $type;
+    }
+    return $type;
+}
+    
+
 sub isLeaf
 {
     my $self = shift;
     my $token = shift;
 
-    return( $self->{'db_dsconfig'}->get( 'n:'.$token ) == 1 );
+    return ( $self->nodeType($token) == 1 );
 }
+
 
 sub isSubtree
 {
     my $self = shift;
     my $token = shift;
 
-    return( $self->{'db_dsconfig'}->get( 'n:'.$token ) == 0 );
+    return( $self->nodeType($token) == 0 );
 }
 
 # Returns the real token or undef
@@ -499,7 +516,7 @@ sub isAlias
     my $self = shift;
     my $token = shift;
 
-    return( ( $self->{'db_dsconfig'}->get( 'n:'.$token ) == 2 ) ?
+    return( ( $self->nodeType($token) == 2 ) ?
             $self->{'db_dsconfig'}->get( 'a:'.$token ) : undef );
 }
 
@@ -586,7 +603,7 @@ sub expandSubstitutions
         $changed = 0;
 
         # Substitute definitions
-        if( index($value, "\$") >= 0 )
+        if( index($value, '$') >= 0 )
         {
             if( not $value =~ /\$(\w+)/o )
             {

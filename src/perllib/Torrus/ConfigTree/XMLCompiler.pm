@@ -241,8 +241,8 @@ sub compile_params
         else
         {
             # Remove spaces in the head and tail.
-            $value =~ s/^\s+//o;
-            $value =~ s/\s+$//o;
+            $value =~ s/^\s+//om;
+            $value =~ s/\s+$//om;
 
             if( $isDS )
             {
@@ -292,19 +292,6 @@ sub compile_ds
 
 
 
-sub expand_name
-{
-    my $self = shift;
-    my $parentpath = shift;
-    my $childname = shift;
-    if( index($childname, '$PARENT') > -1 )
-    {
-        my @pathparts = split(/\//o, $parentpath);
-        my $parentname = pop @pathparts;
-        $childname =~ s/\$PARENT/$parentname/g;
-    }
-    return $childname;
-}
 
 sub validate_nodename
 {
@@ -415,7 +402,6 @@ sub compile_subtrees
             }
             else
             {
-                $name = $self->expand_name( $path, $name );
                 if( $self->validate_nodename( $name ) )
                 {
                     my $stoken = $self->addChild($token, $name.'/');
@@ -437,7 +423,6 @@ sub compile_subtrees
             }
             else
             {
-                $name = $self->expand_name( $path, $name );
                 if( $self->validate_nodename( $name ) )
                 {
                     my $ltoken = $self->addChild($token, $name);

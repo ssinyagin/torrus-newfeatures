@@ -244,13 +244,6 @@ sub compile_params
             $value =~ s/^\s+//o;
             $value =~ s/\s+$//o;
 
-            if( $param eq 'legend' )
-            {
-                # Remove space around delimiters
-                $value =~ s/\s*\:\s*/\:/go;
-                $value =~ s/\s*\;\s*/\;/go;
-            }
-
             if( $isDS )
             {
                 $self->setNodeParam($name, $param, $value);

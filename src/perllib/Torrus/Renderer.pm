@@ -256,16 +256,20 @@ sub xmlnormalize
 {
     my( $txt )= @_;
 
-    # Unscreen special characters
-    $txt =~ s/{COLON}/:/gm;
-    $txt =~ s/{SEMICOL}/;/gm;
-    $txt =~ s/{PERCENT}/%/gm;
+    # Remove spaces in the head and tail.
+    $txt =~ s/^\s+//om;
+    $txt =~ s/\s+$//om;
 
-    $txt =~ s/\&/\&amp\;/gm;
-    $txt =~ s/\</\&lt\;/gm;
-    $txt =~ s/\>/\&gt\;/gm;
-    $txt =~ s/\'/\&apos\;/gm;
-    $txt =~ s/\"/\&quot\;/gm;
+    # Unscreen special characters
+    $txt =~ s/{COLON}/:/ogm;
+    $txt =~ s/{SEMICOL}/;/ogm;
+    $txt =~ s/{PERCENT}/%/ogm;
+
+    $txt =~ s/\&/\&amp\;/ogm;
+    $txt =~ s/\</\&lt\;/ogm;
+    $txt =~ s/\>/\&gt\;/ogm;
+    $txt =~ s/\'/\&apos\;/ogm;
+    $txt =~ s/\"/\&quot\;/ogm;
 
     return $txt;
 }

@@ -556,17 +556,33 @@ sub retrieveNodeParam
     my $token = shift;
     my $param = shift;
 
-    my $value;
+    # walk up the tree and save the grandparent's value at parent's cache
+    
+    my $value;    
     my $currtoken = $token;
+    my @ancestors;
+    my $walked = 0;
+    
     while( not defined($value) and defined($currtoken) )
     {
         $value = $self->getParam( $currtoken, $param, 1 );
         if( not defined $value )
         {
-            # get the parent's token
+            if( $walked )
+            {
+                push( @ancestors, $currtoken );
+            }
+            # walk up to the parent
             $currtoken = $self->getParent($currtoken);
+            $walked = 1;
         }
     }
+
+    foreach my $ancestor ( @ancestors )
+    {
+        $self->{'paramcache'}{$ancestor}{$param} = $value;
+    }
+    
     return $self->expandNodeParam( $token, $param, $value );
 }
 

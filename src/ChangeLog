@@ -1,3 +1,7 @@
+2010-08-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* performance optimizations: XML compiler runs 15-20% faster 
+
 2010-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:

@@ -572,9 +572,12 @@ sub retrieveNodeParam
             {
                 push( @ancestors, $currtoken );
             }
+            else
+            {
+                $walked = 1;
+            }
             # walk up to the parent
             $currtoken = $self->getParent($currtoken);
-            $walked = 1;
         }
     }
 

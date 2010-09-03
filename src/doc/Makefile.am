@@ -28,6 +28,7 @@ EXTRA_DIST = $(SRCPOD)
 
 SRCPOD = \
 		install.pod.in \
+		nodeid_usage.pod.in \
 		reporting_setup.pod.in \
 		rpnexpr.pod.in \
 		rrfw_torrus_migration.pod.in \
@@ -41,6 +42,7 @@ SRCPOD = \
 
 POD_FILES = \
 		install.pod \
+		nodeid_usage.pod \
 		reporting_setup.pod \
 		rpnexpr.pod \
 		rrfw_torrus_migration.pod \
@@ -58,6 +60,7 @@ pkgdocdir  = @pkgdocdir@
 if POD2TEXT_PRESENT
 nodist_pkgdoc_DATA = \
 		install.txt \
+		nodeid_usage.txt \
 		reporting_setup.txt \
 		rpnexpr.txt \
 		rrfw_torrus_migration.txt \

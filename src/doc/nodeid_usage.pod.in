@@ -45,7 +45,7 @@ Extensions in M-Net plugin for NodeID manipulation.
 
 
 This document explains the new concept of NodeID and ways of utilizing
-it for intergaring Torrus into OSS environment.
+it for better integration of Torrus into an OSS environment.
 
 
 =head2 NodeID concept

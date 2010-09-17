@@ -98,6 +98,11 @@ $Torrus::Collector::SNMP::unreachableRetryDelay = 600; # 10 min
 $Torrus::Collector::SNMP::mapsRefreshPeriod = 18000;
 $Torrus::Collector::SNMP::mapsRefreshRandom = 0.40;
 
+# After configuration re-compiling, update the maps.
+# Do it randomly and spread the load evenly between 0 and 30 minutes.
+$Torrus::Collector::SNMP::mapsUpdateInterval = 1800;
+
+
 # Wait 10min between refresh checkups
 $Torrus::Collector::SNMP::mapsExpireCheckPeriod = 600;
 

@@ -82,6 +82,9 @@ our $mapsRefreshPeriod;
 # Random factor in refresh period
 our $mapsRefreshRandom;
 
+# Time period after configuration re-compile when we refresh existing mappings
+our $mapsUpdateInterval;
+
 # how often we check for expired maps
 our $mapsExpireCheckPeriod;
 
@@ -128,6 +131,16 @@ sub initCollectorGlobals
     {
         $db_failures->init();
     }
+
+    # Configuration re-compile was probably caused by new object instances
+    # appearing on the monitored devices. Here we force the maps to refresh
+    # soon enough in order to catch up with the changes
+
+    my $now = time();    
+    foreach my $maphash ( keys %mapsExpire )
+    {
+        $mapsExpire{$maphash} = int( $now + rand( $mapsUpdateInterval ) );
+    }    
 }
 
 

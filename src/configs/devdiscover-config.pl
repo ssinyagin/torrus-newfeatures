@@ -69,6 +69,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::F5BigIp',
      'Torrus::DevDiscover::Foundry',
      'Torrus::DevDiscover::FTOS',
+     'Torrus::DevDiscover::Jacarta',
      'Torrus::DevDiscover::JunOS',
      'Torrus::DevDiscover::Liebert',
      'Torrus::DevDiscover::MicrosoftWindows',
@@ -1059,6 +1060,20 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'FTOS::ftos-temperature-sensor-fahrenheit' => {
          'name'     => 'ftos-temperature-sensor-fahrenheit',
          'source'   => 'vendor/ftos.xml',
+     },
+
+     #### Jacarta
+     'Jacarta::imeter-amps-sensor' => {
+         'name'     => 'imeter-amps-sensor',
+         'source'   => 'vendor/jacarta.xml',
+     },
+     'Jacarta::imeter-humi-sensor' => {
+         'name'     => 'imeter-humi-sensor',
+         'source'   => 'vendor/jacarta.xml',
+     },
+     'Jacarta::imeter-temp-sensor' => {
+         'name'     => 'imeter-temp-sensor',
+         'source'   => 'vendor/jacarta.xml',
      },
 
      ##### Juniper JunOS (by Jon Nistor)

@@ -166,6 +166,10 @@ In-detail traffic statistics.
 
 CPU, Temperature and Power supply statistics.
 
+=item * Jacarta iMeter
+
+Humidity, Temperature, Electric current meters.
+
 =item * Juniper JunOS
 
 Class of service, firewall, operating environment, reverse path forwarding,

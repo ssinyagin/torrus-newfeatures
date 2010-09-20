@@ -116,6 +116,7 @@
     <param name="collector-type"    value="cisco-cbqos" />
     <param name="rrd-create-max"    value="1e15"/>
     <param name="graph-lower-limit" value="0" />
+    <param name="node-display-name" value="QoS Statistics" />
     <param name="data-file"
        value="%system-id%_cbqos_%cbqos-policy-nick%_%cbqos-object-nick%.rrd" />
     <param name="collector-timeoffset-hashstring"

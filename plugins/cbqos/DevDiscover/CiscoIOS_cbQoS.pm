@@ -553,11 +553,8 @@ sub buildChildrenConfigs
                         $interface->{$data->{'nameref'}{'ifNick'}};
 
                     $subtreeName =
-                        $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-                    
-                    $param->{'node-display-name'} =
                         $interface->{$data->{'nameref'}{'ifReferenceName'}};
-                    
+                                        
                     $subtreeComment = $interfaceName;
                     
                     my $ifType = $policyRef->{'cbQosIfType'};
@@ -567,7 +564,7 @@ sub buildChildrenConfigs
                     {
                         my $dlci = $policyRef->{'cbQosFrDLCI'};
                         
-                        $subtreeName .= '_' . $dlci;
+                        $subtreeName .= ' ' . $dlci;
                         $subtreeComment .= ' DLCI ' . $dlci;
                         $policyNick .= '_' . $dlci;
                         
@@ -578,7 +575,7 @@ sub buildChildrenConfigs
                         my $vpi = $policyRef->{'cbQosAtmVPI'};
                         my $vci = $policyRef->{'cbQosAtmVCI'};
                         
-                        $subtreeName .= '_' . $vpi . '_' . $vci;
+                        $subtreeName .= ' ' . $vpi . '/' . $vci;
                         $subtreeComment .= ' PVC ' . $vpi . '/' . $vci;
                         $policyNick .= '_' . $vpi . '_' . $vci;
                         
@@ -606,13 +603,13 @@ sub buildChildrenConfigs
                     my $dir = $direction;
                     $dir =~ s/put$//;
                     
-                    $subtreeName .= '_' . $dir;
+                    $subtreeName .= ' ' . $dir;
                     $subtreeComment .= ' ' . $direction . ' policy';
                     $param->{'cbqos-direction'} = $direction;
                     $policyNick .=  '_' . $dir;
                     
                     $param->{'cbqos-policy-nick'} = $policyNick;
-
+                                  
                     my $ifComment =
                         $interface->{$data->{'nameref'}{'ifComment'}};
                     if( length( $ifComment ) > 0 )
@@ -685,7 +682,7 @@ sub buildChildrenConfigs
 
             my $units = $configRef->{'cbQosQueueingCfgBandwidthUnits'};
 
-            $subtreeName = 'Bandwidth_' . $bandwidth . '_' . $units;
+            $subtreeName = 'Bandwidth ' . $bandwidth . ' ' . $units;
             $subtreeComment = 'Queueing statistics';
             $objectNick = 'qu_' . $bandwidth;
             $param->{'cbqos-queueing-bandwidth'} = $bandwidth;
@@ -754,7 +751,7 @@ sub buildChildrenConfigs
         {
             my $rate = $configRef->{'cbQosTSCfgRate'};
             $objectName = $rate;
-            $subtreeName = sprintf('Shape_%d_bps', $rate );
+            $subtreeName = sprintf('Shape %d bps', $rate );
             $subtreeComment = 'Traffic shaping statistics';
             $objectNick = 'ts_' . $rate;
             $param->{'cbqos-shaping-rate'} = $rate;
@@ -780,7 +777,7 @@ sub buildChildrenConfigs
             my $rate = $configRef->{'cbQosPoliceCfgRate'};
             $objectName = $rate;
 
-            $subtreeName = sprintf('Police_%d_bps', $rate );
+            $subtreeName = sprintf('Police %d bps', $rate );
             $subtreeComment = 'Rate policing statistics';
             $objectNick = 'p_' . $rate;
             $param->{'cbqos-police-rate'} = $rate;
@@ -814,6 +811,7 @@ sub buildChildrenConfigs
 
         if( $buildSubtree )
         {
+            $param->{'node-display-name'} = $subtreeName;
             $subtreeName =~ s/\W+/_/g;
             $subtreeName =~ s/_+$//;
             $objectNick =~ s/\W+/_/g;

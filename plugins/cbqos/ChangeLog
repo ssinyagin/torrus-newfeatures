@@ -1,3 +1,9 @@
+2010-09-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* cisco.ios.cbqos.xml: implemented nodeid (only for CM summarries)
+
+	* DevDiscover/CiscoIOS_cbQoS.pm: implemented node-display-name
+
 2009-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* As of IOS 12.2(33)SRD1 and 12.2(33)SRD2, the object indexes

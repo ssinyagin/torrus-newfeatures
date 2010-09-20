@@ -121,6 +121,10 @@
        value="%system-id%_cbqos_%cbqos-policy-nick%_%cbqos-object-nick%.rrd" />
     <param name="collector-timeoffset-hashstring"
            value="%system-id%:%cbqos-policy-nick%:%cbqos-object-nick%" />
+
+    <param name="cbqos-nodeid-prefix"
+     value="qos//%nodeid-device%//%cbqos-policy-nick%//%cbqos-object-nick%//"/>
+
   </template>
 
   <template name="cisco-cbqos-pkt">
@@ -164,7 +168,8 @@
       <param name="ds-type"           value="rrd-multigraph" />
       <param name="ds-names"          value="prepolicy, dropped" />
       <param name="rrd-hwpredict"     value="disabled" />
-
+      <param name="nodeid"            value="%cbqos-nodeid-prefix%//summary"/>
+      
       <param name="precedence"        value="5000" />
       <param name="comment"    value="Pre-policy and dropped trafic summary" />
       <param name="vertical-label"    value="bps" />

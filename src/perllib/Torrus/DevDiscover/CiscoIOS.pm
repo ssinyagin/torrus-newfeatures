@@ -113,11 +113,6 @@ if( not defined( $interfaceFilter ) )
          'ifDescr' => '^Loopback'
          },
 
-     'unrouted VLAN N' => {
-         'ifType'  => 53,                     # propVirtual
-         'ifDescr' => '^unrouted\s+VLAN\s+\d+'
-         },
-
      'SerialN:N-Bearer Channel' => {
          'ifType'  => 81,                     #  ds0, Digital Signal Level 0
          'ifDescr' => '^Serial.*Bearer\s+Channel'
@@ -197,7 +192,17 @@ sub checkdevtype
             'ifDescr' => '^Vlan\d+'
             };
     }
-        
+
+    # same thing with unrouted VLAN interfaces
+    if( $devdetails->param('CiscoIOS::enable-unrouted-vlan-interfaces')
+        ne 'yes' )
+    {
+        $interfaceFilter->{'unrouted VLAN N'} => {
+            'ifType'  => 53,                     # propVirtual
+            'ifDescr' => '^unrouted\s+VLAN\s+\d+'
+            };
+    }
+    
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
 

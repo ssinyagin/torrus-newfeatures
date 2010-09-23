@@ -1,3 +1,8 @@
+2010-09-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS.pm (checkdevtype):
+	New discovery parameter: CiscoIOS::enable-unrouted-vlan-interfaces
+
 2010-09-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/Jacarta.pm:

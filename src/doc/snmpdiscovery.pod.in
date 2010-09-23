@@ -713,6 +713,13 @@ When set to C<yes>, the interfaces VlanXXX are added to statistics.
 By default they are not included, because some hardware platforms give
 irrelevant counter statistics.
 
+=item * C<CiscoIOS::enable-unrouted-vlan-interfaces>
+
+When set to C<yes>, the interfaces "unrouted Vlan XXX" are added to statistics.
+By default they are not included, because some hardware platforms provide
+no statistics for such interfaces.
+
+
 =item * C<CiscoCatOS::suppress-noname-ports>
 
 When set to C<yes>, only those Catalyst ports are included in configuration

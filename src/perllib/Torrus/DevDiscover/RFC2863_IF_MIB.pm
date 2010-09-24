@@ -773,6 +773,10 @@ sub buildConfig
 
         if( $interface->{'hasOctets'} or $interface->{'hasHCOctets'} )
         {
+            $interface->{'hasChild'}{'Bytes_In'} = 1;
+            $interface->{'hasChild'}{'Bytes_Out'} = 1;
+            $interface->{'hasChild'}{'InOut_bps'} = 1;            
+
             foreach my $dir ( 'In', 'Out' )
             {
                 if( defined( $interface->{'selectorActions'}->
@@ -815,13 +819,22 @@ sub buildConfig
 
         if( not $interface->{'selectorActions'}{'NoPacketCounters'} )
         {
+            my $has_someting = 0;
             if( $interface->{'hasHCUcastPkts'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::ifxtable-hcucast-packets' );
+                $has_someting = 1;
             }
             elsif( $interface->{'hasUcastPkts'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-ucast-packets' );
+                $has_someting = 1;
+            }
+
+            if( $has_someting )
+            {
+                $interface->{'hasChild'}{'Packets_In'} = 1;            
+                $interface->{'hasChild'}{'Packets_Out'} = 1;            
             }
         }
 
@@ -830,6 +843,8 @@ sub buildConfig
             if( $interface->{'hasInDiscards'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-discards-in' );
+                $interface->{'hasChild'}{'Discards_In'} = 1;            
+
                 if( defined
                     ($interface->{'selectorActions'}->{'InDiscardsMonitor'}) )
                 {
@@ -843,6 +858,8 @@ sub buildConfig
             if( $interface->{'hasOutDiscards'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-discards-out' );
+                $interface->{'hasChild'}{'Discards_Out'} = 1;
+                
                 if( defined( $interface->{'selectorActions'}->{
                     'OutDiscardsMonitor'} ) )
                 {
@@ -860,6 +877,8 @@ sub buildConfig
             if( $interface->{'hasInErrors'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-errors-in' );
+                $interface->{'hasChild'}{'Errors_In'} = 1;            
+
                 if( defined( $interface->{'selectorActions'}->{
                     'InErrorsMonitor'} ) )
                 {
@@ -872,6 +891,8 @@ sub buildConfig
             if( $interface->{'hasOutErrors'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-errors-out' );
+                $interface->{'hasChild'}{'Errors_Out'} = 1;            
+
                 if( defined( $interface->{'selectorActions'}->{
                     'OutErrorsMonitor'} ) )
                 {
@@ -977,9 +998,12 @@ sub buildConfig
                             $params->{'ext-service-trees'} =
                                 $extStorageTrees{$serviceid};
                         }
-                        
-                        $interface->{'childCustomizations'}->{
-                            'Bytes_' . $dir} = $params;
+
+                        foreach my $param ( keys %{$params} )
+                        {
+                            $interface->{'childCustomizations'}->{
+                                'Bytes_' . $dir}{$param} = $params->{$param};
+                        }
                     }
                 }
             }
@@ -993,9 +1017,13 @@ sub buildConfig
                 foreach my $childName
                     ( sort keys %{$interface->{'childCustomizations'}} )
                 {
-                    $cb->addLeaf
-                        ( $intfNode, $childName,
-                          $interface->{'childCustomizations'}->{$childName} );
+                    if( $interface->{'hasChild'}{$childName} )
+                    {
+                        $cb->addLeaf
+                            ( $intfNode, $childName,
+                              $interface->{'childCustomizations'}->{
+                                  $childName} );
+                    }
                 }
             }
 

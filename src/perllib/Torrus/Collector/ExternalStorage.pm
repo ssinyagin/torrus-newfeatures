@@ -196,15 +196,22 @@ sub processCounter
     my $timestamp = shift;
 
     my $sref = $collector->storageData( 'ext' );
-    my $ret;
 
     if( isDebug() )
     {
         Debug('ExternalStorage::processCounter: token=' . $token .
               ' value=' . $value . ' timestamp=' . $timestamp);
     }
+
+    if( $value eq 'U' )
+    {
+        # the agent rebooted, so we flush the counter
+        delete $sref->{'prevCounter'}{$token};
+        return undef;
+    }
         
     $value = Math::BigInt->new( $value );
+    my $ret;
     
     if( exists( $sref->{'prevCounter'}{$token} ) )
     {

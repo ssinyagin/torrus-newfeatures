@@ -541,7 +541,7 @@ sub expandOidMappings
         }
     }
 
-    # Debug("OID expanded: $oid_in -> $oid");
+    # Debug('OID expanded: ' . $oid_in . ' -> ' . $oid');
     return $oid;
 }
 
@@ -582,7 +582,7 @@ sub lookupMap
         }
 
         # Retrieve map from host
-        Debug("Retrieving map $map from $hosthash");
+        Debug('Retrieving map ' . $map . ' from ' . $hosthash);
 
         my $session = openNonblockingSession( $collector, $token, $hosthash );
         if( not defined($session) )
@@ -962,7 +962,7 @@ sub runCollector
                     
                     if( Torrus::Log::isDebug() )
                     {
-                        Debug("Sending SNMP PDU to $hosthash:");
+                        Debug('Sending SNMP PDU to ' . $hosthash . ':');
                         foreach my $oid ( @pdu_oids )
                         {
                             Debug($oid);
@@ -1064,7 +1064,7 @@ sub callback
         if( defined $uptimeTicks )
         {
             $uptime = $uptimeTicks / 100;
-            Debug("Uptime: $uptime");
+            Debug('Uptime: ' . $uptime);
         }
         else
         {

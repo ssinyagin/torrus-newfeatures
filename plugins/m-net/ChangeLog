@@ -1,3 +1,8 @@
+2010-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* DevDiscover/M_net.pm (checkdevtype): the discovery parameter
+	M_net::manage is required to be "yes". M_net::skip-host is removed.
+
 2010-08-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* DevDiscover/M_net.pm (discover):

@@ -51,8 +51,22 @@ sub checkdevtype
     my $devdetails = shift;
 
     if( $devdetails->isDevType('RFC2863_IF_MIB') and
-        $devdetails->param('M_net::skip-host') ne 'yes' )
+        $devdetails->param('M_net::manage') eq 'yes' )
     {
+        my $data = $devdetails->data();
+        
+        if( $devdetails->hasCap('nodeidReferenceManaged') )
+        {
+            Error('M_net conflicts with ' .
+                  $data->{'nodeidManagedBy'} . ' in nodeid management. ' .
+                  'Modify the discovery instructions to enable only one of ' .
+                  'the modules to manage nodeid.');
+            return 0;
+        }
+        
+        $devdetails->setCap('nodeidReferenceManaged');
+        $data->{'nodeidManagedBy'} = 'M_net';
+        
         return 1;
     }
 

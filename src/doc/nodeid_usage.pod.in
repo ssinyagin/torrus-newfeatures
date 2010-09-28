@@ -134,6 +134,7 @@ parameters would be set:
 
   <host>
     <param name="snmp-host" value="rtr01.example.com"/>
+    <param name="M_net::manage" value="yes"/>
     <param name="M_net::nodeid-prefix-key" value="assetid"/>
   </host>
 

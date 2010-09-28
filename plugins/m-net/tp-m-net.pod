@@ -75,9 +75,9 @@ Discovery parameters:
 
 =over 4
 
-=item C<M_net::skip-host>
+=item C<M_net::manage>
 
-If set to C<yes>, the corresponding host is skipped from plugin processing.
+The plugin processes only hosts which have this parameter set to C<yes>.
 
 
 =item C<M_net::skip-interfaces>
@@ -110,6 +110,7 @@ C<ct=UPSTREAM> or C<ct=BB> and C<st=act>. It also illustrates
 how 2 levels of threshold
 monitoring can be set up for input and output bandwidth usage:
 
+  <param name="M_net::manage" value="yes"/>
   <param name="selectors" value="mymon"/>
   <param name="mymon-selector-type" value="M_net"/>
   <param name="mymon-selector-expr"  value="{ct1},{ct2},OR,{st},AND"/>
@@ -127,8 +128,8 @@ monitoring can be set up for input and output bandwidth usage:
 
 =head2 Monitors
 
-The M_net discovery module automatically includes the
-file F<m-net/m-net-monitors.xml> into the configuration. The file defines
+The M_net plugin also delivers the file F<m-net/m-net-monitors.xml>
+which can be included into the configuration. The file defines
 the monitors and actions and two tokensets C<warnings> and C<critical>.
 
 

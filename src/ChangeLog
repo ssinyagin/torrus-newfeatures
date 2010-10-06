@@ -1,3 +1,8 @@
+2010-10-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* templates/html-incblocks.txt: 'cssoverlay' now must point to
+	an absolute URL
+
 2010-09-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm (checkdevtype):

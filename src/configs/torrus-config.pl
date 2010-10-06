@@ -169,8 +169,9 @@ $Torrus::Monitor::alarmTimeout = 1209600;
 # The default CSS stylesheet and other details for HTML output.
 # These settings may optionally be overwritten by the styling profile below.
 # Additional CSS overlay may be specified with 'cssoverlay' property,
+# It should point to an absolute URL.
 # for example:
-# $Torrus::Renderer::styling{'default'}{'cssoverlay'} = 'mystyle.css';
+# $Torrus::Renderer::styling{'default'}{'cssoverlay'} = '/mystyle.css';
 #
 %Torrus::Renderer::styling =
     ( 'default' => {'stylesheet'   => 'torrus.css'},

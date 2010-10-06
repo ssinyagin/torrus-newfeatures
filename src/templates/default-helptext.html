@@ -11,7 +11,7 @@
 <STYLE type="text/css" media="all">
   @import url( [% plainURL _ style('stylesheet') %] );
   [% cssoverlay = style('cssoverlay'); IF cssoverlay; %]
-  @import url( [% plainURL _ cssoverlay %] );
+  @import url( [% cssoverlay %] );
   [% END %]
 </STYLE>
 </HEAD>

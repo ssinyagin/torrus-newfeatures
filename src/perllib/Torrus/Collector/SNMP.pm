@@ -132,6 +132,12 @@ sub initCollectorGlobals
         $db_failures->init();
     }
 
+    # re-init counters and collect garbage
+    %oldMaps = ();
+    %hostUnreachableSeen = ();
+    %hostUnreachableRetry = ();
+    %unreachableHostDeleted = ();
+    
     # Configuration re-compile was probably caused by new object instances
     # appearing on the monitored devices. Here we force the maps to refresh
     # soon enough in order to catch up with the changes

@@ -201,7 +201,7 @@ sub renderTreeChooser
         'siteInfo'   => $Torrus::Renderer::siteInfo,
         'version'    => $Torrus::Global::version,
         'xmlnorm'    => \&Torrus::Renderer::xmlnormalize,
-        'userAuth'   => $Torrus::ApacheHandler::authorizeUsers,
+        'userAuth'   => $Torrus::CGI::authorizeUsers,
         'uid'        => $self->{'options'}->{'uid'},
         'userAttr'   => sub { return $self->userAttribute( $_[0] ) },
         'mayDisplayTree' => sub { return $self->
@@ -245,7 +245,7 @@ sub mayGlobalSearch
     my $self = shift;
     
     return ( $Torrus::Renderer::globalSearchEnabled and
-             ( not $Torrus::ApacheHandler::authorizeUsers or
+             ( not $Torrus::CGI::authorizeUsers or
                ( $self->hasPrivilege( '*', 'GlobalSearch' ) ) ) );
 }
 

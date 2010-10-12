@@ -472,7 +472,7 @@ sub may_display_reports
 
     if( $Torrus::Renderer::displayReports )
     {
-        if( not $Torrus::ApacheHandler::authorizeUsers )
+        if( not $Torrus::CGI::authorizeUsers )
         {
             return 1;
         }

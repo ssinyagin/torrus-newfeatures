@@ -260,7 +260,7 @@ sub process
         }
         else
         {
-            if( $Torrus::ApacheHandler::authorizeUsers and
+            if( $Torrus::CGI::authorizeUsers and
                 not $options{'acl'}->hasPrivilege( $options{'uid'}, $tree,
                                                    'DisplayTree' ) )
             {
@@ -270,7 +270,7 @@ sub process
             if( $Torrus::Renderer::displayReports and
                 defined( $q->param('htmlreport') ) )
             {
-                if( $Torrus::ApacheHandler::authorizeUsers and
+                if( $Torrus::CGI::authorizeUsers and
                     not $options{'acl'}->hasPrivilege( $options{'uid'}, $tree,
                                                        'DisplayReports' ) )
                 {

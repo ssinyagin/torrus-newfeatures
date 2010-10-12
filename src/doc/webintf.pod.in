@@ -80,7 +80,7 @@ Default: C<'/torrus'>. A URL that points to Torrus renderer.
 Default: C<'/torrus/plain'>. A URL that points to Torrus plain files directory.
 Normally CSS stylesheet files are resided there..
 
-=item * C<$Torrus::ApacheHandler::authorizeUsers>
+=item * C<$Torrus::CGI::authorizeUsers>
 
 Default: C<1>. When true, the web interface users are required to log in.
 

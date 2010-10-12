@@ -205,7 +205,7 @@ in the section about monitor definitions.
 
 B<Define the ACLs>. By default, user authentication is enabled in the web
 interface. You can change this by setting
-C<$Torrus::ApacheHandler::authorizeUsers = 0> in your F<torrus-siteconfig.pl>.
+C<$Torrus::CGI::authorizeUsers = 0> in your F<torrus-siteconfig.pl>.
 In order to get use of user authentication, you need to create I<groups>
 and I<user> accounts. Each user belongs to one or more groups, and each group
 has access to a set of datasource trees. See

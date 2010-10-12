@@ -41,7 +41,7 @@ C<DisplayTree>, and the object name is the name of the tree that
 this group is allowed to browse.
 
 User authorization in the web interface is controlled by the
-C<$Torrus::ApacheHandler::authorizeUsers> variable in F<torrus-siteconfig.pl>.
+C<$Torrus::CGI::authorizeUsers> variable in F<torrus-siteconfig.pl>.
 
 =head1 GROUP MANAGEMENT OPTIONS
 

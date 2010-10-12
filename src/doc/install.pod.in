@@ -519,7 +519,7 @@ like follows:
 =head2 Access Control Lists
 
 By default, Torrus web interface requires user authentication.
-You can disable this by changing C<$Torrus::ApacheHandler::authorizeUsers>
+You can disable this by changing C<$Torrus::CGI::authorizeUsers>
 to zero in your F<torrus-siteconfig.pl>.
 
 ACLs are controlled by C<acledit> utility. See I<Torrus Manual pages>

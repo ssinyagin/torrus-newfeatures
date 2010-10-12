@@ -230,7 +230,8 @@ sub process
                 if( $needsLogin )
                 {
                     $options{'urlPassTree'} = $tree;
-                    foreach my $param ( 'token', 'path', 'nodeid', 'view' )
+                    foreach my $param ( 'token', 'path', 'nodeid',
+                                        'view', 'v' )
                     {
                         my $val = $q->param( $param );
                         if( defined( $val ) and length( $val ) > 0 )
@@ -336,6 +337,10 @@ sub process
                 }
                 
                 my $view = $q->param('view');
+                if( not defined($view) )
+                {
+                    $view = $q->param('v');
+                }
 
                 ( $fname, $mimetype, $expires ) =
                     $renderer->render( $config_tree, $token, $view, %options );

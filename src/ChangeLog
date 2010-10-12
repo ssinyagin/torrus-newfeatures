@@ -1,3 +1,7 @@
+2010-10-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/CGI.pm: New URL parameter: 'v' is a synonym for 'view'
+
 2010-10-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* templates/html-incblocks.txt: 'cssoverlay' now must point to

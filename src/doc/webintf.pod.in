@@ -221,6 +221,11 @@ with this parameter.
 Optional. Specifies the C<view> name for displaying the tree element.
 If not specified, the defaul view is used.
 
+=item v
+
+Optional. Synonym for C<view> parameter.
+
+
 =item hostauth
 
 Mandatory for host-based authentication. The value is treated as a password

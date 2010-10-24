@@ -64,6 +64,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CiscoIOS_SAA',
      'Torrus::DevDiscover::CiscoSCE',
      'Torrus::DevDiscover::CiscoVDSL',
+     'Torrus::DevDiscover::CiscoWLC',
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
@@ -678,6 +679,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'CiscoVDSL::cvdsl-interface' => {
          'name'   => 'cvdsl-interface',
          'source' => 'vendor/cisco.vdsl-line.xml',
+     },
+     'CiscoWLC::ciscowlc-clients-subtree' => {
+         'name'   => 'ciscowlc-clients-subtree',
+         'source' => 'vendor/cisco.wlc.xml',
+     },
+     'CiscoWLC::ciscowlc-ess-leaf' => {
+         'name'   => 'ciscowlc-ess-leaf',
+         'source' => 'vendor/cisco.wlc.xml',
      },
 
      ### Compaq Insite Manager

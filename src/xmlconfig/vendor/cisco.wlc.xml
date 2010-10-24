@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2010 Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+  $Id$
+
+-->
+
+<!-- Cisco Wireless Controller definitions -->
+
+<configuration>
+
+<definitions>
+
+  <!-- AIRESPACE-WIRELESS-MIB::bsnDot11EssTable -->
+  <def name="bsnDot11EssNumberOfMobileStations"
+       value="1.3.6.1.4.1.14179.2.1.1.1.38" />
+
+</definitions>
+
+<datasources>
+
+  <template name="ciscowlc-clients-subtree">
+    <param name="comment" value="Numbers of client stations per SSID" />
+    <param name="node-display-name" value="Wireless Clients" />
+    <param name="rrd-hwpredict" value="disabled" />
+    <param name="descriptive-nickname" value="%system-id%:%ciscowlc-ssid%" />
+    <param name="graph-title" value="%descriptive-nickname%" />
+  </template>
+  
+  <template name="ciscowlc-ess-leaf">
+      <param name="vertical-label" value="Clients"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="data-file"
+             value="%system-id%_wlcclients_%ciscowlc-essindex%.rrd"/>
+      <param name="snmp-object"
+             value="$bsnDot11EssNumberOfMobileStations.%ciscowlc-essindex%"/>
+      <param name="rrd-ds" value="Clients"/>
+      <param name="graph-legend" value="Wireless Clients"/>
+  </template>
+</datasources>
+
+</configuration>

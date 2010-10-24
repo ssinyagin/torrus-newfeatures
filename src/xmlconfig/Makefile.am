@@ -43,6 +43,7 @@ dist_vendor_DATA = \
 	vendor/cisco.ios.mac-accounting.xml \
 	vendor/cisco.sce.xml \
 	vendor/cisco.vdsl-line.xml \
+	vendor/cisco.wlc.xml \
 	vendor/compaq.cim.xml \
 	vendor/empire.systemedge.xml \
 	vendor/empire.systemedge.ntregperf.xml \

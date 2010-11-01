@@ -30,10 +30,14 @@
 
 =item * Operating System
 
-Any UNIX-like operation system where the required components are working.
-The author's primary development platform is Cygwin
-E<lt>http://www.cygwin.comE<gt>,
-and the primary testing environments are Sun Solaris/SPARC and FreeBSD.
+Torrus should easily run on any UNIX-like operation system, as long as the
+required components are provided.
+
+If the OS mounts F</var/run> directory to a temporary filesystem, C<piddir>
+variable must point to a path on a persistent storage. Alternatively
+C<piddir> can point to F</var/run> itself. The default path is
+F</var/run/torrus>, and temporary filesystems do not preserve subdirectories
+after a system reboot. 
 
 Note to B<VmWare> users: as recommended by Gord Philpott, Linux kernel for
 guest machine needs to be compiled with the following feature enabled:
@@ -110,17 +114,18 @@ combinations:
 
 =over 8
 
-=item * Apache 1.3 with mod_perl 1.0
-
-=item * Apache 2.x with mod_perl 2.0
-
 =item * lighttpd with FastCGI
 
 =item * Apache with FastCGI
 
+=item * Apache 1.3 with mod_perl 1.0
+
+=item * Apache 2.x with mod_perl 2.0
+
 =back
 
-FastCGI is supported in Torrus version 1.0.9 or higher.
+FastCGI is supported in Torrus version 1.0.9 or higher. It is the preferred
+way of using Torrus, more stable than mod_perl.
 
 B<Note:> Starting from Torrus version 1.0.9, C<libapreq2> is no longer
 required.
@@ -238,7 +243,8 @@ according to your local administration policy):
   useradd -c 'Torrus Daemon' -d /usr/local/torrus -g torrus torrus
   usermod -G www,torrus www
 
-Further installation process is mostly as usual:
+Further installation process is mostly as usual (watch out C<piddir> setting,
+as described above):
 
   ./configure
   make

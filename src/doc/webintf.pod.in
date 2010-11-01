@@ -25,128 +25,20 @@
 B<Warning:> This documentation is relevant to Torrus version 1.0.9.
 It is incompatible with previous versions.
 
-=head2 Directory structure
 
-By default, the directory F<@webplaindir@/> is the place
-for static HTML, CSS stylesheets and images.
+=head2 HTTP Server configuration
 
-The default CSS stylesheet files are installed in this directory.
-This directory must be configured with I<SetHandler default-handler>
-directive.
-
-=head2 CSS Stylesheets
-
-Additional user-defined stylesheet files may be added in
-F<webplain> directory.
-The default HTML templates that come with the Torrus distribution use the
-global configuration variable C<$Torrus::Renderer::stylesheet>, which is set
-in F<torrus-config.pl> and may be overwritten in F<torrus-siteconfig.pl>.
-
-=head2 Cache files
-
-All generated HTML and graphical images are cached twice: first on the server,
-and then in your browser. Thus, if you change somehow the HTML
-appearance of your Torrus installation, you need to clean both caches:
-
-   torrus clearcache
-
-This will clear the cache on the server. Then you may use your browser's
-"reload" button, or clear the whole browser cache.
+Torrus WebUI supports mod_perl and FastCGI as server engines. FastCGI was
+introduced in Torrus version 1.0.9, and it is the preferred way of setting up
+Torrus user interface.
 
 
-=head2 Site configuration options
+=head3 lighttpd with FastCGI handler
 
-The following variables may need to be set in your
-F<@siteconfdir@/torrus-siteconfig.pl> file:
+Install FastCGI on your server, and also F<FCGI> Perl module from CPAN.
 
-=over 4
-
-=item * C<$Torrus::Renderer::companyName>
-
-The text that you specify here will appear in the top left corner
-of all HTML pages.
-
-=item * C<$Torrus::Renderer::companyURL>
-
-The company name text will be clickable with the URL specified in
-this variable.
-
-=item * C<$Torrus::Renderer::rendererURL>
-
-Default: C<'/torrus'>. A URL that points to Torrus renderer.
-
-=item * C<$Torrus::Renderer::plainURL>
-
-Default: C<'/torrus/plain'>. A URL that points to Torrus plain files directory.
-Normally CSS stylesheet files are resided there..
-
-=item * C<$Torrus::CGI::authorizeUsers>
-
-Default: C<1>. When true, the web interface users are required to log in.
-
-=back
-
-
-=head2 mod_perl 1.0 handler: Torrus::ApacheHandler 
-
-For more documentation, see E<lt>http://perl.apache.org/E<gt>.
-
-The whole output generation is performed by the C<Torrus::ApacheHandler> class.
-However, you still need access to the F<plain> directory where your CSS
-resides. Typical Apache configuration would look like follows. Make sure
-your configuration does not contain tab characters:
-
-  PerlRequire "@cfgdefdir@/webmux.pl"
-  <Location /torrus>
-    SetHandler perl-script
-    PerlHandler Torrus::ApacheHandler
-  </Location>
-
-The base URL would be in this case:
-
-  http://yourhost/torrus/
-
-
-=head2 mod_perl 2.0 handler: Torrus::Apache2Handler
-
-I<Note:> Apache 2.0 support in Torrus is currently in its early
-development stage.
-
-I<Note:> As of now, C<libapreq2> library is not released yet, and only the
-development version is available. You have to download and install it
-manually.
-
-mod_perl version B<1.99_15> or later is supported. To the moment,
-C<libapreq2> version C<2.04_03-dev> is tested.
-
-Make sure you use C<webmux2.pl> and C<Torrus::Apache2Handler> in your
-configuration.
-
-C<SetHandler modperl> directive should give better performance
-than C<SetHandler perl-script>. Both Perl handlers work the same way
-with Torrus.
-
-Typical Apache 2.0 configuration follows:
-
-  PerlRequire "@cfgdefdir@/webmux2.pl"
-  <Location /torrus>
-    SetHandler perl-script
-    PerlResponseHandler Torrus::Apache2Handler
-  </Location>
-
-The base URL would be in this case:
-
-  http://yourhost/torrus/
-
-
-=head2 lighttpd with FastCGI handler
-
-As of version 1.0.9, Torrus supports FastCGI server module. It is also often
-used together with B<lighttpd> HTTP server.
-
-Install FastCGI on your server, and also F<FCGI> module from CPAN.
-
-Add user "lighttpd" to group "torrus".
+Add user "lighttpd" to group "torrus" (this depends on the user name that is
+used for lighttpd in your OS).
 
 The following configuration creates a virtual host, so that any URL which
 starts with "tor" would result in Torrus display:
@@ -172,7 +64,9 @@ starts with "tor" would result in Torrus display:
   }
 
 
-=head2 Apache 2.0.x with FastCGI handler
+
+
+=head3 Apache 2.0.x with FastCGI handler
 
 As of version 1.0.9, Torrus supports the FastCGI server module.
 It is also often used together with B<Apache 2.x> HTTP server.
@@ -192,6 +86,103 @@ The following is an example of a virtual host with four FastCGI child processes
         Allow           from all
     </Location>
     </VirtualHost>
+
+
+
+
+=head3 mod_perl 1.0 handler: Torrus::ApacheHandler 
+
+For more documentation, see E<lt>http://perl.apache.org/E<gt>.
+
+The whole output generation is performed by the C<Torrus::ApacheHandler> class.
+However, you still need access to the F<plain> directory where your CSS
+resides. Typical Apache configuration would look like follows. Make sure
+your configuration does not contain tab characters:
+
+  PerlRequire "@cfgdefdir@/webmux.pl"
+  <Location /torrus>
+    SetHandler perl-script
+    PerlHandler Torrus::ApacheHandler
+  </Location>
+
+
+
+
+
+=head3 mod_perl 2.0 handler: Torrus::Apache2Handler
+
+Make sure you use C<webmux2.pl> and C<Torrus::Apache2Handler> in your
+configuration.
+
+C<SetHandler modperl> directive should give better performance
+than C<SetHandler perl-script>. Both Perl handlers work the same way
+with Torrus.
+
+Typical Apache 2.0 configuration follows:
+
+  PerlRequire "@cfgdefdir@/webmux2.pl"
+  <Location /torrus>
+    SetHandler perl-script
+    PerlResponseHandler Torrus::Apache2Handler
+  </Location>
+
+
+
+
+=head2 CSS Stylesheets
+
+Additional user-defined stylesheet files may be used with Torrus WebUI.
+The global configuration variable C<%Torrus::Renderer::styling> defines the
+stylesheets for various output media ('default', 'printer' for
+printer-friendly output, and 'report' for monthly traffic HTML reports).
+
+By editing F<torrus-siteconfig.pl>, additional stylesheets can be added as
+C<cssoverlay> values. An absolute URI pointing to the additional CSS file
+is required, for example:
+
+  $Torrus::Renderer::styling{'default'}{'cssoverlay'} = '/mystyle.css';
+
+=head2 Cache files
+
+All generated HTML and graphical images are cached twice: first on the server,
+and then in your browser. Thus, if you change somehow the HTML
+appearance of your Torrus installation, you need to clean both caches. The
+command C<torrus clearcache> would clean the Torrus cache. In addition, you
+may need to clean your browser's cache.
+
+
+=head2 Site configuration options
+
+The following variables can be set in your
+F<@siteconfdir@/torrus-siteconfig.pl> file:
+
+=over 4
+
+=item * C<$Torrus::Renderer::companyName>
+
+The text that you specify here will appear in the top left corner
+of all HTML pages.
+
+=item * C<$Torrus::Renderer::companyURL>
+
+The company name text will be clickable with the URL specified in
+this variable.
+
+=item * C<$Torrus::Renderer::rendererURL>
+
+Default: C<'/torrus'>. A URL that points to Torrus renderer.
+
+=item * C<$Torrus::Renderer::plainURL>
+
+Default: C<'/torrus/plain'>. A URL that points to Torrus plain files directory.
+Normally CSS stylesheet files are resided there.
+
+=item * C<$Torrus::CGI::authorizeUsers>
+
+Default: C<1>. When true, the web interface users are required to log in.
+
+=back
+
 
 
 
@@ -277,4 +268,4 @@ to the HTML template as-is, and may be used for your custom purposes.
 
 =head1 Author
 
-Copyright (c) 2002-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2010 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

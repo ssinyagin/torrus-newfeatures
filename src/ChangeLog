@@ -1,3 +1,8 @@
+2010-11-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):
+	New selector action: AddTemplates
+
 2010-10-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoWLC.pm: new discovery module

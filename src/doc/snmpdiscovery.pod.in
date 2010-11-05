@@ -950,6 +950,14 @@ the ones defined in this action.
 Analagous to C<Parameters>, but the parameters are applied to InBytes and
 OutBytes leaves of the selected interface.
 
+=item * C<AddTemplates>
+
+The argument is a comma-separated list of template names to add at the
+interface level. If a template is not seen in the DevDiscover's template
+registry, it produces a warning. See C<template-registry-overlays>
+for more details about a proper way of adding custom templates.
+
+
 =item * C<DocsisUpSNRMonitor>
 
 For a DOCSIS CMTS, this action assigns a new  monitor to the upstream

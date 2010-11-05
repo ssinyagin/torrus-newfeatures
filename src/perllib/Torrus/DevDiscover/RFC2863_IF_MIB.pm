@@ -955,6 +955,13 @@ sub buildConfig
         
         # Add subtree only if there are template references
 
+        if( defined( $interface->{'selectorActions'}{'AddTemplates'} ) )
+        {
+            push( @templates,
+                  split('\s*,\s*',
+                        $interface->{'selectorActions'}{'AddTemplates'}) );
+        }        
+            
         if( scalar( @templates ) > 0 )
         {
             # process interface-level parameters to copy
@@ -1363,7 +1370,8 @@ our %knownSelectorActions =
       'TokensetMember'    => 'RFC2863_IF_MIB',
       'Parameters'        => 'RFC2863_IF_MIB',
       'InBytesParameters' => 'RFC2863_IF_MIB',
-      'OutBytesParameters' => 'RFC2863_IF_MIB',);
+      'OutBytesParameters' => 'RFC2863_IF_MIB',
+      'AddTemplates'       => 'RFC2863_IF_MIB' );
 
                             
 sub applySelectorAction

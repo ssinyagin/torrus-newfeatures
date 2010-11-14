@@ -1,0 +1,171 @@
+#  Copyright (C) 2010  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 Torrus Working Draft: DOCSIS cable modem monitoring
+
+Status: pending implementation.
+Last revised: Nov 15 2010
+
+
+=head2 Introduction
+
+Torrus has already got templates and the discovery engine for DOCSIS CMTS
+monitoring. This draft explains also the approach to monitoring network
+parameters on each individual modem in the cable network.
+
+=head2 CM inventory
+
+The Docsis provisioning system contains a complete list of valid CM MAC
+addresses. Also the DHCP server contains IP addresses assigned to those
+modems which are online or those which were online before the leases timed out.
+
+As the list of valid CM MAC addresses is relatively stable and independent
+from modem online status, it should be taken as the primary reference for all
+monitored modems in Torrus.
+
+Torrus needs also CM IP addresses in order to access their statistics.
+
+We assume that the CM IP lease time is long enough, and is more than two times
+longer than the Torrus import and re-discovery interval.
+
+In order to import the CM data into Torrus, a new tool should be developed. It
+should accept various forms of tabular input (plain text, JSON, YAML, direct
+SQL access, etc.). The tabular data input defines a number of attributes
+for each modem, as follows:
+
+=over 4
+
+=item * CmMacAddress
+
+[Mandatory] A unique modem MAC address (/^[0-9a-f]{12}$/)
+
+=item * CmIPv6Addr
+
+[Optional] CM management IPv6 address
+
+=item * CmIPv4Addr
+
+[Optional] CM management IPv6 address
+
+=item * CmSvcId
+
+[Optional] Unique Service ID. If undefined, CmMacAddress is taken as the
+Service ID value. This identifier is used as a base for C<nodeid> values.
+Allowed symbols: letters, digits and underscores.
+
+=back
+
+The import tool processes only those modems having IPv4 or IPv6 management
+addresses. Its output is a DevDiscover input XML (DDX) suitable for parallel
+discovery execution. The resulting DDX file contains both CMTS and CM data.
+The same CMTS is not supposed to be used in any other DDX file.
+
+
+In addition to the list of modems, the import tool should receive the following
+parameters:
+
+=over 4
+
+=item * CM SNMP parameters
+
+all SNMP parameters that are understood by Devdiscover, such as snmp-community,
+snmp-version, etc.
+
+=item * CMTS SNMP parameters
+
+all DevDiscover parameters applicable to CMTS, including ifIndex mapping hints,
+selectors, etc.
+
+=back
+
+
+=head2 SNMP discovery
+
+The current RFC2670_DOCS_IF discovery module is only applicable to CMTS.
+It should be extended to be usable with cable modems, and also for per-CM
+statistics on CMTS.
+
+Per-modem statistics on CMTS are organized differently, depending if
+DOCSIS 2.0 and 3.0 is supported by CMTS. The new DOCS-IF3-MIB should be used
+for DOCSIS 3.0 CMTS devices, even if the cable modems are only supporting
+DOCSIS 2.0.
+
+The following CM statistics are collected from CMTS:
+
+=over 4
+
+=item * Upstream RX power
+
+=item * Upstream SNR
+
+=item * Upstream FEC counters (Unerroreds, Correcteds, Uncorrectables)
+
+=back
+
+
+The following statistics are collected from cable modems:
+
+=over 4
+
+=item * Downstream RX power
+
+=item * Downstream SNR
+
+=item * Downstream FEC counters (Unerroreds, Correcteds, Uncorrectables)
+
+=item * Upstream TX power
+
+=back
+
+
+The discovery module should find out if 64-bit FEC counters are supported on
+each device and preferably use them instead of 32-bit counters.
+
+The discovery module should generate per-modem C<nodeid> references based on
+C<CmSvcId> attribute in the import data.
+
+The discovery module should recognize the cable modems and set fixed ifIndex
+mapping for them, so that the collector does not spend extra time on
+interface indexing.
+
+
+=head2 SNMP collection
+
+As there are thousands of modems per CMTS, the SNMP collection job should be
+distributed among multiple collector instances. Also the
+C<collector-instance-hashstring> parameter should include the CMTS system ID
+and CM MAC address, so that per-CM statistics collection from CMTS is spread
+across the collector instances.
+
+
+=head2 Modules organization
+
+It makes sense to move all DOCSIS-related tools, discovery modules, and
+XML templates into a separate Torrus plugin.
+
+
+
+
+
+
+=head1 Author
+
+Copyright (c) 2010 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -83,6 +83,7 @@ dist_devdoc_DATA = \
 		devdoc/reqs.0.1.pod \
 		devdoc/torrus_roadmap.pod \
 		devdoc/wd.distributed.pod \
+		devdoc/wd.docsis-cm-monitoring.pod \
 		devdoc/wd.launcher.pod \
 		devdoc/wd.messaging.pod \
 		devdoc/wd.monitor-escalation.pod \

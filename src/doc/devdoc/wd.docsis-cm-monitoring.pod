@@ -161,6 +161,27 @@ across the collector instances.
 It makes sense to move all DOCSIS-related tools, discovery modules, and
 XML templates into a separate Torrus plugin.
 
+=head2 Graphical presentation
+
+The current Torrus WebUI is not very convenient for watching and surfing
+large flat sets of data, such as CM MAC addresses. It is intended that Torrus
+UI would hand over the graphs to some external DOCSIS management portal.
+The graphs would be referenced by unique C<nodeid> strings, as described in
+I<Torrus/OSS integration: NodeID usage guidelines> document. These strings
+will contain CM MAc addresses or unique Service ID assigned at the data import.
+
+In order to avoid subtrees with thousands of child elements, the per-CM
+subtrees should be organized in multi-level hierarchies. The import tool
+should accept the number of hierarchy levels and the number of nybbles per
+level as parameters. Then each level (except the bottom) would have 16 or 256
+or 4096 child subtrees.
+
+For example, if we use one nybble per level and 3 levels in the hierarchy,
+the statistics for the modem I<00:24:d1:20:48:ac> would lie in a subtree
+I</DOCS_CM/ac/48/20/0024d12048ac/>.
+
+Humans are not supposed to look into this hierarchy, and its mere purpose is
+to speed up the tree walk by the compiler and collector.
 
 
 

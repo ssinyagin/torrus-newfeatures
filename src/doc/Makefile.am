@@ -81,13 +81,7 @@ dist_devdoc_DATA = \
 		devdoc/progstyle.pod \
 		devdoc/reqs.0.0.pod \
 		devdoc/reqs.0.1.pod \
-		devdoc/torrus_roadmap.pod \
-		devdoc/wd.distributed.pod \
-		devdoc/wd.docsis-cm-monitoring.pod \
-		devdoc/wd.launcher.pod \
-		devdoc/wd.messaging.pod \
-		devdoc/wd.monitor-escalation.pod \
-		devdoc/wd.uptime-mon.pod
+		devdoc/torrus_roadmap.pod
 
 SUFFIXES = .pod.in .pod .txt
 

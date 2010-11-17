@@ -1,3 +1,8 @@
+2010-11-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoWLC.pm:
+	new discovery parameter: CiscoWLC::only-ssid
+
 2010-11-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (buildConfig):

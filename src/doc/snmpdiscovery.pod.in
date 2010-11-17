@@ -768,6 +768,11 @@ device comment.
 If set to C<yes>, the corresponding statistics are excluded from Cisco SCE
 graphs.
 
+=item * C<CiscoWLC::only-ssid>
+
+Comma-separated list of SSID which are only allowed for discovery. By default,
+all SSID are allowed.
+
 =item * C<FTOS::disable-cpu>, C<FTOS::disable-power>,
     C<FTOS::disable-temperature>
 

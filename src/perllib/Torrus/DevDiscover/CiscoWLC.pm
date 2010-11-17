@@ -86,9 +86,28 @@ sub discover
     {
         return 1;
     }
-    
+
+    my $filter_ssid = 0;
+    my %only_ssid;
+    if( defined($devdetails->param('CiscoWLC::only-ssid')) )
+    {
+        $filter_ssid = 1;
+        
+        foreach my $ssid
+            (split(/\s*,\s*/, $devdetails->param('CiscoWLC::only-ssid')))
+        {
+            $only_ssid{$ssid} = 1;
+        }
+    }
+             
+
     while( my( $oid, $ssid ) = each %{$ssidTable} )
     {
+        if( $filter_ssid and not $only_ssid{$ssid} )
+        {
+            next;
+        }
+        
         my $INDEX = substr( $oid, $prefixLen );
         my $name = $namesTable->{$name_oid . '.' . $INDEX};
 

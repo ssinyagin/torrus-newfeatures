@@ -64,8 +64,10 @@ our %oiddef =
      'ccarConfigConformAction'           => '1.3.6.1.4.1.9.9.113.1.1.1.1.8',
      'ccarConfigExceedAction'            => '1.3.6.1.4.1.9.9.113.1.1.1.1.9',
      # CISCO-VPDN-MGMT-MIB
-     'cvpdnSystemTunnelTotal'            => '1.3.6.1.4.1.9.10.24.1.1.4.1.2'
-     );
+     'cvpdnSystemTunnelTotal'            => '1.3.6.1.4.1.9.10.24.1.1.4.1.2',
+     # CISCO-WAN-3G-MIB
+     'c3gGsmNearbyCellRscp'              => '1.3.6.1.4.1.9.9.661.1.3.4.2.1.3',
+    );
 
 
 # Not all interfaces are normally needed to monitor.
@@ -536,6 +538,38 @@ sub discover
         }
     }
 
+    if( $devdetails->param('CiscoIOS::disable-3g-stats') ne 'yes' )
+    {
+        my $base = $dd->oiddef('c3gGsmNearbyCellRscp');
+        my $table = $session->get_table( -baseoid => $base );
+        my $prefixLen = length( $base ) + 1;
+        
+        if( defined( $table ) and scalar( %{$table} ) > 0 )
+        {
+            $devdetails->setCap('Cisco3G');
+            
+            while( my( $oid, $val ) = each %{$table} )
+            {
+                my $cellid = substr( $oid, $prefixLen );
+                my( $phy, $cellno ) = split(/\./, $cellid);
+
+                my $phyName = $data->{'entityPhysical'}{$phy}{'name'};
+                if( not defined( $phyName ) )
+                {
+                    $phyName = 'Cellular Modem';
+                }
+                
+                $data->{'cisco3G'}{$cellid} = {
+                    'phy'    => $phy,
+                    'name'   => $phyName,
+                    'cellno' => $cellno,
+                };
+            }
+        }
+    }
+
+            
+            
     if( $devdetails->param('CiscoIOS::short-device-comment') eq 'yes' )
     {
         # Remove serials from device comment
@@ -670,6 +704,30 @@ sub buildConfig
                   'tunIndex' => $INDEX,
                   'tunFile'  => lc($tunnelProtocol) },
                 [ 'CiscoIOS::cisco-vpdn-leaf' ] );
+        }
+    }
+
+    if( $devdetails->hasCap('Cisco3G') )
+    { 
+        foreach my $cellid ( sort keys %{$data->{'cisco3G'}} )
+        {
+            my $r = $data->{'cisco3G'}{$cellid};
+
+            my $subtreeName = '3G_' . $cellid;
+            $subtreeName =~ s/\W/_/go;
+
+            my $displayname = $r->{'name'} . ', Cell #' . $r->{'cellno'};
+            
+            $cb->addSubtree
+                ( $devNode, $subtreeName,
+                  {
+                      'node-display-name' => $displayname,
+                      'comment'  => '3G cellular statistics',
+                      'cisco-3g-cellid' => $cellid,
+                      '3gcell-nodeid' => 'cell//%nodeid-device%//' . $cellid,
+                      'nodeid' => '%3gcell-nodeid%',
+                  },
+                  [ 'CiscoIOS::cisco-3g-stats' ] );
         }
     }
 }

@@ -118,6 +118,12 @@
           value="1.3.6.1.4.1.9.10.24.1.1.4.1.3"/>
   <def name="cvpdnSystemDeniedUsersTotal"
           value="1.3.6.1.4.1.9.10.24.1.1.4.1.4"/>
+  
+  <!-- CISCO-WAN-3G-MIB -->
+  <def name="c3gGsmNearbyCellRscp"
+          value="1.3.6.1.4.1.9.9.661.1.3.4.2.1.3"/>
+  <def name="c3gGsmNearbyCellEcIoMeasurement"
+          value="1.3.6.1.4.1.9.9.661.1.3.4.2.1.4"/>
 
 </definitions>
 
@@ -935,7 +941,40 @@
       <param name="precedence"        value="997" />
     </leaf>
   </template>
+
+  <template name="cisco-3g-dbm">
+    <param name="rrd-create-dstype" value="GAUGE" />
+    <param name="rrd-create-min" value="-150"/>
+    <param name="rrd-create-max" value="0"/>
+    <param name="data-file"
+             value="%system-id%_3g_%cisco-3g-cellid%.rrd" />
+    <param name="graph-upper-limit" value="0" />
+    <param name="graph-lower-limit" value="-150" />
+    <param name="vertical-label" value="dBm" />
+  </template>
+  
+  <template name="cisco-3g-stats">
+    <leaf name="RSCP">
+      <apply-template name="cisco-3g-dbm"/>
+      <param name="comment"     value="Received signal code power" />
+      <param name="graph-legend"    value="RSCP" />      
+      <param name="snmp-object"
+          value="$c3gGsmNearbyCellRscp.%cisco-3g-cellid%"/>
+      <param name="rrd-ds"          value="RSCP" />
+      <param name="nodeid" value="%3gcell-nodeid%//rscp"/>
+    </leaf>
     
+    <leaf name="ECIO">
+      <apply-template name="cisco-3g-dbm"/>
+      <param name="comment"     value="Pilot Strength (Ec/Io)" />
+      <param name="graph-legend"    value="Ec/Io" />      
+      <param name="snmp-object"
+          value="$c3gGsmNearbyCellEcIoMeasurement.%cisco-3g-cellid%"/>
+      <param name="rrd-ds"          value="ECIO" />
+      <param name="nodeid" value="%3gcell-nodeid%//ecio"/>
+    </leaf>
+  </template>
+  
 </datasources>
 
 </configuration>

@@ -132,7 +132,7 @@ DOCSIS uBR-specific variables (modem quantities and channel utilization);
 CISCO-ENHANCED-MEMPOOL-MIB (linecards and VIP modules memory, see notes below);
 MAC accounting statistics (associated with BGP AS numbers when applicable); LRE
 and VDSL line statistics; BGP prefix counts (http://tinyurl.com/y3ganv);
-CAR statistics; VPDN Statistics.
+CAR statistics; VPDN Statistics; 3G cellular statistics.
 
 
 B<Note:> On Cisco 7500, IOS version 12.0(26)S2 or 12.0(26)S3,

@@ -66,7 +66,7 @@ our %oiddef =
      # CISCO-VPDN-MGMT-MIB
      'cvpdnSystemTunnelTotal'            => '1.3.6.1.4.1.9.10.24.1.1.4.1.2',
      # CISCO-WAN-3G-MIB
-     'c3gGsmNearbyCellRscp'              => '1.3.6.1.4.1.9.9.661.1.3.4.2.1.3',
+     'c3gStandard'                       => '1.3.6.1.4.1.9.9.661.1.1.1.1',
     );
 
 
@@ -540,31 +540,41 @@ sub discover
 
     if( $devdetails->param('CiscoIOS::disable-3g-stats') ne 'yes' )
     {
-        my $base = $dd->oiddef('c3gGsmNearbyCellRscp');
+        my $base = $dd->oiddef('c3gStandard');
         my $table = $session->get_table( -baseoid => $base );
         my $prefixLen = length( $base ) + 1;
         
         if( defined( $table ) and scalar( %{$table} ) > 0 )
-        {
-            $devdetails->setCap('Cisco3G');
-            
+        {            
             while( my( $oid, $val ) = each %{$table} )
             {
-                my $cellid = substr( $oid, $prefixLen );
-                my( $phy, $cellno ) = split(/\./, $cellid);
-
-                my $phyName = $data->{'entityPhysical'}{$phy}{'name'};
-                if( not defined( $phyName ) )
+                if( $val == 2 )
                 {
-                    $phyName = 'Cellular Modem';
+                    $devdetails->setCap('Cisco3G');
+                    my $phy = substr( $oid, $prefixLen );
+                    my $phyName = $data->{'entityPhysical'}{$phy}{'name'};
+                    if( not defined( $phyName ) )
+                    {
+                        $phyName = 'Cellular Modem';
+                    }
+                    
+                    $data->{'cisco3G'}{$phy} = {
+                        'name'   => $phyName,
+                        'standard' => 'gsm',
+                    };
                 }
-                
-                $data->{'cisco3G'}{$cellid} = {
-                    'phy'    => $phy,
-                    'name'   => $phyName,
-                    'cellno' => $cellno,
-                };
+                else
+                {
+                    Warn('CISCO-WAN-3G-MIB: CDMA statistics are ' .
+                         'not yet implemented');
+                }
             }
+        }
+
+        my $tokenset = $devdetails->param('CiscoIOS::3g-stats-tokenset');
+        if( defined($tokenset) )
+        {
+            $data->{'cisco3G_tokenset'} = $tokenset;
         }
     }
 
@@ -709,25 +719,38 @@ sub buildConfig
 
     if( $devdetails->hasCap('Cisco3G') )
     { 
-        foreach my $cellid ( sort keys %{$data->{'cisco3G'}} )
+        foreach my $phy ( sort keys %{$data->{'cisco3G'}} )
         {
-            my $r = $data->{'cisco3G'}{$cellid};
-
-            my $subtreeName = '3G_' . $cellid;
-            $subtreeName =~ s/\W/_/go;
-
-            my $displayname = $r->{'name'} . ', Cell #' . $r->{'cellno'};
+            my @templates;
+            my $summary_leaf;
+            if( $data->{'cisco3G'}{$phy}{'standard'} eq 'gsm' )
+            {
+                push(@templates, 'CiscoIOS::cisco-3g-gsm-stats');
+                $summary_leaf = 'RSSI';
+            }
             
-            $cb->addSubtree
+            my $phyName = $data->{'cisco3G'}{$phy}{'name'};
+
+            my $subtreeName = $phyName;
+            $subtreeName =~ s/\W/_/go;
+            
+            my $subtree = $cb->addSubtree
                 ( $devNode, $subtreeName,
                   {
-                      'node-display-name' => $displayname,
+                      'node-display-name' => $phyName,
                       'comment'  => '3G cellular statistics',
-                      'cisco-3g-cellid' => $cellid,
-                      '3gcell-nodeid' => 'cell//%nodeid-device%//' . $cellid,
+                      'cisco-3g-phy' => $phy,
+                      '3gcell-nodeid' => 'cell//%nodeid-device%//' . $phy,
                       'nodeid' => '%3gcell-nodeid%',
                   },
-                  [ 'CiscoIOS::cisco-3g-stats' ] );
+                  \@templates );
+            
+            if( defined($data->{'cisco3G_tokenset'}) )
+            {
+                $cb->addLeaf
+                    ($subtree, $summary_leaf,
+                     {'tokenset-member' => $data->{'cisco3G_tokenset'}});
+            }
         }
     }
 }

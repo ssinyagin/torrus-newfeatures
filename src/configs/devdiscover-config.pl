@@ -590,8 +590,8 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-vpdn-leaf',
          'source' => 'vendor/cisco.ios.xml'
          },
-     'CiscoIOS::cisco-3g-stats' => {
-         'name'   => 'cisco-3g-stats',
+     'CiscoIOS::cisco-3g-gsm-stats' => {
+         'name'   => 'cisco-3g-gsm-stats',
          'source' => 'vendor/cisco.ios.xml'
          },
      'CiscoIOS_Docsis::cisco-docsis-mac-subtree' => {

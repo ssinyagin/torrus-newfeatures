@@ -167,7 +167,8 @@ foreach my $tree ( @trees )
                 {
                     foreach my $member ( $oldConfig->tsetMembers( $ts ) )
                     {
-                        my $origin = $oldConfig->tsetMembers( $ts, $member );
+                        my $origin =
+                            $oldConfig->tsetMemberOrigin( $ts, $member );
                         if( defined( $origin ) and $origin ne 'static' )
                         {
                             my $path = $oldConfig->path($member);

@@ -487,6 +487,10 @@ sub nodeType
     if( not defined( $type ) )
     {
         $type = $self->{'db_dsconfig'}->get( 'n:'.$token );
+        if( not defined( $type ) )
+        {
+            $type = -1;
+        }
         $self->{'nodetype_cache'}{$token} = $type;
     }
     return $type;

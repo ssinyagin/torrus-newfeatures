@@ -298,6 +298,7 @@
       <param name="graph-legend"      value="rtr %rtt-index%" />
       <param name="vertical-label"    value="milliseconds" />
       <param name="graph-lower-limit" value="0"/>
+      <param name="nodeid"   value="sla//%nodeid-device%//%rtt-index%//rtt"/>
     </leaf>
   </template>
 

@@ -1,3 +1,7 @@
+2010-11-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/CGI.pm (do_process): added extra DB cleaninup
+
 2010-11-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm:

@@ -170,6 +170,8 @@ sub discover
             $interface->{'param'} = {};
             $interface->{'vendor_templates'} = [];
 
+            $interface->{'ifIndex'} = $ifIndex;
+            
             $interface->{'ifType'} =
                 $devdetails->snmpVar($dd->oiddef('ifType') . '.' . $ifIndex);
 

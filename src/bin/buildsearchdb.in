@@ -161,7 +161,7 @@ sub splitAndStore
     if( length( $value ) > 0 )
     {
         # split the value into words
-        my @words = split( /\W+/ms, $value );
+        my @words = split( /[^a-zA-Z0-9-_]+/mso, $value );
         if( scalar( @words ) > 0 )
         {
             foreach my $word ( @words )
@@ -170,8 +170,8 @@ sub splitAndStore
                 {
                     $search->storeKeyword( $tree, $word, $path, $param );
                             
-                    # Split the word by underscores and minus
-                    my @subwords = split( /_+/, $word );
+                    # Split the word by underscores and dashes
+                    my @subwords = split( /[-_]+/o, $word );
                     if( scalar( @subwords ) > 1 )
                     {
                         foreach my $subword ( @subwords )

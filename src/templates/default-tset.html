@@ -20,11 +20,35 @@
      IF nodename=='';
        nodename=path(node);
      END;
-     INCLUDE shortgraph
-        token=node
-        nodename=nodename
-        comment=nodeParam(parent(node),'comment',1)
-   %]
+     comment=nodeParam(parent(node),'comment',1); %]   
+  <DIV CLASS="ShortGraph">
+      <DIV CLASS="NodeName">
+        <A HREF="[%url(token,urlview)%]">[% nodename %]</A>
+      </DIV>
+      [%IF comment%]<DIV CLASS="NodeDescr">[%xmlnorm(comment)%]</DIV>[%END%]
+      [%
+        nodeView = param(token,'rrgraph-view');
+        IF nodeView=='';
+          nodeView = nodeParam(node,'rrgraph-views').split(',').0;
+        END;
+        nodevars = [];
+        IF nodeParam(node, 'rrd-hwpredict') == 'enabled' and
+           param(nodeView, 'rrd-hwpredict') != 'disabled';
+          global.hwpredict = 1;
+          IF variables.NOHW;
+            nodevars = ['NOHW', 1];
+          ELSE;
+            nodevars = ['NOHW', ''];          
+          END;
+        END
+      %]
+      <DIV CLASS="GraphImage">
+        <A HREF="[%url(node)%]">
+          <IMG SRC="[%url(node, nodeView, nodevars)%]"
+               ALT="[% param(nodeView, 'description') %]">
+        </A>
+      </DIV>
+  </DIV>  
 </DIV>
   [% IF pos == 1 %]
     [% SET pos = 2 %]

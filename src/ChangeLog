@@ -1,3 +1,10 @@
+2010-12-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm (discover):
+	New discovery parameter: X-tokenset-rrgraph-view
+
+	* templates/default-tset.html: New view parameter: rrgraph-view
+
 2010-11-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
         * perllib/Torrus/DevDiscover/CiscoIOS.pm:
         New discovery parameter: CiscoIOS::enable-dialer-interfaces

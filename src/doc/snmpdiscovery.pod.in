@@ -377,6 +377,11 @@ Each tokenset name is followed by colon (:) and the description text:
     unimportant-graphs: Unimportant Graphs
   </param>
 
+=item * C<XXX-tokenset-rrgraph-view>
+
+For a tokenset XXX, specifies the value of C<rrgraph-view> parameter. It
+defines the view name that is used to display graphs inside the tokenset.
+
 =item * C<suppress-legend>
 
 if set to C<yes>, the legend is not shown. It usually has uptime,

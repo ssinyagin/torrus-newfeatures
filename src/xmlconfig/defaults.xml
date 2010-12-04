@@ -212,6 +212,14 @@
         <param name="start"         value="-24hours" />
         <param name="description"   value="Last 24 hours graph" />
       </view>
+      <view name="lastweek-small">
+        <param name="start"         value="-7days" />
+        <param name="description"   value="Last week graph" />
+      </view>
+      <view name="lastmonth-small">
+        <param name="start"         value="-1month" />
+        <param name="description"   value="Last month graph" />
+      </view>
     </view>
   </view>
 

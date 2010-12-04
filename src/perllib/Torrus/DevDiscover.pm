@@ -442,6 +442,8 @@ sub discover
         foreach my $pair ( split(/\s*;\s*/, $define_tokensets ) )
         {
             my( $tset, $description ) = split( /\s*:\s*/, $pair );
+            my $params = {};
+            
             if( $tset !~ /^[a-z][a-z0-9-_]*$/ )
             {
                 Error('Invalid name for tokenset: ' . $tset);
@@ -454,7 +456,18 @@ sub discover
             }
             else
             {
-                $self->{'define-tokensets'}{$tset} = $description;
+                $params->{'comment'} = $description;
+            }
+
+            my $v = $devdetails->param($tset . '-tokenset-rrgraph-view');
+            if( defined($v) and length($v) > 0 )
+            {
+                $params->{'rrgraph-view'} = $v;
+            }
+
+            if( $ok )
+            {
+                $self->{'define-tokensets'}{$tset} = $params;
             }
         }
     }
@@ -593,8 +606,8 @@ sub buildConfig
         my $tsetsNode = $cb->startTokensets();
         foreach my $tset ( sort keys %{$self->{'define-tokensets'}} )
         {
-            $cb->addTokenset( $tsetsNode, $tset, {
-                'comment' => $self->{'define-tokensets'}{$tset} } );
+            $cb->addTokenset( $tsetsNode, $tset, 
+                              $self->{'define-tokensets'}{$tset} );
         }
     }
 }

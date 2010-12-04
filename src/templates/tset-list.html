@@ -11,7 +11,7 @@
 [%   counter = 0;
      evenRow = 0;
 
-     FOREACH tset = tsetList();
+     FOREACH tset = tsetList().sort;
        sz = tsetMembers(tset).size;
 
        IF sz.length > 0 AND sz > 0;

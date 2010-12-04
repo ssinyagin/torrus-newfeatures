@@ -105,11 +105,6 @@ if( not defined( $interfaceFilter ) )
          'ifDescr' => '^Virtual-Access'
          },
      
-     'DialerN' => {
-         'ifType'  => 23,                     # ppp
-         'ifDescr' => '^Dialer'
-         },
-
      'LoopbackN'  => {
          'ifType'  => 24,                     # softwareLoopback
          'ifDescr' => '^Loopback'
@@ -199,12 +194,22 @@ sub checkdevtype
     if( $devdetails->param('CiscoIOS::enable-unrouted-vlan-interfaces')
         ne 'yes' )
     {
-        $interfaceFilter->{'unrouted VLAN N'} => {
+        $interfaceFilter->{'unrouted VLAN N'} = {
             'ifType'  => 53,                     # propVirtual
             'ifDescr' => '^unrouted\s+VLAN\s+\d+'
             };
     }
-    
+
+    # sometimes we want Dialer interface stats
+    if( $devdetails->param('CiscoIOS::enable-dialer-interfaces')
+        ne 'yes' )
+    {
+        $interfaceFilter->{'DialerN'} = {
+            'ifType'  => 23,                     # ppp
+            'ifDescr' => '^Dialer'
+        },
+    }
+
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
 
@@ -740,6 +745,7 @@ sub buildConfig
                       'node-display-name' => $phyName,
                       'comment'  => '3G cellular statistics',
                       'cisco-3g-phy' => $phy,
+                      'cisco-3g-phyname' => $phyName,
                       '3gcell-nodeid' => 'cell//%nodeid-device%//' . $phy,
                       'nodeid' => '%3gcell-nodeid%',
                   },

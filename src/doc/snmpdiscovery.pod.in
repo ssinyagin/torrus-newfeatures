@@ -719,6 +719,9 @@ When set to C<yes>, the interfaces "unrouted Vlan XXX" are added to statistics.
 By default they are not included, because some hardware platforms provide
 no statistics for such interfaces.
 
+=item * C<CiscoIOS::enable-dialer-interfaces>
+
+If set to C<yes>, DialerX interfaces are included in discovery results.
 
 =item * C<CiscoCatOS::suppress-noname-ports>
 

@@ -1,3 +1,7 @@
+2010-11-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+        * perllib/Torrus/DevDiscover/CiscoIOS.pm:
+        New discovery parameter: CiscoIOS::enable-dialer-interfaces
+
 2010-11-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:

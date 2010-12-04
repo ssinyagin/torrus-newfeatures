@@ -1,5 +1,7 @@
 2010-12-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* sup/webplain/torrus.css: slightly darker top and bottom shortcuts
+
 	* perllib/Torrus/DevDiscover.pm (discover):
 	New discovery parameter: X-tokenset-rrgraph-view
 

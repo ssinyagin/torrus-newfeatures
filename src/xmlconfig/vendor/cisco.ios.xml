@@ -966,6 +966,8 @@
       <param name="line-style"         value="AREA" />
       <param name="vertical-label"     value="dBm" />
       <param name="graph-title"        value="%system-id% 3G Stats" />
+      <param name="descriptive-nickname"
+          value="%system-id% %cisco-3g-phyname% RSSI" />
     </leaf>
 
     <leaf name="CellID">
@@ -984,6 +986,8 @@
           value="$c3gGsmCurrentCellId.%cisco-3g-phy%"/>
       <param name="rrd-ds"           value="CellID" />
       <param name="nodeid"           value="%3gcell-nodeid%//cellid"/>
+      <param name="descriptive-nickname"
+          value="%system-id% %cisco-3g-phyname% Cell ID" />
     </leaf>
   </template>
   

@@ -234,6 +234,7 @@ sub clearcache
 
     Debug('Clearing renderer cache');
     my $cursor = $self->{'db'}->cursor( -Write => 1 );
+    sleep(1);
     while( my ($key, $val) = $self->{'db'}->next( $cursor ) )
     {
         my($t_render, $t_expires, $filename, $mime_type) =  split(':', $val);

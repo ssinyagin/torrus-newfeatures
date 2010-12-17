@@ -67,7 +67,7 @@ our %oiddef =
      'cvpdnSystemTunnelTotal'            => '1.3.6.1.4.1.9.10.24.1.1.4.1.2',
      # CISCO-WAN-3G-MIB
      'c3gStandard'                       => '1.3.6.1.4.1.9.9.661.1.1.1.1',
-    );
+     );
 
 
 # Not all interfaces are normally needed to monitor.
@@ -150,7 +150,7 @@ our %tunnelType =
      '1' => 'L2F',
      '2' => 'L2TP',
      '3' => 'PPTP'
-    );
+     );
 
 
 sub checkdevtype
@@ -207,8 +207,8 @@ sub checkdevtype
         $interfaceFilter->{'DialerN'} = {
             'ifType'  => 23,                     # ppp
             'ifDescr' => '^Dialer'
-        },
-    }
+            },
+            }
 
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
@@ -236,7 +236,7 @@ my %ccarAction =
       3 => 'continue',
       4 => 'precedXmit',
       5 => 'precedCont' );
-                      
+
 
 
 sub discover
@@ -405,7 +405,7 @@ sub discover
                 $peer->{'prefixLimit'} =
                     $limitsTable->{$dd->oiddef('cbgpPeerPrefixAdminLimit') .
                                        '.' . $INDEX};
-                    
+                
                 $data->{'cbgpPeers'}{$INDEX} = $peer;                
             }
 
@@ -520,8 +520,8 @@ sub discover
         if( $dd->checkSnmpTable( 'cvpdnSystemTunnelTotal' ) )
         {
             # Find the Tunnel type
-            my $tableTun = $session->get_table(
-                            -baseoid => $dd->oiddef('cvpdnSystemTunnelTotal') );
+            my $tableTun = $session->get_table
+                ( -baseoid => $dd->oiddef('cvpdnSystemTunnelTotal') );
 
             if( $tableTun )
             {
@@ -530,12 +530,12 @@ sub discover
                 $devdetails->storeSnmpVars( $tableTun );
 
                 # VPDN indexing: 1: l2f, 2: l2tp, 3: pptp
-                foreach my $typeIndex (
-                            $devdetails->getSnmpIndices(
-                              $dd->oiddef('cvpdnSystemTunnelTotal') ) )
+                foreach my $typeIndex
+                    ( $devdetails->getSnmpIndices
+                      ( $dd->oiddef('cvpdnSystemTunnelTotal') ) )
                 {
                     Debug("CISCO-VPDN-MGMT-MIB: found Tunnel type " .
-                           $tunnelType{$typeIndex} );
+                          $tunnelType{$typeIndex} );
 
                     $data->{'ciscoVPDN'}{$typeIndex} = $tunnelType{$typeIndex};
                 }
@@ -583,8 +583,8 @@ sub discover
         }
     }
 
-            
-            
+    
+    
     if( $devdetails->param('CiscoIOS::short-device-comment') eq 'yes' )
     {
         # Remove serials from device comment
@@ -664,12 +664,12 @@ sub buildConfig
             {
                 $subtreeName .= '_' . $car->{'carIndex'};
             }
-               
+            
             my $param = {
                 'searchable' => 'yes',
                 'car-direction' => $car->{'direction'},
                 'car-index' => $car->{'carIndex'} };
-                
+            
             $param->{'interface-name'} =
                 $interface->{'param'}{'interface-name'};            
             $param->{'interface-nick'} =
@@ -715,10 +715,10 @@ sub buildConfig
             my $tunnelProtocol = $data->{'ciscoVPDN'}{$INDEX};
 
             $cb->addSubtree( $tunnelNode, $tunnelProtocol,
-                { 'comment'  => $tunnelProtocol . ' information',
-                  'tunIndex' => $INDEX,
-                  'tunFile'  => lc($tunnelProtocol) },
-                [ 'CiscoIOS::cisco-vpdn-leaf' ] );
+                             { 'comment'  => $tunnelProtocol . ' information',
+                               'tunIndex' => $INDEX,
+                               'tunFile'  => lc($tunnelProtocol) },
+                             [ 'CiscoIOS::cisco-vpdn-leaf' ] );
         }
     }
 

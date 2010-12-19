@@ -240,11 +240,23 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
 
      #### ADSL-LINE-MIB
-     'RFC2662_ADSL_LINE::adsl-line-interface' => {
-         'name'   => 'adsl-line-interface',
+     'RFC2662_ADSL_LINE::adsl-line-snr' => {
+         'name'   => 'adsl-line-snr',
          'source' => 'generic/rfc2662.adsl-line.xml'
          },
-
+     'RFC2662_ADSL_LINE::adsl-line-atn' => {
+         'name'   => 'adsl-line-atn',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-line-attrate' => {
+         'name'   => 'adsl-line-attrate',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-channel-txrate' => {
+         'name'   => 'adsl-channel-txrate',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     
      #### Alteon application switches
      'Alteon::alteon-cpu' => {
          'name'   => 'alteon-cpu',

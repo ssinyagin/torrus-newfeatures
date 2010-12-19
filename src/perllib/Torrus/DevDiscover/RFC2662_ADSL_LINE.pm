@@ -39,9 +39,15 @@ $Torrus::DevDiscover::registry{'RFC2662_ADSL_LINE'} = {
 our %oiddef =
     (
      # ADSL-LINE-MIB
-     'adslAtucPhysTable'  => '1.3.6.1.2.1.10.94.1.1.2',
      'adslAtucCurrSnrMgn' => '1.3.6.1.2.1.10.94.1.1.2.1.4',
-     'adslAturPhysTable' => '1.3.6.1.2.1.10.94.1.1.3'
+     'adslAtucCurrAtn' => '1.3.6.1.2.1.10.94.1.1.2.1.5',
+     'adslAtucCurrAttainableRate' => '1.3.6.1.2.1.10.94.1.1.2.1.8',
+     'adslAtucChanCurrTxRate' => '1.3.6.1.2.1.10.94.1.1.4.1.2',
+     
+     'adslAturCurrSnrMgn' => '1.3.6.1.2.1.10.94.1.1.3.1.4',
+     'adslAturCurrAtn' => '1.3.6.1.2.1.10.94.1.1.3.1.5',
+     'adslAturCurrAttainableRate' => '1.3.6.1.2.1.10.94.1.1.3.1.8',
+     'adslAturChanCurrTxRate' => '1.3.6.1.2.1.10.94.1.1.5.1.2',
      );
 
 
@@ -51,18 +57,12 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    my $session = $dd->session();
     my $data = $devdetails->data();
 
-    my $atucTable =
-        $session->get_table( -baseoid => $dd->oiddef('adslAtucPhysTable') );
-    if( not defined $atucTable )
+    if( not $dd->checkSnmpTable('adslAtucCurrSnrMgn') )
     {
         return 0;
     }
-    $devdetails->storeSnmpVars( $atucTable );
-
-    ## Do we need to check adslAtucPhysTable ? ##
 
     return 1;
 }
@@ -74,20 +74,37 @@ sub discover
     my $devdetails = shift;
 
     my $data = $devdetails->data();
+    my $session = $dd->session();
 
-    $data->{'adslAtucPhysTable'} = [];
-
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    $data->{'AdslLine'} = {};
+    
+    foreach my $oidname
+        ( 'adslAtucCurrSnrMgn',
+          'adslAtucCurrAtn',
+          'adslAtucCurrAttainableRate',
+          'adslAtucChanCurrTxRate',
+          'adslAturCurrSnrMgn',
+          'adslAturCurrAtn',
+          'adslAturCurrAttainableRate',
+          'adslAturChanCurrTxRate' )
     {
-        if( $devdetails->hasOID( $dd->oiddef('adslAtucCurrSnrMgn') .
-                                 '.' . $ifIndex ) )
-        {
-            push( @{$data->{'adslAtucPhysTable'}}, $ifIndex );
+        my $base = $dd->oiddef($oidname);
+        my $table = $session->get_table( -baseoid => $base );
+        my $prefixLen = length( $base ) + 1;
+        
+        if( defined( $table ) and scalar( %{$table} ) > 0 )
+        {            
+            while( my( $oid, $val ) = each %{$table} )
+            {
+                my $ifIndex = substr( $oid, $prefixLen );
+                $data->{'AdslLine'}{$ifIndex}{$oidname} = 1;
+            }
         }
     }
-
+                
     return 1;
 }
+
 
 
 sub buildConfig
@@ -100,32 +117,63 @@ sub buildConfig
     my $subtreeName = 'ADSL_Line_Stats';
 
     my $param = {
-        'precedence'         => '-600',
-        'comment'            => 'ADSL line statistics'
+        'precedence'          => '-600',
+        'node-display-name'   => 'ADSL line statistics'
         };
+    
     my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName, $param );
 
     my $data = $devdetails->data();
-
-    foreach my $ifIndex ( sort {$a<=>$b} @{$data->{'adslAtucPhysTable'}} )
+    my $precedence = $1000;
+    
+    foreach my $ifIndex ( sort {$a<=>$b} %{$data->{'AdslLine'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
-
+        next if not defined($interface);
+        
         my $ifSubtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
-
-        my $templates = ['RFC2662_ADSL_LINE::adsl-line-interface'];
 
         my $param = {
             'interface-name' => $interface->{'param'}{'interface-name'},
             'interface-nick' => $interface->{'param'}{'interface-nick'},
+            'data-file' => '%system-id%_%interface-nick%_adsl-stats.rrd',
+            'node-display-name' => $interface->{'param'}{'node-display-name'},
             'collector-timeoffset-hashstring' =>'%system-id%:%interface-nick%',
-            'comment'        => $interface->{'param'}{'comment'}
+            'comment'        => $interface->{'param'}{'comment'},
+            'precedence'     => $precedence,
         };
         
-        $param->{'node-display-name'} =
-            $interface->{$data->{'nameref'}{'ifReferenceName'}};
+        my $templates = [];
+
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucCurrSnrMgn'} and
+            $data->{'AdslLine'}{$ifIndex}{'adslAturCurrSnrMgn'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-line-snr');
+        }
         
-        $cb->addSubtree( $subtreeNode, $ifSubtreeName, $param, $templates );
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucCurrAtn'} and
+            $data->{'AdslLine'}{$ifIndex}{'adslAturCurrAtn'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-line-atn');
+        }
+
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucCurrAttainableRate'} and
+            $data->{'AdslLine'}{$ifIndex}{'adslAturCurrAttainableRate'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-line-attrate');
+        }
+        
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucChanCurrTxRate'} and
+            $data->{'AdslLine'}{$ifIndex}{'adslAturChanCurrTxRate'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-channel-txrate');
+        }
+
+        if( scalar(@{$templates}) > 0 )
+        {
+            $cb->addSubtree( $subtreeNode, $ifSubtreeName,
+                             $param, $templates );
+        }
     }
 }
 

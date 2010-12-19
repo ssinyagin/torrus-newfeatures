@@ -1,3 +1,8 @@
+2010-12-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2662_ADSL_LINE.pm:
+	re-organized the templates for Cisco 837 compatibility
+
 2010-12-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* sup/webplain/torrus.css: slightly darker top and bottom shortcuts

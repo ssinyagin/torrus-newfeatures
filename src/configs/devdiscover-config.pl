@@ -606,6 +606,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-3g-gsm-stats',
          'source' => 'vendor/cisco.ios.xml'
          },
+     'CiscoIOS::cisco-port-qos-packets' => {
+         'name'   => 'cisco-port-qos-packets',
+         'source' => 'vendor/cisco.ios.xml'
+         },
      'CiscoIOS_Docsis::cisco-docsis-mac-subtree' => {
          'name'   => 'cisco-docsis-mac-subtree',
          'source' => 'vendor/cisco.ios.docsis.xml'

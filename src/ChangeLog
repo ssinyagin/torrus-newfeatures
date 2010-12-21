@@ -1,3 +1,8 @@
+2010-12-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS.pm:
+	added Port QoS stats (ME3400)
+
 2010-12-19  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2662_ADSL_LINE.pm:

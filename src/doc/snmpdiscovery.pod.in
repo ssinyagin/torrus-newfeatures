@@ -764,6 +764,10 @@ from discovery.
 When set to C<yes>, the VPDN (Virtual Private Dial-up Network) statistics
 are disabled from discovery.
 
+=item * C<CiscoIOS::disable-port-qos-stats>
+
+If set to C<yes>, ME3400 Port QoS statistics are disabled.
+
 =item * C<CiscoIOS::short-device-comment>
 
 If set to C<yes>, the Hw Serial and Revision strings are not shown in

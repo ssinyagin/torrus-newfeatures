@@ -33,7 +33,7 @@ $Torrus::DevDiscover::registry{'CiscoIOS'} = {
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig
-    };
+};
 
 
 our %oiddef =
@@ -67,7 +67,9 @@ our %oiddef =
      'cvpdnSystemTunnelTotal'            => '1.3.6.1.4.1.9.10.24.1.1.4.1.2',
      # CISCO-WAN-3G-MIB
      'c3gStandard'                       => '1.3.6.1.4.1.9.9.661.1.1.1.1',
-     );
+     # CISCO-PORT-QOS-MIB
+     'cportQosDropPkts'                  => '1.3.6.1.4.1.9.9.189.1.3.2.1.7',
+    );
 
 
 # Not all interfaces are normally needed to monitor.
@@ -93,56 +95,56 @@ if( not defined( $interfaceFilter ) )
      'Null0' => {
          'ifType'  => 1,                      # other
          'ifDescr' => '^Null'
-         },
+     },
 
      'E1 N/N/N' => {
          'ifType'  => 18,                     # ds1
          'ifDescr' => '^E1'
-         },
+     },
 
      'Virtual-AccessN' => {
          'ifType'  => 23,                     # ppp
          'ifDescr' => '^Virtual-Access'
-         },
+     },
      
      'LoopbackN'  => {
          'ifType'  => 24,                     # softwareLoopback
          'ifDescr' => '^Loopback'
-         },
+     },
 
      'SerialN:N-Bearer Channel' => {
          'ifType'  => 81,                     #  ds0, Digital Signal Level 0
          'ifDescr' => '^Serial.*Bearer\s+Channel'
-         },
+     },
 
      'Voice Encapsulation (POTS) Peer: N' => {
          'ifType'  => 103                     # voiceEncap
-         },
+     },
 
      'Voice Over IP Peer: N' => {
          'ifType'  => 104                     # voiceOverIp
-         },
+     },
 
      'ATMN/N/N.N-atm subif' => {
          'ifType'  => 134,                    # atmSubInterface
          'ifDescr' => '^ATM[0-9\/]+\.[0-9]+\s+subif'
-         },
+     },
      
      'BundleN' => {
          'ifType'  => 127,                    # docsCableMaclayer
          'ifDescr' => '^Bundle'
-         },
+     },
 
      'EOBCN/N' => {
          'ifType'  => 53,                     # propVirtual
          'ifDescr' => '^EOBC'
-         },
+     },
 
      'FIFON/N' => {
          'ifType'  => 53,                     # propVirtual
          'ifDescr' => '^FIFO'
-         },
-     );
+     },
+    );
 
 our %tunnelType =
     (
@@ -150,7 +152,7 @@ our %tunnelType =
      '1' => 'L2F',
      '2' => 'L2TP',
      '3' => 'PPTP'
-     );
+    );
 
 
 sub checkdevtype
@@ -187,7 +189,7 @@ sub checkdevtype
         $interfaceFilter->{'VlanN'} = {
             'ifType'  => 53,                     # propVirtual
             'ifDescr' => '^Vlan\d+'
-            };
+        };
     }
 
     # same thing with unrouted VLAN interfaces
@@ -197,7 +199,7 @@ sub checkdevtype
         $interfaceFilter->{'unrouted VLAN N'} = {
             'ifType'  => 53,                     # propVirtual
             'ifDescr' => '^unrouted\s+VLAN\s+\d+'
-            };
+        };
     }
 
     # sometimes we want Dialer interface stats
@@ -207,8 +209,8 @@ sub checkdevtype
         $interfaceFilter->{'DialerN'} = {
             'ifType'  => 23,                     # ppp
             'ifDescr' => '^Dialer'
-            },
-            }
+        },
+    }
 
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
@@ -273,14 +275,14 @@ sub discover
                                          . '.' . $ifIndex ) == 0 and
                    $devdetails->snmpVar( $dd->oiddef('ifInOctets')
                                          . '.' . $ifIndex ) > 0
-                   )
+                  )
                   or
                   (
                    $devdetails->snmpVar( $dd->oiddef('ifHCOutOctets')
                                          . '.' . $ifIndex ) == 0 and
                    $devdetails->snmpVar( $dd->oiddef('ifOutOctets')
                                          . '.' . $ifIndex ) > 0
-                   ) ) )
+                  ) ) )
             {
                 Debug('Disabling HC octets for ' . $ifIndex . ': ' .
                       $interface->{'ifDescr'});
@@ -357,7 +359,7 @@ sub discover
                 my $peer = {
                     'peerIP' => $peerIP,
                     'addrFamily' => 'IPv4 Unicast'
-                    };
+                };
                 
                 if( $afi != 1 and $safi != 1 )
                 {
@@ -520,8 +522,8 @@ sub discover
         if( $dd->checkSnmpTable( 'cvpdnSystemTunnelTotal' ) )
         {
             # Find the Tunnel type
-            my $tableTun = $session->get_table
-                ( -baseoid => $dd->oiddef('cvpdnSystemTunnelTotal') );
+            my $tableTun = $session->get_table(
+                -baseoid => $dd->oiddef('cvpdnSystemTunnelTotal') );
 
             if( $tableTun )
             {
@@ -530,9 +532,9 @@ sub discover
                 $devdetails->storeSnmpVars( $tableTun );
 
                 # VPDN indexing: 1: l2f, 2: l2tp, 3: pptp
-                foreach my $typeIndex
-                    ( $devdetails->getSnmpIndices
-                      ( $dd->oiddef('cvpdnSystemTunnelTotal') ) )
+                foreach my $typeIndex (
+                    $devdetails->getSnmpIndices(
+                        $dd->oiddef('cvpdnSystemTunnelTotal') ) )
                 {
                     Debug("CISCO-VPDN-MGMT-MIB: found Tunnel type " .
                           $tunnelType{$typeIndex} );
@@ -583,6 +585,32 @@ sub discover
         }
     }
 
+
+    if( $devdetails->param('CiscoIOS::disable-port-qos-stats') ne 'yes' )
+    {
+        my $base = $dd->oiddef('cportQosDropPkts');
+        my $table = $session->get_table( -baseoid => $base );
+        my $prefixLen = length( $base ) + 1;
+        
+        if( defined( $table ) and scalar( %{$table} ) > 0 )
+        {            
+            $devdetails->setCap('CiscoPortQos');
+            $data->{'ciscoPortQos'} = {};
+            
+            while( my( $oid, $val ) = each %{$table} )
+            {
+                my $qos_entry = substr( $oid, $prefixLen );
+                my($ifIndex, $direction, $qos_index) =
+                    split(/\./o, $qos_entry);
+                
+                $data->{'ciscoPortQos'}{$qos_entry} = {
+                    'ifIndex' => $ifIndex,
+                    'direction' => ($direction==1)?'ingress':'egress',
+                    'qosidx' => $qos_index,
+                };                
+            }
+        }
+    }
     
     
     if( $devdetails->param('CiscoIOS::short-device-comment') eq 'yes' )
@@ -757,6 +785,51 @@ sub buildConfig
                     ($subtree, $summary_leaf,
                      {'tokenset-member' => $data->{'cisco3G_tokenset'}});
             }
+        }
+    }
+
+    if( $devdetails->hasCap('CiscoPortQos') )
+    {
+        my $subtreeNode = $cb->addSubtree
+            ( $devNode, 'Port_QoS',
+              {'node-display-name' => 'QoS drop statistics'} );
+
+        my $precedence = 1000;
+        foreach my $qos_entry (sort keys %{$data->{'ciscoPortQos'}})
+        {
+            my $entry = $data->{'ciscoPortQos'}{$qos_entry};
+            
+            my $interface = $data->{'interfaces'}{$entry->{'ifIndex'}};
+            next unless defined($interface);
+            next if $interface->{'excluded'};
+
+            my $leafName =
+                $interface->{$data->{'nameref'}{'ifSubtreeName'}} . '_' .
+                $entry->{'direction'} . '_drops';
+
+            my $intfName  =
+                $interface->{$data->{'nameref'}{'ifReferenceName'}};
+
+            my $intfNick = $interface->{$data->{'nameref'}{'ifNick'}};
+
+            my $params = {
+                'cisco-pqos-entry' => $qos_entry,
+                'cisco-pqos-ifnick' => $intfNick,
+                'cisco-pqos-direction' => $entry->{'direction'},
+                'graph-legend' => 'Dropped packets',
+                'precedence' => $precedence--,                
+            };
+
+            $params->{'node-display-name'} =
+                $intfName . ' ' . $entry->{'direction'} . ' drops';
+            
+            $params->{'graph-title'} =
+                $params->{'descriptive-nickname'} = 
+                '%system-id% ' . $intfName . ' ' .
+                $entry->{'direction'} . ' drops';
+            
+            $cb->addLeaf($subtreeNode, $leafName, $params,
+                ['CiscoIOS::cisco-port-qos-packets']);
         }
     }
 }

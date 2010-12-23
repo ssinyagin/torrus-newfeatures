@@ -1,3 +1,9 @@
+2010-12-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):
+	ifDescr and ifName are checked for uniqueness before being used for
+	default interface indexing
+
 2010-12-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm:

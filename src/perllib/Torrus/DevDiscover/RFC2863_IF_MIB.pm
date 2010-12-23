@@ -123,19 +123,39 @@ sub discover
     $data->{'param'}{'has-inout-leaves'} = 'yes';
 
     ## Set default interface index mapping
-    
-    $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
-    $data->{'nameref'}{'ifReferenceName'}   = 'ifDescr';
 
-    if( $devdetails->hasCap('ifName') )
+    my $valid_ifDescr = validateReference($devdetails, 'ifDescr');
+    my $valid_ifName = ( $devdetails->hasCap('ifName') and
+                         validateReference($devdetails, 'ifName') );
+    
+    if( $valid_ifDescr )
     {
+        $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
+        $data->{'nameref'}{'ifReferenceName'}   = 'ifDescr';
+
+        if( $valid_ifName )
+        {
+            $data->{'nameref'}{'ifNick'} = 'ifNameT';
+        }
+        else
+        {
+            $data->{'nameref'}{'ifNick'} = 'ifDescrT';
+        }
+    }
+    elsif( $valid_ifName )
+    {
+        $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+        $data->{'nameref'}{'ifReferenceName'} = 'ifName';
         $data->{'nameref'}{'ifNick'} = 'ifNameT';
     }
     else
     {
-        $data->{'nameref'}{'ifNick'} = 'ifDescrT';
+        $devdetails->setCap('interfaceIndexingPersistent');
+        $data->{'nameref'}{'ifSubtreeName'} = 'ifIndex';
+        $data->{'nameref'}{'ifReferenceName'} = 'ifIndex';
+        $data->{'nameref'}{'ifNick'} = 'ifIndex';
     }
-
+    
     if( $devdetails->hasCap('ifAlias') )
     {
         $data->{'nameref'}{'ifComment'} = 'ifAlias';
@@ -1194,13 +1214,42 @@ sub addInterfaceFilter
 }
 
 
+# check if a given reference returns unique names and no empty values
+
+sub validateReference
+{
+    my $devdetails = shift;
+    my $nameref = shift;
+
+    my $data = $devdetails->data();
+    my %seen;
+
+    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+
+        my $entry = $interface->{$nameref};
+        if( not defined($entry) or length($entry) == 0 )
+        {
+            return 0;
+        }
+        if( $seen{$entry} )
+        {
+            return 0;
+        }
+        $seen{$entry} = 1;
+    }
+    return 1;
+}
+
+
 sub uniqueEntries
 {
     my $devdetails = shift;
     my $nameref = shift;
 
     my $data = $devdetails->data();
-    my %count = ();
+    my %count;
 
     foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {

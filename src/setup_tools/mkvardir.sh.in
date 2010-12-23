@@ -32,7 +32,7 @@ if test ! -d $dir; then
     if test "@enable_varperm@" = "yes"; then
 
         if test "x@host_os@" != "xcygwin"; then
-            test -z "$user"  && user=torrus
+            test -z "$user"  && user=@torrus_user@
             test -z "$group" && group=torrus
             test -z "$mode"  && mode=775
         fi

@@ -536,6 +536,13 @@ this case, the C<ifIndex> values are recorded as they are at the moment of
 discovery. This option is ignored if the device is supported by a vendor
 specific discovery module.
 
+=item * C<RFC2863_IF_MIB::ifnick-from-ifname>
+
+Optional. Before Torrus version 1.0.10, C<interface-nick> parameter was
+derived from C<ifName> values, even if they were non-unique. Now this
+interface nick is based on C<ifName> only if it contains unique values.
+This discovery parameter, if set to C<yes>, restores the old behavior.
+
 =item * C<RFC2863_IF_MIB::subtree-name-hint>
 
 Optional. By default, per-interface subtrees are named after the values of

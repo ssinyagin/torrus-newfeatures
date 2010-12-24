@@ -133,7 +133,12 @@ sub discover
         $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
         $data->{'nameref'}{'ifReferenceName'}   = 'ifDescr';
 
-        if( $valid_ifName )
+        if( $devdetails->param('RFC2863_IF_MIB::ifnick-from-ifname') eq 'yes'
+            and $devdetails->hasCap('ifName') )
+        {
+            $data->{'nameref'}{'ifNick'} = 'ifNameT';
+        }
+        elsif( $valid_ifName )
         {
             $data->{'nameref'}{'ifNick'} = 'ifNameT';
         }
@@ -1231,10 +1236,12 @@ sub validateReference
         my $entry = $interface->{$nameref};
         if( not defined($entry) or length($entry) == 0 )
         {
+            Debug($nameref . ' contains empty entries');
             return 0;
         }
         if( $seen{$entry} )
         {
+            Debug($nameref . ' contains duplicate entries');
             return 0;
         }
         $seen{$entry} = 1;

@@ -37,9 +37,20 @@ if( $Torrus::Renderer::globalDebug )
 }
 
 
+# After processing $count requests, we exit and let FCGI re-spawn the process.
+# This way there's less chance of DB becoming corrupted
+# The count is randomized, so that multiple FCGI processes don't stop at
+# the same time
+my $count = int(50 + rand(50));
+
 while( my $q = new CGI::Fast )
 {
     Torrus::CGI->process($q);
+    
+    if( $count-- <= 0 )
+    {
+        exit;
+    }
 }
 
 

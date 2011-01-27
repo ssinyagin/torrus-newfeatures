@@ -20,6 +20,7 @@
     END;
 
     etoken = pathToken(entry.0);
+    NEXT UNLESS etoken;
 %]
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
     <SPAN CLASS="NodeName"><A HREF="[%persistentUrl(etoken)%]">

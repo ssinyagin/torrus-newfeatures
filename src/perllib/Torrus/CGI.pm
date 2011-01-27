@@ -350,6 +350,12 @@ sub do_process
                     $view = $q->param('v');
                 }
 
+                if( defined($view) and
+                    not $config_tree->viewExists($view) )
+                {
+                    return report_error($q, 'Invalid view name: ' . $view);
+                }
+                
                 ( $fname, $mimetype, $expires ) =
                     $renderer->render( $config_tree, $token, $view, %options );
                 

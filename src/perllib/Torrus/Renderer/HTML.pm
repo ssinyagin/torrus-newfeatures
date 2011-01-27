@@ -211,25 +211,27 @@ sub makeURL
     my @add_vars = @_;
 
     my $ret = $Torrus::Renderer::rendererURL . '/' . $config_tree->treeName();
+
+    # Try using nodeid whenever it's available
     
-    if( $persistent )
+    my $nodeid = $config_tree->getNodeParam($token, 'nodeid', 1);
+    if( defined( $nodeid ) )
     {
-        my $nodeid = $config_tree->getNodeParam($token, 'nodeid', 1);
-        if( defined( $nodeid ) )
-        {
-            $ret .= '?nodeid=' .
-                uri_escape($nodeid, $Torrus::Renderer::uriEscapeExceptions);
-        }
-        else
+        $ret .= '?nodeid=' .
+            uri_escape($nodeid, $Torrus::Renderer::uriEscapeExceptions);
+    }
+    else
+    {
+        if( $persistent )
         {
             $ret .= '?path=' .
                 uri_escape($config_tree->path($token),
                            $Torrus::Renderer::uriEscapeExceptions);
         }
-    }
-    else
-    {
-        $ret .= '?token=' . uri_escape($token);
+        else
+        {
+            $ret .= '?token=' . uri_escape($token);
+        }
     }
 
     if( $view )

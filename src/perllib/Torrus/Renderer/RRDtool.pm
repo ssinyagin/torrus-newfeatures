@@ -82,9 +82,11 @@ sub render_rrgraph
         # At the moment, we call the DEF as 'A'. Could change in the future
         if( $leaftype eq 'rrd-def' )
         {
-            push( @{$obj->{'args'}{'defs'}},
-                  $self->rrd_make_def( $config_tree, $token,
-                                       $obj->{'dname'} ) );
+            my $defstring =
+                $self->rrd_make_def( $config_tree, $token, $obj->{'dname'} );
+            return(undef) unless defined($defstring);
+            
+            push( @{$obj->{'args'}{'defs'}}, $defstring );
 
             if( $self->rrd_check_hw( $config_tree, $token, $view ) )
             {
@@ -108,6 +110,8 @@ sub render_rrgraph
         $self->rrd_make_graphline( $config_tree, $token, $view, $obj );
     }
 
+    return(undef) if $obj->{'error'};
+    
     $self->rrd_make_hrules( $config_tree, $token, $view, $obj );
     if( not $Torrus::Renderer::ignoreDecorations )
     {
@@ -184,14 +188,15 @@ sub render_rrprint
     my $dname = 'A';
     if( $leaftype eq 'rrd-def' )
     {
-        push( @arg_defs,
-              $self->rrd_make_def( $config_tree, $token, $dname ) );
+        my $defstring = $self->rrd_make_def( $config_tree, $token, $dname );
+        return(undef) unless defined($defstring);
+        push( @arg_defs, $defstring );
     }
     elsif( $leaftype eq 'rrd-cdef' )
     {
         my $expr = $config_tree->getNodeParam($token, 'rpn-expr');
         push( @arg_defs,
-              $self->rrd_make_cdef($config_tree, $token, $dname, $expr) );
+              $self->rrd_make_cdef($config_tree, $token, $dname, $expr));
     }
     else
     {
@@ -303,9 +308,16 @@ sub rrd_make_multigraph
         if( $dograph or $gprint_this )
         {
             my $expr = $config_tree->getNodeParam($token, 'ds-expr-'.$dname);
-            push( @{$obj->{'args'}{'defs'}},
-                  $self->rrd_make_cdef($config_tree, $token, $dname, $expr) );
-
+            my @cdefs =
+                $self->rrd_make_cdef($config_tree, $token, $dname, $expr);
+            if( not scalar(@cdefs) )
+            {
+                $obj->{'error'} = 1;
+                next;
+            }
+            
+            push( @{$obj->{'args'}{'defs'}}, @cdefs );
+            
             $legend =
                 $config_tree->getNodeParam($token, 'graph-legend-'.$dname);
             if( defined( $legend ) )
@@ -409,12 +421,16 @@ sub rrd_make_holtwinters
 
     my $dname = $obj->{'dname'};
 
-    push( @{$obj->{'args'}{'defs'}},
-          $self->rrd_make_def( $config_tree, $token,
-                               $dname . 'pred', 'HWPREDICT' ) );
-    push( @{$obj->{'args'}{'defs'}},
-          $self->rrd_make_def( $config_tree, $token,
-                               $dname . 'dev', 'DEVPREDICT' ) );
+    my $defstring = $self->rrd_make_def( $config_tree, $token,
+                                         $dname . 'pred', 'HWPREDICT' );
+    return() unless defined($defstring);
+    push( @{$obj->{'args'}{'defs'}}, $defstring );
+
+    $defstring = $self->rrd_make_def( $config_tree, $token,
+                                      $dname . 'dev', 'DEVPREDICT' );
+    return() unless defined($defstring);
+    push( @{$obj->{'args'}{'defs'}}, $defstring );
+    
     # Upper boundary definition
     push( @{$obj->{'args'}{'defs'}},
           sprintf( 'CDEF:%supper=%spred,%sdev,2,*,+',
@@ -426,9 +442,10 @@ sub rrd_make_holtwinters
                    $dname, $dname, $dname  ) );
 
     # Failures definition
-    push( @{$obj->{'args'}{'defs'}},
-          $self->rrd_make_def( $config_tree, $token,
-                               $dname . 'fail', 'FAILURES' ) );
+    $defstring = $self->rrd_make_def( $config_tree, $token,
+                                      $dname . 'fail', 'FAILURES' );
+    return() unless defined($defstring);    
+    push( @{$obj->{'args'}{'defs'}}, $defstring );
 
     # Generate H-W Boundary Lines
 
@@ -587,13 +604,20 @@ sub rrd_make_decorations
                                 getParam($view, 'dec-color-' . $decorName) );
             my $expr = $config_tree->
                 getParam($view, 'dec-expr-' . $decorName);
-
-            push( @{$decor->{$order}{'def'}},
-                  $self->rrd_make_cdef( $config_tree, $token, $decorName,
-                                        $obj->{'dname'} . ',POP,' . $expr ) );
-
-            $decor->{$order}{'line'} =
-                sprintf( '%s:%s%s', $style, $decorName, $color );
+            
+            my @cdefs =
+                $self->rrd_make_cdef( $config_tree, $token, $decorName,
+                                      $obj->{'dname'} . ',POP,' . $expr );
+            if( scalar(@cdefs) )
+            {
+                push( @{$decor->{$order}{'def'}}, @cdefs );
+                $decor->{$order}{'line'} =
+                    sprintf( '%s:%s%s', $style, $decorName, $color );
+            }
+            else
+            {
+                $obj->{'error'} = 1;
+            }
         }
 
         foreach my $order ( sort {$a<=>$b} keys %{$decor} )
@@ -789,7 +813,8 @@ sub rrd_make_cdef
     my $expr  = shift;
 
     my @args = ();
-
+    my $ok = 1;
+    
     # We will name the DEFs as $dname.sprintf('%.2d', $ds_couter++);
     my $ds_couter = 1;
 
@@ -816,13 +841,23 @@ sub rrd_make_cdef
             $config_tree->getRelative($token, $noderef) : $token;
 
         my $varname = $dname . sprintf('%.2d', $ds_couter++);
-        push( @args,
-              $self->rrd_make_def( $config_tree, $leaf, $varname, $cf ) );
+        my $defstring =
+            $self->rrd_make_def( $config_tree, $leaf, $varname, $cf );
+        if( not defined($defstring) )
+        {
+            $ok = 0;
+        }
+        else
+        {
+            push( @args, $defstring );
+        }
         return $varname;
     };
-
+    
     $expr = $rpn->translate( $expr, $callback );
+    return() unless $ok;
     push( @args, sprintf( 'CDEF:%s=%s', $dname, $expr ) );
+    
     return @args;
 }
 

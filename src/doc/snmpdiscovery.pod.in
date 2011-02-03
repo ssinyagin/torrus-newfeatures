@@ -1148,7 +1148,19 @@ F<examples/docsis-monitors.xml>:
            value="docs-outerrors-1,docs-outerrors-2"/>
 
 
+This example excludes all non-Gigabit ports from discovery results:
+
+  <host>
+    <param name="snmp-host"                 value="router001"/>
+    <param  name="output-file"              value="routers/router001.xml"/>
+    <param name="selectors"                 value="NotGigE" />
+    <param  name="NotGigE-selector-type"    value="RFC2863_IF_MIB"  />
+    <param name="NotGigE-selector-expr"     value="{ifSubtreeName},NOT"  />
+    <param  name="NotGigE-ifSubtreeName"    value="^Gigabit" />
+    <param  name="NotGigE-selector-actions" value="RemoveInterface" />
+  </host>
+
 
 =head1 Author
 
-Copyright (c) 2002-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

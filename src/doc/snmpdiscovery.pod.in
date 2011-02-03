@@ -984,6 +984,10 @@ interface level. If a template is not seen in the DevDiscover's template
 registry, it produces a warning. See C<template-registry-overlays>
 for more details about a proper way of adding custom templates.
 
+=item * C<RemoveInterface>
+
+This action excludes the matched interface from discovery results. No
+arguments needed.
 
 =item * C<DocsisUpSNRMonitor>
 

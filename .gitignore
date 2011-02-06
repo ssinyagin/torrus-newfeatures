@@ -1,0 +1,246 @@
+
+# /htdocs/
+/htdocs/*.pod.html
+
+# /htdocs/devdoc/
+/htdocs/devdoc/*.pod.html
+
+# /htdocs/manpages/
+/htdocs/manpages/*.pod.html
+
+# /htdocs/plugins/
+/htdocs/plugins/*.pod.html
+
+# /plugins/cbqos/
+/plugins/cbqos/aclocal.m4
+/plugins/cbqos/autom4te.cache
+/plugins/cbqos/config.log
+/plugins/cbqos/config.status
+/plugins/cbqos/Makefile
+/plugins/cbqos/Makefile.in
+/plugins/cbqos/configure
+/plugins/cbqos/configure.lineno
+/plugins/cbqos/pod2htmi.tmp
+/plugins/cbqos/pod2htmd.tmp
+/plugins/cbqos/tp-cisco-cbqos-*.tar.gz
+/plugins/cbqos/*.txt
+
+# /plugins/dummy/
+/plugins/dummy/aclocal.m4
+/plugins/dummy/autom4te.cache
+/plugins/dummy/config.log
+/plugins/dummy/config.status
+/plugins/dummy/Makefile
+/plugins/dummy/Makefile.in
+/plugins/dummy/configure
+/plugins/dummy/configure.lineno
+/plugins/dummy/config.status.lineno
+/plugins/dummy/dummyscript
+/plugins/dummy/substvars.sh
+/plugins/dummy/tp-dummy-*.tar.gz
+/plugins/dummy/*.txt
+
+# /plugins/easytarget/
+/plugins/easytarget/aclocal.m4
+/plugins/easytarget/autom4te.cache
+/plugins/easytarget/config.log
+/plugins/easytarget/config.status
+/plugins/easytarget/Makefile
+/plugins/easytarget/Makefile.in
+/plugins/easytarget/configure
+/plugins/easytarget/configure.lineno
+/plugins/easytarget/config.status.lineno
+/plugins/easytarget/easytarget
+/plugins/easytarget/substvars.sh
+/plugins/easytarget/tp-*.tar.gz
+/plugins/easytarget/*.txt
+/plugins/easytarget/*.pod
+/plugins/easytarget/*.tmp
+
+# /plugins/httpcollector/
+/plugins/httpcollector/aclocal.m4
+/plugins/httpcollector/autom4te.cache
+/plugins/httpcollector/config.log
+/plugins/httpcollector/config.status
+/plugins/httpcollector/Makefile
+/plugins/httpcollector/Makefile.in
+/plugins/httpcollector/configure
+/plugins/httpcollector/configure.lineno
+/plugins/httpcollector/tp-httpcollector-*.tar.gz
+/plugins/httpcollector/pod2htmi.tmp
+/plugins/httpcollector/pod2htmd.tmp
+/plugins/httpcollector/*.txt
+
+# /plugins/m-net/
+/plugins/m-net/aclocal.m4
+/plugins/m-net/autom4te.cache
+/plugins/m-net/config.log
+/plugins/m-net/config.status
+/plugins/m-net/Makefile
+/plugins/m-net/Makefile.in
+/plugins/m-net/configure
+/plugins/m-net/configure.lineno
+/plugins/m-net/pod2htmi.tmp
+/plugins/m-net/pod2htmd.tmp
+/plugins/m-net/tp-m-net-*.tar.gz
+/plugins/m-net/*.txt
+
+# /plugins/overview/
+/plugins/overview/aclocal.m4
+/plugins/overview/autom4te.cache
+/plugins/overview/config.log
+/plugins/overview/config.status
+/plugins/overview/Makefile
+/plugins/overview/Makefile.in
+/plugins/overview/mkvardir.sh
+/plugins/overview/configure
+/plugins/overview/configure.lineno
+/plugins/overview/tp-overview-*.tar.gz
+/plugins/overview/pod2htmi.tmp
+/plugins/overview/pod2htmd.tmp
+/plugins/overview/*.txt
+/plugins/overview/ov_substvars.sh
+/plugins/overview/tp-overview.apache.conf
+
+# /plugins/overview/menu/
+/plugins/overview/menu/menu.xsl
+
+# /plugins/overview/overview/
+/plugins/overview/overview/overview.xsl
+
+# /plugins/overview/xtree/
+/plugins/overview/xtree/xtree.js
+
+# /plugins/randomcollector/
+/plugins/randomcollector/aclocal.m4
+/plugins/randomcollector/autom4te.cache
+/plugins/randomcollector/config.log
+/plugins/randomcollector/config.status
+/plugins/randomcollector/Makefile
+/plugins/randomcollector/Makefile.in
+/plugins/randomcollector/configure
+/plugins/randomcollector/configure.lineno
+/plugins/randomcollector/genrandomcfg
+/plugins/randomcollector/substvars.sh
+/plugins/randomcollector/tp-randomcollector-*.tar.gz
+/plugins/randomcollector/pod2htmi.tmp
+/plugins/randomcollector/pod2htmd.tmp
+/plugins/randomcollector/*.txt
+
+# /plugins/rawexport/
+/plugins/rawexport/aclocal.m4
+/plugins/rawexport/autom4te.cache
+/plugins/rawexport/config.log
+/plugins/rawexport/config.status
+/plugins/rawexport/Makefile
+/plugins/rawexport/Makefile.in
+/plugins/rawexport/configure
+/plugins/rawexport/configure.lineno
+/plugins/rawexport/tp-rawexport-*.tar.gz
+/plugins/rawexport/pod2htmi.tmp
+/plugins/rawexport/pod2htmd.tmp
+/plugins/rawexport/*.txt
+
+# /src/
+/src/aclocal.m4
+/src/autom4te.cache
+/src/config.log
+/src/config.status
+/src/Makefile
+/src/Makefile.in
+/src/configure
+/src/configure.lineno
+/src/init.torrus
+/src/*.swp
+/src/torrus-*.tar.gz
+/src/DIST_REVISION
+
+# /src/bin/
+/src/bin/Makefile
+/src/bin/Makefile.in
+/src/bin/acledit
+/src/bin/aclfixup
+/src/bin/action_printemail
+/src/bin/action_notify
+/src/bin/action_snmptrap
+/src/bin/action_snmpv1trap
+/src/bin/buildsearchdb
+/src/bin/bdbinfo
+/src/bin/cleanup
+/src/bin/clearcache
+/src/bin/collector
+/src/bin/compilexml
+/src/bin/configinfo
+/src/bin/configsnapshot
+/src/bin/devdiscover
+/src/bin/flushmonitors
+/src/bin/genddx
+/src/bin/genlist
+/src/bin/genreport
+/src/bin/install_plugin
+/src/bin/mkroutercfg
+/src/bin/monitor
+/src/bin/nodeid
+/src/bin/prepviews
+/src/bin/render
+/src/bin/rrddir2xml
+/src/bin/schedulerinfo
+/src/bin/snmpfailures
+/src/bin/srvderive
+/src/bin/torrus
+/src/bin/torrus.fcgi
+/src/bin/ttproclist
+
+# /src/configs/
+/src/configs/Makefile
+/src/configs/Makefile.in
+/src/configs/instvars
+
+# /src/doc/
+/src/doc/Makefile
+/src/doc/Makefile.in
+/src/doc/pod2htmi.tmp
+/src/doc/pod2htmd.tmp
+/src/doc/*.txt
+/src/doc/*.pod
+
+# /src/doc/manpages/
+/src/doc/manpages/Makefile
+/src/doc/manpages/Makefile.in
+/src/doc/manpages/pod2htmi.tmp
+/src/doc/manpages/pod2htmd.tmp
+/src/doc/manpages/*.1
+/src/doc/manpages/*.5
+/src/doc/manpages/*.7
+/src/doc/manpages/*.pod
+/src/doc/manpages/xformstrings.sed
+
+# /src/examples/
+/src/examples/Makefile
+/src/examples/Makefile.in
+
+# /src/init.d/
+/src/init.d/torrus
+
+# /src/perllib/
+/src/perllib/Makefile
+/src/perllib/Makefile.in
+
+# /src/scripts/
+/src/scripts/Makefile
+/src/scripts/Makefile.in
+
+# /src/setup_tools/
+/src/setup_tools/substvars.sh
+/src/setup_tools/mkvardir.sh
+
+# /src/sup/
+/src/sup/Makefile
+/src/sup/Makefile.in
+
+# /src/sup/mibs/
+/src/sup/mibs/.index
+
+# /src/xmlconfig/
+/src/xmlconfig/Makefile
+/src/xmlconfig/Makefile.in

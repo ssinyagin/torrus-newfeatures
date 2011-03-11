@@ -3,11 +3,6 @@
 	* perllib/Torrus/Renderer/HTML.pm (makeURL):
 	Now nodeid is used in HTML whenever available
 
-2011-01-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
-
-	* bin/torrus.fcgi.in: Let FCGI handler re-spawn after every 50-100
-	requests for better DB stability
-
 2010-12-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 	
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):

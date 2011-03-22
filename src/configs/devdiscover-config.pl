@@ -230,6 +230,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'hr-system-processes',
          'source' => 'generic/rfc2790.host-resources.xml'
          },
+     'RFC2790_HOST_RESOURCES::hr-processor-load' => {
+         'name'   => 'hr-processor-load',
+         'source' => 'generic/rfc2790.host-resources.xml'
+         },
      'RFC2790_HOST_RESOURCES::hr-storage-subtree' => {
          'name'   => 'hr-storage-subtree',
          'source' => 'generic/rfc2790.host-resources.xml'

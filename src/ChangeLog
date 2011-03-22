@@ -1,3 +1,14 @@
+2011-03-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2790_HOST_RESOURCES.pm:
+	added CPU Load graphs. Still some problems with persistent
+	indexing and naming.
+
+	* perllib/Torrus/DevDiscover/MicrosoftWindows.pm:
+	added to interface filter: PPP, Tunnel, WAN Miniport, and
+	QoS Packet Scheduler virtual interfaces
+	interface-level nodeid is now dependent on MAC address
+
 2011-01-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/HTML.pm (makeURL):

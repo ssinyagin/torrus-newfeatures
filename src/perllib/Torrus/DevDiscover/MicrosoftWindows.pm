@@ -1,4 +1,4 @@
-#  Copyright (C) 2003-2004  Stanislav Sinyagin, Shawn Ferry
+#  Copyright (C) 2003-2011  Stanislav Sinyagin, Shawn Ferry
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -71,6 +71,24 @@ if( not defined( $interfaceFilter ) )
      'MS TCP Loopback interface' => {
          'ifType'  => 24                        # softwareLoopback
          },
+     
+     'Tunnel' => {
+         'ifType'  => 131                       # tunnel
+         },
+     
+     'PPP' => {
+         'ifType'  => 23                        # ppp
+         },
+     
+     'WAN Miniport Ethernet' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => '^WAN\s+Miniport'
+         },
+     
+     'QoS Packet Scheduler' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => 'QoS\s+Packet\s+Scheduler'
+         },
      );
 
 sub checkdevtype
@@ -120,6 +138,7 @@ sub discover
                                                                $devdetails );
 
     $data->{'nameref'}{'ifNick'} = 'MAC';
+    $data->{'nameref'}{'ifNodeid'} = 'MAC';
     
     # FTP and HTTP servers, if present
     if( $dd->checkSnmpTable( 'ms_ftpStatistics' ) )

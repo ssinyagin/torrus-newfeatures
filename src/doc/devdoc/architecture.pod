@@ -434,7 +434,8 @@ SNMP host failure information. Hosthash is a concatenation of hostname, UDP
 port, and SNMP community, separated by "|". Known failures: I<unreachable>,
 I<removed>. Timestamp is a UNIX time of the event.
 
-=item * m:E<lt>hosthashE<gt> -- E<lt>pathE<gt>:E<lt>timestampE<gt>
+=item * m:E<lt>path_md5E<gt>:E<lt>hosthashE<gt> --
+ E<lt>pathE<gt>:E<lt>timestampE<gt>
 
 MIB failures (I<noSuchObject>, I<noSuchInstance>, and I<endOfMibView>)
 for a given host, with the tree path of their occurence and the UNIX timestamp.

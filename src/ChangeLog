@@ -1,5 +1,8 @@
 2011-04-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/SNMP_Failures.pm (mib_error): bugfix - now all
+	MIB errors are registered, not just one
+
 	* perllib/Torrus/Collector/SNMP.pm: API change: replaced getHostname()
 	with getHostHash()
 

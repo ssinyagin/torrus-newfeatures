@@ -167,13 +167,13 @@ sub initTarget
     $collector->registerDeleteCallback
         ( $token, \&Torrus::Collector::SNMP::deleteTarget );
 
-    my $hostname = getHostname( $collector, $token );
-    if( not defined( $hostname ) )
+    my $hosthash = getHostHash( $collector, $token );
+    if( not defined( $hosthash ) )
     {
         return 0;
     }
 
-    $tref->{'hostname'} = $hostname;
+    $tref->{'hosthash'} = $hosthash;
     
     return Torrus::Collector::SNMP::initTargetAttributes( $collector, $token );
 }
@@ -189,25 +189,9 @@ sub initTargetAttributes
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
 
-    my $hostname = $tref->{'hostname'};
-    my $port = $collector->param($token, 'snmp-port');
+    my $hosthash = $tref->{'hosthash'};
+
     my $version = $collector->param($token, 'snmp-version');
-
-    my $community;
-    if( $version eq '1' or $version eq '2c' )
-    {
-        $community = $collector->param($token, 'snmp-community');
-    }
-    else
-    {
-        # We use community string to identify the agent.
-        # For SNMPv3, it's the user name
-        $community = $collector->param($token, 'snmp-username');
-    }
-
-    my $hosthash = join('|', $hostname, $port, $community);
-    $tref->{'hosthash'} = $hosthash;
-
     if( $version eq '1' )
     {
         $snmpV1Hosts{$hosthash} = 1;
@@ -280,7 +264,7 @@ sub initTargetAttributes
 }
 
 
-sub getHostname
+sub getHostHash
 {
     my $collector = shift;
     my $token = shift;
@@ -297,7 +281,22 @@ sub getHostname
         $hostname .= '.' . $domain;
     }
     
-    return $hostname;
+    my $port = $collector->param($token, 'snmp-port');
+    my $version = $collector->param($token, 'snmp-version');
+
+    my $community;
+    if( $version eq '1' or $version eq '2c' )
+    {
+        $community = $collector->param($token, 'snmp-community');
+    }
+    else
+    {
+        # We use community string to identify the agent.
+        # For SNMPv3, it's the user name
+        $community = $collector->param($token, 'snmp-username');
+    }
+
+    return join('|', $hostname, $port, $community);
 }
 
 

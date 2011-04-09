@@ -1,3 +1,8 @@
+2011-04-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Collector/Cisco_cbQoS.pm: adapted to API change:
+	replaced getHostname() with getHostHash()
+
 2010-09-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* cisco.ios.cbqos.xml: implemented nodeid (only for CM summarries)

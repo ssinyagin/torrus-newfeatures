@@ -162,7 +162,6 @@ sub initTarget
     my $token = shift;
 
     my $tref = $collector->tokenData( $token );
-    my $cref = $collector->collectorData( 'snmp' );
 
     $collector->registerDeleteCallback
         ( $token, \&Torrus::Collector::SNMP::deleteTarget );
@@ -268,8 +267,6 @@ sub getHostHash
 {
     my $collector = shift;
     my $token = shift;
-
-    my $cref = $collector->collectorData( 'snmp' );
 
     my $hostname = $collector->param($token, 'snmp-host');
     my $domain = $collector->param($token, 'domain-name');
@@ -779,8 +776,6 @@ sub checkUnreachableRetry
     my $collector = shift;
     my $hosthash = shift;
 
-    my $cref = $collector->collectorData( 'snmp' );
-
     my $ret = 1;
     if( $hostUnreachableSeen{$hosthash} )
     {
@@ -811,7 +806,6 @@ sub isHostDead
     my $collector = shift;
     my $hosthash = shift;
 
-    my $cref = $collector->collectorData( 'snmp' );
     return $unreachableHostDeleted{$hosthash};
 }
 
@@ -821,7 +815,6 @@ sub hostReachableAgain
     my $collector = shift;
     my $hosthash = shift;
     
-    my $cref = $collector->collectorData( 'snmp' );
     if( exists( $hostUnreachableSeen{$hosthash} ) )
     {
         delete $hostUnreachableSeen{$hosthash};

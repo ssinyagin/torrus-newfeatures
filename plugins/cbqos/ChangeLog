@@ -1,3 +1,8 @@
+2011-04-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Collector/Cisco_cbQoS.pm (initTarget): bugfix: QoS maps were
+	retrieved and deleted for every target token.
+
 2011-04-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Collector/Cisco_cbQoS.pm: adapted to API change:

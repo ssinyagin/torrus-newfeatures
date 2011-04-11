@@ -572,6 +572,8 @@ sub postProcess
     # We use some SNMP collector internals
     my $scref = $collector->collectorData( 'snmp' );
 
+    my %remapping_hosts;
+    
     # Flush all QoS object mapping
     foreach my $token ( keys %{$scref->{'needsRemapping'}},
                         keys %{$cref->{'cbQoSNeedsRemapping'}} )
@@ -580,12 +582,24 @@ sub postProcess
         {
             my $tref = $collector->tokenData( $token );
             my $hosthash = $tref->{'hosthash'};    
-            
-            delete $cref->{'ServicePolicyTable'}{$hosthash};
-            delete $cref->{'ServicePolicyMapping'}{$hosthash};
-            delete $cref->{'ObjectsTable'}{$hosthash};
-            delete $cref->{'CfgTable'}{$hosthash};
-            
+
+            if( not defined($remapping_hosts{$hosthash}) )
+            {
+                $remapping_hosts{$hosthash} = [];
+            }
+            push(@{$remapping_hosts{$hosthash}}, $token);
+        }
+    }
+
+    while(my ($hosthash, $tokens) = each %remapping_hosts )
+    {
+        delete $cref->{'ServicePolicyTable'}{$hosthash};
+        delete $cref->{'ServicePolicyMapping'}{$hosthash};
+        delete $cref->{'ObjectsTable'}{$hosthash};
+        delete $cref->{'CfgTable'}{$hosthash};
+
+        foreach my $token (@{$tokens})
+        {
             delete $scref->{'needsRemapping'}{$token};
             delete $cref->{'cbQoSNeedsRemapping'}{$token};
             if( not Torrus::Collector::Cisco_cbQoS::initTargetAttributes

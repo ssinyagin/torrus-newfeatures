@@ -1,4 +1,4 @@
-#  Copyright (C) 2002-2007  Stanislav Sinyagin
+#  Copyright (C) 2002-2011  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Collector::SNMP;
@@ -1243,6 +1242,79 @@ sub postProcess
     }    
 }
 
+
+####  ====  SNMP Reachability Collector ====
+
+# Register the collector type (it should always run after snmp collector)
+$Torrus::Collector::collectorTypes{'snmp-reachable'} = 2;
+
+
+# List of needed parameters and default values
+
+$Torrus::Collector::params{'snmp-reachable'} = {
+    'snmp-version'      => undef,
+    'snmp-port'         => undef,
+    'snmp-community'    => undef,
+    'snmp-username'     => undef,
+    'domain-name'       => undef,
+    'snmp-host'         => undef,
+};
+
+
+# This is first executed per target
+
+$Torrus::Collector::initTarget{'snmp-reachable'} = \&reachable_initTarget;
+
+
+sub reachable_initTarget
+{
+    my $collector = shift;
+    my $token = shift;
+        
+    my $cref = $collector->collectorData('snmp-reachable');
+    my $tref = $collector->tokenData( $token );    
+    my $hosthash = getHostHash( $collector, $token );
+    if( not defined( $hosthash ) )
+    {
+        return 0;
+    }
+
+    $tref->{'hosthash'} = $hosthash;
+    $cref->{'targets'}{$hosthash}{$token} = 1;
+
+    return 1;
+}
+
+
+# Main collector cycle
+
+$Torrus::Collector::runCollector{'snmp-reachable'} = \&reachable_runCollector;
+
+sub reachable_runCollector
+{
+    my $collector = shift;
+    my $cref = shift;
+
+    if( not defined( $db_failures ) )
+    {
+        Error('$db_failures is not initialized. ' .
+              'snmp-reachable collector cannot continue');
+        return;
+    }
+
+    my $timestamp = time();
+
+    while(my ($hosthash, $r) = each %{$cref->{'targets'}} )
+    {
+        foreach my $token (keys %{$r})
+        {
+            my $val = $db_failures->is_host_available($hosthash) ? 100:0;
+            $collector->setValue( $token, $val, $timestamp, 0 );
+        }
+    }
+}
+
+        
 1;
 
 

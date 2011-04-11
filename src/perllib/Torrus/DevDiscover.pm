@@ -541,6 +541,11 @@ sub buildConfig
             {
                 push( @{$data->{'templates'}}, '::holt-winters-defaults' );
             }
+            
+            if( $devdetails->param('disable-reachability-stats' ) ne 'yes' )
+            {
+                push( @{$data->{'templates'}}, '::snmp-reachability' );
+            }
 
             
             my $devNodeName = $devdetails->param('symbolic-name');

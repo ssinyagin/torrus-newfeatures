@@ -161,6 +161,28 @@
     <param name="system-id" value="%snmp-host%" />
   </template>
 
+  <!-- Device reachability statistics -->
+  <template name="snmp-reachability">
+    <leaf name="Device_Reachability">
+      <param name="node-display-name"  value="Device Reachability"/>
+      <param name="comment"  value="Device availability statistics" />
+      <param name="ds-type"        value="collector" />
+      <param name="collector-type" value="snmp-reachable" />
+      <param name="vertical-label" value="Percent" />
+      <param name="graph-legend"   value="Reachability" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="graph-upper-limit" value="100" />
+      <param name="line-style"    value="##resourceusage" />
+      <param name="line-color"    value="##resourceusage" />
+      <param name="precedence"    value="-10000" />
+      <param name="descriptive-nickname" value="%system-id%"/>
+      <param name="graph-title" value="%descriptive-nickname%" />
+      <param name="nodeid" value="reachable//%nodeid-device%"/>
+      <param name="data-file" value="%system-id%_snmp_reachability.rrd" />
+      <param name="rrd-ds"    value="reachable" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+    </leaf>
+  </template>
   
 </datasources>
 

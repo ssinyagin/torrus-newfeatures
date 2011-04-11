@@ -1,3 +1,9 @@
+2011-04-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml: new host-level template: snmp-reachability
+
+	* perllib/Torrus/Collector/SNMP.pm: new collector type: 'snmp-reachable'
+
 2011-04-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/SNMP_Failures.pm (mib_error): bugfix - now all

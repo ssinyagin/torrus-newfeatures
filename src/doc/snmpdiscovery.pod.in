@@ -367,6 +367,11 @@ When set to C<yes>, this parameter disables SNMP collection for this
 host. It is useful for creating custom views, in conjunction with
 C<RFC2863_IF_MIB::only-interfaces> parameter.
 
+=item * C<disable-reachability-stats>
+
+If set to C<yes>, the device reachability statistics are not enabled for
+this host.
+
 =item * C<define-tokensets>
 
 Semicolon-separated (;) list of pairs of tokenset names and descriptions.

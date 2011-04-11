@@ -49,6 +49,8 @@ sub initThreads
 }
 
 
+our %collectorTypes;
+
 ## One collector module instance holds all leaf tokens which
 ## must be collected at the same time.
 
@@ -66,10 +68,15 @@ sub new
     my $self  = $class->SUPER::new( %options );
     bless $self, $class;
 
-    foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
+    $self->{'types_sorted'} = [];
+    
+    foreach my $collector_type
+        ( sort {$collectorTypes{$a} <=> $collectorTypes{$b}}
+          keys %collectorTypes )
     {
         $self->{'types'}{$collector_type} = {};
         $self->{'types_in_use'}{$collector_type} = 0;
+        push(@{$self->{'types_sorted'}}, $collector_type);
     }
 
     foreach my $storage_type ( keys %Torrus::Collector::storageTypes )
@@ -100,7 +107,7 @@ sub addTarget
     $self->{'targets'}{$token}{'path'} = $config_tree->path($token);
 
     my $collector_type = $config_tree->getNodeParam($token, 'collector-type');
-    if( not $Torrus::Collector::collectorTypes{$collector_type} )
+    if( not $collectorTypes{$collector_type} )
     {
         Error('Unknown collector type: ' . $collector_type);
         return;
@@ -397,8 +404,8 @@ sub run
     my $self = shift;
 
     undef $self->{'values'};
-
-    while( my ($collector_type, $ref) = each %{$self->{'types'}} )
+    
+    foreach my $collector_type ( @{$self->{'types_sorted'}} )
     {
         next unless $self->{'types_in_use'}{$collector_type};
 
@@ -412,7 +419,8 @@ sub run
                                         -Wait => 1 );
         }
         
-        &{$Torrus::Collector::runCollector{$collector_type}}( $self, $ref );
+        &{$Torrus::Collector::runCollector{$collector_type}}
+        ( $self, $self->collectorData($collector_type) );
         
         if( defined( $self->{'config_tree'} ) )
         {

@@ -106,6 +106,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'viewonly-defaults',
          'source' => 'snmp-defs.xml'
          },
+     '::snmp-reachability' => {
+         'name'   => 'snmp-reachability',
+         'source' => 'snmp-defs.xml'
+         },
 
      #### CDef Collector defaults
      '::cdef-collector-defaults' => {

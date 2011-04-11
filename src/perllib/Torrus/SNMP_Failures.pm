@@ -87,6 +87,15 @@ sub host_failure
 }
 
 
+sub is_host_available
+{
+    my $self = shift;    
+    my $hosthash = shift;
+
+    return( not defined($self->{'db_failures'}->get('h:' . $hosthash)) );
+}
+
+
 sub set_counter
 {
     my $self = shift;    

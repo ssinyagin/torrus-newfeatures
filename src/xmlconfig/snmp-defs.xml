@@ -172,10 +172,10 @@
       <param name="graph-legend"   value="Reachability" />
       <param name="graph-lower-limit" value="0" />
       <param name="graph-upper-limit" value="100" />
-      <param name="line-style"    value="##resourceusage" />
-      <param name="line-color"    value="##resourceusage" />
+      <param name="line-style"    value="##SingleGraph" />
+      <param name="line-color"    value="##SingleGraph" />
       <param name="precedence"    value="-10000" />
-      <param name="descriptive-nickname" value="%system-id%"/>
+      <param name="descriptive-nickname" value="%system-id% reachability"/>
       <param name="graph-title" value="%descriptive-nickname%" />
       <param name="nodeid" value="reachable//%nodeid-device%"/>
       <param name="data-file" value="%system-id%_snmp_reachability.rrd" />

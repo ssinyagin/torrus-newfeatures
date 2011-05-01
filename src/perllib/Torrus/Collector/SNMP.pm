@@ -1,4 +1,4 @@
-#  Copyright (C) 2002-2007  Stanislav Sinyagin
+#  Copyright (C) 2002-2011  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Collector::SNMP;
@@ -162,18 +161,17 @@ sub initTarget
     my $token = shift;
 
     my $tref = $collector->tokenData( $token );
-    my $cref = $collector->collectorData( 'snmp' );
 
     $collector->registerDeleteCallback
         ( $token, \&Torrus::Collector::SNMP::deleteTarget );
 
-    my $hostname = getHostname( $collector, $token );
-    if( not defined( $hostname ) )
+    my $hosthash = getHostHash( $collector, $token );
+    if( not defined( $hosthash ) )
     {
         return 0;
     }
 
-    $tref->{'hostname'} = $hostname;
+    $tref->{'hosthash'} = $hosthash;
     
     return Torrus::Collector::SNMP::initTargetAttributes( $collector, $token );
 }
@@ -189,25 +187,9 @@ sub initTargetAttributes
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
 
-    my $hostname = $tref->{'hostname'};
-    my $port = $collector->param($token, 'snmp-port');
+    my $hosthash = $tref->{'hosthash'};
+
     my $version = $collector->param($token, 'snmp-version');
-
-    my $community;
-    if( $version eq '1' or $version eq '2c' )
-    {
-        $community = $collector->param($token, 'snmp-community');
-    }
-    else
-    {
-        # We use community string to identify the agent.
-        # For SNMPv3, it's the user name
-        $community = $collector->param($token, 'snmp-username');
-    }
-
-    my $hosthash = join('|', $hostname, $port, $community);
-    $tref->{'hosthash'} = $hosthash;
-
     if( $version eq '1' )
     {
         $snmpV1Hosts{$hosthash} = 1;
@@ -280,12 +262,10 @@ sub initTargetAttributes
 }
 
 
-sub getHostname
+sub getHostHash
 {
     my $collector = shift;
     my $token = shift;
-
-    my $cref = $collector->collectorData( 'snmp' );
 
     my $hostname = $collector->param($token, 'snmp-host');
     my $domain = $collector->param($token, 'domain-name');
@@ -297,7 +277,22 @@ sub getHostname
         $hostname .= '.' . $domain;
     }
     
-    return $hostname;
+    my $port = $collector->param($token, 'snmp-port');
+    my $version = $collector->param($token, 'snmp-version');
+
+    my $community;
+    if( $version eq '1' or $version eq '2c' )
+    {
+        $community = $collector->param($token, 'snmp-community');
+    }
+    else
+    {
+        # We use community string to identify the agent.
+        # For SNMPv3, it's the user name
+        $community = $collector->param($token, 'snmp-username');
+    }
+
+    return join('|', $hostname, $port, $community);
 }
 
 
@@ -780,8 +775,6 @@ sub checkUnreachableRetry
     my $collector = shift;
     my $hosthash = shift;
 
-    my $cref = $collector->collectorData( 'snmp' );
-
     my $ret = 1;
     if( $hostUnreachableSeen{$hosthash} )
     {
@@ -812,7 +805,6 @@ sub isHostDead
     my $collector = shift;
     my $hosthash = shift;
 
-    my $cref = $collector->collectorData( 'snmp' );
     return $unreachableHostDeleted{$hosthash};
 }
 
@@ -822,7 +814,6 @@ sub hostReachableAgain
     my $collector = shift;
     my $hosthash = shift;
     
-    my $cref = $collector->collectorData( 'snmp' );
     if( exists( $hostUnreachableSeen{$hosthash} ) )
     {
         delete $hostUnreachableSeen{$hosthash};
@@ -1251,6 +1242,79 @@ sub postProcess
     }    
 }
 
+
+####  ====  SNMP Reachability Collector ====
+
+# Register the collector type (it should always run after snmp collector)
+$Torrus::Collector::collectorTypes{'snmp-reachable'} = 2;
+
+
+# List of needed parameters and default values
+
+$Torrus::Collector::params{'snmp-reachable'} = {
+    'snmp-version'      => undef,
+    'snmp-port'         => undef,
+    'snmp-community'    => undef,
+    'snmp-username'     => undef,
+    'domain-name'       => undef,
+    'snmp-host'         => undef,
+};
+
+
+# This is first executed per target
+
+$Torrus::Collector::initTarget{'snmp-reachable'} = \&reachable_initTarget;
+
+
+sub reachable_initTarget
+{
+    my $collector = shift;
+    my $token = shift;
+        
+    my $cref = $collector->collectorData('snmp-reachable');
+    my $tref = $collector->tokenData( $token );    
+    my $hosthash = getHostHash( $collector, $token );
+    if( not defined( $hosthash ) )
+    {
+        return 0;
+    }
+
+    $tref->{'hosthash'} = $hosthash;
+    $cref->{'targets'}{$hosthash}{$token} = 1;
+
+    return 1;
+}
+
+
+# Main collector cycle
+
+$Torrus::Collector::runCollector{'snmp-reachable'} = \&reachable_runCollector;
+
+sub reachable_runCollector
+{
+    my $collector = shift;
+    my $cref = shift;
+
+    if( not defined( $db_failures ) )
+    {
+        Error('$db_failures is not initialized. ' .
+              'snmp-reachable collector cannot continue');
+        return;
+    }
+
+    my $timestamp = time();
+
+    while(my ($hosthash, $r) = each %{$cref->{'targets'}} )
+    {
+        foreach my $token (keys %{$r})
+        {
+            my $val = $db_failures->is_host_available($hosthash) ? 100:0;
+            $collector->setValue( $token, $val, $timestamp, 0 );
+        }
+    }
+}
+
+        
 1;
 
 

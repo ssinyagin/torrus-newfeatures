@@ -106,6 +106,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'viewonly-defaults',
          'source' => 'snmp-defs.xml'
          },
+     '::snmp-reachability' => {
+         'name'   => 'snmp-reachability',
+         'source' => 'snmp-defs.xml'
+         },
 
      #### CDef Collector defaults
      '::cdef-collector-defaults' => {
@@ -228,6 +232,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
      'RFC2790_HOST_RESOURCES::hr-system-processes' => {
          'name'   => 'hr-system-processes',
+         'source' => 'generic/rfc2790.host-resources.xml'
+         },
+     'RFC2790_HOST_RESOURCES::hr-processor-load' => {
+         'name'   => 'hr-processor-load',
          'source' => 'generic/rfc2790.host-resources.xml'
          },
      'RFC2790_HOST_RESOURCES::hr-storage-subtree' => {

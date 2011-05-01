@@ -22,9 +22,12 @@
 
 package Torrus::SNMP_Failures;
 
+
+use strict;
+use Digest::MD5 qw(md5_hex);
+
 use Torrus::DB;
 use Torrus::Log;
-use strict;
 
 
 sub new
@@ -84,6 +87,15 @@ sub host_failure
 }
 
 
+sub is_host_available
+{
+    my $self = shift;    
+    my $hosthash = shift;
+
+    return( not defined($self->{'db_failures'}->get('h:' . $hosthash)) );
+}
+
+
 sub set_counter
 {
     my $self = shift;    
@@ -112,7 +124,8 @@ sub mib_error
     my $count = $self->{'db_failures'}->get('M:' . $hosthash);
     $count = 0 unless defined($count);
 
-    $self->{'db_failures'}->put('m:' . $hosthash, $path . ':' . time());    
+    $self->{'db_failures'}->put('m:' . md5_hex($path) . ':' . $hosthash,
+                                $path . ':' . time());    
     $self->{'db_failures'}->put('M:' . $hosthash, $count + 1);
 
     my $global_count = $self->{'db_failures'}->get('c:mib_errors');
@@ -161,7 +174,7 @@ sub read
                     'time' => scalar(localtime( $timestamp )),
                 };
             }
-            elsif( $key =~ /^m:(.+)$/o )
+            elsif( $key =~ /^m:[0-9a-f]+:(.+)$/o )
             {
                 my $hosthash = $1;
                 my ($path, $timestamp) = split(/:/o, $val);

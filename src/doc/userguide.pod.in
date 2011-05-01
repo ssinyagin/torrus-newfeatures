@@ -15,7 +15,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 #
@@ -864,6 +863,38 @@ the contents of the database.
   /etc/init.d/torrus start
   /etc/init.d/apache start
 
+
+=head3 Gaps in the graphs after re-compiling the tree
+
+Starting from Torrus release 1.0.9, the collector tries to refresh its
+SNMP name-to-index mappings soon after the re-compilation of the tree. This is
+done in order to catch up faster with new physical or logical
+interfaces on the network devices.
+
+By default, the collector schedules the refresh of its maps randomly within
+1800 seconds (controlled by C<$Torrus::Collector::SNMP::mapsUpdateInterval>).
+
+In some occasions, this period is too short and needs an increase in
+F<torrus-siteconfig.pl>. Possible causes are:
+
+=over 4
+
+=item *
+
+longer collecting period (15 minutes instead of 5)
+
+=item *
+
+too many devices in the tree
+
+=item *
+
+devices are too slow-responding or network latency is too big
+
+=back
+
+
+
 =head1 Author
 
-Copyright (c) 2002-2007 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

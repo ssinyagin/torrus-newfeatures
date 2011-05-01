@@ -222,14 +222,14 @@ sub initTarget
     $collector->registerDeleteCallback
         ( $token, \&Torrus::Collector::Cisco_cbQoS::deleteTarget );
     
-    my $hostname =
-        Torrus::Collector::SNMP::getHostname( $collector, $token );
-    if( not defined( $hostname ) )
+    my $hosthash = 
+        Torrus::Collector::SNMP::getHostHash( $collector, $token );
+    if( not defined( $hosthash ) )
     {
         $collector->deleteTarget($token);
         return 0;
     }
-    $tref->{'hostname'} = $hostname;
+    $tref->{'hosthash'} = $hosthash;
 
     return Torrus::Collector::Cisco_cbQoS::initTargetAttributes
         ( $collector, $token );
@@ -294,24 +294,7 @@ sub initTargetAttributes
         return 1;
     }
 
-    my $hostname = $tref->{'hostname'};
-    my $port = $collector->param($token, 'snmp-port');
-
-    my $version = $collector->param($token, 'snmp-version');
-    my $community;
-    if( $version eq '1' or $version eq '2c' )
-    {
-        $community = $collector->param($token, 'snmp-community');
-    }
-    else
-    {
-        # We use community string to identify the agent.
-        # For SNMPv3, it's the user name
-        $community = $collector->param($token, 'snmp-username');
-    }
-
-    my $hosthash = join('|', $hostname, $port, $community);
-    $tref->{'hosthash'} = $hosthash;
+    my $hosthash = $tref->{'hosthash'};
     
     if( Torrus::Collector::SNMP::isHostDead( $collector, $hosthash ) )
     {
@@ -353,7 +336,7 @@ sub initTargetAttributes
 
     if( not defined $cref->{'ServicePolicyTable'}{$hosthash} )
     {
-        Debug("Retrieving Cisco cbQoS maps from $hostname");
+        Debug('Retrieving Cisco cbQoS maps from ' . $hosthash);
 
         my $ref = {};
         $cref->{'ServicePolicyTable'}{$hosthash} = $ref;
@@ -363,8 +346,8 @@ sub initTargetAttributes
                                  $oiddef{'cbQosServicePolicyTable'} );
         if( not defined( $result ) )
         {
-            Error("Error retrieving cbQosServicePolicyTable from $hostname: " .
-                  $session->error());
+            Error('Error retrieving cbQosServicePolicyTable from ' .
+                  $hosthash . ': ' . $session->error());
             
             # When the remote agent is reacheable, but system objecs are
             # not implemented, we get a positive error_status
@@ -461,8 +444,8 @@ sub initTargetAttributes
                                  $oiddef{'cbQosObjectsTable'} );
         if( not defined( $result ) )
         {
-            Error("Error retrieving cbQosObjectsTable from $hostname: " .
-                  $session->error());
+            Error('Error retrieving cbQosObjectsTable from ' . $hosthash .
+                  ': ' . $session->error());
 
             # When the remote agent is reacheable, but system objecs are
             # not implemented, we get a positive error_status
@@ -589,6 +572,8 @@ sub postProcess
     # We use some SNMP collector internals
     my $scref = $collector->collectorData( 'snmp' );
 
+    my %remapping_hosts;
+    
     # Flush all QoS object mapping
     foreach my $token ( keys %{$scref->{'needsRemapping'}},
                         keys %{$cref->{'cbQoSNeedsRemapping'}} )
@@ -597,12 +582,24 @@ sub postProcess
         {
             my $tref = $collector->tokenData( $token );
             my $hosthash = $tref->{'hosthash'};    
-            
-            delete $cref->{'ServicePolicyTable'}{$hosthash};
-            delete $cref->{'ServicePolicyMapping'}{$hosthash};
-            delete $cref->{'ObjectsTable'}{$hosthash};
-            delete $cref->{'CfgTable'}{$hosthash};
-            
+
+            if( not defined($remapping_hosts{$hosthash}) )
+            {
+                $remapping_hosts{$hosthash} = [];
+            }
+            push(@{$remapping_hosts{$hosthash}}, $token);
+        }
+    }
+
+    while(my ($hosthash, $tokens) = each %remapping_hosts )
+    {
+        delete $cref->{'ServicePolicyTable'}{$hosthash};
+        delete $cref->{'ServicePolicyMapping'}{$hosthash};
+        delete $cref->{'ObjectsTable'}{$hosthash};
+        delete $cref->{'CfgTable'}{$hosthash};
+
+        foreach my $token (@{$tokens})
+        {
             delete $scref->{'needsRemapping'}{$token};
             delete $cref->{'cbQoSNeedsRemapping'}{$token};
             if( not Torrus::Collector::Cisco_cbQoS::initTargetAttributes

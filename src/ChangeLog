@@ -1,3 +1,28 @@
+2011-04-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml: new host-level template: snmp-reachability
+
+	* perllib/Torrus/Collector/SNMP.pm: new collector type: 'snmp-reachable'
+
+2011-04-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/SNMP_Failures.pm (mib_error): bugfix - now all
+	MIB errors are registered, not just one
+
+	* perllib/Torrus/Collector/SNMP.pm: API change: replaced getHostname()
+	with getHostHash()
+
+2011-03-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2790_HOST_RESOURCES.pm:
+	added CPU Load graphs. Still some problems with persistent
+	indexing and naming.
+
+	* perllib/Torrus/DevDiscover/MicrosoftWindows.pm:
+	added to interface filter: PPP, Tunnel, WAN Miniport, and
+	QoS Packet Scheduler virtual interfaces
+	interface-level nodeid is now dependent on MAC address
+
 2011-01-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/HTML.pm (makeURL):

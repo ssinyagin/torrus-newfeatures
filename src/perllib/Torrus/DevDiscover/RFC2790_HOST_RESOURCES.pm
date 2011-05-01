@@ -18,13 +18,16 @@
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
-# Standard HOST_RESOURCES_MIB discovery, which should apply to most hosts
+# Standard HOST_RESOURCES_MIB discovery, which should apply to most hosts.
+
+# The CPU indexing is not persistent, and may change after the target host
+# reboot. This needs a re-discover, and the old CPU usage data may be lost.
+
 
 package Torrus::DevDiscover::RFC2790_HOST_RESOURCES;
 
 use strict;
 use Torrus::Log;
-
 
 $Torrus::DevDiscover::registry{'RFC2790_HOST_RESOURCES'} = {
     'sequence'     => 100,
@@ -50,7 +53,8 @@ our %oiddef =
      'hrStorageAllocationUnits'     => '1.3.6.1.2.1.25.2.3.1.4',
      'hrStorageSize'                => '1.3.6.1.2.1.25.2.3.1.5',
      'hrStorageUsed'                => '1.3.6.1.2.1.25.2.3.1.6',
-     'hrStorageAllocationFailures'  => '1.3.6.1.2.1.25.2.3.1.7'
+     'hrStorageAllocationFailures'  => '1.3.6.1.2.1.25.2.3.1.7',
+     'hrProcessorLoad'              => '1.3.6.1.2.1.25.3.3.1.2',
      );
 
 
@@ -188,6 +192,27 @@ sub discover
         }
     }
 
+    # hrProcessor support
+    {
+        my $oid = $dd->oiddef('hrProcessorLoad');
+        my $table = $session->get_table( -baseoid => $oid );
+        if( defined($table) )
+        {
+            $data->{'hrProcessors'} = [];
+            my $prefixLen = length( $oid ) + 1;
+        
+            while( my( $oid, $load ) = each %{$table} )
+            {
+                push( @{$data->{'hrProcessors'}}, substr( $oid, $prefixLen ));
+            }
+
+            if( scalar( @{$data->{'hrProcessors'}} ) > 0 )
+            {
+                $devdetails->setCap('hrProcessor');
+            }
+        }
+    }
+    
     return 1;
 }
 
@@ -200,7 +225,7 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    { # Anon sub for System Info
+    { # Anon sub for System Performance
         my $subtreeName =
             $devdetails->param('RFC2790_HOST_RESOURCES::sysperf-subtree-name');
         if( not defined( $subtreeName ) )
@@ -227,6 +252,24 @@ sub buildConfig
 
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, \@templates );
+
+        if( $devdetails->hasCap('hrProcessor') )
+        {
+            foreach my $INDEX ( sort {$a<=>$b} @{$data->{'hrProcessors'}} )
+            {
+                my $subtreeName = 'CPU_' . $INDEX . '_Load';
+                
+                my $param = {
+                    'cpu-id' => $INDEX,
+                    'node-display-name' => 'CPU ' . $INDEX . ' Load',
+                    'precedence' => sprintf("%d", 1000 - $INDEX),
+                };
+                
+                $cb->addLeaf( $subtreeNode, $subtreeName, $param,
+                              ['RFC2790_HOST_RESOURCES::hr-processor-load']);
+                
+            }
+        }
     }
 
     if( $devdetails->hasCap('hrStorage') )

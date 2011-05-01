@@ -1,3 +1,9 @@
+2011-05-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm: SNMP reachability stats are
+	disabled when "only-devtypes" is in use, and can be forced by
+	"enable-reachability-stats"
+
 2011-04-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* xmlconfig/snmp-defs.xml: new host-level template: snmp-reachability

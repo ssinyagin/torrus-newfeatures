@@ -331,8 +331,10 @@ in order to run the discovery on those appliances.
 
 =item * C<only-devtypes>
 
-Optional comma-separated list of device types. If defined, only the specified
-types will be used for device probing.
+Optional comma-separated list of device types. If defined, only the
+specified types will be used for device probing. Also it automatically
+disables the SNMP reachability statistics unless
+C<enable-reachability-stats> is set to C<yes>.
 
 =item * C<host-aliases>
 
@@ -370,7 +372,13 @@ C<RFC2863_IF_MIB::only-interfaces> parameter.
 =item * C<disable-reachability-stats>
 
 If set to C<yes>, the device reachability statistics are not enabled for
-this host.
+this host. 
+
+=item * C<enable-reachability-stats>
+
+If C<only-devtypes> parameter is specified, the SNMP reachability
+statistics are disabled by default. If C<enable-reachability-stats> is
+set to C<yes>, the reachability statistics are actvated in any case.
 
 =item * C<define-tokensets>
 

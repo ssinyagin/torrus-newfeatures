@@ -284,6 +284,12 @@ $Torrus::ACL::minPasswordLength = 6;
 $Torrus::Renderer::LoginScreen::mimeType = 'text/html; charset=UTF-8';
 $Torrus::Renderer::LoginScreen::template = 'default-login.html';
 
+# FCGI process lifetime limits.
+$Torrus::FCGI::maxRequests = 5000;
+$Torrus::FCGI::maxRequestsRandomFactor = 200;
+$Torrus::FCGI::maxLifetime = 172800;  #48 hours
+$Torrus::FCGI::maxLifetimeRandomFactor = 10800; #3 hours
+
 ####
 ####  SQL connections configuration
 # For a given Perl class and an optional subtype,

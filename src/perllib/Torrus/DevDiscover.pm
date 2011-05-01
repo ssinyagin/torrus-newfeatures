@@ -542,11 +542,12 @@ sub buildConfig
                 push( @{$data->{'templates'}}, '::holt-winters-defaults' );
             }
             
-            if( $devdetails->param('disable-reachability-stats') ne 'yes' and
-                not (
-                    defined($devdetails->param('only-devtypes'))
-                    and
-                    $devdetails->param('enable-reachability-stats') eq 'yes'
+            if( $devdetails->param('disable-reachability-stats') ne 'yes'
+                and
+                (
+                 (not defined($devdetails->param('only-devtypes')))
+                 or
+                 $devdetails->param('enable-reachability-stats') eq 'yes'
                 ) )
             {
                 push( @{$data->{'templates'}}, '::snmp-reachability' );

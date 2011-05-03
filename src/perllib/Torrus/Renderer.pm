@@ -242,7 +242,7 @@ sub clearcache
         unlink $Torrus::Global::cacheDir.'/'.$filename;
         $self->{'db'}->c_del( $cursor );
     }
-    undef $cursor;
+    $self->{'db'}->c_close($cursor);
     Debug('Renderer cache cleared');
 }
 

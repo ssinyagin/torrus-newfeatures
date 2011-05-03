@@ -356,7 +356,7 @@ sub cleanupExpired
             $self->{'db_alarms'}->c_del( $cursor );            
         }
     }
-    undef $cursor;
+    $self->{'db_alarms'}->c_close($cursor);
     
     &Torrus::DB::checkInterrupted();
 }
@@ -604,7 +604,7 @@ sub beforeRun
             $data->{'mlist'}{$token} = [];
             push( @{$data->{'mlist'}{$token}}, split(',', $mlist) );
         }
-        undef $cursor;
+        $data->{'db_tokens'}->c_close($cursor);
         $data->{'db_tokens'}->closeNow();
         undef $data->{'db_tokens'};
     }

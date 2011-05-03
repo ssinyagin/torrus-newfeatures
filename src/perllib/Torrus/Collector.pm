@@ -637,7 +637,7 @@ sub beforeRun
 
             &Torrus::DB::checkInterrupted();
         }
-        undef $cursor;
+        $db_tokens->c_close($cursor);
         $db_tokens->closeNow();
         undef $db_tokens;
 

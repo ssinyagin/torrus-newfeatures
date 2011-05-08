@@ -207,10 +207,12 @@ sub genConfig
 
             my $params = {};
             my $templates = [];
-            
+
+            $params->{'easytarget-node'} = $node;
+
             # Propagate global parameters and templates at the leaf level
             if( not $thisIsSubtree )
-            {
+            {                
                 foreach my $param ( keys %globalParameters )
                 {
                     $params->{$param} = $globalParameters{$param};

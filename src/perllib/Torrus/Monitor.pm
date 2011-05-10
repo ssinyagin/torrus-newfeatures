@@ -605,6 +605,7 @@ sub beforeRun
             push( @{$data->{'mlist'}{$token}}, split(',', $mlist) );
         }
         $data->{'db_tokens'}->c_close($cursor);
+        undef $cursor;
         $data->{'db_tokens'}->closeNow();
         undef $data->{'db_tokens'};
     }

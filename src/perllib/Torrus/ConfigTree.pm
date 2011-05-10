@@ -214,6 +214,7 @@ sub new
             $self->{'paramprop'}{$prop}{$param} = $val;
         }
         $self->{'db_paramprops'}->c_close($cursor);
+        undef $cursor;
         $self->{'db_paramprops'}->closeNow();
         delete $self->{'db_paramprops'};
     }

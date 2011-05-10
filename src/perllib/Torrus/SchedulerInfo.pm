@@ -111,7 +111,7 @@ sub clearStats
             $self->{'db_stats'}->c_del( $cursor );
         }
     }
-    undef $cursor;
+    $self->{'db_stats'}->c_close($cursor);
 }
 
 

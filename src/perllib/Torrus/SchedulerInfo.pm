@@ -70,7 +70,7 @@ sub readStats
             $stats->{$id}{$variable} = $value;
         }
     }
-    undef $cursor;
+    $self->{'db_stats'}->c_close($cursor);
 
     return $stats;
 }
@@ -111,7 +111,7 @@ sub clearStats
             $self->{'db_stats'}->c_del( $cursor );
         }
     }
-    undef $cursor;
+    $self->{'db_stats'}->c_close($cursor);
 }
 
 

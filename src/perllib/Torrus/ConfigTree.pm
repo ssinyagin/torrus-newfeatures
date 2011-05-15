@@ -86,7 +86,7 @@ sub new
             {
                 $self->{'db_config_instances'}->c_put( $cursor, $key, 1 );
             }
-            undef $cursor;
+            $self->{'db_config_instances'}->c_close($cursor);
             if( not $ok )
             {
                 return undef;
@@ -213,6 +213,7 @@ sub new
             my( $param, $prop ) = split( /:/o, $key );
             $self->{'paramprop'}{$prop}{$param} = $val;
         }
+        $self->{'db_paramprops'}->c_close($cursor);
         undef $cursor;
         $self->{'db_paramprops'}->closeNow();
         delete $self->{'db_paramprops'};
@@ -259,7 +260,7 @@ sub DESTROY
         my $cursor = $self->{'db_config_instances'}->cursor( -Write => 1 );
         $self->{'db_config_instances'}->c_put
             ( $cursor, 'compiling:' . $self->{'treename'}, 0 );
-        undef $cursor;
+        $self->{'db_config_instances'}->c_close($cursor);
     }
     else
     {
@@ -339,7 +340,7 @@ sub waitReaders
                     'timestamp' => $timestamp } );
             }
         }
-        undef $cursor;
+        $self->{'db_readers'}->c_close($cursor);
         if( @readers > 0 )
         {
             Info('Waiting for ' . scalar(@readers) . ' readers:');
@@ -380,7 +381,7 @@ sub waitReaders
                         $self->{'db_readers'}->c_del( $cursor );
                     }
                 }
-                undef $cursor;
+                $self->{'db_readers'}->c_close($cursor);
                 $noReaders = 1;
             }
         }

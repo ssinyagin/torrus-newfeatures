@@ -201,7 +201,7 @@ sub read
             &Torrus::DB::checkInterrupted();
         }
         
-        undef $cursor;
+        $self->{'db_failures'}->c_close($cursor);
     }
 }
 

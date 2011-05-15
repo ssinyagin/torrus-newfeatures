@@ -106,7 +106,8 @@ foreach my $tree ( @trees )
         $db->c_del( $cursor );            
         
     }
-    undef $cursor;   
+    $db->c_close($cursor);
+    undef $cursor;
     undef $db;
     
     &Torrus::DB::checkInterrupted();

@@ -93,8 +93,7 @@ sub deleteGroups
                     $self->{'db_acl'}->c_del( $cursor );
                 }
             }
-            undef $cursor;
-
+            $self->{'db_acl'}->c_close($cursor);
             Info('Group deleted: ' . $group);
         }
         else
@@ -146,7 +145,7 @@ sub listGroupMembers
             }
         }
     }
-    undef $cursor;
+    $self->{'db_users'}->c_close($cursor);
     return $members;
 }
 
@@ -293,7 +292,7 @@ sub listUsers
             push( @ret, $uid );
         }
     }
-    undef $cursor;
+    $self->{'db_users'}->c_close($cursor);
     return @ret;
 }
 
@@ -427,8 +426,7 @@ sub deleteUser
                 $self->{'db_users'}->c_del( $cursor );
             }
         }
-        undef $cursor;
-
+        $self->{'db_users'}->c_close($cursor);
         Info('User deleted: ' . $uid);
     }
     else
@@ -559,7 +557,7 @@ sub listPrivileges
             $ret->{$object}{$privilege} = 1;
         }
     }
-    undef $cursor;
+    $self->{'db_acl'}->c_close($cursor);
 
     return $ret;
 }

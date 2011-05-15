@@ -431,6 +431,13 @@ sub c_put
 }
 
 
+sub c_close
+{
+    my $self = shift;
+    my $cursor = shift;
+    $cursor->c_close();
+}
+
 
 # Btree best match. We assume that the searchKey is longer or equal
 # than the matched key in the database.

@@ -1,5 +1,8 @@
 2011-05-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* Makefile.am (dist-hook): DIST_REVISION now displays Git branch
+	information
+
 	* bin/torrus.fcgi.in: Let FCGI handler re-spawn every 5000
 	requests or 48 hours for better DB stability
 

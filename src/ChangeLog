@@ -1,3 +1,13 @@
+2011-05-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/torrus.fcgi.in: Let FCGI handler re-spawn every 5000
+	requests or 48 hours for better DB stability
+
+2011-05-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* BDB cursor destructors are explicitly controlled for better
+	stability
+
 2011-05-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm: SNMP reachability stats are
@@ -34,13 +44,8 @@
 	* perllib/Torrus/Renderer/HTML.pm (makeURL):
 	Now nodeid is used in HTML whenever available
 
-2011-01-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
-
-	* bin/torrus.fcgi.in: Let FCGI handler re-spawn after every 50-100
-	requests for better DB stability
-
 2010-12-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
-	
+
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):
 	new discovery parameter: RFC2863_IF_MIB::ifnick-from-ifname
 	provides backwards compatibility with devices which have non-unique
@@ -48,7 +53,7 @@
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):
 	ifDescr and ifName are checked for uniqueness before being used for
-	default interface indexing	
+	default interface indexing
 
 2010-12-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -129,7 +134,7 @@
 
 2010-08-31  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* performance optimizations: XML compiler runs 15-20% faster 
+	* performance optimizations: XML compiler runs 15-20% faster
 
 2010-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -154,7 +159,7 @@
 
 	* init.d/torrus.in: bugfix in RHEL compatibility.
 	Do "chkconfig --del torrus", install the new version into /etc/init.d,
-	then "chkconfig --add torrus", then "service torrus restart"	
+	then "chkconfig --add torrus", then "service torrus restart"
 
 2010-07-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -204,9 +209,9 @@
 
 2010-03-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* perllib/Torrus/DevDiscover.pm: 
+	* perllib/Torrus/DevDiscover.pm:
 	Default snmp-max-msg-size is set back to 1470
-	
+
 	* perllib/Torrus/DevDiscover/Foundry.pm: new discovery module
 
 2010-03-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
@@ -253,7 +258,7 @@
 	* perllib/Torrus/Renderer/HTML.pm:
 	New parameter: node-display-name. Now interface names are not
 	underscored
-	
+
 
 2010-02-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -396,7 +401,7 @@
 2008-06-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Tree names can be specified in the External
-	Storage (Billing reports) 
+	Storage (Billing reports)
 
 2008-06-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -472,7 +477,6 @@
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm:
 	Removed BGP Advertized prefixes
 	Added the prefix limits to Accepted prefixes
-	
 
 2007-08-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -490,7 +494,6 @@
 	daemons. A new copy of init.d/torrus should be copied
 	in startup scripts directory. Also execute for every tree:
 	torrus si --tree=TREE --clear
-	
 
 2007-06-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -522,7 +525,6 @@
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
 	New discovery parameter: RFC2863_IF_MIB::traffic-summaries
 	Currently summaries work only within single output file.
-	
 
 2007-04-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -614,7 +616,7 @@
 2006-12-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/JunOS.pm:
-	New discovery module for Juniper 
+	New discovery module for Juniper
 
 2006-12-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -715,7 +717,7 @@
 2006-07-21  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/RRDStorage.pm (updateRRD):
-	Added threading support: a background thread for RRD updates	
+	Added threading support: a background thread for RRD updates
 
 2006-07-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -769,7 +771,7 @@
 2006-02-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
-	Complex matching expressions for subtree name selector 
+	Complex matching expressions for subtree name selector
 
 	* perllib/Torrus/DevDiscover/CiscoGeneric.pm (discover):
 	Cisco power supply monitoring
@@ -798,7 +800,7 @@
 
 2005-11-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* bin/ttproclist.in: Two new functions: lc, uc	
+	* bin/ttproclist.in: Two new functions: lc, uc
 
 2005-11-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -889,7 +891,7 @@
 2005-07-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm (buildConfig):
-	New discovery parameter: disable-snmpcollector	
+	New discovery parameter: disable-snmpcollector
 
 	* bin/devdiscover.in: Preventing the bundle file update when
 	--limit is specified.
@@ -933,7 +935,7 @@
 	* configure.ac: 1.0.1 Patchlevel 1
 
 	* bin/action_snmpv1trap.in, bin/action_snmptrap.in:
-	added torrusMonitorDesc 
+	added torrusMonitorDesc
 
 	* sup/mibs/TORRUS-MIB.txt: new OID: torrusMonitorDesc
 
@@ -1054,9 +1056,9 @@
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
 	RFC2863_IF_MIB::errors-monitor is no longer supported.
 	Replaced with appropriate selector action
-	
+
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
-	Implemented IF-MIB selector actions - 
+	Implemented IF-MIB selector actions -
 	InBytesMonitor, OutBytesMonitor, ErrorsMonitor, HoltWinters,
 	NoPacketCounters, NoErrorCounters, Parameters
 
@@ -1161,7 +1163,7 @@
 2004-12-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* configure.ac: replaced --disable-modcheck with --enable-pkgonly
-	
+
 2004-11-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Release 0.1.8
@@ -1259,7 +1261,8 @@
 
 2004-07-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* lib/Torrus/DevDiscover/ATMEL.pm: New discocery module from Scott Brooks
+	* lib/Torrus/DevDiscover/ATMEL.pm: New discocery module from Scott
+	Brooks
 
 2004-07-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -1302,7 +1305,8 @@
 
 2004-07-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* lib/Torrus/DevDiscover/CiscoIOS.pm: Added CISCO-IPSEC-FLOW-MONITOR-MIB
+	* lib/Torrus/DevDiscover/CiscoIOS.pm: Added
+	CISCO-IPSEC-FLOW-MONITOR-MIB
 
 2004-07-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -1400,7 +1404,7 @@
 
 	* NEWS: Release 0.1.6
 
-	* ../plugins/cbqos: first release of Cisco QoS monitoring plugin 
+	* ../plugins/cbqos: first release of Cisco QoS monitoring plugin
 
 	* bin/rrd_getdim.in: RRDtool 1.1.x compatibility improved
 
@@ -1442,8 +1446,9 @@
 	* bin/schedulerinfo.in: Only nonzero statistics are shown in runtime
 	report
 
-	* lib/Torrus/Scheduler.pm: reorganized statistics: late start increments
-	only when that happens. Runtime longer than period is also recorded
+	* lib/Torrus/Scheduler.pm: reorganized statistics: late start
+	increments only when that happens. Runtime longer than period is
+	also recorded
 	(sferry).
 
 	* bin/collector.in: more verbosity in non-verbose mode (sferry)
@@ -1452,8 +1457,9 @@
 
 2004-04-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* lib/Torrus/DevDiscover/RFC1697_RDBMS.pm, 
-	 lib/Torrus/DevDiscover/OracleDatabase.pm: New discovery modules (sferry)
+	* lib/Torrus/DevDiscover/RFC1697_RDBMS.pm,
+	lib/Torrus/DevDiscover/OracleDatabase.pm: New discovery
+	modules (sferry)
 
 	* NEWS: Bugfix release 0.1.5bf2
 
@@ -1465,7 +1471,6 @@
 
 	* lib/Torrus/Renderer/RRDtool.pm (rrd_make_cdef):
 	New @-functions in RPN references: AVERAGE MIN MAX LAST
-	
 	(rrd_make_multigraph): New multigraph parameter: ignore-views-X
 
 	* lib/Torrus/DevDiscover/CiscoGeneric.pm (buildConfig):
@@ -1503,7 +1508,7 @@
 
 	* NEWS: Release 0.1.5
 
-	* lib/Torrus/DB.pm (new): Unique DB environment log file per PID. 
+	* lib/Torrus/DB.pm (new): Unique DB environment log file per PID.
 
 2004-03-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -1516,13 +1521,13 @@
 
 2004-03-09  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* lib/Torrus/DevDiscover/UcdSnmp.pm, 
+	* lib/Torrus/DevDiscover/UcdSnmp.pm,
 	lib/Torrus/DevDiscover/RFC2790_HOST_RESOURCES.pm,
 	xmlconfig/vendor/ucd.ucd-snmp.xml,
 	xmlconfig/generic/rfc2790.host-resources.xml:
 	Rearranged the host performance templates.
 	Fixed bug in Interrupts RRD. You need to
-	rm /var/snmpcollector/*ucd-context_interrupts.rrd		
+	rm /var/snmpcollector/*ucd-context_interrupts.rrd
 
 2004-03-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -1605,7 +1610,8 @@
 2004-02-05  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* lib/Torrus/ConfigTree.pm (expandNodeParam):
-	$Torrus::ConfigTree::nodeParamHook: hook for custom parameter processing 
+	$Torrus::ConfigTree::nodeParamHook: hook for custom parameter
+	processing
 
 2004-02-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -1624,7 +1630,7 @@
 
 	* lib/Torrus/DevDiscover.pm (discover):
 	New discovery parameter: disable-devtypes
-	
+
 	* lib/Torrus/DevDiscover.pm (discover):
 	Better treatment for agents without "system" OIDs.
 
@@ -1663,7 +1669,8 @@
 
 	* lib/Torrus/RPN.pm: Slight reorganisation and better fault control
 
-	* doc/userguide.pod: New in Tips: Several Torrus instances on one server
+	* doc/userguide.pod: New in Tips: Several Torrus instances on one
+	server
 
 2004-01-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -1802,7 +1809,7 @@
 
 	* xmlconfig/generic/rfc2863.if-mib.xml:
 	Replaced $IFIDX with %ifindex-map%
-	
+
 	Split template iftable-discards into iftable-discards-in and
 	iftable-discards-out. For some devices,
 	/var/snmpcollector/*_discards.rrd need to be deleted, and
@@ -1833,7 +1840,7 @@
 
 	* lib/Torrus/DevDiscover/RFC2863_IF_MIB.pm (discover):
 	New discovery option: RFC2863_IF_MIB::suppress-hc-counters
-	
+
 2003-11-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/devdiscover.in: now it accepts XML input only
@@ -2045,7 +2052,8 @@
 
 2003-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* lib/Torrus/Renderer.pm (render_html): Added current time in HTML output
+	* lib/Torrus/Renderer.pm (render_html): Added current time in HTML
+	output
 
 2003-09-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -2053,7 +2061,8 @@
 
 2003-09-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* lib/Torrus/Monitor.pm (setAlarm): New parameter: monitor-action-target
+	* lib/Torrus/Monitor.pm (setAlarm): New parameter:
+	monitor-action-target
 
 2003-09-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 

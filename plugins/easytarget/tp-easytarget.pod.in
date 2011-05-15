@@ -90,6 +90,9 @@ There are two types of parameters: the ones consisting of capitals ([A-Z]) are
 the parameters for the EasyTarget engine, and all others are the parameters
 passed to the generated Torrus config file.
 
+The prarameter C<easytarget-node> is set to the path as specified in the
+section header in the input INI file.
+
 There is no parameter inheritance. You can only define either a parameter
 on the global level, or in each of the sections. That means, for example,
 that if C<OUTXML> is missing at the global level, it should be present
@@ -157,6 +160,8 @@ and can be overridden by explicitly defining the parameter.
 
 This is the type of the datasource to be collected. In case of non-counter
 type of the OID, this parameter should be changed to C<GAUGE>.
+
+=item * C<nodeid>: 'et//%easytarget-node%'
 
 =back
 

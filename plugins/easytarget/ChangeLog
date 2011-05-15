@@ -1,3 +1,9 @@
+2011-05-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* easytarget-config.pl: Added "nodeid" derived from "easytarget-node"
+
+	* EasyTarget.pm: new parameter: easytarget-node
+
 2007-01-25  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Plugin Release 1.0

@@ -1,4 +1,4 @@
-#  Copyright (C) 2007  Stanislav Sinyagin
+#  Copyright (C) 2007-2011  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,13 +14,12 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 
 # Dummy Torrus plugin Autoconf script
 
-AC_INIT(tp-easytarget, 1.0, ssinyagin@users.sourceforge.net)
+AC_INIT(tp-easytarget, 1.1, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)

@@ -141,6 +141,23 @@
 /plugins/rawexport/pod2htmd.tmp
 /plugins/rawexport/*.txt
 
+# /plugins/siam/
+/plugins/siam/aclocal.m4
+/plugins/siam/autom4te.cache
+/plugins/siam/config.log
+/plugins/siam/config.status
+/plugins/siam/Makefile
+/plugins/siam/Makefile.in
+/plugins/siam/configure
+/plugins/siam/configure.lineno
+/plugins/siam/config.status.lineno
+/plugins/siam/siam
+/plugins/siam/substvars.sh
+/plugins/siam/tp-*.tar.gz
+/plugins/siam/*.txt
+/plugins/siam/*.pod
+/plugins/siam/*.tmp
+
 # /src/
 /src/aclocal.m4
 /src/autom4te.cache

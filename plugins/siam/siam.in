@@ -1,0 +1,247 @@
+#!@PERL@
+#  Copyright (C) 2011  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+BEGIN { require '@siam_config_pl@'; }
+
+
+use strict;
+use Getopt::Long;
+use Sys::Hostname;
+use XML::LibXML;
+
+use Torrus::SIAM;
+use Torrus::Log;
+
+my $server = hostname();
+
+my $ddx_path = $Torrus::SIAM::ddx_path;
+my $bundles_path = $Torrus::SIAM::bundles_path;
+my $nodes_path = $Torrus::SIAM::nodes_path;
+my $rrd_path = $Torrus::SIAM::rrd_path;
+
+my $debug = 0;
+my $verbose = 0;
+
+
+
+my $ok = GetOptions( 'server=s'    => \$server,
+                     'pddx=s'      => \$ddx_path,
+                     'pbundles=s'  => \$bundles_path,
+                     'pnodes=s'    => \$nodes_path,
+                     'prrd=s'      => \$rrd_path,
+                     'verbose'     => \$verbose,
+                     'debug'       => \$debug );
+
+if( not $ok or scalar( @ARGV ) > 0 )
+{
+    print STDERR
+        ("Usage: $0 --tree=TREE options...\n",
+         "Options:\n",
+         " --server=HOSTNAME       Torrus server to match in SIAM [" .
+         $server . "]\n",
+         " --pddx=PATH             Path to store DDX files\n",
+         "    [" . $ddx_path . "]\n",
+         " --pbundles=PATH         Path to store bundles XML\n",
+         "    [" . $bundles_path . "]\n",
+         " --pnodes=PATH           Path to store per-node XML\n",
+         "    [" . $nodes_path . "]\n",
+         " --prrd=PATH             RRD data storage path\n",
+         "    [" . $rrd_path . "]\n",
+         " --verbose               print extra information\n",
+         " --debug                 print debugging information\n",
+         "\n");
+    exit 1;
+}
+
+if( $debug )
+{
+    Torrus::Log::setLevel('debug');
+}
+elsif( $verbose )
+{
+    Torrus::Log::setLevel('verbose');
+}
+
+if( not -d $bundles_path )
+{
+    Error('No such directory: ' . $bundles_path);
+}
+
+if( not -d $nodes_path )
+{
+    Error('No such directory: ' . $nodes_path);
+}
+
+my $siam = Torrus::SIAM->open();
+exit(1) unless defined($siam);
+
+Verbose('Connected to SIAM');
+
+my $devices = $siam->get_contained_objects
+    ('SIAM::Device', {'match_attribute' => ['torrus.server', [$server]]});
+
+Verbose('Retrieved ' . scalar(@{$devices}) . ' from SIAM');
+
+
+# Distribute devices into bundles by torrus.tree attribute
+my %bundles;
+foreach my $device (@{$devices})
+{
+    next unless $device->attr('snmp.managed');
+    
+    my $tree = $device->attr('torrus.tree');
+    if( not defined($tree) )
+    {
+        Error('SIAM::Device "' . $device->id .
+              '" does not define "torrus.tree" attribute. Aborting.');
+        exit(1);
+    }
+   
+    if( not defined($bundles{$tree}) )
+    {
+        $bundles{$tree} = [];
+    }
+
+    push(@{$bundles{$tree}}, $device);
+}
+
+
+my $success = 1;
+
+Verbose('Preparing to generate ' . scalar(keys %bundles) . ' bundles');
+
+foreach my $tree (sort keys %bundles)
+{
+    Verbose('Bundle ' . $tree . ': ' . scalar(@{$bundles{$tree}}) .
+            ' devices');
+
+    my $outfile = $ddx_path . 'siam-' . $tree . '.ddx';
+    Verbose('Preparing to write ' . $outfile);
+    
+    my $doc = XML::LibXML->createDocument( "1.0", "UTF-8" );
+    my $root = $doc->createElement('snmp-discovery');
+    $doc->setDocumentElement( $root );
+
+    {
+        my $fileInfoNode = $doc->createElement('file-info');
+        $root->appendChild( $fileInfoNode );
+        
+        my $formatNode = $doc->createElement('format-version');
+        $formatNode->appendText('1.0');
+        $fileInfoNode->appendChild( $formatNode );
+    }
+
+    {
+        my $creatorNode = $doc->createElement('creator-info');
+        $creatorNode->appendText
+            ("This file is generated from SIAM\n" .
+             'for Torrus tree ' . $tree . ' on ' . scalar(localtime(time())));
+        $root->appendChild( $creatorNode );
+    }
+
+    my $globalParams = {
+        'output-bundle'  => $bundles_path . '/siam-' . $tree . '.xml',
+        'data-dir'       => $rrd_path,
+        'siam-managed'   => 1,
+    };
+
+    foreach my $p (keys %{$Torrus::SIAM::ddx_defaults})
+    {
+        $globalParams->{$p} = $Torrus::SIAM::ddx_defaults->{$p};
+    }
+    
+    createParamsDom( $globalParams, $doc, $root );
+
+    
+    foreach my $device (sort {$a->attr('siam.device.name') cmp
+                                  $b->attr('siam.device.name')}
+                        @{$bundles{$tree}})
+    {
+        my $name = $device->attr('siam.device.name');
+        
+        my $params = {
+            'output-file' => $nodes_path . '/' . $name . '.xml',
+            'system-id' => $name,
+        };
+
+        my $host = $device->attr('snmp.host');
+        if( not defined($host) )
+        {
+            $host = $name;
+        }
+
+        $params->{'snmp-host'} = $host;
+
+        foreach my $p ('version', 'community', 'timeout', 'retries')
+        {
+            my $v = $device->attr('snmp.' . $p);
+            if( defined($v) )
+            {
+                $params->{'snmp-' . $p} = $v;
+            }
+        }
+
+        my $hostNode = $doc->createElement('host');
+        $root->appendChild( $hostNode );
+        
+        createParamsDom( $params, $doc, $hostNode );            
+    }
+
+    my $ok = $doc->toFile( $outfile, 2 );
+    if( $ok )
+    {
+        Info("Wrote $outfile");
+    }
+    else
+    {
+        Error("Cannot write $outfile: $!");
+        $success = 0;
+    }
+}
+
+exit($success ? 0:1);    
+
+
+
+
+
+
+sub createParamsDom
+{
+    my $params = shift;
+    my $doc = shift;
+    my $parentNode = shift;
+    
+    foreach my $param ( sort keys %{$params} )
+    {
+        my $paramNode = $doc->createElement('param');
+        $paramNode->setAttribute( 'name', $param );
+        $paramNode->setAttribute( 'value', $params->{$param} );
+        $parentNode->appendChild( $paramNode );
+    }
+}
+
+    
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:
+
+

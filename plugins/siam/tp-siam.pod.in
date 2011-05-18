@@ -1,0 +1,28 @@
+=head1 SIAM plugin for Torrus
+
+
+=head2 Installation
+
+Follow the Torrus installation guide for the main software installation.
+
+Install two Perl modules from CPAN:
+
+  perl -MCPAN -e 'install Config::Tiny'
+  perl -MCPAN -e 'install Config::Any'
+
+Unpack the plugin distribution package in some directory:
+
+  gzip -dc tp-easytarget-1.X.tar.gz | tar xvf -
+
+Then run the Torrus plugin installation utility, pointing to the
+unpacked plugin directory:
+
+  torrus install_plugin tp-siam-1.X
+
+
+=head2 Quick steps
+
+
+=head1 Author
+
+Copyright (c) 2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

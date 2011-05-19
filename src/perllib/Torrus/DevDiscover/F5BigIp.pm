@@ -167,8 +167,8 @@ sub discover
     my $result = $dd->retrieveSnmpOIDs( '4.x_globalAttrProductCode' );
     my $product_code = $result->{'4.x_globalAttrProductCode'};
 
-    $product_name = %f5_product->{$product_code}->{'product'};
-    if( %f5_product->{$product_code}->{'supported'} )
+    $product_name = $f5_product{$product_code}->{'product'};
+    if( $f5_product{$product_code}->{'supported'} )
     {
         $devdetails->setCap( 'BigIp_' . $product_name );
     }

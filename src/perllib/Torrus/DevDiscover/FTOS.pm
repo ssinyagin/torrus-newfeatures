@@ -165,7 +165,7 @@ sub discover
     if( defined( $chassisSerial ) )
     {
         $data->{'param'}{'comment'} =
-            %f10ChassisType->{$chassisSerial->{'chType'}} .
+            $f10ChassisType{$chassisSerial->{'chType'}} .
             ', Hw Serial#: ' . $chassisSerial->{'chSerialNumber'};
     }
     else
@@ -191,7 +191,7 @@ sub discover
                                      ( $dd->oiddef('chRpmCpuIndex') ) )
             {
                 my $cpuType = $dd->oiddef('chRpmCpuIndex') . "." . $ftosCPUidx;
-                my $cpuName = %f10CPU->{$ftosCpuTable->{$cpuType}};
+                my $cpuName = $f10CPU{$ftosCpuTable->{$cpuType}};
 
                 Debug("FTOS::CPU index $ftosCPUidx, $cpuName");
 

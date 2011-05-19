@@ -1049,7 +1049,7 @@ sub buildConfig
 
             Debug("    Offer: $offerName");
 
-            foreach my $bundleID ( @{%{$offerBundle}->{$offerNameID}} )
+            foreach my $bundleID ( @{$offerBundle->{$offerNameID}} )
             {
                 my @btemplates;
                 my $bundleName =  $data->{'arbor_e'}{'bundleName'}{$bundleID};

@@ -55,6 +55,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::AxxessIT',
      'Torrus::DevDiscover::BetterNetworks',
      'Torrus::DevDiscover::CasaCMTS',
+     'Torrus::DevDiscover::CCOM',
      'Torrus::DevDiscover::CiscoCatOS',
      'Torrus::DevDiscover::CiscoFirewall',
      'Torrus::DevDiscover::CiscoGeneric',

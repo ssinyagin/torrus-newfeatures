@@ -89,26 +89,29 @@ sub discover
     }
     $devdetails->storeSnmpVars( $ifTable );
 
-    my $ifXTable =
-        $session->get_table( -baseoid => $dd->oiddef('ifXTable') );
-    if( defined $ifXTable )
+    if( not $devdetails->hasCap('disable_ifXTable') )
     {
-        $devdetails->storeSnmpVars( $ifXTable );
-        $devdetails->setCap('ifXTable');
-
-        if( $devdetails->hasOID( $dd->oiddef('ifName') ) )
+        my $ifXTable =
+            $session->get_table( -baseoid => $dd->oiddef('ifXTable') );
+        if( defined $ifXTable )
         {
-            $devdetails->setCap('ifName');
-        }
-
-        if( $devdetails->hasOID( $dd->oiddef('ifAlias') ) )
-        {
-            $devdetails->setCap('ifAlias');
-        }
-        
-        if( $devdetails->hasOID( $dd->oiddef('ifHighSpeed') ) )
-        {
-            $devdetails->setCap('ifHighSpeed');
+            $devdetails->storeSnmpVars( $ifXTable );
+            $devdetails->setCap('ifXTable');
+            
+            if( $devdetails->hasOID( $dd->oiddef('ifName') ) )
+            {
+                $devdetails->setCap('ifName');
+            }
+            
+            if( $devdetails->hasOID( $dd->oiddef('ifAlias') ) )
+            {
+                $devdetails->setCap('ifAlias');
+            }
+            
+            if( $devdetails->hasOID( $dd->oiddef('ifHighSpeed') ) )
+            {
+                $devdetails->setCap('ifHighSpeed');
+            }
         }
     }
 

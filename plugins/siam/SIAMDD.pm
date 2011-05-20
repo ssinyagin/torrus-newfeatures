@@ -102,8 +102,10 @@ sub discover
 
     $data->{'nameref'}{'ifNodeidPrefix'} = 'SIAM_ifNodeidPrefix';
     $data->{'nameref'}{'ifNodeid'} = 'SIAM_ifNodeid';
-    
+
     my %ifRef;
+    my %ifRefDuplicates;
+
     foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
@@ -114,9 +116,34 @@ sub discover
         
         $interface->{$data->{'nameref'}{'ifNodeid'}} =
             $interface->{$orig_nameref_ifNodeid};
-        
+
+        # first, respect the chosen reference as discovered by other modules
         my $refkey = $interface->{$data->{'nameref'}{'ifReferenceName'}};
-        $ifRef{$refkey} = $interface;
+        $ifRef{'default'}{$refkey} = $interface;
+
+        # then, try everything else
+        foreach my $prop (@Torrus::SIAMDD::match_port_properties)
+        {
+            if( $prop ne $data->{'nameref'}{'ifReferenceName'}
+                and
+                not $ifRefDuplicates{$prop} )
+            {
+                my $val = $interface->{$prop};
+                if( defined($val) and length($val) > 0 )
+                {
+                    if( defined($ifRef{$prop}{$val}) )
+                    {
+                        # value already seen before,
+                        # this property has duplicates
+                        $ifRefDuplicates{$prop} = 1;
+                    }
+                    else
+                    {
+                        $ifRef{$prop}{$val} = $interface;
+                    }
+                }
+            }
+        }                        
     }
 
     # Find the matches of service units against device interfaces
@@ -125,7 +152,7 @@ sub discover
     {
         my $unit_type = $unit->attr('siam.svcunit.type');
 
-        if( $unit_type eq 'IFMIB' )
+        if( $unit_type eq 'IFMIB.Port' )
         {
             Debug('Processing ServiceUnit: ' . $unit->id);
             my $interface;
@@ -138,10 +165,26 @@ sub discover
                 if( defined($val) )
                 {
                     Debug('Trying to match interface name: ' . $val);
-                    if( defined($ifRef{$val}) )
+                    if( defined($ifRef{'default'}{$val}) )
                     {
-                        $interface = $ifRef{$val};
-                        Debug('Match interface name: ' . $val);
+                        $interface = $ifRef{'default'}{$val};
+                    }
+                    else
+                    {
+                        foreach my $prop
+                            (@Torrus::SIAMDD::match_port_properties)
+                        {
+                            if( not $ifRefDuplicates{$prop} and
+                                defined($ifRef{$prop}{$val}) )
+                            {
+                                $interface = $ifRef{$prop}{$val};
+                            }
+                        }
+                    }
+                        
+                    if( defined($interface) )
+                    {
+                        Debug('Matched interface name: ' . $val);
                     }
                     else
                     {
@@ -152,53 +195,19 @@ sub discover
             
             if( defined($interface) )
             {
-                my $dataelements = $unit->get_data_elements();
-                my $ok = 1;
-                
-                foreach my $el (@{$dataelements})
-                {                    
-                    if( $el->attr('siam.svcdata.driver') ne
-                        'Torrus.TimeSeries' )
-                    {
-                        next;
-                    }
-                    
-                    my $data_type = $el->attr('siam.svcdata.type');
-                    if( $data_type ne 'PortTraffic' )
-                    {
-                        Error('SIAM::ServiceDataElement, id="' . $el->id .
-                              '" has unsupported siam.svcdata.type: ' .
-                              $data_type);
-                        $el->set_condition('torrus.import_successful',
-                                           '0;Unsupported siam.svcdata.type');
-                        $ok = 0;
-                        next;
-                    }
-
-                    my $nodeid = $el->attr('torrus.nodeid');
-                    if( not defined($nodeid) )
-                    {
-                        Error('SIAM::ServiceDataElement, id="' . $el->id .
-                              '" does not define torrus.nodeid');
-                        $el->set_condition('torrus.import_successful',
-                                           '0;Undefined torrus.nodeid');
-                        $ok = 0;
-                        next;
-                    }
-
-                    $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
-                    $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
-                    $el->set_condition('torrus.import_successful', 1);
-                }
-
-                if( $ok )
+                my $nodeid = $unit->attr('torrus.port.nodeid');
+                if( not defined($nodeid) )
                 {
-                    $unit->set_condition('torrus.import_successful', 1);
+                    Error('SIAM::ServiceUnit, id="' . $unit->id .
+                          '" does not define torrus.port.nodeid');
+                    $unit->set_condition('torrus.import_successful',
+                                         '0;Undefined torrus.port.nodeid');
                 }
                 else
                 {
-                    $unit->set_condition('torrus.import_successful',
-                                         '0;Failed matching a data element');
+                    $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
+                    $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
+                    $unit->set_condition('torrus.import_successful', 1);
                 }
             }
             else

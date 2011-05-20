@@ -36,6 +36,12 @@ $Torrus::SIAM::ddx_defaults = {
     ('torrus.port.name',
      'torrus.port.shortname');
 
+@Torrus::SIAMDD::match_port_properties =
+    ('ifName',
+     'ifDescr',
+     'ifAlias');
+
+
 require '@siam_siteconfig_pl@';
 
 1;

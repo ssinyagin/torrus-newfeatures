@@ -130,9 +130,9 @@ DIV.Graph, DIV.ShortGraph  {
   [% dayValues = rrprint(token, 'rrd-print-daily') %]
   [% lastValue = rrprint(token, 'rrd-print-last') %]
 
-  <P>24 hours Min: [% scale('%.1f', dayValues.0) %], &nbsp;
-  Avg: [% scale('%.1f', dayValues.1) %], &nbsp;
-  Max: <STRONG>[% scale('%.1f', dayValues.2) %]</STRONG>, &nbsp;
+  <P>24-hour minimum: [% scale('%.1f', dayValues.0) %], &nbsp;
+  average: [% scale('%.1f', dayValues.1) %], &nbsp;
+  maximum: <STRONG>[% scale('%.1f', dayValues.2) %]</STRONG>. &nbsp;
   Last: [% scale('%.1f', lastValue) %]
   </P>
 [% END %]

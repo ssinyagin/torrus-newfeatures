@@ -168,7 +168,7 @@
       <param name="ds-type"           value="rrd-multigraph" />
       <param name="ds-names"          value="prepolicy, dropped" />
       <param name="rrd-hwpredict"     value="disabled" />
-      <param name="nodeid"            value="%cbqos-nodeid-prefix%//summary"/>
+      <param name="nodeid"            value="%cbqos-nodeid-prefix%summary"/>
       
       <param name="precedence"        value="5000" />
       <param name="comment"    value="Pre-policy and dropped trafic summary" />

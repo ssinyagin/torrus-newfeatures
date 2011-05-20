@@ -311,7 +311,12 @@
     <param name="html-template" value="search.html" />
   </view>
 
-    
+  <!-- minimalistic view for iframe embedding -->
+  <view name="iframe-rrd">
+    <param name="view-type"     value="html" />
+    <param name="expires"       value="300" />
+    <param name="html-template" value="iframe-rrd.html" />
+  </view>    
 </views>
 
 </configuration>

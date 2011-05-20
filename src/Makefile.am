@@ -51,6 +51,7 @@ dist_tmpl_DATA = \
 	templates/report-yearly.html \
 	templates/search.html \
 	templates/html-incblocks.txt \
+	templates/iframe-rrd.html \
 	templates/tset-list.html \
 	templates/email-alarm.txt
 

@@ -309,17 +309,6 @@ sub discover
              'value' => $devdetails->snmpVar($self->oiddef('sysDescr'))
              }
          );
-
-    if( defined( $devdetails->snmpVar($self->oiddef('sysUpTime')) ) )
-    {
-        $legendValues{40}{'name'} = 'Uptime';
-        $legendValues{40}{'value'} =
-            sprintf("%d days since %s",
-                    $devdetails->snmpVar($self->oiddef('sysUpTime')) /
-                    (100*3600*24),
-                    strftime($Torrus::DevDiscover::timeFormat,
-                             localtime(time())));
-    }
      
     my $legend = '';
     foreach my $key ( sort keys %legendValues )

@@ -96,7 +96,7 @@ Verbose('Connected to SIAM');
 my $devices = $siam->get_contained_objects
     ('SIAM::Device', {'match_attribute' => ['torrus.server', [$server]]});
 
-Verbose('Retrieved ' . scalar(@{$devices}) . ' from SIAM');
+Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
 
 
 # Distribute devices into bundles by torrus.tree attribute
@@ -158,7 +158,7 @@ foreach my $tree (sort keys %bundles)
     my $globalParams = {
         'output-bundle'  => $bundles_path . '/siam-' . $tree . '.xml',
         'data-dir'       => $rrd_path,
-        'siam-managed'   => 1,
+        'siam-managed'   => 'yes',
     };
 
     foreach my $p (keys %{$Torrus::SIAM::ddx_defaults})
@@ -180,6 +180,9 @@ foreach my $tree (sort keys %bundles)
             'system-id' => $name,
         };
 
+        $params->{'siam-device-inventory-id'} =
+            $device->attr('siam.device.inventory_id');
+        
         my $host = $device->attr('snmp.host');
         if( not defined($host) )
         {
@@ -197,6 +200,12 @@ foreach my $tree (sort keys %bundles)
             }
         }
 
+        my $subtree = $device->attr('torrus.subtree-path');
+        if( defined($subtree) )
+        {
+            $params->{'host-subtree'} = $subtree;
+        }
+        
         my $hostNode = $doc->createElement('host');
         $root->appendChild( $hostNode );
         

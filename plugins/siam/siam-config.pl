@@ -28,8 +28,13 @@ $Torrus::SIAM::ddx_defaults = {
     'snmp-community' => 'public',
     'snmp-timeout'   => 3,
     'snmp-retries'   => 2,
+    'CiscoIOS_cbQoS::classmaps-only' => 'yes',
 };
 
+
+@Torrus::SIAMDD::match_port_name_attributes =
+    ('torrus.port.name',
+     'torrus.port.shortname');
 
 require '@siam_siteconfig_pl@';
 

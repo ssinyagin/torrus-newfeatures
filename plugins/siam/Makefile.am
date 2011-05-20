@@ -31,6 +31,8 @@ EXTRA_DIST = siam.in siam-config.pl siam-siteconfig.pl
 myperlmoddir = $(perllibdir)/Torrus
 dist_myperlmod_DATA = SIAM.pm SIAMLogger.pm
 
+myperlmoddiscdir = $(perllibdir)/Torrus/DevDiscover
+dist_myperlmoddisc_DATA = SIAMDD.pm
 
 #####   CLI wrapper  #####
 wrapperdir = $(plugwrapperdir)
@@ -58,6 +60,10 @@ install-data-local:
 	for f in siam-config.pl; do \
 	  $(SUBST) $$f > \
 		$(DESTDIR)$(cfgdefdir)/$$f; \
+	done
+	for f in siam-ddconfig.pl; do \
+	  $(SUBST) $$f > \
+		$(DESTDIR)$(plugdevdisccfgdir)/$$f; \
 	done
 	for f in siam-siteconfig.pl; do \
 	  if test ! -r $(DESTDIR)$(siteconfdir)/$$f; then \

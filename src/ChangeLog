@@ -1,5 +1,8 @@
 2011-05-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/NexComm.pm: new discovery module for
+	NexComm xDSL gateways
+
 	* perllib/Torrus/DevDiscover/Actelis.pm: new discovery module for
 	Actelis xDSL gateways
 

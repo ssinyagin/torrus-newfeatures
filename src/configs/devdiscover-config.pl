@@ -80,6 +80,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::NetApp',
      'Torrus::DevDiscover::NetScreen',
      'Torrus::DevDiscover::NetBotz',
+     'Torrus::DevDiscover::NexComm',
      'Torrus::DevDiscover::OracleDatabase',
      'Torrus::DevDiscover::Paradyne',          # needs testing
      'Torrus::DevDiscover::RFC1697_RDBMS',

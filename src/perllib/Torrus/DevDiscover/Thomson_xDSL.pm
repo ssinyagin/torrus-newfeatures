@@ -50,6 +50,13 @@ sub checkdevtype
     }
     
     $devdetails->setCap('interfaceIndexingPersistent');
+
+    &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+        ($devdetails,
+         {
+             'BRG' => {
+                 'ifType'  => 6,   # ethernetCsmacd
+                 'ifDescr' => '^BRG:' } });
     
     return 1;
 }
@@ -68,6 +75,8 @@ sub discover
     $data->{'nameref'}{'ifNick'} = 'ifIndex';
     $data->{'nameref'}{'ifNodeid'} = 'ifIndex';
 
+    undef $data->{'nameref'}{'ifComment'};
+    
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
     return 1;
 }

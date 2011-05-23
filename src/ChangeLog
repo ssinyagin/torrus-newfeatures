@@ -1,5 +1,8 @@
 2011-05-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/Actelis.pm: new discovery module for
+	Actelis xDSL gateways
+
 	* perllib/Torrus/DevDiscover/Thomson_xDSL.pm: new discovery module
 	for Technicolor/Thomson xDSL gateways
 

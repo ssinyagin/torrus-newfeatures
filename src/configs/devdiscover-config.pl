@@ -44,6 +44,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::RFC2670_DOCS_IF',
      'Torrus::DevDiscover::RFC2737_ENTITY_MIB',
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
+     'Torrus::DevDiscover::Actelis',
      'Torrus::DevDiscover::Alteon',
      'Torrus::DevDiscover::ALU_Timetra',
      'Torrus::DevDiscover::AlliedTelesyn_PBC18',

@@ -1,3 +1,8 @@
+2011-05-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/Thomson_xDSL.pm: new discovery module
+	for Technicolor/Thomson xDSL gateways
+
 2011-05-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover.pm: removed uptime from the legend,

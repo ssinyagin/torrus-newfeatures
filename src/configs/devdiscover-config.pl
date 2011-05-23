@@ -83,6 +83,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::Paradyne',          # needs testing
      'Torrus::DevDiscover::RFC1697_RDBMS',
      'Torrus::DevDiscover::Symmetricom',
+     'Torrus::DevDiscover::Thomson_xDSL',
      'Torrus::DevDiscover::UcdSnmp',
      'Torrus::DevDiscover::Xylan'
      );

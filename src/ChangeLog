@@ -1,5 +1,8 @@
 2011-05-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/Patton.pm: new discovery module for
+	Patton devices
+
 	* perllib/Torrus/DevDiscover/NexComm.pm: new discovery module for
 	NexComm xDSL gateways
 

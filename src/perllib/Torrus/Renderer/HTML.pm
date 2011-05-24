@@ -347,7 +347,7 @@ sub scale
                    "n", # 10e-9  Nano
                    "u", # 10e-6  Micro
                    "m", # 10e-3  Milli
-                   " ", # Base
+                   "", # Base
                    "k", # 10e3   Kilo
                    "M", # 10e6   Mega
                    "G", # 10e9   Giga
@@ -357,7 +357,7 @@ sub scale
 
     my $symbcenter = 6;
     my $digits = (0 == $value)? 0 : floor(log(abs($value))/log(1000));
-    return sprintf( $fmt . " %s", $value/pow(1000, $digits),
+    return sprintf( $fmt . "%s", $value/pow(1000, $digits),
                     $symbols[ $symbcenter+$digits ] );
 }
 

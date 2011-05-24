@@ -1142,11 +1142,6 @@ Returns the value of the parameter for the given view, monitor, or action.
 Returns the URL which displays the given node using the given view.
 If the view is omitted, use the default view.
 
-=item * C<persistentUrl(token, [view])>
-
-Same as above, but the URL is built from persistent information: nodeid
-(if available) or full path in the tree.
-
 =item * C<splitUrls(token, [view])>
 
 Returns a piece of HTML code representing the path with clickable

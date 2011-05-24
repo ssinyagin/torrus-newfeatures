@@ -1,3 +1,9 @@
+2011-05-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/HTML.pm (makeURL): All navigation is now
+	done with persistent URLs. Tokens are removed from GUI wnenever
+	possible.
+
 2011-05-23  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/Patton.pm: new discovery module for

@@ -74,8 +74,7 @@ sub render_html
         'parent'     => sub { return $config_tree->getParent($_[0]); },
         'nodeParam'  => sub { return $config_tree->getNodeParam(@_); },
         'param'      => sub { return $config_tree->getParam(@_); },
-        'url'        => sub { return $self->makeURL($config_tree, 0, @_); },
-        'persistentUrl' => sub { return $self->makeURL($config_tree, 1, @_); },
+        'url'        => sub { return $self->makeURL($config_tree, @_); },
         'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
                               return undef;},
         'plainURL'   => $Torrus::Renderer::plainURL,
@@ -198,14 +197,12 @@ sub sortTokens
 
 
 # compose an URL for a node.
-# $persistent defines if the link should be persistent
-# Persistent link is done with nodeid if available, or with path
+# Link is done with nodeid if available, or with path
 
 sub makeURL
 {
     my $self = shift;
     my $config_tree = shift;
-    my $persistent = shift;
     my $token = shift;
     my $view = shift;
     my @add_vars = @_;
@@ -213,24 +210,24 @@ sub makeURL
     my $ret = $Torrus::Renderer::rendererURL . '/' . $config_tree->treeName();
 
     # Try using nodeid whenever it's available
-    
-    my $nodeid = $config_tree->getNodeParam($token, 'nodeid', 1);
-    if( defined( $nodeid ) )
+
+    if( $config_tree->isTset($token) )
     {
-        $ret .= '?nodeid=' .
-            uri_escape($nodeid, $Torrus::Renderer::uriEscapeExceptions);
+        $ret .= '?token=' . $token;
     }
     else
     {
-        if( $persistent )
+        my $nodeid = $config_tree->getNodeParam($token, 'nodeid', 1);
+        if( defined( $nodeid ) )
+        {
+            $ret .= '?nodeid=' .
+                uri_escape($nodeid, $Torrus::Renderer::uriEscapeExceptions);
+        }
+        else
         {
             $ret .= '?path=' .
                 uri_escape($config_tree->path($token),
                            $Torrus::Renderer::uriEscapeExceptions);
-        }
-        else
-        {
-            $ret .= '?token=' . uri_escape($token);
         }
     }
 
@@ -291,7 +288,7 @@ sub makeSplitURLs
         my $str = '<SPAN CLASS="PathElement">';
         $str .=
             sprintf('<A HREF="%s">%s%s</A>',
-                    $self->makeURL($config_tree, 0, $token, $view),
+                    $self->makeURL($config_tree, $token, $view),
                     $config_tree->nodeName($path),
                     ( $config_tree->isSubtree($token) and
                       $path ne '/') ? '/':'' );

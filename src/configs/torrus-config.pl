@@ -258,6 +258,7 @@ $Torrus::Renderer::RPC::pretty_json = 0;
 # List of leaf parameters that are always queried
 @Torrus::Renderer::RPC::default_leaf_params =
     ('nodeid',
+     'system-id',
      'descriptive-nickname',
      'comment',
      'node-display-name');

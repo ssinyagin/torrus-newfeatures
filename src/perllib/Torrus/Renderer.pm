@@ -1,4 +1,4 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2011  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Renderer;
@@ -31,12 +30,16 @@ use Torrus::SiteConfig;
 
 use Torrus::Renderer::HTML;
 use Torrus::Renderer::RRDtool;
+use Torrus::Renderer::Frontpage;
+use Torrus::Renderer::AdmInfo;
+use Torrus::Renderer::RPC;
 
 # Inherit methods from these modules
 use base qw(Torrus::Renderer::HTML
             Torrus::Renderer::RRDtool
             Torrus::Renderer::Frontpage
-            Torrus::Renderer::AdmInfo);
+            Torrus::Renderer::AdmInfo
+            Torrus::Renderer::RPC);
 
 sub new
 {

@@ -316,6 +316,12 @@
     <param name="view-type"     value="html" />
     <param name="expires"       value="300" />
     <param name="html-template" value="iframe-rrd.html" />
+  </view>
+  
+  <!-- RPC calls -->
+  <view name="rpc">
+    <param name="view-type"     value="rpc" />
+    <param name="expires"       value="300" />
   </view>    
 </views>
 

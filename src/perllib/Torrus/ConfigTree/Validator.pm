@@ -128,7 +128,8 @@ my %view_params =
                      'rrprint' => {'start' => undef,
                                    'print-cf' => undef},
                      'html' => {'html-template' => undef},
-                     'adminfo' => undef}
+                     'adminfo' => undef,
+                     'rpc' => undef}
      );
 
 

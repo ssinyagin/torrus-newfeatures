@@ -244,6 +244,23 @@ $Torrus::Renderer::searchEnabled = 1;
 # is enabled, the user should have rights DisplayTree and GlobalSearch for '*'
 $Torrus::Renderer::globalSearchEnabled = 1;
 
+# Set to true if you want JSON to be pretty and canonical (needs extra
+# CPU cycles)
+$Torrus::Renderer::RPC::pretty_json = 0;
+
+# List of parameters which are never returned by RPC calls
+%Torrus::Renderer::RPC::params_blacklist =
+    ('snmp-community'    => 1,
+     'snmp-username'     => 1,
+     'snmp-authpassword' => 1,
+     'snmp-privpassword' => 1);
+
+# List of leaf parameters that are always queried
+@Torrus::Renderer::RPC::default_leaf_params =
+    ('nodeid',
+     'descriptive-nickname',
+     'comment',
+     'node-display-name');
 
 # Modules that Collector will use for collecting and storing data.
 @Torrus::Collector::loadModules =

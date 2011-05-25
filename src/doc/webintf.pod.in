@@ -266,6 +266,79 @@ All other parameters whose name starts with capital letter, are passed
 to the HTML template as-is, and may be used for your custom purposes.
 
 
+=head2 RPC interface
+
+The RPC interface is designed for external systems to retrieve Torrus
+data. The RPC calls are done via URL parameters, and the returned data
+is in JSON format.
+
+The resulting data size cannot exceed the security limit (by default,
+100 items).
+
+The view C<rpc> is responsible for returning RPC data. The following CGI
+parameters are recognized:
+
+=over 4
+
+=item * RPCCALL
+
+The RPC call to execute. This is a mandatory parameter. Below see the
+list of supported values.
+
+=item * GET_PARAMS
+
+Optional comma-separated list of datasource leaf parameters that are
+going to be retrieved from the configuration
+tree. C<@Torrus::Renderer::RPC::default_leaf_params> in
+F<torrus-config.pl> defines the list of parameters that are always
+queried, and GET_PATAMS would add parameter names to that list. Several
+parameter names, such as I<snmp-community>, are blacklisted because of
+security concern.
+
+=item * PRETTY
+
+Optional. If set to 1, the resulting JSON data is sorted and formatted
+for human reading.
+
+=back
+
+
+The following RPC calls are supported:
+
+=over 4
+
+=item * WALK_LEAVES
+
+This RPC call walks down the tree from the node specified by the URL,
+and returns all the leaves with their respective parameters.
+
+=back
+
+
+The return data is a JSON map with the following keys:
+
+=over 4
+
+=item * success
+
+If the value is nonzero, the RPC call was successful.
+
+=item * error
+
+In case of a failure, this value returns athe error string.
+
+=item * data
+
+This is a map of objects, with datasource tokens as keys. Each object
+lists the node parameters. In addition to parameters, the entry C<path>
+presents the path information in the datasource tree.
+
+=back
+
+
+
+
+
 =head1 Author
 
-Copyright (c) 2002-2010 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

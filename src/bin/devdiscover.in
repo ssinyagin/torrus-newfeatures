@@ -522,6 +522,12 @@ sub doDiscover
 
         if( not $ok )
         {
+            foreach my $callback
+                (values %Torrus::DevDiscover::discovery_failed_callbacks)
+            {
+                &{$callback}( $hostParams );
+            }
+            
             Error($outfile . ' was not written because of errors');
             $everythingsOk = 0;
             last;

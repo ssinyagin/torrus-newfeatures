@@ -27,6 +27,23 @@ use warnings;
 use Torrus::SIAM;
 use Torrus::Log;
 
+
+my $siam;
+
+$Torrus::DevDiscover::thread_start_callbacks{'SIAMDD'} =
+    sub {
+        $siam = Torrus::SIAM->open();
+    };
+
+
+$Torrus::DevDiscover::thread_end_callbacks{'SIAMDD'} =
+    sub {
+        $siam->disconnect();
+        undef $siam;
+    };
+
+
+
 $Torrus::DevDiscover::registry{'SIAMDD'} = {
     'sequence'     => 600,
     'checkdevtype' => \&checkdevtype,
@@ -76,11 +93,10 @@ sub discover
         Error('Undefined parameter: siam-device-inventory-id');
         return 0;
     }
-
-    my $siam = Torrus::SIAM->open();
+       
     if( not defined($siam) )
     {
-        Error('Cannot connect to SIAM database');
+        Error('SIAM is not connected');
         return 0;
     }
 
@@ -218,7 +234,6 @@ sub discover
         }
     }
     
-    $siam->disconnect();
     return 1;
 }
 

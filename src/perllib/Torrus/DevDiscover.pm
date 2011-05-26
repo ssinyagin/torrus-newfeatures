@@ -242,6 +242,8 @@ sub discover
     $snmpargs{'-hostname'} = $hostname;
 
     my $port = $snmpargs{'-port'};
+
+    my $time_start = time();
     Debug('Discovering host: ' . $hostname . ':' . $port . ':' . $community);
 
     my ($session, $error) =
@@ -460,6 +462,10 @@ sub discover
             }
         }
     }
+
+    Verbose('Discovery for ' . $hostname . ' finished in ' .
+            (time() - $time_start) . ' seconds');
+    
     return $ok;
 }
 

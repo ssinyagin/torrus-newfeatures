@@ -216,6 +216,12 @@ if( $workerThreads > 1 )
 
     threads::shared::share( \$everythingsOk );
 
+    foreach my $callback
+        (values %Torrus::DevDiscover::threading_init_callbacks)
+    {
+        &{$callback}();
+    }
+
     $jobQueue = new Thread::Queue;
     $bundleDeletionQueue = new Thread::Queue;
     $confBuildSemaphore = new Thread::Semaphore;
@@ -261,6 +267,11 @@ if( $workerThreads > 1 )
 else
 {
     # Single-thread operation
+
+    foreach my $callback (values %Torrus::DevDiscover::thread_start_callbacks)
+    {
+        &{$callback}();
+    }
        
     foreach my $outfile ( sort keys %{$perOutfileHostParams} )
     {
@@ -273,6 +284,11 @@ else
         {
             removeFromBundle( $outfile );
         }
+    }
+
+    foreach my $callback (values %Torrus::DevDiscover::thread_end_callbacks)
+    {
+        &{$callback}();
     }
 }
 
@@ -464,8 +480,14 @@ sub matchLimitRe
 
 sub discoveryThread
 {
-    Torrus::Log::setTID( threads->tid() );
-    Debug('Started thread #' . threads->tid());
+    &Torrus::Log::setTID( threads->tid() );
+    Debug('Started thread no. ' . threads->tid());
+    
+    foreach my $callback (values %Torrus::DevDiscover::thread_start_callbacks)
+    {
+        &{$callback}();
+    }
+
     my $outfile;
     while( defined( $outfile = $jobQueue->dequeue_nb() ))
     {
@@ -474,6 +496,12 @@ sub discoveryThread
             $bundleDeletionQueue->enqueue( $outfile );
         }
     }
+    
+    foreach my $callback (values %Torrus::DevDiscover::thread_end_callbacks)
+    {
+        &{$callback}();
+    }
+    
     Debug('Finished thread #' . threads->tid());
 }
 

@@ -48,6 +48,13 @@ my %logLevel = (
 
 my $currentLogLevel = $logLevel{'info'};
 
+our $TID = 0;
+sub setTID
+{
+    $TID = shift;
+}
+
+
 sub Log
 {
     my( $level, @msg ) = @_;    
@@ -56,6 +63,10 @@ sub Log
     
     if( $level <= $currentLogLevel )
     {
+        if( $currentLogLevel >= 9 )
+        {
+            unshift(@msg, $$ . '.' . $TID . ' ');
+        }
         my $severity = ( $level <= $logLevel{'warn'} ) ? '*' : ' ';
         printf STDERR ( "[%s%s] %s\n",
                         timeStr( time() ), $severity, join( '', @msg ) );
@@ -84,15 +95,9 @@ sub Verbose
     Log( 'verbose', @_ );
 }
 
-our $TID = 0;
-sub setTID
-{
-    $TID = shift;
-}
-
 sub Debug
 {
-    Log( 'debug', $$ . '.' . $TID . ' ', join('|', @_) );
+    Log( 'debug', join('|', @_) );
 }
 
 

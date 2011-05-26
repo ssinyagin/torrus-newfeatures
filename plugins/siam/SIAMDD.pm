@@ -43,6 +43,26 @@ $Torrus::DevDiscover::thread_end_callbacks{'SIAMDD'} =
     };
 
 
+$Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
+    sub {
+        my $hostParams = shift;
+        if( $hostParams->{'siam-managed'} eq 'yes'
+            and
+            defined($hostParams->{'siam-device-inventory-id'}) )
+        {
+            my $devobj =
+                $siam->get_device($hostParams->{'siam-device-inventory-id'});
+            if( defined($devobj) )
+            {
+                $devobj->set_condition('torrus.imported',
+                                       '0;SNMP discovery failed');
+            }
+        }
+    };
+
+
+
+
 
 $Torrus::DevDiscover::registry{'SIAMDD'} = {
     'sequence'     => 600,
@@ -216,23 +236,25 @@ sub discover
                 {
                     Error('SIAM::ServiceUnit, id="' . $unit->id .
                           '" does not define torrus.port.nodeid');
-                    $unit->set_condition('torrus.import_successful',
+                    $unit->set_condition('torrus.imported',
                                          '0;Undefined torrus.port.nodeid');
                 }
                 else
                 {
                     $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
                     $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
-                    $unit->set_condition('torrus.import_successful', 1);
+                    $unit->set_condition('torrus.imported', 1);
                 }
             }
             else
             {
-                $unit->set_condition('torrus.import_successful',
+                $unit->set_condition('torrus.imported',
                                      '0;Could not match interface name');
             }
         }
     }
+    
+    $devobj->set_condition('torrus.imported', 1);
     
     return 1;
 }

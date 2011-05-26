@@ -614,6 +614,11 @@ sub beforeRun
     
     if( $actual_ts >= $known_ts or not $data->{'targets_initialized'} )
     {
+        Info('Acquiring an exclusive lock for configuration slurp');
+        my $db_lock =
+            new Torrus::DB( 'collector_lock', -WriteAccess => 1 );        
+        my $cursor_lock = $db_lock->cursor( -Write => 1 );
+        
         Info('Initializing tasks for collector instance ' . $instance);
         Debug("Config TS: $actual_ts, Collector TS: $known_ts");
         my $init_start = time();
@@ -641,7 +646,7 @@ sub beforeRun
         undef $cursor;
         $db_tokens->closeNow();
         undef $db_tokens;
-
+        
         &Torrus::DB::checkInterrupted();
 
         # Set the timestamp
@@ -668,6 +673,12 @@ sub beforeRun
                 $self->addTask( $collector );
             }
         }
+
+        $db_lock->c_close($cursor_lock);
+        undef $cursor_lock;
+        $db_lock->closeNow();
+        undef $db_lock;
+
         Verbose(sprintf("Tasks initialization finished in %d seconds",
                         time() - $init_start));
 

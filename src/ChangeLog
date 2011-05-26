@@ -1,3 +1,10 @@
+2011-05-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector.pm (beforeRun): Collector
+	initialization is done with an exclusive lock on
+	collector_lock.db. This avoids the concurrent config slurping at
+	collector startup and minimizes the I/O delays.
+
 2011-05-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/HTML.pm (makeURL): All navigation is now

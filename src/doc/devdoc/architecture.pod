@@ -448,7 +448,9 @@ Count of MIB failures per SNMP host.
 
 
 
-
+B<collector_lock.db> is a I<Hash> database that does not contain any
+data. It's only used for acquiring exclusive locks for collector
+processes.
 
 
 

@@ -95,6 +95,29 @@ sub discover
         }
     }
 
+    # Copy the old nodeid values into a new reference map
+    my $orig_nameref_ifNodeidPrefix =
+        $data->{'nameref'}{'ifNodeidPrefix'};
+    my $orig_nameref_ifNodeid =
+        $data->{'nameref'}{'ifNodeid'};
+
+    $data->{'nameref'}{'ifNodeidPrefix'} = 'M_net_ifNodeidPrefix';
+    $data->{'nameref'}{'ifNodeid'} = 'M_net_ifNodeid';
+
+    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        next if $interface->{'excluded'};
+
+        $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
+            $interface->{$orig_nameref_ifNodeidPrefix};
+        
+        $interface->{$data->{'nameref'}{'ifNodeid'}} =
+            $interface->{$orig_nameref_ifNodeid};
+    }
+
+    # Process comment strings and populate nodeid when matched
+    
     my $nodeid_prefix_key = $devdetails->param('M_net::nodeid-prefix-key');
     
     foreach my $ifIndex ( keys %{$data->{'interfaces'}} )

@@ -24,6 +24,7 @@ package Torrus::CGI;
 use strict;
 use CGI;
 use IO::File;
+use JSON ();
 
 # This modue is not a part of mod_perl
 use Apache::Session::File;
@@ -36,7 +37,8 @@ use Torrus::ACL;
 
 ## Torrus::CGI->process($q)
 ## Expects a CGI object as input
-## In case of an error, the DB environment would be uncleaned after do_process()
+## In case of an error, the DB environment would
+## be uncleaned after do_process().
 ## Here we explicitly clean it up
 sub process
 {
@@ -321,7 +323,7 @@ sub do_process
                             if( not defined($token) )
                             {
                                 return report_error
-                                    ($q, 'Cannot find nodeid:' . $nodeid);
+                                    ($q, 'Cannot find nodeid: ' . $nodeid);
                             }
                         }
                         else
@@ -421,10 +423,21 @@ sub report_error
     my $q = shift;
     my $msg = shift;
 
-    print $q->header('-type' => 'text/plain',
-                     '-expires' => 'now');
 
-    print('Error: ' . $msg);
+    my $v = $q->param('view');
+    if( defined($v) and $v eq 'rpc' )
+    {
+        my $json = new JSON;
+        $json->pretty;
+        $json->canonical;
+        print $q->header('-type' => 'application/json', '-expires' => 'now');
+        print $json->encode({'success' => 0, 'error' => $msg});
+    }
+    else
+    {          
+        print $q->header('-type' => 'text/plain', '-expires' => 'now');
+        print('Error: ' . $msg);
+    }
 }
 
 

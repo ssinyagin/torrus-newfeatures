@@ -967,8 +967,10 @@ sub buildConfig
 
             # We accept that parameters may be added by some other ways
 
-            if( defined( $interface->{'param'}{'bandwidth-limit-in'} ) and
-                defined( $interface->{'param'}{'bandwidth-limit-out'} ) )
+            if( defined($interface->{'param'}{'bandwidth-limit-in'}) and
+                defined($interface->{'param'}{'bandwidth-limit-out'}) and
+                $interface->{'hasChild'}{'Bytes_In'} and
+                $interface->{'hasChild'}{'Bytes_Out'} )
             {
                 push( @templates,
                       'RFC2863_IF_MIB::interface-bandwidth-usage' );

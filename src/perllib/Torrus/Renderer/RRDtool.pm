@@ -681,10 +681,18 @@ sub rrd_make_opts
                     $value = $now . $value;
                 }
             }
-            elsif( $param eq 'imgformat' and
-                    defined($obj) and defined($mime_type{$value}) )
+            elsif( $param eq 'imgformat' )
             {
-                $obj->{'mimetype'} = $mime_type{$value};
+                if( not defined($mime_type{$value}) )
+                {
+                    Error('Unsupported value for imgformat: ' . $value);
+                    $value = 'PNG';
+                }
+
+                if( defined($obj) )
+                {
+                    $obj->{'mimetype'} = $mime_type{$value};
+                }
             }
             
             push( @args, $opthash->{$param}, $value );

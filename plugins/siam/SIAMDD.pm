@@ -239,10 +239,46 @@ sub discover
                     $unit->set_condition('torrus.imported',
                                          '0;Undefined torrus.port.nodeid');
                 }
+                elsif( not $interface->{'hasOctets'} and
+                       not $interface->{'hasHCOctets'} )
+                {
+                    Error('SIAM::ServiceUnit, id="' . $unit->id .
+                          '": interface does not have in/out octet counters');
+                    $unit->set_condition
+                        ('torrus.imported',
+                         '0;interface does not have in/out octet counters');
+                }
                 else
                 {
                     $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
                     $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
+
+                    # Apply the service access bandwidth
+                    my $bw = $unit->attr('torrus.port.bandwidth');
+                    if( not defined($bw) or $bw == 0 )
+                    {
+                        if( defined( $interface->{'ifSpeed'} ) )
+                        {
+                            $bw = $interface->{'ifSpeed'};
+                        }
+                    }
+
+                    if( $bw > 0 )
+                    {
+                        $interface->{'param'}{'bandwidth-limit-in'} =
+                            $bw / 1e6;
+                        $interface->{'param'}{'bandwidth-limit-out'} =
+                            $bw / 1e6;
+                        $interface->{'childCustomizations'}->{'InOut_bps'}->{
+                            'upper-limit'} = $bw;
+                        $interface->{'childCustomizations'}->{'Bytes_In'} ->{
+                            'upper-limit'} = $bw / 8;
+                        $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
+                            'upper-limit'} = $bw / 8;
+                        $interface->{'param'}{'monitor-vars'} =
+                            sprintf('bw=%g', $bw);
+                    }        
+                    
                     $unit->set_condition('torrus.imported', 1);
                 }
             }

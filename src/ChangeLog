@@ -1,5 +1,8 @@
 2011-05-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/Renderer/RRDtool.pm: "imgformat" is now a
+	configurable view parameter
+
 	* xmlconfig/defaults.xml: new view: "embedded" for external GUI
 	systems
 

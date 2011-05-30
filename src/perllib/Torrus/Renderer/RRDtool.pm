@@ -1,4 +1,4 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2011  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -34,8 +34,15 @@ my %rrd_graph_opts =
      'start'  => '--start',
      'end'    => '--end',
      'width'  => '--width',
-     'height' => '--height'
+     'height' => '--height',
+     'imgformat' => '--imgformat', 
      );
+
+my %mime_type =
+    ('PNG' => 'image/png',
+     'SVG' => 'image/svg+xml',
+     'EPS' => 'application/postscript',
+     'PDF' => 'application/pdf');
 
 my @arg_arrays = qw(opts defs bg hwtick hrule hwline line fg);
 
@@ -63,7 +70,7 @@ sub render_rrgraph
 
     push( @{$obj->{'args'}{'opts'}},
           $self->rrd_make_opts( $config_tree, $token, $view,
-                                \%rrd_graph_opts, ) );
+                                \%rrd_graph_opts, $obj ) );
 
     push( @{$obj->{'args'}{'opts'}},
           $self->rrd_make_graph_opts( $config_tree, $token, $view ) );
@@ -139,7 +146,13 @@ sub render_rrgraph
         return undef;
     }
 
-    return( $config_tree->getParam($view, 'expires')+time(), 'image/png' );
+    my $mimetype = $obj->{'mimetype'};
+    if( not defined($mimetype) )
+    {
+        $mimetype = 'image/png';
+    }
+            
+    return( $config_tree->getParam($view, 'expires')+time(), $mimetype );
 }
 
 
@@ -640,6 +653,7 @@ sub rrd_make_opts
     my $token = shift;
     my $view = shift;
     my $opthash = shift;
+    my $obj = shift;
 
     my @args = ();
     foreach my $param ( keys %{$opthash} )
@@ -667,6 +681,12 @@ sub rrd_make_opts
                     $value = $now . $value;
                 }
             }
+            elsif( $param eq 'imgformat' and
+                    defined($obj) and defined($mime_type{$value}) )
+            {
+                $obj->{'mimetype'} = $mime_type{$value};
+            }
+            
             push( @args, $opthash->{$param}, $value );
         }
     }
@@ -694,8 +714,8 @@ sub rrd_make_graph_opts
     my $token = shift;
     my $view = shift;
 
-    my @args = ( '--imgformat', 'PNG' );
-
+    my @args;
+    
     my $graph_log = $config_tree->getNodeParam($token, 'graph-logarithmic');
     if( defined($graph_log) and $graph_log eq 'yes' )
     {

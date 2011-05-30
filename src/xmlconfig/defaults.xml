@@ -120,6 +120,7 @@
     <param name="end"           value="now" />
     <param name="width"         value="500" />
     <param name="height"        value="250" />
+    <param name="imgformat"     value="PNG" />
     <param name="line-style"    value="##SingleGraph" />
     <param name="line-color"    value="##SingleGraph" />
     <param name="hw-bndr-style" value="##HWBoundary" />

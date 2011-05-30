@@ -236,7 +236,7 @@ Optional. If given, presents the output for the given moment, instead of the
 current time. Must be of the form understood by C<rrdtool> (see
 RRDTool manuals).
 
-=item Gstart, Gend, Gwidth, Gheight
+=item Gstart, Gend, Gwidth, Gheight, Gimgformat
 
 Optional vaiables that override the ones defined in the view.
 

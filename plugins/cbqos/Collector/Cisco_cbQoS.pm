@@ -159,7 +159,7 @@ my %servicePolicyTableParams =
 
 
 # This list defines the order for entries mapping in
-# $cref->{'ServicePolicyMapping'}
+# $ServicePolicyMapping
 
 my @servicePolicyTableEntries =
     ( 'cbQosIfType', 'cbQosPolicyDirection', 'cbQosIfIndex',
@@ -200,6 +200,11 @@ my %objTypeAttributes =
          'name-param' => 'cbqos-police-rate',
          'name-oid'   => 'cbQosPoliceCfgRate' }
      );
+
+my %ServicePolicyTable;
+my %ServicePolicyMapping;
+my %ObjectsTable;
+my %CfgTable;
 
 
 # This is first executed per target
@@ -269,7 +274,7 @@ sub make_full_name
 
     if( defined($objNameOid) )
     {
-        $objectID .= $cref->{'CfgTable'}{$hosthash}{
+        $objectID .= $CfgTable{$hosthash}{
             $objCfgIndex}{$objNameOid};
     }
     
@@ -334,12 +339,12 @@ sub initTargetAttributes
 
     # Retrieve and translate cbQosServicePolicyTable
 
-    if( not defined $cref->{'ServicePolicyTable'}{$hosthash} )
+    if( not defined $ServicePolicyTable{$hosthash} )
     {
         Debug('Retrieving Cisco cbQoS maps from ' . $hosthash);
 
         my $ref = {};
-        $cref->{'ServicePolicyTable'}{$hosthash} = $ref;
+        $ServicePolicyTable{$hosthash} = $ref;
 
         my $result =
             $session->get_table( -baseoid =>
@@ -380,7 +385,7 @@ sub initTargetAttributes
         }
 
         my $mapRef = {};
-        $cref->{'ServicePolicyMapping'}{$hosthash} = $mapRef;
+        $ServicePolicyMapping{$hosthash} = $mapRef;
 
         foreach my $policyIndex ( keys %{$ref} )
         {
@@ -396,10 +401,10 @@ sub initTargetAttributes
 
     # Retrieve config information from cbQosxxxCfgTable
 
-    if( not defined $cref->{'CfgTable'}{$hosthash} )
+    if( not defined $CfgTable{$hosthash} )
     {
         my $ref = {};
-        $cref->{'CfgTable'}{$hosthash} = $ref;
+        $CfgTable{$hosthash} = $ref;
 
         foreach my $table ( 'cbQosPolicyMapName', 'cbQosCMName',
                             'cbQosMatchStmtName', 'cbQosQueueingCfgBandwidth',
@@ -434,10 +439,10 @@ sub initTargetAttributes
 
     # Retrieve and translate cbQosObjectsTable
 
-    if( not defined $cref->{'ObjectsTable'}{$hosthash} )
+    if( not defined $ObjectsTable{$hosthash} )
     {
         my $ref = {};
-        $cref->{'ObjectsTable'}{$hosthash} = $ref;
+        $ObjectsTable{$hosthash} = $ref;
 
         my $result =
             $session->get_table( -baseoid =>
@@ -510,7 +515,7 @@ sub initTargetAttributes
 
     # Find the entry in cbQosServicePolicyTable
 
-    my $mapRef = $cref->{'ServicePolicyMapping'}{$hosthash};
+    my $mapRef = $ServicePolicyMapping{$hosthash};
 
     my $mapString = '';
     foreach my $entryName ( @servicePolicyTableEntries )
@@ -531,7 +536,7 @@ sub initTargetAttributes
 
     my $theObjectID = $collector->param($token, 'cbqos-full-name');
     
-    my $theObjectIndex = $cref->{'ObjectsTable'}{$hosthash}->{
+    my $theObjectIndex = $ObjectsTable{$hosthash}->{
         $thePolicyIndex}{$theObjectID};
 
     if( not defined( $theObjectIndex ) )
@@ -593,10 +598,10 @@ sub postProcess
 
     while(my ($hosthash, $tokens) = each %remapping_hosts )
     {
-        delete $cref->{'ServicePolicyTable'}{$hosthash};
-        delete $cref->{'ServicePolicyMapping'}{$hosthash};
-        delete $cref->{'ObjectsTable'}{$hosthash};
-        delete $cref->{'CfgTable'}{$hosthash};
+        delete $ServicePolicyTable{$hosthash};
+        delete $ServicePolicyMapping{$hosthash};
+        delete $ObjectsTable{$hosthash};
+        delete $CfgTable{$hosthash};
 
         foreach my $token (@{$tokens})
         {

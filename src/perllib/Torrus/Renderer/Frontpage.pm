@@ -188,6 +188,8 @@ sub renderTreeChooser
                                 Torrus::SiteConfig::treeDescription($_[0]) }
         ,
         'url'  => sub { return $Torrus::Renderer::rendererURL . '/' . $_[0] },
+        'pathUrl'  => sub { return $Torrus::Renderer::rendererURL . '/' .
+                                $_[0] . '?path=' . $_[1] },
         'plainURL'   => $Torrus::Renderer::plainURL,
         'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
                               return undef;},

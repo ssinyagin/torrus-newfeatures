@@ -147,6 +147,8 @@ sub discover
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if $interface->{'excluded'};
 
+        next unless ($interface->{'hasOctets'} or $interface->{'hasHCOctets'});
+        
         $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
             $interface->{$orig_nameref_ifNodeidPrefix};
         
@@ -238,15 +240,6 @@ sub discover
                           '" does not define torrus.port.nodeid');
                     $unit->set_condition('torrus.imported',
                                          '0;Undefined torrus.port.nodeid');
-                }
-                elsif( not $interface->{'hasOctets'} and
-                       not $interface->{'hasHCOctets'} )
-                {
-                    Error('SIAM::ServiceUnit, id="' . $unit->id .
-                          '": interface does not have in/out octet counters');
-                    $unit->set_condition
-                        ('torrus.imported',
-                         '0;interface does not have in/out octet counters');
                 }
                 else
                 {

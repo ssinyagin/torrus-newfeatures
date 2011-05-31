@@ -162,9 +162,7 @@ sub discover
         # then, try everything else
         foreach my $prop (@Torrus::SIAMDD::match_port_properties)
         {
-            if( $prop ne $data->{'nameref'}{'ifReferenceName'}
-                and
-                not $ifRefDuplicates{$prop} )
+            if( $prop ne $data->{'nameref'}{'ifReferenceName'} )
             {
                 my $val = $interface->{$prop};
                 if( defined($val) and length($val) > 0 )
@@ -173,7 +171,7 @@ sub discover
                     {
                         # value already seen before,
                         # this property has duplicates
-                        $ifRefDuplicates{$prop} = 1;
+                        $ifRefDuplicates{$prop}{$val} = 1;
                     }
                     else
                     {
@@ -212,7 +210,8 @@ sub discover
                         foreach my $prop
                             (@Torrus::SIAMDD::match_port_properties)
                         {
-                            if( not $ifRefDuplicates{$prop} and
+                            if( (not $ifRefDuplicates{$prop}{$val})
+                                and
                                 defined($ifRef{$prop}{$val}) )
                             {
                                 $interface = $ifRef{$prop}{$val};

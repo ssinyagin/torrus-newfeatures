@@ -162,7 +162,10 @@ sub checkdevtype
 
     my $session = $dd->session();
 
-    if( $devdetails->isDevType('CiscoIOS') )
+    # cbQoS template use 64-bit counters, so SNMPv1 is explicitly unsupported
+    
+    if( $devdetails->isDevType('CiscoIOS') and
+        $devdetails->param('snmp-version') ne '1' )
     {
         my $cbQosServicePolicyTable =
             $session->get_table( -baseoid =>

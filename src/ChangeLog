@@ -1,5 +1,8 @@
 2011-06-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/Collector/RRDStorage.pm (updateRRD): suppress
+	inserting NaN when no data is available for the whole RRD file
+
 	* xmlconfig/snmp-defs.xml: default rrd-create-heartbeat changed
 	from 500 to 720
 

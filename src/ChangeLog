@@ -1,3 +1,8 @@
+2011-06-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml: default rrd-create-heartbeat changed
+	from 500 to 720
+
 2011-05-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm: "imgformat" is now a

@@ -1,3 +1,8 @@
+2011-06-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Scheduler.pm, perllib/Torrus/Collector.pm: repeat
+	immediately 3 collector cycles at start
+
 2011-06-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/RRDStorage.pm (updateRRD): suppress

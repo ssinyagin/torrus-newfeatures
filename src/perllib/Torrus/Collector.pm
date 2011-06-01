@@ -64,6 +64,12 @@ sub new
         $options{'-Name'} = "Collector";
     }
 
+    # Repeat so many cycles immediately at start
+    if( $Torrus::Collector::fastCycles > 0 )
+    {
+        $options{'-FastCycles'} = $Torrus::Collector::fastCycles;
+    }
+    
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new( %options );
     bless $self, $class;

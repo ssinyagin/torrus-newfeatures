@@ -23,6 +23,7 @@ use strict;
 use Torrus::ConfigTree;
 use Torrus::Log;
 
+use RRDs;
 use JSON ();
 use IO::File;
 
@@ -39,6 +40,19 @@ our %params_blacklist;
 # make sure we don't pull too much data
 our $result_limit = 100;
 
+my %rpc_methods =
+    (
+     'WALK_LEAVES' => {
+         'call' => \&rpc_walk_leaves,
+         'needs_params' => 1,
+     },
+     
+     'AGGREGATE_DS'   => {
+         'call' => \&rpc_aggregate_ds,
+     },
+     );
+
+    
 # All our methods are imported by Torrus::Renderer;
 
 sub render_rpc
@@ -51,49 +65,54 @@ sub render_rpc
               
     my $result = {'success' => 1, 'data' => {}};
 
+    my $callproc = $self->{'options'}{'variables'}{'RPCCALL'};
+    if( not defined $callproc )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'Missing RPC call name in RPCCALL';
+    }
+    elsif( not defined($rpc_methods{$callproc}) )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'Unsupported RPC call: ' . $callproc;
+    }
+        
     # Prepare the list of parameters to retrieve via an RPC call
     my @params;
-    push(@params, @default_leaf_params);
-
-    my $additional_params = $self->{'options'}{'variables'}{'GET_PARAMS'};
-    if( defined($additional_params) )
+    if( $result->{'success'} and
+        $rpc_methods{$callproc}{'needs_params'} )
     {
-        foreach my $p (split(/\s*,\s*/o, $additional_params))
+        push(@params, @default_leaf_params);
+
+        my $additional_params = $self->{'options'}{'variables'}{'GET_PARAMS'};
+        if( defined($additional_params) )
         {
-            if( $params_blacklist{$p} )
+            foreach my $p (split(/\s*,\s*/o, $additional_params))
             {
-                $result->{'success'} = 0;
-                $result->{'error'} = 'Parameter ' . $p . ' is blacklisted';
-            }
-            else
-            {
-                push(@params, $p);
+                if( $params_blacklist{$p} )
+                {
+                    $result->{'success'} = 0;
+                    $result->{'error'} = 'Parameter ' . $p . ' is blacklisted';
+                    last;
+                }
+                else
+                {
+                    push(@params, $p);
+                }
             }
         }
     }
 
+    # Process the call
     if( $result->{'success'} )
     {
-        # process the call
-        my $callproc = $self->{'options'}{'variables'}{'RPCCALL'};
-        if( defined($callproc) )
-        {
-            if( $callproc eq 'WALK_LEAVES' )
-            {
-                rpc_walk_leaves($self, $config_tree,
-                                $token, \@params, $result);
-            }
-            else
-            {
-                $result->{'success'} = 0;
-                $result->{'error'} = 'Unsupported RPC call: ' . $callproc;
-            }
-        }
-        else
-        {
-            $result->{'success'} = 0;
-            $result->{'error'} = 'Missing RPC call name in RPCCALL';
-        }
+        &{$rpc_methods{$callproc}{'call'}}
+        ($self, $config_tree,
+         {
+             'token' => $token,
+             'view'  => $view,
+             'params' => \@params,
+             'result' => $result });
     }
 
     my $json = new JSON;
@@ -126,9 +145,12 @@ sub rpc_walk_leaves
 {
     my $self = shift;
     my $config_tree = shift;
-    my $token = shift;
-    my $params = shift;
-    my $result = shift;
+    my $opts = shift;
+
+    my $token = $opts->{'token'};
+    my $params = $opts->{'params'};
+    my $result = $opts->{'result'};
+    
 
     if( scalar(keys %{$result->{'data'}}) > $result_limit )
     {
@@ -155,9 +177,133 @@ sub rpc_walk_leaves
     {
         foreach my $ctoken ($config_tree->getChildren($token))
         {
-            rpc_walk_leaves($self, $config_tree, $ctoken, $params, $result);
+            rpc_walk_leaves($self, $config_tree,
+                            {'token' => $ctoken,
+                             'params' => $params,
+                             'result' => $result});
         }
     }
+}
+
+
+
+my @rpc_print_statements =
+    (
+     {
+         'name' => 'START',
+         'args' => ['CDEF:B1=Aavg,POP,TIME',
+                    'VDEF:B2=B1,MINIMUM',
+                    'PRINT:B2:%.0lf'],
+     },
+     {
+         'name' => 'END',
+         'args' => ['CDEF:C1=Aavg,POP,TIME',
+                    'VDEF:C2=C1,MAXIMUM',
+                    'PRINT:C2:%.0lf'],
+     },
+     {
+         'name' => 'AVG',
+         'args' => ['VDEF:D1=Aavg,AVERAGE',
+                    'PRINT:D1:%le'],
+     },
+     {
+         'name' => 'MAX',
+         'args' => ['VDEF:E1=Amax,MAXIMUM',
+                    'PRINT:E1:%le'],
+     },
+     {
+         'name' => 'AVAIL',
+         'args' => ['CDEF:F1=Aavg,UN,0,100,IF',
+                    'VDEF:F2=F1,AVERAGE',
+                    'PRINT:F2:%.2lf'],
+     },
+     );
+     
+my %rrd_print_opts =
+    (
+     'start'  => '--start',
+     'end'    => '--end',
+     );
+     
+
+sub rpc_aggregate_ds
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $opts = shift;
+
+    my $token = $opts->{'token'};
+    my $view = $opts->{'view'};
+    my $params = $opts->{'params'};
+    my $result = $opts->{'result'};
+    
+    if( not $config_tree->isLeaf($token) )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'AGREGATE_DS method supports only leaf nodes';
+        return;
+    }
+
+    if( $config_tree->getNodeParam($token, 'ds-type') eq 'rrd-multigraph' )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} =
+            'AGREGATE_DS method does not support rrd-multigraph leaves';
+        return undef;
+    }
+
+    my $leaftype = $config_tree->getNodeParam($token, 'leaf-type');
+    if( $leaftype ne 'rrd-def' )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'Unsupported leaf-type: ' . $leaftype;
+        return;
+    }
+
+    my @args;    
+    
+    push( @args, $self->rrd_make_opts( $config_tree, $token, $view,
+                                       \%rrd_print_opts, ) );
+    
+    push( @args,
+          $self->rrd_make_def($config_tree, $token, 'Aavg', 'AVERAGE'),
+          $self->rrd_make_def($config_tree, $token, 'Amax', 'MAX') );
+          
+    foreach my $entry ( @rpc_print_statements )
+    {
+        push( @args, @{$entry->{'args'}} );
+    }
+
+    Debug('RRDs::graphv arguments: ' . join(' ', @args));
+
+    my $r = RRDs::graphv('-', @args);
+
+    my $ERR=RRDs::error;
+    if( $ERR )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'RRD::graphv returned error: ' . $ERR;
+        return undef;
+    }
+
+    my $data = {};
+    my $i = 0;
+
+    foreach my $entry ( @rpc_print_statements )
+    {
+        my $key = 'print[' . $i . ']';
+        my $val = $r->{$key};
+
+        if( not defined($val) )
+        {
+            $val = 'NaN';
+        }
+
+        $data->{$entry->{'name'}} = $val;
+        $i++;
+    }
+
+    $result->{'data'}{$token} = $data;
 }
 
 

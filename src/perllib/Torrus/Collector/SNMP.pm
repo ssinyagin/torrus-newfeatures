@@ -573,9 +573,11 @@ sub lookupMap
         {
             return $ret;
         }
-
-        if( scalar(@mappingSessions) >=
-            $Torrus::Collector::SNMP::maxSessionsPerDispatcher )
+        
+        if( not $collector->didNotRun()
+            and
+            (scalar(@mappingSessions) >=
+             $Torrus::Collector::SNMP::maxSessionsPerDispatcher) )
         {
             snmp_dispatcher();
             @mappingSessions = ();

@@ -61,6 +61,11 @@ $Torrus::Global::ConfigReadersWaitPeriod = 5;
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;
 
+# By default, run 3 full collector cycles immediately at start. This
+# allows all SNMP name->index maps to be fetched and used ASAP
+# The 3rd cycle is needed for cbQoS to fetch its mappings
+$Torrus::Collector::fastCycles = 3;
+
 # SO_RCVBUF, the receiving buffer size of the SNMP collector socket.
 # Should be large enough to sustain the traffic bursts, and should be
 # within limits incurred by local OS and kernel settings.

@@ -112,9 +112,9 @@
       RRA:AVERAGE:0.042:288:732    RRA:MAX:0.042:288:732
     </param>
 
-    <!-- if no updates are received for 8 minutes, consider the datasource
+    <!-- if no updates are received for 12 minutes, consider the datasource
          unknown, i.e. dead -->
-    <param name="rrd-create-heartbeat" value="500"/>
+    <param name="rrd-create-heartbeat" value="720"/>
 
     <param name="rrd-create-min" value="0"/>
     <param name="rrd-create-max" value="U"/>

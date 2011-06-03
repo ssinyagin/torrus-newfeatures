@@ -433,6 +433,8 @@ sub updateRRD
 
     my $step = $collector->period();
 
+    my $has_values = 0;
+    
     foreach my $ds ( keys %ds_updating )
     {
         my $token = $ds_updating{$ds};
@@ -447,6 +449,7 @@ sub updateRRD
         if( ref $sref->{'values'}{$token} )
         {
             ($value, $timestamp, $uptime) = @{$sref->{'values'}{$token}};
+            $has_values = 1;
         }
 
         push( @timestamps, $timestamp );
@@ -463,6 +466,11 @@ sub updateRRD
         $values .= ':'. $value;
     }
 
+    if( not $has_values )
+    {
+        return;
+    }
+    
     # Get the average timestamp
     my $sum = 0;
     map {$sum += $_} @timestamps;

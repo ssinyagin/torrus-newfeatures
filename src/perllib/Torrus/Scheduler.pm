@@ -162,11 +162,11 @@ sub run
                     $task->beforeRun( $self->{'stats'} );
 
                     $self->setProcessStatus('running');
-                    $task->run();
-                    my $whenNext = $task->whenNext();
-                    
+                    $task->run();                    
                     $task->afterRun( $self->{'stats'}, $startTime );
                     $self->afterTaskRun( $task, $startTime );
+
+                    my $whenNext = $task->whenNext();
                     
                     if( $whenNext > 0 )
                     {
@@ -255,7 +255,9 @@ sub beforeTaskRun
     my $startTime = shift;
     my $plannedStartTime = shift;
 
-    if( not $task->didNotRun() and  $startTime > $plannedStartTime + 1 )
+    if( (not $task->didNotRun()) and
+        $task->initialized() and
+        $startTime > $plannedStartTime + 1 )
     {
         my $late = $startTime - $plannedStartTime;
         Verbose(sprintf('Task delayed %d seconds', $late));
@@ -291,6 +293,7 @@ sub data
 #   -Offset   => seconds    -- time offset from even period moments
 #   -Name     => "string"   -- Symbolic name for log messages
 #   -Instance => N          -- instance number
+#   -FastCycles => N        -- optional number of cycles to run immediately
 
 package Torrus::Scheduler::PeriodicTask;
 
@@ -320,12 +323,18 @@ sub new
     $self->{'options'}{'-Name'} = "PeriodicTask" unless
         defined( $self->{'options'}{'-Name'} );
 
+    $self->{'options'}{'-FastCycles'} = 0 unless
+        defined($self->{'options'}{'-FastCycles'});
+    
     $self->{'missedPeriods'} = 0;
 
     $self->{'options'}{'-Started'} = time();
 
     # Array of (Name, Value) pairs for any kind of stats    
     $self->{'statValues'} = [];
+
+    # counter of passed cycles 
+    $self->{'cycles'} = 0;
     
     Debug("New Periodic Task created: period=" .
           $self->{'options'}{'-Period'} .
@@ -342,6 +351,13 @@ sub whenNext
     if( $self->period() > 0 )
     {
         my $now = time();
+        
+        if( not $self->initialized() )
+        {
+            # Repeat immediately as many cycles as required at start
+            return $now;
+        }
+
         my $period = $self->period();
         my $offset = $self->offset();
         my $previous;
@@ -367,7 +383,7 @@ sub whenNext
 
         my $whenNext = $previous + $period;
         $self->{'previousSchedule'} = $whenNext;
-
+        
         Debug("Task ". $self->{'options'}{'-Name'}.
               " wants to run next time at " . scalar(localtime($whenNext)));
         return $whenNext;
@@ -397,7 +413,9 @@ sub afterRun
     my $self = shift;
     my $stats = shift;
     my $startTime = shift;
-    
+
+    $self->{'cycles'}++;
+
     my $len = time() - $startTime;
     if( $len > $self->period() )
     {
@@ -451,6 +469,11 @@ sub didNotRun
     return( not defined( $self->{'previousSchedule'} ) );
 }
 
+sub initialized
+{
+    my $self = shift;
+    return ($self->{'cycles'} >= $self->{'options'}{'-FastCycles'});
+}
 
 sub name
 {

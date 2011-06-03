@@ -147,6 +147,8 @@ sub discover
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if $interface->{'excluded'};
 
+        next unless ($interface->{'hasOctets'} or $interface->{'hasHCOctets'});
+        
         $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
             $interface->{$orig_nameref_ifNodeidPrefix};
         
@@ -160,9 +162,7 @@ sub discover
         # then, try everything else
         foreach my $prop (@Torrus::SIAMDD::match_port_properties)
         {
-            if( $prop ne $data->{'nameref'}{'ifReferenceName'}
-                and
-                not $ifRefDuplicates{$prop} )
+            if( $prop ne $data->{'nameref'}{'ifReferenceName'} )
             {
                 my $val = $interface->{$prop};
                 if( defined($val) and length($val) > 0 )
@@ -171,7 +171,7 @@ sub discover
                     {
                         # value already seen before,
                         # this property has duplicates
-                        $ifRefDuplicates{$prop} = 1;
+                        $ifRefDuplicates{$prop}{$val} = 1;
                     }
                     else
                     {
@@ -210,7 +210,8 @@ sub discover
                         foreach my $prop
                             (@Torrus::SIAMDD::match_port_properties)
                         {
-                            if( not $ifRefDuplicates{$prop} and
+                            if( (not $ifRefDuplicates{$prop}{$val})
+                                and
                                 defined($ifRef{$prop}{$val}) )
                             {
                                 $interface = $ifRef{$prop}{$val};
@@ -243,6 +244,33 @@ sub discover
                 {
                     $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
                     $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
+
+                    # Apply the service access bandwidth
+                    my $bw = $unit->attr('torrus.port.bandwidth');
+                    if( not defined($bw) or $bw == 0 )
+                    {
+                        if( defined( $interface->{'ifSpeed'} ) )
+                        {
+                            $bw = $interface->{'ifSpeed'};
+                        }
+                    }
+
+                    if( $bw > 0 )
+                    {
+                        $interface->{'param'}{'bandwidth-limit-in'} =
+                            $bw / 1e6;
+                        $interface->{'param'}{'bandwidth-limit-out'} =
+                            $bw / 1e6;
+                        $interface->{'childCustomizations'}->{'InOut_bps'}->{
+                            'upper-limit'} = $bw;
+                        $interface->{'childCustomizations'}->{'Bytes_In'} ->{
+                            'upper-limit'} = $bw / 8;
+                        $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
+                            'upper-limit'} = $bw / 8;
+                        $interface->{'param'}{'monitor-vars'} =
+                            sprintf('bw=%g', $bw);
+                    }        
+                    
                     $unit->set_condition('torrus.imported', 1);
                 }
             }

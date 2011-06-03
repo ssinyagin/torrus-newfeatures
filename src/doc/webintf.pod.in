@@ -314,7 +314,7 @@ and returns all the leaves with their respective parameters.  In
 addition to parameters, the entry C<path> presents the path information
 in the datasource tree.
 
-=item * AGREGATE_DS
+=item * AGGREGATE_DS
 
 This RPC call is applicable to any datasource leaf with "leaf-type" set
 to "rrd-def". It fetches the average and maximum values for a given
@@ -333,8 +333,8 @@ Average and maximum values calculated for the given interval.
 
 =item * AVAIL
 
-Percentage of time for which the data is not a NaN value. The accuracy of this
-value depends on the time interval and the RRA's being used to produce
+Percentage of time for which the data is not NaN. Accuracy of this
+value depends on the time interval and RRA's being used to produce
 the value. Consolidated RRA's may already screen out some unavailable
 data samples.
 

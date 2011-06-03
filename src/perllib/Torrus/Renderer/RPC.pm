@@ -240,7 +240,7 @@ sub rpc_aggregate_ds
     if( not $config_tree->isLeaf($token) )
     {
         $result->{'success'} = 0;
-        $result->{'error'} = 'AGREGATE_DS method supports only leaf nodes';
+        $result->{'error'} = 'AGGREGATE_DS method supports only leaf nodes';
         return;
     }
 
@@ -248,7 +248,7 @@ sub rpc_aggregate_ds
     {
         $result->{'success'} = 0;
         $result->{'error'} =
-            'AGREGATE_DS method does not support rrd-multigraph leaves';
+            'AGGREGATE_DS method does not support rrd-multigraph leaves';
         return undef;
     }
 

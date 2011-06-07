@@ -323,11 +323,11 @@ sub rpc_search_nodeid
     my $params = $opts->{'params'};
     my $result = $opts->{'result'};
 
-    my $search_prefix = $self->{'options'}{'variables'}{'RREFIX'};
+    my $search_prefix = $self->{'options'}{'variables'}{'PREFIX'};
     if( not defined $search_prefix )
     {
         $result->{'success'} = 0;
-        $result->{'error'} = 'Missing the search prefix in RREFIX';
+        $result->{'error'} = 'Missing the search prefix in PREFIX';
         return;
     }
 

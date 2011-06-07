@@ -310,7 +310,41 @@ The following RPC calls are supported:
 =item * WALK_LEAVES
 
 This RPC call walks down the tree from the node specified by the URL,
-and returns all the leaves with their respective parameters.
+and returns all the leaves with their respective parameters.  In
+addition to parameters, the entry C<path> presents the path information
+in the datasource tree.
+
+=item * AGGREGATE_DS
+
+This RPC call is applicable to any datasource leaf with "leaf-type" set
+to "rrd-def". It fetches the average and maximum values for a given
+period. The URL parameters C<Gstart> and C<Gend> are used to define the
+time interval. Returned data is a map of the following keys and values:
+
+=over 8
+
+=item * START, END
+
+Unix timestamps of the calculated time interval.
+
+=item * AVG, MAX
+
+Average and maximum values calculated for the given interval.
+
+=item * AVAIL
+
+Percentage of time for which the data is not NaN. Accuracy of this
+value depends on the time interval and RRA's being used to produce
+the value. Consolidated RRA's may already screen out some unavailable
+data samples.
+
+=back
+
+=item * SEARCH_NODEID
+
+This RPC call performs a prefix search for I<nodeid> values among all
+leaves in the tree. The prefix string is expected in C<PREFIX> CGI
+argument. The call returns the same data format as WALK_LEAVES.
 
 =back
 
@@ -330,8 +364,7 @@ In case of a failure, this value returns athe error string.
 =item * data
 
 This is a map of objects, with datasource tokens as keys. Each object
-lists the node parameters. In addition to parameters, the entry C<path>
-presents the path information in the datasource tree.
+represents the data as specified by the RPC call.
 
 =back
 

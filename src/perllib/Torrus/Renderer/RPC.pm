@@ -50,6 +50,11 @@ my %rpc_methods =
      'AGGREGATE_DS'   => {
          'call' => \&rpc_aggregate_ds,
      },
+     
+     'SEARCH_NODEID' => {
+         'call' => \&rpc_search_nodeid,
+         'needs_params' => 1,
+     },
      );
 
     
@@ -305,6 +310,56 @@ sub rpc_aggregate_ds
 
     $result->{'data'}{$token} = $data;
 }
+
+
+
+sub rpc_search_nodeid
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $opts = shift;
+
+    my $token = $opts->{'token'};
+    my $params = $opts->{'params'};
+    my $result = $opts->{'result'};
+
+    my $search_prefix = $self->{'options'}{'variables'}{'RREFIX'};
+    if( not defined $search_prefix )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'Missing the search prefix in RREFIX';
+        return;
+    }
+
+    my $search_results = $config_tree->searchNodeidPrefix($search_prefix);
+    
+    if( scalar(@{$search_results}) > $result_limit )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'Result is too big. Aborting the RPC call';
+        return;
+    }
+    
+    # results are pairs [nodeid,token]
+    foreach my $res ( @{$search_results} )
+    {
+        my $token = $res->[1];
+        if( $config_tree->isLeaf($token) )
+        {
+            my $data = {'path' => $config_tree->path($token)};
+            foreach my $p (@{$params})
+            {
+                my $val = $config_tree->getNodeParam($token, $p);
+                if( defined($val) )
+                {
+                    $data->{$p} = $val;
+                }
+            }
+            $result->{'data'}{$token} = $data;
+        }
+    }
+}
+
 
 
 

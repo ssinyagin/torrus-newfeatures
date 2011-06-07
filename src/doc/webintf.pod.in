@@ -340,6 +340,12 @@ data samples.
 
 =back
 
+=item * SEARCH_NODEID
+
+This RPC call performs a prefix search for I<nodeid> values among all
+leaves in the tree. The prefix string is expected in C<RREFIX> CGI
+argument. The call returns the same data format as WALK_LEAVES.
+
 =back
 
 

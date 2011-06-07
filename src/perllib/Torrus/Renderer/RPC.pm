@@ -332,6 +332,13 @@ sub rpc_search_nodeid
     }
 
     my $search_results = $config_tree->searchNodeidPrefix($search_prefix);
+
+    if( not defined($search_results) or scalar(@{$search_results}) == 0 )
+    {
+        $result->{'data'} = {};
+        return;
+    }
+   
     
     if( scalar(@{$search_results}) > $result_limit )
     {

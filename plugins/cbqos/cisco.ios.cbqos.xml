@@ -122,9 +122,12 @@
     <param name="collector-timeoffset-hashstring"
            value="%system-id%:%cbqos-policy-nick%:%cbqos-object-nick%" />
 
-    <param name="cbqos-nodeid-prefix"
-     value="qos//%nodeid-device%//%cbqos-policy-nick%//%cbqos-object-nick%//"/>
+    <!-- default value which is usually overwritten by discovery module -->
+    <param name="nodeid-cbqos-policy"
+       value="qos//%nodeid-device%//%cbqos-policy-nick%"/>
 
+    <param name="nodeid-cbqos-object"
+       value="%nodeid-cbqos-policy%//%cbqos-object-nick%"/>
   </template>
 
   <template name="cisco-cbqos-pkt">
@@ -168,7 +171,7 @@
       <param name="ds-type"           value="rrd-multigraph" />
       <param name="ds-names"          value="prepolicy, dropped" />
       <param name="rrd-hwpredict"     value="disabled" />
-      <param name="nodeid"            value="%cbqos-nodeid-prefix%summary"/>
+      <param name="nodeid"            value="%nodeid-cbqos-object%//summary"/>
       
       <param name="precedence"        value="5000" />
       <param name="comment"    value="Pre-policy and dropped trafic summary" />

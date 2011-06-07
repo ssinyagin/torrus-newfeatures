@@ -619,6 +619,12 @@ sub buildChildrenConfigs
                     {
                         $subtreeComment .= ' (' . $ifComment . ')';
                     }
+
+                    $param->{'nodeid-cbqos-policy'} =
+                        'qos//' .
+                        $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} .
+                        $interface->{$data->{'nameref'}{'ifNodeid'}} .
+                        '//' . $dir;
                 }
                 else
                 {

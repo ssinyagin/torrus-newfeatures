@@ -844,11 +844,15 @@ sub buildChildrenConfigs
             $fullName .= $objectName . ':' . $objTypeMap{$objType};
 
             $param->{'cbqos-full-name'} = $fullName;
-
-            
-
             $param->{'comment'} = $subtreeComment;
-
+            
+            $param->{'cbqos-object-descr'} = $subtreeComment;
+            if( (length($parentObjType) > 0) and (length($parentObjName) > 0) )
+            {
+                $param->{'cbqos-object-descr'} .= ' in ' .
+                    $parentObjType . ': ' . $parentObjName;
+            }
+            
             my $objectNode = $cb->addSubtree( $parentNode, $subtreeName,
                                               $param, \@templates );
 

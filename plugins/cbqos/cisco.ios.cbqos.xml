@@ -109,6 +109,12 @@
                                             
 </definitions>
 
+<param-properties>
+  <!-- Parameters which are included in search DB -->
+  <prop param="cbqos-object-descr"    prop="search" value="1"/>
+</param-properties>
+
+
 <datasources>
 
   <template name="cisco-cbqos-subtree">
@@ -169,25 +175,25 @@
 
     <leaf name="Summary">
       <param name="ds-type"           value="rrd-multigraph" />
-      <param name="ds-names"          value="prepolicy, dropped" />
+      <param name="ds-names"          value="postpolicy, dropped" />
       <param name="rrd-hwpredict"     value="disabled" />
       <param name="nodeid"            value="%nodeid-cbqos-object%//summary"/>
       
       <param name="precedence"        value="5000" />
-      <param name="comment"    value="Pre-policy and dropped trafic summary" />
+      <param name="comment"   value="Post-policy and dropped trafic summary" />
       <param name="vertical-label"    value="bps" />
 
-      <param name="ds-expr-prepolicy"      value="{Pre_Policy_Bytes},8,*"/>
-      <param name="graph-legend-prepolicy" value="Pre-policy" />
-      <param name="line-style-prepolicy"   value="##SingleGraph" />
-      <param name="line-color-prepolicy"   value="##blue" />
-      <param name="line-order-prepolicy"   value="1" />
+      <param name="ds-expr-postpolicy"      value="{Post_Policy_Bytes},8,*"/>
+      <param name="graph-legend-postpolicy" value="Post-policy" />
+      <param name="line-style-postpolicy"   value="##SingleGraph" />
+      <param name="line-color-postpolicy"   value="##blue" />
+      <param name="line-order-postpolicy"   value="1" />
 
       <param name="ds-expr-dropped"      value="{Dropped_Bytes},8,*"/>
       <param name="graph-legend-dropped" value="Dropped" />
       <param name="line-style-dropped"   value="##SingleGraph" />
       <param name="line-color-dropped"   value="##red" />
-      <param name="line-order-dropped"   value="2" />      
+      <param name="line-order-dropped"   value="2" />
     </leaf>
     
     <!-- ******  Pre-policy meters ****** -->
@@ -255,6 +261,7 @@
       <apply-template name="cisco-cbqos-pkt" />
       <param name="snmp-object" value="$cbQosCMDropPkt64.POL.OBJ" />
       <param name="rrd-ds"      value="DropPkt" />
+      <param name="nodeid"      value="%nodeid-cbqos-object%//droppkt"/>
       <param name="comment">
         Dropped packets as the result of all features that can produce drops
         (e.g., police, random detect, etc.)

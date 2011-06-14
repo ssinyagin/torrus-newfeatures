@@ -158,7 +158,7 @@ foreach my $tree (sort keys %bundles)
     my $globalParams = {
         'output-bundle'  => $bundles_path . '/siam-' . $tree . '.xml',
         'data-dir'       => $rrd_path,
-        'siam-managed'   => 'yes',
+        'SIAM::managed'   => 'yes',
     };
 
     foreach my $p (keys %{$Torrus::SIAM::ddx_defaults})
@@ -180,7 +180,7 @@ foreach my $tree (sort keys %bundles)
             'system-id' => $name,
         };
 
-        $params->{'siam-device-inventory-id'} =
+        $params->{'SIAM::device-inventory-id'} =
             $device->attr('siam.device.inventory_id');
         
         my $host = $device->attr('snmp.host');

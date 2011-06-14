@@ -199,6 +199,8 @@ sub discover
             $interface->{'vendor_templates'} = [];
 
             $interface->{'ifIndex'} = $ifIndex;
+            $interface->{'ifAdminStatus'} = $admStatus;
+            $interface->{'ifOperStatus'} = $operStatus;
             
             $interface->{'ifType'} =
                 $devdetails->snmpVar($dd->oiddef('ifType') . '.' . $ifIndex);

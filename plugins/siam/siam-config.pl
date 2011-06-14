@@ -29,6 +29,8 @@ $Torrus::SIAM::ddx_defaults = {
     'snmp-timeout'   => 3,
     'snmp-retries'   => 2,
     'CiscoIOS_cbQoS::classmaps-only' => 'yes',
+    'RFC2863_IF_MIB::list-admindown-interfaces' => 'yes',
+    'SIAM::exclude-unmatched-admindown-interfaces' => 'yes',
 };
 
 

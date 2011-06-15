@@ -128,7 +128,7 @@ my $endtime;
 
 if( defined($enddate) )
 {
-    $endtime = str2time( $startdate ); 
+    $endtime = str2time( $enddate ); 
     if( not defined($endtime) )
     {
         Error('Cannot parse end date: ' . $enddate);
@@ -327,6 +327,9 @@ for( my $pos = 0; $pos < $n_points; $pos++ )
         }
     }
 }
+
+$dbh->commit() or Error('Error committing to SQL database: ' . $dbh->errstr);
+$dbh->disconnect();
 
 Verbose('Database update finished');
 

@@ -145,8 +145,9 @@ if( not defined( $interfaceFilter ) )
          'ifDescr' => '^FIFO'
      },
      
-     'vFC' => {
-         'ifType'  => 56                      # virtualFibreChannel
+     'vfc' => {
+         'ifType'  => 56,                     # virtualFibreChannel
+         'ifDescr' => '^vfc'
      },
     );
 

@@ -48,10 +48,10 @@ $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
         my $hostParams = shift;
         if( $hostParams->{'siam-managed'} eq 'yes'
             and
-            defined($hostParams->{'siam-device-inventory-id'}) )
+            defined($hostParams->{'SIAM::device-inventory-id'}) )
         {
             my $devobj =
-                $siam->get_device($hostParams->{'siam-device-inventory-id'});
+                $siam->get_device($hostParams->{'SIAM::device-inventory-id'});
             if( defined($devobj) )
             {
                 $devobj->set_condition('torrus.imported',
@@ -79,7 +79,7 @@ sub checkdevtype
 
     my $data = $devdetails->data();
     
-    if( $devdetails->param('siam-managed') eq 'yes' )
+    if( $devdetails->param('SIAM::managed') eq 'yes' )
     {
         if( $devdetails->hasCap('nodeidReferenceManaged') )
         {
@@ -107,10 +107,10 @@ sub discover
 
     my $data = $devdetails->data();
 
-    my $invid = $devdetails->param('siam-device-inventory-id');
+    my $invid = $devdetails->param('SIAM::device-inventory-id');
     if( not defined($invid) )
     {
-        Error('Undefined parameter: siam-device-inventory-id');
+        Error('Undefined parameter: SIAM::device-inventory-id');
         return 0;
     }
        
@@ -242,9 +242,9 @@ sub discover
                 }
                 else
                 {
+                    $interface->{'SIAM::matched'} = 1;
                     $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
                     $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
-
                     # Apply the service access bandwidth
                     my $bw = $unit->attr('torrus.port.bandwidth');
                     if( not defined($bw) or $bw == 0 )
@@ -272,6 +272,13 @@ sub discover
                     }        
                     
                     $unit->set_condition('torrus.imported', 1);
+                    
+                    if( $interface->{'ifAdminStatus'} != 1 )
+                    {
+                        $unit->set_condition
+                            ('torrus.warning',
+                             'Port is administratively down on the device');
+                    }
                 }
             }
             else
@@ -281,6 +288,25 @@ sub discover
             }
         }
     }
+
+    # Admin-down interfaces which were not matched against SIAM have no
+    # further interest, and we exclude them
+    
+    if( $devdetails->param('SIAM::exclude-unmatched-admindown-interfaces')
+        eq 'yes' )
+    {
+        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+        {
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            next if $interface->{'excluded'};
+
+            if( $interface->{'ifAdminStatus'} != 1 and
+                (not $interface->{'SIAM::matched'}) )
+            {
+                $interface->{'excluded'} = 1;
+            }
+        }
+    }            
     
     $devobj->set_condition('torrus.imported', 1);
     

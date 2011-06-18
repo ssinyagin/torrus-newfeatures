@@ -144,6 +144,10 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 53,                     # propVirtual
          'ifDescr' => '^FIFO'
      },
+     
+     'vFC' => {
+         'ifType'  => 56                      # virtualFibreChannel
+     },
     );
 
 our %tunnelType =

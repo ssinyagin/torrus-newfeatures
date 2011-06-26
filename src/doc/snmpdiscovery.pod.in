@@ -372,13 +372,19 @@ C<RFC2863_IF_MIB::only-interfaces> parameter.
 =item * C<disable-reachability-stats>
 
 If set to C<yes>, the device reachability statistics are not enabled for
-this host. 
+this host.
 
 =item * C<enable-reachability-stats>
 
 If C<only-devtypes> parameter is specified, the SNMP reachability
 statistics are disabled by default. If C<enable-reachability-stats> is
 set to C<yes>, the reachability statistics are actvated in any case.
+
+=item * C<snmp-reachability-rra>
+
+This parameter overrides the round-robin array definitions for SNMP
+reachability statistics. By default, 5-minute data is stored for 3
+months, and daily averages are stored for 3 years.
 
 =item * C<define-tokensets>
 

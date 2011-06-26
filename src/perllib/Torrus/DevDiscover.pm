@@ -98,6 +98,7 @@ our @copyParams =
       'snmp-oids-per-pdu',
       'snmp-check-sysuptime',
       'snmp-max-msg-size',
+      'snmp-reachability-rra',
       'system-id' );
 
 

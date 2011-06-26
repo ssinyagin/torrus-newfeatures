@@ -112,6 +112,16 @@
       RRA:AVERAGE:0.042:288:732    RRA:MAX:0.042:288:732
     </param>
 
+    <!-- Round-robin arrays for device reachability
+      By default we keep: 5-minute details for 3 months,
+      1-day average for 3 years.
+      In daily average one hour of missing samples are allowed.
+    -->
+    <param name="snmp-reachability-rra">
+      RRA:AVERAGE:0:1:26784
+      RRA:AVERAGE:0.042:288:1100
+    </param>      
+    
     <!-- if no updates are received for 12 minutes, consider the datasource
          unknown, i.e. dead -->
     <param name="rrd-create-heartbeat" value="720"/>
@@ -181,6 +191,7 @@
       <param name="data-file" value="%system-id%_snmp_reachability.rrd" />
       <param name="rrd-ds"    value="reachable" />
       <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="rrd-create-rra" value="%snmp-reachability-rra%"/>
     </leaf>
   </template>
   

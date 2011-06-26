@@ -70,6 +70,7 @@
   <prop param="nodeid"                prop="expand" value="1"/>
   <prop param="normal-level"          prop="expand" value="1"/>
   <prop param="rpn-expr"              prop="expand" value="1"/>
+  <prop param="rrd-create-rra"        prop="expand" value="1"/>
   <prop param="rrd-create-max"        prop="expand" value="1"/>
   <prop param="rrd-create-min"        prop="expand" value="1"/>
   <prop param="rrd-ds"                prop="expand" value="1"/>

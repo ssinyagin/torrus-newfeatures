@@ -1,3 +1,8 @@
+2011-06-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/snmp-defs.xml: RRA for SNMP reachability is separately
+	defined. New discovery parameter: snmp-reachability-rra.
+
 2011-06-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector.pm (beforeRun): Collector

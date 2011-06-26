@@ -51,7 +51,7 @@ my $ok = GetOptions( 'server=s'    => \$server,
 if( not $ok or scalar( @ARGV ) > 0 )
 {
     print STDERR
-        ("Usage: $0 --tree=TREE options...\n",
+        ("Usage: $0 [options...]\n",
          "Options:\n",
          " --server=HOSTNAME       Torrus server to match in SIAM [" .
          $server . "]\n",

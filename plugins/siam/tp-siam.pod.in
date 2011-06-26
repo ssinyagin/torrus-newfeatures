@@ -5,14 +5,13 @@
 
 Follow the Torrus installation guide for the main software installation.
 
-Install two Perl modules from CPAN:
+Install the SIAM Perl module from CPAN:
 
-  perl -MCPAN -e 'install Config::Tiny'
-  perl -MCPAN -e 'install Config::Any'
+  perl -MCPAN -e 'install SIAM'
 
 Unpack the plugin distribution package in some directory:
 
-  gzip -dc tp-easytarget-1.X.tar.gz | tar xvf -
+  gzip -dc tp-siam-1.X.tar.gz | tar xvf -
 
 Then run the Torrus plugin installation utility, pointing to the
 unpacked plugin directory:
@@ -20,7 +19,141 @@ unpacked plugin directory:
   torrus install_plugin tp-siam-1.X
 
 
-=head2 Quick steps
+=head2 Usage
+
+Service Inventory Abstraction Model (SIAM) is a Perl library
+available at CPAN. It is designed to be an abstraction interface between
+enterprise-specific inventory database and various programs, such as
+Torrus. SIAM is supposed to be used with an enterprise-specific driver
+which maps the inventory data into SIAM objects and attributes.
+
+The C<tp-siam> plugin consists of a command-line utility which generates
+DDX files from SIAM data, and a DevDiscover module which tries to match
+the IF-MIB interface names in SIAM against those on the network
+devices. The resulting configuration contains I<nodeid> values imported
+from SIAM, and those values would be typically based on service
+identifiers in the inventory database. Thus the external programs can
+fetch Torrus data by using the enterprise-specific service identifiers.
+
+The command-line utility reads the device list and their attributes from
+SIAM and creates corresponding discovery instruction (DDX) files:
+
+  torrus siam [options...]
+
+    Options:
+     --server=HOSTNAME       Torrus server to match in SIAM
+     --pddx=PATH             Path to store DDX files
+     --pbundles=PATH         Path to store bundles XML
+     --pnodes=PATH           Path to store per-node XML
+     --prrd=PATH             RRD data storage path
+     --verbose               print extra information
+     --debug                 print debugging information
+
+By default, the pluginSIAM utility retrieves all devices for the local server's
+I<hostname>, and stores the resulting DDX files in the default
+I<discovery> directory. The DDX files are named as "siam-I<TREE>.ddx"
+for each given tree name supplied by SIAM parameters. The DDX files
+would store the generated bundle files in I<xmlconfig/bundles/>, and
+deviec-specific XML files in I<xmlconfig/nodes/> subdirectories of the
+standard XML configuration location.
+
+
+=head2 SIAM Attributes
+
+SIAM::Device object attributes used by the plugin:
+
+=over 4
+
+=item * torrus.server
+
+This attribute is matched when the SIAM command-line utility imports the
+devicesinto the DDX files.
+
+=item * torrus.tree
+
+The Torrus tree name. It should match an existing tree name in Torrus
+configuration.
+
+=item * siam.device.name
+
+Unique device name which is used for C<sustem-id> parameter in Torrus.
+
+=item * siam.device.inventory_id
+
+Unique device identifier that is used to retrieve the corresponding
+SIAM::Device object from SIAM.
+
+=item * snmp.managed
+
+Must return a true value in order for the device to be included in
+further processing.
+
+=item * snmp.host, snmp-version, snmp-community, snmp-timeout, snmp-retries
+
+Optional attributes that may override the default values.
+
+=item * torrus.subtree-path
+
+Optional attribute, identifies the subtree name where the device node is
+placed.
+
+=back
+
+
+
+SIAM::ServiceUnit object attributes used by the discovery module:
+
+=over 4
+
+=item * siam.svcunit.type
+
+Type of service unit. Supported value: C<IFMIB.Port>
+
+=item * torrus.port.name, torrus.port.shortname
+
+These attributes are matched against the IF-MIB interface names in order
+to find the corresponding ifIndex. This list can be modified in
+I<siam-siteconfig.pl>.
+
+=item * torrus.port.nodeid
+
+Unique value of C<nodeid> which will be assigned to the matched interface.
+
+=item * torrus.port.bandwidth
+
+Optional service bandwidth in bit per second. If defined, the
+corresponding bandwidth limit parameters are applied to the interface
+configuration.
+
+=back
+
+
+=head2 SIAM conditions
+
+Conditions are used for sending the SNMP discovery status events back
+into the SIAM driver. They can be used for diagnostics and reporting
+purposes.
+
+=over 4
+
+=item torrus.imported
+
+This condition is applied to SIAM::Device and SIAM::ServiceUnit
+objects. The value is a status code and a status message separated by
+semicolon (;). Non-zero status code corresponds to success, and no
+status message is given. Zero status code indicates an error, and the
+status message explains the details.
+
+=item torrus.warning
+
+The condition is applied to SIAM::ServiceUnit in case of non-critical
+problems. The supplied value is a message string with the warning
+message.
+
+
+=back
+
+
 
 
 =head1 Author

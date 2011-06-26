@@ -14,7 +14,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 #
@@ -39,6 +38,10 @@ M-net plugin.
 =item * Fibre Noire Internet Inc, Canada (www.fibrenoire.ca)
 
 Extensions in M-Net plugin for NodeID manipulation.
+
+=item * upc cablecom GmbH (www.upc-cablecom.ch)
+
+SIAM library and its binding with Torrus and Extopus.
 
 =back
 
@@ -191,20 +194,40 @@ The resulting NodeID values would be based on "0xC0FFEE" string instead of
   if//0xC0FFEE//GigabitEthernet0/1//inoutbit
 
 
-=head2 Future development
+=head2 Service-centric display: SIAM+Extopus
 
-The NodeID is a relatively new concept in Torrus, and there will be other
-ways of specifying and using it in the course of Torrus development.
+Service Inventory Abstraction Model (SIAM) is a new Perl library
+available at CPAN. It is designed to be an abstraction interface between
+enterprise-specific inventory database and various programs, such as
+Torrus. SIAM is supposed to be used with an enterprise-specific driver
+which maps the inventory data into SIAM objects and attributes.
 
-One of the directions for future enhancement is a look-up of NodeID values
-in some external database before or during SNMP discovery.
+Torrus 1.0.10 introduces a new plugin module: C<tp-siam>. It consists of
+a command-line utility which generates DDX files from SIAM data, and a
+DevDiscover module which tries to match the IF-MIB interface names in
+SIAM against those on the network devices. The resulting configuration
+contains I<nodeid> values imported from SIAM, and those values would be
+typically based on service identifiers in the inventory database. Thus
+the external programs can fetch Torrus data by using the
+enterprise-specific service identifiers.
 
-The usage of NodeID is not limited to IF-MIB interfaces. Some Torrus
-templates already assign NodeID values to, for example, environment sensors
-and DOCSIS statistics.
+Extopus (www.extopus.org) is a Tobi Oetiker's new software product, a
+universal front-end for various open-source systems. It's designed to
+aggregate and display data from various sources, such as network
+monitoring systems. Extopus contains plugin modules for SIAM and Torrus,
+and allows for service-centric display (opposed to Torrus'
+device-centric presentation).
+
+SIAM represents the inventory data in a service-centric fashion:
+customer contracts consist of services, and each service may contain
+multiple physical objects, such as device interfaces. Also the user
+privilege system in SIAM allows assigning visible contracts to the
+front-end users. Extopus allows the end-user to log in and navigate
+through its service hierarchy, and display the traffic graphs and
+summaries which are pulled and proxied from a Torrus server.
 
 
 
 =head1 Author
 
-Copyright (c) 2010 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2010-2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -72,7 +72,7 @@ htdocs:
 	done
 
 UPLOADPATH = \
-   ssinyagin@shell.sourceforge.net:/home/groups/t/to/torrus/htdocs/devel
+   ssinyagin,torrus@web.sourceforge.net:/home/groups/t/to/torrus/htdocs/devel
 
 upload: dist
 	scp $(distdir).tar.gz $(UPLOADPATH)

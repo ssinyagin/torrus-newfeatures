@@ -1,5 +1,5 @@
 #  install.pod - Torrus installation instructions
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2011  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -587,6 +587,14 @@ If you prefer not to do this, it's recommended that you clear the
 Web interface cache both in your browser and in Torrus:
 
   torrus clearcache
+
+
+=head2 Plugins
+
+As of Torrus version 2.01, plugins inherit a new release numbering
+scheme: a plugin release version is a 3-component number, where the
+first two numbers are the Torrus release version that is compatible with
+this plugin.
 
 
 =head2 Planning the disk space

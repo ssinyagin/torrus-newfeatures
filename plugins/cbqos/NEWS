@@ -1,3 +1,8 @@
+04-SEP-2011: Release 2.01.01
+
+The new release fixes a few Cisco compatibility issues, and also enables
+the compatibility with Torrus 2.01 features.
+
 05-AUG-2008: Release 1.6
 
 The new release fixes an old bug in RRD file naming, thus all the

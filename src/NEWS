@@ -1,3 +1,59 @@
+04-SEP-2011: Torrus release 2.01
+
+In this release:
+
+-- New release numbering scheme. Torrus releases are two-number, and
+   compatible plugins have 3-number versions.
+
+-- New discovery modules: CiscoWLC, C-COM CAPSPAN, Thomson_xDSL, Actelis,
+   NexComm, Patton
+
+-- New MIBs supported: CISCO-WAN-3G-MIB
+
+-- New IF-MIB selector action: AddTemplates
+
+-- "rrgraph-view" parameter can be used in tokensets to define the
+   default graph presentation. It can also be set by XXX-tokenset-rrgraph-view
+   in DevDiscover input file.
+
+-- RFC2662_ADSL_LINE discovery module is now compatible with Cisco 837
+
+-- Port QoS stats for Cisco ME3400
+
+-- ifDescr and ifName uniqueness is checked before using them as
+   interface identifiers. This eases the use of new devices with their
+   special interface naming.
+
+-- WebUI now uses NodeID whenever it is available instead of tokens, and
+   full node paths if NodeID is unavailable.
+
+-- MicrosoftWindows discovery module is improved and lots of unneeded
+   IF-MIB interfaces are eliminated.
+   
+-- New feature: SNMP reachability statistics for devices.
+
+-- FastCGI handler is automatically re-spawning every 5000 requests.
+
+-- Device uptime is no longer displayed in the graph legend.
+
+-- Exclusive collector initialization lock is added for servers with
+   multiple collector processes. This reduces the disk seek concurrency
+   at collector startup.
+
+-- Default rrd-create-heartbeat changed	from 500 to 720
+
+-- Reduced the possibility for NaN values in RRD files at collector
+   re-initialization
+
+-- Integration into external portals: Web RPC, embedded graph view, PDF
+   and SVG formats for the graphs
+
+-- New plugin: tp-siam for SIAM library integration. It enables to build
+   customer portals with the use of Extopus software and an external
+   service inventory. See docs/nodeid_usage.pod for more details.
+
+
+   
 24-OCT-2010: Torrus release 1.0.9
 
 It is recommended to re-run discovery and compilation immediately after

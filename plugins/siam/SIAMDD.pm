@@ -32,30 +32,48 @@ my $siam;
 
 $Torrus::DevDiscover::thread_start_callbacks{'SIAMDD'} =
     sub {
-        $siam = Torrus::SIAM->open();
+        if( defined($Torrus::SIAM::siam_config) and
+            -f $Torrus::SIAM::siam_config )
+        {
+            $siam = Torrus::SIAM->open();
+            if( not defined($siam) )
+            {
+                Error('Cannot initialize SIAM connection');
+            }
+        }
+        else
+        {
+            Error('Missing or invalid SIAM configuration file');
+        }
     };
 
 
 $Torrus::DevDiscover::thread_end_callbacks{'SIAMDD'} =
     sub {
-        $siam->disconnect();
-        undef $siam;
+        if( defined($siam) )
+        {
+            $siam->disconnect();
+            undef $siam;
+        }
     };
 
 
 $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
     sub {
-        my $hostParams = shift;
-        if( $hostParams->{'siam-managed'} eq 'yes'
-            and
-            defined($hostParams->{'SIAM::device-inventory-id'}) )
+        if( defined($siam) )
         {
-            my $devobj =
-                $siam->get_device($hostParams->{'SIAM::device-inventory-id'});
-            if( defined($devobj) )
+            my $hostParams = shift;
+            if( $hostParams->{'siam-managed'} eq 'yes'
+                and
+                defined($hostParams->{'SIAM::device-inventory-id'}) )
             {
-                $devobj->set_condition('torrus.imported',
-                                       '0;SNMP discovery failed');
+                my $devobj = $siam->get_device
+                    ($hostParams->{'SIAM::device-inventory-id'});
+                if( defined($devobj) )
+                {
+                    $devobj->set_condition('torrus.imported',
+                                           '0;SNMP discovery failed');
+                }
             }
         }
     };
@@ -79,7 +97,8 @@ sub checkdevtype
 
     my $data = $devdetails->data();
     
-    if( $devdetails->param('SIAM::managed') eq 'yes' )
+    if( defined($siam) and defined($devdetails->param('SIAM::managed')) and
+        $devdetails->param('SIAM::managed') eq 'yes' )
     {
         if( $devdetails->hasCap('nodeidReferenceManaged') )
         {

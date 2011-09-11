@@ -22,7 +22,6 @@
 package Torrus::DevDiscover::SIAMDD;
 
 use strict;
-use warnings;
 
 use Torrus::SIAM;
 use Torrus::Log;
@@ -97,8 +96,7 @@ sub checkdevtype
 
     my $data = $devdetails->data();
     
-    if( defined($siam) and defined($devdetails->param('SIAM::managed')) and
-        $devdetails->param('SIAM::managed') eq 'yes' )
+    if( defined($siam) and $devdetails->param('SIAM::managed') eq 'yes' )
     {
         if( $devdetails->hasCap('nodeidReferenceManaged') )
         {

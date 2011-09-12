@@ -179,15 +179,17 @@ sub discover
     my $chassisSerial =
         $dd->retrieveSnmpOIDs( 'jnxBoxDescr', 'jnxBoxSerialNo' );
 
-    if( defined( $chassisSerial ) )
+    if( not defined($data->{'param'}{'comment'}) )
     {
-        $data->{'param'}{'comment'} = $chassisSerial->{'jnxBoxDescr'} .
-            ', Hw Serial#: ' . $chassisSerial->{'jnxBoxSerialNo'};
-    } else
-    {
-        $data->{'param'}{'comment'} = "Juniper router";
+        if( defined( $chassisSerial ) )
+        {
+            $data->{'param'}{'comment'} = $chassisSerial->{'jnxBoxDescr'} .
+                ', Hw Serial#: ' . $chassisSerial->{'jnxBoxSerialNo'};
+        } else
+        {
+            $data->{'param'}{'comment'} = "Juniper router";
+        }
     }
-
 
     # PROG: Class of Service
     #

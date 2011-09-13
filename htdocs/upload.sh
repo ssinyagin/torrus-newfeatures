@@ -1,5 +1,5 @@
 
-DEST="ssinyagin,torrus@web.sourceforge.net:/home/groups/t/to/torrus/htdocs"
+DEST="ssinyagin@web.sourceforge.net:/home/project-web/torrus/htdocs"
 
 if test x"$*" = x; then
   scp -C *.html *.txt *.css $DEST

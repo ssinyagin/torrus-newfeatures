@@ -18,7 +18,7 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 
-SUBDIRS = . bin configs doc examples perllib sup xmlconfig 
+SUBDIRS = . bin configs doc examples perllib sup xmlconfig
 
 EXTRA_DIST = \
 	setup_tools/Bundle/Torrus.pm \
@@ -78,7 +78,7 @@ install-data-local:
 	$(mkvardir) $(DESTDIR)$(reportsdir)
 	$(mkvardir) $(DESTDIR)$(logdir)
 	$(mkvardir) $(DESTDIR)$(sesstordir)
-	$(mkvardir) $(DESTDIR)$(seslockdir)	
+	$(mkvardir) $(DESTDIR)$(seslockdir)
 	$(mkinstalldirs) $(DESTDIR)$(tmpluserdir)
 	$(mkinstalldirs) $(DESTDIR)$(plugtorruscfgdir)
 	$(mkinstalldirs) $(DESTDIR)$(plugdevdisccfgdir)
@@ -101,7 +101,7 @@ UPLOADPATH = \
 
 upload: dist
 	scp $(distdir).tar.gz TODO $(UPLOADPATH)
-	  
+
 todoup:
 	scp TODO $(UPLOADPATH)
 

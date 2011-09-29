@@ -47,6 +47,6 @@ install-data-local:
 		 notify-siteconfig.pl \
 	         snmptrap-siteconfig.pl torrus-siteconfig.pl; do \
 	  if test ! -r $(DESTDIR)$(siteconfdir)/$$f; then \
-	    $(INSTALL_DATA) $$f $(DESTDIR)$(siteconfdir)/$$f; \
+	    $(INSTALL_DATA) $$f $(DESTDIR)$(siteconfdir)/$$f.sample; \
 	  fi \
 	done

@@ -1,6 +1,8 @@
 # Torrus Site config. Put all your site specifics here.
 # You need to stop and start Apache server every time you change this file.
 
+use Sys::Hostname qw(hostname);
+
 @Torrus::Global::xmlAlwaysIncludeFirst = ( 'defaults.xml', 'site-global.xml' );
 
 %Torrus::Global::treeConfig =
@@ -15,7 +17,7 @@
 # Customizable look in the HTML page top
 # $Torrus::Renderer::companyName = 'Your company name';
 # $Torrus::Renderer::companyURL = 'http://torrus.sf.net';
-# $Torrus::Renderer::siteInfo = `hostname`;
+# $Torrus::Renderer::siteInfo = hostname();
 
 
 1;

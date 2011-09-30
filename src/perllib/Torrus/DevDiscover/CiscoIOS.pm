@@ -214,7 +214,11 @@ sub checkdevtype
         $interfaceFilter->{'DialerN'} = {
             'ifType'  => 23,                     # ppp
             'ifDescr' => '^Dialer'
-        },
+            };
+        $interfaceFilter->{'DialerN_ML'} = {
+            'ifType'  => 108,                    # pppMultilinkBundle
+            'ifDescr' => '^Dialer'
+            };
     }
 
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter

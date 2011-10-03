@@ -65,7 +65,7 @@ if( not defined( $interfaceFilter ) )
     (
      'TunnelN' => {
          'ifType'  => 1,                      # other
-         'ifDescr' => '^Tunnel'
+         'ifName'  => '^Tunnel'
      },
     );
 

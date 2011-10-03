@@ -43,6 +43,33 @@ our %oiddef =
      );
 
 
+# Not all interfaces are normally needed to monitor.
+# You may override the interface filtering in devdiscover-siteconfig.pl:
+# redefine $Torrus::DevDiscover::CiscoFirewall::interfaceFilter
+# or define $Torrus::DevDiscover::CiscoFirewall::interfaceFilterOverlay
+
+our $interfaceFilter;
+our $interfaceFilterOverlay;
+my %fwInterfaceFilter;
+
+if( not defined( $interfaceFilter ) )
+{
+    $interfaceFilter = \%fwInterfaceFilter;
+}
+
+
+# Key is some unique symbolic name, does not mean anything
+# ifType is the number to match the interface type
+# ifDescr is the regexp to match the interface description
+%fwInterfaceFilter =
+    (
+     'TunnelN' => {
+         'ifType'  => 1,                      # other
+         'ifDescr' => '^Tunnel'
+     },
+    );
+
+
 
 sub checkdevtype
 {
@@ -52,14 +79,25 @@ sub checkdevtype
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    if( $devdetails->isDevType('CiscoGeneric') and
-        $dd->checkSnmpTable('ciscoFirewallMIB') )
+    if( not ($devdetails->isDevType('CiscoGeneric')
+             and
+             $dd->checkSnmpTable('ciscoFirewallMIB')) )
     {
-        $devdetails->setCap('interfaceIndexingManaged');
-        return 1;
+        return 0;
     }
 
-    return 0;
+    &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+        ($devdetails, $interfaceFilter);
+    
+    if( defined( $interfaceFilterOverlay ) )
+    {
+        &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+            ($devdetails, $interfaceFilterOverlay);
+    }
+
+    $devdetails->setCap('interfaceIndexingManaged');
+
+    return 1;
 }
 
 

@@ -93,7 +93,7 @@ if( not $ok or
     "Options:\n",
     " --host=hostname         device hostname\n",
     " --hostfile=filename     space-separated device hostnames file\n",
-    " --out=filename          output file             [".$outfile."]\n",
+    " --out=filename          output file          [$outfile]\n",
 
     " --discout=filename      discovery output file\n",
     "      [", $globalParams{'output-file'}, "]\n",

@@ -91,9 +91,9 @@ if( not $ok or
 
     print STDERR "Usage: $0 options...\n",
     "Options:\n",
-    " --host=hostname         router hostname\n",
-    " --hostfile=filename     space-separated router hostnames file\n",
-    " --out=filename          output file             [".$outfile."]\n",
+    " --host=hostname         device hostname\n",
+    " --hostfile=filename     space-separated device hostnames file\n",
+    " --out=filename          output file          [$outfile]\n",
 
     " --discout=filename      discovery output file\n",
     "      [", $globalParams{'output-file'}, "]\n",
@@ -131,13 +131,22 @@ if( not $ok or
 }
 
 # Place the output file in discovery directory if the path is not given
-if( $outfile !~ /\// )
+if( $outfile !~ m|^/| ) # this is not safe for non-unix
 {
     $outfile = $Torrus::Global::discoveryDir . '/' . $outfile;
 }
 
+# Sanity check the output directory
+{
+    $outfile =~ s{//+}{/}g; # remove duplicate slashes
+    my $outdir = $outfile;
+    $outdir =~ s{/[^/]+$}{};
+    die "Output location $outdir doesnt exist?" unless -e $outdir;
+    die "Output location $outdir is not a directory?" unless -d $outdir;
+}
+
 # Convert flags from true/false to yes/no
-foreach my $param ( 'rrd-hwpredict' )
+for my $param ( 'rrd-hwpredict' )
 {
     if( $globalParams{$param} )
     {

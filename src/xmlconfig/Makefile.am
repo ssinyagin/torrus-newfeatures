@@ -106,5 +106,7 @@ install-data-local:
 	  $(INSTALL_DATA) site-global.xml \
 		$(DESTDIR)$(sitexmldir)/site-global.xml; \
 	fi
+	  $(INSTALL_DATA) site-global.xml \
+		$(DESTDIR)$(sitexmldir)/site-global.xml.sample;
 
 

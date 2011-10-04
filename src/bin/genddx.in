@@ -131,7 +131,7 @@ if( not $ok or
 }
 
 # Place the output file in discovery directory if the path is not given
-if( $outfile !~ /\// )
+if( $outfile !~ m{/} )
 {
     $outfile = $Torrus::Global::discoveryDir . '/' . $outfile;
 }

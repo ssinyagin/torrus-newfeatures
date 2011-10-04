@@ -131,13 +131,14 @@ if( not $ok or
 }
 
 # Place the output file in discovery directory if the path is not given
-if( $outfile !~ m|^/| )
+if( $outfile !~ m|^/| ) # this is not safe for non-unix
 {
     $outfile = $Torrus::Global::discoveryDir . '/' . $outfile;
 }
 
 # Sanity check the output directory
 {
+    $outfile =~ s{//+}{/}g; # remove duplicate slashes
     my $outdir = $outfile;
     $outdir =~ s{/[^/]+$}{};
     die "Output location $outdir doesnt exist?" unless -e $outdir;

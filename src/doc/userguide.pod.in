@@ -167,7 +167,7 @@ you need to execute the compiler:
   torrus compile --tree=treename --verbose
 
 For most of the processes that you run within Torrus, you need to specify
-the tree name with C<--tree> option. Some proramms accept C<--all> option,
+the tree name with C<--tree> option. Some programs accept C<--all> option,
 which causes them to process all existing trees.
 With C<--verbose> option, the compiler tells you about the files being
 processed, and about some other actions that may take quite a long time.

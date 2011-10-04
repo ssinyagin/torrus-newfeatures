@@ -136,6 +136,16 @@ if( $outfile !~ m{/} )
     $outfile = $Torrus::Global::discoveryDir . '/' . $outfile;
 }
 
+# Sanity check the output directory
+{
+    $outfile =~ s{//+}{/}g; # remove duplicate slashes
+    my $outdir = $outfile;
+    $outdir =~ s{/[^/]+$}{}; # remove trailing slash
+    die "Output location $outdir doesnt exist?" unless -e $outdir;
+    die "Output location $outdir is not a directory?" unless -d $outdir;
+}
+
+
 # Convert flags from true/false to yes/no
 foreach my $param ( 'rrd-hwpredict' )
 {

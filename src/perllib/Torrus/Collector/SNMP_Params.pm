@@ -19,6 +19,8 @@
 
 package Torrus::Collector::SNMP_Params;
 
+use strict;
+
 ###  Initialize the configuration validator with module-specific parameters
 ###  Moved to a separate module to speed up the compiler initialization
 

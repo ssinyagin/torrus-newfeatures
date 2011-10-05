@@ -23,6 +23,8 @@
 
 package Torrus::ConfigTree::Writer;
 
+use strict;
+
 use Torrus::ConfigTree;
 our @ISA=qw(Torrus::ConfigTree);
 
@@ -30,8 +32,7 @@ use Torrus::Log;
 use Torrus::TimeStamp;
 use Torrus::SiteConfig;
 use Torrus::ServiceID;
-    
-use strict;
+
 use Digest::MD5 qw(md5); # needed as hash function
 
 our $VERSION = 1.0;

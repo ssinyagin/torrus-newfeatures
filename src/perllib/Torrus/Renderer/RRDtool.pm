@@ -241,15 +241,15 @@ sub render_rrprint
         return
     }
 
-    if( not open(OUT, ">$outfile") )
+    if( open(my $OUT, '>', $outfile) )
     {
-        Error("Cannot open $outfile for writing: $!");
-        return
+        printf $OUT ("%s\n", join(':', @{$printout}));
+        close $OUT;
     }
     else
     {
-        printf OUT ("%s\n", join(':', @{$printout}));
-        close OUT;
+        Error("Cannot open $outfile for writing: $!");
+        return
     }
 
     return( $config_tree->getParam($view, 'expires')+time(), 'text/plain' );

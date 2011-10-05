@@ -20,6 +20,8 @@
 
 package Torrus::ConfigTree::XMLCompiler;
 
+use strict;
+
 use Torrus::ConfigTree::Writer;
 our @ISA=qw(Torrus::ConfigTree::Writer);
 
@@ -30,7 +32,6 @@ use Torrus::Log;
 use Torrus::TimeStamp;
 
 use XML::LibXML;
-use strict;
 
 our $VERSION = 1.0;
 

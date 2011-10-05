@@ -29,6 +29,8 @@ package Torrus::DevDiscover::RFC2790_HOST_RESOURCES;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 $Torrus::DevDiscover::registry{'RFC2790_HOST_RESOURCES'} = {
     'sequence'     => 100,
     'checkdevtype' => \&checkdevtype,
@@ -118,7 +120,7 @@ sub discover
         my $ref = {};
         $data->{'hrStorage'} = $ref;
 
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->getSnmpIndices($dd->oiddef('hrStorageIndex') ) )
         {
             my $typeNum = $devdetails->snmpVar( $dd->oiddef('hrStorageType') .
@@ -255,7 +257,7 @@ sub buildConfig
 
         if( $devdetails->hasCap('hrProcessor') )
         {
-            foreach my $INDEX ( sort {$a<=>$b} @{$data->{'hrProcessors'}} )
+            for my $INDEX ( sort {$a<=>$b} @{$data->{'hrProcessors'}} )
             {
                 my $subtreeName = 'CPU_' . $INDEX . '_Load';
                 
@@ -282,7 +284,7 @@ sub buildConfig
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, \@templates  );
 
-        foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'hrStorage'}} )
+        for my $INDEX ( sort {$a<=>$b} keys %{$data->{'hrStorage'}} )
         {
             my $ref = $data->{'hrStorage'}{$INDEX};
 

@@ -25,6 +25,8 @@ use Torrus::Log;
 use strict;
 use RRDs;
 
+our $VERSION = 1.0;
+
 our $useThreads;
 our $threadsInUse = 0;
 our $thrQueueLimit;
@@ -207,7 +209,7 @@ sub createRRD
 
     my $timestamp = time();
 
-    foreach my $token ( keys %{$tokens} )
+    for my $token ( keys %{$tokens} )
     {
         my $ds_string =
             sprintf('DS:%s:%s:%d:%s:%s',
@@ -218,7 +220,7 @@ sub createRRD
                     $collector->param($token, 'rrd-create-max'));
         $DS_hash{$ds_string} = 1;
 
-        foreach my $rra_string
+        for my $rra_string
             ( split(/\s+/, $collector->param($token, 'rrd-create-rra')) )
         {
             $RRA_hash{$rra_string} = 1;
@@ -228,7 +230,7 @@ sub createRRD
         {
             $needs_hw = 1;
 
-            foreach my $param ( 'alpha', 'beta', 'gamma', 'winlen', 'failth',
+            for my $param ( 'alpha', 'beta', 'gamma', 'winlen', 'failth',
                                 'season', 'rralen' )
             {
                 my $value = $collector->param($token, 'rrd-create-hw-'.$param);
@@ -341,7 +343,7 @@ sub updateRRD
 
         semaphoreUp();
 
-        foreach my $prop ( keys %$rrdinfo )
+        for my $prop ( keys %$rrdinfo )
         {
             if( $prop =~ /^ds\[(\S+)\]\./o )
             {
@@ -356,13 +358,13 @@ sub updateRRD
     my %ds_updating = ();
     my $ds_conflict = 0;
 
-    foreach my $token ( keys %{$tokens} )
+    for my $token ( keys %{$tokens} )
     {
         $ds_updating{ $collector->param($token, 'rrd-ds') } = $token;
     }
 
     # Check if we update all datasources in RRD file
-    foreach my $ds ( keys %{$sref->{'rrdinfo_ds'}{$filename}} )
+    for my $ds ( keys %{$sref->{'rrdinfo_ds'}{$filename}} )
     {
         if( not $ds_updating{$ds} )
         {
@@ -373,7 +375,7 @@ sub updateRRD
     }
 
     # Check if all DS that we update are defined in RRD
-    foreach my $ds ( keys %ds_updating )
+    for my $ds ( keys %ds_updating )
     {
         if( not $sref->{'rrdinfo_ds'}{$filename}{$ds} )
         {
@@ -435,7 +437,7 @@ sub updateRRD
 
     my $has_values = 0;
     
-    foreach my $ds ( keys %ds_updating )
+    for my $ds ( keys %ds_updating )
     {
         my $token = $ds_updating{$ds};
         if( length($template) > 0 )

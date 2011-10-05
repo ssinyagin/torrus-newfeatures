@@ -136,7 +136,7 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
         {
             my $tokens = [];
             # results are pairs [nodeid,token]
-            foreach my $res ( @{$results} )
+            for my $res ( @{$results} )
             {
                 push(@{$tokens}, $res->[1]);
             }
@@ -170,7 +170,7 @@ sub print_nodeid
 
     my @all;
 
-    foreach my $token ( @{$tokens} )
+    for my $token ( @{$tokens} )
     {
         my $info = {
             'nodeid' => $config_tree->getNodeParam($token, 'nodeid', 1),
@@ -187,7 +187,7 @@ sub print_nodeid
                 $info->{'param:ds-type'} = $dsType;
                 if( $dsType eq 'collector' )
                 {
-                    foreach my $param
+                    for my $param
                         ('collector-type', 'collector-period',
                          'storage-type', 'data-file', 'data-dir', 'rrd-ds',
                          'ext-service-id',

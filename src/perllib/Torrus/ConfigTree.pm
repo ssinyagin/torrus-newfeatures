@@ -26,6 +26,7 @@ use Torrus::TimeStamp;
 
 use strict;
 
+our $VERSION = 1.0;
 
 
 sub new
@@ -89,7 +90,7 @@ sub new
             $self->{'db_config_instances'}->c_close($cursor);
             if( not $ok )
             {
-                return undef;
+                return
             }
             $self->{'iam_writer'} = 1;
         }
@@ -181,14 +182,14 @@ sub new
                 {
                     Error('Configuration wait timed out');
                     $self->clearReader();
-                    return undef;
+                    return
                 }
             }
             else
             {
                 Error('Configuration is not ready');
                 $self->clearReader();
-                return undef;
+                return
             }
         }
     }
@@ -345,7 +346,7 @@ sub waitReaders
         {
             Info('Waiting for ' . scalar(@readers) . ' readers:');
             my $recentTS = 0;
-            foreach my $reader ( @readers )
+            for my $reader ( @readers )
             {
                 Info($reader->{'reader'} . ', timestamp: ' .
                      localtime( $reader->{'timestamp'} ));
@@ -586,7 +587,7 @@ sub retrieveNodeParam
         }
     }
 
-    foreach my $ancestor ( @ancestors )
+    for my $ancestor ( @ancestors )
     {
         $self->{'paramcache'}{$ancestor}{$param} = $value;
     }
@@ -718,7 +719,7 @@ sub getNodeParam
         my $status = substr( $cacheval, 0, 1 );
         if( $status eq 'U' )
         {
-            return undef;
+            return
         }
         else
         {
@@ -760,7 +761,7 @@ sub getParams
     my $fromDS = shift;
 
     my $ret = {};
-    foreach my $param ( $self->getParamNames( $name, $fromDS ) )
+    for my $param ( $self->getParamNames( $name, $fromDS ) )
     {
         $ret->{$param} = $self->getParam( $name, $param, $fromDS );
     }
@@ -828,11 +829,11 @@ sub getNodesByPattern
     if( $pattern !~ /^\//o )
     {
         Error("Incorrect pattern: $pattern");
-        return undef;
+        return
     }
 
     my @retlist = ();
-    foreach my $nodepattern ( $self->splitPath($pattern) )
+    for my $nodepattern ( $self->splitPath($pattern) )
     {
         my @next_retlist = ();
 
@@ -842,10 +843,10 @@ sub getNodesByPattern
 
         if( $patternname =~ /\W/o )
         {
-            foreach my $candidate ( @retlist )
+            for my $candidate ( @retlist )
             {
                 # This is a pattern, let's get all matching children
-                foreach my $child ( $self->getChildren( $candidate ) )
+                for my $child ( $self->getChildren( $candidate ) )
                 {
                     # Cut the trailing slash and leading path
                     my $childname = $self->path($child);
@@ -865,7 +866,7 @@ sub getNodesByPattern
         }
         else
         {
-            foreach my $candidate ( @retlist )
+            for my $candidate ( @retlist )
             {
                 my $proposal = $self->path($candidate).$nodepattern;
                 if( defined( my $proptoken = $self->token($proposal) ) )
@@ -917,7 +918,7 @@ sub getRelative
                 $token = $self->token( $path . $childName );
                 if( not defined $token )
                 {
-                    return undef;
+                    return
                 }
             }
         }

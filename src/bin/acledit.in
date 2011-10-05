@@ -264,7 +264,7 @@ my %showGroupsHash;
 
 if( @showgroups )
 {
-    foreach my $group ( @showgroups )
+    for my $group ( @showgroups )
     {
         if( $aclEdit->groupExists( $group ) )
         {
@@ -279,13 +279,13 @@ if( @showgroups )
 
 if( @showusers )
 {
-    foreach my $uid ( sort @showusers )
+    for my $uid ( sort @showusers )
     {
         if( $aclEdit->userExists( $uid ) )
         {
             printf("User: %s (%s)\n",
                    $uid, $aclEdit->userAttribute( $uid, 'cn' ) );
-            foreach my $group ( sort $aclEdit->memberOf( $uid ) )
+            for my $group ( sort $aclEdit->memberOf( $uid ) )
             {
                 printf("Member of: %s\n", $group);
                 $showGroupsHash{$group} = 1;
@@ -307,21 +307,21 @@ if( @showusers )
 
 if( %showGroupsHash )
 {
-    foreach my $group ( sort keys %showGroupsHash )
+    for my $group ( sort keys %showGroupsHash )
     {
         printf("Group: %s\n", $group);
 
         my $privs = $aclEdit->listPrivileges( $group );
-        foreach my $object ( sort keys %{$privs} )
+        for my $object ( sort keys %{$privs} )
         {
-            foreach my $priv ( sort keys %{$privs->{$object}} )
+            for my $priv ( sort keys %{$privs->{$object}} )
             {
                 printf("Has privilege \"%s\" for %s \"%s\"\n", $priv,
                        $knownPrivileges{$priv}, $object);
             }
         }
 
-        foreach my $uid ( sort @{$aclEdit->listGroupMembers( $group )} )
+        for my $uid ( sort @{$aclEdit->listGroupMembers( $group )} )
         {
             printf("Member: %s\n", $uid);
         }
@@ -351,18 +351,18 @@ sub setupPrivileges
     my $permit = shift;
 
     my $ok = 1;
-    foreach my $priv ( @{$privs} )
+    for my $priv ( @{$privs} )
     {
         if( defined( $knownPrivileges{$priv} ) )
         {
             if( $knownPrivileges{$priv} eq 'tree' )
             {
-                foreach my $obj ( @{$objects} )
+                for my $obj ( @{$objects} )
                 {
                     if( $obj eq '*' or
                         Torrus::SiteConfig::treeExists( $obj ) or $force )
                     {
-                        foreach my $group ( @{$groups} )
+                        for my $group ( @{$groups} )
                         {
                             if( $permit )
                             {
@@ -386,7 +386,7 @@ sub setupPrivileges
             }
             elsif( $knownPrivileges{$priv} eq 'global' )
             {
-                foreach my $obj ( @{$objects} )
+                for my $obj ( @{$objects} )
                 {
                     if( $obj ne '*' )
                     {
@@ -397,7 +397,7 @@ sub setupPrivileges
 
                 if( $ok )
                 {
-                    foreach my $group ( @{$groups} )
+                    for my $group ( @{$groups} )
                     {
                         if( $permit )
                         {

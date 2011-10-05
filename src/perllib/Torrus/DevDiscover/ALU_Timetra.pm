@@ -30,6 +30,8 @@ package Torrus::DevDiscover::ALU_Timetra;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 
 $Torrus::DevDiscover::registry{'ALU_Timetra'} = {
     'sequence'     => 500,
@@ -315,16 +317,16 @@ sub buildConfig
     {
         my $customersNode = $cb->addSubtree( $devNode, 'Customers' );
 
-        foreach my $custId (sort {$a <=> $b} keys %{$data->{'timetraCustSvc'}})
+        for my $custId (sort {$a <=> $b} keys %{$data->{'timetraCustSvc'}})
         {
             # count the number of SAPs
             my $nSaps = 0;
-            foreach my $svcId ( keys %{$data->{'timetraCustSvc'}{$custId}} )
+            for my $svcId ( keys %{$data->{'timetraCustSvc'}{$custId}} )
             {
                 my $svcSaps = $data->{'timetraSvc'}{$svcId}{'sap'};
                 if( defined( $svcSaps ) )
                 {
-                    foreach my $sapID ( @{$svcSaps} )
+                    for my $sapID ( @{$svcSaps} )
                     {
                         if( not $data->{'timetraSap'}{$sapID}{'excluded'} )
                         {               
@@ -351,14 +353,14 @@ sub buildConfig
             
             my $precedence = 10000;
             
-            foreach my $svcId
+            for my $svcId
                 ( keys %{$data->{'timetraCustSvc'}{$custId}} )
             {
                 my $svcSaps = $data->{'timetraSvc'}{$svcId}{'sap'};
                 
                 if( defined($svcSaps ) )
                 {                    
-                    foreach my $sapID
+                    for my $sapID
                         ( sort {sapCompare($data->{'timetraSap'}{$a},
                                            $data->{'timetraSap'}{$b})}
                           @{$svcSaps} )

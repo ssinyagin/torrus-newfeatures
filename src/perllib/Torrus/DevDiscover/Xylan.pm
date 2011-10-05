@@ -33,6 +33,7 @@ package Torrus::DevDiscover::Xylan;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'Xylan'} = {
     'sequence'     => 500,
@@ -133,7 +134,7 @@ sub discover
 
     $devdetails->storeSnmpVars( $phyPortTable );
 
-    foreach my $slotDotPort
+    for my $slotDotPort
         ( $devdetails->
           getSnmpIndices( $dd->oiddef('xylanPhyPortDescription') ) )
     {
@@ -160,7 +161,7 @@ sub discover
 
     # verify if all interfaces are processed
 
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 

@@ -29,6 +29,7 @@ use Torrus::DataAccess;
 use Torrus::TimeStamp;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 sub new
 {
@@ -87,13 +88,13 @@ sub run
                                           -Subdir => $self->{'tree_name'},
                                           -WriteAccess => 1);
 
-    foreach my $token ( @{$self->{'targets'}} )
+    for my $token ( @{$self->{'targets'}} )
     {
         &Torrus::DB::checkInterrupted();
         
         my $mlist = $self->{'sched_data'}{'mlist'}{$token};
         
-        foreach my $mname ( @{$mlist} )
+        for my $mname ( @{$mlist} )
         {
             my $obj = { 'token' => $token, 'mname' => $mname };
 
@@ -194,7 +195,7 @@ sub substitute_vars
         {
             my $varstring =
                 $config_tree->getNodeParam( $token, 'monitor-vars' );
-            foreach my $pair ( split( '\s*;\s*', $varstring ) )
+            for my $pair ( split( '\s*;\s*', $varstring ) )
             {
                 my( $var, $value ) = split( '\s*\=\s*', $pair );
                 $vars->{$var} = $value;
@@ -307,7 +308,7 @@ sub setAlarm
         }
         $obj->{'action_token'} = $action_token;
 
-        foreach my $aname (split(',',
+        for my $aname (split(',',
                                  $config_tree->getParam($mname, 'action')))
         {
             &Torrus::DB::checkInterrupted();
@@ -465,7 +466,7 @@ sub run_event_exec
 
         if( defined( $setenv_params ) )
         {
-            foreach my $param ( split( ',', $setenv_params ) )
+            for my $param ( split( ',', $setenv_params ) )
             {
                 # We retrieve the param from the monitored token, not
                 # from action-token
@@ -492,7 +493,7 @@ sub run_event_exec
         {
             # <param name="setenv_dataexpr" value="ENV1=expr1, ENV2=expr2"/>
             # Integrity checks are done at compilation time.
-            foreach my $pair ( split( ',', $setenv_dataexpr ) )
+            for my $pair ( split( ',', $setenv_dataexpr ) )
             {
                 my ($env, $param) = split( '=', $pair );
                 my $expr = $config_tree->getParam($aname, $param);
@@ -512,7 +513,7 @@ sub run_event_exec
         }
 
         # Clean up the environment
-        foreach my $envName ( keys %ENV )
+        for my $envName ( keys %ENV )
         {
             if( $envName =~ /^TORRUS_/ )
             {
@@ -542,7 +543,7 @@ sub beforeRun
     my $config_tree = new Torrus::ConfigTree(-TreeName => $tree, -Wait => 1);
     if( not defined( $config_tree ) )
     {
-        return undef;
+        return
     }
 
     my $data = $self->data();
@@ -620,16 +621,16 @@ sub beforeRun
         my $init_start = time();
         $self->flushTasks();
 
-        foreach my $period ( keys %{$data->{'targets'}} )
+        for my $period ( keys %{$data->{'targets'}} )
         {
-            foreach my $offset ( keys %{$data->{'targets'}{$period}} )
+            for my $offset ( keys %{$data->{'targets'}{$period}} )
             {
                 my $monitor = new Torrus::Monitor( -Period => $period,
                                                    -Offset => $offset,
                                                    -TreeName => $tree,
                                                    -SchedData => $data );
 
-                foreach my $token ( @{$data->{'targets'}{$period}{$offset}} )
+                for my $token ( @{$data->{'targets'}{$period}{$offset}} )
                 {
                     &Torrus::DB::checkInterrupted();
                     
@@ -657,7 +658,7 @@ sub cacheMonitors
 
     my $data = $self->data();
 
-    foreach my $ctoken ( $config_tree->getChildren( $ptoken ) )
+    for my $ctoken ( $config_tree->getChildren( $ptoken ) )
     {
         &Torrus::DB::checkInterrupted();
 

@@ -22,6 +22,7 @@ package Torrus::DevDiscover::NexComm;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'NexComm'} = {
     'sequence'     => 500,

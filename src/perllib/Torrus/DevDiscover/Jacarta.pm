@@ -26,6 +26,7 @@ use Torrus::Log;
 use Switch;
 use Data::Dumper;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'Jacarta'} = {
     'sequence'     => 500,
@@ -107,7 +108,7 @@ sub discover
     # store the sensor names to guarantee uniqueness
     my %sensorNames;
     
-    foreach my $INDEX
+    for my $INDEX
         ($devdetails->getSnmpIndices( $oiddef{'sensorIndex'} ))
     {
         my $sensorType =
@@ -189,7 +190,7 @@ sub buildConfig
     my $sensorTree =
         $cb->addSubtree( $devNode, 'Sensors', $param );
 
-    foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'Jacarta'}} )
+    for my $INDEX ( sort {$a<=>$b} keys %{$data->{'Jacarta'}} )
     {
         my $ref = $data->{'Jacarta'}{$INDEX};
         

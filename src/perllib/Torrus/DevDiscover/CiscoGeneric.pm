@@ -24,6 +24,7 @@ package Torrus::DevDiscover::CiscoGeneric;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoGeneric'} = {
     'sequence'     => 500,
@@ -161,7 +162,7 @@ sub discover
             $devdetails->setCap('cempMemPool');
             $data->{'cempMemPool'} = {};
 
-            foreach my $INDEX
+            for my $INDEX
                 ( $devdetails->
                   getSnmpIndices($dd->oiddef('cempMemPoolName') ) )
             {
@@ -202,7 +203,7 @@ sub discover
                 
                 $data->{'ciscoMemoryPool'} = {};
                 
-                foreach my $memType
+                for my $memType
                     ( $devdetails->
                       getSnmpIndices($dd->oiddef('ciscoMemoryPoolName')) )
                 {
@@ -237,7 +238,7 @@ sub discover
 
             # Find multiple CPU entries pointing to the same Phy index
             my %phyReferers = ();            
-            foreach my $INDEX
+            for my $INDEX
                 ( $devdetails->
                   getSnmpIndices($dd->oiddef('cpmCPUTotalPhysicalIndex') ) )
             {
@@ -247,7 +248,7 @@ sub discover
                 $phyReferers{$phyIndex}++;
             }
                 
-            foreach my $INDEX
+            for my $INDEX
                 ( $devdetails->
                   getSnmpIndices($dd->oiddef('cpmCPUTotalPhysicalIndex') ) )
             {
@@ -345,7 +346,7 @@ sub buildConfig
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, $templates );
         
-        foreach my $sIndex ( sort {$a<=>$b} keys
+        for my $sIndex ( sort {$a<=>$b} keys
                              %{$data->{'ciscoTemperatureSensors'}} )
         {
             my $leafName = sprintf( 'sensor_%.2d', $sIndex );
@@ -412,7 +413,7 @@ sub buildConfig
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, $templates );
         
-        foreach my $sIndex ( sort {$a<=>$b} @{$data->{'ciscoPowerSupplies'}} )
+        for my $sIndex ( sort {$a<=>$b} @{$data->{'ciscoPowerSupplies'}} )
         {
             my $leafName = sprintf( 'power_%.2d', $sIndex );
 
@@ -446,7 +447,7 @@ sub buildConfig
 
         if( $devdetails->hasCap('cempMemPool') )
         {
-            foreach my $INDEX ( sort {
+            for my $INDEX ( sort {
                 $data->{'cempMemPool'}{$a}{'phyIndex'} <=>
                     $data->{'cempMemPool'}{$b}{'phyIndex'} or
                     $data->{'cempMemPool'}{$a}{'poolIndex'} <=>
@@ -498,7 +499,7 @@ sub buildConfig
         }
         else
         {
-            foreach my $memType
+            for my $memType
                 ( sort {$a<=>$b} keys %{$data->{'ciscoMemoryPool'}} )
             {
                 my $poolName = $data->{'ciscoMemoryPool'}{$memType};
@@ -534,7 +535,7 @@ sub buildConfig
             $cb->addSubtree( $devNode, $subtreeName, $param,
                              ['CiscoGeneric::cisco-cpu-usage-subtree']);
         
-        foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'ciscoCpuStats'}} )
+        for my $INDEX ( sort {$a<=>$b} keys %{$data->{'ciscoCpuStats'}} )
         {
             my $cpu = $data->{'ciscoCpuStats'}{$INDEX};
 

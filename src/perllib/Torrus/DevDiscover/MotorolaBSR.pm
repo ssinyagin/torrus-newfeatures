@@ -27,6 +27,7 @@ package Torrus::DevDiscover::MotorolaBSR;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'MotorolaBSR'} = {
     'sequence'     => 500,
@@ -78,7 +79,7 @@ sub discover
     {
         $devdetails->setCap('rdnCmtsUpstreamChannelTable');
 
-        foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+        for my $ifIndex ( @{$data->{'docsCableUpstream'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             
@@ -160,7 +161,7 @@ sub buildConfig
             '//%nodeid-device%//modems';
         
         my $first = 1;
-        foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+        for my $ifIndex ( @{$data->{'docsCableUpstream'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             

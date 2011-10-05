@@ -24,6 +24,7 @@ package Torrus::DevDiscover::CasaCMTS;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CasaCMTS'} = {
     'sequence'     => 500,
@@ -70,7 +71,7 @@ sub discover
     push( @{$data->{'docsConfig'}{'docsCableMaclayer'}{'templates'}},
           'CasaCMTS::casa-docsis-mac-subtree' );
     
-    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+    for my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -78,7 +79,7 @@ sub discover
               'CasaCMTS::casa-docsis-mac-util' );
     }
 
-    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+    for my $ifIndex ( @{$data->{'docsCableUpstream'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -86,7 +87,7 @@ sub discover
               'CasaCMTS::casa-docsis-upstream-util' );
     }
     
-    foreach my $ifIndex ( @{$data->{'docsCableDownstream'}} )
+    for my $ifIndex ( @{$data->{'docsCableDownstream'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         
@@ -144,7 +145,7 @@ sub buildConfig
             '//%nodeid-device%//modems';
         
         my $first = 1;
-        foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+        for my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             
@@ -187,7 +188,7 @@ sub buildConfig
         }
         
         # Apply selector actions
-        foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+        for my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             

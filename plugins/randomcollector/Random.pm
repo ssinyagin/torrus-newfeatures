@@ -84,7 +84,7 @@ sub runCollector
 
     my $now = time();
 
-    foreach my $token ( $collector->listCollectorTargets('random') )
+    for my $token ( $collector->listCollectorTargets('random') )
     {
         my $value = $collector->param( $token, 'rnd-baseline-height' );
         my $ampl = $collector->param( $token, 'rnd-amplitude' );

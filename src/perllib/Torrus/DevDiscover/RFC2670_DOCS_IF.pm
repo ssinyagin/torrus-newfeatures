@@ -24,6 +24,7 @@ package Torrus::DevDiscover::RFC2670_DOCS_IF;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'RFC2670_DOCS_IF'} = {
     'sequence'     => 100,
@@ -99,7 +100,7 @@ sub discover
     $data->{'docsCableDownstream'} = [];
     $data->{'docsCableUpstream'} = [];
 
-    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         my $ifType = $interface->{'ifType'};
@@ -189,14 +190,14 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    foreach my $category ( sort keys %{$data->{'docsConfig'}} )
+    for my $category ( sort keys %{$data->{'docsConfig'}} )
     {
         if( scalar( @{$data->{$category}} ) > 0 and
             scalar( @{$data->{'docsConfig'}{$category}{'templates'}} ) > 0 )
         {
             # Count non-excluded interfaces
             my $updatedInterfaceList = [];
-            foreach my $ifIndex ( @{$data->{$category}} )
+            for my $ifIndex ( @{$data->{$category}} )
             {
                 my $interface = $data->{'interfaces'}{$ifIndex};
                 next if $interface->{'excluded'};
@@ -215,7 +216,7 @@ sub buildConfig
                                  $data->{'docsConfig'}{$category}{
                                      'templates'});
 
-            foreach my $ifIndex ( @{$data->{$category}} )
+            for my $ifIndex ( @{$data->{$category}} )
             {
                 my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -225,7 +226,7 @@ sub buildConfig
 
                 # Copy some parameters from IF-MIB discovery results
                 
-                foreach my $p ('interface-name', 'interface-nick',
+                for my $p ('interface-name', 'interface-nick',
                                'node-display-name', 'comment')
                 {
                     $param->{$p} = $interface->{'param'}{$p};

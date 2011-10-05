@@ -29,6 +29,7 @@ use Digest::MD5 qw(md5_hex);
 use Torrus::DB;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 sub new
 {
@@ -68,7 +69,7 @@ sub init
 
     $self->{'db_failures'}->trunc();
     
-    foreach my $c ( @{$self->{'counters'}} )
+    for my $c ( @{$self->{'counters'}} )
     {
         $self->{'db_failures'}->put('c:' . $c, 0);
     }
@@ -140,7 +141,7 @@ sub read
     my $out = shift;
     my %options = @_;
 
-    foreach my $c ( @{$self->{'counters'}} )
+    for my $c ( @{$self->{'counters'}} )
     {
         if( not defined( $out->{'total_' . $c} ) )
         {

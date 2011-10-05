@@ -24,6 +24,7 @@ package Torrus::DevDiscover::CiscoFirewall;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoFirewall'} = {
     'sequence'     => 510,

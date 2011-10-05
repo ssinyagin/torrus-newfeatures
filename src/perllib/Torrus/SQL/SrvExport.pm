@@ -28,6 +28,8 @@ use base 'Torrus::SQL';
 
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 # The name of the table and columns where the collector export is stored
 # defaults configured in torrus-config.pl
 our $tableName;

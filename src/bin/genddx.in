@@ -246,7 +246,7 @@ sub createParamsDom
     my $doc = shift;
     my $parentNode = shift;
 
-    foreach my $param ( sort keys %{$params} )
+    for my $param ( sort keys %{$params} )
     {
         my $paramNode = $doc->createElement('param');
         $paramNode->setAttribute( 'name', $param );

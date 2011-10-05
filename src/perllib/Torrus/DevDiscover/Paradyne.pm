@@ -45,6 +45,7 @@ package Torrus::DevDiscover::Paradyne;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'Paradyne'} = {
     'sequence'     => 500,
@@ -118,7 +119,7 @@ sub discover
     }
     
     my $slot = $devdetails->param('Paradyne::slot-name');    
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         $interface->{'ParadyneIfNick'} =
@@ -133,7 +134,7 @@ sub discover
         $devdetails->storeSnmpVars( $xdslTable );
         $devdetails->setCap('paradyneXDSL');
 
-        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+        for my $ifIndex ( keys %{$data->{'interfaces'}} )
         {
             if( $devdetails->hasOID( $xdslOID .'.'. $ifIndex .'.'.
                                      $statsInterval ) )
@@ -167,7 +168,7 @@ sub buildConfig
 
         my $data = $devdetails->data();
 
-        foreach my $ifIndex
+        for my $ifIndex
             ( sort {$a<=>$b} @{$data->{'paradyneXDSLInterfaces'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};

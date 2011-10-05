@@ -100,9 +100,9 @@ else
 {
     my $et = new Torrus::EasyTarget;
 
-    foreach my $cfgElem ( @{$cfg} )
+    for my $cfgElem ( @{$cfg} )
     {
-        foreach my $cfgHash ( values ( %{$cfgElem} ) )
+        for my $cfgHash ( values ( %{$cfgElem} ) )
         {
             $ok = $et->genConfig( $cfgHash ) ? $ok : 0;
         }

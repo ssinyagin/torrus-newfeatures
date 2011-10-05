@@ -22,6 +22,7 @@ package Torrus::DevDiscover::Patton;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'Patton'} = {
     'sequence'     => 500,

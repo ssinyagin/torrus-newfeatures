@@ -31,6 +31,8 @@ use strict;
 use Torrus::Log;
 use Math::BigFloat;
 
+our $VERSION = 1.0;
+
 # Each RPN operator is defined by an array reference with the
 # following  elements: <number of args>, <subroutine>, <accepts undef>
 
@@ -143,7 +145,7 @@ sub translate
     # Debug("Translating RPN: $string");
     my $item;
     my @new_items;
-    foreach $item ( split( /,/, $string ) )
+    for $item ( split( /,/, $string ) )
     {
         if( $item =~ /^\{([^\}]*)\}$/ )
         {
@@ -187,7 +189,7 @@ sub run
     }
 
     my $item;
-    foreach $item ( split( /,/, $string ) )
+    for $item ( split( /,/, $string ) )
     {
         if( ref( $operators->{$item} ) )
         {

@@ -32,6 +32,8 @@ use Date::Format;
 use Torrus::SQL::SrvExport;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 $Torrus::Collector::ExternalStorage::backendInit =
     \&Torrus::Collector::ExtDBI::backendInit;
 
@@ -101,7 +103,7 @@ sub backendStoreData
         }
     }
 
-    return undef;
+    return;
 }
 
 

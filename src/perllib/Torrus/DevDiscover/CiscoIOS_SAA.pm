@@ -31,6 +31,7 @@ use Socket qw(inet_ntoa);
 
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoIOS_SAA'} = {
     'sequence'     => 510,
@@ -208,7 +209,7 @@ sub discover
 
     $data->{'rtt_entries'} = {};
 
-    foreach my $rttIndex
+    for my $rttIndex
         ( $devdetails->getSnmpIndices( $dd->oiddef('rttMonCtrlAdminOwner') ) )
     {
         # we're interested in Active agents only
@@ -225,7 +226,7 @@ sub discover
         my $comment = '';
         my $legend = '';
 
-        foreach my $adminField
+        for my $adminField
             ( sort {$adminInterpret{$a}{'order'} <=>
                         $adminInterpret{$b}{'order'}}
               keys %adminInterpret )
@@ -287,7 +288,7 @@ sub buildConfig
         $cb->addSubtree( $devNode, 'SAA', undef,
                          ['CiscoIOS_SAA::cisco-saa-subtree']);
 
-    foreach my $rttIndex ( sort {$a<=>$b} keys %{$data->{'rtt_entries'}} )
+    for my $rttIndex ( sort {$a<=>$b} keys %{$data->{'rtt_entries'}} )
     {
         my $subtreeName = 'rtt_' . $rttIndex;
         my $param = $data->{'rtt_entries'}{$rttIndex}{'param'};

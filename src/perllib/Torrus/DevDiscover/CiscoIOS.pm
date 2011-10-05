@@ -27,6 +27,7 @@ package Torrus::DevDiscover::CiscoIOS;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoIOS'} = {
     'sequence'     => 500,
@@ -261,7 +262,7 @@ sub discover
     # Old mkroutercfg used cisco-interface-counters
     if( $Torrus::DevDiscover::CiscoIOS::useCiscoInterfaceCounters )
     {
-        foreach my $interface ( values %{$data->{'interfaces'}} )
+        for my $interface ( values %{$data->{'interfaces'}} )
         {
             $interface->{'hasHCOctets'} = 0;
             $interface->{'hasOctets'} = 0;
@@ -274,7 +275,7 @@ sub discover
         # This is a well-known bug in IOS: HC counters are implemented,
         # but always zero. We can catch this only for active interfaces.
 
-        foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
+        for my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -358,7 +359,7 @@ sub discover
             # Number of peers for each AS
             my %asNumbers;    
 
-            foreach my $INDEX
+            for my $INDEX
                 ( $devdetails->
                   getSnmpIndices( $dd->oiddef('cbgpPeerAcceptedPrefixes') ) )
             {
@@ -426,7 +427,7 @@ sub discover
                     $session->get_table
                     ( -baseoid => $dd->oiddef('cbgpPeerAddrFamilyName') );
                 
-                foreach my $INDEX ( @nonV4Unicast )
+                for my $INDEX ( @nonV4Unicast )
                 {
                     my $peer = $data->{'cbgpPeers'}{$INDEX};
 
@@ -442,7 +443,7 @@ sub discover
 
             # Construct the subtree names from AS, peer IP, and address
             # family
-            foreach my $INDEX ( keys %{$data->{'cbgpPeers'}} )
+            for my $INDEX ( keys %{$data->{'cbgpPeers'}} )
             {
                 my $peer = $data->{'cbgpPeers'}{$INDEX};
                 
@@ -477,7 +478,7 @@ sub discover
 
             $data->{'ccar'} = {};
 
-            foreach my $INDEX
+            for my $INDEX
                 ( $devdetails->
                   getSnmpIndices( $dd->oiddef('ccarConfigType') ) )
             {
@@ -541,7 +542,7 @@ sub discover
                 $devdetails->storeSnmpVars( $tableTun );
 
                 # VPDN indexing: 1: l2f, 2: l2tp, 3: pptp
-                foreach my $typeIndex (
+                for my $typeIndex (
                     $devdetails->getSnmpIndices(
                         $dd->oiddef('cvpdnSystemTunnelTotal') ) )
                 {
@@ -651,7 +652,7 @@ sub buildConfig
                                  'comment' => 'Accepted prefixes',
                              } );
 
-        foreach my $INDEX ( sort
+        for my $INDEX ( sort
                             { $data->{'cbgpPeers'}{$a}{'subtreeName'} <=>
                                   $data->{'cbgpPeers'}{$b}{'subtreeName'} }
                             keys %{$data->{'cbgpPeers'}} )
@@ -688,7 +689,7 @@ sub buildConfig
                 'node-display-name' => 'CAR', },
                              ['CiscoIOS::cisco-car-subtree']);
         
-        foreach my $INDEX ( sort keys %{$data->{'ccar'}} )
+        for my $INDEX ( sort keys %{$data->{'ccar'}} )
         {
             my $car = $data->{'ccar'}{$INDEX};
             my $interface = $data->{'interfaces'}{$car->{'ifIndex'}};
@@ -747,7 +748,7 @@ sub buildConfig
               {'node-display-name' => 'VPDN Statistics'},
               [ 'CiscoIOS::cisco-vpdn-subtree' ] );
 
-        foreach my $INDEX ( sort keys %{$data->{'ciscoVPDN'}} )
+        for my $INDEX ( sort keys %{$data->{'ciscoVPDN'}} )
         {
             my $tunnelProtocol = $data->{'ciscoVPDN'}{$INDEX};
 
@@ -761,7 +762,7 @@ sub buildConfig
 
     if( $devdetails->hasCap('Cisco3G') )
     { 
-        foreach my $phy ( sort keys %{$data->{'cisco3G'}} )
+        for my $phy ( sort keys %{$data->{'cisco3G'}} )
         {
             my @templates;
             my $summary_leaf;
@@ -804,7 +805,7 @@ sub buildConfig
               {'node-display-name' => 'QoS drop statistics'} );
 
         my $precedence = 1000;
-        foreach my $qos_entry (sort keys %{$data->{'ciscoPortQos'}})
+        for my $qos_entry (sort keys %{$data->{'ciscoPortQos'}})
         {
             my $entry = $data->{'ciscoPortQos'}{$qos_entry};
             

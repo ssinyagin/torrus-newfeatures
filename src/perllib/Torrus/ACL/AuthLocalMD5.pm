@@ -25,6 +25,8 @@ use Torrus::Log;
 use Digest::MD5 qw(md5_hex);
 use strict;
 
+our $VERSION = 1.0;
+
 sub new
 {
     my $self = {};
@@ -48,7 +50,7 @@ sub authenticateUser
 
     if( not $password or not $attrValues->{'userPasswordMD5'} )
     {
-        return undef;
+        return
     }
     my $pw_md5 = md5_hex( $password );
     return( $pw_md5 eq $attrValues->{'userPasswordMD5'} );

@@ -51,7 +51,7 @@ foreach my $policy ( keys %Torrus::Notify::policies )
         my @targets = ();
         my $levels = $Torrus::Notify::policies{$policy}{'severity'};
         
-        foreach my $level ( sort {$a <=>$b} keys %{$levels} )
+        for my $level ( sort {$a <=>$b} keys %{$levels} )
         {
             if( $severity >= $level )
             {
@@ -64,7 +64,7 @@ foreach my $policy ( keys %Torrus::Notify::policies )
             Debug('Selected notification targets: ' . join(' ', @targets));
         }
 
-        foreach my $target ( @targets )
+        for my $target ( @targets )
         {
             my($protocol, $arg) = split(':', $target);
             if( defined( $Torrus::Notify::programs{$protocol} ) )

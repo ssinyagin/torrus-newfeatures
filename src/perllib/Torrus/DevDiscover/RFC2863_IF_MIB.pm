@@ -24,6 +24,7 @@ package Torrus::DevDiscover::RFC2863_IF_MIB;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'RFC2863_IF_MIB'} = {
     'sequence'     => 50,
@@ -180,7 +181,7 @@ sub discover
     my $excludeOperDown =
         $devdetails->param('RFC2863_IF_MIB::exclude-down-interfaces')
         eq 'yes';
-    foreach my $ifIndex
+    for my $ifIndex
         ( $devdetails->getSnmpIndices( $dd->oiddef('ifDescr') ) )
     {
         my $admStatus =
@@ -344,15 +345,15 @@ sub discover
 
     if( ref( $data->{'interfaceFilter'} ) )
     {
-        foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
+        for my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             my $match = 0;
 
-            foreach my $filterHash ( @{$data->{'interfaceFilter'}} )
+            for my $filterHash ( @{$data->{'interfaceFilter'}} )
             {
                 last if $match;
-                foreach my $filter ( values %{$filterHash} )
+                for my $filter ( values %{$filterHash} )
                 {
                     last if $match;
 
@@ -382,7 +383,7 @@ sub discover
 
     # Explore each interface capability
 
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -487,7 +488,7 @@ sub buildConfig
     {
         $bandwidthUsageConfigured = 1;
         my $limits = $devdetails->param('RFC2863_IF_MIB::bandwidth-limits');
-        foreach my $intfLimit ( split( /\s*;\s*/, $limits ) )
+        for my $intfLimit ( split( /\s*;\s*/, $limits ) )
         {
             my( $intf, $limitIn, $limitOut ) = split( /\s*:\s*/, $intfLimit );
             $bandwidthLimits{$intf}{'In'} = $limitIn;
@@ -499,7 +500,7 @@ sub buildConfig
 
     my $nInterfaces = 0;
    
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -601,7 +602,7 @@ sub buildConfig
         
     if( defined( $excludeNameList ) and length( $excludeNameList ) > 0 )
     {
-        foreach my $name ( split( /\s*,\s*/, $excludeNameList ) )
+        for my $name ( split( /\s*,\s*/, $excludeNameList ) )
         {
             $excludeName{$name} = 1;
         }
@@ -615,7 +616,7 @@ sub buildConfig
     if( defined( $onlyNamesList ) and length( $onlyNamesList ) > 0 )
     {
         $onlyNamesDefined = 1;
-        foreach my $name ( split( /\s*,\s*/, $onlyNamesList ) )
+        for my $name ( split( /\s*,\s*/, $onlyNamesList ) )
         {
             $onlyName{$name} = 1;
         }
@@ -631,10 +632,10 @@ sub buildConfig
         $devdetails->param('RFC2863_IF_MIB::tokenset-members');
     if( defined( $tsetMembership ) and length( $tsetMembership ) > 0 )
     {
-        foreach my $memList ( split( /\s*;\s*/, $tsetMembership ) )
+        for my $memList ( split( /\s*;\s*/, $tsetMembership ) )
         {
             my ($tset, $list) = split( /\s*:\s*/, $memList );
-            foreach my $intfName ( split( /\s*,\s*/, $list ) )
+            for my $intfName ( split( /\s*,\s*/, $list ) )
             {
                 if( $intfName =~ /\// )
                 {
@@ -661,7 +662,7 @@ sub buildConfig
     
     if( defined( $extSrv ) and length( $extSrv ) > 0 )
     {
-        foreach my $srvDef ( split( /\s*,\s*/, $extSrv ) )
+        for my $srvDef ( split( /\s*,\s*/, $extSrv ) )
         {
             my ( $serviceid, $intfName, $direction, $trees ) =
                 split( /\s*:\s*/, $srvDef );
@@ -716,7 +717,7 @@ sub buildConfig
     my %trafficSummary;
     if( defined( $trafficSums ) )
     {
-        foreach my $summary ( split( /\s*,\s*/, $trafficSums ) )
+        for my $summary ( split( /\s*,\s*/, $trafficSums ) )
         {
             $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
                 $summary}{'path'} =
@@ -734,7 +735,7 @@ sub buildConfig
                 ('RFC2863_IF_MIB::traffic-' . $summary . '-interfaces');
 
             # get the intreface names for this host
-            foreach my $intfName ( split( /\s*,\s*/, $intfList ) )
+            for my $intfName ( split( /\s*,\s*/, $intfList ) )
             {
                 if( $intfName =~ /\// )
                 {
@@ -784,7 +785,7 @@ sub buildConfig
         $cb->addSubtree( $devNode, $subtreeName, $subtreeParams,
                          ['RFC2863_IF_MIB::rfc2863-ifmib-subtree'] );
     
-    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -841,7 +842,7 @@ sub buildConfig
             $interface->{'hasChild'}{'Bytes_Out'} = 1;
             $interface->{'hasChild'}{'InOut_bps'} = 1;            
 
-            foreach my $dir ( 'In', 'Out' )
+            for my $dir ( 'In', 'Out' )
             {
                 if( defined( $interface->{'selectorActions'}->
                              {$dir . 'BytesMonitor'} ) )
@@ -860,7 +861,7 @@ sub buildConfig
                               $interface->{'selectorActions'}{
                                   $dir . 'BytesParameters'});
                     
-                    foreach my $pair( @pairs )
+                    for my $pair( @pairs )
                     {
                         my ($param, $val) = split('\s*=\s*', $pair);
                         $interface->{'childCustomizations'}->{
@@ -970,7 +971,7 @@ sub buildConfig
         
         if( defined( $interface->{'selectorActions'}{'TokensetMember'} ) )
         {
-            foreach my $tset
+            for my $tset
                 ( split('\s*,\s*',
                         $interface->{'selectorActions'}{'TokensetMember'}) )
             {
@@ -982,7 +983,7 @@ sub buildConfig
         {
             my @pairs = split('\s*;\s*',
                               $interface->{'selectorActions'}{'Parameters'});
-            foreach my $pair( @pairs )
+            for my $pair( @pairs )
             {
                 my ($param, $val) = split('\s*=\s*', $pair);
                 $interface->{'param'}{$param} = $val;
@@ -1016,7 +1017,7 @@ sub buildConfig
         {
             # process interface-level parameters to copy
 
-            foreach my $param ( @intfCopyParams )
+            for my $param ( @intfCopyParams )
             {
                 my $val = $devdetails->param('RFC2863_IF_MIB::' .
                                              $param . '::' . $subtreeName );
@@ -1038,7 +1039,7 @@ sub buildConfig
 
             if( defined( $extStorage{$subtreeName} ) )
             {
-                foreach my $dir ( 'In', 'Out' )
+                for my $dir ( 'In', 'Out' )
                 {
                     if( defined( $extStorage{$subtreeName}{$dir} ) )
                     {
@@ -1056,7 +1057,7 @@ sub buildConfig
                                 $extStorageTrees{$serviceid};
                         }
 
-                        foreach my $param ( keys %{$params} )
+                        for my $param ( keys %{$params} )
                         {
                             $interface->{'childCustomizations'}->{
                                 'Bytes_' . $dir}{$param} = $params->{$param};
@@ -1071,7 +1072,7 @@ sub buildConfig
 
             if( defined( $interface->{'childCustomizations'} ) )
             {
-                foreach my $childName
+                for my $childName
                     ( sort keys %{$interface->{'childCustomizations'}} )
                 {
                     if( $interface->{'hasChild'}{$childName} )
@@ -1087,7 +1088,7 @@ sub buildConfig
             # If the interafce is a member of traffic summary
             if( defined( $trafficSummary{$subtreeName} ) )
             {
-                foreach my $summary ( keys %{$trafficSummary{$subtreeName}} )
+                for my $summary ( keys %{$trafficSummary{$subtreeName}} )
                 {
                     addTrafficSummaryElement( $globalData,
                                               $summary, $intfNode );
@@ -1105,7 +1106,7 @@ sub buildConfig
     if( scalar( %tsetMember ) > 0 )
     {
         my @failedIntf;
-        foreach my $intfName ( keys %tsetMember )
+        for my $intfName ( keys %tsetMember )
         {
             if( not $tsetMemberApplied{$intfName} )
             {
@@ -1157,7 +1158,7 @@ sub buildGlobalConfig
         return;
     }
     
-    foreach my $summary ( keys %{$globalData->{
+    for my $summary ( keys %{$globalData->{
         'RFC2863_IF_MIB::summaryMembers'}} )
     {
         next if scalar( @{$globalData->{
@@ -1180,17 +1181,17 @@ sub buildGlobalConfig
         
         # generate subtree path XML
         my $subtreeNode = undef;
-        foreach my $subtreeName ( split( '/', $path ) )
+        for my $subtreeName ( split( '/', $path ) )
         {
             $subtreeNode = $cb->addSubtree( $subtreeNode, $subtreeName, {
                 'comment'  => $attr->{'comment'},
                 'data-dir' => $attr->{'data-dir'} } );
         }
 
-        foreach my $dir ('In', 'Out')
+        for my $dir ('In', 'Out')
         {
             my $rpn = '';
-            foreach my $member ( @{$globalData->{
+            for my $member ( @{$globalData->{
                 'RFC2863_IF_MIB::summaryMembers'}{$summary}} )
             {
                 my $memRef = '{' . $cb->getElementPath($member) .
@@ -1252,7 +1253,7 @@ sub validateReference
     my $data = $devdetails->data();
     my %seen;
 
-    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -1281,7 +1282,7 @@ sub uniqueEntries
     my $data = $devdetails->data();
     my %count;
 
-    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -1313,7 +1314,7 @@ sub retrieveMacAddresses
 
     my $data = $devdetails->data();
 
-    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -1344,7 +1345,7 @@ sub storeIfIndexParams
 
     my $data = $devdetails->data();
 
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         $interface->{'param'}{'interface-index'} = $ifIndex;        
@@ -1388,7 +1389,7 @@ sub checkSelectorAttribute
     {
         my $value = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
         my $match = 0;
-        foreach my $chkexpr ( split( /\s+/, $checkval ) )
+        for my $chkexpr ( split( /\s+/, $checkval ) )
         {
             if( $value =~ $chkexpr )
             {

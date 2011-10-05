@@ -26,6 +26,7 @@ package Torrus::DevDiscover::RFC2737_ENTITY_MIB;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'RFC2737_ENTITY_MIB'} = {
     'sequence'     => 100,
@@ -86,7 +87,7 @@ sub discover
     my $chassisIndex = 0;
     my $oidContainedIn = $dd->oiddef('entPhysicalContainedIn');
 
-    foreach my $phyIndex
+    for my $phyIndex
         ( $devdetails->getSnmpIndices($dd->oiddef('entPhysicalDescr')) )
     {
         my $ref = {};

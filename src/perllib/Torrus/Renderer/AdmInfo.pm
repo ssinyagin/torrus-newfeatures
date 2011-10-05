@@ -27,6 +27,8 @@ use Torrus::ACL;
 
 use Template;
 
+our $VERSION = 1.0;
+
 my %rrd_params =
     (
      'leaf-type' => {'rrd-def' => {'rrd-ds' => undef,
@@ -150,7 +152,7 @@ sub render_adminfo
         if( not open(OUT, ">$outfile") )
         {
             Error("Cannot open $outfile for writing: $!");
-            return undef;
+            return
         }
         else
         {
@@ -196,9 +198,9 @@ sub retrieve_adminfo
     {
         my @next_namemaps = ();
 
-        foreach my $namemap ( @namemaps )
+        for my $namemap ( @namemaps )
         {
-            foreach my $paramkey ( keys %{$namemap} )
+            for my $paramkey ( keys %{$namemap} )
             {
                 my $pname = $paramkey;
 

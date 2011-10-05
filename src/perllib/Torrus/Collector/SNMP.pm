@@ -29,6 +29,7 @@ use Socket;
 use Net::SNMP qw(:snmp);
 use Math::BigInt;
 
+our $VERSION = 1.0;
 
 # Register the collector type
 $Torrus::Collector::collectorTypes{'snmp'} = 1;
@@ -142,7 +143,7 @@ sub initCollectorGlobals
     # soon enough in order to catch up with the changes
 
     my $now = time();    
-    foreach my $maphash ( keys %mapsExpire )
+    for my $maphash ( keys %mapsExpire )
     {
         $mapsExpire{$maphash} = int( $now + rand( $mapsUpdateInterval ) );
     }    
@@ -321,7 +322,7 @@ sub snmpSessionArgs
                 -retries      => $collector->param($token, 'snmp-retries'),
                 -version      => $version ];
     
-    foreach my $arg ( qw(-localaddr -localport) )
+    for my $arg ( qw(-localaddr -localport) )
     {
         if( defined( $collector->param($token, 'snmp' . $arg) ) )
         {
@@ -337,7 +338,7 @@ sub snmpSessionArgs
     {
         push( @{$ret}, -username, $community);
 
-        foreach my $arg ( qw(-authkey -authpassword -authprotocol
+        for my $arg ( qw(-authkey -authpassword -authprotocol
                              -privkey -privpassword -privprotocol) )
         {
             if( defined( $collector->param($token, 'snmp' . $arg) ) )
@@ -396,7 +397,7 @@ sub openNonblockingSession
     if( not defined($session) )
     {
         Error('Cannot create SNMP session for ' . $hosthash . ': ' . $error);
-        return undef;
+        return
     }
     
     if( $collector->param($token, 'snmp-transport') eq 'udp' )
@@ -454,7 +455,7 @@ sub expandOidMappings
         if( not $oid =~ /^(.*)M\(\s*([0-9\.]+)\s*,\s*([^\)]+)\)(.*)$/o )
         {
             Error("Error in OID mapping syntax: $oid");
-            return undef;
+            return
         }
 
         my $head = $1;
@@ -481,7 +482,7 @@ sub expandOidMappings
         }
         else
         {
-            return undef;
+            return
         }
     }
 
@@ -492,7 +493,7 @@ sub expandOidMappings
         if( not $oid =~ /^(.*)V\(\s*([0-9\.]+)\s*\)(.*)$/o )
         {
             Error("Error in OID value lookup syntax: $oid");
-            return undef;
+            return
         }
 
         my $head = $1;
@@ -509,7 +510,7 @@ sub expandOidMappings
             my $session = openBlockingSession( $collector, $token, $hosthash );
             if( not defined($session) )
             {
-                return undef;
+                return
             }
 
             my $result = $session->get_request( -varbindlist => [$key] );
@@ -524,7 +525,7 @@ sub expandOidMappings
                 Error("Error retrieving $key from $hosthash: " .
                       $session->error());
                 probablyDead( $collector, $hosthash );
-                return undef;
+                return
             }
         }
         else
@@ -646,7 +647,7 @@ sub lookupMap
     }
     else
     {
-        return undef;
+        return
     }
 }
 
@@ -680,7 +681,7 @@ sub mapLookupCallback
               $session->error());
         $session->close();
         probablyDead( $collector, $hosthash );
-        return undef;
+        return
     }    
 }
 
@@ -748,7 +749,7 @@ sub probablyDead
         }
         
         Debug('Deleting ' . scalar( @deleteTargets ) . ' tokens');
-        foreach my $token ( @deleteTargets )
+        for my $token ( @deleteTargets )
         {
             $collector->deleteTarget($token);
         }
@@ -855,7 +856,7 @@ sub deleteTarget
 
     delete $cref->{'needsRemapping'}{$token};
     
-    foreach my $maphash ( keys %{$cref->{'mapsRelatedMaps'}{$token}} )
+    for my $maphash ( keys %{$cref->{'mapsRelatedMaps'}{$token}} )
     {
         delete $cref->{'mapsDependentTokens'}{$maphash}{$token};
     }
@@ -902,7 +903,7 @@ sub runCollector
 
         my @sessions;
 
-        foreach my $hosthash ( @batch )
+        for my $hosthash ( @batch )
         {
             my @oids = sort keys %{$cref->{'targets'}{$hosthash}};
 
@@ -962,7 +963,7 @@ sub runCollector
                     if( Torrus::Log::isDebug() )
                     {
                         Debug('Sending SNMP PDU to ' . $hosthash . ':');
-                        foreach my $oid ( @pdu_oids )
+                        for my $oid ( @pdu_oids )
                         {
                             Debug($oid);
                         }
@@ -970,11 +971,11 @@ sub runCollector
 
                     # Generate the list of tokens that form this PDU
                     my $pdu_tokens = {};
-                    foreach my $oid ( @pdu_oids )
+                    for my $oid ( @pdu_oids )
                     {
                         if( defined( $cref->{'targets'}{$hosthash}{$oid} ) )
                         {
-                            foreach my $token
+                            for my $token
                                 ( keys %{$cref->{'targets'}{$hosthash}{$oid}} )
                             {
                                 $pdu_tokens->{$oid}{$token} = 1;
@@ -1036,9 +1037,9 @@ sub callback
         
         # Clear the mapping
         delete $maps{$hosthash};
-        foreach my $oid ( keys %{$pdu_tokens} )
+        for my $oid ( keys %{$pdu_tokens} )
         {
-            foreach my $token ( keys %{$pdu_tokens->{$oid}} )
+            for my $token ( keys %{$pdu_tokens->{$oid}} )
             {
                 $cref->{'needsRemapping'}{$token} = 1;
             }
@@ -1083,9 +1084,9 @@ sub callback
             delete $maps{$hosthash};
 
             $timestamp -= $uptime;
-            foreach my $oid ( keys %{$pdu_tokens} )
+            for my $oid ( keys %{$pdu_tokens} )
             {
-                foreach my $token ( keys %{$pdu_tokens->{$oid}} )
+                for my $token ( keys %{$pdu_tokens->{$oid}} )
                 {
                     $collector->setValue( $token, 'U', $timestamp, $uptime );
                     $cref->{'needsRemapping'}{$token} = 1;
@@ -1110,7 +1111,7 @@ sub callback
                 {
                     Error("Error retrieving $oid from $hosthash: $value");
                     
-                    foreach my $token ( keys %{$pdu_tokens->{$oid}} )
+                    for my $token ( keys %{$pdu_tokens->{$oid}} )
                     {
                         if( defined( $db_failures ) )
                         {
@@ -1129,7 +1130,7 @@ sub callback
                     $value = Math::BigInt->new($value);
                 }
 
-                foreach my $token ( keys %{$pdu_tokens->{$oid}} )
+                for my $token ( keys %{$pdu_tokens->{$oid}} )
                 {
                     $collector->setValue( $token, $value,
                                           $timestamp, $uptime );
@@ -1167,9 +1168,9 @@ sub postProcess
     # look if some maps are ready after last expiration check
     if( scalar( @{$cref->{'mapsRefreshed'}} ) > 0 )
     {
-        foreach my $maphash ( @{$cref->{'mapsRefreshed'}} )
+        for my $maphash ( @{$cref->{'mapsRefreshed'}} )
         {
-            foreach my $token
+            for my $token
                 ( keys %{$cref->{'mapsDependentTokens'}{$maphash}} )
             {
                 $cref->{'needsRemapping'}{$token} = 1;
@@ -1231,7 +1232,7 @@ sub postProcess
         }
     }
     
-    foreach my $token ( keys %{$cref->{'needsRemapping'}} )
+    for my $token ( keys %{$cref->{'needsRemapping'}} )
     {
         &Torrus::DB::checkInterrupted();
 
@@ -1308,7 +1309,7 @@ sub reachable_runCollector
 
     while(my ($hosthash, $r) = each %{$cref->{'targets'}} )
     {
-        foreach my $token (keys %{$r})
+        for my $token (keys %{$r})
         {
             my $val = $db_failures->is_host_available($hosthash) ? 100:0;
             $collector->setValue( $token, $val, $timestamp, 0 );

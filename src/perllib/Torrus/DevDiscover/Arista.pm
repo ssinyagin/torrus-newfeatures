@@ -27,6 +27,8 @@ package Torrus::DevDiscover::Arista;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 $Torrus::DevDiscover::registry{'Arista'} = {
     'sequence'     => 500,
     'checkdevtype' => \&checkdevtype,

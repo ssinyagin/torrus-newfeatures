@@ -32,6 +32,7 @@ package Torrus::DevDiscover::RFC1628_UPS_MIB;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'RFC1628_UPS_MIB'} = {
     'sequence'     => 100,
@@ -133,7 +134,7 @@ sub buildConfig
                                   { 'comment' => 'Input feeds' },
                                   [ 'RFC1628_UPS_MIB::ups-input-subtree' ] );
 
-        foreach my $INDEX ( 1 .. $data->{'numInput'} )
+        for my $INDEX ( 1 .. $data->{'numInput'} )
         {
             $cb->addSubtree( $nodeInput, sprintf('Phase_%d', $INDEX),
                              { 'ups-input-idx' => $INDEX },
@@ -147,7 +148,7 @@ sub buildConfig
                                    { 'comment' => 'Output feeds' },
                                    [ 'RFC1628_UPS_MIB::ups-output-subtree' ] );
 
-        foreach my $INDEX ( 1 .. $data->{'numOutput'} )
+        for my $INDEX ( 1 .. $data->{'numOutput'} )
         {
             $cb->addSubtree( $nodeOutput, sprintf('Phase_%d', $INDEX),
                              { 'ups-output-idx' => $INDEX },
@@ -161,7 +162,7 @@ sub buildConfig
                                    { 'comment' => 'Bypass feeds' },
                                    [ 'RFC1628_UPS_MIB::ups-bypass-subtree' ] );
 
-        foreach my $INDEX ( 1 .. $data->{'numBypass'} )
+        for my $INDEX ( 1 .. $data->{'numBypass'} )
         {
             $cb->addSubtree( $nodeBypass, sprintf('Phase_%d', $INDEX),
                              { 'ups-bypass-idx' => $INDEX },

@@ -23,6 +23,7 @@ package Torrus::DevDiscover::NetBotz;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'NetBotz'} = {
     'sequence'     => 500,
@@ -96,7 +97,7 @@ sub discover
     my $data = $devdetails->data();
     my $session = $dd->session();
 
-    foreach my $stype (sort keys %sensor_types)
+    for my $stype (sort keys %sensor_types)
     {
         my $oid = $sensor_types{$stype}{'oid'};
         
@@ -109,7 +110,7 @@ sub discover
             # store the sensor names to guarantee uniqueness
             my %sensorNames;
             
-            foreach my $INDEX ($devdetails->getSnmpIndices($oid . '.1'))
+            for my $INDEX ($devdetails->getSnmpIndices($oid . '.1'))
             {
                 my $label = $devdetails->snmpVar( $oid . '.4.' . $INDEX );
                 
@@ -176,7 +177,7 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'NetBotz'}} )
+    for my $INDEX ( sort {$a<=>$b} keys %{$data->{'NetBotz'}} )
     {
         my $ref = $data->{'NetBotz'}{$INDEX};
         

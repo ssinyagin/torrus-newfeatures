@@ -22,6 +22,7 @@ package Torrus::DevDiscover::EmpireSystemedge;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'EmpireSystemedge'} = {
     'sequence'     => 500,
@@ -262,7 +263,7 @@ sub discover
         my $ref= {'indices' => []};
         $data->{'empireDiskStats'} = $ref;
 
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->
               getSnmpIndices( $dd->oiddef('empireDiskStatsIndex') ) )
         {
@@ -315,7 +316,7 @@ sub discover
         my $ref= {};
         $data->{'empireDev'} = $ref;
 
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->getSnmpIndices($dd->oiddef('empireDevIndex') ) )
         {
             next if( $INDEX < 1 );
@@ -406,7 +407,7 @@ sub discover
         my $ref= {};
         $data->{'empireCpuStats'} = $ref;
 
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->
               getSnmpIndices( $dd->oiddef('empireCpuStatsIndex') ) )
         {
@@ -495,7 +496,7 @@ sub discover
 
         my $ref = {};
         $data->{'empireNTREGPERF'} = $ref;
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->getSnmpIndices($dd->oiddef('empireNTREGPERF') ) )
         {
             # This is all configured on a per site basis.
@@ -632,7 +633,7 @@ sub buildConfig
             $cb->addSubtree( $StorageNode, $subtreeName, $param,
                              [ 'EmpireSystemedge::empire-device-subtree' ] );
 
-        foreach my $INDEX ( sort {$a<=>$b} @{$data->{'empireDev'}{'indices'}} )
+        for my $INDEX ( sort {$a<=>$b} @{$data->{'empireDev'}{'indices'}} )
         {
             my $ref = $data->{'empireDev'}{$INDEX};
 
@@ -659,7 +660,7 @@ sub buildConfig
             $cb->addSubtree( $StorageNode, $subtreeName, $param,
                              ['EmpireSystemedge::empire-disk-stats-subtree']);
 
-        foreach my $INDEX
+        for my $INDEX
             ( sort {$a<=>$b} @{$data->{'empireDiskStats'}{'indices'}} )
         {
             my $ref = $data->{'empireDiskStats'}{$INDEX};
@@ -747,7 +748,7 @@ sub buildConfig
             $cb->addSubtree( $PerformanceNode, $subtreeName, $param,
                              [ 'EmpireSystemedge::empire-cpu-subtree' ] );
 
-        foreach my $INDEX
+        for my $INDEX
             ( sort {$a<=>$b} @{$data->{'empireCpuStats'}{'indices'} } )
         {
             my $ref = $data->{'empireCpuStats'}{$INDEX};
@@ -775,7 +776,7 @@ sub buildConfig
         my $ntregnode =
             $cb->addSubtree( $devNode, $ntregTree, $ntregParam );
 
-        foreach my $INDEX
+        for my $INDEX
             ( sort {$a<=>$b} @{$data->{'empireNTREGPERF'}{'indices'} } )
         {
             my $ref = $data->{'empireNTREGPERF'}{$INDEX};

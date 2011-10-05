@@ -22,6 +22,8 @@ package Torrus::DevDiscover::Actelis;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 
 $Torrus::DevDiscover::registry{'Actelis'} = {
     'sequence'     => 500,

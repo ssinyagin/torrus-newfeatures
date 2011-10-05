@@ -166,7 +166,7 @@ foreach my $rrdfile ( sort keys %rrdinfos )
     my @nameparts = split( $splitexpr, $rrdfile, $levels );
     
     my $subtreeNode = $topSubtreeNode;
-    foreach my $subtreeName ( @nameparts )
+    for my $subtreeName ( @nameparts )
     {
         $subtreeNode = $cb->addSubtree( $subtreeNode, $subtreeName );
     }
@@ -182,7 +182,7 @@ foreach my $rrdfile ( sort keys %rrdinfos )
     my %dsnames;
     my $this_rrd_hwpredict = 0;
 
-    foreach my $prop ( keys %{$info->{'rrdinfo'}} )
+    for my $prop ( keys %{$info->{'rrdinfo'}} )
     {
         if( $prop =~ /^ds\[(\S+)\]\./o )
         {
@@ -203,7 +203,7 @@ foreach my $rrdfile ( sort keys %rrdinfos )
         $this_rrd_hwpredict = 0;
     }
     
-    foreach my $dsname ( sort keys %dsnames )
+    for my $dsname ( sort keys %dsnames )
     {
         my $dslegend = $legend . 'DS:' . $dsname . ';Type:' .
             $info->{'rrdinfo'}->{'ds['.$dsname.'].type'};
@@ -251,7 +251,7 @@ sub read_rrd_dir
     my %dir;
     tie( %dir, 'IO::Dir', $indir );
     
-    foreach my $file ( keys %dir )
+    for my $file ( keys %dir )
     {
         if( $file =~ /^\./ or $file !~ $filter )
         {
@@ -296,7 +296,7 @@ sub read_rrd_dir
     
     if( $recursive and scalar( @subdirs ) > 0 )
     {
-        foreach my $subdir ( @subdirs )
+        for my $subdir ( @subdirs )
         {
             read_rrd_dir( $infos, $indir . '/' . $subdir,
                           $filter, $recursive );

@@ -34,6 +34,8 @@ use Torrus::ServiceID;
 
 use base 'Torrus::ReportGenerator';
 
+our $VERSION = 1.0;
+
 sub isMonthly
 {
     return 1;
@@ -64,7 +66,7 @@ sub generate
     my $srvIDParams = new Torrus::ServiceID();
     
     my $srvIDs = $self->{'srvexport'}->getServiceIDs();
-    foreach my $serviceid ( @{$srvIDs} )
+    for my $serviceid ( @{$srvIDs} )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -87,7 +89,7 @@ sub generate
 
         my $maxVal = 0;
         
-        foreach my $row ( @{$data} )
+        for my $row ( @{$data} )
         {
             my $rowtime = str2time( $row->{'srv_date'} . 'T' .
                                     $row->{'srv_time'} );
@@ -116,7 +118,7 @@ sub generate
 
         my $sum = Math::BigFloat->new(0);
         my $unavailCount = 0;
-        foreach my $pos ( 0 .. $#aligned )
+        for my $pos ( 0 .. $#aligned )
         {
             if( not defined( $aligned[$pos] ) )
             {
@@ -146,7 +148,7 @@ sub generate
             $params->{'dstype'} =~ /^COUNTER/o )
         {
             $volumeDefined = 1;
-            foreach my $row ( @{$data} )
+            for my $row ( @{$data} )
             {
                 $volume += $row->{'value'} * $row->{'intvl'};
             }

@@ -27,6 +27,8 @@ use IO::File;
 
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 sub new
 {
     my $self = {};
@@ -71,7 +73,7 @@ sub lookupRegistry
 
     my $ret = undef;
 
-    foreach my $regOverlay ( @{$self->{'registry_overlays'}} )
+    for my $regOverlay ( @{$self->{'registry_overlays'}} )
     {
         if( defined( $regOverlay->{$template} ) )
         {
@@ -115,7 +117,7 @@ sub addRequiredFiles
 {
     my $self = shift;
 
-    foreach my $file ( $self->requiredFiles() )
+    for my $file ( $self->requiredFiles() )
     {
         $self->addFileInclusion( $file );
     }
@@ -232,7 +234,7 @@ sub addChildElement
 
     if( ref( $templates ) )
     {
-        foreach my $tmpl ( sort @{$templates} )
+        for my $tmpl ( sort @{$templates} )
         {
             $self->addTemplateApplication( $childNode, $tmpl );
         }
@@ -260,7 +262,7 @@ sub getChildSubtree
     if( not @subtrees )
     {
         Error('Cannot find subtree named ' . $childName);
-        return undef;
+        return
     }
     return $subtrees[0];
 }
@@ -333,7 +335,7 @@ sub addParams
 
     if( ref( $params ) )
     {
-        foreach my $paramName ( sort keys %{$params} )
+        for my $paramName ( sort keys %{$params} )
         {
             $self->addParam( $parentNode, $paramName, $params->{$paramName} );
         }
@@ -461,7 +463,7 @@ sub addStatistics
 {
     my $self = shift;
 
-    foreach my $stats ( sort keys %{$self->{'statistics'}} )
+    for my $stats ( sort keys %{$self->{'statistics'}} )
     {
         my $node = $self->{'doc'}->createElement('configbuilder-statistics');
         $node->setAttribute( 'category', $stats );
@@ -477,7 +479,7 @@ sub requiredFiles
     my $self = shift;
 
     my %files;
-    foreach my $template ( keys %{$self->{'required_templates'}} )
+    for my $template ( keys %{$self->{'required_templates'}} )
     {
         my $file;
         my $reg = $self->lookupRegistry( $template );
@@ -515,7 +517,7 @@ sub toFile
     }
     else
     {
-        return undef;
+        return
     }
 }
 

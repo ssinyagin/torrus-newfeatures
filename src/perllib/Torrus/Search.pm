@@ -26,6 +26,7 @@ use Torrus::DB;
 use Torrus::Log;
 use strict;
 
+our $VERSION = 1.0;
 
 sub new
 {
@@ -123,7 +124,7 @@ sub searchPrefix
     
     if( defined( $result ) )
     {
-        foreach my $pair ( @{$result} )
+        for my $pair ( @{$result} )
         {
             my $retstrings = [];
             push( @{$retstrings}, split(':', $pair->[1]) );

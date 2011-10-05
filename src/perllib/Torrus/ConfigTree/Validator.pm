@@ -26,6 +26,8 @@ use Torrus::RPN;
 use Torrus::SiteConfig;
 use strict;
 
+our $VERSION = 1.0;
+
 Torrus::SiteConfig::loadStyling();
 
 %Torrus::ConfigTree::Validator::reportedErrors = ();
@@ -136,7 +138,7 @@ my %view_params =
 # Load additional validation, configurable from
 # torrus-config.pl and torrus-siteconfig.pl
 
-foreach my $mod ( @Torrus::Validator::loadLeafValidators )
+for my $mod ( @Torrus::Validator::loadLeafValidators )
 {
     eval( 'require ' . $mod );
     die( $@ ) if $@;
@@ -215,7 +217,7 @@ sub validateNode
                 }
                 else
                 {
-                    foreach my $view ( @rrviews )
+                    for my $view ( @rrviews )
                     {
                         if( not $config_tree->viewExists( $view ) )
                         {
@@ -247,7 +249,7 @@ sub validateNode
         my $mlist = $config_tree->getNodeParam( $token, 'monitor' );
         if( defined $mlist )
         {
-            foreach my $param ( 'monitor-period', 'monitor-timeoffset' )
+            for my $param ( 'monitor-period', 'monitor-timeoffset' )
             {
                 if( not defined( $config_tree->getNodeParam( $token,
                                                              $param ) ) )
@@ -259,7 +261,7 @@ sub validateNode
                 }
             }
             
-            foreach my $monitor ( split(',', $mlist) )
+            for my $monitor ( split(',', $mlist) )
             {
                 if( not $config_tree->{'validator'}{'monitorExists'}{$monitor}
                     and
@@ -279,7 +281,7 @@ sub validateNode
                 $config_tree->getNodeParam( $token, 'monitor-vars' );
             if( defined $varstring )
             {
-                foreach my $pair ( split( '\s*;\s*', $varstring ) )
+                for my $pair ( split( '\s*;\s*', $varstring ) )
                 {
                     if( $pair !~ /^\w+\s*\=\s*[0-9\-+.eU]+$/o )
                     {
@@ -350,7 +352,7 @@ sub validateNode
                 Error("ds-names list is empty in $path");
                 $ok = 0;
             }
-            foreach my $dname ( @dsNames )
+            for my $dname ( @dsNames )
             {
                 my $param = 'ds-expr-' . $dname;
                 my $expr = $config_tree->getNodeParam( $token, $param );
@@ -365,7 +367,7 @@ sub validateNode
                     $ok = validateRPN( $token, $expr, $config_tree ) ? $ok : 0;
                 }
 
-                foreach my $paramprefix ( 'graph-legend-', 'line-style-',
+                for my $paramprefix ( 'graph-legend-', 'line-style-',
                                           'line-color-', 'line-order-' )
                 {
                     my $param = $paramprefix.$dname;
@@ -445,7 +447,7 @@ sub validateNode
             $config_tree->{'validator'}{'viewExists'}{$view} = 1;
         }
 
-        foreach my $ctoken ( $config_tree->getChildren($token) )
+        for my $ctoken ( $config_tree->getChildren($token) )
         {
             if( not $config_tree->isAlias($ctoken) )
             {
@@ -498,7 +500,7 @@ sub validateRPN
             Error('Invalid function name ' . $function .
                   ' in node reference at ' . $path);
             $ok = 0;
-            return undef;
+            return
         }            
         
         my $leaf = length($noderef) > 0 ?
@@ -509,14 +511,14 @@ sub validateRPN
             my $path = $config_tree->path($token);
             Error("Cannot find relative reference $noderef at $path");
             $ok = 0;
-            return undef;
+            return
         }
         if( not $config_tree->isLeaf( $leaf ) )
         {
             my $path = $config_tree->path($token);
             Error("Relative reference $noderef at $path is not a leaf");
             $ok = 0;
-            return undef;
+            return
         }
         if( $config_tree->getNodeParam($leaf, 'leaf-type') ne 'rrd-def' )
         {
@@ -524,14 +526,14 @@ sub validateRPN
             Error("Relative reference $noderef at $path must point to a ".
                   "leaf of type rrd-def");
             $ok = 0;
-            return undef;
+            return
         }
         if( defined( $timeoffset ) and not $timeoffset_supported )
         {
             my $path = $config_tree->path($token);
             Error("Time offsets are not supported at $path");
             $ok = 0;
-            return undef;
+            return
         }
 
         $ds_couter++;
@@ -555,7 +557,7 @@ sub validateViews
     my $config_tree = shift;
     my $ok = 1;
 
-    foreach my $view ($config_tree->getViewNames())
+    for my $view ($config_tree->getViewNames())
     {
         &Torrus::DB::checkInterrupted();
         
@@ -566,7 +568,7 @@ sub validateViews
             my $hrulesList = $config_tree->getParam($view, 'hrules');
             if( defined( $hrulesList ) )
             {
-                foreach my $hrule ( split(',', $hrulesList ) )
+                for my $hrule ( split(',', $hrulesList ) )
                 {
                     my $valueParam =
                         $config_tree->getParam($view, 'hrule-value-' . $hrule);
@@ -595,9 +597,9 @@ sub validateViews
             my $decorList = $config_tree->getParam($view, 'decorations');
             if( defined( $decorList ) )
             {
-                foreach my $decorName ( split(',', $decorList ) )
+                for my $decorName ( split(',', $decorList ) )
                 {
-                    foreach my $paramName ( qw(order style color expr) )
+                    for my $paramName ( qw(order style color expr) )
                     {
                         my $param = 'dec-' . $paramName . '-' . $decorName;
                         if( not defined( $config_tree->
@@ -628,7 +630,7 @@ sub validateViews
             my $gprintValues = $config_tree->getParam($view, 'gprint-values');
             if( defined( $gprintValues ) and length( $gprintValues ) > 0 )
             {
-                foreach my $gprintVal ( split(',', $gprintValues ) )
+                for my $gprintVal ( split(',', $gprintValues ) )
                 {
                     my $format =
                         $config_tree->getParam($view,
@@ -701,7 +703,7 @@ sub validateMonitors
     my $config_tree = shift;
     my $ok = 1;
 
-    foreach my $action ($config_tree->getActionNames())
+    for my $action ($config_tree->getActionNames())
     {        
         $ok = validateInstanceParams($config_tree, $action,
                                      'action', \%action_params) ? $ok:0;
@@ -725,10 +727,10 @@ sub validateMonitors
             my $launch_when = $config_tree->getParam($action, 'launch-when');
             if( defined $launch_when )
             {
-                foreach my $when ( split(',', $launch_when) )
+                for my $when ( split(',', $launch_when) )
                 {
                     my $matched = 0;
-                    foreach my $event ('set', 'repeat', 'clear', 'forget')
+                    for my $event ('set', 'repeat', 'clear', 'forget')
                     {
                         if( $when eq $event )
                         {
@@ -760,7 +762,7 @@ sub validateMonitors
                 # <param name="setenv_dataexpr"
                 #        value="ENV1=expr1, ENV2=expr2"/>
 
-                foreach my $pair ( split( ',', $setenv_dataexpr ) )
+                for my $pair ( split( ',', $setenv_dataexpr ) )
                 {
                     my ($env, $param) = split( '=', $pair );
                     if( not $param )
@@ -789,12 +791,12 @@ sub validateMonitors
         }
     }
 
-    foreach my $monitor ($config_tree->getMonitorNames())
+    for my $monitor ($config_tree->getMonitorNames())
     {
         $ok = validateInstanceParams($config_tree, $monitor,
                                      'monitor', \%monitor_params) ? $ok:0;
         my $alist = $config_tree->getParam( $monitor, 'action' );
-        foreach my $action ( split(',', $alist ) )
+        for my $action ( split(',', $alist ) )
         {
             if( not $config_tree->actionExists( $action ) )
             {
@@ -824,7 +826,7 @@ sub validateTokensets
         $ok = 0;
     }
 
-    foreach my $tset ($config_tree->getTsets())
+    for my $tset ($config_tree->getTsets())
     {
         &Torrus::DB::checkInterrupted();
         
@@ -869,9 +871,9 @@ sub validateInstanceParams
     {
         my @next_namemaps = ();
 
-        foreach my $namemap (@namemaps)
+        for my $namemap (@namemaps)
         {
-            foreach my $paramkey (keys %{$namemap})
+            for my $paramkey (keys %{$namemap})
             {
                 # Debug("Checking param: $pname");
 
@@ -924,7 +926,7 @@ sub validateInstanceParams
                 {
                     if( ref( $namemap->{$paramkey} ) )
                     {
-                        foreach my $pval ( @pvalues )
+                        for my $pval ( @pvalues )
                         {
                             if( exists $namemap->{$paramkey}->{$pval} )
                             {

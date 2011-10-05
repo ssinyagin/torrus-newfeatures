@@ -24,6 +24,8 @@ package Torrus::DevDiscover::CiscoIOS_Docsis;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 # Sequence number is 600 - we depend on RFC2670_DOCS_IF and CiscoIOS
 
 $Torrus::DevDiscover::registry{'CiscoIOS_Docsis'} = {
@@ -79,7 +81,7 @@ sub discover
     push( @{$data->{'docsConfig'}{'docsCableMaclayer'}{'templates'}},
           'CiscoIOS_Docsis::cisco-docsis-mac-subtree' );
 
-    foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+    for my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -87,7 +89,7 @@ sub discover
               'CiscoIOS_Docsis::cisco-docsis-mac-util' );
     }
 
-    foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+    for my $ifIndex ( @{$data->{'docsCableUpstream'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
@@ -143,7 +145,7 @@ sub buildConfig
             };
         
         my $first = 1;
-        foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+        for my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             
@@ -186,7 +188,7 @@ sub buildConfig
         }
         
         # Apply selector actions
-        foreach my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
+        for my $ifIndex ( @{$data->{'docsCableMaclayer'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             
@@ -210,7 +212,7 @@ sub buildConfig
                                   $data->{'docsConfig'}{'docsCableUpstream'}{
                                       'subtreeName'} );
         
-        foreach my $ifIndex ( @{$data->{'docsCableUpstream'}} )
+        for my $ifIndex ( @{$data->{'docsCableUpstream'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             

@@ -24,6 +24,7 @@ package Torrus::DevDiscover::RFC1697_RDBMS;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'RFC1697_RDBMS'} = {
     'sequence'     => 100,
@@ -119,7 +120,7 @@ sub discover
         $ref->{'indices'} = [];
         $data->{'DbTable'} = $ref;
 
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->getSnmpIndices( $dd->oiddef('rdbmsDbIndex') ) )
         {
             
@@ -175,7 +176,7 @@ sub discover
             $param->{'comment'} = $descr;
             $param->{'precedence'} = 1000 - $INDEX;
 
-            foreach my $dbType ( keys %{ $dbTypes } )
+            for my $dbType ( keys %{ $dbTypes } )
             {
                 if( Net::SNMP::oid_base_match
                     ( $dbTypes->{$dbType}, $dbMIBOID ) )
@@ -220,7 +221,7 @@ sub buildConfig
     {
         my $ref = $data->{'DbTable'};
 
-        foreach my $INDEX ( @{ $ref->{'indices'} } )
+        for my $INDEX ( @{ $ref->{'indices'} } )
         {
             my $param = $ref->{$INDEX}->{'param'};
             $cb->addSubtree( $oraNode, $param->{'nick'}, $param,

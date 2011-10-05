@@ -27,6 +27,8 @@ use RRDs;
 use JSON ();
 use IO::File;
 
+our $VERSION = 1.0;
+
 # Set to true if you want JSON to be pretty and canonical
 our $pretty_json;
 
@@ -92,7 +94,7 @@ sub render_rpc
         my $additional_params = $self->{'options'}{'variables'}{'GET_PARAMS'};
         if( defined($additional_params) )
         {
-            foreach my $p (split(/\s*,\s*/o, $additional_params))
+            for my $p (split(/\s*,\s*/o, $additional_params))
             {
                 if( $params_blacklist{$p} )
                 {
@@ -132,7 +134,7 @@ sub render_rpc
     if( not $fh )
     {
         Error("Error opening $outfile for writing: $!");
-        return undef;
+        return
     }
 
     $fh->binmode(':utf8');
@@ -167,7 +169,7 @@ sub rpc_walk_leaves
     if( $config_tree->isLeaf($token) )
     {
         my $data = {'path' => $config_tree->path($token)};
-        foreach my $p (@{$params})
+        for my $p (@{$params})
         {
             my $val = $config_tree->getNodeParam($token, $p);
             if( defined($val) )
@@ -180,7 +182,7 @@ sub rpc_walk_leaves
     }
     elsif( $config_tree->isSubtree($token) )
     {
-        foreach my $ctoken ($config_tree->getChildren($token))
+        for my $ctoken ($config_tree->getChildren($token))
         {
             rpc_walk_leaves($self, $config_tree,
                             {'token' => $ctoken,
@@ -254,7 +256,7 @@ sub rpc_aggregate_ds
         $result->{'success'} = 0;
         $result->{'error'} =
             'AGGREGATE_DS method does not support rrd-multigraph leaves';
-        return undef;
+        return
     }
 
     my $leaftype = $config_tree->getNodeParam($token, 'leaf-type');
@@ -274,7 +276,7 @@ sub rpc_aggregate_ds
           $self->rrd_make_def($config_tree, $token, 'Aavg', 'AVERAGE'),
           $self->rrd_make_def($config_tree, $token, 'Amax', 'MAX') );
           
-    foreach my $entry ( @rpc_print_statements )
+    for my $entry ( @rpc_print_statements )
     {
         push( @args, @{$entry->{'args'}} );
     }
@@ -288,13 +290,13 @@ sub rpc_aggregate_ds
     {
         $result->{'success'} = 0;
         $result->{'error'} = 'RRD::graphv returned error: ' . $ERR;
-        return undef;
+        return
     }
 
     my $data = {};
     my $i = 0;
 
-    foreach my $entry ( @rpc_print_statements )
+    for my $entry ( @rpc_print_statements )
     {
         my $key = 'print[' . $i . ']';
         my $val = $r->{$key};
@@ -348,13 +350,13 @@ sub rpc_search_nodeid
     }
     
     # results are pairs [nodeid,token]
-    foreach my $res ( @{$search_results} )
+    for my $res ( @{$search_results} )
     {
         my $token = $res->[1];
         if( $config_tree->isLeaf($token) )
         {
             my $data = {'path' => $config_tree->path($token)};
-            foreach my $p (@{$params})
+            for my $p (@{$params})
             {
                 my $val = $config_tree->getNodeParam($token, $p);
                 if( defined($val) )

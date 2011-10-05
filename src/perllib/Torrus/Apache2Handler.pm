@@ -26,6 +26,8 @@ use Apache2::Const -compile => qw(:common);
 
 use Torrus::CGI;
 
+our $VERSION = 1.0;
+
 sub handler : method
 {
     my($class, $r) = @_;

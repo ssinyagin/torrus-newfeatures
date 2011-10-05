@@ -32,6 +32,8 @@ use Torrus::TimeStamp;
 use XML::LibXML;
 use strict;
 
+our $VERSION = 1.0;
+
 sub new
 {
     my $proto = shift;
@@ -43,7 +45,7 @@ sub new
     my $self  = $class->SUPER::new( %options );
     if( not defined( $self ) )
     {
-        return undef;
+        return
     }
 
     bless $self, $class;
@@ -102,7 +104,7 @@ sub compile
     my $node;
 
     # First of all process all pre-required files
-    foreach $node ( $root->getElementsByTagName('include') )
+    for $node ( $root->getElementsByTagName('include') )
     {
         my $incfile = $node->getAttribute('filename');
         if( not $incfile )
@@ -116,35 +118,35 @@ sub compile
         }
     }
 
-    foreach $node ( $root->getElementsByTagName('param-properties') )
+    for $node ( $root->getElementsByTagName('param-properties') )
     {
         $ok = $self->compile_paramprops( $node ) ? $ok:0;
     }
 
     if( not $self->{'-NoDSRebuild'} )
     {
-        foreach $node ( $root->getElementsByTagName('definitions') )
+        for $node ( $root->getElementsByTagName('definitions') )
         {
             $ok = $self->compile_definitions( $node ) ? $ok:0;
         }
 
-        foreach $node ( $root->getElementsByTagName('datasources') )
+        for $node ( $root->getElementsByTagName('datasources') )
         {
             $ok = $self->compile_ds( $node ) ? $ok:0;
         }
     }
 
-    foreach $node ( $root->getElementsByTagName('monitors') )
+    for $node ( $root->getElementsByTagName('monitors') )
     {
         $ok = $self->compile_monitors( $node ) ? $ok:0;
     }
 
-    foreach $node ( $root->getElementsByTagName('token-sets') )
+    for $node ( $root->getElementsByTagName('token-sets') )
     {
         $ok = $self->compile_tokensets( $node ) ? $ok:0;
     }
 
-    foreach $node ( $root->getElementsByTagName('views') )
+    for $node ( $root->getElementsByTagName('views') )
     {
         $ok = $self->compile_views( $node ) ? $ok:0;
     }
@@ -159,7 +161,7 @@ sub compile_definitions
     my $node = shift;
     my $ok = 1;
 
-    foreach my $def ( $node->getChildrenByTagName('def') )
+    for my $def ( $node->getChildrenByTagName('def') )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -192,7 +194,7 @@ sub compile_paramprops
     my $node = shift;
     my $ok = 1;
 
-    foreach my $def ( $node->getChildrenByTagName('prop') )
+    for my $def ( $node->getChildrenByTagName('prop') )
     {
         &Torrus::DB::checkInterrupted();
           
@@ -226,7 +228,7 @@ sub compile_params
     &Torrus::DB::checkInterrupted();
           
     my $ok = 1;
-    foreach my $p_node ( $node->getChildrenByTagName('param') )
+    for my $p_node ( $node->getChildrenByTagName('param') )
     {
         my $param = $p_node->getAttribute('name');
         my $value = $p_node->getAttribute('value');
@@ -267,7 +269,7 @@ sub compile_ds
     # First, process templates. We expect them to be direct children of
     # <datasources>
 
-    foreach my $template ( $ds_node->getChildrenByTagName('template') )
+    for my $template ( $ds_node->getChildrenByTagName('template') )
     {
         my $name = $template->getAttribute('name');
         if( not $name )
@@ -313,7 +315,7 @@ sub compile_subtrees
 
     # Apply templates
 
-    foreach my $templateapp ( $node->getChildrenByTagName('apply-template') )
+    for my $templateapp ( $node->getChildrenByTagName('apply-template') )
     {
         my $name = $templateapp->getAttribute('name');
         if( not $name )
@@ -341,14 +343,14 @@ sub compile_subtrees
 
     # Handle aliases -- we are still in compile_subtrees()
 
-    foreach my $alias ( $node->getChildrenByTagName('alias') )
+    for my $alias ( $node->getChildrenByTagName('alias') )
     {
         my $apath = $alias->textContent();
         $apath =~ s/\s+//mgo;
         $ok = $self->setAlias($token, $apath) ? $ok:0;
     }
 
-    foreach my $setvar ( $node->getChildrenByTagName('setvar') )        
+    for my $setvar ( $node->getChildrenByTagName('setvar') )        
     {
         my $name = $setvar->getAttribute('name');
         my $value = $setvar->getAttribute('value');
@@ -365,7 +367,7 @@ sub compile_subtrees
 
     # Compile-time variables
     
-    foreach my $iftrue ( $node->getChildrenByTagName('iftrue') )        
+    for my $iftrue ( $node->getChildrenByTagName('iftrue') )        
     {
         my $var = $iftrue->getAttribute('var');
         if( not defined( $var ) )
@@ -379,7 +381,7 @@ sub compile_subtrees
         }
     }
 
-    foreach my $iffalse ( $node->getChildrenByTagName('iffalse') )        
+    for my $iffalse ( $node->getChildrenByTagName('iffalse') )        
     {
         my $var = $iffalse->getAttribute('var');
         if( not defined( $var ) )
@@ -399,7 +401,7 @@ sub compile_subtrees
 
     if( not $iamLeaf )
     {
-        foreach my $subtree ( $node->getChildrenByTagName('subtree') )
+        for my $subtree ( $node->getChildrenByTagName('subtree') )
         {
             my $name = $subtree->getAttribute('name');
             if( not defined( $name ) or length( $name ) == 0 )
@@ -422,7 +424,7 @@ sub compile_subtrees
             }
         }
 
-        foreach my $leaf ( $node->getChildrenByTagName('leaf') )
+        for my $leaf ( $node->getChildrenByTagName('leaf') )
         {
             my $name = $leaf->getAttribute('name');
             if( not defined( $name ) or length( $name ) == 0 )
@@ -455,7 +457,7 @@ sub compile_monitors
     my $mon_node = shift;
     my $ok = 1;
 
-    foreach my $monitor ( $mon_node->getChildrenByTagName('monitor') )
+    for my $monitor ( $mon_node->getChildrenByTagName('monitor') )
     {
         my $mname = $monitor->getAttribute('name');
         if( not $mname )
@@ -469,7 +471,7 @@ sub compile_monitors
         }
     }
 
-    foreach my $action ( $mon_node->getChildrenByTagName('action') )
+    for my $action ( $mon_node->getChildrenByTagName('action') )
     {
         my $aname = $action->getAttribute('name');
         if( not $aname )
@@ -494,7 +496,7 @@ sub compile_tokensets
 
     $ok = $self->compile_params($tsets_node, 'SS') ? $ok:0;
 
-    foreach my $tokenset ( $tsets_node->getChildrenByTagName('token-set') )
+    for my $tokenset ( $tsets_node->getChildrenByTagName('token-set') )
     {
         my $sname = $tokenset->getAttribute('name');
         if( not $sname )
@@ -519,7 +521,7 @@ sub compile_views
     my $parentname = shift;
     my $ok = 1;
 
-    foreach my $view ( $vw_node->getChildrenByTagName('view') )
+    for my $view ( $vw_node->getChildrenByTagName('view') )
     {
         my $vname = $view->getAttribute('name');
         if( not $vname )

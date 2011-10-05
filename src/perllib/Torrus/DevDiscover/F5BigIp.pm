@@ -24,6 +24,7 @@ package Torrus::DevDiscover::F5BigIp;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'F5BigIp'} = {
     'sequence'     => 500,
@@ -197,7 +198,7 @@ sub discover
         $ref->{'indices'} = [];
         $data->{'poolTable'} = $ref;
 
-        foreach my $INDEX ( $devdetails->
+        for my $INDEX ( $devdetails->
                             getSnmpIndices( $dd->oiddef('4.x_poolName') ) )
         {
             push( @{$ref->{'indices'}}, $INDEX );
@@ -230,7 +231,7 @@ sub discover
         my $ref = {};
         $data->{'poolMemberTable'} = $ref;
 
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->
               getSnmpIndices( $dd->oiddef('4.x_poolMemberPoolName') ) )
         {
@@ -272,7 +273,7 @@ sub discover
             my $ref = {};
             $data->{'virtualServer'} = $ref;
 
-            foreach my $INDEX
+            for my $INDEX
                 ( $devdetails->
                   getSnmpIndices( $dd->oiddef('4.x_virtualServerIp') ) )
             {
@@ -319,7 +320,7 @@ sub discover
         $ref->{'indices'} = [];
         $data->{'sslProxyTable'} = $ref;
 
-        foreach my $INDEX ( $devdetails->
+        for my $INDEX ( $devdetails->
             getSnmpIndices( $dd->oiddef('4.x_sslProxyOrigIpAddress') ) )
         {
             push( @{$ref->{'indices'}}, $INDEX );
@@ -418,7 +419,7 @@ sub buildConfig
 
         my $ref = $data->{'virtualServer'};
 
-        foreach my $INDEX ( @{ $ref->{'indices'} } )
+        for my $INDEX ( @{ $ref->{'indices'} } )
         {
             my $server = $ref->{$INDEX}->{'param'};
 
@@ -444,7 +445,7 @@ sub buildConfig
                              ['F5BigIp::BigIp_4.x_pool-actvconn-overview']);
         my $ref = $data->{'poolTable'};
 
-        foreach my $INDEX ( @{ $ref->{'indices'} } )
+        for my $INDEX ( @{ $ref->{'indices'} } )
         {
             my $pool = $ref->{$INDEX}->{'param'};
 
@@ -471,7 +472,7 @@ sub buildConfig
             $cb->addSubtree( $devNode, $poolMemberName, $poolMemberParam );
         my $ref = $data->{'poolMemberTable'};
 
-        foreach my $INDEX ( @{ $ref->{'indices'} } )
+        for my $INDEX ( @{ $ref->{'indices'} } )
         {
             my $poolMemberPoolTree;
             my $lastPoolTree;
@@ -520,7 +521,7 @@ sub buildConfig
 
         my $ref = $data->{'sslProxyTable'};
 
-        foreach my $INDEX ( @{ $ref->{'indices'} } )
+        for my $INDEX ( @{ $ref->{'indices'} } )
         {
             my $proxy = $ref->{$INDEX}->{'param'};
 

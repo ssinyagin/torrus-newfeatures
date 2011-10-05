@@ -96,7 +96,7 @@ foreach my $node ( @rawnodes )
 my %params;
 if( defined( $parameters ) )
 {
-    foreach my $pair ( split( '\s*,\s*', $parameters ) )
+    for my $pair ( split( '\s*,\s*', $parameters ) )
     {
         my ($name, $val) = split( '\s*:\s*', $pair );
         $params{$name} = $val;

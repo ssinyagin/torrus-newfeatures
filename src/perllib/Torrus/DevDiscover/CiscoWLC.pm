@@ -25,6 +25,7 @@ package Torrus::DevDiscover::CiscoWLC;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoWLC'} = {
     'sequence'     => 510,
@@ -93,7 +94,7 @@ sub discover
     {
         $filter_ssid = 1;
         
-        foreach my $ssid
+        for my $ssid
             (split(/\s*,\s*/, $devdetails->param('CiscoWLC::only-ssid')))
         {
             $only_ssid{$ssid} = 1;
@@ -134,7 +135,7 @@ sub buildConfig
             $cb->addSubtree( $devNode, 'Wireless_Clients', undef,
                              [ 'CiscoWLC::ciscowlc-clients-subtree'] );
         
-        foreach my $INDEX ( sort {$a <=> $b} keys %{$data->{'CiscoWLC'}} )
+        for my $INDEX ( sort {$a <=> $b} keys %{$data->{'CiscoWLC'}} )
         {
             my $ssid = $data->{'CiscoWLC'}{$INDEX}{'ssid'};
             my $name = $data->{'CiscoWLC'}{$INDEX}{'name'};

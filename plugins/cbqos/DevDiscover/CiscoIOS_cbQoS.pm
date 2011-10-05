@@ -193,12 +193,12 @@ sub discover
 
     $data->{'cbqos_policies'} = {};
 
-    foreach my $policyIndex
+    for my $policyIndex
         ( $devdetails->getSnmpIndices( $dd->oiddef('cbQosIfType') ) )
     {
         $data->{'cbqos_policies'}{$policyIndex} = {};
 
-        foreach my $row ('cbQosIfType', 'cbQosPolicyDirection', 'cbQosIfIndex',
+        for my $row ('cbQosIfType', 'cbQosPolicyDirection', 'cbQosIfIndex',
                          'cbQosFrDLCI', 'cbQosAtmVPI', 'cbQosAtmVCI',
                          'cbQosEntityIndex', 'cbQosVlanIndex')
         {
@@ -228,15 +228,15 @@ sub discover
 
     my $needTables = {};
 
-    foreach my $policyIndex ( keys %{$data->{'cbqos_policies'}} )
+    for my $policyIndex ( keys %{$data->{'cbqos_policies'}} )
     {
-        foreach my $objectIndex
+        for my $objectIndex
             ( $devdetails->getSnmpIndices( $dd->oiddef('cbQosConfigIndex') .
                                            '.' . $policyIndex ) )
         {
             my $object = { 'cbQosPolicyIndex' => $policyIndex };
             
-            foreach my $row ( 'cbQosConfigIndex',
+            for my $row ( 'cbQosConfigIndex',
                               'cbQosObjectsType',
                               'cbQosParentObjectsIndex' )
             {
@@ -289,7 +289,7 @@ sub discover
                 push( @{$data->{'cbqos_children'}{$parent}},
                       $policyIndex .'.'. $objectIndex );
 
-                foreach my $tableName
+                for my $tableName
                     ( @{$cfgTablesForType{$object->{'cbQosObjectsType'}}} )
                 {
                     $needTables->{$tableName} = 1;
@@ -300,7 +300,7 @@ sub discover
 
     # Retrieve the needed SNMP tables
 
-    foreach my $tableName ( keys %{$needTables} )
+    for my $tableName ( keys %{$needTables} )
     {
         my $table =
             $session->get_table( -baseoid => $dd->oiddef( $tableName ) );
@@ -414,7 +414,7 @@ sub discover
             Error('Unsupported object type: ' . $objType);
         }
 
-        foreach my $row ( @rows )
+        for my $row ( @rows )
         {
             my $value = $devdetails->snmpVar($dd->oiddef($row) .
                                              '.' . $objConfIndex);
@@ -436,9 +436,9 @@ sub discover
         # In addition, get per-DSCP RED configuration
         if( $objType eq 'randomDetect')
         {
-            foreach my $dscp ( @dscpValues )
+            for my $dscp ( @dscpValues )
             {
-                foreach my $row ( qw(cbQosREDCfgMinThreshold
+                for my $row ( qw(cbQosREDCfgMinThreshold
                                      cbQosREDCfgMaxThreshold
                                      cbQosREDCfgPktDropProb
                                      cbQosREDClassCfgThresholdUnit
@@ -505,7 +505,7 @@ sub buildChildrenConfigs
 
     my $precedence = 10000;
     
-    foreach my $policyObjectIndex
+    for my $policyObjectIndex
         ( sort { $a <=> $b } @{$data->{'cbqos_children'}{$parentObjIndex}} )
     {
         my $objectRef     = $data->{'cbqos_objects'}{$policyObjectIndex};
@@ -859,7 +859,7 @@ sub buildChildrenConfigs
             if( $objType eq 'randomDetect')
             {
                 my $ref = $data->{'cbqos_redcfg'}{$objConfIndex};
-                foreach my $dscp
+                for my $dscp
                     (sort {translateDscpValue($a) <=> translateDscpValue($b)}
                      keys %{$ref})
                 {

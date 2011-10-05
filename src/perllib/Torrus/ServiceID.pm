@@ -26,6 +26,7 @@ use Torrus::Log;
 
 use strict;
 
+our $VERSION = 1.0;
 
 sub new
 {
@@ -82,12 +83,12 @@ sub add
     
     my $trees = $parameters->{'trees'};
 
-    foreach my $tree ( split(/\s*,\s*/o, $trees) )
+    for my $tree ( split(/\s*,\s*/o, $trees) )
     {
         $self->{'db_params'}->addToList( 't:'.$tree, $serviceid );
     }
 
-    foreach my $param ( keys %{$parameters} )
+    for my $param ( keys %{$parameters} )
     {
         my $val = $parameters->{$param};
         
@@ -107,7 +108,7 @@ sub getParams
 
     my $ret = {};
     my $plist = $self->{'db_params'}->get( 'P:'.$serviceid );
-    foreach my $param ( split(',', $plist ) )
+    for my $param ( split(',', $plist ) )
     {
         $ret->{$param} =
             $self->{'db_params'}->get( 'p:'.$serviceid.':'.$param );
@@ -140,7 +141,7 @@ sub cleanAllForTree
     my $idlist = $self->{'db_params'}->get('t:'.$tree);
     if( defined( $idlist ) )
     {
-        foreach my $serviceid ( split( ',', $idlist ) )
+        for my $serviceid ( split( ',', $idlist ) )
         {
             # A ServiceID may belong to several trees.
             # delete it from all other trees.
@@ -148,7 +149,7 @@ sub cleanAllForTree
             my $srvTrees =
                 $self->{'db_params'}->get( 'p:'.$serviceid.':trees' );
             
-            foreach my $srvTree ( split(/\s*,\s*/o, $srvTrees) )
+            for my $srvTree ( split(/\s*,\s*/o, $srvTrees) )
             {
                 if( $srvTree ne $tree )
                 {
@@ -161,7 +162,7 @@ sub cleanAllForTree
             
             my $plist = $self->{'db_params'}->get( 'P:'.$serviceid );
 
-            foreach my $param ( split(',', $plist ) )
+            for my $param ( split(',', $plist ) )
             {
                 $self->{'db_params'}->del( 'p:'.$serviceid.':'.$param );
             }

@@ -29,6 +29,8 @@ use Torrus::SiteConfig;
 
 use base 'Torrus::ReportOutput';
 
+our $VERSION = 1.0;
+
 our @monthNames = qw
     (January February March April May June
      July August September October November December);

@@ -36,6 +36,8 @@ use strict;
 use Torrus::SchedulerInfo;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 sub new
 {
     my $self = {};
@@ -113,9 +115,9 @@ sub flushTasks
 
     if( defined( $self->{'tasks'} ) )
     {
-        foreach my $when ( keys %{$self->{'tasks'}} )
+        for my $when ( keys %{$self->{'tasks'}} )
         {
-            foreach my $task ( @{$self->{'tasks'}{$when}} )
+            for my $task ( @{$self->{'tasks'}{$when}} )
             {
                 $self->{'stats'}->clearStats( $task->id() );
             }
@@ -147,12 +149,12 @@ sub run
         }
         $self->setProcessStatus('');
         my $nextRun = time() + 3600;
-        foreach my $when ( keys %{$self->{'tasks'}} )
+        for my $when ( keys %{$self->{'tasks'}} )
         {
             # We have 1-second rounding error
             if( $when <= time() + 1 )
             {
-                foreach my $task ( @{$self->{'tasks'}{$when}} )
+                for my $task ( @{$self->{'tasks'}{$when}} )
                 {
                     &Torrus::DB::checkInterrupted();
                     
@@ -390,7 +392,7 @@ sub whenNext
     }
     else
     {
-        return undef;
+        return
     }
 }
 
@@ -434,7 +436,7 @@ sub afterRun
         $self->{'missedPeriods'} = 0;
     }
 
-    foreach my $pair( @{$self->{'statValues'}} )
+    for my $pair( @{$self->{'statValues'}} )
     {
         $stats->setStatsValues( $self->id(), @{$pair} );
     }

@@ -34,6 +34,7 @@ use Torrus::ServiceID;
 use strict;
 use Digest::MD5 qw(md5); # needed as hash function
 
+our $VERSION = 1.0;
 
 our %multigraph_remove_space =
     ('ds-expr-' => 1,
@@ -56,7 +57,7 @@ sub new
     my $self  = $class->SUPER::new( %options );
     if( not defined( $self ) )
     {
-        return undef;
+        return
     }
     
     bless $self, $class;
@@ -69,7 +70,7 @@ sub new
         Torrus::SiteConfig::collectorInstances( $self->treeName() );
 
     $self->{'db_collectortokens'} = [];
-    foreach my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
+    for my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
     {
         $self->{'db_collectortokens'}->[$instance] =
             new Torrus::DB( 'collector_tokens' . '_' .
@@ -167,7 +168,7 @@ sub addChild
     {
         Error('Cannot add a child to a non-subtree node: ' .
               $self->path($token));
-        return undef;
+        return
     }
 
     my $path = $self->path($token) . $childname;
@@ -238,7 +239,7 @@ sub setAlias
         my $nodepath = '';
         my $parent_token = $self->token('/');
 
-        foreach my $nodename ( @pathelements )
+        for my $nodename ( @pathelements )
         {
             $nodepath .= $nodename;
             my $child_token = $self->token( $nodepath );
@@ -389,7 +390,7 @@ sub postProcess
 
     # Propagate view inherited parameters
     $self->{'viewParamsProcessed'} = {};
-    foreach my $vname ( $self->getViewNames() )
+    for my $vname ( $self->getViewNames() )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -441,7 +442,7 @@ sub postProcessNodes
         my $tsets = $self->getNodeParam( $token, 'tokenset-member' );
         if( defined( $tsets ) )
         {
-            foreach my $tset ( split(/,/o, $tsets) )
+            for my $tset ( split(/,/o, $tsets) )
             {
                 my $tsetName = 'S'.$tset;
                 if( not $self->tsetExists( $tsetName ) )
@@ -467,9 +468,9 @@ sub postProcessNodes
                 my @dsNames =
                     split(/,/o, $self->getNodeParam($token, 'ds-names') );
                 
-                foreach my $dname ( @dsNames )
+                for my $dname ( @dsNames )
                 {
-                    foreach my $param ( 'ds-expr-', 'graph-legend-' )
+                    for my $param ( 'ds-expr-', 'graph-legend-' )
                     {
                         my $dsParam = $param . $dname;
                         my $value = $self->getNodeParam( $token, $dsParam );
@@ -533,7 +534,7 @@ sub postProcessNodes
                     # Process dispersed collector offsets
                     
                     my %p;
-                    foreach my $param ( 'collector-timeoffset-min',
+                    for my $param ( 'collector-timeoffset-min',
                                         'collector-timeoffset-max',
                                         'collector-timeoffset-step',
                                         'collector-timeoffset-hashstring' )
@@ -598,7 +599,7 @@ sub postProcessNodes
 
                 my $storagetypes =
                     $self->getNodeParam( $token, 'storage-type' );
-                foreach my $stype ( split(/,/o, $storagetypes) )
+                for my $stype ( split(/,/o, $storagetypes) )
                 {
                     if( $stype eq 'ext' )
                     {
@@ -620,7 +621,7 @@ sub postProcessNodes
                         my $serviceid =
                             $self->getNodeParam($token, 'ext-service-id');
 
-                        foreach my $srvTree (split(/\s*,\s*/o, $srvTrees))
+                        for my $srvTree (split(/\s*,\s*/o, $srvTrees))
                         {
                             if( not Torrus::SiteConfig::treeExists($srvTree) )
                             {
@@ -682,7 +683,7 @@ sub postProcessNodes
     }
     else
     {
-        foreach my $ctoken ( $self->getChildren( $token ) )
+        for my $ctoken ( $self->getChildren( $token ) )
         {
             if( not $self->isAlias( $ctoken ) )
             {
@@ -712,7 +713,7 @@ sub propagateViewParams
         $self->propagateViewParams( $parent );
 
         my $parentParams = $self->getParams( $parent );
-        foreach my $param ( keys %{$parentParams} )
+        for my $param ( keys %{$parentParams} )
         {
             if( not defined( $self->getParam( $vname, $param ) ) )
             {

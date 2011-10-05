@@ -26,6 +26,8 @@ use strict;
 use Math::BigInt;
 use Math::BigFloat;
 
+our $VERSION = 1.0;
+
 # Pluggable backend module implements all storage-specific tasks
 BEGIN
 {
@@ -207,7 +209,7 @@ sub processCounter
     {
         # the agent rebooted, so we flush the counter
         delete $sref->{'prevCounter'}{$token};
-        return undef;
+        return
     }
         
     $value = Math::BigInt->new( $value );

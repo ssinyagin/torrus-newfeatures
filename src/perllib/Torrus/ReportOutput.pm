@@ -29,6 +29,7 @@ use Torrus::Log;
 use Torrus::SQL::Reports;
 use Torrus::ServiceID;
 
+our $VERSION = 1.0;
 
 sub new
 {
@@ -45,7 +46,7 @@ sub new
     if( not defined( $sqlRep ) )
     {
         Error('Cannot connect to the database');
-        return undef;
+        return
     }
     $self->{'backend'} = $sqlRep;
 
@@ -58,7 +59,7 @@ sub new
         if( not mkdir( $outdir ) )
         {
             Error('Cannot create directory ' . $outdir . ': ' . $!);
-            return undef;
+            return
         }
     }
 

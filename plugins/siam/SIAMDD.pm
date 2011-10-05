@@ -159,7 +159,7 @@ sub discover
     my %ifRef;
     my %ifRefDuplicates;
 
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if $interface->{'excluded'};
@@ -177,7 +177,7 @@ sub discover
         $ifRef{'default'}{$refkey} = $interface;
 
         # then, try everything else
-        foreach my $prop (@Torrus::SIAMDD::match_port_properties)
+        for my $prop (@Torrus::SIAMDD::match_port_properties)
         {
             if( $prop ne $data->{'nameref'}{'ifReferenceName'} )
             {
@@ -201,7 +201,7 @@ sub discover
 
     # Find the matches of service units against device interfaces
     my $svcunits = $devobj->get_all_service_units();
-    foreach my $unit ( @{$svcunits} )
+    for my $unit ( @{$svcunits} )
     {
         my $unit_type = $unit->attr('siam.svcunit.type');
 
@@ -210,7 +210,7 @@ sub discover
             Debug('Processing ServiceUnit: ' . $unit->id);
             my $interface;
         
-            foreach my $attr (@Torrus::SIAMDD::match_port_name_attributes)
+            for my $attr (@Torrus::SIAMDD::match_port_name_attributes)
             {
                 last if defined($interface);
                 
@@ -224,7 +224,7 @@ sub discover
                     }
                     else
                     {
-                        foreach my $prop
+                        for my $prop
                             (@Torrus::SIAMDD::match_port_properties)
                         {
                             if( (not $ifRefDuplicates{$prop}{$val})
@@ -312,7 +312,7 @@ sub discover
     if( $devdetails->param('SIAM::exclude-unmatched-admindown-interfaces')
         eq 'yes' )
     {
-        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+        for my $ifIndex ( keys %{$data->{'interfaces'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             next if $interface->{'excluded'};

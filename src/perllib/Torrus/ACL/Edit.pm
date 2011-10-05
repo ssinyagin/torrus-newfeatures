@@ -25,6 +25,8 @@ use Torrus::Log;
 
 use strict;
 
+our $VERSION = 1.0;
+
 @Torrus::ACL::Edit::ISA = qw(Torrus::ACL);
 
 sub new
@@ -45,7 +47,7 @@ sub addGroups
     my @groups = shift;
 
     my $ok = 1;
-    foreach my $group ( @groups )
+    for my $group ( @groups )
     {
         if( length( $group ) == 0 or $group =~ /\W/ )
         {
@@ -73,12 +75,12 @@ sub deleteGroups
     my @groups = shift;
 
     my $ok = 1;
-    foreach my $group ( @groups )
+    for my $group ( @groups )
     {
         if( $self->groupExists( $group ) )
         {
             my $members = $self->listGroupMembers( $group );
-            foreach my $uid ( @{$members} )
+            for my $uid ( @{$members} )
             {
                 $self->{'db_users'}->delFromList( 'gm:' . $uid, $group );
             }
@@ -159,7 +161,7 @@ sub addUserToGroups
     my $ok = 1;
     if( $self->userExists( $uid ) )
     {
-        foreach my $group ( @groups )
+        for my $group ( @groups )
         {
             if( $self->groupExists( $group ) )
             {
@@ -203,7 +205,7 @@ sub delUserFromGroups
     my $ok = 1;
     if( $self->userExists( $uid ) )
     {
-        foreach my $group ( @groups )
+        for my $group ( @groups )
         {
             if( $self->groupExists( $group ) )
             {
@@ -329,7 +331,7 @@ sub delUserAttribute
     my $uid = shift;
     my @attrs = @_;
 
-    foreach my $attr ( @attrs )
+    for my $attr ( @attrs )
     {
         $self->{'db_users'}->del( 'ua:' . $uid . ':' . $attr );
         $self->{'db_users'}->delFromList( 'uA:' . $uid, $attr );
@@ -347,7 +349,7 @@ sub setUserAttributes
 
     my $ok = 1;
     
-    foreach my $attr ( keys %{$attrValues} )
+    for my $attr ( keys %{$attrValues} )
     {
         $ok = $self->setUserAttribute( $uid, $attr, $attrValues->{$attr} )
             ? $ok:0;

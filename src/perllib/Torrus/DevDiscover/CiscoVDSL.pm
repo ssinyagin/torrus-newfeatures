@@ -25,6 +25,7 @@ package Torrus::DevDiscover::CiscoVDSL;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoVDSL'} = {
     'sequence'     => 600,
@@ -74,7 +75,7 @@ sub discover
 
     $data->{'cvdsl'} = [];
 
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $oid = $dd->oiddef('cvdslCurrSnrMgn') . '.' . $ifIndex;
         if( $devdetails->hasOID( $oid . '.1' ) and
@@ -101,7 +102,7 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    foreach my $ifIndex ( sort {$a<=>$b} @{$data->{'cvdsl'}} )
+    for my $ifIndex ( sort {$a<=>$b} @{$data->{'cvdsl'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 

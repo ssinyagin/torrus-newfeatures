@@ -26,6 +26,8 @@ use Torrus::RPN;
 use strict;
 use RRDs;
 
+our $VERSION = 1.0;
+
 # The Torrus::DataAccess object contains cached values, and it does not
 # check the cache validity. We assume that a Torrus::DataAccess object
 # lifetime is within a short period of time, such as one monitor cycle.
@@ -72,7 +74,7 @@ sub read
     {
         my $path = $config_tree->path( $token );
         Error("Torrus::DataAccess::readLast: $path is not a leaf");
-        return undef;
+        return
     }
 
     my $ret_val;
@@ -144,7 +146,7 @@ sub read_RRD_DS
     if( $ERR )
     {
         Error("Error during RRD info for $filename: $ERR");
-        return undef;
+        return
 
     }
     my $step = $rrdinfo->{'step'};
@@ -176,7 +178,7 @@ sub read_RRD_DS
     if( $ERR )
     {
         Error("Error during RRD fetch for $filename: $ERR");
-        return undef;
+        return
 
     }
 
@@ -189,7 +191,7 @@ sub read_RRD_DS
     
     # Get the last available data and store in cache
     
-    foreach my $f_line ( @{$f_data} )
+    for my $f_line ( @{$f_data} )
     {
         for( my $i = 0; $i < @{$f_names}; $i++ )
         {
@@ -205,7 +207,7 @@ sub read_RRD_DS
     if( not exists( $self->{'cache_RRD'}{$cachekey}{$ds} ) )
     {
         Error("DS name $ds is not found in $filename");
-        return undef;
+        return
     }
     else
     {
@@ -213,7 +215,7 @@ sub read_RRD_DS
         {
             Warn("Value undefined for ",
                  "DS=$ds, CF=$cf, start=$t_start, end=$t_end in $filename");
-            return undef;
+            return
         }
         else
         {
@@ -266,7 +268,7 @@ sub read_RPN
         {
             my $path = $config_tree->path($token);
             Error("Cannot find relative reference $noderef at $path");
-            return undef;
+            return
         }
 
         my ($rval, $var_tstamp) = $self->read($config_tree,
@@ -296,7 +298,7 @@ sub read_RPN
             elsif( not $cfNames{$function} )
             {
                 Error("Function not supported in RPN: $function");
-                return undef;
+                return
             }
         }
         return $rval;

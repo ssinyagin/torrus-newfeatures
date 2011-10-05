@@ -60,7 +60,7 @@ foreach my $tree ( @tree_names )
     else
     {
         my $stats = {};
-        foreach my $name ( 'leaves', 'collectorLeaves', 'monitorLeaves',
+        for my $name ( 'leaves', 'collectorLeaves', 'monitorLeaves',
                            'holtwintersLeaves', 'subtrees',
                            'maxSubtreePath', 'maxSubtreeSize', 'views',
                            'monitors', 'actions', 'compiled' )
@@ -111,7 +111,7 @@ sub collectStats
         $stats->{'maxSubtreePath'} = $config_tree->path( $token );
     }
 
-    foreach my $ctoken ( @children )
+    for my $ctoken ( @children )
     {
         if( $config_tree->isSubtree( $ctoken ) )
         {

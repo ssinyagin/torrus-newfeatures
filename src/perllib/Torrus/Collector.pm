@@ -27,9 +27,11 @@ use Torrus::Log;
 use Torrus::RPN;
 use Torrus::Scheduler;
 
+our $VERSION = 1.0;
+
 BEGIN
 {
-    foreach my $mod ( @Torrus::Collector::loadModules )
+    for my $mod ( @Torrus::Collector::loadModules )
     {
         eval( 'require ' . $mod );
         die( $@ ) if $@;
@@ -39,7 +41,7 @@ BEGIN
 # Executed once after the fork. Here modules can launch processing threads
 sub initThreads
 {
-    foreach my $key ( %Torrus::Collector::initThreadsHandlers )
+    for my $key ( %Torrus::Collector::initThreadsHandlers )
     {
         if( ref( $Torrus::Collector::initThreadsHandlers{$key} ) )
         {
@@ -76,7 +78,7 @@ sub new
 
     $self->{'types_sorted'} = [];
     
-    foreach my $collector_type
+    for my $collector_type
         ( sort {$collectorTypes{$a} <=> $collectorTypes{$b}}
           keys %collectorTypes )
     {
@@ -85,7 +87,7 @@ sub new
         push(@{$self->{'types_sorted'}}, $collector_type);
     }
 
-    foreach my $storage_type ( keys %Torrus::Collector::storageTypes )
+    for my $storage_type ( keys %Torrus::Collector::storageTypes )
     {
         $self->{'storage'}{$storage_type} = {};
         $self->{'storage_in_use'}{$storage_type} = 0;
@@ -125,7 +127,7 @@ sub addTarget
     $self->{'types_in_use'}{$collector_type} = 1;
     
     my $storage_types = $config_tree->getNodeParam($token, 'storage-type');
-    foreach my $storage_type ( split( ',', $storage_types ) )
+    for my $storage_type ( split( ',', $storage_types ) )
     {
         if( not $Torrus::Collector::storageTypes{$storage_type} )
         {
@@ -165,7 +167,7 @@ sub addTarget
     if( defined $valueMap and length($valueMap) > 0 )
     {
         my $map = {};
-        foreach my $item ( split( ',', $valueMap ) )
+        for my $item ( split( ',', $valueMap ) )
         {
             my ($key, $value) = split( ':', $item );
             $map->{$key} = $value;
@@ -187,7 +189,7 @@ sub addTarget
 
     if( $ok )
     {
-        foreach my $storage_type
+        for my $storage_type
             ( @{$self->{'targets'}{$token}{'storage-types'}} )
         {
             my $storage_string = $storage_type . '-storage';
@@ -228,9 +230,9 @@ sub fetchParams
         &Torrus::DB::checkInterrupted();
         
         my @next_maps = ();
-        foreach my $map ( @maps )
+        for my $map ( @maps )
         {
-            foreach my $param ( keys %{$map} )
+            for my $param ( keys %{$map} )
             {
                 my $value = $config_tree->getNodeParam( $token, $param );
 
@@ -284,7 +286,7 @@ sub fetchMoreParams
 
     my $ref = \$self->{'targets'}{$token}{'params'};
 
-    foreach my $param ( @params )
+    for my $param ( @params )
     {
         my $value = $config_tree->getNodeParam( $token, $param );
         if( defined $value )
@@ -329,7 +331,7 @@ sub listCollectorTargets
     my $collector_type = shift;
 
     my @ret;
-    foreach my $token ( keys %{$self->{'targets'}} )
+    for my $token ( keys %{$self->{'targets'}} )
     {
         if( $self->{'targets'}{$token}{'type'} eq $collector_type )
         {
@@ -365,7 +367,7 @@ sub deleteTarget
     
     if( ref( $self->{'targets'}{$token}{'deleteProc'} ) )
     {
-        foreach my $proc ( @{$self->{'targets'}{$token}{'deleteProc'}} )
+        for my $proc ( @{$self->{'targets'}{$token}{'deleteProc'}} )
         {
             &{$proc}( $self, $token );
         }
@@ -411,7 +413,7 @@ sub run
 
     undef $self->{'values'};
     
-    foreach my $collector_type ( @{$self->{'types_sorted'}} )
+    for my $collector_type ( @{$self->{'types_sorted'}} )
     {
         next unless $self->{'types_in_use'}{$collector_type};
 
@@ -554,7 +556,7 @@ sub setValue
               $self->path($token) . ' TS=' . $timestamp);
     }
 
-    foreach my $storage_type
+    for my $storage_type
         ( @{$self->{'targets'}{$token}{'storage-types'}} )
     {
         &{$Torrus::Collector::setValue{$storage_type}}( $self, $token,
@@ -575,7 +577,7 @@ sub configTree
     else
     {
         Error('Cannot provide ConfigTree object');
-        return undef;
+        return
     }
 }
 
@@ -601,7 +603,7 @@ sub beforeRun
     my $config_tree = new Torrus::ConfigTree(-TreeName => $tree, -Wait => 1);
     if( not defined( $config_tree ) )
     {
-        return undef;
+        return
     }
 
     my $data = $self->data();
@@ -665,9 +667,9 @@ sub beforeRun
         
         $self->flushTasks();
 
-        foreach my $period ( keys %{$targets} )
+        for my $period ( keys %{$targets} )
         {
-            foreach my $offset ( keys %{$targets->{$period}} )
+            for my $offset ( keys %{$targets->{$period}} )
             {
                 my $collector =
                     new Torrus::Collector( -Period => $period,
@@ -675,7 +677,7 @@ sub beforeRun
                                            -TreeName => $tree,
                                            -Instance => $instance );
 
-                foreach my $token ( @{$targets->{$period}{$offset}} )
+                for my $token ( @{$targets->{$period}{$offset}} )
                 {
                     &Torrus::DB::checkInterrupted();
                     $collector->addTarget( $config_tree, $token );
@@ -699,7 +701,7 @@ sub beforeRun
         $data->{'targets_initialized'} = 1;        
         Info('Tasks for collector instance ' . $instance . ' initialized');
 
-        foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
+        for my $collector_type ( keys %Torrus::Collector::collectorTypes )
         {
             if( ref($Torrus::Collector::initCollectorGlobals{
                 $collector_type}) )

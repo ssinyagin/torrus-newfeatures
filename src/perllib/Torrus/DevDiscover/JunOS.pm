@@ -39,6 +39,7 @@ package Torrus::DevDiscover::JunOS;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'JunOS'} = {
     'sequence'     => 500,
@@ -206,7 +207,7 @@ sub discover
             $devdetails->setCap('jnxCoS');
 
             # Find the index of the CoS queue name    
-            foreach my $cosFcIndex ( $devdetails->getSnmpIndices
+            for my $cosFcIndex ( $devdetails->getSnmpIndices
                                      ($dd->oiddef('jnxCosFcIdToFcName')) )
             {
                 my $cosFcNameOid = $dd->oiddef('jnxCosFcIdToFcName') . "." .
@@ -228,7 +229,7 @@ sub discover
 
 	    if( $cosIfIndex )            
             {
-		foreach my $INDEX ( $devdetails->getSnmpIndices
+		for my $INDEX ( $devdetails->getSnmpIndices
                                 ($dd->oiddef('jnxCosQstatQedPkts')) )
             	{
                 	my( $ifIndex, $cosQueueIndex ) = split( '\.', $INDEX );
@@ -275,7 +276,7 @@ sub discover
 
             # PROG: Build tables for all the oids
             #       We are using the Descr oid base for matching. (cheap hack)
-            foreach my $opIndex ( $devdetails->getSnmpIndices
+            for my $opIndex ( $devdetails->getSnmpIndices
                                   ($dd->oiddef('jnxOperatingDescr')) )
             {
                 my $opCPU  = $devdetails->snmpVar
@@ -332,7 +333,7 @@ sub discover
 
             # PROG: Build tables for all the oids
             #       We are using the FW Filter name as the Indexing
-            foreach my $fwIndex ( $devdetails->getSnmpIndices
+            for my $fwIndex ( $devdetails->getSnmpIndices
                                   ($dd->oiddef('jnxFWCounterDisplayName')) )
             {
                 my $fwFilter = $devdetails->snmpVar
@@ -372,7 +373,7 @@ sub discover
             $devdetails->setCap('jnxRPF');
 
             # PROG: Find all the relevent interfaces
-            foreach my $rpfIndex ( $devdetails->getSnmpIndices
+            for my $rpfIndex ( $devdetails->getSnmpIndices
                                    ($dd->oiddef('jnxRpfStatsPackets')) )
             {
                 my ($ifIndex,$addrFamily) = split('\.',$rpfIndex);
@@ -420,7 +421,7 @@ sub buildConfig
 	my $nodeTop = $cb->addSubtree( $devNode, 'CoS', undef,
                                   [ 'JunOS::junos-cos-subtree']);
 
-        foreach my $ifIndex ( sort {$a <=> $b} keys
+        for my $ifIndex ( sort {$a <=> $b} keys
                               %{$data->{'jnxCos'}{'ifIndex'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
@@ -440,7 +441,7 @@ sub buildConfig
                                  [ 'JunOS::junos-cos-subtree-interface' ]);
 
             # Loop to create subtree's for each QueueName/ID pair
-            foreach my $cosIndex ( sort keys %{$data->{'jnxCos'}{'queue'}} )
+            for my $cosIndex ( sort keys %{$data->{'jnxCos'}{'queue'}} )
             {
                 my $cosName  = $data->{'jnxCos'}{'queue'}{$cosIndex};
                 
@@ -472,8 +473,8 @@ sub buildConfig
                           [ 'JunOS::junos-cos-red' ]);
                 }
                 
-            } # end foreach (INDEX of queue's [Q-ID])
-        } # end foreach (INDEX of port)
+            } # end for (INDEX of queue's [Q-ID])
+        } # end for (INDEX of port)
     } # end if HasCap->{CoS}
 
 
@@ -485,7 +486,7 @@ sub buildConfig
                                       [ 'JunOS::junos-firewall-subtree' ]);
 
         # Loop through and find all the filter names
-        foreach my $fwFilter
+        for my $fwFilter
             ( sort {$a <=> $b} keys %{$data->{'jnxFirewall'}} )
         {
             my $firewall  = $data->{'jnxFirewall'}{$fwFilter};
@@ -497,7 +498,7 @@ sub buildConfig
                                  [ 'JunOS::junos-firewall-filter-subtree' ]);
             
             # Loop through and find all the counter names within the filter
-            foreach my $fwCounter ( sort {$a <=> $b} keys %{$firewall} )
+            for my $fwCounter ( sort {$a <=> $b} keys %{$firewall} )
             {
                 my $fwOid     = $firewall->{$fwCounter}{'oid'};
                 my $fwType    = $firewall->{$fwCounter}{'type'};
@@ -526,8 +527,8 @@ sub buildConfig
                                       'fw-counter' => $fwCounter,
                                       'fw-filter'  => $fwFilter,
                                       'fw-index'   => $fwOid }, \@templates );
-            } # END foreach $fwCounter
-        } # END foreach $fwFilter
+            } # END for $fwCounter
+        } # END for $fwFilter
     } # END: if hasCap jnxFirewall
 
 
@@ -552,7 +553,7 @@ sub buildConfig
                              [ 'JunOS::junos-temperature-subtree' ]);
 
         
-        foreach my $opIndex
+        for my $opIndex
             ( sort {$a <=> $b} keys %{$data->{'jnxOperating'}} )
         {
             my $operating = $data->{'jnxOperating'}{$opIndex};
@@ -600,7 +601,7 @@ sub buildConfig
                                   [ 'JunOS::junos-temperature-sensor' ]);
                 }
             }
-        } # END foreach $opIndex
+        } # END for $opIndex
     } # END if jnxOperating
 
 
@@ -612,7 +613,7 @@ sub buildConfig
                                        [ 'JunOS::junos-rpf-subtree' ]);
 
         # Loop through and find all interfaces with RPF enabled
-        foreach my $ifIndex ( sort {$a <=> $b} keys %{$data->{'jnxRPF'}} )
+        for my $ifIndex ( sort {$a <=> $b} keys %{$data->{'jnxRPF'}} )
         {
             # Set some names
             my $ifAlias = $data->{'interfaces'}{$ifIndex}{'ifAlias'};

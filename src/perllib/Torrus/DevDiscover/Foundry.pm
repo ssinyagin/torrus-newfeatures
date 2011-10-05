@@ -25,6 +25,7 @@ package Torrus::DevDiscover::Foundry;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'Foundry'} = {
     'sequence'     => 500,
@@ -447,7 +448,7 @@ sub buildConfig
                                      'Foundry::fdry-board-overview' );
         
             
-        foreach my $brdIndex ( sort {$a <=> $b} keys %{$data->{'fdryBoard'}} )
+        for my $brdIndex ( sort {$a <=> $b} keys %{$data->{'fdryBoard'}} )
         {
             my $descr = $data->{'fdryBoard'}{$brdIndex}{'description'};
             my $param = {
@@ -512,7 +513,7 @@ sub buildConfig
 
                 my @sensors;
                 
-                foreach my $sensor
+                for my $sensor
                     ( sort {$a <=> $b}
                       keys %{$data->{'fdryBoard'}{$brdIndex}{'temperature'}} )
                 {

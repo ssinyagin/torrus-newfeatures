@@ -120,7 +120,7 @@ sub walkSubtree
 
     my $tree = $config_tree->treeName();
     
-    foreach my $token ( $config_tree->getChildren( $ptoken ) )
+    for my $token ( $config_tree->getChildren( $ptoken ) )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -164,7 +164,7 @@ sub splitAndStore
         my @words = split( /[^a-zA-Z0-9-_]+/mso, $value );
         if( scalar( @words ) > 0 )
         {
-            foreach my $word ( @words )
+            for my $word ( @words )
             {
                 if( length( $word ) > 1 )
                 {
@@ -174,7 +174,7 @@ sub splitAndStore
                     my @subwords = split( /[-_]+/o, $word );
                     if( scalar( @subwords ) > 1 )
                     {
-                        foreach my $subword ( @subwords )
+                        for my $subword ( @subwords )
                         {
                             if( length( $subword ) > 1 )
                             {

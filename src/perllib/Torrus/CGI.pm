@@ -35,6 +35,8 @@ use Torrus::Renderer;
 use Torrus::SiteConfig;
 use Torrus::ACL;
 
+our $VERSION = 1.0;
+
 ## Torrus::CGI->process($q)
 ## Expects a CGI object as input
 ## In case of an error, the DB environment would
@@ -113,7 +115,7 @@ sub do_process
     }
 
     my %options = ();
-    foreach my $name ( @paramNames )
+    for my $name ( @paramNames )
     {
         if( $name =~ /^[A-Z]/ and $name ne 'SESSION_ID' )
         {
@@ -240,7 +242,7 @@ sub do_process
                 if( $needsLogin )
                 {
                     $options{'urlPassTree'} = $tree;
-                    foreach my $param ( 'token', 'path', 'nodeid',
+                    for my $param ( 'token', 'path', 'nodeid',
                                         'view', 'v' )
                     {
                         my $val = $q->param( $param );

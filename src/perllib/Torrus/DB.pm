@@ -23,6 +23,7 @@ use Torrus::Log;
 use BerkeleyDB;
 use strict;
 
+our $VERSION = 1.0;
 
 # This is an abstraction layer for BerkeleyDB database operations
 #
@@ -60,12 +61,12 @@ sub new
         {
             Error('$Torrus::Global::dbHome must be defined ' .
                   'in torrus_config.pl');
-            return undef;
+            return
         }
         elsif( not -d $Torrus::Global::dbHome )
         {
             Error("No such directory: $Torrus::Global::dbHome" );
-            return undef;
+            return
         }
         else
         {
@@ -84,7 +85,7 @@ sub new
             {
                 Error("Cannot create BerkeleyDB Environment: ".
                       $BerkeleyDB::Error);
-                return undef;
+                return
             }
         }
     }
@@ -97,13 +98,13 @@ sub new
         if( not -d $dirname and not mkdir( $dirname ) )
         {
             Error("Cannot create directory $dirname: $!");
-            return undef;
+            return
         }
         $dirname .= '/' . $options{'-Subdir'};
         if( not -d $dirname and not mkdir( $dirname ) )
         {
             Error("Cannot create directory $dirname: $!");
-            return undef;
+            return
         }
         $filename =
             $Torrus::DB::dbSub . '/' . $options{'-Subdir'} . '/' . $filename;
@@ -143,7 +144,7 @@ sub new
         if( not $dbh )
         {
             Error("Cannot open database $filename: $! $BerkeleyDB::Error");
-            return undef;
+            return
         }
 
         $Torrus::DB::dbPool{$filename} = { 'dbh'        => $dbh,
@@ -163,7 +164,7 @@ sub new
         {
             Error('Database in dbPool has different flags: ' .
                   $self->{'dbname'});
-            return undef;
+            return
         }
     }
 
@@ -299,7 +300,7 @@ sub cleanupEnvironment
 {
     if( defined( $Torrus::DB::env ) )
     {
-        foreach my $filename ( sort keys %Torrus::DB::dbPool )
+        for my $filename ( sort keys %Torrus::DB::dbPool )
         {
             Debug('Closing ' . $filename);
             $Torrus::DB::dbPool{$filename}->{'dbh'}->db_close();
@@ -416,7 +417,7 @@ sub c_get
     }
     else
     {
-        return undef;
+        return
     }
 }
 
@@ -600,7 +601,7 @@ sub _populateListCache
         my $values = $self->get($key);
         if( defined( $values ) )
         {
-            foreach my $val (split(/,/o, $values))
+            for my $val (split(/,/o, $values))
             {
                 $ref->{$val} = 1;
             }

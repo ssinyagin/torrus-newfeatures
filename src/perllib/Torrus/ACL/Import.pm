@@ -27,6 +27,8 @@ use Torrus::Log;
 use XML::LibXML;
 use strict;
 
+our $VERSION = 1.0;
+
 my %formatsSupported = ('1.0' => 1,
                         '1.1' => 1);
 
@@ -61,7 +63,7 @@ sub importACL
         return 0;
     }
 
-    foreach my $groupnode ( ($root->getElementsByTagName('groups'))[0]->
+    for my $groupnode ( ($root->getElementsByTagName('groups'))[0]->
                             getElementsByTagName('group') )
     {
         my $group = $groupnode->getAttribute('name');
@@ -75,7 +77,7 @@ sub importACL
             Debug('Group already exists: ' . $group);
         }
 
-        foreach my $privnode ( $groupnode->getElementsByTagName('privilege') )
+        for my $privnode ( $groupnode->getElementsByTagName('privilege') )
         {
             my $object = $privnode->getAttribute('object');
             my $priv = $privnode->getAttribute('name');
@@ -84,7 +86,7 @@ sub importACL
             $ok = $self->setPrivilege( $group, $object, $priv ) ? $ok:0;
         }
 
-        foreach my $attrnode ( $groupnode->getElementsByTagName('attribute') )
+        for my $attrnode ( $groupnode->getElementsByTagName('attribute') )
         {
             my $attr = $attrnode->getAttribute('name');
             if( $attr ne 'modified' )
@@ -98,7 +100,7 @@ sub importACL
         }
     }
 
-    foreach my $usernode ( ($root->getElementsByTagName('users'))[0]->
+    for my $usernode ( ($root->getElementsByTagName('users'))[0]->
                             getElementsByTagName('user') )
     {
         my $uid = $usernode->getAttribute('uid');
@@ -113,7 +115,7 @@ sub importACL
             Debug('User already exists: ' . $uid);
         }
 
-        foreach my $membernode ( $usernode->getElementsByTagName('member-of') )
+        for my $membernode ( $usernode->getElementsByTagName('member-of') )
         {
             my $group = $membernode->getAttribute('group');
             Debug('Adding ' . $uid . ' to group ' . $group);
@@ -128,7 +130,7 @@ sub importACL
             }
         }
 
-        foreach my $attrnode ( $usernode->getElementsByTagName('attribute') )
+        for my $attrnode ( $usernode->getElementsByTagName('attribute') )
         {
             my $attr = $attrnode->getAttribute('name');
             if( $attr ne 'modified' )

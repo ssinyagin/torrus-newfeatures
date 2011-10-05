@@ -89,21 +89,21 @@ sub runCollector {
 
   my $now = time();
 
-  foreach my $url (keys(%{$cref->{'byurl'}})) {
+  for my $url (keys(%{$cref->{'byurl'}})) {
     Debug('Now doing '.$url, $cref->{timeout}{$url});
     $ua->timeout($cref->{timeout}{$url});
     my $res = $ua->get($url);
 
     if (!($res->is_success)) {
       Error('HTTP: Error getting: '.$url);
-      foreach my $token (@{$cref->{'byurl'}{$url}}) {
+      for my $token (@{$cref->{'byurl'}{$url}}) {
         Debug("Setting value: U for token: $token");
         $collector->setValue( $token, 'U', $now );
       };
     } else {
       my $content = $res->content;
       #Debug ( "Web-Content:",$content );
-      foreach my $token (@{$cref->{'byurl'}{$url}}) {
+      for my $token (@{$cref->{'byurl'}{$url}}) {
 
         my $object = $collector->param( $token, 'http-object' );
 

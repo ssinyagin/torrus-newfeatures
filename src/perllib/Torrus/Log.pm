@@ -36,6 +36,8 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw(Debug Warn Info Error Verbose isDebug);
 
+our $VERSION = 1.0;
+
 my @monthNames = ( 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
                    'Aug', 'Sep', 'Oct', 'Nov', 'Dec' );
 
@@ -71,7 +73,7 @@ sub Log
         printf STDERR ( "[%s%s] %s\n",
                         timeStr( time() ), $severity, join( '', @msg ) );
     }
-    return undef;
+    return
 }
 
 

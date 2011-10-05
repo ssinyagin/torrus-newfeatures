@@ -27,6 +27,8 @@ use Torrus::Log;
 
 use RRDs;
 
+our $VERSION = 1.0;
+
 # All our methods are imported by Torrus::Renderer;
 
 my %rrd_graph_opts =
@@ -58,12 +60,12 @@ sub render_rrgraph
     if( not $config_tree->isLeaf($token) )
     {
         Error("Token $token is not a leaf");
-        return undef;
+        return
     }
 
     my $obj = {'args' => {}, 'dname' => 'A'};
 
-    foreach my $arrayName ( @arg_arrays )
+    for my $arrayName ( @arg_arrays )
     {
         $obj->{'args'}{$arrayName} = [];
     }
@@ -111,7 +113,7 @@ sub render_rrgraph
         else
         {
             Error("Unsupported leaf-type: $leaftype");
-            return undef;
+            return
         }
 
         $self->rrd_make_graphline( $config_tree, $token, $view, $obj );
@@ -129,7 +131,7 @@ sub render_rrgraph
 
 
     my @args;
-    foreach my $arrayName ( @arg_arrays )
+    for my $arrayName ( @arg_arrays )
     {
         push( @args, @{$obj->{'args'}{$arrayName}} );
     }
@@ -143,7 +145,7 @@ sub render_rrgraph
     {
         my $path = $config_tree->path($token);
         Error("$path $view: Error during RRD graph: $ERR");
-        return undef;
+        return
     }
 
     my $mimetype = $obj->{'mimetype'};
@@ -175,7 +177,7 @@ sub render_rrprint
     if( not $config_tree->isLeaf($token) )
     {
         Error("Token $token is not a leaf");
-        return undef;
+        return
     }
 
     my @arg_opts;
@@ -191,7 +193,7 @@ sub render_rrprint
     {
         Error("View type rrprint is not supported ".
               "for DS type rrd-multigraph");
-        return undef;
+        return
     }
 
     my $leaftype = $config_tree->getNodeParam($token, 'leaf-type');
@@ -214,10 +216,10 @@ sub render_rrprint
     else
     {
         Error("Unsupported leaf-type: $leaftype");
-        return undef;
+        return
     }
 
-    foreach my $cf ( split(',', $config_tree->getParam($view, 'print-cf')) )
+    for my $cf ( split(',', $config_tree->getParam($view, 'print-cf')) )
     {
         push( @arg_print, sprintf( 'PRINT:%s:%s:%%le', $dname, $cf ) );
     }
@@ -236,13 +238,13 @@ sub render_rrprint
     {
         my $path = $config_tree->path($token);
         Error("$path $view: Error during RRD graph: $ERR");
-        return undef;
+        return
     }
 
     if( not open(OUT, ">$outfile") )
     {
         Error("Cannot open $outfile for writing: $!");
-        return undef;
+        return
     }
     else
     {
@@ -271,7 +273,7 @@ sub rrd_make_multigraph
 
     # Analyze the drawing order
     my %dsOrder;
-    foreach my $dname ( @dsNames )
+    for my $dname ( @dsNames )
     {
         my $order = $config_tree->getNodeParam($token, 'line-order-'.$dname);
         $dsOrder{$dname} = defined( $order ) ? $order : 100;
@@ -294,7 +296,7 @@ sub rrd_make_multigraph
         }
     }
 
-    foreach my $dname ( sort {$dsOrder{$a} <=> $dsOrder{$b}} @dsNames )
+    for my $dname ( sort {$dsOrder{$a} <=> $dsOrder{$b}} @dsNames )
     {
         my $dograph = 1;
         my $ignoreViews =
@@ -559,7 +561,7 @@ sub rrd_make_hrules
     my $hrulesList = $config_tree->getParam($view, 'hrules');
     if( defined( $hrulesList ) )
     {
-        foreach my $hruleName ( split(',', $hrulesList ) )
+        for my $hruleName ( split(',', $hrulesList ) )
         {
             # The presence of this parameter is checked by Validator
             my $valueParam =
@@ -603,7 +605,7 @@ sub rrd_make_decorations
         (not defined($ignore_decor) or $ignore_decor ne 'yes') )
     {
         my $decor = {};
-        foreach my $decorName ( split(',', $decorList ) )
+        for my $decorName ( split(',', $decorList ) )
         {
             my $order =
                 $config_tree->getParam($view, 'dec-order-' . $decorName);
@@ -633,7 +635,7 @@ sub rrd_make_decorations
             }
         }
 
-        foreach my $order ( sort {$a<=>$b} keys %{$decor} )
+        for my $order ( sort {$a<=>$b} keys %{$decor} )
         {
             my $array = $order < 0 ? 'bg':'fg';
 
@@ -656,7 +658,7 @@ sub rrd_make_opts
     my $obj = shift;
 
     my @args = ();
-    foreach my $param ( keys %{$opthash} )
+    for my $param ( keys %{$opthash} )
     {
         my $value =
             $self->{'options'}->{'variables'}->{'G' . $param};
@@ -811,7 +813,7 @@ sub rrd_make_def
     {
         my $path = $config_tree->path($token);
         Error("$path: No such file or directory: $rrdfile");
-        return undef;
+        return
     }
 
     my $ds = $config_tree->getNodeParam($token, 'rrd-ds');
@@ -919,7 +921,7 @@ sub rrd_make_gprint
     my $gprintValues = $config_tree->getParam($view, 'gprint-values');
     if( defined( $gprintValues ) and length( $gprintValues ) > 0 )
     {
-        foreach my $gprintVal ( split(',', $gprintValues ) )
+        for my $gprintVal ( split(',', $gprintValues ) )
         {
             my $format =
                 $config_tree->getParam($view, 'gprint-format-' . $gprintVal);

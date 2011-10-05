@@ -41,6 +41,8 @@ use base qw(Torrus::Renderer::HTML
             Torrus::Renderer::AdmInfo
             Torrus::Renderer::RPC);
 
+our $VERSION = 1.0;
+
 sub new
 {
     my $self = {};
@@ -50,18 +52,18 @@ sub new
     if( not defined $Torrus::Global::cacheDir )
     {
         Error('$Torrus::Global::cacheDir must be defined');
-        return undef;
+        return
     }
     elsif( not -d $Torrus::Global::cacheDir )
     {
         Error("No such directory: $Torrus::Global::cacheDir");
-        return undef;
+        return
     }
 
     $self->{'db'} = new Torrus::DB('render_cache', -WriteAccess => 1);
     if( not defined( $self->{'db'} ) )
     {
-        return undef;
+        return
     }
 
     srand( time() * $$ );
@@ -104,7 +106,7 @@ sub render
         if( not defined( $config_tree->path($token) ) )
         {
             Error("No such token: $token");
-            return undef;
+            return
         }
     }
 
@@ -167,7 +169,7 @@ sub cacheKey
 
     if( ref( $self->{'options'}->{'variables'} ) )
     {
-        foreach my $name ( sort keys %{$self->{'options'}->{'variables'}} )
+        for my $name ( sort keys %{$self->{'options'}->{'variables'}} )
         {
             my $val = $self->{'options'}->{'variables'}->{$name};
             $keystring .= ':' . $name . '=' . $val;
@@ -190,7 +192,7 @@ sub getCache
     }
     else
     {
-        return undef;
+        return
     }
 }
 

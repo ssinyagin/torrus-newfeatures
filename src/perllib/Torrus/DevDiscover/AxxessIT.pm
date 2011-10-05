@@ -36,6 +36,7 @@ package Torrus::DevDiscover::AxxessIT;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'AxxessIT'} = {
     'sequence'     => 500,
@@ -168,7 +169,7 @@ sub discover
                 'ifComment'  => 'Ethernet LANX interface: slot %d, port %d' }
               );
 
-        foreach my $type ( keys %map )
+        for my $type ( keys %map )
         {
             my $mapTable =
                 $session->get_table( -baseoid =>
@@ -180,7 +181,7 @@ sub discover
                                      $dd->oiddef($map{$type}{'Description'}) );
             $devdetails->storeSnmpVars( $descTable );
         
-            foreach my $ifIndex
+            for my $ifIndex
                 ( $devdetails->
                   getSnmpIndices($dd->oiddef($map{$type}{'MapSlotNumber'})) )
             {
@@ -253,7 +254,7 @@ sub discover
                                  $dd->oiddef('axx155EEthPortTable') );
         $devdetails->storeSnmpVars( $ethTable );
 
-        foreach my $port
+        for my $port
             ( $devdetails->
               getSnmpIndices($dd->oiddef('axx155EEthPortIfIndex')) )
         {
@@ -319,7 +320,7 @@ sub discover
         }
     }
     
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         if( not defined( $data->{'interfaces'}{$ifIndex}->
                          {'param'}{'interface-index'} ) )

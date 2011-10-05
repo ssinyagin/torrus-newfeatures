@@ -28,6 +28,7 @@ use Template;
 
 use strict;
 
+our $VERSION = 1.0;
 
 sub exportACL
 {

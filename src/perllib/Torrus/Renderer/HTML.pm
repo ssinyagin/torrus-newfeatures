@@ -31,6 +31,8 @@ use POSIX qw(abs log floor pow);
 use Date::Parse;
 use Date::Format;
 
+our $VERSION = 1.0;
+
 Torrus::SiteConfig::loadStyling();
 
 # All our methods are imported by Torrus::Renderer;
@@ -76,7 +78,7 @@ sub render_html
         'param'      => sub { return $config_tree->getParam(@_); },
         'url'        => sub { return $self->makeURL($config_tree, @_); },
         'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
-                              return undef;},
+                              return},
         'plainURL'   => $Torrus::Renderer::plainURL,
         'splitUrls'  => sub { return $self->makeSplitURLs($config_tree,
                                                           $_[0], $_[1]); },
@@ -138,7 +140,7 @@ sub render_html
             Error("Error while rendering $path: " .
                   $self->{'tt'}->error());
         }
-        return undef;
+        return
     }
 
     return ($expires+time(), 'text/html; charset=UTF-8');
@@ -250,7 +252,7 @@ sub makeURL
 
     if( ref( $self->{'options'}->{'variables'} ) )
     {
-        foreach my $name ( sort keys %{$self->{'options'}->{'variables'}} )
+        for my $name ( sort keys %{$self->{'options'}->{'variables'}} )
         {
             my $val = $self->{'options'}->{'variables'}->{$name};
             if( not defined( $vars{$name} ) )
@@ -260,7 +262,7 @@ sub makeURL
         }
     }
 
-    foreach my $name ( sort keys %vars )
+    for my $name ( sort keys %vars )
     {
         if( $vars{$name} ne '' )
         {
@@ -405,7 +407,7 @@ sub hasPrivilege
     }
     else
     {
-        return undef;
+        return
     }
 }
 
@@ -425,7 +427,7 @@ sub translateMarkup
     
     my $ret = '';
     
-    foreach my $str ( @strings )
+    for my $str ( @strings )
     {
         my $output = '';
         my $result = $tt->process( \$str, $ttvars, \$output );

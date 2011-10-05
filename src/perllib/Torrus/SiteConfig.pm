@@ -24,6 +24,8 @@ package Torrus::SiteConfig;
 use Torrus::Log;
 use strict;
 
+our $VERSION = 1.0;
+
 our %validDaemonNames = ('collector' => 1,
                          'monitor'   => 1);
 
@@ -59,7 +61,7 @@ sub verify
         $ok = 0;
     }
 
-    foreach my $tree ( keys %Torrus::Global::treeConfig )
+    for my $tree ( keys %Torrus::Global::treeConfig )
     {
         if( $tree !~ /^[a-zA-Z][a-zA-Z0-9_\-]*$/o )
         {
@@ -83,7 +85,7 @@ sub verify
         }
         else
         {
-            foreach my $file ( @{$xmlfiles} )
+            for my $file ( @{$xmlfiles} )
             {
                 $ok = findXMLFile( $file,
                                    "in the tree named \"" . $tree . "\"" ) ?
@@ -92,7 +94,7 @@ sub verify
 
             if( ref( $Torrus::Global::treeConfig{$tree}{'run'} ) )
             {
-                foreach my $daemon
+                for my $daemon
                     ( keys %{$Torrus::Global::treeConfig{$tree}{'run'}} )
                 {
                     if( not $validDaemonNames{$daemon} )
@@ -106,13 +108,13 @@ sub verify
         }
     }
 
-    foreach my $file ( @Torrus::Global::xmlAlwaysIncludeFirst )
+    for my $file ( @Torrus::Global::xmlAlwaysIncludeFirst )
     {
         $ok = findXMLFile( $file,
                            'in @Torrus::Global::xmlAlwaysIncludeFirst' ) ?
                                $ok:0;
     }
-    foreach my $file ( @Torrus::Global::xmlAlwaysIncludeLast )
+    for my $file ( @Torrus::Global::xmlAlwaysIncludeLast )
     {
         $ok = findXMLFile( $file,
                            'in @Torrus::Global::xmlAlwaysIncludeLast' ) ?
@@ -147,7 +149,7 @@ sub verify
 
         my $profile = \%Torrus::Renderer::graphStyles;
         # Check if mandatory parameters present
-        foreach my $element ( keys %mandatoryGraphStyles )
+        for my $element ( keys %mandatoryGraphStyles )
         {
             if( ref( $profile->{$element} ) )
             {
@@ -174,7 +176,7 @@ sub verify
             }
         }
         # Check validity of all parameters
-        foreach my $element ( keys %{$profile} )
+        for my $element ( keys %{$profile} )
         {
             if( defined( $profile->{$element}{'color'} ) )
             {
@@ -239,7 +241,7 @@ sub findXMLFile
     if( defined( $file ) )
     {
         my $found = 0;
-        foreach my $dir ( @Torrus::Global::xmlDirs )
+        for my $dir ( @Torrus::Global::xmlDirs )
         {
             $filename = $dir . '/' . $file;
             if( -r $filename )

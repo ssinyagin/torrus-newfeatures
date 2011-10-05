@@ -63,6 +63,8 @@ package Torrus::DevDiscover::Arbor_E;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 
 $Torrus::DevDiscover::registry{'Arbor_E'} = {
     'sequence'     => 500,
@@ -219,7 +221,7 @@ sub discover
                 {
                     $devdetails->setCap('e30-fwdTable-login');
 
-                    foreach my $statsIdx ( $devdetails->getSnmpIndices(
+                    for my $statsIdx ( $devdetails->getSnmpIndices(
                                       $dd->oiddef('loginRespOkStatsIndex') ) )
                     {
                         push(@{$data->{'e30'}{'loginResp'}}, $statsIdx);
@@ -271,7 +273,7 @@ sub discover
 		$devdetails->storeSnmpVars( $l2tpSecEndTable );
 
                 Debug("e30: L2TP secure endpoints found:");
-                foreach my $SEP ( $devdetails->getSnmpIndices(
+                for my $SEP ( $devdetails->getSnmpIndices(
                                   $dd->oiddef('l2tpSecureEndpointIpAddress') ) )
 		{
 			next if( ! $SEP );
@@ -298,7 +300,7 @@ sub discover
             {
                 $devdetails->setCap('e30-mempool');
 
-                foreach my $memOID (
+                for my $memOID (
                            $devdetails->getSnmpIndices(
                                 $dd->oiddef('memPoolNameIndex') ) )
                 {
@@ -323,7 +325,7 @@ sub discover
             $devdetails->storeSnmpVars( $bundleTable );
 
             Debug("e30: Bundle Information id:name");
-            foreach my $bundleID (
+            for my $bundleID (
                        $devdetails->getSnmpIndices( $dd->oiddef('bundleName') ))
             {
                     my $bundleName = $bundleTable->{$dd->oiddef('bundleName') .
@@ -331,7 +333,7 @@ sub discover
                     $data->{'e30'}{'bundleID'}{$bundleID} = $bundleName;
 	
                     Debug("e30:    $bundleID $bundleName");
-            } # END foreache my $bundleID
+            } # END fore my $bundleID
 
             if( $devdetails->param('Arbor_E::disable-e30-bundle-deny') ne 'yes')
             {
@@ -398,7 +400,7 @@ sub discover
             $devdetails->setCap('e100-cpu');
 
             # PROG: Find all the CPU's ..
-            foreach my $cpuIndex ( $devdetails->getSnmpIndices(
+            for my $cpuIndex ( $devdetails->getSnmpIndices(
                                    $dd->oiddef('cpuName') ) )
             {
               my $cpuName = $cpuNameTable->{$dd->oiddef('cpuName') .
@@ -422,7 +424,7 @@ sub discover
             $devdetails->setCap('e100-hdd');
 
             # PROG: Find all the paritions and names ..
-            foreach my $hddIndex ( $devdetails->getSnmpIndices(
+            for my $hddIndex ( $devdetails->getSnmpIndices(
                                    $dd->oiddef('partitionName') ) )
             {
               my $partitionName = $hddTable->{$dd->oiddef('partitionName') .
@@ -445,7 +447,7 @@ sub discover
             $devdetails->setCap('e100-mem');
 
             # PROG: Find all memory indexes
-            foreach my $memIndex ( $devdetails->getSnmpIndices(
+            for my $memIndex ( $devdetails->getSnmpIndices(
                                    $dd->oiddef('cpuSdramIndex') ) )
             {
               my $memName = $data->{'e100'}{'cpu'}{$memIndex};
@@ -482,7 +484,7 @@ sub discover
             $devdetails->setCap('e100-submgmt');
 
             # Sub: Find state name entries
-            foreach my $stateIDX ( $devdetails->getSnmpIndices( $dd->oiddef(
+            for my $stateIDX ( $devdetails->getSnmpIndices( $dd->oiddef(
 					'subscriberStateName') ) )
             {
                my $state = $subTable->{
@@ -511,7 +513,7 @@ sub discover
         # ------------------------------------------------------------
         my $switchingModules = 2;
 
-        foreach my $flowModule (1 .. $switchingModules) {
+        for my $flowModule (1 .. $switchingModules) {
             Debug("common:  Flow Lookup Device " . $flowModule);
 
             my $flowPoolOid  = 'flowPoolNameD' . $flowModule;
@@ -521,7 +523,7 @@ sub discover
 
             # PROG: Look for pool names and indexes and store them.
             if( $flowModTable ) {
-                foreach my $flowPoolIDX ( $devdetails->getSnmpIndices(
+                for my $flowPoolIDX ( $devdetails->getSnmpIndices(
                                             $dd->oiddef($flowPoolOid) ) )
                 {
                     my $flowPoolName = $flowModTable->{
@@ -532,9 +534,9 @@ sub discover
 
                     Debug("common:    IDX: $flowPoolIDX  Pool: $flowPoolName");
 
-                } # END: foreach my $flowPoolIDX
+                } # END: for my $flowPoolIDX
             } # END: if $flowModTable
-        } # END: foreach my $flowModule
+        } # END: for my $flowModule
     }
 
 
@@ -552,7 +554,7 @@ sub discover
         {
             $devdetails->setCap('arbor-bundle');
 
-            foreach my $boOfferNameID ( $devdetails->getSnmpIndices(
+            for my $boOfferNameID ( $devdetails->getSnmpIndices(
                                 $dd->oiddef('boOfferName') ) )
             {
 		my ($bundleID,$offerNameID) = split( /\./, $boOfferNameID );
@@ -648,7 +650,7 @@ sub buildConfig
                                     { 'comment' => 'Bundle statistics' },
                                     [ 'Arbor_E::e30-bundle-subtree' ] );
 
-            foreach my $bundleID
+            for my $bundleID
                 ( sort {$a <=> $b} keys %{$data->{'e30'}{'bundleID'} } )
             {
                 my $srvName     =  $data->{'e30'}{'bundleID'}{$bundleID};
@@ -682,7 +684,7 @@ sub buildConfig
                                    'e30-bundle-rrd'   => $bundleRRD,
                                    'precedence'       => 1000 - $bundleID },
                                  \@templates );
-            } # END foreach my $bundleID
+            } # END for my $bundleID
         }
 
         # e30 cpu
@@ -720,7 +722,7 @@ sub buildConfig
                     };
                 my $dsList;
 
-                foreach my $sindex ( sort { $a <=> $b } 
+                for my $sindex ( sort { $a <=> $b } 
                                      @{$data->{'e30'}{'loginResp'}} )
                 {
 		
@@ -742,7 +744,7 @@ sub buildConfig
                     $multiParam->{"line-order-$dsName"}   = $sindex;
 
                     Debug("  loginReps: $sindex, color: $color");
-                } # END: foreach $sindex
+                } # END: for $sindex
 
                 $dsList =~ s/,$//o;	# Remove final comma
                 $multiParam->{'ds-names'} = $dsList;
@@ -794,7 +796,7 @@ sub buildConfig
                              { 'comment' => 'Secure endpoint parties' },
                              [ 'Arbor_E::e30-l2tp-secure-endpoints-subtree' ] );
 
-                foreach my $SEP ( keys %{$data->{'e30'}{'l2tpSEP'}} )
+                for my $SEP ( keys %{$data->{'e30'}{'l2tpSEP'}} )
                 {
                   my $endPoint =  $SEP;
                      $endPoint =~ s/\W/_/g;
@@ -803,7 +805,7 @@ sub buildConfig
                               { 'e30-l2tp-ep'   => $SEP,
                                 'e30-l2tp-file' => $endPoint },
                               [ 'Arbor_E::e30-l2tp-secure-endpoints-leaf' ]);
-                } # END: foreach
+                } # END: for
             }
         }
 
@@ -824,7 +826,7 @@ sub buildConfig
             my $nodeTop     = $cb->addSubtree( $devNode, $subtreeName,
                                                $param, $templates );
 
-            foreach my $memIDX ( keys %{$memIndex} )
+            for my $memIDX ( keys %{$memIndex} )
             {
                 my $leafName = $memIndex->{$memIDX};
                 my $dataFile = "%snmp-host%_mempool_" . $leafName . '.rrd';
@@ -873,7 +875,7 @@ sub buildConfig
                 };
             my $dsList;
 
-            foreach my $cpuIndex ( sort keys %{$data->{'e100'}{'cpu'}} )
+            for my $cpuIndex ( sort keys %{$data->{'e100'}{'cpu'}} )
             {
                 my $cpuName = $data->{'e100'}{'cpu'}{$cpuIndex};
   
@@ -901,7 +903,7 @@ sub buildConfig
                 $multiParam->{"line-style-$cpuName"}   = "LINE1";
                 $multiParam->{"line-color-$cpuName"}   = $color;
                 $multiParam->{"line-order-$cpuName"}   = $cpuIndex;
-            } # END: foreach $cpuIndex
+            } # END: for $cpuIndex
 
             $dsList =~ s/,$//o;     # Remove final comma
             $multiParam->{'ds-names'} = $dsList;
@@ -916,7 +918,7 @@ sub buildConfig
             my $hddTree = $cb->addSubtree( $devNode, $subtree, undef,
                                          [ 'Arbor_E::e100-hdd-subtree' ] );
 
-            foreach my $hddIndex ( sort keys %{$data->{'e100'}{'hdd'}} )
+            for my $hddIndex ( sort keys %{$data->{'e100'}{'hdd'}} )
             {
               my $hddName = $data->{'e100'}{'hdd'}{$hddIndex};
               $cb->addSubtree( $hddTree, $hddName,
@@ -934,7 +936,7 @@ sub buildConfig
             my $subtree = "Memory_Usage";
             my $memTree = $cb->addSubtree( $devNode, $subtree, undef,
                                          [ 'Arbor_E::e100-mem-subtree' ] );
-            foreach my $memIndex ( sort keys %{$data->{'e100'}{'mem'}} )
+            for my $memIndex ( sort keys %{$data->{'e100'}{'mem'}} )
             {
               my $memName = $data->{'e100'}{'cpu'}{$memIndex};
 
@@ -982,7 +984,7 @@ sub buildConfig
             };
             my $dsList;
 
-            foreach my $stateIDX ( sort keys %{$data->{'e100'}{'submgmt'}} )
+            for my $stateIDX ( sort keys %{$data->{'e100'}{'submgmt'}} )
             {
                 my $color        =  shift @colors;
                 my $stateName    =  $data->{'e100'}{'submgmt'}{$stateIDX};
@@ -1025,7 +1027,7 @@ sub buildConfig
         my $nodeTop     = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, $templates );
 
-        foreach my $offerNameID ( keys %{$data->{'arbor_e'}{'offerName'}} )
+        for my $offerNameID ( keys %{$data->{'arbor_e'}{'offerName'}} )
         {
             my $offerName   =  $data->{'arbor_e'}{'offerName'}{$offerNameID};
                $offerName   =~ s/\W/_/g;
@@ -1049,7 +1051,7 @@ sub buildConfig
 
             Debug("    Offer: $offerName");
 
-            foreach my $bundleID ( @{$offerBundle->{$offerNameID}} )
+            for my $bundleID ( @{$offerBundle->{$offerNameID}} )
             {
                 my @btemplates;
                 my $bundleName =  $data->{'arbor_e'}{'bundleName'}{$bundleID};
@@ -1101,8 +1103,8 @@ sub buildConfig
                 # Build tree
                 $cb->addSubtree( $offerTop, $bundleName,
                                  $bparam, \@btemplates );
-            } # END: foreach $bundleID
-        } # END: foreach $offerNameID
+            } # END: for $bundleID
+        } # END: for $offerNameID
     } # END: hasCap arbor-bundle
 
     # Flow device lookups
@@ -1115,7 +1117,7 @@ sub buildConfig
 
         my $flowLookup = $data->{'arbor_e'}{'flowModule'};
 
-        foreach my $flowDevIdx ( keys %{$flowLookup} )
+        for my $flowDevIdx ( keys %{$flowLookup} )
         {
             my $flowNodeDev = $cb->addSubtree( $flowNode,
                               'Flow_Lookup_' .  $flowDevIdx,
@@ -1124,7 +1126,7 @@ sub buildConfig
                               [ 'Arbor_E::arbor-flowlkup-subtree' ] );
 
             # PROG: Find all the pool names and add Subtree
-            foreach my $flowPoolIdx ( keys %{$flowLookup->{$flowDevIdx}} )
+            for my $flowPoolIdx ( keys %{$flowLookup->{$flowDevIdx}} )
             {
                 my $poolName = $flowLookup->{$flowDevIdx}{$flowPoolIdx};
 
@@ -1135,8 +1137,8 @@ sub buildConfig
                                  'flowpool-name'  => $poolName,
                                  'precedence'     => 1000 - $flowPoolIdx},
                                [ 'Arbor_E::arbor-flowlkup-leaf' ] );
-            } # END: foreach my $flowPoolIdx
-        } # END: foreach my $flowDevIdx
+            } # END: for my $flowPoolIdx
+        } # END: for my $flowDevIdx
     } # END: hasCap arbor-flowLookup
 
 }

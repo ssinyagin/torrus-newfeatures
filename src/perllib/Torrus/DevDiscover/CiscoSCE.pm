@@ -36,6 +36,7 @@ package Torrus::DevDiscover::CiscoSCE;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoSCE'} = {
     'sequence'     => 500,
@@ -186,7 +187,7 @@ sub discover
         
         $devdetails->storeSnmpVars( $txQueueDesc );
         
-        foreach my $pIndex
+        for my $pIndex
             ( $devdetails->getSnmpIndices( $dd->oiddef('pportNumTxQueues') ) )
         {
             # We take ports with more than one queue and add queueing
@@ -202,7 +203,7 @@ sub discover
 
                 $data->{'scePortIfIndex'}{$pIndex} = $ifIndex;
                 
-                foreach my $qIndex
+                for my $qIndex
                     ( $devdetails->getSnmpIndices
                       ( $dd->oiddef('txQueuesDescription') . '.' . $pIndex ) )
                 {
@@ -228,7 +229,7 @@ sub discover
         
         $devdetails->storeSnmpVars( $counterNames );
         
-        foreach my $gcIndex
+        for my $gcIndex
             ( $devdetails->getSnmpIndices
               ( $dd->oiddef('globalScopeServiceCounterName') ) )
         {
@@ -256,7 +257,7 @@ sub discover
             
             $devdetails->storeSnmpVars( $categoryNames );
             
-            foreach my $categoryIndex
+            for my $categoryIndex
                 ( $devdetails->getSnmpIndices
                   ( $dd->oiddef('rdrFormatterCategoryName') ) )
             {
@@ -297,7 +298,7 @@ sub buildConfig
                                       { 'comment' => 'TP usage statistics' },
                                       [ 'CiscoSCE::cisco-sce-tp-subtree']);
 
-        foreach my $tp ( 1 .. $data->{'sceTrafficProcessors'} )
+        for my $tp ( 1 .. $data->{'sceTrafficProcessors'} )
         {
             $cb->addSubtree( $tpNode, sprintf('TP_%d', $tp),
                              { 'sce-tp-index' => $tp },
@@ -315,7 +316,7 @@ sub buildConfig
                              { 'comment' => 'TX queues usage statistics' },
                              [ 'CiscoSCE::cisco-sce-queues-subtree']);
         
-        foreach my $pIndex ( sort {$a <=> $b}
+        for my $pIndex ( sort {$a <=> $b}
                              keys %{$data->{'scePortIfIndex'}} )
         {
             my $ifIndex = $data->{'scePortIfIndex'}{$pIndex};
@@ -328,7 +329,7 @@ sub buildConfig
                   { 'sce-port-index' => $pIndex,
                     'precedence' => 1000 - $pIndex });
             
-            foreach my $qIndex ( sort {$a <=> $b} keys 
+            for my $qIndex ( sort {$a <=> $b} keys 
                                  %{$data->{'sceQueues'}{$pIndex}} )
             {
                 my $qName = $data->{'sceQueues'}{$pIndex}{$qIndex};
@@ -346,7 +347,7 @@ sub buildConfig
     # Global counters
     if( $devdetails->hasCap('sceGlobalCounters') )
     {
-        foreach my $linkIndex ( 1 .. $data->{'sceInfo'}{'pmoduleNumLinks'} )
+        for my $linkIndex ( 1 .. $data->{'sceInfo'}{'pmoduleNumLinks'} )
         {
             my $gcNode =
                 $cb->addSubtree( $devNode,
@@ -357,7 +358,7 @@ sub buildConfig
                                  },
                                  [ 'CiscoSCE::cisco-sce-gc-subtree']);
             
-            foreach my $gcIndex
+            for my $gcIndex
                 ( sort {$a <=> $b} keys %{$data->{'sceGlobalCounters'}} )
             {
                 my $srvName = $data->{'sceGlobalCounters'}{$gcIndex};
@@ -388,7 +389,7 @@ sub buildConfig
                              { 'comment' => 'Raw Data Records per Category' },
                              [ 'CiscoSCE::cisco-sce-rdr-category-subtree' ]);
         
-        foreach my $cIndex ( sort {$a <=> $b} keys %{$data->{'sceRDR'}} )
+        for my $cIndex ( sort {$a <=> $b} keys %{$data->{'sceRDR'}} )
         {
             my $categoryName;
             if ( $data->{'sceRDR'}{$cIndex} )

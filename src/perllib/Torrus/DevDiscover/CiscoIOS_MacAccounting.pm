@@ -24,6 +24,7 @@ package Torrus::DevDiscover::CiscoIOS_MacAccounting;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoIOS_MacAccounting'} = {
     'sequence'     => 510,
@@ -82,7 +83,7 @@ sub discover
         my $extStorage = {};
         my $extStorageTrees = {};
 
-        foreach my $srvDef ( split( /\s*,\s*/, $extSrv ) )
+        for my $srvDef ( split( /\s*,\s*/, $extSrv ) )
         {
             my ( $serviceid, $peerName, $direction, $trees ) =
                 split( /\s*:\s*/, $srvDef );
@@ -122,10 +123,10 @@ sub discover
     if( defined( $tsetMembership ) and length( $tsetMembership ) > 0 )
     {
         my $tsetMember = {};
-        foreach my $memList ( split( /\s*;\s*/, $tsetMembership ) )
+        for my $memList ( split( /\s*;\s*/, $tsetMembership ) )
         {
             my ($tset, $list) = split( /\s*:\s*/, $memList );
-            foreach my $peerName ( split( /\s*,\s*/, $list ) )
+            for my $peerName ( split( /\s*,\s*/, $list ) )
             {
                 $tsetMember->{$peerName}{$tset} = 1;
             }
@@ -136,7 +137,7 @@ sub discover
     Torrus::DevDiscover::RFC2011_IP_MIB::discover($dd, $devdetails);
     Torrus::DevDiscover::RFC1657_BGP4_MIB::discover($dd, $devdetails);
     
-    foreach my $INDEX
+    for my $INDEX
         ( $devdetails->
           getSnmpIndices( $dd->oiddef('cipMacHCSwitchedBytes') ) )
     {
@@ -147,7 +148,7 @@ sub discover
 
         my $phyAddr = '0x';
         my $macAddrString = '';
-        foreach my $byte ( @phyAddrOctets )
+        for my $byte ( @phyAddrOctets )
         {
             $phyAddr .= sprintf('%.2x', $byte);
             if( length( $macAddrString ) > 0 )
@@ -241,7 +242,7 @@ sub discover
     }
 
     my %asNumbers;    
-    foreach my $INDEX ( keys %{$data->{'cipMac'}} )
+    for my $INDEX ( keys %{$data->{'cipMac'}} )
     {        
         my $peer = $data->{'cipMac'}{$INDEX};
 
@@ -258,7 +259,7 @@ sub discover
         }
     }
     
-    foreach my $INDEX ( keys %{$data->{'cipMac'}} )
+    for my $INDEX ( keys %{$data->{'cipMac'}} )
     {
         my $peer = $data->{'cipMac'}{$INDEX};
         
@@ -292,7 +293,7 @@ sub buildConfig
                          {'node-display-name' => 'MAC Accounting'},
                          ['CiscoIOS_MacAccounting::cisco-macacc-subtree']);
     
-    foreach my $INDEX ( sort { $data->{'cipMac'}{$a}{'subtreeName'} <=>
+    for my $INDEX ( sort { $data->{'cipMac'}{$a}{'subtreeName'} <=>
                                    $data->{'cipMac'}{$b}{'subtreeName'} }
                         keys %{$data->{'cipMac'}} )
     {
@@ -320,7 +321,7 @@ sub buildConfig
             my $extStorageApplied = 0;
             my $tsetMemberApplied = 0;
             
-            foreach my $peerName ( 'AS'.$peer->{'peerAS'}, $peer->{'peerIP'},
+            for my $peerName ( 'AS'.$peer->{'peerAS'}, $peer->{'peerIP'},
                                    $peer->{'phyAddr'} )
             {
                 if( defined( $peerName ) )
@@ -330,7 +331,7 @@ sub buildConfig
                     {
                         my $extStorage =
                             $data->{'cipMacExtStorage'}{$peerName};
-                        foreach my $dir ( 'In', 'Out' )
+                        for my $dir ( 'In', 'Out' )
                         {
                             if( defined( $extStorage->{$dir} ) )
                             {

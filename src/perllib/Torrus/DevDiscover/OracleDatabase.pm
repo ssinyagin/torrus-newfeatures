@@ -24,6 +24,7 @@ package Torrus::DevDiscover::OracleDatabase;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'OracleDatabase'} = {
     'sequence'     => 600,
@@ -153,7 +154,7 @@ sub discover
 
     Debug("Looking For dbNames");
 
-    foreach my $dbName ( keys %{ $dbType } )
+    for my $dbName ( keys %{ $dbType } )
     {
         Debug("DBName: $dbName");
 
@@ -181,7 +182,7 @@ sub discover
             $db->{'oraTableSpace'} = $ref;
 
             # Table Space
-            foreach my $tsIndex
+            for my $tsIndex
                 ( $devdetails->
                   getSnmpIndices( $dd->oiddef('oraDbTablespaceIndex') .
                                   '.' . $dbIndex ) )
@@ -200,7 +201,7 @@ sub discover
             $db->{'oraDbDataFile'} = $ref;
 
             # Data File
-            foreach my $dfIndex
+            for my $dfIndex
                 ( $devdetails->
                   getSnmpIndices( $dd->oiddef('oraDbDataFileIndex') .
                                   '.' . $dbIndex ) )
@@ -219,7 +220,7 @@ sub discover
             $db->{'oraDbLibraryCache'} = $ref;
 
             # Library Cache
-            foreach my $lcIndex
+            for my $lcIndex
                 ( $devdetails->
                   getSnmpIndices( $dd->oiddef('oraDbLibraryCacheIndex') .
                                   '.' . $dbIndex ) )
@@ -250,7 +251,7 @@ sub buildConfig
     my $appNode = $cb->addSubtree($devNode, 'Applications' );
     my $vendorNode = $cb->addSubtree($appNode, 'Oracle' );
 
-    foreach my $dbName ( keys %{ $dbType } )
+    for my $dbName ( keys %{ $dbType } )
     {
         my $db = $dbType->{$dbName};
         my $dbIndex = $dbType->{$dbName}->{'index'};
@@ -286,7 +287,7 @@ sub buildConfig
 
             my $tsNode = $cb->addSubtree($dbNode, 'Table_Space', $tsParam );
 
-            foreach my $tsName ( keys %{ $db->{'oraTableSpace'} } )
+            for my $tsName ( keys %{ $db->{'oraTableSpace'} } )
             {
                 my $INDEX = $db->{'oraTableSpace'}->{$tsName};
 
@@ -321,7 +322,7 @@ sub buildConfig
 
             my $dfNode = $cb->addSubtree($dbNode, 'Data_Files', $dfParam );
 
-            foreach my $dfName ( keys %{ $db->{'oraDbDataFile'} } )
+            for my $dfName ( keys %{ $db->{'oraDbDataFile'} } )
             {
                 my $INDEX = $db->{'oraDbDataFile'}->{$dfName};
 
@@ -357,7 +358,7 @@ sub buildConfig
 
             my $lcNode = $cb->addSubtree($dbNode, 'Library_Cache', $lcParam );
 
-            foreach my $lcName ( keys %{ $db->{'oraDbLibraryCache'} } )
+            for my $lcName ( keys %{ $db->{'oraDbLibraryCache'} } )
             {
                 my $INDEX = $db->{'oraDbLibraryCache'}->{$lcName};
 

@@ -99,7 +99,7 @@ if( $report_config )
     thickLine();
     printf("Scheduler configuration report\n\n");
 
-    foreach my $instance ( sort {$a<=>$b} keys %{$stats->{'collectorLeaves'}} )
+    for my $instance ( sort {$a<=>$b} keys %{$stats->{'collectorLeaves'}} )
     {
         printf("Collector leaves for instance #%d: %d\n",
                $instance, 
@@ -110,14 +110,14 @@ if( $report_config )
 
     printf("Scheduled leaves by type:\n");
 
-    foreach my $type ( sort keys %{$stats->{'leavesPerType'}} )
+    for my $type ( sort keys %{$stats->{'leavesPerType'}} )
     {
         printf("  %10s  %-10d\n", $type,
                $stats->{'leavesPerType'}{$type});
     }
     printf("\n");
 
-    foreach my $instance ( sort {$a<=>$b} keys %{$stats->{'collectorLeaves'}} )
+    for my $instance ( sort {$a<=>$b} keys %{$stats->{'collectorLeaves'}} )
     {
         if( $stats->{'collectorLeaves'}{$instance} > 0 )
         {
@@ -184,7 +184,7 @@ if( $report_runtime )
     printf("Scheduler runtime report\n\n");
 
     my $periodicTasks = {};
-    foreach my $taskId ( keys %{$stats} )
+    for my $taskId ( keys %{$stats} )
     {
         my ($type, $taskName, $instance, $period, $offset) =
             split( ':', $taskId );
@@ -194,16 +194,16 @@ if( $report_runtime )
         }
     }
     
-    foreach my $taskName ( sort keys %{$periodicTasks} )
+    for my $taskName ( sort keys %{$periodicTasks} )
     {
-        foreach my $instance ( sort {$a<=>$b}
+        for my $instance ( sort {$a<=>$b}
                                keys %{$periodicTasks->{$taskName}} )
         {
-            foreach my $period
+            for my $period
                 ( sort {$a<=>$b}
                   keys %{$periodicTasks->{$taskName}{$instance}} )
             {
-                foreach my $offset
+                for my $offset
                     ( sort {$a<=>$b}
                       keys %{$periodicTasks->{$taskName}{$instance}{$period}} )
                 {
@@ -218,7 +218,7 @@ if( $report_runtime )
                            "Period: %d seconds, Offset: %d seconds\n",
                            $taskName, $instance, $period, $offset);
                 
-                    foreach my $format ( @counterFormats )
+                    for my $format ( @counterFormats )
                     {
                         if( defined( $ref->{$format->{'varname'}} ) )
                         {
@@ -232,7 +232,7 @@ if( $report_runtime )
                     printf("%-15s%-10s%-10s%-10s%-10s\n",
                            '', 'Min', 'Max', 'Average', 'Exp Average');
 
-                    foreach my $format ( @reportFormats )
+                    for my $format ( @reportFormats )
                     {
                         my $varname =  $format->{'varname'};
                         if( defined( $ref->{'Min' . $varname} ) )
@@ -271,7 +271,7 @@ sub collectStats
 
     my @children = $config_tree->getChildren( $token );
 
-    foreach my $ctoken ( @children )
+    for my $ctoken ( @children )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -333,7 +333,7 @@ sub reportTimeline
     
     # calculate the common period length (least common multiple)
     my $lcm = 0;
-    foreach my $period ( keys %{$schedule} )
+    for my $period ( keys %{$schedule} )
     {
         my $a = $period;
         my $b = $lcm;
@@ -365,12 +365,12 @@ sub reportTimeline
     # populate the common period
     my %cp;
     my $chunks = 0;
-    foreach my $period ( keys %{$schedule} )
+    for my $period ( keys %{$schedule} )
     {
-        foreach my $offset ( keys %{$schedule->{$period}} )
+        for my $offset ( keys %{$schedule->{$period}} )
         {
             $chunks++;
-            foreach my $type ( keys %{$schedule->{$period}{$offset}} )
+            for my $type ( keys %{$schedule->{$period}{$offset}} )
             {
                 for( my $i = 0; $i < ($lcm / $period); $i++ )
                 {
@@ -386,7 +386,7 @@ sub reportTimeline
 
     my $previous;
     my $first;
-    foreach my $time ( sort { $a <=> $b } keys %cp )
+    for my $time ( sort { $a <=> $b } keys %cp )
     {
         if( not defined($first) )
         {
@@ -409,9 +409,9 @@ sub reportTimeline
            '(sec)', '(sec)', '', 'sources');
     thinLine();
 
-    foreach my $time ( sort { $a <=> $b } keys %cp )
+    for my $time ( sort { $a <=> $b } keys %cp )
     {
-        foreach my $type ( keys %{$cp{$time}{'col'}} )
+        for my $type ( keys %{$cp{$time}{'col'}} )
         {
             printf("%-10d%-10d%-20s%-10d\n",
                    $time,
@@ -427,7 +427,7 @@ sub reportTimeline
 
 sub thickLine
 {
-    foreach my $i ( 1..75 )
+    for my $i ( 1..75 )
     {
         print '=';
     }
@@ -436,7 +436,7 @@ sub thickLine
 
 sub thinLine
 {
-    foreach my $i ( 1..70 )
+    for my $i ( 1..70 )
     {
         print '-';
     }

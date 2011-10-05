@@ -27,6 +27,7 @@ package Torrus::DevDiscover::RFC2011_IP_MIB;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 our %oiddef =
     (
@@ -56,7 +57,7 @@ sub discover
     
     $devdetails->storeSnmpVars( $table );
 
-    foreach my $INDEX
+    for my $INDEX
         ( $devdetails->
           getSnmpIndices( $dd->oiddef('ipNetToMediaPhysAddress') ) )
     {

@@ -38,6 +38,7 @@ package Torrus::DevDiscover::Liebert;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'Liebert'} = {
     'sequence'     => 500,
@@ -122,7 +123,7 @@ sub discover
             {
                 $devdetails->setCap('env-temperature-celcius');
 
-                foreach my $index ( $devdetails->getSnmpIndices(
+                for my $index ( $devdetails->getSnmpIndices(
                                     $dd->oiddef('TemperatureIdDegC') ) )
                 {
                     Debug("Liebert: Temp (degC) index: $index");
@@ -139,7 +140,7 @@ sub discover
             {
                 $devdetails->setCap('env-temperature-fahrenheit');
 
-                foreach my $index ( $devdetails->getSnmpIndices(
+                for my $index ( $devdetails->getSnmpIndices(
                                     $dd->oiddef('TemperatureIdDegF') ) )
                 {
                     Debug("Liebert: Temp (degF) index: $index");
@@ -159,7 +160,7 @@ sub discover
         if( defined( $idTable ) )
         {
             $devdetails->setCap('env-humidity');
-            foreach my $index ( $devdetails->getSnmpIndices(
+            for my $index ( $devdetails->getSnmpIndices(
                                 $dd->oiddef('HumidityIdRel') ) )
             {
                 Debug("Liebert: humidity index: $index");
@@ -250,7 +251,7 @@ sub buildConfig
 
 	# ----------------------------------------------------------------
         # PROG: Figure out how many indexes we have
-        foreach my $index ( keys %{$data->{'liebert'}{'tempidx'}} )
+        for my $index ( keys %{$data->{'liebert'}{'tempidx'}} )
         {
             my $dataFile = "%system-id%_sensor_$index" . 
                            ($fahrenheit ? '_fahrenheit':'') . ".rrd";
@@ -263,7 +264,7 @@ sub buildConfig
 
             $cb->addSubtree( $nodeTemp, 'sensor_' . $index, $param,
                         [ @template ] );
-        } # END: foreach my $index
+        } # END: for my $index
     } # END: env-temperature
 
 
@@ -274,7 +275,7 @@ sub buildConfig
                                           [ 'Liebert::humidity-subtree' ] );
 
         # PROG: Figure out how many sensors we have
-        foreach my $index ( keys %{$data->{'liebert'}{'humididx'}} )
+        for my $index ( keys %{$data->{'liebert'}{'humididx'}} )
         {
             Debug("Liebert: Humidity idx: $index");
 

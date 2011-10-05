@@ -26,6 +26,7 @@ use Torrus::DB;
 use Torrus::Log;
 use strict;
 
+our $VERSION = 1.0;
 
 sub new
 {

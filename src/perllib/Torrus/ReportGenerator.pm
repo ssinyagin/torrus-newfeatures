@@ -29,6 +29,8 @@ use Torrus::Log;
 use Torrus::SQL::Reports;
 use Torrus::SQL::SrvExport;
 
+our $VERSION = 1.0;
+
 sub new
 {
     my $class = shift;
@@ -40,7 +42,7 @@ sub new
         not defined( $options->{'Name'} ) )
     {
         Error('Missing options in Torrus::Report constructor');
-        return undef;
+        return
     }
     
     my $self = {};
@@ -85,7 +87,7 @@ sub new
         if( not defined( $srvExp ) )
         {
             Error('Cannot connect to the database');
-            return undef;
+            return
         }
         $self->{'srvexport'} = $srvExp;
     }
@@ -96,7 +98,7 @@ sub new
     if( not defined( $sqlRep ) )
     {
         Error('Cannot connect to the database');
-        return undef;
+        return
     }
     $self->{'backend'} = $sqlRep;
     
@@ -108,7 +110,7 @@ sub new
     if( $sqlRep->isComplete( $reportId ) )
     {
         Error('Report already exists');
-        return undef;
+        return
     }
     
     return $self;    

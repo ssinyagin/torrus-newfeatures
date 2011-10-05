@@ -26,6 +26,7 @@ package Torrus::DevDiscover::BetterNetworks;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'BetterNetworks'} = {
     'sequence'     => 500,
@@ -121,7 +122,7 @@ sub discover
         # store the sensor names to guarantee uniqueness
         my %sensorNames;
             
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->getSnmpIndices($dd->oiddef('BNEsensorName') ) )
         {
             if( $devdetails->snmpVar( $dd->oiddef('BNEsensorValid') .
@@ -215,7 +216,7 @@ sub buildConfig
 
     if( $devdetails->hasCap('BNEsensor') )
     {
-        foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'BNEsensor'}} )
+        for my $INDEX ( sort {$a<=>$b} keys %{$data->{'BNEsensor'}} )
         {
             my $param = $data->{'BNEsensor'}{$INDEX}{'param'};
             my $leafName = $data->{'BNEsensor'}{$INDEX}{'leafName'};

@@ -26,6 +26,8 @@ package Torrus::DevDiscover::AlliedTelesyn_PBC18;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 
 $Torrus::DevDiscover::registry{'AlliedTelesyn_PBC18'} = {
     'sequence'     => 500,
@@ -95,7 +97,7 @@ sub discover
     
     $devdetails->storeSnmpVars( $table );
     
-    foreach my $INDEX ( $devdetails->getSnmpIndices($oid) )
+    for my $INDEX ( $devdetails->getSnmpIndices($oid) )
     {
         my $moduleType = $devdetails->snmpVar( $oid . '.' . $INDEX );
         if( $moduleType == 0 )
@@ -115,10 +117,10 @@ sub discover
         }
     }
 
-    foreach my $INDEX ( keys %{$data->{'PBC18'}} )
+    for my $INDEX ( keys %{$data->{'PBC18'}} )
     {
         my $oids = [];
-        foreach my $oidname ( 'ATMCCommon-MIB::mcModuleName',
+        for my $oidname ( 'ATMCCommon-MIB::mcModuleName',
                               'ATMCCommon-MIB::mcModuleState',
                               'ATMCCommon-MIB::mcModuleAportLinkState',
                               'ATMCCommon-MIB::mcModuleBportLinkState',
@@ -140,7 +142,7 @@ sub discover
         }
     }
 
-    foreach my $INDEX ( keys %{$data->{'PBC18'}} )
+    for my $INDEX ( keys %{$data->{'PBC18'}} )
     {
         if( $devdetails->snmpVar
             ( $dd->oiddef('ATMCCommon-MIB::mcModuleState') .'.'.$INDEX )
@@ -158,7 +160,7 @@ sub discover
             $data->{'PBC18'}{$INDEX}{'moduleName'} = $name;
         }
 
-        foreach my $portName ('A', 'B', 'C', 'D')
+        for my $portName ('A', 'B', 'C', 'D')
         {
             my $oid = $dd->oiddef
                 ('ATMCCommon-MIB::mcModule'.$portName.'portLinkState').
@@ -213,7 +215,7 @@ sub buildConfig
 
     $cb->addParams( $devNode, $param );
         
-    foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'PBC18'}} )
+    for my $INDEX ( sort {$a<=>$b} keys %{$data->{'PBC18'}} )
     {
         my $param = { 'pbc-module-index' => $INDEX };
         
@@ -241,7 +243,7 @@ sub buildConfig
         };
         
         my $n = 1;
-        foreach my $portName
+        for my $portName
             ( sort keys %{$data->{'PBC18'}{$INDEX}{'portAvailable'}} )
         {
             if( $n > 1 )

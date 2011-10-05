@@ -89,7 +89,7 @@ sub discover
     my $str = $devdetails->param('M_net::skip-interfaces');
     if( defined( $str ) )
     {
-        foreach my $name ( split( /\s*,\s*/, $str ) )
+        for my $name ( split( /\s*,\s*/, $str ) )
         {
             $skip_interfaces{$name} = 1;
         }
@@ -104,7 +104,7 @@ sub discover
     $data->{'nameref'}{'ifNodeidPrefix'} = 'M_net_ifNodeidPrefix';
     $data->{'nameref'}{'ifNodeid'} = 'M_net_ifNodeid';
 
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if $interface->{'excluded'};
@@ -120,7 +120,7 @@ sub discover
     
     my $nodeid_prefix_key = $devdetails->param('M_net::nodeid-prefix-key');
     
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         
@@ -146,7 +146,7 @@ sub discover
         }
 
         my $mnet_attr = {};
-        foreach my $pair ( split( /\s*;\s*/, $comment ) )
+        for my $pair ( split( /\s*;\s*/, $comment ) )
         {
             my ($key, $val) = split( /\s*=\s*/, $pair );
 

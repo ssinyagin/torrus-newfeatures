@@ -46,7 +46,7 @@ sub open
     if( $@ )
     {
         Error("Cannot load YAML data from ${siam_config}: $@");
-        return undef;        
+        return        
     }
     
     $siamcfg->{'Logger'} = new Torrus::SIAMLogger;
@@ -55,13 +55,13 @@ sub open
     if( not defined($siam) )
     {
         Error('Failed to load SIAM');
-        return undef;
+        return
     }
 
     if( not $siam->connect() )
     {
         Error('Failed connecting to SIAM');
-        return undef;
+        return
     }
 
     return $siam;        

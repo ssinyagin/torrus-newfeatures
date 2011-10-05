@@ -148,7 +148,7 @@ sub collect_monitors
 
     my $monitorsNode = $cb->startMonitors();
 
-    foreach my $action ( $config_tree->getActionNames() )
+    for my $action ( $config_tree->getActionNames() )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -156,7 +156,7 @@ sub collect_monitors
         $cb->addMonitorAction( $monitorsNode, $action, $params );
     }
 
-    foreach my $monitor ( $config_tree->getMonitorNames() )
+    for my $monitor ( $config_tree->getMonitorNames() )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -172,7 +172,7 @@ sub collect_tokensets
 
     my $tsetsNode = $cb->startTokensets();
 
-    foreach my $tset ( $config_tree->getTsets() )
+    for my $tset ( $config_tree->getTsets() )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -191,7 +191,7 @@ sub collect_definitions
 
     my $definitionsNode = $cb->startDefinitions();
 
-    foreach my $defName ( sort $config_tree->getDefinitionNames() )
+    for my $defName ( sort $config_tree->getDefinitionNames() )
     {
         &Torrus::DB::checkInterrupted();
 
@@ -204,9 +204,9 @@ sub collect_definitions
 
     &Torrus::DB::checkInterrupted();
 
-    foreach my $prop ( sort keys %{$props} )
+    for my $prop ( sort keys %{$props} )
     {
-        foreach my $param ( sort keys %{$props->{$prop}} )
+        for my $param ( sort keys %{$props->{$prop}} )
         {
             $cb->addParamProp( $propsNode, $param, $prop,
                                $props->{$prop}{$param} );
@@ -246,7 +246,7 @@ sub apply_filter
 
     $filterTokens{$token} = 0;
     
-    foreach my $ctoken ( $config_tree->getChildren( $token ) )
+    for my $ctoken ( $config_tree->getChildren( $token ) )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -277,7 +277,7 @@ sub collect_subtrees
     my $token = shift;
     my $parentNode = shift;
     
-    foreach my $ctoken ( $config_tree->getChildren( $token ) )
+    for my $ctoken ( $config_tree->getChildren( $token ) )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -298,7 +298,7 @@ sub collect_subtrees
                 $cb->addLeaf( $parentNode, $childName, $params );
             }
             
-            foreach my $aliasToken ( $config_tree->getAliases( $ctoken ) )
+            for my $aliasToken ( $config_tree->getAliases( $ctoken ) )
             {
                 $cb->addAlias( $parentNode,
                                $config_tree->path( $aliasToken ) );

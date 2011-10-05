@@ -22,6 +22,7 @@ package Torrus::DevDiscover::CCOM;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CCOM'} = {
     'sequence'     => 500,
@@ -67,7 +68,7 @@ sub discover
     # for some devices, ifDescr is poisoned with non-ASSCII characters.
     # clean that up to get some meaningful names
     
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    for my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         

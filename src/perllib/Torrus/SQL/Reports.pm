@@ -30,6 +30,8 @@ use base 'Torrus::SQL';
 use Torrus::Log;
 # use Torrus::SQL::ReportFields;
 
+our $VERSION = 1.0;
+
 # The name of the table and columns 
 # defaults configured in torrus-config.pl
 our $tableName;
@@ -187,14 +189,14 @@ sub getAllReports
         $self->fetchall([ 'id', 'rep_date', 'rep_time', 'reportname' ]);
 
     my $ret = {};
-    foreach my $report ( @{$reports} )
+    for my $report ( @{$reports} )
     {
         my($year, $month, $day) = split('-', $report->{'rep_date'});
 
         my $fields = $self->getFields( $report->{'id'} );
         my $fieldsref = {};
         
-        foreach my $field ( @{$fields} )
+        for my $field ( @{$fields} )
         {
             if( not ref( $srvIdList ) or
                 grep {$field->{'serviceid'} eq $_} @{$srvIdList} )

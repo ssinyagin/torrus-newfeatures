@@ -22,6 +22,8 @@ package Torrus::Collector::SNMP_Params;
 ###  Initialize the configuration validator with module-specific parameters
 ###  Moved to a separate module to speed up the compiler initialization
 
+our $VERSION = 1.0;
+
 my %validatorLeafParams =
     (
      'snmp-ipversion'     => {'4'   => undef, '6'   => undef},

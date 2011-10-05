@@ -22,6 +22,7 @@ package Torrus::DevDiscover::Thomson_xDSL;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'Thomson_xDSL'} = {
     'sequence'     => 500,

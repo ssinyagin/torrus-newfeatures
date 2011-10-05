@@ -27,6 +27,8 @@ package Torrus::DevDiscover::Alteon;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 
 $Torrus::DevDiscover::registry{'Alteon'} = {
     'sequence'     => 500,
@@ -95,7 +97,7 @@ sub discover
     my $virtTable = $session->get_table ( -baseoid =>
                                           $dd->oiddef('slbStatVServerIndex') );
     $devdetails->storeSnmpVars( $virtTable ); 
-    foreach my $virtIndex
+    for my $virtIndex
         ( $devdetails->getSnmpIndices( $dd->oiddef('slbStatVServerIndex') ) )
     {
         Debug("Alteon::vserver  Found index $virtIndex");
@@ -108,7 +110,7 @@ sub discover
                               $dd->oiddef('slbStatPortMaintPortIndex') );
     $devdetails->storeSnmpVars( $maintTable );
     
-    foreach my $mIndex
+    for my $mIndex
         ( $devdetails->getSnmpIndices
           ( $dd->oiddef('slbStatPortMaintPortIndex') ) )
     {
@@ -138,7 +140,7 @@ sub buildConfig
                          { 'comment' => 'Stats per Virtual Server' },
                          [ 'Alteon::alteon-vserver-subtree'] );
 
-    foreach my $virtIndex ( sort {$a <=> $b } keys %{$data->{'VSERVER'}} )
+    for my $virtIndex ( sort {$a <=> $b } keys %{$data->{'VSERVER'}} )
     {
         $cb->addSubtree( $virtNode, 'VirtualHost_' . $virtIndex,
                          { 'alteon-vserver-index' => $virtIndex },
@@ -151,7 +153,7 @@ sub buildConfig
                          { 'comment' => 'SLB port maintenance statistics' },
                          [ 'Alteon::alteon-maint-subtree'] );
     
-    foreach my $mIndex ( sort {$a <=> $b } keys %{$data->{'MAINT'}} )
+    for my $mIndex ( sort {$a <=> $b } keys %{$data->{'MAINT'}} )
     {
         $cb->addSubtree( $maintNode, 'Port_' . $mIndex,
                          { 'alteon-maint-index' => $mIndex },

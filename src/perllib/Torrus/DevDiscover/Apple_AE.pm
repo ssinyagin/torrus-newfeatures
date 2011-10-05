@@ -28,6 +28,8 @@ package Torrus::DevDiscover::Apple_AE;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 
 $Torrus::DevDiscover::registry{'Apple_AE'} = {
     'sequence'     => 500,
@@ -116,7 +118,7 @@ sub discover
             # PROG: setCap that we actually have clients ...
             $devdetails->setCap('AE_clients');
 
-            foreach my $wClient ( $devdetails->getSnmpIndices
+            for my $wClient ( $devdetails->getSnmpIndices
                                   ($dd->oiddef('wirelessPhysAddress')) )
             {
                 my $wMAC = $devdetails->snmpVar(
@@ -150,7 +152,7 @@ sub buildConfig
             $cb->addSubtree( $devNode, 'Wireless_Clients', undef,
                              [ 'Apple_AE::ae-wireless-clients-subtree'] );
 
-        foreach my $wClient ( keys %{$data->{'Apple_AE'}{'wClients'}} )
+        for my $wClient ( keys %{$data->{'Apple_AE'}{'wClients'}} )
         {
             my $airport = $data->{'Apple_AE'}{'wClients'}{$wClient};
             my $wMAC    = $airport->{'wMAC'};

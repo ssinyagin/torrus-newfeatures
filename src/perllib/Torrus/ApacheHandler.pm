@@ -26,6 +26,8 @@ use Apache;
 
 use Torrus::CGI;
 
+our $VERSION = 1.0;
+
 sub handler
 {
     my $r = shift;

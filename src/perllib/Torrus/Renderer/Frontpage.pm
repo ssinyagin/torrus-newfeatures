@@ -28,6 +28,8 @@ use Torrus::Log;
 use Template;
 use URI::Escape;
 
+our $VERSION = 1.0;
+
 # All our methods are imported by Torrus::Renderer;
 
 sub renderUserLogin
@@ -192,7 +194,7 @@ sub renderTreeChooser
                                 $_[0] . '?path=' . $_[1] },
         'plainURL'   => $Torrus::Renderer::plainURL,
         'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
-                              return undef;},
+                              return},
         'style'      => sub { return $self->style($_[0]); },
         'companyName'=> $Torrus::Renderer::companyName,
         'companyLogo'=> $Torrus::Renderer::companyLogo,
@@ -264,7 +266,7 @@ sub doGlobalSearch
     my %seen;
     my $ret = [];
     
-    foreach my $element ( @{$sorted} )
+    for my $element ( @{$sorted} )
     {
         my $string = join( ':', $element->[0], $element->[1] );
         if( not $seen{$string} )

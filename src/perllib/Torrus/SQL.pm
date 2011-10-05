@@ -30,6 +30,8 @@ use DBIx::Sequence;
 
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 my %connectionArgsCache;
 
 # Obtain connection attributes for particular class and object subtype.
@@ -68,10 +70,10 @@ sub getConnectionArgs
     }    
 
     my $ret = {};
-    foreach my $attr ( 'dsn', 'username', 'password' )
+    for my $attr ( 'dsn', 'username', 'password' )
     {
         my $val;
-        foreach my $key ( @lookup )
+        for my $key ( @lookup )
         {
             if( defined( $Torrus::SQL::connections{$key} ) )
             {
@@ -147,7 +149,7 @@ sub dbh
 
 END
 {
-    foreach my $dbh ( values %dbhPool )
+    for my $dbh ( values %dbhPool )
     {
         $dbh->disconnect();
     }
@@ -164,7 +166,7 @@ sub new
     $self->{'dbh'} = $class->dbh( $subtype );
     if( not defined( $self->{'dbh'} ) )
     {
-        return undef;
+        return
     }
     
     $self->{'sql'} = DBIx::Abstract->connect( $self->{'dbh'} );
@@ -213,7 +215,7 @@ sub fetchall
     {
         my $retrecord = {};
         my $i = 0;
-        foreach my $col ( @{$columns} )
+        for my $col ( @{$columns} )
         {
             $retrecord->{$col} = $row->[$i++];
         }

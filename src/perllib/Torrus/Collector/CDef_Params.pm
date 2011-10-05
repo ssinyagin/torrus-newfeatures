@@ -25,6 +25,8 @@ package Torrus::Collector::CDef_Params;
 
 use strict;
 
+our $VERSION = 1.0;
+
 ###  Initialize the configuration validator with module-specific parameters
 our %params =
     (
@@ -66,4 +68,3 @@ sub initAdmInfo
 
 
 1;
-

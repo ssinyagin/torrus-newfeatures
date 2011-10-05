@@ -27,6 +27,7 @@ package Torrus::DevDiscover::CiscoCatOS;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CiscoCatOS'} = {
     'sequence'     => 500,
@@ -128,7 +129,7 @@ sub discover
         my $portName = $session->get_table( -baseoid => $portNameOID );
         if( defined $portName )
         {
-            foreach my $portIndex
+            for my $portIndex
                 ( $devdetails->getSnmpIndices( $portIfIndexOID ) )
             {
                 my $ifIndex =
@@ -145,7 +146,7 @@ sub discover
     if( $devdetails->param('CiscoCatOS::suppress-noname-ports') eq 'yes' )
     {
         my $nExcluded = 0;
-        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+        for my $ifIndex ( keys %{$data->{'interfaces'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
             if( not defined( $interface->{'portName'} ) or

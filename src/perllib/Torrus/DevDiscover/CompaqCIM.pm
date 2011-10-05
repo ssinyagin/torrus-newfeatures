@@ -26,6 +26,7 @@ package Torrus::DevDiscover::CompaqCIM;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'CompaqCIM'} = {
     'sequence'     => 500,
@@ -88,7 +89,7 @@ sub discover
 
     my @checkOids = ( 'cpqHeCorrMemTotalErrs' );
 
-    foreach my $oid ( @checkOids )
+    for my $oid ( @checkOids )
     {
         if( $dd->checkSnmpOID($oid) )
         { 
@@ -110,7 +111,7 @@ sub discover
         $data->{'TemperatureTable'} = $ref;
 
         # Index is Chassis . Index
-        foreach my $INDEX
+        for my $INDEX
             ( $devdetails->
               getSnmpIndices( $dd->oiddef('cpqHeTemperatureIndex') ) )
         {
@@ -192,7 +193,7 @@ sub buildConfig
 
         my $ref = $data->{'TemperatureTable'};
 
-        foreach my $INDEX ( @{ $ref->{'indices'} } )
+        for my $INDEX ( @{ $ref->{'indices'} } )
         {
             my $param = $ref->{$INDEX}->{'param'};
             $cb->addLeaf( $tempNode, $param->{'cpq-cim-sensor-nick'}, $param,

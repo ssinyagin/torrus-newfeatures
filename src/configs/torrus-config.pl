@@ -398,7 +398,7 @@ $Torrus::SQL::ReportFields::tableName = 'reportfields';
     opendir(CFGDIR, $dir) or die("Cannot open directory $dir: $!");
     my @files = grep { !/^\./ } readdir(CFGDIR);
     closedir( CFGDIR );
-    foreach my $file ( @files )
+    for my $file ( @files )
     {
         require $dir . '/' . $file;
     }

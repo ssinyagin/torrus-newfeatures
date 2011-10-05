@@ -27,6 +27,7 @@ package Torrus::DevDiscover::MicrosoftWindows;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'MicrosoftWindows'} = {
     'sequence'     => 500,

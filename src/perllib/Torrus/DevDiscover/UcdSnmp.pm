@@ -24,6 +24,7 @@ package Torrus::DevDiscover::UcdSnmp;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'UcdSnmp'} = {
     'sequence'     => 500,
@@ -106,7 +107,7 @@ sub discover
     my $result = $dd->retrieveSnmpOIDs( @checkOids );
     if( defined( $result ) )
     {
-        foreach my $oid ( @checkOids )
+        for my $oid ( @checkOids )
         {
             if( defined($result->{$oid}) and length($result->{$oid}) > 0 )
             {

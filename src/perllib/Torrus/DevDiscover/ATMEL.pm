@@ -23,6 +23,7 @@ package Torrus::DevDiscover::ATMEL;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'ATMEL'} = {
     'sequence'     => 500,
@@ -150,7 +151,7 @@ sub buildConfig
         push (@templates, 'ATMEL::atmel-client-stats');
     }
 
-    foreach my $tmpl ( @templates )
+    for my $tmpl ( @templates )
     {
         $cb->addTemplateApplication( $devNode, $tmpl );
     }

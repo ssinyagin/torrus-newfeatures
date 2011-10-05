@@ -25,6 +25,8 @@ use Torrus::Log;
 
 use strict;
 
+our $VERSION = 1.0;
+
 BEGIN
 {
     eval( 'require ' . $Torrus::ACL::userAuthModule );
@@ -73,7 +75,7 @@ sub hasPrivilege
     my $object = shift;
     my $privilege = shift;
 
-    foreach my $group ( $self->memberOf( $uid ) )
+    for my $group ( $self->memberOf( $uid ) )
     {
         if( $self->{'db_acl'}->get( $group.':'.$object.':'.$privilege ) )
         {
@@ -90,7 +92,7 @@ sub hasPrivilege
     
     Debug('User ' . $uid . ' has NO privilege ' . $privilege .
           ' for ' . $object);
-    return undef;
+    return
 }
 
 
@@ -112,7 +114,7 @@ sub authenticateUser
 
     my @attrList = $self->{'auth'}->getUserAttrList();
     my $attrValues = {};
-    foreach my $attr ( @attrList )
+    for my $attr ( @attrList )
     {
         $attrValues->{$attr} = $self->userAttribute( $uid, $attr );
     }

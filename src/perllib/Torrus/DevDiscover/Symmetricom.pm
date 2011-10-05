@@ -28,6 +28,7 @@ package Torrus::DevDiscover::Symmetricom;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'Symmetricom'} = {
     'sequence'     => 500,

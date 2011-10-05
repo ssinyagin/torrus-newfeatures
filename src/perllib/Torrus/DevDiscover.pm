@@ -30,9 +30,11 @@ use Digest::MD5 qw(md5);
 
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 BEGIN
 {
-    foreach my $mod ( @Torrus::DevDiscover::loadModules )
+    for my $mod ( @Torrus::DevDiscover::loadModules )
     {
         eval( 'require ' . $mod );
         die( $@ ) if $@;
@@ -127,7 +129,7 @@ sub new
     $self->{'oidrev'} = {};
 
     # Combine all %MODULE::oiddef hashes into one
-    foreach my $module ( 'Torrus::DevDiscover',
+    for my $module ( 'Torrus::DevDiscover',
                          @Torrus::DevDiscover::loadModules )
     {
         while( my($name, $oid) = each %{eval('\%'.$module.'::oiddef')} )
@@ -160,12 +162,12 @@ sub discover
 
     my $devdetails = new Torrus::DevDiscover::DevDetails();
 
-    foreach my $params ( \%defaultParams, @paramhashes )
+    for my $params ( \%defaultParams, @paramhashes )
     {
         $devdetails->setParams( $params );
     }
 
-    foreach my $param ( @requiredParams )
+    for my $param ( @requiredParams )
     {
         if( not defined( $devdetails->param( $param ) ) )
         {
@@ -180,7 +182,7 @@ sub discover
     my $version = $devdetails->param( 'snmp-version' );
     $snmpargs{'-version'} = $version;    
 
-    foreach my $arg ( qw(-port -localaddr -localport -timeout -retries) )
+    for my $arg ( qw(-port -localaddr -localport -timeout -retries) )
     {
         if( defined( $devdetails->param( 'snmp' . $arg ) ) )
         {
@@ -212,7 +214,7 @@ sub discover
     }
     elsif( $version eq '3' )        
     {
-        foreach my $arg ( qw(-username -authkey -authpassword -authprotocol
+        for my $arg ( qw(-username -authkey -authpassword -authprotocol
                              -privkey -privpassword -privprotocol) )
         {
             if( defined $devdetails->param( 'snmp' . $arg ) )
@@ -254,11 +256,11 @@ sub discover
     if( not defined($session) )
     {
         Error('Cannot create SNMP session: ' . $error);
-        return undef;
+        return
     }
     
     my @oids = ();
-    foreach my $var ( @systemOIDs )
+    for my $var ( @systemOIDs )
     {
         push( @oids, $self->oiddef( $var ) );
     }
@@ -278,7 +280,7 @@ sub discover
         {
             Error("Unable to communicate with SNMP agent on " . $hostname .
                   ':' . $port . ':' . $community . " - " . $session->error());
-            return undef;
+            return
         }
     }
 
@@ -314,7 +316,7 @@ sub discover
          );
      
     my $legend = '';
-    foreach my $key ( sort keys %legendValues )
+    for my $key ( sort keys %legendValues )
     {
         my $text = $legendValues{$key}{'value'};
         if( length( $text ) > 0 )
@@ -334,7 +336,7 @@ sub discover
     my @hostCopyParams =
         split('\s*,\s*', $devdetails->param('host-copy-params'));
     
-    foreach my $param ( @copyParams, @hostCopyParams )
+    for my $param ( @copyParams, @hostCopyParams )
     {
         my $val = $devdetails->param( $param );
         if( length( $val ) > 0 )
@@ -372,7 +374,7 @@ sub discover
 
     my %onlyDevtypes;
     my $useOnlyDevtypes = 0;
-    foreach my $devtype ( split('\s*,\s*',
+    for my $devtype ( split('\s*,\s*',
                                 $devdetails->param('only-devtypes') ) )
     {
         $onlyDevtypes{$devtype} = 1;
@@ -380,7 +382,7 @@ sub discover
     }
 
     my %disabledDevtypes;
-    foreach my $devtype ( split('\s*,\s*',
+    for my $devtype ( split('\s*,\s*',
                                 $devdetails->param('disable-devtypes') ) )
     {
         $disabledDevtypes{$devtype} = 1;
@@ -389,7 +391,7 @@ sub discover
     # 'checkdevtype' procedures for each known device type return true
     # when it's their device. They also research the device capabilities.
     my $reg = \%Torrus::DevDiscover::registry;
-    foreach my $devtype
+    for my $devtype
         ( sort {$reg->{$a}{'sequence'} <=> $reg->{$b}{'sequence'}}
           keys %{$reg} )
     {
@@ -411,7 +413,7 @@ sub discover
 
     # Do the detailed discovery and prepare data
     my $ok = 1;
-    foreach my $devtype ( @devtypes )
+    for my $devtype ( @devtypes )
     {
         $ok = &{$reg->{$devtype}{'discover'}}($self, $devdetails) ? $ok:0;
     }
@@ -431,7 +433,7 @@ sub discover
     my $define_tokensets = $devdetails->param('define-tokensets');
     if( defined( $define_tokensets ) and length( $define_tokensets ) > 0 )
     {
-        foreach my $pair ( split(/\s*;\s*/, $define_tokensets ) )
+        for my $pair ( split(/\s*;\s*/, $define_tokensets ) )
         {
             my( $tset, $description ) = split( /\s*:\s*/, $pair );
             my $params = {};
@@ -478,7 +480,7 @@ sub buildConfig
 
     my $reg = \%Torrus::DevDiscover::registry;
         
-    foreach my $subtree ( sort keys %{$self->{'devdetails'}} )
+    for my $subtree ( sort keys %{$self->{'devdetails'}} )
     {
         # Chop the first and last slashes
         my $path = $subtree;
@@ -487,12 +489,12 @@ sub buildConfig
 
         # generate subtree path XML
         my $subtreeNode = undef;
-        foreach my $subtreeName ( split( '/', $path ) )
+        for my $subtreeName ( split( '/', $path ) )
         {
             $subtreeNode = $cb->addSubtree( $subtreeNode, $subtreeName );
         }
 
-        foreach my $devdetails
+        for my $devdetails
             ( sort {$a->param('snmp-host') cmp $b->param('snmp-host')}
               @{$self->{'devdetails'}{$subtree}} )
         {
@@ -505,7 +507,7 @@ sub buildConfig
                 my @overlayNames = 
                     split(/\s*,\s*/,
                           $devdetails->param('template-registry-overlays' ));
-                foreach my $overlayName ( @overlayNames )
+                for my $overlayName ( @overlayNames )
                 {
                     if( defined( $templateOverlays{$overlayName}) )
                     {
@@ -567,7 +569,7 @@ sub buildConfig
             my $aliases = $devdetails->param('host-aliases');
             if( length( $aliases ) > 0 )
             {
-                foreach my $alias ( split( '\s*,\s*', $aliases ) )
+                for my $alias ( split( '\s*,\s*', $aliases ) )
                 {
                     $cb->addAlias( $devNode, $alias );
                 }
@@ -576,7 +578,7 @@ sub buildConfig
             my $includeFiles = $devdetails->param('include-files');
             if( length( $includeFiles ) > 0 )
             {
-                foreach my $file ( split( '\s*,\s*', $includeFiles ) )
+                for my $file ( split( '\s*,\s*', $includeFiles ) )
                 {
                     $cb->addFileInclusion( $file );
                 }
@@ -585,7 +587,7 @@ sub buildConfig
 
             # Let the device type-specific modules add children
             # to the subtree
-            foreach my $devtype
+            for my $devtype
                 ( sort {$reg->{$a}{'sequence'} <=> $reg->{$b}{'sequence'}}
                   $devdetails->getDevTypes() )
             {
@@ -597,7 +599,7 @@ sub buildConfig
         }
     }
 
-    foreach my $devtype
+    for my $devtype
         ( sort {$reg->{$a}{'sequence'} <=> $reg->{$b}{'sequence'}}
           keys %{$reg} )
     {
@@ -611,7 +613,7 @@ sub buildConfig
     if( defined( $self->{'define-tokensets'} ) )
     {
         my $tsetsNode = $cb->startTokensets();
-        foreach my $tset ( sort keys %{$self->{'define-tokensets'}} )
+        for my $tset ( sort keys %{$self->{'define-tokensets'}} )
         {
             $cb->addTokenset( $tsetsNode, $tset, 
                               $self->{'define-tokensets'}{$tset} );
@@ -678,7 +680,7 @@ sub listDataDirs
 
     if( $Torrus::DevDiscover::hashDataDirEnabled )
     {
-        foreach my $basedir ( @basedirs )
+        for my $basedir ( @basedirs )
         {
             for( my $i = 0;
                  $i < $Torrus::DevDiscover::hashDataDirBucketSize;
@@ -751,7 +753,7 @@ sub retrieveSnmpOIDs
 
     my $session = $self->session();
     my $oids = [];
-    foreach my $oidname ( @oidnames )
+    for my $oidname ( @oidnames )
     {
         push( @{$oids}, $self->oiddef( $oidname ) );
     }                   
@@ -760,13 +762,13 @@ sub retrieveSnmpOIDs
     if( $session->error_status() == 0 and defined( $result ) )
     {
         my $ret = {};
-        foreach my $oidname ( @oidnames )
+        for my $oidname ( @oidnames )
         {
             $ret->{$oidname} = $result->{$self->oiddef( $oidname )};
         }
         return $ret;
     }
-    return undef;
+    return
 }
 
 ##
@@ -945,7 +947,7 @@ sub getSnmpIndices
     my $prefixLen = length( $prefix ) + 1;
     my $matched = 0;
 
-    foreach my $oid ( @{$self->{'sortedoids'}} )
+    for my $oid ( @{$self->{'sortedoids'}} )
     {
         if( defined($self->{'snmpvars'}{$oid} ) )
         {
@@ -1051,7 +1053,7 @@ sub applySelectors
 
     my $reg = \%Torrus::DevDiscover::selectorsRegistry;
     
-    foreach my $sel ( split('\s*,\s*', $selList) )
+    for my $sel ( split('\s*,\s*', $selList) )
     {
         my $type = $self->param( $sel . '-selector-type' );
         if( not defined( $type ) )
@@ -1071,7 +1073,7 @@ sub applySelectors
             my $treg = $reg->{$type};
             my @objects = &{$treg->{'getObjects'}}( $self, $type );
 
-            foreach my $object ( @objects )
+            for my $object ( @objects )
             {
                 Debug('Checking object: ' .
                       &{$treg->{'getObjectName'}}( $self, $object, $type ));
@@ -1099,7 +1101,7 @@ sub applySelectors
                 if( $result )
                 {
                     my $actions = $self->param( $sel . '-selector-actions' );
-                    foreach my $action ( split('\s*,\s*', $actions) )
+                    for my $action ( split('\s*,\s*', $actions) )
                     {
                         my $arg =
                             $self->param( $sel . '-' . $action . '-arg' );

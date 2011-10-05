@@ -31,6 +31,8 @@ package Torrus::DevDiscover::FTOS;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
+
 $Torrus::DevDiscover::registry{'FTOS'} = {
     'sequence'     => 500,
     'checkdevtype' => \&checkdevtype,
@@ -187,7 +189,7 @@ sub discover
             $devdetails->setCap('ftosCPU');
 
             # Find the index of the CPU
-            foreach my $ftosCPUidx ( $devdetails->getSnmpIndices
+            for my $ftosCPUidx ( $devdetails->getSnmpIndices
                                      ( $dd->oiddef('chRpmCpuIndex') ) )
             {
                 my $cpuType = $dd->oiddef('chRpmCpuIndex') . "." . $ftosCPUidx;
@@ -221,7 +223,7 @@ sub discover
             $devdetails->setCap('ftosPSU');
 
             # Find the Index of the Power Supplies
-            foreach my $ftosPSUidx ( $devdetails->getSnmpIndices
+            for my $ftosPSUidx ( $devdetails->getSnmpIndices
                                      ($dd->oiddef('chSysPowerSupplyIndex')) )
             {
                 Debug("FTOS::PSU index $ftosPSUidx");
@@ -250,7 +252,7 @@ sub discover
         {
             $devdetails->setCap('ftosSensor');
             
-            foreach my $sensorIdx ( $devdetails->getSnmpIndices
+            for my $sensorIdx ( $devdetails->getSnmpIndices
                                     ( $dd->oiddef('chSysCardSlotIndex') ) )
             {
                 my $sensorCard =
@@ -283,7 +285,7 @@ sub buildConfig
         my $nodeTop = $cb->addSubtree( $devNode, 'CPU_Usage', undef,
                                        [ 'FTOS::ftos-cpu-subtree'] );
 
-        foreach my $CPUidx ( sort {$a <=> $b} keys %{$data->{'ftosCPU'}} )
+        for my $CPUidx ( sort {$a <=> $b} keys %{$data->{'ftosCPU'}} )
         {
             my $CPUName = $data->{'ftosCPU'}{$CPUidx};
             my $subName = sprintf( 'CPU_%.2d', $CPUidx );
@@ -315,7 +317,7 @@ sub buildConfig
                                        $param, $templates );
 
 
-        foreach my $PSUidx ( sort {$a <=> $b} @{$data->{'ftosPSU'}} )
+        for my $PSUidx ( sort {$a <=> $b} @{$data->{'ftosPSU'}} )
         {
             my $leafName = sprintf( 'power_%.2d', $PSUidx );
 
@@ -343,7 +345,7 @@ sub buildConfig
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, $templates );
 
-        foreach my $sIndex ( sort {$a<=>$b} keys %{$data->{'ftosSensor'}} )
+        for my $sIndex ( sort {$a<=>$b} keys %{$data->{'ftosSensor'}} )
         {
             my $leafName   = sprintf( 'sensor_%.2d', $sIndex );
             my $threshold  = 60;  # Forced value for the time being, 60 degC

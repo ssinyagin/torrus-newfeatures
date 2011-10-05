@@ -249,7 +249,7 @@ foreach my $serviceid ( @input )
     # Fill in the aligned array. For each interval by modulo(step),
     # we take the sum of values that get into that interval
     
-    foreach my $row ( @{$in_data{$serviceid}} )
+    for my $row ( @{$in_data{$serviceid}} )
     {
         my $rowtime = str2time( $row->{'srv_date'} . 'T' .
                                 $row->{'srv_time'} );
@@ -295,7 +295,7 @@ if( not defined( $sth ) )
 for( my $pos = 0; $pos < $n_points; $pos++ )
 {
     my @args;
-    foreach my $serviceid ( @input )
+    for my $serviceid ( @input )
     {
         my $val = $aligned_data{$serviceid}->[$pos];
         if( defined( $val ) )
@@ -341,7 +341,7 @@ sub function_max
     my $value = Math::BigFloat->new();
     $value->binf('-');
 
-    foreach my $a ( @_ )
+    for my $a ( @_ )
     {
         if( $value->bcmp($a) < 0 )
         {
@@ -357,7 +357,7 @@ sub function_sum
 {
     my $value = Math::BigFloat->new(0);
 
-    foreach my $a ( @_ )
+    for my $a ( @_ )
     {
         $value->badd($a);
     }

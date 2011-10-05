@@ -27,6 +27,7 @@ package Torrus::DevDiscover::RFC2662_ADSL_LINE;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'RFC2662_ADSL_LINE'} = {
     'sequence'     => 100,
@@ -78,7 +79,7 @@ sub discover
 
     $data->{'AdslLine'} = {};
     
-    foreach my $oidname
+    for my $oidname
         ( 'adslAtucCurrSnrMgn',
           'adslAtucCurrAtn',
           'adslAtucCurrAttainableRate',
@@ -126,7 +127,7 @@ sub buildConfig
     my $data = $devdetails->data();
     my $precedence = $1000;
     
-    foreach my $ifIndex ( sort {$a<=>$b} %{$data->{'AdslLine'}} )
+    for my $ifIndex ( sort {$a<=>$b} %{$data->{'AdslLine'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if not defined($interface);

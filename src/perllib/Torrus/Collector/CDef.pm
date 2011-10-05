@@ -33,6 +33,8 @@ use Torrus::RPN;
 use Torrus::DataAccess;
 use Torrus::Collector::RRDStorage;
 
+our $VERSION = 1.0;
+
 # Register the collector type
 $Torrus::Collector::collectorTypes{'cdef'} = 1;
 
@@ -77,7 +79,7 @@ sub runCollector
     my $defaultAccessTime = $now -
         ( $now % $collector->period() ) + $collector->offset();
     
-    foreach my $token ( @{$cref->{'crefTokens'}} )
+    for my $token ( @{$cref->{'crefTokens'}} )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -117,4 +119,3 @@ sub runCollector
 
 
 1;
-

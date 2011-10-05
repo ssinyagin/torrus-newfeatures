@@ -116,7 +116,7 @@ foreach my $tree ( @trees )
     push( @xmlFiles, Torrus::SiteConfig::listXmlFiles( $tree ) );
     push( @xmlFiles, @Torrus::Global::xmlAlwaysIncludeLast );
 
-    foreach my $xmlfile ( @xmlFiles )
+    for my $xmlfile ( @xmlFiles )
     {
         if( not $compiler->compile( $xmlfile ) )
         {
@@ -161,11 +161,11 @@ foreach my $tree ( @trees )
         my $oldConfig = new Torrus::ConfigTree( -TreeName => $tree );
         if( defined( $oldConfig ) )
         {
-            foreach my $ts ( $oldConfig->getTsets() )
+            for my $ts ( $oldConfig->getTsets() )
             {
                 if( $compiler->tsetExists( $ts ) )
                 {
-                    foreach my $member ( $oldConfig->tsetMembers( $ts ) )
+                    for my $member ( $oldConfig->tsetMembers( $ts ) )
                     {
                         my $origin =
                             $oldConfig->tsetMemberOrigin( $ts, $member );

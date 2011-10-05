@@ -177,7 +177,7 @@ foreach my $infile ( @infiles )
 
     # Parse the body of the XML
 
-    foreach my $hostNode ( $root->getChildrenByTagName('host') )
+    for my $hostNode ( $root->getChildrenByTagName('host') )
     {
         my $hostParams = parseParams( $hostNode, $globalParams );
         normalizeParams( $hostParams );
@@ -192,7 +192,7 @@ foreach my $infile ( @infiles )
         my $outBundles = $hostParams->{'output-bundle'};
         if( length( $outBundles ) > 0 )
         {
-            foreach my $bundleName ( split( /\s*,\s*/, $outBundles ) )
+            for my $bundleName ( split( /\s*,\s*/, $outBundles ) )
             {
                 $bundleName = absXmlFilename( $bundleName );
                 $outputBundles{$bundleName}{ relXmlFilename($outfile) } = 1;
@@ -216,7 +216,7 @@ if( $workerThreads > 1 )
 
     threads::shared::share( \$everythingsOk );
 
-    foreach my $callback
+    for my $callback
         (values %Torrus::DevDiscover::threading_init_callbacks)
     {
         &{$callback}();
@@ -227,7 +227,7 @@ if( $workerThreads > 1 )
     $confBuildSemaphore = new Thread::Semaphore;
 
     # Enqueue the output filenames    
-    foreach my $outfile ( sort keys %{$perOutfileHostParams} )
+    for my $outfile ( sort keys %{$perOutfileHostParams} )
     {
         if( not matchLimitRe( $outfile ) )
         {
@@ -239,7 +239,7 @@ if( $workerThreads > 1 )
 
     # Start the worker threads
     my @workers;
-    foreach my $i ( 1..$workerThreads )
+    for my $i ( 1..$workerThreads )
     {
         push( @workers, threads->create( \&discoveryThread ) );
     }
@@ -268,12 +268,12 @@ else
 {
     # Single-thread operation
 
-    foreach my $callback (values %Torrus::DevDiscover::thread_start_callbacks)
+    for my $callback (values %Torrus::DevDiscover::thread_start_callbacks)
     {
         &{$callback}();
     }
        
-    foreach my $outfile ( sort keys %{$perOutfileHostParams} )
+    for my $outfile ( sort keys %{$perOutfileHostParams} )
     {
         if( not matchLimitRe( $outfile ) )
         {
@@ -286,7 +286,7 @@ else
         }
     }
 
-    foreach my $callback (values %Torrus::DevDiscover::thread_end_callbacks)
+    for my $callback (values %Torrus::DevDiscover::thread_end_callbacks)
     {
         &{$callback}();
     }
@@ -303,13 +303,13 @@ if( scalar( keys %outputBundles ) > 0 )
     }
     elsif( $everythingsOk )
     {
-        foreach my $bundleName ( sort keys %outputBundles )
+        for my $bundleName ( sort keys %outputBundles )
         {
             my $cb = new Torrus::ConfigBuilder;
 
             $cb->addCreatorInfo( $creator );
             
-            foreach my $bundleMember
+            for my $bundleMember
                 ( sort keys %{$outputBundles{$bundleName}} )
             {
                 $cb->addFileInclusion( $bundleMember );
@@ -352,7 +352,7 @@ sub parseParams
         }
     }
 
-    foreach my $paramNode ( $parentNode->getChildrenByTagName('param') )
+    for my $paramNode ( $parentNode->getChildrenByTagName('param') )
     {
         my $param = $paramNode->getAttribute('name');
         my $value = $paramNode->getAttribute('value');
@@ -483,7 +483,7 @@ sub discoveryThread
     &Torrus::Log::setTID( threads->tid() );
     Debug('Started thread no. ' . threads->tid());
     
-    foreach my $callback (values %Torrus::DevDiscover::thread_start_callbacks)
+    for my $callback (values %Torrus::DevDiscover::thread_start_callbacks)
     {
         &{$callback}();
     }
@@ -497,7 +497,7 @@ sub discoveryThread
         }
     }
     
-    foreach my $callback (values %Torrus::DevDiscover::thread_end_callbacks)
+    for my $callback (values %Torrus::DevDiscover::thread_end_callbacks)
     {
         &{$callback}();
     }
@@ -516,13 +516,13 @@ sub doDiscover
     my $dd = new Torrus::DevDiscover;
     my $ok = 1;
 
-    foreach my $hostParams ( @{$perOutfileHostParams->{$outfile}} )
+    for my $hostParams ( @{$perOutfileHostParams->{$outfile}} )
     {
         $ok = $dd->discover( $hostParams );
 
         if( not $ok )
         {
-            foreach my $callback
+            for my $callback
                 (values %Torrus::DevDiscover::discovery_failed_callbacks)
             {
                 &{$callback}( $hostParams );
@@ -581,7 +581,7 @@ sub doDiscover
             my ($login,$pass,$uid,$gid) = getpwnam('@torrus_user@')
                 or die "Cannot get user details for @torrus_user@";
             
-            foreach my $dir ( $dd->listDataDirs() )
+            for my $dir ( $dd->listDataDirs() )
             {
                 if( not -d $dir )
                 {
@@ -634,7 +634,7 @@ sub removeFromBundle
 
     if( $removeFromBundle )
     {
-        foreach my $bundleName ( sort keys %outputBundles )
+        for my $bundleName ( sort keys %outputBundles )
         {
             if( exists( $outputBundles{$bundleName}{$relname} ) )
             {

@@ -31,6 +31,7 @@ package Torrus::DevDiscover::AscendMax;
 use strict;
 use Torrus::Log;
 
+our $VERSION = 1.0;
 
 $Torrus::DevDiscover::registry{'AscendMax'} = {
     'sequence'     => 500,
@@ -148,7 +149,7 @@ sub discover
 
         $data->{'ascend_wanLines'} = {};
 
-        foreach my $ifIndex ( $devdetails->getSnmpIndices( $stateOid ) )
+        for my $ifIndex ( $devdetails->getSnmpIndices( $stateOid ) )
         {
             # Check if the line State is 13(active)
             if( $devdetails->snmpVar( $stateOid . '.' . $ifIndex) == 13 )
@@ -178,7 +179,7 @@ sub buildConfig
     my $callStatsNode = $cb->addSubtree( $devNode, 'Call_Statistics', undef,
                                          ['AscendMax::ascend-totalcalls']);
 
-    foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'ascend_wanLines'}} )
+    for my $ifIndex ( sort {$a<=>$b} keys %{$data->{'ascend_wanLines'}} )
     {
         my $param = {};
         $param->{'precedence'} = sprintf('%d', -10000 - $ifIndex);

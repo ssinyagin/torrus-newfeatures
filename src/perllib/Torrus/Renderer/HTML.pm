@@ -321,15 +321,15 @@ sub rrPrint
     }
     else
     {
-        if( not open(IN, $fname) )
+        if( open(my $IN, '<', $fname) )
         {
-            Error("Cannot open $fname for reading: $!");
+            chomp(my $values = <$IN>);
+            @ret = split(':', $values);
+            close $IN;
         }
         else
         {
-            chomp(my $values = <IN>);
-            @ret = split(':', $values);
-            close IN;
+            Error("Cannot open $fname for reading: $!");
         }
     }
     return @ret;

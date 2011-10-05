@@ -18,9 +18,10 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Monitor;
-@Torrus::Monitor::ISA = qw(Torrus::Scheduler::PeriodicTask);
 
 use strict;
+
+@Torrus::Monitor::ISA = qw(Torrus::Scheduler::PeriodicTask);
 
 use Torrus::DB;
 use Torrus::ConfigTree;

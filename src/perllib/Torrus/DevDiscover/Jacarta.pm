@@ -23,7 +23,6 @@ package Torrus::DevDiscover::Jacarta;
 
 use strict;
 use Torrus::Log;
-use Switch;
 use Data::Dumper;
 
 our $VERSION = 1.0;

@@ -18,8 +18,6 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # Class for Reporter data manipulation
-package Torrus::SQL::ReportFields;
-
 package Torrus::SQL::Reports;
 
 use strict;
@@ -28,7 +26,6 @@ use Torrus::SQL;
 use base 'Torrus::SQL';
 
 use Torrus::Log;
-# use Torrus::SQL::ReportFields;
 
 our $VERSION = 1.0;
 
@@ -211,80 +208,6 @@ sub getAllReports
     }
     return $ret;    
 }
-
-        
-        
-    
-    
-
-        
-################################################
-## Class for report fields table
-
-package Torrus::SQL::ReportFields;
-use strict;
-
-use Torrus::SQL;
-use base 'Torrus::SQL';
-
-use Torrus::Log;
-
-# The name of the table and columns 
-# defaults configured in torrus-config.pl
-our $tableName;
-our %columns;
-
-sub add
-{
-    my $self = shift;
-    my $reportId = shift;
-    my $attrs = shift;
-    
-    my $id = $self->sequenceNext();
-    
-    $self->{'sql'}->insert({
-        'table' => $tableName,
-        'fields' => { $columns{'id'}         => $id,
-                      $columns{'rep_id'}     => $reportId,
-                      $columns{'name'}       => $attrs->{'name'},
-                      $columns{'serviceid'}  => $attrs->{'serviceid'},
-                      $columns{'value'}      => $attrs->{'value'},
-                      $columns{'units'}      => $attrs->{'units'} } });
-}
-
-
-sub getAll
-{
-    my $self = shift;
-    my $reportId = shift;
-       
-    $self->{'sql'}->select({
-        'table' => $tableName,
-        'where' => { $columns{'rep_id'} => $reportId },
-        'fields' => [ $columns{'name'},
-                      $columns{'serviceid'},
-                      $columns{'value'},
-                      $columns{'units'}] });
-
-    return $self->fetchall([ 'name', 'serviceid', 'value', 'units' ]);
-}
-
-
-sub removeAll
-{
-    my $self = shift;
-    my $reportId = shift;
-       
-    $self->{'sql'}->delete({
-        'table' => $tableName,
-        'where' => { $columns{'rep_id'} => $reportId }});
-}    
-    
-    
-    
-    
-1;
-
 
 # Local Variables:
 # mode: perl

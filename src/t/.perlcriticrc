@@ -1,2 +1,3 @@
+severity  = 2
 [BuiltinFunctions::ProhibitStringyEval]
 allow_includes = 1

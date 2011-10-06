@@ -102,10 +102,8 @@ sub compile
     # Initialize the '/' element
     $self->initRoot();
 
-    my $node;
-
     # First of all process all pre-required files
-    for $node ( $root->getElementsByTagName('include') )
+    for my $node ( $root->getElementsByTagName('include') )
     {
         my $incfile = $node->getAttribute('filename');
         if( not $incfile )
@@ -119,35 +117,35 @@ sub compile
         }
     }
 
-    for $node ( $root->getElementsByTagName('param-properties') )
+    for my $node ( $root->getElementsByTagName('param-properties') )
     {
         $ok = $self->compile_paramprops( $node ) ? $ok:0;
     }
 
     if( not $self->{'-NoDSRebuild'} )
     {
-        for $node ( $root->getElementsByTagName('definitions') )
+        for my $node ( $root->getElementsByTagName('definitions') )
         {
             $ok = $self->compile_definitions( $node ) ? $ok:0;
         }
 
-        for $node ( $root->getElementsByTagName('datasources') )
+        for my $node ( $root->getElementsByTagName('datasources') )
         {
             $ok = $self->compile_ds( $node ) ? $ok:0;
         }
     }
 
-    for $node ( $root->getElementsByTagName('monitors') )
+    for my $node ( $root->getElementsByTagName('monitors') )
     {
         $ok = $self->compile_monitors( $node ) ? $ok:0;
     }
 
-    for $node ( $root->getElementsByTagName('token-sets') )
+    for my $node ( $root->getElementsByTagName('token-sets') )
     {
         $ok = $self->compile_tokensets( $node ) ? $ok:0;
     }
 
-    for $node ( $root->getElementsByTagName('views') )
+    for my $node ( $root->getElementsByTagName('views') )
     {
         $ok = $self->compile_views( $node ) ? $ok:0;
     }

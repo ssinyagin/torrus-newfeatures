@@ -23,10 +23,45 @@ can_ok('main', qw(
 )) or die("Bail out! Test::More did not export all necessary functions\n");
 
 my %requires = (
-	'Digest::MD5'     => { can => [ qw( new md5_hex ) ] },
+
+#Apache2::ServerUtil
+#BerkeleyDB
+#CGI
+#CGI::Fast
+#Data::Dumper
+#Date::Format
+#Date::Parse
+#DBI
+#DBIx::Abstract
+
+	'Digest::MD5'     => { can => [ qw( new md5_hex ) ] }, # FIXME: need to check which other functions we need
+
+#Fcntl
+#File::Copy
+#File::Find
+#Getopt::Long
+#IO::Dir
+#JSON
+#Math::BigFloat
+#Math::BigInt
+#mod_perl2
+#Net::hostent
+#Net::SNMP  Net::SNMP qw(:snmp :asn1);
+
 	'POSIX'           => { can => [ qw( abs log floor pow strftime ) ] },
+
+#Proc::Daemon
+#RRDs
+
 	'Socket'          => { exports => [ qw( inet_ntoa ) ] },
         'Sys::Hostname'   => { exports => [ qw( hostname ) ] },
+
+#Template
+#Text::Tabs
+#threads
+#URI::Escape
+#XML::LibXML
+
 );
 
 my $bail;

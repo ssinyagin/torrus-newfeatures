@@ -72,14 +72,14 @@ sub new
         {
             $Torrus::DB::dbEnvErrFile =
                 $Torrus::Global::logDir . '/dbenv_errlog_' . $$;
-            
+
             Debug("Creating BerkeleyDB::Env");
             umask 0002;
             $Torrus::DB::env =
                 new BerkeleyDB::Env(-Home  => $Torrus::Global::dbHome,
                                     -Flags => (DB_CREATE |
                                                DB_INIT_CDB | DB_INIT_MPOOL),
-                                    -Mode  => 0664,
+                                    -Mode  => oct(664),
                                     -ErrFile => $Torrus::DB::dbEnvErrFile);
             if( not defined($Torrus::DB::env) )
             {
@@ -130,7 +130,7 @@ sub new
     {
         $property = DB_DUP | DB_DUPSORT;
     }
-        
+
     if( not exists( $Torrus::DB::dbPool{$filename} ) )
     {
         Debug('Opening ' . $self->{'dbname'});
@@ -139,7 +139,7 @@ sub new
                                   -Filename => $filename,
                                   -Flags    => $flags,
                                   -Property => $property,
-                                  -Mode     => 0664,
+                                  -Mode     => oct(664),
                                   -Env      => $Torrus::DB::env );
         if( not $dbh )
         {
@@ -200,7 +200,7 @@ sub setSignalHandlers
     {
         return;
     }
-    
+
     $SIG{'TERM'} = sub {
         if( $safeSignals )
         {
@@ -211,7 +211,7 @@ sub setSignalHandlers
         {
             Warn('Received SIGTERM. Stopping the process.');
             exit(1);
-        }            
+        }
     };
 
     $SIG{'INT'} = sub {
@@ -224,9 +224,9 @@ sub setSignalHandlers
         {
             Warn('Received SIGINT. Stopping the process');
             exit(1);
-        }            
+        }
     };
-    
+
 
     $SIG{'PIPE'} = sub {
         if( $safeSignals )
@@ -238,9 +238,9 @@ sub setSignalHandlers
         {
             Warn('Received SIGPIPE. Stopping the process');
             exit(1);
-        }            
+        }
     };
-    
+
     $SIG{'QUIT'} = sub {
         if( $safeSignals )
         {
@@ -251,7 +251,7 @@ sub setSignalHandlers
         {
             Warn('Received SIGQUIT. Stopping the process');
             exit(1);
-        }            
+        }
     };
 
     $signalHandlersSet = 1;
@@ -270,7 +270,7 @@ sub setUnsafeSignalHandlers
     setSignalHandlers();
     $safeSignals = 0;
 }
-    
+
 
 # If we were previously interrupted, gracefully exit now
 
@@ -306,7 +306,7 @@ sub cleanupEnvironment
             $Torrus::DB::dbPool{$filename}->{'dbh'}->db_close();
             delete $Torrus::DB::dbPool{$filename};
         }
-        
+
         Debug("Destroying BerkeleyDB::Env");
         $Torrus::DB::env->close();
         $Torrus::DB::env = undef;
@@ -325,7 +325,7 @@ sub delay
     $self->{'delay_list_commit'} = 1;
 }
 
-    
+
 
 sub trunc
 {
@@ -372,7 +372,7 @@ sub cursor
 {
     my $self = shift;
     my %options = @_;
-    
+
     return $self->{'dbh'}->db_cursor( $options{'-Write'} ? DB_WRITECURSOR:0 );
 }
 
@@ -549,9 +549,9 @@ sub searchPrefix
 
     undef $cursor;
 
-    return( $ok ? $ret : undef );    
+    return( $ok ? $ret : undef );
 }
-    
+
 
 # Search the keys that match the specified substring.
 # Return value is an array of [key,val] pairs or undef
@@ -578,12 +578,12 @@ sub searchSubstring
             push( @{$ret}, [ $key, $val ] );
         }
     }
-    
+
     undef $cursor;
-    
-    return( $ok ? $ret : undef );    
+
+    return( $ok ? $ret : undef );
 }
-    
+
 
 
 
@@ -597,7 +597,7 @@ sub _populateListCache
 
     if( not exists( $self->{'listcache'}{$key} ) )
     {
-        my $ref = {};        
+        my $ref = {};
         my $values = $self->get($key);
         if( defined( $values ) )
         {
@@ -622,7 +622,7 @@ sub _storeListCache
     }
 }
 
-    
+
 sub addToList
 {
     my $self = shift;
@@ -630,9 +630,9 @@ sub addToList
     my $newval = shift;
 
     $self->_populateListCache($key);
-    
+
     $self->{'listcache'}{$key}{$newval} = 1;
-    
+
     $self->_storeListCache($key);
 }
 
@@ -659,7 +659,7 @@ sub delFromList
     {
         delete $self->{'listcache'}{$key}{$name};
     }
-    
+
     $self->_storeListCache($key);
 }
 
@@ -673,7 +673,7 @@ sub getListItems
     return keys %{$self->{'listcache'}{$key}};
 }
 
-    
+
 
 sub deleteList
 {
@@ -688,7 +688,7 @@ sub deleteList
 sub commit
 {
     my $self = shift;
-    
+
     if( $self->{'delay_list_commit'} and
         defined( $self->{'listcache'} ) )
     {
@@ -698,7 +698,7 @@ sub commit
         }
     }
 }
-            
+
 
 
 1;

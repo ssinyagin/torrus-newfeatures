@@ -149,15 +149,16 @@ sub render_adminfo
     }
     else
     {
-        if( not open(OUT, ">$outfile") )
+        if( open(my $OUT, '>', $outfile) )
         {
-            Error("Cannot open $outfile for writing: $!");
-            return
+            print $OUT "Cannot display admin information\n";
+            close $OUT;
         }
         else
         {
-            print OUT "Cannot display admin information\n";
-            close OUT;
+            Error("Cannot open $outfile for writing: $!");
+            return
+
         }
 
         return (300+time(), 'text/plain');

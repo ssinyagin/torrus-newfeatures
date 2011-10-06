@@ -1,3 +1,32 @@
+2011-10-06  Dean Hamstead <dean.hamstead@optusnet.com.au>
+
+        * Change all 'foreach' to 'for'
+        * genddx: needless concatenation after interpolated strings
+        * genddx: change regex from a pile of matchsticks to readable form
+        * genddx: sanity check the output directory, rather than a vauge message
+        * tests: adding a few basic tests
+        * tests: add spelling test
+        * add $VERSION to lots of modules
+        * replace return undef with return
+        * Monitor.pm: fixed perlcritic warning
+        * SNMP_params.pm: add 'use strict' for perlcritic warning
+        * Writer.pm: fixed up perlcritic warning
+        * XMLCompiler.pm: fixed up perlcritic warning
+        * HTML.pm: fixed two perlcritic violations
+        * RRDTool.pm: fixed two perlcritic violations
+        * AdmInfo.pm: fixes for two perlcritic issues
+        * Collector.pm: updates for perlcritic issues
+        * Reports.pm: split out the SQL::ReportFields.pm package in to its own file
+        * add 000-sanity.t
+        * ReportFields.pm,Reports.pm,SrvExport.pm: fixes for poorly understood 'use base'
+        * Fixes for evals
+        * Jacarta.pm: 'Switch' imported and not used, this module is also deprecated
+        * RFC2863_IF_MIB.pm: fixes
+        * SNMP_Params.pm: fixes for strictness. also killed some dead whitespace
+        * DB.pm: Perl interprets numbers with leading zeros as octal. Use oct() to make that clear
+        * RPN.pm: Loop iterators werent lexical properly
+        * XMLCompiler.pm: Non lexical loop values removed
+
 2011-10-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoFirewall.pm: interface filter

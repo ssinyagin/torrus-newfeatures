@@ -84,7 +84,7 @@ relevant discovery module for each target host.
 
 =item * C<Torrus::DevDiscover::DevDetails>
 
-This Perl module is defined in F<perllib/Torrus/DevDiscover.pm>, and provides
+This Perl module is defined in F<lib/Torrus/DevDiscover.pm>, and provides
 the functionality to store the results of SNMP device discovery.
 
 =item * C<Torrus::ConfigBuilder>

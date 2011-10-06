@@ -50,7 +50,7 @@ AC_SUBST(enable_pkgonly)
 AC_ARG_ENABLE(threads,
         [AC_HELP_STRING([--disable-threads],
                         [Disable Perl threads usage])])
-        
+
 perllibdirs="\'\${perllibdir}\'"
 
 PERLOPTS=
@@ -221,9 +221,9 @@ AC_ARG_VAR(exmpdir, [[PKGHOME/examples] Examples])
 if test -z "$exmpdir"; then
    exmpdir='${pkghome}/examples'; fi
 
-AC_ARG_VAR(perllibdir,  [[PKGHOME/perllib] Torrus Perl libraries])
+AC_ARG_VAR(perllibdir,  [[PKGHOME/lib] Torrus Perl libraries])
 if test -z "$perllibdir"; then
-   perllibdir='${pkghome}/perllib'; fi
+   perllibdir='${pkghome}/lib'; fi
 
 AC_ARG_VAR(pluginsdir,   [[PKGHOME/plugins] Plugin configurations])
 if test -z "$pluginsdir"; then
@@ -241,7 +241,7 @@ AC_ARG_VAR(plugwrapperdir, [[PLUGINSDIR/wrapper]])
 if test -z "$plugwrapperdir"; then
    plugwrapperdir='${pluginsdir}/wrapper'; fi
 
-      
+
 AC_ARG_VAR(scriptsdir, [[PKGHOME/scripts] Script files])
 if test -z "$scriptsdir"; then
    scriptsdir='${pkghome}/scripts'; fi
@@ -331,12 +331,12 @@ AC_ARG_VAR(defrrddir, [[/srv/torrus/collector_rrd] Default RRD storage path])
 if test -z "$defrrddir"; then
    defrrddir='/srv/torrus/collector_rrd'; fi
 
-   
+
 AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
 AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])
-AC_CONFIG_FILES([examples/Makefile perllib/Makefile])
+AC_CONFIG_FILES([examples/Makefile lib/Makefile])
 AC_CONFIG_FILES([sup/Makefile xmlconfig/Makefile])
-                                    
+
 AC_CONFIG_FILES([setup_tools/substvars.sh],[chmod +x setup_tools/substvars.sh])
 AC_CONFIG_FILES([setup_tools/mkvardir.sh], [chmod +x setup_tools/mkvardir.sh])
 AC_CONFIG_FILES([init.d/torrus], [chmod +x init.d/torrus])

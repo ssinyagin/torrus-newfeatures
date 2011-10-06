@@ -1370,7 +1370,8 @@ sub getSelectorObjects
 {
     my $devdetails = shift;
     my $objType = shift;
-    return sort {$a<=>$b} keys ( %{$devdetails->data()->{'interfaces'}} );
+    my @r = sort {$a<=>$b} keys ( %{$devdetails->data()->{'interfaces'}} );
+    return @r
 }
 
 

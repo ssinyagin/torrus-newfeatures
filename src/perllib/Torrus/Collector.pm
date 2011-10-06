@@ -19,9 +19,10 @@
 
 
 package Torrus::Collector;
+use strict;
+
 @Torrus::Collector::ISA = qw(Torrus::Scheduler::PeriodicTask);
 
-use strict;
 use Torrus::ConfigTree;
 use Torrus::Log;
 use Torrus::RPN;

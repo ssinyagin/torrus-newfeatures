@@ -24,32 +24,9 @@ can_ok('main', qw(
 
 my %requires = (
 	'Digest::MD5'     => { can => [ qw( new md5_hex ) ] },
-	'Digest::SHA1'    => { can => [ qw( sha1 ) ] },
-	'Errno'           => { import => [ qw(
-		EAGAIN
-	) ] },
-	'File::Spec'      => { can => [ qw( catfile catdir ) ] },
-	'File::Temp'      => { can => [ qw( tempdir ) ] },
-	'IO::Handle'      => { can => [ qw( new ) ] },
-	'IO::File'        => { can => [ qw( new ) ] },
-	'IO::Socket'      => {},
-	'MIME::Base64'    => { can => [ qw( encode_base64 decode_base64 ) ] },
-	'POSIX'           => { import => [ qw(
-		:sys_wait_h SIGALRM SIGTERM SIGKILL _exit
-	) ] },
-	'Socket'          => { exports => [ qw( PF_UNIX SOCK_STREAM ) ] },
-	'Symbol'          => { import => [ qw( delete_package ) ] },
-	'Test::File'      => { exports => [ qw(
-		file_empty_ok file_exists_ok file_not_exists_ok
-		file_mode_is
-		symlink_target_dangles_ok symlink_target_exists_ok
-		owner_is
-	) ] },
-	'Test::Files'     => { exports => [ qw(
-		file_ok compare_ok dir_contains_ok dir_only_contains_ok
-	) ] },
-	'Test::Trap'      => { exports => [ qw( trap $trap ) ] },
-	'Time::ParseDate' => { exports => [ qw( parsedate ) ] },
+	'POSIX'           => { can => [ qw( abs log floor pow strftime ) ] },
+	'Socket'          => { exports => [ qw( inet_ntoa ) ] },
+        'Sys::Hostname'   => { exports => [ qw( hostname ) ] },
 );
 
 my $bail;

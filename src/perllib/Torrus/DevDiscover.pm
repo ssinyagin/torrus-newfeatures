@@ -36,7 +36,7 @@ BEGIN
 {
     for my $mod ( @Torrus::DevDiscover::loadModules )
     {
-        eval( 'require ' . $mod );
+        eval "require $mod";
         die( $@ ) if $@;
     }
 }
@@ -132,7 +132,7 @@ sub new
     for my $module ( 'Torrus::DevDiscover',
                          @Torrus::DevDiscover::loadModules )
     {
-        while( my($name, $oid) = each %{eval('\%'.$module.'::oiddef')} )
+        while( my($name, $oid) = each %{eval{'\%'.$module.'::oiddef'}} )
         {
             die( $@ ) if $@;
             $self->{'oiddef'}->{$name} = $oid;

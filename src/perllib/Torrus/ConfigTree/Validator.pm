@@ -140,9 +140,9 @@ my %view_params =
 
 for my $mod ( @Torrus::Validator::loadLeafValidators )
 {
-    eval( 'require ' . $mod );
+    eval{ 'require ' . $mod };
     die( $@ ) if $@;
-    eval( '&' . $mod . '::initValidatorLeafParams( \%leaf_params )' );
+    eval{ '&' . $mod . '::initValidatorLeafParams( \%leaf_params )' };
     die( $@ ) if $@;
 }
 

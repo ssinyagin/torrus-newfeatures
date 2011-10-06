@@ -34,7 +34,7 @@ BEGIN
 {
     for my $mod ( @Torrus::Collector::loadModules )
     {
-        eval( 'require ' . $mod );
+        eval "require $mod";
         die( $@ ) if $@;
     }
 }

@@ -113,7 +113,7 @@ sub generate
                     {
                         my $class =
                             $Torrus::ReportGenerator::modules{$reportName};
-                        eval( 'require ' . $class );
+                        eval "require $class";
                         die( $@ ) if $@;
 
                         $monthlyReportNames{$reportName} =

@@ -31,7 +31,7 @@ our $VERSION = 1.0;
 # Pluggable backend module implements all storage-specific tasks
 BEGIN
 {
-    eval( 'require ' . $Torrus::Collector::ExternalStorage::backend );
+    eval 'require ' . $Torrus::Collector::ExternalStorage::backend;
     die( $@ ) if $@;    
 }
 

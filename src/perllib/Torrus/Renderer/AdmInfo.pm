@@ -121,11 +121,11 @@ my %param_categories =
 # Load additional validation, configurable from
 # torrus-config.pl and torrus-siteconfig.pl
 
-foreach my $mod ( @Torrus::Renderer::loadAdmInfo )
+for my $mod ( @Torrus::Renderer::loadAdmInfo )
 {
-    eval( 'require ' . $mod );
+    eval "require $mod";
     die( $@ ) if $@;
-    eval( '&' . $mod . '::initAdmInfo( \%leaf_params, \%param_categories )' );
+    eval ( '&' . $mod . '::initAdmInfo( \%leaf_params, \%param_categories )' );
     die( $@ ) if $@;
 }
 

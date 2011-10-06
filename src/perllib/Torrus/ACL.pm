@@ -29,7 +29,7 @@ our $VERSION = 1.0;
 
 BEGIN
 {
-    eval( 'require ' . $Torrus::ACL::userAuthModule );
+    eval 'require '. $Torrus::ACL::userAuthModule;
     die( $@ ) if $@;
 }
 
@@ -40,7 +40,7 @@ sub new
     my %options = @_;
     bless $self, $class;
 
-    eval( '$self->{"auth"} = new ' . $Torrus::ACL::userAuthModule );
+    eval '$self->{auth} =' . $Torrus::ACL::userAuthModule . '->new()';
     die( $@ ) if $@;
 
     my $writing = $options{'-WriteAccess'};

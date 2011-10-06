@@ -143,9 +143,8 @@ sub translate
     my $callback = shift;
 
     # Debug("Translating RPN: $string");
-    my $item;
     my @new_items;
-    for $item ( split( /,/, $string ) )
+    for my $item ( split( /,/, $string ) )
     {
         if( $item =~ /^\{([^\}]*)\}$/ )
         {
@@ -188,8 +187,7 @@ sub run
         $string = $self->translate( $string, $callback );
     }
 
-    my $item;
-    for $item ( split( /,/, $string ) )
+    for my $item ( split( /,/, $string ) )
     {
         if( ref( $operators->{$item} ) )
         {
@@ -200,7 +198,7 @@ sub run
             $self->pushStack( Math::BigFloat->new($item) );
         }
     }
-    
+
     my $retval = $self->popStack();
     # Debug("RPN result: $retval");
     return $retval;

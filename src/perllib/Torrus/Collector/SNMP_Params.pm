@@ -34,7 +34,7 @@ my %validatorLeafParams =
      'snmp-port'          => undef,
      '+snmp-localaddr'    => undef,
      '+snmp-localport'    => undef,
-     '+domain-name'       => undef,     
+     '+domain-name'       => undef,
      'snmp-object'        => undef,
      'snmp-version'       => { '1'  => { 'snmp-community'     => undef },
                                '2c' => { 'snmp-community'     => undef },
@@ -67,7 +67,7 @@ my %reachable_validatorLeafparams =
     (
      'snmp-host'          => undef,
      'snmp-port'          => undef,
-     '+domain-name'       => undef,     
+     '+domain-name'       => undef,
      'snmp-version'       => { '1'  => { 'snmp-community'     => undef },
                                '2c' => { 'snmp-community'     => undef },
                                '3'  => {
@@ -75,7 +75,7 @@ my %reachable_validatorLeafparams =
                                },
      },
     );
-    
+
 sub initValidatorLeafParams
 {
     my $hashref = shift;
@@ -140,7 +140,7 @@ my %admInfoParamCategories =
      'snmp-authprotocol'  => 'SNMP',
      'snmp-privkey'       => 'SNMP',
      'snmp-privpassword'  => 'SNMP',
-     'snmp-privprotocol'  => 'SNMP',     
+     'snmp-privprotocol'  => 'SNMP',
      'snmp-object'        => 'SNMP',
      'snmp-version'       => 'SNMP',
      'snmp-timeout'       => 'SNMP',
@@ -157,14 +157,14 @@ sub initAdmInfo
 {
     my $map = shift;
     my $categories = shift;
-    
+
     $map->{'ds-type'}{'collector'}{'collector-type'}{'snmp'} =
         \%admInfoLeafParams;
-    
+
     $map->{'ds-type'}{'collector'}{'collector-type'}{'snmp-reachable'} =
         \%reachable_admInfoLeafParams;
 
-    while( ($pname, $category) = each %admInfoParamCategories )
+    while( my ($pname, $category) = each %admInfoParamCategories )
     {
         $categories->{$pname} = $category;
     }

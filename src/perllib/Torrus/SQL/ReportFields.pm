@@ -21,12 +21,9 @@
 ## Class for report fields table
 
 package Torrus::SQL::ReportFields;
+
 use strict;
-
-use Torrus::SQL;
 use base 'Torrus::SQL';
-
-use Torrus::Log;
 
 our $VERSION = 1.0;
 

@@ -22,11 +22,7 @@
 package Torrus::SQL::SrvExport;
 
 use strict;
-
-use Torrus::SQL;
 use base 'Torrus::SQL';
-
-use Torrus::Log;
 
 our $VERSION = 1.0;
 

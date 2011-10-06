@@ -25,15 +25,15 @@
 AC_INIT(tp-httpcollector, 1.0d, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
-AM_INIT_AUTOMAKE(1.9)    
+AM_INIT_AUTOMAKE(1.9)
 
 AC_PATH_PROG(PERL, perl, no)
 
 AC_ARG_ENABLE(pkgonly,
         [AC_HELP_STRING([--enable-pkgonly],
                         [Skip all checking])])
-        
-if test "$enable_pkgonly" != yes; then        
+
+if test "$enable_pkgonly" != yes; then
   AC_MSG_CHECKING([environment variables])
   if test -z "$pkghome" -o -z "$sitedir"; then
     AC_MSG_ERROR([Missing mandatory environment variables]);
@@ -54,7 +54,7 @@ AC_ARG_VAR(pkgbindir,   [[PKGHOME/bin] Torrus executables])
 AC_ARG_VAR(cfgdefdir,   [[PKGHOME/conf_defaults] torrus-config.pl and others])
 AC_ARG_VAR(pkgdocdir, [[PKGHOME/doc] Documentation files])
 AC_ARG_VAR(exmpdir, [[PKGHOME/examples] Examples])
-AC_ARG_VAR(perllibdir,  [[PKGHOME/perllib] Torrus Perl libraries])
+AC_ARG_VAR(perllibdir,  [[PKGHOME/lib] Torrus Perl libraries])
 AC_ARG_VAR(pluginsdir,   [[PKGHOME/plugins] Plugin configurations])
 AC_ARG_VAR(plugtorruscfgdir, [[PLUGINSDIR/torrus-config]])
 AC_ARG_VAR(plugdevdisccfgdir, [[PLUGINSDIR/devdiscover-config]])
@@ -78,7 +78,7 @@ AC_ARG_VAR(sesstordir, [[VARPREFIX/session_data/store] Web session storage])
 AC_ARG_VAR(wrapperdir, [[BINDIR] CLI wrapper])
 AC_ARG_VAR(defrrddir, [[/srv/torrus/collector_rrd] Default RRD storage path])
 
-                           
-                   
+
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

@@ -148,7 +148,7 @@ if( $runonce )
     $options{'-RunOnce'} = 1;
 }
 
-my $scheduler = new Torrus::MonitorScheduler( %options );
+my $scheduler = Torrus::MonitorScheduler->new( %options );
 $scheduler->run();
 
 if( not $options{'-RunOnce'} )

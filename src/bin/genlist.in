@@ -43,7 +43,7 @@ my %listingsSupported =
          'readonly'   => 1,
          'all'        => 1,
      },
-     
+
      'snmphosts' => {
          'collector'  => 1,
      },
@@ -84,7 +84,7 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 
 &Torrus::DB::setSafeSignalHandlers();
 
-my $config_tree = new Torrus::ConfigTree( -TreeName => $tree, -Wait => 1 );
+my $config_tree = Torrus::ConfigTree->new( -TreeName => $tree, -Wait => 1 );
 if( not defined( $config_tree ) )
 {
     exit 1;
@@ -102,7 +102,7 @@ my $listing = {};
 my $listParams = {};
 if( $selectType eq 'all' )
 {
-    foreach my $type ( keys %{$listingsSupported{$listWhat}} )
+    for my $type ( keys %{$listingsSupported{$listWhat}} )
     {
         if( $type ne 'all' )
         {
@@ -117,7 +117,7 @@ else
 
 pickup_data( $config_tree, $initToken, $listing, $listWhat, $listParams );
 
-foreach my $item ( sort keys %{$listing} )
+for my $item ( sort keys %{$listing} )
 {
     print $item, "\n";
 }
@@ -132,10 +132,10 @@ sub pickup_data
     my $listWhat = shift;
     my $listParams = shift;
 
-    foreach my $ctoken ( $config_tree->getChildren( $token ) )
+    for my $ctoken ( $config_tree->getChildren( $token ) )
     {
         &Torrus::DB::checkInterrupted();
-        
+
         if( $config_tree->isSubtree( $ctoken ) )
         {
             pickup_data( $config_tree, $ctoken,

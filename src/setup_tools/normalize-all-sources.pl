@@ -36,7 +36,7 @@ sub preprocess_filenames
 {
     my @names = @_;
     my @ret;
-    foreach my $name ( @names )
+    for my $name ( @names )
     {
         if( $name ne 'CVS' )
         {
@@ -67,7 +67,7 @@ sub process_file
             my $longLineReported = 0;
             my @new_lines = ();
             # Remove end-of-line space
-            foreach my $line ( @lines )
+            for my $line ( @lines )
             {
                 $line =~ s/\s+$//;
                 push( @new_lines, $line );
@@ -98,7 +98,7 @@ sub process_file
 
             open( OUT, "> $filename" ) or
                 die('Error opening ' . $filename . ' for writing: ' . $!);
-            foreach my $line ( @lines )
+            for my $line ( @lines )
             {
                 print OUT $line, "\n";
             }

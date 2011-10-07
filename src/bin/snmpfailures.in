@@ -23,7 +23,7 @@ BEGIN { require '@torrus_config_pl@'; }
 use strict;
 use Getopt::Long;
 use JSON;
-    
+
 use Torrus::SiteConfig;
 use Torrus::DB;
 use Torrus::Log;
@@ -68,21 +68,21 @@ my $out = {};
 my $nInstances = Torrus::SiteConfig::collectorInstances( $tree );
 for( my $instance = 0; $instance < $nInstances; $instance++ )
 {
-    my $db_failures = new Torrus::SNMP_Failures( -Tree => $tree,
+    my $db_failures = Torrus::SNMP_Failures->new( -Tree => $tree,
                                                  -Instance => $instance );
-    
+
     if( not defined( $db_failures ) )
     {
         exit(1);
     }
-    
-    
+
+
     $db_failures->read( $out, -details => $print_details );
     undef $db_failures;
 }
 
 
-my $json = new JSON;
+my $json = JSON->new();
 $json->canonical();
 $json->pretty();
 print $json->encode($out);

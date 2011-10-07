@@ -327,7 +327,7 @@ sub initTargetAttributes
     elsif( $ifIndex eq 'notfound' )
     {
         Error("Cannot find ifDescr mapping for $ifDescr at $hosthash");
-        return undef;
+        return
     }
     
     my $session = Torrus::Collector::SNMP::openBlockingSession
@@ -387,10 +387,10 @@ sub initTargetAttributes
         my $mapRef = {};
         $ServicePolicyMapping{$hosthash} = $mapRef;
 
-        foreach my $policyIndex ( keys %{$ref} )
+        for my $policyIndex ( keys %{$ref} )
         {
             my $mapString = '';
-            foreach my $entryName ( @servicePolicyTableEntries )
+            for my $entryName ( @servicePolicyTableEntries )
             {
                 $mapString .=
                     sprintf( '%d:', $ref->{$policyIndex}{$entryName} );
@@ -406,7 +406,7 @@ sub initTargetAttributes
         my $ref = {};
         $CfgTable{$hosthash} = $ref;
 
-        foreach my $table ( 'cbQosPolicyMapName', 'cbQosCMName',
+        for my $table ( 'cbQosPolicyMapName', 'cbQosCMName',
                             'cbQosMatchStmtName', 'cbQosQueueingCfgBandwidth',
                             'cbQosTSCfgRate', 'cbQosPoliceCfgRate' )
         {
@@ -518,7 +518,7 @@ sub initTargetAttributes
     my $mapRef = $ServicePolicyMapping{$hosthash};
 
     my $mapString = '';
-    foreach my $entryName ( @servicePolicyTableEntries )
+    for my $entryName ( @servicePolicyTableEntries )
     {
         $mapString .=
             sprintf( '%d:', $policyParamValues{$entryName} );
@@ -529,7 +529,7 @@ sub initTargetAttributes
     {
         Error('Cannot find cbQosServicePolicyTable mapping for ' .
               $mapString);
-        return undef;
+        return
     }
 
     # compose the object ID from token parameters as "parent:type:name" string
@@ -543,7 +543,7 @@ sub initTargetAttributes
     {
         Error('Cannot find object index for ' . $thePolicyIndex . ':' .
               '--' . $theObjectID);
-        return undef;
+        return
     }
 
     # Finally we got the object to monitor!
@@ -580,7 +580,7 @@ sub postProcess
     my %remapping_hosts;
     
     # Flush all QoS object mapping
-    foreach my $token ( keys %{$scref->{'needsRemapping'}},
+    for my $token ( keys %{$scref->{'needsRemapping'}},
                         keys %{$cref->{'cbQoSNeedsRemapping'}} )
     {
         if( $cref->{'QosEnabled'}{$token} )
@@ -603,7 +603,7 @@ sub postProcess
         delete $ObjectsTable{$hosthash};
         delete $CfgTable{$hosthash};
 
-        foreach my $token (@{$tokens})
+        for my $token (@{$tokens})
         {
             delete $scref->{'needsRemapping'}{$token};
             delete $cref->{'cbQoSNeedsRemapping'}{$token};

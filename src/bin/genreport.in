@@ -78,7 +78,7 @@ if( not $ok or (not $report and not $genhtml) or
     "\n",
     "Report names supported:\n";
 
-    foreach my $rep ( sort keys %Torrus::ReportGenerator::modules )
+    for my $rep ( sort keys %Torrus::ReportGenerator::modules )
     {
         print STDERR "  ", $rep, "\n";
     }
@@ -132,7 +132,7 @@ if( $genhtml )
     }
     else
     {
-        foreach my $tree ( @trees )
+        for my $tree ( @trees )
         {
             if( not Torrus::SiteConfig::treeExists( $tree ) )
             {
@@ -144,10 +144,10 @@ if( $genhtml )
 
     if( $ok )
     {
-        foreach my $tree ( @trees )
+        for my $tree ( @trees )
         {
             &Torrus::DB::checkInterrupted();
-            
+
             Verbose('Generating HTML report for tree ' . $tree);
 
             my $options = {'Tree' => $tree};
@@ -156,9 +156,9 @@ if( $genhtml )
             {
                 $options->{'All_Service_IDs'} = 1;
             }
-            
-            my $out = new Torrus::ReportOutput::HTML( $options );
-            
+
+            my $out = Torrus::ReportOutput::HTML->new( $options );
+
             if( $out->init() )
             {
                 $ok = $out->generate() ? $ok:0;

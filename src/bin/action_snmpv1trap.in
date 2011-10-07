@@ -83,7 +83,7 @@ my @varbindlist = ( $Torrus::Snmptrap::enterprise . '.2',
 
                     $Torrus::Snmptrap::enterprise . '.7',
                     OCTET_STRING, $ENV{'TORRUS_TREE'},
-                    
+
                     $Torrus::Snmptrap::enterprise . '.9',
                     OCTET_STRING, $ENV{'TORRUS_MCOMMENT'}
                     );
@@ -95,7 +95,7 @@ if( defined( $severity ) )
           INTEGER32, $severity );
 }
 
-foreach my $host ( @Torrus::Snmptrap::hosts )
+for my $host ( @Torrus::Snmptrap::hosts )
 {
     my( $session, $error ) =
         Net::SNMP->session( -hostname  => $host,

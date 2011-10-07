@@ -23,7 +23,7 @@ sub child
 {
     print "C> Child thread started. I will print 10 lines, one per second\n";
 
-    foreach my $i (1..10)
+    for my $i (1..10)
     {
         print("C> Child tick " . $i . "\n");
         sleep(1);

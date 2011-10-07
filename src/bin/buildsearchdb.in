@@ -75,14 +75,14 @@ if( $verbose )
 
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
-my $search = new Torrus::Search( -WriteAccess => 1 );
+my $search = Torrus::Search->new( -WriteAccess => 1 );
 
 if( $build_global )
 {
     $search->openGlobal();
 }
 
-foreach my $tree ( @trees )
+for my $tree ( @trees )
 {
     if( not Torrus::SiteConfig::treeExists( $tree ) )
     {
@@ -92,7 +92,7 @@ foreach my $tree ( @trees )
 
     &Torrus::DB::checkInterrupted();
 
-    my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
+    my $config_tree = Torrus::ConfigTree->new( -TreeName => $tree );
     if( not defined($config_tree) )
     {
         print("Configuration is not ready\n");
@@ -120,7 +120,7 @@ sub walkSubtree
 
     my $tree = $config_tree->treeName();
     
-    foreach my $token ( $config_tree->getChildren( $ptoken ) )
+    for my $token ( $config_tree->getChildren( $ptoken ) )
     {
         &Torrus::DB::checkInterrupted();
         
@@ -164,7 +164,7 @@ sub splitAndStore
         my @words = split( /[^a-zA-Z0-9-_]+/mso, $value );
         if( scalar( @words ) > 0 )
         {
-            foreach my $word ( @words )
+            for my $word ( @words )
             {
                 if( length( $word ) > 1 )
                 {
@@ -174,7 +174,7 @@ sub splitAndStore
                     my @subwords = split( /[-_]+/o, $word );
                     if( scalar( @subwords ) > 1 )
                     {
-                        foreach my $subword ( @subwords )
+                        for my $subword ( @subwords )
                         {
                             if( length( $subword ) > 1 )
                             {

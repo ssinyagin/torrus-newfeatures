@@ -311,7 +311,7 @@ sub rawUpdateThread
         my $ts_format = $filejob->{'ts_format'};
         my $separator = $filejob->{'separator'};
 
-        foreach my $rowentry ( @{$filejob->{'values'}} )
+        for my $rowentry ( @{$filejob->{'values'}} )
         {
             print RAWOUT ( join( $separator,
                                  time2str( $ts_format, $rowentry->{'time'} ),

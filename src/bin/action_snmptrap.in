@@ -94,7 +94,7 @@ if( defined( $severity ) )
 }
           
 
-foreach my $host ( @Torrus::Snmptrap::hosts )
+for my $host ( @Torrus::Snmptrap::hosts )
 {
     my( $session, $error ) =
         Net::SNMP->session( -hostname  => $host,

@@ -42,8 +42,8 @@ if test ! -z "$PERLINC"; then
        perllibdirs=${perllibdirs}"\,\'"${d}"\'"
    done
 fi
-                                
-        
+
+
 # Check the necessary Perl modules
 # This is the example of AutoLoader search, which is always in Perl
 # distribution anyway
@@ -65,18 +65,18 @@ if test "$enable_pkgonly" != yes; then
          AC_MSG_ERROR([Perl cannot find $module]);
      fi
    done
-   
+
 fi
 
 AC_SUBST(perllibdirs, [${perllibdirs}])
 
-        
+
 AC_ARG_VAR(pkghome,   [[PREFIX/torrus] Place for Torrus static files])
 AC_ARG_VAR(pkgbindir,   [[PKGHOME/bin] Torrus executables])
 AC_ARG_VAR(cfgdefdir,   [[PKGHOME/conf_defaults] torrus-config.pl and others])
 AC_ARG_VAR(pkgdocdir, [[PKGHOME/doc] Documentation files])
 AC_ARG_VAR(exmpdir, [[PKGHOME/examples] Examples])
-AC_ARG_VAR(perllibdir,  [[PKGHOME/perllib] Torrus Perl libraries])
+AC_ARG_VAR(perllibdir,  [[PKGHOME/lib] Torrus Perl libraries])
 AC_ARG_VAR(pluginsdir,   [[PKGHOME/plugins] Plugin configurations])
 AC_ARG_VAR(plugtorruscfgdir, [[PLUGINSDIR/torrus-config]])
 AC_ARG_VAR(plugdevdisccfgdir, [[PLUGINSDIR/devdiscover-config]])

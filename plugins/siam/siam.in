@@ -101,7 +101,7 @@ Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
 
 # Distribute devices into bundles by torrus.tree attribute
 my %bundles;
-foreach my $device (@{$devices})
+for my $device (@{$devices})
 {
     next unless $device->attr('snmp.managed');
     
@@ -126,7 +126,7 @@ my $success = 1;
 
 Verbose('Preparing to generate ' . scalar(keys %bundles) . ' bundles');
 
-foreach my $tree (sort keys %bundles)
+for my $tree (sort keys %bundles)
 {
     Verbose('Bundle ' . $tree . ': ' . scalar(@{$bundles{$tree}}) .
             ' devices');
@@ -161,7 +161,7 @@ foreach my $tree (sort keys %bundles)
         'SIAM::managed'   => 'yes',
     };
 
-    foreach my $p (keys %{$Torrus::SIAM::ddx_defaults})
+    for my $p (keys %{$Torrus::SIAM::ddx_defaults})
     {
         $globalParams->{$p} = $Torrus::SIAM::ddx_defaults->{$p};
     }
@@ -169,7 +169,7 @@ foreach my $tree (sort keys %bundles)
     createParamsDom( $globalParams, $doc, $root );
 
     
-    foreach my $device (sort {$a->attr('siam.device.name') cmp
+    for my $device (sort {$a->attr('siam.device.name') cmp
                                   $b->attr('siam.device.name')}
                         @{$bundles{$tree}})
     {
@@ -191,7 +191,7 @@ foreach my $tree (sort keys %bundles)
 
         $params->{'snmp-host'} = $host;
 
-        foreach my $p ('version', 'community', 'timeout', 'retries')
+        for my $p ('version', 'community', 'timeout', 'retries')
         {
             my $v = $device->attr('snmp.' . $p);
             if( defined($v) )
@@ -237,7 +237,7 @@ sub createParamsDom
     my $doc = shift;
     my $parentNode = shift;
     
-    foreach my $param ( sort keys %{$params} )
+    for my $param ( sort keys %{$params} )
     {
         my $paramNode = $doc->createElement('param');
         $paramNode->setAttribute( 'name', $param );

@@ -75,7 +75,7 @@ if( $help_needed or not $ok or (not $startdate) or
     "  --month              [optional] Calendar month timespan\n",
     "  --end=YYYY-MM-DD     [optional] Next day after the timespan end\n",
     "  Either --month or --end option must be defined\n\n",
-    "OUTPUT:\n",    
+    "OUTPUT:\n",
     "  --out=SERVICEID      [mandatory] Output Service ID\n\n",
     "FUNCTION:\n",
     "  --func=MAX|SUM       [mandatory] Aggregation function\n\n",
@@ -86,10 +86,10 @@ if( $help_needed or not $ok or (not $startdate) or
     "Options:\n",
     " --step=N              [300] service data interval\n",
     " --verbose             print extra information\n",
-    " --debug               print debugging information\n",   
-    " --help                print usage information\n",   
+    " --debug               print debugging information\n",
+    " --help                print usage information\n",
     "\n";
-    
+
     exit 1;
 }
 
@@ -150,10 +150,10 @@ else
     $year += 1900;
     $month++;
     $day++;
-  
+
     my $endyear = $year;
     my $endmonth = $month + 1;
-    
+
     if( $endmonth > 12 )
     {
         $endmonth = 1;
@@ -172,10 +172,10 @@ else
             $endmonth = 1;
             $endyear++;
         }
-        
+
         $endtime = str2time( sprintf('%.4d-%.2d-%.2d',
                                      $endyear, $endmonth, $day) );
-        
+
         if( not defined($endtime) )
         {
             Error('Cannot determine the end date');
@@ -200,7 +200,7 @@ if( not defined( $srvExp ) )
 
 my $srvIDs = $srvExp->getServiceIDs();
 
-foreach my $serviceid ( @input )
+for my $serviceid ( @input )
 {
     if( not grep {$serviceid eq $_} @{$srvIDs} )
     {
@@ -214,7 +214,7 @@ foreach my $serviceid ( @input )
 # Check if the output ServiceID exists in the local database
 # The database contains only IDs generated from datasource trees.
 
-my $srvIDParams = new Torrus::ServiceID();
+my $srvIDParams = Torrus::ServiceID->new();
 if( $srvIDParams->idExists( $output ) )
 {
     Error('Output service ID was previously created from Torrus ' .
@@ -227,7 +227,7 @@ if( $srvIDParams->idExists( $output ) )
 
 my %in_data;
 
-foreach my $serviceid ( @input )
+for my $serviceid ( @input )
 {
     $in_data{$serviceid} =
         $srvExp->getIntervalData( $startdate, $enddate, $serviceid );
@@ -241,7 +241,7 @@ my $n_points = floor( ($endtime - $starttime) / $step );
 
 my %aligned_data;
 
-foreach my $serviceid ( @input )
+for my $serviceid ( @input )
 {
     my @aligned = ();
     $#aligned = $n_points;
@@ -249,7 +249,7 @@ foreach my $serviceid ( @input )
     # Fill in the aligned array. For each interval by modulo(step),
     # we take the sum of values that get into that interval
     
-    foreach my $row ( @{$in_data{$serviceid}} )
+    for my $row ( @{$in_data{$serviceid}} )
     {
         my $rowtime = str2time( $row->{'srv_date'} . 'T' .
                                 $row->{'srv_time'} );
@@ -295,7 +295,7 @@ if( not defined( $sth ) )
 for( my $pos = 0; $pos < $n_points; $pos++ )
 {
     my @args;
-    foreach my $serviceid ( @input )
+    for my $serviceid ( @input )
     {
         my $val = $aligned_data{$serviceid}->[$pos];
         if( defined( $val ) )
@@ -341,7 +341,7 @@ sub function_max
     my $value = Math::BigFloat->new();
     $value->binf('-');
 
-    foreach my $a ( @_ )
+    for my $a ( @_ )
     {
         if( $value->bcmp($a) < 0 )
         {
@@ -357,7 +357,7 @@ sub function_sum
 {
     my $value = Math::BigFloat->new(0);
 
-    foreach my $a ( @_ )
+    for my $a ( @_ )
     {
         $value->badd($a);
     }

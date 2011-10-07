@@ -86,7 +86,7 @@ Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
 our $global_ok = 1;
 
-foreach my $tree ( @trees )
+for my $tree ( @trees )
 {
     if( not Torrus::SiteConfig::treeExists( $tree ) )
     {
@@ -95,12 +95,12 @@ foreach my $tree ( @trees )
     }
 
     &Torrus::DB::checkInterrupted();
-    
+
     Verbose("Compiling tree: $tree");
 
     my $ok = 1;
     my $compiler =
-        new Torrus::ConfigTree::XMLCompiler( -TreeName => $tree,
+        Torrus::ConfigTree::XMLCompiler->new( -TreeName => $tree,
                                              -NoDSRebuild => $no_ds,
                                              -ForceWriter => $force );
     if( not defined( $compiler ) )
@@ -110,13 +110,13 @@ foreach my $tree ( @trees )
               'running, use the --force option');
         $global_ok = 0;
         last;
-    }     
-    
+    }
+
     my @xmlFiles = @Torrus::Global::xmlAlwaysIncludeFirst;
     push( @xmlFiles, Torrus::SiteConfig::listXmlFiles( $tree ) );
     push( @xmlFiles, @Torrus::Global::xmlAlwaysIncludeLast );
 
-    foreach my $xmlfile ( @xmlFiles )
+    for my $xmlfile ( @xmlFiles )
     {
         if( not $compiler->compile( $xmlfile ) )
         {
@@ -154,18 +154,18 @@ foreach my $tree ( @trees )
     }
 
     &Torrus::DB::checkInterrupted();
-    
+
     # Preserve the dynamic tokenset members
     if( not $compiler->{'first_time_created'} )
     {
-        my $oldConfig = new Torrus::ConfigTree( -TreeName => $tree );
+        my $oldConfig = Torrus::ConfigTree->new( -TreeName => $tree );
         if( defined( $oldConfig ) )
         {
-            foreach my $ts ( $oldConfig->getTsets() )
+            for my $ts ( $oldConfig->getTsets() )
             {
                 if( $compiler->tsetExists( $ts ) )
                 {
-                    foreach my $member ( $oldConfig->tsetMembers( $ts ) )
+                    for my $member ( $oldConfig->tsetMembers( $ts ) )
                     {
                         my $origin =
                             $oldConfig->tsetMemberOrigin( $ts, $member );

@@ -83,26 +83,26 @@ sub genConfig
         $globalOutFile = absXmlFilename( $globalOutFile );
     }
         
-    foreach my $file ( @defaultIncludes )
+    for my $file ( @defaultIncludes )
     {
         $includeFiles{$file} = 1;
     }
     
     if( defined( $cfg->{'INCLUDE'} ) )
     {
-        foreach my $file ( split( /\s+,\s+/, $cfg->{'INCLUDE'} ) )
+        for my $file ( split( /\s+,\s+/, $cfg->{'INCLUDE'} ) )
         {
             $includeFiles{$file} = 1;
         }
     }
     
     my %globalParameters;
-    foreach my $param ( keys %defaultParams )
+    for my $param ( keys %defaultParams )
     {
         $globalParameters{$param} = $defaultParams{$param};
     }
 
-    foreach my $node ( sort keys %{$cfg} )
+    for my $node ( sort keys %{$cfg} )
     {
         if( $node !~ /^\// )
         {
@@ -148,7 +148,7 @@ sub genConfig
 
                 if( defined( $cfg->{$node}{'INCLUDE'} ) )
                 {
-                    foreach my $file ( split( /\s+,\s+/,
+                    for my $file ( split( /\s+,\s+/,
                                               $cfg->{$node}{'INCLUDE'} ) )
                     {
                         $includeFiles{$file} = 1;
@@ -173,7 +173,7 @@ sub genConfig
 
     my %writtenFiles;
     
-    foreach my $outxml ( sort keys %outFiles )
+    for my $outxml ( sort keys %outFiles )
     {
         my $cb = new Torrus::ConfigBuilder;
 
@@ -181,12 +181,12 @@ sub genConfig
 
         $cb->addRequiredFiles();
 
-        foreach my $file ( sort keys %includeFiles )
+        for my $file ( sort keys %includeFiles )
         {
             $cb->addFileInclusion( $file );
         }
 
-        foreach my $node ( sort keys %{$outFiles{$outxml}} )
+        for my $node ( sort keys %{$outFiles{$outxml}} )
         {
             my $thisIsSubtree = ( $node =~ /\/$/ );
             
@@ -200,7 +200,7 @@ sub genConfig
                 
             # generate subtree path XML
             my $subtreeNode = undef;
-            foreach my $subtreeName ( @pathElements )
+            for my $subtreeName ( @pathElements )
             {
                 $subtreeNode = $cb->addSubtree( $subtreeNode, $subtreeName );
             }
@@ -213,7 +213,7 @@ sub genConfig
             # Propagate global parameters and templates at the leaf level
             if( not $thisIsSubtree )
             {                
-                foreach my $param ( keys %globalParameters )
+                for my $param ( keys %globalParameters )
                 {
                     $params->{$param} = $globalParameters{$param};
                 }
@@ -231,7 +231,7 @@ sub genConfig
                 }                
             }
                 
-            foreach my $param ( keys %{$cfg->{$node}} )
+            for my $param ( keys %{$cfg->{$node}} )
             {
                 if( $param !~ /^[A-Z]/ )
                 {
@@ -277,12 +277,12 @@ sub genConfig
         $ok = $writeOk ? $ok : 0;
     }
 
-    foreach my $bundleName ( sort keys %outputBundles )
+    for my $bundleName ( sort keys %outputBundles )
     {
         my $cb = new Torrus::ConfigBuilder;
         $cb->addCreatorInfo( $creator );
 
-        foreach my $bundleMember
+        for my $bundleMember
             ( sort keys %{$outputBundles{$bundleName}} )
         {
             if( $writtenFiles{$bundleMember} )

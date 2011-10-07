@@ -75,7 +75,7 @@ elsif( $verbose )
 
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
-foreach my $tree ( @trees )
+for my $tree ( @trees )
 {
     if( not Torrus::SiteConfig::treeExists( $tree ) )
     {
@@ -84,17 +84,17 @@ foreach my $tree ( @trees )
     }
 
     &Torrus::DB::checkInterrupted();
-    
+
     Verbose("Flushing alarms and tokensets for the tree: $tree");
 
-    my $config_tree = new Torrus::ConfigTree( -TreeName => $tree,
+    my $config_tree = Torrus::ConfigTree->new( -TreeName => $tree,
                                               -Wait => 1 );
     if( not defined( $config_tree ) )
     {
         next;
     }
 
-    my $db = new Torrus::DB('monitor_alarms',
+    my $db = Torrus::DB->new('monitor_alarms',
                             -Subdir => $tree,
                             -WriteAccess => 1);
 
@@ -102,22 +102,22 @@ foreach my $tree ( @trees )
     my $cursor = $db->cursor(-Write => 1);
     while( my ($key, $timers) = $db->next($cursor) )
     {
-        Debug('Deleting alarm: ' . $key);        
-        $db->c_del( $cursor );            
-        
+        Debug('Deleting alarm: ' . $key);
+        $db->c_del( $cursor );
+
     }
     $db->c_close($cursor);
     undef $cursor;
     undef $db;
-    
+
     &Torrus::DB::checkInterrupted();
 
     my @members;
-    foreach my $ts ( $config_tree->getTsets() )
+    for my $ts ( $config_tree->getTsets() )
     {
         Debug('Processing tokenset: ' . $ts);
         
-        foreach my $member ( $config_tree->tsetMembers( $ts ) )
+        for my $member ( $config_tree->tsetMembers( $ts ) )
         {
             my $origin = $config_tree->tsetMembers( $ts, $member );
             

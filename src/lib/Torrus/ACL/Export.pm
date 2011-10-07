@@ -36,7 +36,7 @@ sub exportACL
     my $exportfile = shift;
     my $exporttemplate = shift;
 
-    my $tt = new Template(INCLUDE_PATH => $Torrus::Global::templateDirs,
+    my $tt = Template->new(INCLUDE_PATH => $Torrus::Global::templateDirs,
                           TRIM => 1);
 
     my $vars = {

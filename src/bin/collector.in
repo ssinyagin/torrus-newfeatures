@@ -46,7 +46,7 @@ my $help_needed;
 my $process_name = $0;
 $process_name =~ s/^.*\/([^\/]+)$/$1/;
 $process_name .= ' ' . join(' ', @ARGV);
-                            
+
 my $ok = GetOptions ('tree=s'     => \$tree,
                      'instance=i' => \$instance,
                      'nodaemon'   => \$nodaemon,
@@ -178,7 +178,7 @@ if( $runalways )
 }
 
 
-my $scheduler = new Torrus::CollectorScheduler( %options );
+my $scheduler = Torrus::CollectorScheduler( %options )->new();
 $scheduler->run();
 
 if( not $options{'-RunOnce'} )

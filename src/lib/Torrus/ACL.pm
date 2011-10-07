@@ -45,10 +45,10 @@ sub new
 
     my $writing = $options{'-WriteAccess'};
 
-    $self->{'db_users'} = new Torrus::DB('users', -WriteAccess => $writing );
+    $self->{'db_users'} = Torrus::DB->new('users', -WriteAccess => $writing );
     defined( $self->{'db_users'} ) or return( undef );
 
-    $self->{'db_acl'} = new Torrus::DB('acl', -WriteAccess => $writing );
+    $self->{'db_acl'} = Torrus::DB->new('acl', -WriteAccess => $writing );
     defined( $self->{'db_acl'} ) or return( undef );
 
     $self->{'is_writing'} = $writing;

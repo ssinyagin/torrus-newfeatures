@@ -287,15 +287,15 @@ sub storeData
     {
         return;
     }
-    
+
     Verbose('Exporting data to external storage for ' .
             $nTokens . ' tokens');
     &{$backendOpenSession}();
-    
+
     while( my($token, $valuetriple) = each( %{$sref->{'values'}} ) )
     {
         &Torrus::DB::checkInterrupted();
-        
+
         my( $value, $timestamp, $interval ) = @{$valuetriple};
         my $serviceid =
             $collector->param($token, 'ext-service-id');

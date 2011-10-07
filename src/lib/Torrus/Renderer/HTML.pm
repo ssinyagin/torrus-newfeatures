@@ -48,14 +48,14 @@ sub render_html
     my $tmplfile = $config_tree->getParam($view, 'html-template');
 
     my $expires = $config_tree->getParam($view, 'expires');
-    
+
     # Create the Template Toolkit processor once, and reuse
     # it in subsequent render() calls
 
     if( not defined( $self->{'tt'} ) )
     {
         $self->{'tt'} =
-            new Template(INCLUDE_PATH => $Torrus::Global::templateDirs,
+            Template->new(INCLUDE_PATH => $Torrus::Global::templateDirs,
                          TRIM => 1);
     }
     my $ttvars =
@@ -417,16 +417,16 @@ sub translateMarkup
     my $self = shift;
     my @strings = @_;
 
-    my $tt = new Template( TRIM => 1 );
+    my $tt = Template->new( TRIM => 1 );
 
     my $ttvars =
     {
         'em'      =>  sub { return '<em>' . $_[0] . '</em>'; },
         'strong'  =>  sub { return '<strong>' . $_[0] . '</strong>'; }
     };
-    
+
     my $ret = '';
-    
+
     for my $str ( @strings )
     {
         my $output = '';
@@ -505,18 +505,18 @@ sub doSearch
     my $self = shift;
     my $config_tree = shift;
     my $string = shift;
-    
+
 
     my $tree = $config_tree->treeName();
-    
-    my $sr = new Torrus::Search;
+
+    my $sr = Torrus::Search->new();
     $sr->openTree( $tree );
     my $result = $sr->searchPrefix( $string, $tree );
     $sr->closeTree( $tree );
 
     my $ret = [];
     push( @{$ret}, sort {$a->[0] cmp $b->[0]} @{$result} );
-    
+
     return $ret;
 }
 

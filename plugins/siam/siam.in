@@ -101,7 +101,7 @@ Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
 
 # Distribute devices into bundles by torrus.tree attribute
 my %bundles;
-foreach my $device (@{$devices})
+for my $device (@{$devices})
 {
     next unless $device->attr('snmp.managed');
     
@@ -126,7 +126,7 @@ my $success = 1;
 
 Verbose('Preparing to generate ' . scalar(keys %bundles) . ' bundles');
 
-foreach my $tree (sort keys %bundles)
+for my $tree (sort keys %bundles)
 {
     Verbose('Bundle ' . $tree . ': ' . scalar(@{$bundles{$tree}}) .
             ' devices');

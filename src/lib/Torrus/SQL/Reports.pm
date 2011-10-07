@@ -39,11 +39,11 @@ sub new
     my $self  = $class->SUPER::new( $subtype );
 
     $self->{'fields'} = Torrus::SQL::ReportFields->new( $subtype );
-    
+
     bless ($self, $class);
     return $self;
 }
-    
+
 
 # Find or create a new row in reports table
 # 
@@ -60,10 +60,10 @@ sub reportId
         'where' => { $columns{'rep_date'}   => $repdate,
                      $columns{'rep_time'}   => $reptime,
                      $columns{'reportname'} => $repname } });
-    
+
     if( defined( $result ) )
     {
-        if( not $result->[1] ) 
+        if( not $result->[1] )
         {
             # iscomplete is zero - the report is unfinished
             Warn('Found unfinished report ' . $repname . ' for ' .
@@ -71,7 +71,7 @@ sub reportId
                  '. Deleting the previous report data');
             $self->{'fields'}->removeAll( $result->[0] );
         }
-            
+
         return $result->[0];
     }
     else
@@ -85,7 +85,7 @@ sub reportId
                           $columns{'rep_time'}   => $reptime,
                           $columns{'reportname'} => $repname,
                           $columns{'iscomplete'} => 0 } });
-        
+
         return $id;
     }
 }

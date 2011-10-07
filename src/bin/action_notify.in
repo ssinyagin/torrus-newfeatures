@@ -42,7 +42,7 @@ our $nowWeekday = time2str('%w', $now);
 my $severity = $ENV{'TORRUS_SEVERITY'};
 my $ok = 1;
 
-foreach my $policy ( keys %Torrus::Notify::policies )
+for my $policy ( keys %Torrus::Notify::policies )
 {
     if( &{$Torrus::Notify::policies{$policy}{'match'}} )
     {

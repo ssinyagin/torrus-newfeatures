@@ -49,11 +49,11 @@ my $max_time = time() + $Torrus::FCGI::maxLifetime +
     rand($Torrus::FCGI::maxLifetimeRandomFactor);
 
 my $req_count = 0;
-while( my $q = new CGI::Fast )
+while( my $q = CGI::Fast->new() )
 {
     Torrus::CGI->process($q);
     $req_count++;
-    
+
     if( $req_count > $max_req_count or
         time() > $max_time )
     {

@@ -74,33 +74,33 @@ sub addTarget
 sub run
 {
     my $self = shift;
-    
+
     my $config_tree =
-        new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
+        Torrus::ConfigTree->new( -TreeName => $self->{'tree_name'},
                                 -Wait => 1 );
     if( not defined( $config_tree ) )
     {
         return;
     }
 
-    my $da = new Torrus::DataAccess;
-    
-    $self->{'db_alarms'} = new Torrus::DB('monitor_alarms',
+    my $da = Torrus::DataAccess->new();
+
+    $self->{'db_alarms'} = Torrus::DB->new('monitor_alarms',
                                           -Subdir => $self->{'tree_name'},
                                           -WriteAccess => 1);
 
     for my $token ( @{$self->{'targets'}} )
     {
         &Torrus::DB::checkInterrupted();
-        
+
         my $mlist = $self->{'sched_data'}{'mlist'}{$token};
-        
+
         for my $mname ( @{$mlist} )
         {
             my $obj = { 'token' => $token, 'mname' => $mname };
 
             $obj->{'da'} = $da;
-            
+
             my $mtype = $config_tree->getParam($mname, 'monitor-type');
             $obj->{'mtype'} = $mtype;
             
@@ -541,7 +541,7 @@ sub beforeRun
     my $self = shift;
 
     my $tree = $self->treeName();
-    my $config_tree = new Torrus::ConfigTree(-TreeName => $tree, -Wait => 1);
+    my $config_tree = Torrus::ConfigTree->new(-TreeName => $tree, -Wait => 1);
     if( not defined( $config_tree ) )
     {
         return
@@ -571,7 +571,7 @@ sub beforeRun
         undef $data->{'targets'};
         $need_new_tasks = 1;
 
-        $data->{'db_tokens'} = new Torrus::DB( 'monitor_tokens',
+        $data->{'db_tokens'} = Torrus::DB->new( 'monitor_tokens',
                                                -Subdir => $tree,
                                                -WriteAccess => 1,
                                                -Truncate    => 1 );
@@ -592,7 +592,7 @@ sub beforeRun
     {
         $need_new_tasks = 1;
 
-        $data->{'db_tokens'} = new Torrus::DB('monitor_tokens',
+        $data->{'db_tokens'} = Torrus::DB->new('monitor_tokens',
                                               -Subdir => $tree);
         my $cursor = $data->{'db_tokens'}->cursor();
         while( my ($token, $schedule) = $data->{'db_tokens'}->next($cursor) )
@@ -626,7 +626,7 @@ sub beforeRun
         {
             for my $offset ( keys %{$data->{'targets'}{$period}} )
             {
-                my $monitor = new Torrus::Monitor( -Period => $period,
+                my $monitor = Torrus::Monitor->new( -Period => $period,
                                                    -Offset => $offset,
                                                    -TreeName => $tree,
                                                    -SchedData => $data );
@@ -634,7 +634,7 @@ sub beforeRun
                 for my $token ( @{$data->{'targets'}{$period}{$offset}} )
                 {
                     &Torrus::DB::checkInterrupted();
-                    
+
                     $monitor->addTarget( $config_tree, $token );
                 }
 

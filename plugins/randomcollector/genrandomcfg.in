@@ -40,7 +40,7 @@ my $subtree = 'RandomTest';
 my $datadir = '@defrrddir@';
 
 my $creator = $0 . " \\\n";
-foreach my $arg ( @ARGV )
+for my $arg ( @ARGV )
 {
     if( $arg =~ /^--/ )
     {

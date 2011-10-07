@@ -72,13 +72,13 @@ sub new
     {
         $options{'-FastCycles'} = $Torrus::Collector::fastCycles;
     }
-    
+
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new( %options );
     bless $self, $class;
 
     $self->{'types_sorted'} = [];
-    
+
     for my $collector_type
         ( sort {$collectorTypes{$a} <=> $collectorTypes{$b}}
           keys %collectorTypes )
@@ -92,7 +92,7 @@ sub new
     {
         $self->{'storage'}{$storage_type} = {};
         $self->{'storage_in_use'}{$storage_type} = 0;
-        
+
         my $storage_string = $storage_type . '-storage';
         if( ref( $Torrus::Collector::initStorage{$storage_string} ) )
         {
@@ -101,7 +101,7 @@ sub new
     }
 
     $self->{'tree_name'} = $options{'-TreeName'};
-    
+
     return $self;
 }
 
@@ -126,7 +126,7 @@ sub addTarget
 
     $self->{'targets'}{$token}{'type'} = $collector_type;
     $self->{'types_in_use'}{$collector_type} = 1;
-    
+
     my $storage_types = $config_tree->getNodeParam($token, 'storage-type');
     for my $storage_type ( split( ',', $storage_types ) )
     {
@@ -143,7 +143,7 @@ sub addTarget
             }
             push( @{$self->{'targets'}{$token}{'storage-types'}},
                   $storage_type );
-            
+
             $self->fetchParams($config_tree, $token, $storage_string);
             $self->{'storage_in_use'}{$storage_type} = 1;
         }
@@ -155,14 +155,14 @@ sub addTarget
     {
         $self->{'targets'}{$token}{'transform'} = $code;
     }
-    
+
     # If specified, store the scale RPN
     my $scalerpn = $config_tree->getNodeParam($token, 'collector-scale');
     if( defined $scalerpn )
     {
         $self->{'targets'}{$token}{'scalerpn'} = $scalerpn;
     }
-    
+
     # If specified, store the value map
     my $valueMap = $config_tree->getNodeParam($token, 'value-map');
     if( defined $valueMap and length($valueMap) > 0 )
@@ -201,7 +201,7 @@ sub addTarget
             }
         }
     }
-    
+
     if( not $ok )
     {
         $self->deleteTarget( $token );
@@ -229,7 +229,7 @@ sub fetchParams
     while( scalar( @maps ) > 0 )
     {
         &Torrus::DB::checkInterrupted();
-        
+
         my @next_maps = ();
         for my $map ( @maps )
         {
@@ -365,7 +365,7 @@ sub deleteTarget
     &Torrus::DB::checkInterrupted();
 
     Info('Deleting target: ' . $self->path($token));
-    
+
     if( ref( $self->{'targets'}{$token}{'deleteProc'} ) )
     {
         for my $proc ( @{$self->{'targets'}{$token}{'deleteProc'}} )
@@ -413,24 +413,24 @@ sub run
     my $self = shift;
 
     undef $self->{'values'};
-    
+
     for my $collector_type ( @{$self->{'types_sorted'}} )
     {
         next unless $self->{'types_in_use'}{$collector_type};
 
         &Torrus::DB::checkInterrupted();
-        
+
         if( $Torrus::Collector::needsConfigTree
             {$collector_type}{'runCollector'} )
         {
             $self->{'config_tree'} =
-                new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
+                Torrus::ConfigTree->new( -TreeName => $self->{'tree_name'},
                                         -Wait => 1 );
         }
-        
+
         &{$Torrus::Collector::runCollector{$collector_type}}
         ( $self, $self->collectorData($collector_type) );
-        
+
         if( defined( $self->{'config_tree'} ) )
         {
             undef $self->{'config_tree'};
@@ -440,14 +440,14 @@ sub run
     while( my ($storage_type, $ref) = each %{$self->{'storage'}} )
     {
         next unless $self->{'storage_in_use'}{$storage_type};
-        
+
         &Torrus::DB::checkInterrupted();
-        
+
         if( $Torrus::Collector::needsConfigTree
             {$storage_type}{'storeData'} )
         {
             $self->{'config_tree'} =
-                new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
+                Torrus::ConfigTree->new( -TreeName => $self->{'tree_name'},
                                         -Wait => 1 );
         }
 
@@ -456,25 +456,25 @@ sub run
         if( defined( $self->{'config_tree'} ) )
         {
             undef $self->{'config_tree'};
-        }        
+        }
     }
-    
+
     while( my ($collector_type, $ref) = each %{$self->{'types'}} )
     {
         next unless $self->{'types_in_use'}{$collector_type};
-        
+
         if( ref( $Torrus::Collector::postProcess{$collector_type} ) )
         {
             &Torrus::DB::checkInterrupted();
-            
+
             if( $Torrus::Collector::needsConfigTree
                 {$collector_type}{'postProcess'} )
             {
                 $self->{'config_tree'} =
-                    new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
+                    Torrus::ConfigTree->new( -TreeName => $self->{'tree_name'},
                                             -Wait => 1 );
             }
-            
+
             &{$Torrus::Collector::postProcess{$collector_type}}( $self, $ref );
 
             if( defined( $self->{'config_tree'} ) )
@@ -499,7 +499,7 @@ sub setValue
     if( $value ne 'U' )
     {
         if( defined( my $code = $self->{'targets'}{$token}{'transform'} ) )
-        {            
+        {
             # Screen out the percent sign and $_
             $code =~ s/DOLLAR/\$/gm;
             $code =~ s/MOD/\%/gm;
@@ -544,7 +544,7 @@ sub setValue
         if( defined( $self->{'targets'}{$token}{'scalerpn'} ) )
         {
             Debug('Value before scaling: ' . $value);
-            my $rpn = new Torrus::RPN;
+            my $rpn = Torrus::RPN->new();
             $value = $rpn->run( $value . ',' .
                                 $self->{'targets'}{$token}{'scalerpn'},
                                 sub{} );
@@ -601,7 +601,7 @@ sub beforeRun
     &Torrus::DB::checkInterrupted();
 
     my $tree = $self->treeName();
-    my $config_tree = new Torrus::ConfigTree(-TreeName => $tree, -Wait => 1);
+    my $config_tree = Torrus::ConfigTree->new(-TreeName => $tree, -Wait => 1);
     if( not defined( $config_tree ) )
     {
         return
@@ -610,7 +610,7 @@ sub beforeRun
     my $data = $self->data();
 
     my $instance = $self->{'options'}{'-Instance'};
-        
+
     # Prepare the list of tokens, sorted by period and offset,
     # from config tree or from cache.
 
@@ -620,7 +620,7 @@ sub beforeRun
     my $timestamp_key = $tree . ':' . $instance . ':collector_cache';
     my $known_ts = Torrus::TimeStamp::get( $timestamp_key );
     my $actual_ts = $config_tree->getTimestamp();
-    
+
     if( $actual_ts >= $known_ts or not $data->{'targets_initialized'} )
     {
         my $db_lock;
@@ -629,10 +629,10 @@ sub beforeRun
         {
             Info('Acquiring an exclusive lock for configuration slurp');
             $db_lock =
-                new Torrus::DB( 'collector_lock', -WriteAccess => 1 );        
+                Torrus::DB->new( 'collector_lock', -WriteAccess => 1 );
             $cursor_lock = $db_lock->cursor( -Write => 1 );
         }
-        
+
         Info('Initializing tasks for collector instance ' . $instance);
         Debug("Config TS: $actual_ts, Collector TS: $known_ts");
         my $init_start = time();
@@ -643,7 +643,7 @@ sub beforeRun
             new Torrus::DB('collector_tokens' . '_' . $instance . '_' .
                            $config_tree->{'ds_config_instance'},
                            -Subdir => $tree);
-        
+
         my $cursor = $db_tokens->cursor();
         while( my ($token, $schedule) = $db_tokens->next($cursor) )
         {
@@ -660,12 +660,12 @@ sub beforeRun
         undef $cursor;
         $db_tokens->closeNow();
         undef $db_tokens;
-        
+
         &Torrus::DB::checkInterrupted();
 
         # Set the timestamp
         &Torrus::TimeStamp::setNow( $timestamp_key );
-        
+
         $self->flushTasks();
 
         for my $period ( keys %{$targets} )
@@ -673,7 +673,7 @@ sub beforeRun
             for my $offset ( keys %{$targets->{$period}} )
             {
                 my $collector =
-                    new Torrus::Collector( -Period => $period,
+                    Torrus::Collector->new( -Period => $period,
                                            -Offset => $offset,
                                            -TreeName => $tree,
                                            -Instance => $instance );
@@ -699,7 +699,7 @@ sub beforeRun
         Verbose(sprintf("Tasks initialization finished in %d seconds",
                         time() - $init_start));
 
-        $data->{'targets_initialized'} = 1;        
+        $data->{'targets_initialized'} = 1;
         Info('Tasks for collector instance ' . $instance . ' initialized');
 
         for my $collector_type ( keys %Torrus::Collector::collectorTypes )
@@ -709,15 +709,15 @@ sub beforeRun
             {
                 &{$Torrus::Collector::initCollectorGlobals{
                     $collector_type}}($tree, $instance);
-                
+
                 Verbose('Initialized collector globals for type: ' .
                         $collector_type);
             }
         }
     }
-    
+
     Torrus::TimeStamp::release();
-    
+
     return 1;
 }
 

@@ -65,7 +65,7 @@ elsif( $verbose )
 
 my @realinfiles;
 
-foreach my $infile ( @infiles )
+for my $infile ( @infiles )
 {
     if( not -r $infile )
     {

@@ -63,7 +63,7 @@ sub generate
         $step = 300;
     }
 
-    my $srvIDParams = new Torrus::ServiceID();
+    my $srvIDParams = Torrus::ServiceID->new();
     
     my $srvIDs = $self->{'srvexport'}->getServiceIDs();
     for my $serviceid ( @{$srvIDs} )

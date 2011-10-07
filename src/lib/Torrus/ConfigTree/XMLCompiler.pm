@@ -68,13 +68,13 @@ sub compile
     my $filename = shift;
 
     &Torrus::DB::checkInterrupted();
-    
+
     $filename = Torrus::SiteConfig::findXMLFile($filename);
     if( not defined( $filename ) )
     {
         return 0;
     }
-                    
+
     # Make sure we process each file only once
     if( $self->{'files_processed'}{$filename} )
     {
@@ -88,7 +88,7 @@ sub compile
     Verbose('Compiling ' . $filename);
 
     my $ok = 1;
-    my $parser = new XML::LibXML;
+    my $parser = XML::LibXML->new();
     my $doc;
     eval { $doc = $parser->parse_file( $filename );  };
     if( $@ )

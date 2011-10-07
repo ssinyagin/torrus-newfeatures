@@ -46,7 +46,7 @@ sub openTree
     my $self = shift;
     my $tree = shift;
 
-    my $db = new Torrus::DB
+    my $db = Torrus::DBi->new
         ( 'searchwords',
           -Subdir => $tree,
           -Btree => 1,
@@ -71,14 +71,14 @@ sub openGlobal
 {
     my $self = shift;
 
-    my $db = new Torrus::DB
+    my $db = Torrus::DB->new
         ( 'globsearchwords',
           -Btree => 1,
           -Duplicates => 1,
           -WriteAccess => $self->{'options'}{'-WriteAccess'},
           -Truncate => $self->{'options'}{'-WriteAccess'} );
 
-    $self->{'db_globwords'} = $db;    
+    $self->{'db_globwords'} = $db;
 }
 
 
@@ -96,7 +96,7 @@ sub storeKeyword
         $val .= ':' . $param;
     }
 
-    my $lookupkey = join( ':', $tree, $keyword, $val );    
+    my $lookupkey = join( ':', $tree, $keyword, $val );
     if( not $self->{'stored'}{$lookupkey} )
     {
         $self->{'db_treewords'}{$tree}->put( $keyword, $val );

@@ -40,7 +40,7 @@ sub new
     die() if not defined( $options{'-Tree'} );
 
     $self->{'db_stats'} =
-        new Torrus::DB( 'scheduler_stats',
+        Torrus::DB->new( 'scheduler_stats',
                       -Subdir => $self->{'options'}{'-Tree'},
                       -Btree => 1,
                       -WriteAccess => $options{'-WriteAccess'} );

@@ -67,7 +67,7 @@ sub renderUserLogin
     if( not defined( $self->{'tt'} ) )
     {
         $self->{'tt'} =
-            new Template(INCLUDE_PATH => $Torrus::Global::templateDirs,
+            Template->new(INCLUDE_PATH => $Torrus::Global::templateDirs,
                          TRIM => 1);
     }
 
@@ -76,7 +76,7 @@ sub renderUserLogin
     {
         $url .= '/' . $self->{'options'}->{'urlPassTree'};
     }
-    
+
     my $ttvars =
     {
         'url'        => $url,
@@ -114,7 +114,7 @@ sub renderUserLogin
         @ret = ($outfile, $mime_type, $t_expires - time());
     }
 
-    $self->{'options'} = undef;   
+    $self->{'options'} = undef;
 
     return @ret;
 }
@@ -161,7 +161,7 @@ sub renderTreeChooser
 
     $t_expires = time() + $Torrus::Renderer::Chooser::expires;
     $mime_type = $Torrus::Renderer::Chooser::mimeType;
-    
+
     my $tmplfile;
     if( defined( $self->{'options'}{'variables'}{'SEARCH'} ) and
         $self->mayGlobalSearch() )
@@ -179,7 +179,7 @@ sub renderTreeChooser
     if( not defined( $self->{'tt'} ) )
     {
         $self->{'tt'} =
-            new Template(INCLUDE_PATH => $Torrus::Global::templateDirs,
+            Template->new(INCLUDE_PATH => $Torrus::Global::templateDirs,
                          TRIM => 1);
     }
 
@@ -208,7 +208,7 @@ sub renderTreeChooser
         'mayDisplayTree' => sub { return $self->
                                       hasPrivilege( $_[0], 'DisplayTree' ) }
         ,
-        'mayGlobalSearch' => sub { return $self->mayGlobalSearch(); },        
+        'mayGlobalSearch' => sub { return $self->mayGlobalSearch(); },
         'searchResults'   => sub { return $self->doGlobalSearch($_[0]); }
     };
 
@@ -235,7 +235,7 @@ sub renderTreeChooser
         @ret = ($outfile, $mime_type, $t_expires - time());
     }
 
-    $self->{'options'} = undef;   
+    $self->{'options'} = undef;
 
     return @ret;
 }
@@ -244,7 +244,7 @@ sub renderTreeChooser
 sub mayGlobalSearch
 {
     my $self = shift;
-    
+
     return ( $Torrus::Renderer::globalSearchEnabled and
              ( not $Torrus::CGI::authorizeUsers or
                ( $self->hasPrivilege( '*', 'GlobalSearch' ) ) ) );
@@ -254,8 +254,8 @@ sub doGlobalSearch
 {
     my $self = shift;
     my $string = shift;
-    
-    my $sr = new Torrus::Search;
+
+    my $sr = Torrus::Search->new();
     $sr->openGlobal();
     my $result = $sr->searchPrefix( $string );
 
@@ -265,7 +265,7 @@ sub doGlobalSearch
     # remove duplicating entries
     my %seen;
     my $ret = [];
-    
+
     for my $element ( @{$sorted} )
     {
         my $string = join( ':', $element->[0], $element->[1] );
@@ -275,7 +275,7 @@ sub doGlobalSearch
             push( @{$ret}, $element );
         }
     }
-        
+
     return $ret;
 }
 

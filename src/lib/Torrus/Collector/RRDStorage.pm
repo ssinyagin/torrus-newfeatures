@@ -81,10 +81,10 @@ sub initThreads
         require Thread::Queue;
         require Thread::Semaphore;
 
-        $thrUpdateQueue = new Thread::Queue;
-        $thrErrorsQueue = new Thread::Queue;
-        $rrdtoolSemaphore = new Thread::Semaphore;
-        
+        $thrUpdateQueue = Thread::Queue->new();
+        $thrErrorsQueue = Thread::Queue->new();
+        $rrdtoolSemaphore = Thread::Semaphore->new();
+
         $thrUpdateThread = threads->create( \&rrdUpdateThread );
         $thrUpdateThread->detach();
         $threadsInUse = 1;

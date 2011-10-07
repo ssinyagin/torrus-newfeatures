@@ -40,7 +40,7 @@ sub new
     die('ERROR: TreeName is mandatory') if not $self->{'treename'};
 
     $self->{'db_config_instances'} =
-        new Torrus::DB( 'config_instances', -WriteAccess => 1 );
+        Torrus::DB->new( 'config_instances', -WriteAccess => 1 );
     defined( $self->{'db_config_instances'} ) or return( undef );
 
     my $i = $self->{'db_config_instances'}->get('ds:' . $self->{'treename'});
@@ -105,25 +105,25 @@ sub new
     $self->{'ds_config_instance'} = $dsConfInstance;
     $self->{'other_config_instance'} = $otherConfInstance;
 
-    $self->{'db_readers'} = new Torrus::DB('config_readers',
+    $self->{'db_readers'} = Torrus::DB->new('config_readers',
                                            -Subdir => $self->{'treename'},
                                            -WriteAccess => 1 );
     defined( $self->{'db_readers'} ) or return( undef );
 
     $self->{'db_dsconfig'} =
-        new Torrus::DB('ds_config_' . $dsConfInstance,
+        Torrus::DB->new('ds_config_' . $dsConfInstance,
                        -Subdir => $self->{'treename'},  -Btree => 1,
                        -WriteAccess => $options{'-WriteAccess'});
     defined( $self->{'db_dsconfig'} ) or return( undef );
-    
+
     $self->{'db_otherconfig'} =
-        new Torrus::DB('other_config_' . $otherConfInstance,
+        Torrus::DB->new('other_config_' . $otherConfInstance,
                        -Subdir => $self->{'treename'}, -Btree => 1,
                        -WriteAccess => $options{'-WriteAccess'});
     defined( $self->{'db_otherconfig'} ) or return( undef );
-    
+
     $self->{'db_aliases'} =
-        new Torrus::DB('aliases_' . $dsConfInstance,
+        Torrus::DB->new('aliases_' . $dsConfInstance,
                        -Subdir => $self->{'treename'},  -Btree => 1,
                        -WriteAccess => $options{'-WriteAccess'});
     defined( $self->{'db_aliases'} ) or return( undef );
@@ -196,11 +196,11 @@ sub new
 
     # Read the parameter properties into memory
     $self->{'db_paramprops'} =
-        new Torrus::DB('paramprops_' . $dsConfInstance,
+        Torrus::DB->new('paramprops_' . $dsConfInstance,
                        -Subdir => $self->{'treename'},  -Btree => 1,
                        -WriteAccess => $options{'-WriteAccess'});
     defined( $self->{'db_paramprops'} ) or return( undef );
-    
+
     if( $options{'-Rebuild'} )
     {
         $self->{'db_paramprops'}->trunc();
@@ -220,16 +220,16 @@ sub new
         delete $self->{'db_paramprops'};
     }
 
-    
+
     $self->{'db_sets'} =
-        new Torrus::DB('tokensets_' . $dsConfInstance,
+        Torrus::DB->new('tokensets_' . $dsConfInstance,
                        -Subdir => $self->{'treename'}, -Btree => 0,
                        -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
     defined( $self->{'db_sets'} ) or return( undef );
 
 
     $self->{'db_nodepcache'} =
-        new Torrus::DB('nodepcache_' . $dsConfInstance,
+        Torrus::DB->new('nodepcache_' . $dsConfInstance,
                        -Subdir => $self->{'treename'}, -Btree => 1,
                        -WriteAccess => 1,
                        -Truncate => ($options{'-Rebuild'} and
@@ -238,7 +238,7 @@ sub new
 
 
     $self->{'db_nodeid'} =
-        new Torrus::DB('nodeid_' . $dsConfInstance,
+        Torrus::DB->new('nodeid_' . $dsConfInstance,
                        -Subdir => $self->{'treename'}, -Btree => 1,
                        -WriteAccess => 1,
                        -Truncate => ($options{'-Rebuild'} and

@@ -75,17 +75,17 @@ sub do_process
             {
                 $type = 'text/html';
             }
-            
+
             if( -r $fname )
             {
-                my $fh = new IO::File( $fname );
+                my $fh = IO::File->new( $fname );
                 if( defined( $fh ) )
                 {
                     print $q->header('-type' => $type,
                                      '-expires' => '+1h');
-                    
+
                     $fh->binmode(':raw');
-                    my $buffer;           
+                    my $buffer;
                     while( $fh->read( $buffer, 65536 ) )
                     {
                         print( $buffer );
@@ -102,14 +102,14 @@ sub do_process
                 $q->h2('Error'),
                 $q->strong('Cannot retrieve file: ' . $fname);
             }
-            
+
             return;
         }
     }
-    
+
     my @paramNames = $q->param();
 
-    if( $q->param('DEBUG') and not $Torrus::Renderer::globalDebug ) 
+    if( $q->param('DEBUG') and not $Torrus::Renderer::globalDebug )
     {
         &Torrus::Log::setLevel('debug');
     }
@@ -126,7 +126,7 @@ sub do_process
     my( $fname, $mimetype, $expires );
     my @cookies;
 
-    my $renderer = new Torrus::Renderer();
+    my $renderer = Torrus::Renderer->new();
     if( not defined( $renderer ) )
     {
         return report_error($q, 'Error initializing Renderer');
@@ -137,7 +137,7 @@ sub do_process
 
     if( $Torrus::CGI::authorizeUsers )
     {
-        $options{'acl'} = new Torrus::ACL;
+        $options{'acl'} = Torrus::ACL->new();
         
         my $hostauth = $q->param('hostauth');
         if( defined( $hostauth ) )
@@ -147,7 +147,7 @@ sub do_process
             my $password = $uid . '//' . $hostauth;
 
             Debug('Host-based authentication for ' . $uid);
-            
+
             if( not $options{'acl'}->authenticateUser( $uid, $password ) )
             {
                 print $q->header(-status=>'403 Forbidden',
@@ -156,13 +156,13 @@ sub do_process
                 Info('Host-based authentication failed for ' . $uid);
                 return;
             }
-            
+
             Info('Host authenticated: ' . $uid);
             $options{'uid'} = $uid;
         }
         else
         {
-            
+
             my $ses_id = $q->cookie('SESSION_ID');
 
             my $needs_new_session = 1;
@@ -293,25 +293,25 @@ sub do_process
                 my $reportfname = $q->param('htmlreport');
                 # strip off leading slashes for security
                 $reportfname =~ s/^.*\///o;
-                
+
                 $fname = $Torrus::Global::reportsDir . '/' . $tree .
                     '/html/' . $reportfname;
                 if( not -f $fname )
                 {
                     return report_error($q, 'No such file: ' . $reportfname);
                 }
-                
+
                 $mimetype = 'text/html';
                 $expires = '3600';
             }
             else
             {
-                my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
+                my $config_tree = Torrus::ConfigTree->new( -TreeName => $tree );
                 if( not defined($config_tree) )
                 {
                     return report_error($q, 'Configuration is not ready');
                 }
-                
+
                 my $token = $q->param('token');
                 if( not defined($token) )
                 {
@@ -362,7 +362,7 @@ sub do_process
                 
                 ( $fname, $mimetype, $expires ) =
                     $renderer->render( $config_tree, $token, $view, %options );
-                
+
                 undef $config_tree;
             }
         }
@@ -382,18 +382,18 @@ sub do_process
         {
             return report_error($q, 'No such file or directory: ' . $fname);
         }
-        
+
         Debug("Render returned $fname $mimetype $expires");
 
-        my $fh = new IO::File( $fname );
+        my $fh = IO::File->new( $fname );
         if( defined( $fh ) )
         {
             print $q->header('-type' => $mimetype,
                              '-expires' => '+'.$expires.'s',
                              '-cookie' => \@cookies);
-            
+
             $fh->binmode(':raw');
-            my $buffer;           
+            my $buffer;
             while( $fh->read( $buffer, 65536 ) )
             {
                 print( $buffer );
@@ -410,9 +410,9 @@ sub do_process
         return report_error($q, "Renderer returned error.\n" .
                             "Probably wrong directory permissions or " .
                             "directory missing:\n" .
-                            $Torrus::Global::cacheDir);            
+                            $Torrus::Global::cacheDir);
     }
-    
+
     if( not $Torrus::Renderer::globalDebug )
     {
         &Torrus::Log::setLevel('info');
@@ -429,7 +429,7 @@ sub report_error
     my $v = $q->param('view');
     if( defined($v) and $v eq 'rpc' )
     {
-        my $json = new JSON;
+        my $json = JSON->new();
         $json->pretty;
         $json->canonical;
         print $q->header('-type' => 'application/json', '-expires' => 'now');

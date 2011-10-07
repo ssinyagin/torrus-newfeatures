@@ -38,7 +38,7 @@ sub importACL
     my $filename = shift;
 
     my $ok = 1;
-    my $parser = new XML::LibXML;
+    my $parser = XML::LibXML->new();
     my $doc;
     eval { $doc = $parser->parse_file( $filename );  };
     if( $@ )

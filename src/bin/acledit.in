@@ -155,7 +155,7 @@ elsif( $verbose )
 
 Verbose(sprintf("Torrus version %s", '@VERSION@'));
 
-my $aclEdit = new Torrus::ACL::Edit;
+my $aclEdit = Torrus::ACL::Edit->new();
 
 if( $ok and $exportfile )
 {

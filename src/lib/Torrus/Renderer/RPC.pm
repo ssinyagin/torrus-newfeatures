@@ -122,7 +122,7 @@ sub render_rpc
              'result' => $result });
     }
 
-    my $json = new JSON;
+    my $json = JSON->new();
 
     if( $pretty_json or $self->{'options'}{'variables'}{'PRETTY'})
     {
@@ -130,7 +130,7 @@ sub render_rpc
         $json->canonical;
     }
 
-    my $fh = new IO::File($outfile, 'w');
+    my $fh = IO::File->new($outfile, 'w');
     if( not $fh )
     {
         Error("Error opening $outfile for writing: $!");
@@ -157,7 +157,7 @@ sub rpc_walk_leaves
     my $token = $opts->{'token'};
     my $params = $opts->{'params'};
     my $result = $opts->{'result'};
-    
+
 
     if( scalar(keys %{$result->{'data'}}) > $result_limit )
     {
@@ -165,7 +165,7 @@ sub rpc_walk_leaves
         $result->{'error'} = 'Result is too big. Aborting the tree walk';
         return;
     }
-    
+
     if( $config_tree->isLeaf($token) )
     {
         my $data = {'path' => $config_tree->path($token)};
@@ -225,13 +225,13 @@ my @rpc_print_statements =
                     'PRINT:F2:%.2lf'],
      },
      );
-     
+
 my %rrd_print_opts =
     (
      'start'  => '--start',
      'end'    => '--end',
      );
-     
+
 
 sub rpc_aggregate_ds
 {
@@ -243,7 +243,7 @@ sub rpc_aggregate_ds
     my $view = $opts->{'view'};
     my $params = $opts->{'params'};
     my $result = $opts->{'result'};
-    
+
     if( not $config_tree->isLeaf($token) )
     {
         $result->{'success'} = 0;
@@ -267,15 +267,15 @@ sub rpc_aggregate_ds
         return;
     }
 
-    my @args;    
-    
+    my @args;
+
     push( @args, $self->rrd_make_opts( $config_tree, $token, $view,
                                        \%rrd_print_opts, ) );
-    
+
     push( @args,
           $self->rrd_make_def($config_tree, $token, 'Aavg', 'AVERAGE'),
           $self->rrd_make_def($config_tree, $token, 'Amax', 'MAX') );
-          
+
     for my $entry ( @rpc_print_statements )
     {
         push( @args, @{$entry->{'args'}} );

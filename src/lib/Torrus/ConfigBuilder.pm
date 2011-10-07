@@ -487,7 +487,7 @@ sub requiredFiles
         {
             $file = $reg->{'source'};
         }
-        
+
         if( defined( $file ) )
         {
             $files{$file} = 1;
@@ -508,7 +508,7 @@ sub toFile
     my $self = shift;
     my $filename = shift;
 
-    my $fh = new IO::File('> ' . $filename);
+    my $fh = IO::File->new('> ' . $filename);
     if( defined( $fh ) )
     {
         my $ok = $self->{'doc'}->toFH( $fh, 2 );

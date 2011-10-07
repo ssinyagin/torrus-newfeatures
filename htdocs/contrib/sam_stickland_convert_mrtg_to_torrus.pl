@@ -42,7 +42,7 @@ sub getBasicInfo($)
 	my $rrdinfo = shift @_;
 	my (@data_rras, @ds_names);
 	
-	foreach my $prop (sort keys %$rrdinfo)
+	for my $prop (sort keys %$rrdinfo)
 	{
 		my $propval = $$rrdinfo{$prop};
 	 
@@ -79,7 +79,7 @@ sub defineDataSources($$)
 	
 	my @DS;
   
-	foreach my $ds_name ( @$ds_names )
+	for my $ds_name ( @$ds_names )
 	{
 		my $type = $$rrdinfo{'ds['.$ds_name.'].type'};
 		my $args = '';
@@ -116,7 +116,7 @@ sub defineRRAs($$)
 	my ($rrdinfo, $data_rras) = @_;
 	
 	my @RRA;
-	foreach my $rranum ( @$data_rras )
+	for my $rranum ( @$data_rras )
 	{
 		push( @RRA, sprintf('RRA:%s:%e:%d:%d',
 											 $$rrdinfo{'rra['.$rranum.'].cf'},
@@ -144,7 +144,7 @@ sub collectData($)
 
 	my $ref;
 	my $mode = "AVG";
-	foreach my $line (@mrtg_lines)
+	for my $line (@mrtg_lines)
 	{
 		$mode = "MAX" if $line =~ m/MAX/; 
 		
@@ -196,7 +196,7 @@ sub generateExtrapolatedEntries($$$$)
 	my ($i, $next_update) = (0, 0);
 	
 	my $started = 0;
-	foreach my $time (sort (keys( %$avg_ref ) ) )
+	for my $time (sort (keys( %$avg_ref ) ) )
 	{
 	  # Start at first sample after midnight
 		if( !$started )
@@ -270,7 +270,7 @@ sub generateExtrapolatedEntries($$$$)
 	
 	# Copy the data into the new array
 	my $lastest = ( sort  { $b cmp $a } ( keys( %new_samples ) ) )[0];
-	foreach my $time ( sort { $b cmp $a } ( keys( %{$all_samples} ) ) )
+	for my $time ( sort { $b cmp $a } ( keys( %{$all_samples} ) ) )
 	{
 		last if( $time < $earliest );
 		$new_samples{$time} = $all_samples->{$time};
@@ -283,7 +283,7 @@ sub updateLastDS( $$$$$ )
 {
 	my ( $root, $in_ds_name, $out_ds_name, $in_last_ds, $out_last_ds ) = @_;
 	
-	foreach my $ds ( $root->findnodes( 'ds' ) )
+	for my $ds ( $root->findnodes( 'ds' ) )
 	{
 		my $ds_name = $ds->findvalue( 'name' );
 		if( $ds_name =~ m/$in_ds_name/ )
@@ -370,7 +370,7 @@ sub convert_mrtg( $$$ )
 	
 	# Add in the most recent entries that have not yet been averaged
   my $started = 0;
-	foreach my $time ( sort ( keys ( %{$avg300} ) ) )
+	for my $time ( sort ( keys ( %{$avg300} ) ) )
 	{
 	  # Start at first sample after midnight
 		if( !$started )
@@ -434,7 +434,7 @@ sub convert_mrtg( $$$ )
 	my ( $i, $next_update ) = ( 0, 0 );
 	my $errors = "";
 	
-	foreach my $time ( sort ( keys( %{$all_samples} ) ) )
+	for my $time ( sort ( keys( %{$all_samples} ) ) )
 	{   
 		$totalIn->badd( $all_samples->{$time}->[0] );
 		$totalOut->badd( $all_samples->{$time}->[1] );

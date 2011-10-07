@@ -38,7 +38,7 @@ sub new
     my $writing = $options{'-WriteAccess'};
 
     $self->{'db_params'} =
-        new Torrus::DB( 'serviceid_params',
+        Torrus::DB->new( 'serviceid_params',
                         -Btree => 1,
                         -WriteAccess => $writing );
     defined( $self->{'db_params'} ) or return( undef );

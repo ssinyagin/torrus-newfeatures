@@ -27,7 +27,7 @@
 # Options:
 #   -Tree        => tree name
 #   -ProcessName => process name and commandline options
-#   -RunOnce     => 1       -- this prevents from infinite loop.   
+#   -RunOnce     => 1       -- this prevents from infinite loop.
 
 
 package Torrus::Scheduler;
@@ -54,7 +54,7 @@ sub new
         die();
     }
 
-    $self->{'stats'} = new Torrus::SchedulerInfo( -Tree => $options{'-Tree'},
+    $self->{'stats'} = Torrus::SchedulerInfo->new( -Tree => $options{'-Tree'},
                                                   -WriteAccess => 1 );    
     return $self;
 }

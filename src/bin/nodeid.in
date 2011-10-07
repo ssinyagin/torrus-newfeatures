@@ -24,7 +24,7 @@ use strict;
 use Getopt::Long;
 use JSON;
 use File::Copy;
-    
+
 use Torrus::ConfigTree;
 use Torrus::SiteConfig;
 use Torrus::Renderer;
@@ -95,13 +95,13 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 &Torrus::DB::setSafeSignalHandlers();
 
 {
-    my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
+    my $config_tree = Torrus::ConfigTree->new( -TreeName => $tree );
     if( not defined($config_tree) )
     {
         Error("Configuration is not ready");
         exit 1;
     }
-        
+
     if( $cmd eq 'info' or $cmd eq 'render' )
     {
         my $token = $config_tree->getNodeByNodeid($nodeid);
@@ -164,7 +164,7 @@ sub print_nodeid
     my $tokens = shift;
     my $details = shift;
 
-    my $json = new JSON;
+    my $json = JSON->new();
     $json->pretty();
     $json->canonical();
 
@@ -209,8 +209,6 @@ sub print_nodeid
 
     print $json->encode(\@all);
 }
-            
-
 
 sub render_node
 {
@@ -219,7 +217,7 @@ sub render_node
     my $view = shift;
     my $out = shift;
 
-    my $r = new Torrus::Renderer;
+    my $r = Torrus::Renderer->new();
 
     my($fname, $mimetype) = $r->render($config_tree, $token, $view);
 
@@ -233,17 +231,13 @@ sub render_node
 
         $fname = $out;
     }
-        
+
     my $json = new JSON;
     $json->pretty();
 
     print $json->encode({'Content-type' => $mimetype,
                          'Filename' => $fname});
 }
-        
-
-
-
 
 # Local Variables:
 # mode: perl

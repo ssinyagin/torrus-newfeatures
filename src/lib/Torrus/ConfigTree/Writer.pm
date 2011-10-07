@@ -60,7 +60,7 @@ sub new
     {
         return
     }
-    
+
     bless $self, $class;
 
     $self->{'viewparent'} = {};
@@ -74,7 +74,7 @@ sub new
     for my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
     {
         $self->{'db_collectortokens'}->[$instance] =
-            new Torrus::DB( 'collector_tokens' . '_' .
+            Torrus::DB->new( 'collector_tokens' . '_' .
                             $instance . '_' . $self->{'ds_config_instance'},
                             -Subdir => $self->treeName(),
                             -WriteAccess => 1,
@@ -583,11 +583,11 @@ sub postProcessNodes
                 }
                 else
                 {
-                    $newOffset += $instance * int( $period / $nInstances ); 
-                } 
+                    $newOffset += $instance * int( $period / $nInstances );
+                }
 
                 $newOffset %= $period;
-                
+
                 if( $newOffset != $oldOffset )
                 {
                     $self->setNodeParam( $token,
@@ -607,7 +607,7 @@ sub postProcessNodes
                         if( not defined( $srvIdParams ) )
                         {
                             $srvIdParams =
-                                new Torrus::ServiceID( -WriteAccess => 1 );
+                                Torrus::ServiceID->new( -WriteAccess => 1 );
                         }
 
                         my $srvTrees =
@@ -618,7 +618,7 @@ sub postProcessNodes
                         {
                             $srvTrees = $self->treeName();
                         }
-                                                
+
                         my $serviceid =
                             $self->getNodeParam($token, 'ext-service-id');
 

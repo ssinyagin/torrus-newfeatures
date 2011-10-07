@@ -37,7 +37,7 @@ sub init
 {
     not defined( $Torrus::TimeStamp::db ) or
         die('$Torrus::TimeStamp::db is defined at init');
-    $Torrus::TimeStamp::db = new Torrus::DB('timestamps', -WriteAccess => 1);
+    $Torrus::TimeStamp::db = Torrus::DB->new('timestamps', -WriteAccess => 1);
 }
 
 sub release

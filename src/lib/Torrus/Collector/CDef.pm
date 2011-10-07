@@ -50,7 +50,7 @@ sub initTarget
 {
     my $collector = shift;
     my $token = shift;
-    
+
     my $cref = $collector->collectorData( 'cdef' );
     if( not defined( $cref->{'crefTokens'} ) )
     {
@@ -58,7 +58,7 @@ sub initTarget
     }
 
     push( @{$cref->{'crefTokens'}}, $token );
-    
+
     return 1;
 }
 
@@ -73,7 +73,7 @@ sub runCollector
     my $config_tree = $collector->configTree();
 
     my $now = time();
-    my $da = new Torrus::DataAccess;
+    my $da = Torrus::DataAccess->new();
 
     # By default, try to get the data from one period behind
     my $defaultAccessTime = $now -

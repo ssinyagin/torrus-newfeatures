@@ -118,11 +118,11 @@ sub initCollectorGlobals
 {
     my $tree = shift;
     my $instance = shift;
-    
+
     if( not defined( $db_failures ) )
     {
         $db_failures =
-            new Torrus::SNMP_Failures( -Tree => $tree,
+            Torrus::SNMP_Failures->new( -Tree => $tree,
                                        -Instance => $instance,
                                        -WriteAccess => 1 );
     }
@@ -137,16 +137,16 @@ sub initCollectorGlobals
     %hostUnreachableSeen = ();
     %hostUnreachableRetry = ();
     %unreachableHostDeleted = ();
-    
+
     # Configuration re-compile was probably caused by new object instances
     # appearing on the monitored devices. Here we force the maps to refresh
     # soon enough in order to catch up with the changes
 
-    my $now = time();    
+    my $now = time();
     for my $maphash ( keys %mapsExpire )
     {
         $mapsExpire{$maphash} = int( $now + rand( $mapsUpdateInterval ) );
-    }    
+    }
 }
 
 
@@ -173,7 +173,7 @@ sub initTarget
     }
 
     $tref->{'hosthash'} = $hosthash;
-    
+
     return Torrus::Collector::SNMP::initTargetAttributes( $collector, $token );
 }
 
@@ -195,7 +195,7 @@ sub initTargetAttributes
     {
         $snmpV1Hosts{$hosthash} = 1;
     }
-    
+
     # If the object is defined as a map, retrieve the whole map
     # and cache it.
 
@@ -203,13 +203,13 @@ sub initTargetAttributes
     {
         return 0;
     }
-        
+
     if( not checkUnreachableRetry( $collector, $hosthash ) )
     {
         $cref->{'needsRemapping'}{$token} = 1;
         return 1;
     }
-    
+
     my $oid = $collector->param($token, 'snmp-object');
     $oid = expandOidMappings( $collector, $token, $hosthash, $oid );
 
@@ -258,7 +258,7 @@ sub initTargetAttributes
     {
         $cref->{'ignoremiberrors'}{$hosthash}{$oid} = 1;
     }
-    
+
     return 1;
 }
 
@@ -270,14 +270,14 @@ sub getHostHash
 
     my $hostname = $collector->param($token, 'snmp-host');
     my $domain = $collector->param($token, 'domain-name');
-    
+
     if( length( $domain ) > 0 and
         index($hostname, '.') < 0 and
         index($hostname, ':') < 0 )
     {
         $hostname .= '.' . $domain;
     }
-    
+
     my $port = $collector->param($token, 'snmp-port');
     my $version = $collector->param($token, 'snmp-version');
 
@@ -311,7 +311,7 @@ sub snmpSessionArgs
 
     my $transport = $collector->param($token, 'snmp-transport') . '/ipv' .
         $collector->param($token, 'snmp-ipversion');
-    
+
     my ($hostname, $port, $community) = split(/\|/o, $hosthash);
 
     my $version = $collector->param($token, 'snmp-version');
@@ -321,7 +321,7 @@ sub snmpSessionArgs
                 -timeout      => $collector->param($token, 'snmp-timeout'),
                 -retries      => $collector->param($token, 'snmp-retries'),
                 -version      => $version ];
-    
+
     for my $arg ( qw(-localaddr -localport) )
     {
         if( defined( $collector->param($token, 'snmp' . $arg) ) )

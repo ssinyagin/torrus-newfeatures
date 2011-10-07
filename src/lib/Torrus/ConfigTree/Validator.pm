@@ -475,13 +475,13 @@ sub validateRPN
     my $timeoffset_supported = shift;
 
     &Torrus::DB::checkInterrupted();
-    
+
     my $ok = 1;
 
     # There must be at least one DS reference
     my $ds_couter = 0;
 
-    my $rpn = new Torrus::RPN;
+    my $rpn = Torrus::RPN->new();
 
     # The callback for RPN translation
     my $callback = sub
@@ -501,8 +501,8 @@ sub validateRPN
                   ' in node reference at ' . $path);
             $ok = 0;
             return
-        }            
-        
+        }
+
         my $leaf = length($noderef) > 0 ?
             $config_tree->getRelative($token, $noderef) : $token;
 

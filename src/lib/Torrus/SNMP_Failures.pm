@@ -44,7 +44,7 @@ sub new
                not defined($options{'-Instance'}) );
 
     $self->{'db_failures'} =
-        new Torrus::DB( 'snmp_failures_' . $options{'-Instance'},
+        Torrus::DB->new( 'snmp_failures_' . $options{'-Instance'},
                         -Subdir => $self->{'options'}{'-Tree'},
                         -Btree => 1,
                         -WriteAccess => $options{'-WriteAccess'} );

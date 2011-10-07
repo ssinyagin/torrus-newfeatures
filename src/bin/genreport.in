@@ -147,7 +147,7 @@ if( $genhtml )
         for my $tree ( @trees )
         {
             &Torrus::DB::checkInterrupted();
-            
+
             Verbose('Generating HTML report for tree ' . $tree);
 
             my $options = {'Tree' => $tree};
@@ -156,9 +156,9 @@ if( $genhtml )
             {
                 $options->{'All_Service_IDs'} = 1;
             }
-            
-            my $out = new Torrus::ReportOutput::HTML( $options );
-            
+
+            my $out = Torrus::ReportOutput::HTML->new( $options );
+
             if( $out->init() )
             {
                 $ok = $out->generate() ? $ok:0;

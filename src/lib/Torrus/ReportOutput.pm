@@ -35,13 +35,13 @@ sub new
 {
     my $class = shift;
     my $options = shift;
-    
+
     my $self = {};
     bless ($self, $class);
-    
+
     $self->{'options'} = $options;    
     defined( $self->{'options'}->{'Tree'} ) or die;
-    
+
     my $sqlRep = Torrus::SQL::Reports->new( $options->{'ReportsSqlSubtype'} );
     if( not defined( $sqlRep ) )
     {
@@ -70,7 +70,7 @@ sub new
 sub init
 {
     my $self = shift;
-    
+
     return 1;
 }
 
@@ -80,16 +80,16 @@ sub generate
     my $self = shift;
 
     my $ok = 1;
-    
+
     my %monthlyReportNames;
 
     my $srvIdList;
     if( not $self->{'options'}->{'All_Service_IDs'} )
     {
-        my $srvId = new Torrus::ServiceID;
+        my $srvId = Torrus::ServiceID->new();
         $srvIdList = $srvId->getAllForTree( $self->{'options'}->{'Tree'} );
     }
-    
+
     my $allReports = $self->{'backend'}->getAllReports( $srvIdList );
 
     # frontpage, title, list of years, etc.
@@ -99,11 +99,11 @@ sub generate
     {
         my $monthlyReportFields = {};
         my $srvidMonthlyFields = {};
-        
+
         while( my( $month, $monthRef ) = each %{$yearRef} )
         {
             my $dailyReportFields = {};
-            
+
             while( my( $day, $dayRef ) = each %{$monthRef} )
             {
                 while( my( $reportName, $fieldsRef ) = each %{$dayRef} )

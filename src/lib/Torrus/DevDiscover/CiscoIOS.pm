@@ -179,7 +179,7 @@ sub checkdevtype
         if( $dd->checkSnmpTable('ceImageTable') )
         {
             # IOS XR has a new MIB for software image management
-            $devdetails->setCap('CiscoIOSXR');            
+            $devdetails->setCap('CiscoIOSXR');
         }
         else
         {
@@ -189,7 +189,7 @@ sub checkdevtype
 
     # On some Layer3 switching devices, VlanXXX interfaces give some
     # useful stats, while on others the stats are not relevant at all
-    
+
     if( $devdetails->param('CiscoIOS::enable-vlan-interfaces') ne 'yes' )
     {
         $interfaceFilter->{'VlanN'} = {

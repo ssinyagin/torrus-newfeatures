@@ -174,7 +174,7 @@ $Torrus::Scheduler::statsExpDecayAlpha = 0.63;
 # Monitor alarms may become orphaned if the configuration changes
 # in the middle of an event. Events older than this time are cleaned up
 # default: 2 weeks
-$Torrus::Monitor::alarmTimeout = 1209600; 
+$Torrus::Monitor::alarmTimeout = 1209600;
 
 # The default CSS stylesheet and other details for HTML output.
 # These settings may optionally be overwritten by the styling profile below.
@@ -217,7 +217,7 @@ $Torrus::Renderer::siteInfo = undef;
 # URL to be shown on the login page for lost password
 # You have to implement that yourself
 # $Torrus::Renderer::lostPasswordURL = 'http://domain.com/lostpw.cgi';
-    
+
 # The time format to print in HTML
 $Torrus::Renderer::timeFormat = '%d-%m-%Y %H:%M';
 
@@ -337,7 +337,7 @@ $Torrus::FCGI::maxLifetimeRandomFactor = 10800; #3 hours
 ####  ExternalStorage collector module initialization.
 # In order to enable External storage, add these lines to torrus-siteconfig.pl:
 # push(@Torrus::Collector::loadModules, 'Torrus::Collector::ExternalStorage');
-# 
+#
 
 # Other configuration available:
 
@@ -403,8 +403,6 @@ $Torrus::SQL::ReportFields::tableName = 'reportfields';
         require $dir . '/' . $file;
     }
 }
-
-    
 
 require '@torrus_siteconfig_pl@';
 

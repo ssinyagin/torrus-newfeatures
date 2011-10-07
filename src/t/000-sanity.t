@@ -82,7 +82,7 @@ for my $module (sort keys %requires) {
 
 		my (@subs, %vars);
 		if (my $exports = $spec->{exports}) {
-			foreach (@$exports) {
+			for (@$exports) {
 				/^\$(.*)/ and do { $vars{$1} = 'SCALAR'; next };
 				/^\@(.*)/ and do { $vars{$1} = 'ARRAY'; next };
 				/^%(.*)/  and do { $vars{$1} = 'HASH'; next };

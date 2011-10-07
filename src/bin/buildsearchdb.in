@@ -75,14 +75,14 @@ if( $verbose )
 
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
-my $search = new Torrus::Search( -WriteAccess => 1 );
+my $search = Torrus::Search->new( -WriteAccess => 1 );
 
 if( $build_global )
 {
     $search->openGlobal();
 }
 
-foreach my $tree ( @trees )
+for my $tree ( @trees )
 {
     if( not Torrus::SiteConfig::treeExists( $tree ) )
     {
@@ -92,7 +92,7 @@ foreach my $tree ( @trees )
 
     &Torrus::DB::checkInterrupted();
 
-    my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
+    my $config_tree = Torrus::ConfigTree->new( -TreeName => $tree );
     if( not defined($config_tree) )
     {
         print("Configuration is not ready\n");

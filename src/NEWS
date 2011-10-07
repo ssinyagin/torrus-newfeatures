@@ -29,7 +29,7 @@ In this release:
 
 -- MicrosoftWindows discovery module is improved and lots of unneeded
    IF-MIB interfaces are eliminated.
-   
+
 -- New feature: SNMP reachability statistics for devices.
 
 -- FastCGI handler is automatically re-spawning every 5000 requests.

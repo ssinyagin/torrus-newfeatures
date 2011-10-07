@@ -72,7 +72,7 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 
 if( $clear_treestats )
 {
-    my $stats = new Torrus::SchedulerInfo( -Tree => $tree, -WriteAccess => 1 );
+    my $stats = Torrus::SchedulerInfo->new( -Tree => $tree, -WriteAccess => 1 );
     $stats->clearAll();
     print STDERR "Statistics cleared for tree $tree\n";
     exit 0;
@@ -85,7 +85,7 @@ printf("Date: %s\n\n", scalar( localtime( time() ) ) );
 
 if( $report_config )
 {
-    my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
+    my $config_tree = Torrus::ConfigTree->new( -TreeName => $tree );
     if( not defined($config_tree) )
     {
         Error("Configuration is not ready");
@@ -93,7 +93,7 @@ if( $report_config )
     }
 
     my $stats = { 'collectorLeaves' => {}, 'monitorLeaves' => 0 };
-    
+
     collectStats( $config_tree, $stats );
 
     thickLine();
@@ -102,10 +102,10 @@ if( $report_config )
     for my $instance ( sort {$a<=>$b} keys %{$stats->{'collectorLeaves'}} )
     {
         printf("Collector leaves for instance #%d: %d\n",
-               $instance, 
+               $instance,
                $stats->{'collectorLeaves'}{$instance});
     }
-    
+
     printf("Total monitor leaves: %d\n\n", $stats->{'monitorLeaves'});
 
     printf("Scheduled leaves by type:\n");
@@ -122,7 +122,7 @@ if( $report_config )
         if( $stats->{'collectorLeaves'}{$instance} > 0 )
         {
             &Torrus::DB::checkInterrupted();
-            
+
             printf("Collector execution timeline for instance #%d:\n",
                    $instance);
             reportTimeline( $stats->{'collectorSchedule'}{$instance} );
@@ -142,10 +142,10 @@ if( $report_runtime )
         (
          { 'label'   => 'Running Time',
            'varname' => 'RunningTime' },
-         
+
          { 'label'   => 'Late Start',
            'varname' => 'LateStart' },
-         
+
          { 'label'   => 'Too Long',
            'varname' => 'TooLong' },
 
@@ -161,7 +161,7 @@ if( $report_runtime )
         (
          { 'label'   => 'running cycles passed',
            'varname' => 'NTimesRunningTime' },
-         
+
          { 'label'   => 'late starts',
            'varname' => 'NTimesLateStart' },
 
@@ -174,8 +174,8 @@ if( $report_runtime )
          { 'label'   => 'missed periods',
            'varname' => 'CountMissedPeriods' }
          );
-    
-    my $sInfo = new Torrus::SchedulerInfo( '-Tree' => $tree );
+
+    my $sInfo = Torrus::SchedulerInfo->new( '-Tree' => $tree );
     exit(1) if not defined( $sInfo );
 
     my $stats = $sInfo->readStats();
@@ -193,7 +193,7 @@ if( $report_runtime )
             $periodicTasks->{$taskName}{$instance}{$period}{$offset} = $taskId;
         }
     }
-    
+
     for my $taskName ( sort keys %{$periodicTasks} )
     {
         for my $instance ( sort {$a<=>$b}
@@ -208,16 +208,16 @@ if( $report_runtime )
                       keys %{$periodicTasks->{$taskName}{$instance}{$period}} )
                 {
                     &Torrus::DB::checkInterrupted();
-                    
+
                     my $taskId =
                         $periodicTasks->{$taskName}{$instance}{
                             $period}{$offset};
                     my $ref = $stats->{$taskId};
-                
+
                     printf("Task: %s, Instance: %d, " .
                            "Period: %d seconds, Offset: %d seconds\n",
                            $taskName, $instance, $period, $offset);
-                
+
                     for my $format ( @counterFormats )
                     {
                         if( defined( $ref->{$format->{'varname'}} ) )
@@ -274,7 +274,7 @@ sub collectStats
     for my $ctoken ( @children )
     {
         &Torrus::DB::checkInterrupted();
-        
+
         if( $config_tree->isSubtree( $ctoken ) )
         {
             collectStats( $config_tree, $stats, $ctoken );
@@ -287,9 +287,9 @@ sub collectStats
                 my $instance =
                     $config_tree->getNodeParam
                     ( $ctoken, 'collector-instance' );
-                
+
                 $stats->{'collectorLeaves'}{$instance}++;
-                
+
                 my $type = 'c:' .
                     $config_tree->getNodeParam( $ctoken, 'collector-type' );
 
@@ -299,12 +299,12 @@ sub collectStats
 
                 my $offset = $config_tree->
                     getNodeParam( $ctoken, 'collector-timeoffset' );
-                
+
                 $stats->{'leavesPerType'}{$type}++;
                 $stats->{'collectorSchedule'}{$instance}{$period}{
                     $offset}{$type}++;
             }
-            
+
             if( defined( $config_tree->getNodeParam( $ctoken, 'monitor' ) ) )
             {
                 $stats->{'monitorLeaves'}++;
@@ -330,7 +330,7 @@ sub collectStats
 sub reportTimeline
 {
     my $schedule = shift;
-    
+
     # calculate the common period length (least common multiple)
     my $lcm = 0;
     for my $period ( keys %{$schedule} )

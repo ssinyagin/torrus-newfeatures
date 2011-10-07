@@ -160,7 +160,7 @@ sub discover
     my $self = shift;
     my @paramhashes = @_;
 
-    my $devdetails = new Torrus::DevDiscover::DevDetails();
+    my $devdetails = Torrus::DevDiscover::DevDetails->new();
 
     for my $params ( \%defaultParams, @paramhashes )
     {
@@ -178,9 +178,9 @@ sub discover
 
     my %snmpargs;
     my $community;
-    
+
     my $version = $devdetails->param( 'snmp-version' );
-    $snmpargs{'-version'} = $version;    
+    $snmpargs{'-version'} = $version;
 
     for my $arg ( qw(-port -localaddr -localport -timeout -retries) )
     {
@@ -806,8 +806,6 @@ sub setMaxMsgSize
     }
 }
 
-    
-
 
 ###########################################################################
 ####  Torrus::DevDiscover::DevDetails: the information container for a device
@@ -1085,17 +1083,17 @@ sub applySelectors
                 {
                     my $attr = shift;
                     my $checkval = $self->param( $sel . '-' . $attr );
-                    
+
                     Debug('Checking attribute: ' . $attr .
                           ' and value: ' . $checkval);
                     my $ret = &{$treg->{'checkAttribute'}}( $self,
                                                             $object, $type,
                                                             $attr, $checkval );
                     Debug(sprintf('Returned value: %d', $ret));
-                    return $ret;                    
+                    return $ret;
                 };
-                
-                my $rpn = new Torrus::RPN;
+
+                my $rpn = Torrus::RPN->new();
                 my $result = $rpn->run( $expr, $callback );
                 Debug('Selector result: ' . $result);
                 if( $result )
@@ -1106,7 +1104,7 @@ sub applySelectors
                         my $arg =
                             $self->param( $sel . '-' . $action . '-arg' );
                         $arg = 1 if not defined( $arg );
-                        
+
                         Debug('Applying action: ' . $action .
                               ' with argument: ' . $arg);
                         &{$treg->{'applyAction'}}( $self, $object, $type,
@@ -1116,7 +1114,7 @@ sub applySelectors
             }
         }
     }
-}    
+}
 
 1;
 

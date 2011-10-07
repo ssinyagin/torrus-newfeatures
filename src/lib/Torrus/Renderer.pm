@@ -60,7 +60,7 @@ sub new
         return
     }
 
-    $self->{'db'} = new Torrus::DB('render_cache', -WriteAccess => 1);
+    $self->{'db'} = Torrus::DB->new('render_cache', -WriteAccess => 1);
     if( not defined( $self->{'db'} ) )
     {
         return

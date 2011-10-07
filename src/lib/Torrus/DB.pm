@@ -28,7 +28,7 @@ our $VERSION = 1.0;
 # This is an abstraction layer for BerkeleyDB database operations
 #
 # Database opening:
-#    my $db = new Torrus::DB('db_name',
+#    my $db = Torrus::DB->new('db_name',
 #                          [ -Btree => 1, ]
 #                          [ -WriteAccess => 1, ]
 #                          [ -Truncate    => 1, ]
@@ -76,7 +76,7 @@ sub new
             Debug("Creating BerkeleyDB::Env");
             umask 0002;
             $Torrus::DB::env =
-                new BerkeleyDB::Env(-Home  => $Torrus::Global::dbHome,
+                BerkeleyDB::Env->new(-Home  => $Torrus::Global::dbHome,
                                     -Flags => (DB_CREATE |
                                                DB_INIT_CDB | DB_INIT_MPOOL),
                                     -Mode  => oct(664),

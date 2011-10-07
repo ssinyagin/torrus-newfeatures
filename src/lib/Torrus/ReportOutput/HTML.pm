@@ -40,7 +40,7 @@ sub init
     my $self = shift;
 
     Torrus::SiteConfig::loadStyling();
-    
+
     my $htmldir = $self->{'outdir'} . '/html';
     if( not -d $htmldir )
     {
@@ -52,9 +52,9 @@ sub init
         }
     }
     $self->{'htmldir'} = $htmldir;
-    
+
     $self->{'tt'} =
-        new Template(INCLUDE_PATH => $Torrus::Global::templateDirs,
+        Template->new(INCLUDE_PATH => $Torrus::Global::templateDirs,
                      TRIM => 1);
     return 1;
 }

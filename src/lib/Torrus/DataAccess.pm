@@ -249,7 +249,7 @@ sub read_RPN
     my @eval_expr;
     my $timestamp = $t_end > 0 ? $t_end : time();
 
-    my $rpn = new Torrus::RPN;
+    my $rpn = Torrus::RPN->new();
 
     my $callback = sub
     {

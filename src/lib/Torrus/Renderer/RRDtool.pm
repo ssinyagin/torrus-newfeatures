@@ -844,11 +844,11 @@ sub rrd_make_cdef
 
     my @args = ();
     my $ok = 1;
-    
+
     # We will name the DEFs as $dname.sprintf('%.2d', $ds_couter++);
     my $ds_couter = 1;
 
-    my $rpn = new Torrus::RPN;
+    my $rpn = Torrus::RPN->new();
 
     # The callback for RPN translation
     my $callback = sub
@@ -866,7 +866,7 @@ sub rrd_make_cdef
         {
             $cf = $function;
         }
-        
+
         my $leaf = length($noderef) > 0 ?
             $config_tree->getRelative($token, $noderef) : $token;
 

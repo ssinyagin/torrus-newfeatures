@@ -1,3 +1,8 @@
+2011-10-07  Dean Hamstead <dean.hamstead@optusnet.com.au>
+
+        * moved from perllib/ to lib/
+        * added 012-pod-coverage.t
+
 2011-10-06  Dean Hamstead <dean.hamstead@optusnet.com.au>
 
         * Change all 'foreach' to 'for'

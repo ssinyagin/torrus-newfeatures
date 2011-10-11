@@ -51,6 +51,9 @@ sub checkdevtype
     
     $devdetails->setCap('interfaceIndexingPersistent');
     
+    # 64-bit counters are always zero, so we skip all of them
+    $devdetails->setCap('disable_ifXTable');
+    
     return 1;
 }
 
@@ -64,7 +67,21 @@ sub discover
     my $session = $dd->session();
             
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
+
+    # Exlcude MLP interfaces as they never update ifIn/Out octet
+    # counters anyway
     
+    foreach my $ifIndex ( keys %{$data->{'interfaces'}})
+    {
+        my $interface = $data->{'interfaces'}{$ifIndex};
+        next if $interface->{'excluded'};
+
+        if( $interface->{'ifType'} == 169 ) # ifType: shdsl(169)
+        {
+            $interface->{'excluded'} = 1;
+        }
+    }
+
     return 1;
 }
 

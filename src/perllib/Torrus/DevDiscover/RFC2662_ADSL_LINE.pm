@@ -124,7 +124,7 @@ sub buildConfig
     my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName, $param );
 
     my $data = $devdetails->data();
-    my $precedence = $1000;
+    my $precedence = 1000;
     
     foreach my $ifIndex ( sort {$a<=>$b} %{$data->{'AdslLine'}} )
     {

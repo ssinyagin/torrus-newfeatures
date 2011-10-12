@@ -52,7 +52,7 @@ sub checkdevtype
     $devdetails->setCap('interfaceIndexingPersistent');
     
     # 64-bit counters are always zero, so we skip all of them
-    $devdetails->setCap('disable_ifXTable');
+    $devdetails->setCap('suppressHCCounters');
     
     return 1;
 }
@@ -67,7 +67,11 @@ sub discover
     my $session = $dd->session();
             
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
-
+    $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
+    $data->{'nameref'}{'ifReferenceName'} = 'ifDescr';
+    $data->{'nameref'}{'ifNick'} = 'ifName';
+    $data->{'nameref'}{'ifNodeid'} = 'ifName';
+    
     # Exlcude MLP interfaces as they never update ifIn/Out octet
     # counters anyway
     
@@ -79,9 +83,21 @@ sub discover
         if( $interface->{'ifType'} == 169 ) # ifType: shdsl(169)
         {
             $interface->{'excluded'} = 1;
+            next;
+        }
+        
+        if( ($ifIndex == 2001) or ($ifIndex == 2002) )
+        {
+            # this is a HSL aggregate interface
+            if( not ref($interface->{'templates'}) )
+            {
+                $interface->{'templates'} = [];
+            }
+            push( @{$interface->{'templates'}},
+                  'RFC2863_IF_MIB::iftable-ifspeed' );
         }
     }
-
+   
     return 1;
 }
 

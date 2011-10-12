@@ -57,7 +57,8 @@
   <def name="ifHCInUcastPkts"   value="1.3.6.1.2.1.31.1.1.1.7" />
   <def name="ifHCOutOctets"     value="1.3.6.1.2.1.31.1.1.1.10" />
   <def name="ifHCOutUcastPkts"  value="1.3.6.1.2.1.31.1.1.1.11" />
-
+  <def name="ifHighSpeed"       value="1.3.6.1.2.1.31.1.1.1.15" />
+  
   <!-- RFC1213-MIB:ipAddrTable -->
   <def name="ipAdEntIfIndex"   value="1.3.6.1.2.1.4.20.1.2" />
 
@@ -131,6 +132,8 @@
     It would show input/output graphs for all interfaces on a single page.
     </param>
   </template>
+
+  <!-- =====  32-bit counters ===== -->
 
   <template name="iftable-octets">
     <leaf name="Bytes_In">
@@ -294,7 +297,28 @@
     </leaf>
   </template>
 
+  <template name="iftable-ifspeed">
+    <leaf name="Speed">
+      <param name="snmp-object"       value="$ifSpeed.%ifindex-map%" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-speed.rrd" />
+      <param name="rrd-ds"            value="ifSpeed" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="rrd-hwpredict"     value="disabled" />
+      <param name="comment"  value="Current interface bandwidth" />
+      <param name="graph-legend"      value="Speed" />
+      <param name="vertical-label"    value="bps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="600" />
+      <param name="nodeid"            value="%nodeid-interface%//speed"/>
+      <param name="help-text">
+      An estimate of the interface's current bandwidth
+      </param>
+    </leaf>
+  </template>
 
+  <!-- =====  64-bit counters ===== -->
+  
   <template name="ifxtable-hcoctets">
     <leaf name="Bytes_In">
       <param name="snmp-object"       value="$ifHCInOctets.%ifindex-map%" />
@@ -384,7 +408,29 @@
     </leaf>
   </template>
 
+  
+  <template name="iftable-ifhighspeed">
+    <leaf name="Speed">
+      <param name="snmp-object"       value="$ifHighSpeed.%ifindex-map%" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-speed.rrd" />
+      <param name="collector-scale"   value="1000000,*" />
+      <param name="rrd-ds"            value="ifHighSpeed" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="rrd-hwpredict"     value="disabled" />
+      <param name="comment"  value="Current interface bandwidth" />
+      <param name="graph-legend"      value="Speed" />
+      <param name="vertical-label"    value="bps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="600" />
+      <param name="nodeid"            value="%nodeid-interface%//speed"/>
+      <param name="help-text">
+      An estimate of the interface's current bandwidth
+      </param>
+    </leaf>
+  </template>
 
+  
   <!-- Bandwidth usage in percentage of megabits
        100 * (bytes * 8 / 1e6) / limit = bytes / (limit * 1250)  -->
   <template name="interface-bandwidth-usage">

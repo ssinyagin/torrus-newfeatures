@@ -1,3 +1,9 @@
+2011-10-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/generic/rfc2863.if-mib.xml: added templates for
+	ifSpeed and ifHighSpeed
+	
+
 2011-10-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoFirewall.pm: interface filter

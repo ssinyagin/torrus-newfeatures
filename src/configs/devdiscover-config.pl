@@ -185,12 +185,20 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'iftable-errors-out',
          'source' => 'generic/rfc2863.if-mib.xml'
          },
+     'RFC2863_IF_MIB::iftable-ifspeed' => {
+         'name'   => 'iftable-ifspeed',
+         'source' => 'generic/rfc2863.if-mib.xml'
+         },
      'RFC2863_IF_MIB::ifxtable-hcoctets' => {
          'name'   => 'ifxtable-hcoctets',
          'source' => 'generic/rfc2863.if-mib.xml'
          },
      'RFC2863_IF_MIB::ifxtable-hcucast-packets' => {
          'name'   => 'ifxtable-hcucast-packets',
+         'source' => 'generic/rfc2863.if-mib.xml'
+         },
+     'RFC2863_IF_MIB::iftable-ifhighspeed' => {
+         'name'   => 'iftable-ifhighspeed',
          'source' => 'generic/rfc2863.if-mib.xml'
          },
      'RFC2863_IF_MIB::interface-bandwidth-usage' => {

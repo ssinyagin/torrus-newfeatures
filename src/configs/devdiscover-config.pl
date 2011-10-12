@@ -40,10 +40,11 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::RFC1657_BGP4_MIB',
      'Torrus::DevDiscover::RFC2011_IP_MIB',
      'Torrus::DevDiscover::RFC2863_IF_MIB',
-     'Torrus::DevDiscover::RFC2662_ADSL_LINE', # needs testing
+     'Torrus::DevDiscover::RFC2662_ADSL_LINE',
      'Torrus::DevDiscover::RFC2670_DOCS_IF',
      'Torrus::DevDiscover::RFC2737_ENTITY_MIB',
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
+     'Torrus::DevDiscover::RFC4319_HDSL2_SHDSL_LINE_MIB',
      'Torrus::DevDiscover::Actelis',
      'Torrus::DevDiscover::Alteon',
      'Torrus::DevDiscover::ALU_Timetra',
@@ -276,6 +277,20 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'RFC2662_ADSL_LINE::adsl-channel-txrate' => {
          'name'   => 'adsl-channel-txrate',
          'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     
+     #### HDSL2-SHDSL-LINE-MIB
+     'RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-subtree' => {
+         'name'   => 'hdsl-subtree',
+         'source' => 'generic/rfc4319_hdsl2_shdsl_line.xml'
+         },
+     'RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-interface' => {
+         'name'   => 'hdsl-interface',
+         'source' => 'generic/rfc4319_hdsl2_shdsl_line.xml'
+         },
+     'RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-endpoint' => {
+         'name'   => 'hdsl-endpoint',
+         'source' => 'generic/rfc4319_hdsl2_shdsl_line.xml'
          },
      
      #### Alteon application switches

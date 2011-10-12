@@ -107,6 +107,17 @@
      'nine'     => {'color'   => '##darkmagenta'},
      'ten'      => {'color'   => '##orangered'},
 
+     'clr1'     => {'color'   => '##one'},
+     'clr2'     => {'color'   => '##two'},
+     'clr3'     => {'color'   => '##three'},
+     'clr4'     => {'color'   => '##four'},
+     'clr5'     => {'color'   => '##five'},
+     'clr6'     => {'color'   => '##six'},
+     'clr7'     => {'color'   => '##seven'},
+     'clr8'     => {'color'   => '##eight'},
+     'clr9'     => {'color'   => '##nine'},
+     'clr10'    => {'color'   => '##ten'},
+     
      # definitions for combinatorial graphing
 
      #RED

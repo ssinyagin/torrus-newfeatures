@@ -67,8 +67,8 @@ sub discover
     my $session = $dd->session();
             
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
-    $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
-    $data->{'nameref'}{'ifReferenceName'} = 'ifDescr';
+    $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
     $data->{'nameref'}{'ifNick'} = 'ifName';
     $data->{'nameref'}{'ifNodeid'} = 'ifName';
     

@@ -112,6 +112,7 @@
       <param name="rrd-ds"             value="CurrAtn" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="dB" />
+      <param name="graph-legend"       value="Attenuation" />
       <param name="graph-lower-limit"  value="0" />
       <param name="precedence"         value="890" />
       <param name="hidden"             value="yes" />
@@ -124,6 +125,7 @@
       <param name="rrd-ds"             value="CurrSnrMgn" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="dB" />
+      <param name="graph-legend"       value="SNR margin" />
       <param name="graph-lower-limit"  value="0" />
       <param name="precedence"         value="880" />
       <param name="hidden"             value="yes" />
@@ -138,6 +140,7 @@
       <param name="rrd-ds"             value="15minES" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="seconds" />
+      <param name="graph-legend"       value="15min ES" />
       <param name="graph-lower-limit"  value="0" />
       <param name="precedence"         value="870" />
     </leaf>
@@ -150,6 +153,7 @@
       <param name="rrd-ds"             value="15minSES" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="seconds" />
+      <param name="graph-legend"       value="15min SES" />
       <param name="graph-lower-limit"  value="0" />
       <param name="precedence"         value="860" />
     </leaf>
@@ -162,6 +166,7 @@
       <param name="rrd-ds"             value="15minCRCA" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="anomalies" />
+      <param name="graph-legend"       value="15min CRCA" />
       <param name="graph-lower-limit"  value="0" />
       <param name="precedence"         value="850" />
     </leaf>
@@ -174,6 +179,7 @@
       <param name="rrd-ds"             value="15minLOSWS" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="seconds" />
+      <param name="graph-legend"       value="15min LOSWS" />
       <param name="graph-lower-limit"  value="0" />
       <param name="precedence"         value="840" />
     </leaf>
@@ -186,6 +192,7 @@
       <param name="rrd-ds"             value="15minUAS" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="seconds" />
+      <param name="graph-legend"       value="15min UAS" />
       <param name="graph-lower-limit"  value="0" />
       <param name="precedence"         value="830" />
     </leaf>

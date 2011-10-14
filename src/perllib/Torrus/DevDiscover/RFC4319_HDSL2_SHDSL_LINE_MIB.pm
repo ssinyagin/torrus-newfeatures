@@ -189,13 +189,20 @@ sub buildConfig
         my $ifSubtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
 
         my $ifParam = {
-            'interface-name' => $interface->{'param'}{'interface-name'},
-            'interface-nick' => $interface->{'param'}{'interface-nick'},
-            'node-display-name' => $interface->{'param'}{'node-display-name'},
             'collector-timeoffset-hashstring' =>'%system-id%:%interface-nick%',
-            'comment'        => $interface->{'param'}{'comment'},
+            'comment'        => $interface->{$data->{'nameref'}{'ifComment'}},
             'precedence'     => $precedence,
         };
+        
+
+        $ifParam->{'interface-name'} =
+            $interface->{$data->{'nameref'}{'ifReferenceName'}};
+        $ifParam->{'interface-nick'} =
+            $interface->{$data->{'nameref'}{'ifNick'}};
+        $ifParam->{'node-display-name'} =
+            $interface->{$data->{'nameref'}{'ifReferenceName'}};
+        
+                
         
         my $ifSubtree = $cb->addSubtree
             ( $subtreeNode, $ifSubtreeName, $ifParam ,
@@ -205,9 +212,11 @@ sub buildConfig
 
         my @snr_membernames;
         my $snr_mg_params = {
-            'comment' => 'SNR Margins overview',
-            'precedence' => 1000,
+            'node-display-name' => 'SNR Margins overview',
+            'precedence' => 0,
             'ds-type' => 'rrd-multigraph',
+            'vertical-label' => 'dB',
+            'graph-lower-limit' => 0,
         };
         
         my $linenum = 1;
@@ -239,7 +248,10 @@ sub buildConfig
                 'hdsl-endpoint-nick' => $epNick,
                 'precedence' => $precedence,
             };
-            
+
+            $param->{'descriptive-nickname'} =
+                '%system-id%:%interface-name% ' . $endpoint;
+
             $precedence--;
             
             $cb->addSubtree( $ifSubtree, $epSubtreeName, $param,
@@ -248,7 +260,7 @@ sub buildConfig
             push( @snr_membernames, $epNick );
             $snr_mg_params->{'ds-expr-' . $epNick} =
                 '{' . $epSubtreeName . '/SNR_Margin}';
-            $snr_mg_params->{'graph-legend-' . $epNick} = $endpoint;
+            $snr_mg_params->{'graph-legend-' . $epNick} = $endpoint . ' SNR';
             $snr_mg_params->{'line-style-' . $epNick} = 'LINE2';
             $snr_mg_params->{'line-color-' . $epNick} = '##clr' . $linenum;
             $snr_mg_params->{'line-order-' . $epNick} = $linenum;

@@ -1,3 +1,9 @@
+2011-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	ifSpeed monitoring is triggered by $interface->{'ifSpeedMonitoring'}.
+	The bandwidth usage templates are updated accordingly. 
+
 2011-10-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC4319_HDSL2_SHDSL_LINE_MIB.pm:

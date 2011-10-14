@@ -88,13 +88,8 @@ sub discover
         
         if( ($ifIndex == 2001) or ($ifIndex == 2002) )
         {
-            # this is a HSL aggregate interface
-            if( not ref($interface->{'templates'}) )
-            {
-                $interface->{'templates'} = [];
-            }
-            push( @{$interface->{'templates'}},
-                  'RFC2863_IF_MIB::iftable-ifspeed' );
+            $interface->{'ignoreHighSpeed'} = 1;
+            $interface->{'ifSpeedMonitoring'} = 1;
         }
     }
    

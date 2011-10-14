@@ -235,7 +235,8 @@ sub discover
             }
 
             my $bw = 0;
-            if( $devdetails->hasCap('ifHighSpeed') )
+            if( $devdetails->hasCap('ifHighSpeed') and
+                not $interface->{'ignoreHighSpeed'} )
             {
                 my $hiBW = 
                     $devdetails->snmpVar($dd->oiddef('ifHighSpeed') . '.' .
@@ -969,7 +970,8 @@ sub buildConfig
                 }
             }
         }
-        
+
+            
         if( defined( $interface->{'selectorActions'}{'TokensetMember'} ) )
         {
             foreach my $tset
@@ -990,8 +992,42 @@ sub buildConfig
                 $interface->{'param'}{$param} = $val;
             }
         }
+        
+        if( $interface->{'ifSpeedMonitoring'} and
+            defined($interface->{'ifSpeed'}) )
+        {
+            if( $devdetails->hasCap('ifHighSpeed') and
+                not $interface->{'ignoreHighSpeed'} )
+            {
+                push( @templates, 'RFC2863_IF_MIB::iftable-ifhighspeed' );
+            }
+            else
+            {
+                push( @templates, 'RFC2863_IF_MIB::iftable-ifspeed' );
+            }
 
-        if( $bandwidthUsageActive and $interface->{'hasBandwidthUsage'} )
+            if( $bandwidthUsageConfigured )
+            {
+                if( not defined($interface->{
+                    'childCustomizations'}->{'InOut_bps'}) )
+                {
+                    $interface->{'childCustomizations'}->{'InOut_bps'} = {};
+                }
+                
+                my $param = $interface->{'childCustomizations'}->{'InOut_bps'};
+                $param->{'ds-expr-bw'} = '{Speed}';
+                $param->{'graph-legend-bw'} = 'Available bandwidth';
+                $param->{'line-style-bw'} = 'LINE1';
+                $param->{'line-color-bw'} = '##HruleMax';
+                $param->{'line-order-bw'} = 10;
+                $param->{'ds-names'} = 'in,out,bw';
+
+                push(@templates,
+                     'RFC2863_IF_MIB::interface-bandwidth-usage-ifspeed');
+            }
+
+        }
+        elsif( $bandwidthUsageActive and $interface->{'hasBandwidthUsage'} )
         {
             push( @templates,
                   'RFC2863_IF_MIB::interface-bandwidth-usage' );

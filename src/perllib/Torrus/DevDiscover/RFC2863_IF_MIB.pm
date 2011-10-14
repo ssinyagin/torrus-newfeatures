@@ -378,9 +378,9 @@ sub discover
     }
 
     my $suppressHCCounters =
-        ($devdetails->param('RFC2863_IF_MIB::suppress-hc-counters') eq 'yes')
-        or
-        ($devdetails->hasCap('suppressHCCounters'));
+        ($devdetails->param('RFC2863_IF_MIB::suppress-hc-counters') eq 'yes'
+         or
+         $devdetails->hasCap('suppressHCCounters'));
 
     # Explore each interface capability
 

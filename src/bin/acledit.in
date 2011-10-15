@@ -212,7 +212,6 @@ elsif( $addhost )
     $uid =~ s/\W/_/g;
     $ok = $aclEdit->addUser( $uid, $attrValues ) ? $ok:0;
 }
-
 elsif( $moduser )
 {
     $uid = $moduser;
@@ -350,7 +349,7 @@ sub setupPrivileges
     my $objects = shift;
     my $permit = shift;
 
-    my $ok = 1;
+    my $success = 1;
     foreach my $priv ( @{$privs} )
     {
         if( defined( $knownPrivileges{$priv} ) )
@@ -366,21 +365,21 @@ sub setupPrivileges
                         {
                             if( $permit )
                             {
-                                $ok = $aclEdit->
+                                $success = $aclEdit->
                                     setPrivilege( $group, $obj,
-                                                  $priv ) ? $ok:0;
+                                                  $priv ) ? $success:0;
                             }
                             else
                             {
-                                $ok = $aclEdit->
+                                $success = $aclEdit->
                                     clearPrivilege( $group, $obj,
-                                                    $priv ) ? $ok:0;
+                                                    $priv ) ? $success:0;
                             }
                         }
                     }
                     else
                     {
-                        Error('No such tree: ' . $obj); $ok = 0;
+                        Error('No such tree: ' . $obj); $success = 0;
                     }
                 }
             }
@@ -391,23 +390,25 @@ sub setupPrivileges
                     if( $obj ne '*' )
                     {
                         Error("Privilege GlobalSearch should be for '*'");
-                        $ok = 0;
+                        $success = 0;
                     }                    
                 }
 
-                if( $ok )
+                if( $success )
                 {
                     foreach my $group ( @{$groups} )
                     {
                         if( $permit )
                         {
-                            $ok = $aclEdit->
-                                setPrivilege( $group, '*', $priv ) ? $ok:0;
+                            $success = $aclEdit->
+                                setPrivilege( $group, '*', $priv ) ?
+                                $success:0;
                         }
                         else
                         {
-                            $ok = $aclEdit->
-                                clearPrivilege( $group, '*', $priv ) ? $ok:0;
+                            $success = $aclEdit->
+                                clearPrivilege( $group, '*', $priv ) ?
+                                $success:0;
                         }
                     }
                 }
@@ -415,10 +416,10 @@ sub setupPrivileges
         }
         else
         {
-            Error('Unknown privilege name: ' . $priv); $ok = 0;
+            Error('Unknown privilege name: ' . $priv); $success = 0;
         }
     }
-    return $ok;
+    return $success;
 }
 
 

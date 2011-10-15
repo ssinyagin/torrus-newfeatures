@@ -109,3 +109,14 @@ dist-hook:
 	date >DIST_REVISION
 	git branch -vv >>DIST_REVISION
 	cp DIST_REVISION $(distdir)/
+
+
+PERLCRITIC_CMD = ${PERLCRITIC} --profile=perlcritic.profile
+
+critic:
+	@if test ${PERLCRITIC} != no; then \
+	  ${PERLCRITIC_CMD} bin/[a-z]*.in; \
+	  ${PERLCRITIC_CMD} perllib/Torrus/; \
+	else \
+	  echo 'perlcritic command not found'; \
+	fi

@@ -26,6 +26,7 @@ AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)
 
 AC_PATH_PROG(PERL, perl, no)
+AC_PATH_PROG(PERLCRITIC, perlcritic, no)
 
 # Need this for init.torrus
 AC_PATH_PROG(SU, su, no)

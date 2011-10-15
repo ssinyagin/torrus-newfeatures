@@ -1,0 +1,47 @@
+# This is the Torrus-specific profile for Perl::Critic
+# The defaults are sometimes too demanding and require too much effort to fix,
+# so this profile proposes a certain compromise.
+
+severity  = 3
+
+# Package vars are used a lot in torrus
+[Variables::ProhibitPackageVars]
+severity = 1
+
+# Complexity is fine as long as it's designed properly :)
+[Modules::ProhibitExcessMainComplexity]
+severity = 1
+
+[Subroutines::ProhibitExcessComplexity]
+severity = 1
+
+[ControlStructures::ProhibitDeepNests]
+severity = 1
+
+
+# there is a lot of whitespace garnage, but removing all of it will make
+# the code unmanageable
+[CodeLayout::ProhibitTrailingWhitespace]
+severity = 1
+
+# Tabs are bad
+[CodeLayout::ProhibitHardTabs]
+severity = 5
+
+# torrus-coonfig.pl is explicitly require'd
+[Modules::RequireBarewordIncludes]
+severity = 1
+
+# new Object() is used everywhere
+[Objects::ProhibitIndirectSyntax]
+severity = 1
+
+
+# if-elsif-elsif-elsif are used in a couple of files
+[ControlStructures::ProhibitCascadingIfElse]
+severity = 1
+
+
+# they tell to use /x in every regexp, but we don't
+[RegularExpressions::RequireExtendedFormatting]
+severity = 1

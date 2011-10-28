@@ -22,6 +22,7 @@
 package Torrus::DevDiscover::RFC2863_IF_MIB;
 
 use strict;
+use warnings;
 use Torrus::Log;
 
 
@@ -136,7 +137,7 @@ sub discover
         $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
         $data->{'nameref'}{'ifReferenceName'}   = 'ifDescr';
 
-        if( $devdetails->param('RFC2863_IF_MIB::ifnick-from-ifname') eq 'yes'
+        if( $devdetails->paramEnabled('RFC2863_IF_MIB::ifnick-from-ifname')
             and $devdetails->hasCap('ifName') )
         {
             $data->{'nameref'}{'ifNick'} = 'ifNameT';
@@ -172,14 +173,12 @@ sub discover
     # Pre-populate the interfaces table, so that other modules may
     # delete unneeded interfaces
     my $includeAdmDown =
-        $devdetails->param('RFC2863_IF_MIB::list-admindown-interfaces')
-        eq 'yes';
+        $devdetails->paramEnabled('RFC2863_IF_MIB::list-admindown-interfaces');
     my $includeNotpresent =
-        $devdetails->param('RFC2863_IF_MIB::list-notpresent-interfaces')
-        eq 'yes';
+        $devdetails->paramEnabled('RFC2863_IF_MIB::list-notpresent-interfaces');
     my $excludeOperDown =
-        $devdetails->param('RFC2863_IF_MIB::exclude-down-interfaces')
-        eq 'yes';
+        $devdetails->paramEnabled('RFC2863_IF_MIB::exclude-down-interfaces');
+
     foreach my $ifIndex
         ( $devdetails->getSnmpIndices( $dd->oiddef('ifDescr') ) )
     {
@@ -379,7 +378,7 @@ sub discover
     }
 
     my $suppressHCCounters =
-        ($devdetails->param('RFC2863_IF_MIB::suppress-hc-counters') eq 'yes'
+        ($devdetails->paramEnabled('RFC2863_IF_MIB::suppress-hc-counters')
          or
          $devdetails->hasCap('suppressHCCounters'));
 
@@ -486,7 +485,7 @@ sub buildConfig
     my $bandwidthUsageConfigured = 0;
     my $bandwidthUsageActive = 0;
     
-    if( $devdetails->param('RFC2863_IF_MIB::bandwidth-usage') eq 'yes' )
+    if( $devdetails->paramEnabled('RFC2863_IF_MIB::bandwidth-usage') )
     {
         $bandwidthUsageConfigured = 1;
         my $limits = $devdetails->param('RFC2863_IF_MIB::bandwidth-limits');
@@ -591,38 +590,34 @@ sub buildConfig
         return;
     }
 
-    if( $devdetails->param('RFC2863_IF_MIB::noout') eq 'yes' )
+    if( $devdetails->paramEnabled('RFC2863_IF_MIB::noout') )
     {
         return;
     }
 
     # explicitly excluded interfaces    
     my %excludeName;
-    my $excludeNameList =
-        $devdetails->param('RFC2863_IF_MIB::exclude-interfaces');
     my $nExplExcluded = 0;
         
-    if( defined( $excludeNameList ) and length( $excludeNameList ) > 0 )
+    foreach my $name
+        ( split( /\s*,\s*/,
+                 $devdetails->paramString
+                 ('RFC2863_IF_MIB::exclude-interfaces') ) )
     {
-        foreach my $name ( split( /\s*,\s*/, $excludeNameList ) )
-        {
-            $excludeName{$name} = 1;
-        }
+        $excludeName{$name} = 1;
     }
 
     # explicitly listed interfaces
     my %onlyName;
-    my $onlyNamesList =
-        $devdetails->param('RFC2863_IF_MIB::only-interfaces');
-    my $onlyNamesDefined = 0;
-    if( defined( $onlyNamesList ) and length( $onlyNamesList ) > 0 )
+ 
+    foreach my $name
+        ( split( /\s*,\s*/,
+                 $devdetails->paramString('RFC2863_IF_MIB::only-interfaces') ) )
     {
-        $onlyNamesDefined = 1;
-        foreach my $name ( split( /\s*,\s*/, $onlyNamesList ) )
-        {
-            $onlyName{$name} = 1;
-        }
+        $onlyName{$name} = 1;
     }
+    
+    my $onlyNamesDefined = (scalar(keys %onlyName) > 0);
 
     # tokenset member interfaces of the form
     # Format: tset:intf,intf; tokenset:intf,intf;
@@ -630,81 +625,77 @@ sub buildConfig
     #     tset:host/intf,host/intf; tokenset:host/intf,host/intf;
     my %tsetMember;
     my %tsetMemberApplied;
-    my $tsetMembership =
-        $devdetails->param('RFC2863_IF_MIB::tokenset-members');
-    if( defined( $tsetMembership ) and length( $tsetMembership ) > 0 )
+    foreach my $memList
+        ( split( /\s*;\s*/,
+                 $devdetails->paramString
+                 ('RFC2863_IF_MIB::tokenset-members') ) )
     {
-        foreach my $memList ( split( /\s*;\s*/, $tsetMembership ) )
+        my ($tset, $list) = split( /\s*:\s*/, $memList );
+        foreach my $intfName ( split( /\s*,\s*/, $list ) )
         {
-            my ($tset, $list) = split( /\s*:\s*/, $memList );
-            foreach my $intfName ( split( /\s*,\s*/, $list ) )
-            {
-                if( $intfName =~ /\// )
-                {
-                    my( $host, $intf ) = split( '/', $intfName );
-                    if( $host eq $devdetails->param('snmp-host') )
-                    {
-                        $tsetMember{$intf}{$tset} = 1;
-                    }
-                }
-                else
-                {
-                    $tsetMember{$intfName}{$tset} = 1;
-                }
-            }
-        }
-    }
-       
-        
-    # External storage serviceid assignment
-    my $extSrv =
-        $devdetails->param('RFC2863_IF_MIB::external-serviceid');
-    my %extStorage;
-    my %extStorageTrees;
-    
-    if( defined( $extSrv ) and length( $extSrv ) > 0 )
-    {
-        foreach my $srvDef ( split( /\s*,\s*/, $extSrv ) )
-        {
-            my ( $serviceid, $intfName, $direction, $trees ) =
-                split( /\s*:\s*/, $srvDef );
-
             if( $intfName =~ /\// )
             {
                 my( $host, $intf ) = split( '/', $intfName );
                 if( $host eq $devdetails->param('snmp-host') )
                 {
-                    $intfName = $intf;
-                }
-                else
-                {
-                    $intfName = undef;
+                    $tsetMember{$intf}{$tset} = 1;
                 }
             }
-
-            if( defined( $intfName ) and length( $intfName ) > 0 )
+            else
             {
-                if( defined( $trees ) )
-                {
-                    # Trees are listed with '|' as separator,
-                    # whereas compiler expects commas
-                    
-                    $trees =~ s/\s*\|\s*/,/g;
-                }
-                            
-                if( $direction eq 'Both' )
-                {
-                    $extStorage{$intfName}{'In'} = $serviceid . '_IN';
-                    $extStorageTrees{$serviceid . '_IN'} = $trees;
-                    
-                    $extStorage{$intfName}{'Out'} = $serviceid . '_OUT';
-                    $extStorageTrees{$serviceid . '_OUT'} = $trees;
-                }
-                else
-                {
-                    $extStorage{$intfName}{$direction} = $serviceid;
-                    $extStorageTrees{$serviceid} = $trees;
-                }
+                $tsetMember{$intfName}{$tset} = 1;
+            }
+        }
+    }
+           
+        
+    # External storage serviceid assignment
+    my %extStorage;
+    my %extStorageTrees;
+    
+    foreach my $srvDef
+        ( split( /\s*,\s*/,
+                 $devdetails->paramString
+                 ('RFC2863_IF_MIB::external-serviceid') ) )
+    {
+        my ( $serviceid, $intfName, $direction, $trees ) =
+            split( /\s*:\s*/, $srvDef );
+        
+        if( $intfName =~ /\// )
+        {
+            my( $host, $intf ) = split( '/', $intfName );
+            if( $host eq $devdetails->param('snmp-host') )
+            {
+                $intfName = $intf;
+            }
+            else
+            {
+                $intfName = undef;
+            }
+        }
+        
+        if( defined($intfName) and length($intfName) > 0 )
+        {
+            if( defined( $trees ) )
+            {
+                # Trees are listed with '|' as separator,
+                # whereas compiler expects commas
+                
+                $trees =~ s/\s*\|\s*/,/g;
+            }
+            
+            if( $direction eq 'Both' )
+            {
+                $extStorage{$intfName}{'In'} = $serviceid . '_IN';
+                $extStorageTrees{$serviceid . '_IN'} = $trees;
+                
+                $extStorage{$intfName}{'Out'} = $serviceid . '_OUT';
+                $extStorageTrees{$serviceid . '_OUT'} = $trees;
+            }
+            else
+            {
+                $extStorage{$intfName}{$direction} = $serviceid;
+                $extStorageTrees{$serviceid} = $trees;
             }
         }
     }
@@ -715,63 +706,64 @@ sub buildConfig
     # RFC2863_IF_MIB::traffic-XXX-comment: description
     # RFC2863_IF_MIB::traffic-XXX-interfaces: list of interfaces to add
     #   format: "intf,intf" or "host/intf, host/intf"
-    my $trafficSums = $devdetails->param('RFC2863_IF_MIB::traffic-summaries');
     my %trafficSummary;
-    if( defined( $trafficSums ) )
+    foreach my $summary
+        ( split( /\s*,\s*/,
+                 $devdetails->paramString
+                 ('RFC2863_IF_MIB::traffic-summaries') ) )
     {
-        foreach my $summary ( split( /\s*,\s*/, $trafficSums ) )
-        {
-            $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
-                $summary}{'path'} =
-                    $devdetails->param
-                    ('RFC2863_IF_MIB::traffic-' . $summary . '-path');
-            $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
-                $summary}{'comment'} =
-                    $devdetails->param
-                    ('RFC2863_IF_MIB::traffic-' . $summary . '-comment');
+        $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
+            $summary}{'path'} =
+                $devdetails->param
+                ('RFC2863_IF_MIB::traffic-' . $summary . '-path');
+        
+        $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
+            $summary}{'comment'} =
+                $devdetails->param
+                ('RFC2863_IF_MIB::traffic-' . $summary . '-comment');
             
-            $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
-                $summary}{'data-dir'} = $devdetails->param('data-dir');
-                    
-            my $intfList = $devdetails->param
-                ('RFC2863_IF_MIB::traffic-' . $summary . '-interfaces');
-
-            # get the intreface names for this host
-            foreach my $intfName ( split( /\s*,\s*/, $intfList ) )
+        $globalData->{'RFC2863_IF_MIB::summaryAttr'}{
+            $summary}{'data-dir'} = $devdetails->param('data-dir');
+        
+        # get the intreface names for this host
+        foreach my $intfName
+            ( split( /\s*,\s*/,
+                     $devdetails->paramString
+                     ('RFC2863_IF_MIB::traffic-' . $summary . '-interfaces')
+              ) )
+        {
+            if( $intfName =~ /\// )
             {
-                if( $intfName =~ /\// )
+                my( $host, $intf ) = split( '/', $intfName );
+                if( $host eq $devdetails->param('snmp-host') )
                 {
-                    my( $host, $intf ) = split( '/', $intfName );
-                    if( $host eq $devdetails->param('snmp-host') )
-                    {
-                        $trafficSummary{$intf}{$summary} = 1;
-                    }
+                    $trafficSummary{$intf}{$summary} = 1;
                 }
-                else
-                {
-                    $trafficSummary{$intfName}{$summary} = 1;
-                }
+            }
+            else
+            {
+                $trafficSummary{$intfName}{$summary} = 1;
             }
         }
     }
     
     # interface-level parameters to copy
     my @intfCopyParams = ();
-    my $copyParams = $devdetails->param('RFC2863_IF_MIB::copy-params');
-    if( defined( $copyParams ) and length( $copyParams ) > 0 )
-    {
-        @intfCopyParams = split( /\s*,\s*/m, $copyParams );
-    }
+    @intfCopyParams =
+        split( /\s*,\s*/m,
+               $devdetails->paramString('RFC2863_IF_MIB::copy-params') );
     
     # Build configuration tree
 
-    my $subtreeName = $devdetails->param('RFC2863_IF_MIB::subtree-name');
+    my $subtreeName = $devdetails->paramString('RFC2863_IF_MIB::subtree-name');
     if( length( $subtreeName ) == 0 )
     {
         $subtreeName = 'Interface_Counters';
     }
+    
     my $subtreeParams = {};
-    my $subtreeComment = $devdetails->param('RFC2863_IF_MIB::subtree-comment');
+    my $subtreeComment =
+        $devdetails->paramString('RFC2863_IF_MIB::subtree-comment');
 
     if( length( $subtreeComment ) > 0 )
     {
@@ -1056,9 +1048,10 @@ sub buildConfig
 
             foreach my $param ( @intfCopyParams )
             {
-                my $val = $devdetails->param('RFC2863_IF_MIB::' .
+                my $val =
+                    $devdetails->paramString('RFC2863_IF_MIB::' .
                                              $param . '::' . $subtreeName );
-                if( defined( $val ) and length( $val ) > 0 )
+                if( length( $val ) > 0 )
                 {
                     $interface->{'param'}{$param} = $val;
                 }
@@ -1161,7 +1154,9 @@ sub buildConfig
     }                 
     
     $cb->{'statistics'}{'interfaces'} += $nInterfaces;
-    if( $cb->{'statistics'}{'max-interfaces-per-host'} < $nInterfaces )
+    if( not defined($cb->{'statistics'}{'max-interfaces-per-host'})
+        or
+        $cb->{'statistics'}{'max-interfaces-per-host'} < $nInterfaces )
     {
         $cb->{'statistics'}{'max-interfaces-per-host'} = $nInterfaces;
     }
@@ -1322,13 +1317,14 @@ sub uniqueEntries
     foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
-
+        
         my $entry = $interface->{$nameref};
-        if( length($entry) == 0 )
+        if( not defined($entry) or length($entry) == 0 )
         {
             $entry = $interface->{$nameref} = '_';
         }
-        if( int( $count{$entry} ) > 0 )
+        
+        if( defined($count{$entry}) and $count{$entry} > 0 )
         {
             my $new_entry = sprintf('%s%d', $entry, int( $count{$entry} ) );
             $interface->{$nameref} = $new_entry;

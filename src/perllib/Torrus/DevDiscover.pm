@@ -24,6 +24,8 @@ package Torrus::DevDiscover::DevDetails;
 package Torrus::DevDiscover;
 
 use strict;
+use warnings;
+
 use POSIX qw(strftime);
 use Net::SNMP qw(:snmp :asn1);
 use Digest::MD5 qw(md5);
@@ -286,11 +288,9 @@ sub discover
     $data->{'param'} = {};
 
     $data->{'templates'} = [];
-    my $customTmpl = $devdetails->param('custom-host-templates');
-    if( length( $customTmpl ) > 0 )
-    {
-        push( @{$data->{'templates'}}, split( /\s*,\s*/, $customTmpl ) );
-    }
+    push( @{$data->{'templates'}},
+          split( /\s*,\s*/,
+                 $devdetails->paramString('custom-host-templates') ) );
     
     # Build host-level legend
     my %legendValues =
@@ -317,14 +317,14 @@ sub discover
     foreach my $key ( sort keys %legendValues )
     {
         my $text = $legendValues{$key}{'value'};
-        if( length( $text ) > 0 )
+        if( defined($text) and length($text) > 0 )
         {
             $text = $devdetails->screenSpecialChars( $text );
             $legend .= $legendValues{$key}{'name'} . ':' . $text . ';';
         }
     }
     
-    if( $devdetails->param('suppress-legend') ne 'yes' )
+    if( $devdetails->paramEnabled('suppress-legend') )
     {
         $data->{'param'}{'legend'} = $legend;
     }
@@ -332,12 +332,12 @@ sub discover
     # some parameters need just one-to-one copying
 
     my @hostCopyParams =
-        split('\s*,\s*', $devdetails->param('host-copy-params'));
+        split('\s*,\s*', $devdetails->paramString('host-copy-params'));
     
     foreach my $param ( @copyParams, @hostCopyParams )
     {
         my $val = $devdetails->param( $param );
-        if( length( $val ) > 0 )
+        if( defined($val) )
         {
             $data->{'param'}{$param} = $val;
         }
@@ -373,7 +373,7 @@ sub discover
     my %onlyDevtypes;
     my $useOnlyDevtypes = 0;
     foreach my $devtype ( split('\s*,\s*',
-                                $devdetails->param('only-devtypes') ) )
+                                $devdetails->paramString('only-devtypes') ) )
     {
         $onlyDevtypes{$devtype} = 1;
         $useOnlyDevtypes = 1;
@@ -381,7 +381,7 @@ sub discover
 
     my %disabledDevtypes;
     foreach my $devtype ( split('\s*,\s*',
-                                $devdetails->param('disable-devtypes') ) )
+                                $devdetails->paramString('disable-devtypes') ) )
     {
         $disabledDevtypes{$devtype} = 1;
     }
@@ -428,39 +428,36 @@ sub discover
     }
     push( @{$self->{'devdetails'}{$subtree}}, $devdetails );
 
-    my $define_tokensets = $devdetails->param('define-tokensets');
-    if( defined( $define_tokensets ) and length( $define_tokensets ) > 0 )
+    foreach my $pair
+        ( split(/\s*;\s*/, $devdetails->paramString('define-tokensets') ) )
     {
-        foreach my $pair ( split(/\s*;\s*/, $define_tokensets ) )
+        my( $tset, $description ) = split( /\s*:\s*/, $pair );
+        my $params = {};
+        
+        if( $tset !~ /^[a-z][a-z0-9-_]*$/ )
         {
-            my( $tset, $description ) = split( /\s*:\s*/, $pair );
-            my $params = {};
-            
-            if( $tset !~ /^[a-z][a-z0-9-_]*$/ )
-            {
-                Error('Invalid name for tokenset: ' . $tset);
-                $ok = 0;
-            }
-            elsif( length( $description ) == 0 )
-            {
-                Error('Missing description for tokenset: ' . $tset);
-                $ok = 0;
-            }
-            else
-            {
-                $params->{'comment'} = $description;
-            }
-
-            my $v = $devdetails->param($tset . '-tokenset-rrgraph-view');
-            if( defined($v) and length($v) > 0 )
-            {
-                $params->{'rrgraph-view'} = $v;
-            }
-
-            if( $ok )
-            {
-                $self->{'define-tokensets'}{$tset} = $params;
-            }
+            Error('Invalid name for tokenset: ' . $tset);
+            $ok = 0;
+        }
+        elsif( length( $description ) == 0 )
+        {
+            Error('Missing description for tokenset: ' . $tset);
+            $ok = 0;
+        }
+        else
+        {
+            $params->{'comment'} = $description;
+        }
+        
+        my $v = $devdetails->param($tset . '-tokenset-rrgraph-view');
+        if( defined($v) )
+        {
+            $params->{'rrgraph-view'} = $v;
+        }
+        
+        if( $ok )
+        {
+            $self->{'define-tokensets'}{$tset} = $params;
         }
     }
 
@@ -524,7 +521,7 @@ sub buildConfig
             # set by previous host
             $cb->setRegistryOverlays( @registryOverlays );            
             
-            if( $devdetails->param('disable-snmpcollector' ) eq 'yes' )
+            if( $devdetails->paramEnabled('disable-snmpcollector' ) )
             {
                 push( @{$data->{'templates'}}, '::viewonly-defaults' );
             }
@@ -533,27 +530,27 @@ sub buildConfig
                 push( @{$data->{'templates'}}, '::snmp-defaults' );
             }
 
-            if( $devdetails->param('rrd-hwpredict' ) eq 'yes' )
+            if( $devdetails->paramEnabled('rrd-hwpredict' ) )
             {
                 push( @{$data->{'templates'}}, '::holt-winters-defaults' );
             }
             
-            if( $devdetails->param('disable-reachability-stats') ne 'yes'
+            if( $devdetails->paramDisabled('disable-reachability-stats') 
                 and
                 (
                  (not defined($devdetails->param('only-devtypes')))
                  or
-                 $devdetails->param('enable-reachability-stats') eq 'yes'
+                 $devdetails->paramEnabled('enable-reachability-stats') 
                 ) )
             {
                 push( @{$data->{'templates'}}, '::snmp-reachability' );
             }
 
             
-            my $devNodeName = $devdetails->param('symbolic-name');
+            my $devNodeName = $devdetails->paramString('symbolic-name');
             if( length( $devNodeName ) == 0 )
             {
-                $devNodeName = $devdetails->param('system-id');
+                $devNodeName = $devdetails->paramString('system-id');
                 if( length( $devNodeName ) == 0 )
                 {
                     $devNodeName = $devdetails->param('snmp-host');
@@ -564,22 +561,18 @@ sub buildConfig
                                            $data->{'param'},
                                            $data->{'templates'} );
 
-            my $aliases = $devdetails->param('host-aliases');
-            if( length( $aliases ) > 0 )
+            foreach my $alias
+                ( split( '\s*,\s*',
+                         $devdetails->paramString('host-aliases') ) )
             {
-                foreach my $alias ( split( '\s*,\s*', $aliases ) )
-                {
-                    $cb->addAlias( $devNode, $alias );
-                }
+                $cb->addAlias( $devNode, $alias );
             }
 
-            my $includeFiles = $devdetails->param('include-files');
-            if( length( $includeFiles ) > 0 )
+            foreach my $file
+                ( split( '\s*,\s*',
+                         $devdetails->paramString('include-files') ) )
             {
-                foreach my $file ( split( '\s*,\s*', $includeFiles ) )
-                {
-                    $cb->addFileInclusion( $file );
-                }
+                $cb->addFileInclusion( $file );
             }
                     
 
@@ -860,6 +853,34 @@ sub param
     my $self = shift;
     my $name = shift;
     return $self->{'params'}->{$name};
+}
+
+
+# The following 3 methods get around undefined parameters and
+# make "use warnings" happy
+
+sub paramEnabled
+{
+    my $self = shift;
+    my $name = shift;
+    my $val = $self->param($name);
+    return (defined($val) and ($val eq 'yes'));
+}
+
+sub paramDisabled
+{
+    my $self = shift;
+    my $name = shift;
+    my $val = $self->param($name);
+    return (not defined($val) or ($val ne 'yes'));
+}
+
+sub paramString
+{
+    my $self = shift;
+    my $name = shift;
+    my $val = $self->param($name);
+    return (defined($val) ? $val:'');    
 }
 
 

@@ -111,7 +111,7 @@ dist-hook:
 	cp DIST_REVISION $(distdir)/
 
 
-PERLCRITIC_CMD = ${PERLCRITIC} --profile=perlcritic.profile
+PERLCRITIC_CMD = ${PERLCRITIC} --profile=critic.profile
 
 critic:
 	@if test ${PERLCRITIC} != no; then \

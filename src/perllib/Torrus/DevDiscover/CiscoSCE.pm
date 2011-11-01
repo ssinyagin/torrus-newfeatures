@@ -34,6 +34,8 @@
 package Torrus::DevDiscover::CiscoSCE;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -141,7 +143,7 @@ sub discover
         ", Hw Serial#: " . $sceInfo->{'pmoduleSerialNumber'};
     
     # TP: Traffic Processor
-    if( $devdetails->param('CiscoSCE::disable-tp') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoSCE::disable-tp') )
     { 
         $devdetails->setCap('sceTP');
 
@@ -150,13 +152,13 @@ sub discover
     }
 
     # HDD: Disk Usage
-    if( $devdetails->param('CiscoSCE::disable-disk') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoSCE::disable-disk') )
     {
         $devdetails->setCap('sceDisk');
     }
 
     # SUBS: subscriber aware configuration
-    if( $devdetails->param('CiscoSCE::disable-subs') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoSCE::disable-subs') )
     {
         if( $sceInfo->{'subscribersNumIpAddrMappings'}  > 0 or
             $sceInfo->{'subscribersNumIpRangeMappings'} > 0 or
@@ -169,7 +171,7 @@ sub discover
     
     
     # QOS: TX Queues Names
-    if( $devdetails->param('CiscoSCE::disable-qos') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoSCE::disable-qos') )
     { 
         $devdetails->setCap('sceQos');
 
@@ -218,7 +220,7 @@ sub discover
 
 
     # GC: Global Service Counters
-    if( $devdetails->param('CiscoSCE::disable-gc') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoSCE::disable-gc') )
     {
         # Set the Capability for the Global Counters
         $devdetails->setCap('sceGlobalCounters');
@@ -234,16 +236,18 @@ sub discover
         {
             my $oid =
                 $dd->oiddef('globalScopeServiceCounterName') . '.' . $gcIndex;
-            if( length( $counterNames->{$oid} ) > 0 )
+            my $cName = $counterNames->{$oid};
+            
+            if( defined($cName) and $cName ne '' )
             {
-                $data->{'sceGlobalCounters'}{$gcIndex} = $counterNames->{$oid};
+                $data->{'sceGlobalCounters'}{$gcIndex} = $cName;
             }
         }
     }
 
 
     # RDR: Raw Data Record
-    if( $devdetails->param('CiscoSCE::disable-rdr') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoSCE::disable-rdr') )
     {   
         if( $sceInfo->{'rdrFormatterEnable'} > 0 )
         {

@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::CiscoGeneric;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -84,7 +86,7 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    if( $devdetails->param('CiscoGeneric::disable-sensors') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoGeneric::disable-sensors') )
     {
         # Check if temperature sensors are supported
 
@@ -122,7 +124,7 @@ sub discover
         }
     }
 
-    if( $devdetails->param('CiscoGeneric::disable-psupplies') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoGeneric::disable-psupplies') )
     {
         # Check if power supply status is supported
 
@@ -149,12 +151,13 @@ sub discover
         }
     }
     
-    if( $devdetails->param('CiscoGeneric::disable-memory-pools') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoGeneric::disable-memory-pools') )
     {
         my $eMemPool =
             $session->get_table( -baseoid =>
                                  $dd->oiddef('cempMemPoolName') );
-        if( defined $eMemPool and scalar( %{$eMemPool} ) > 0 and
+        
+        if( defined($eMemPool) and scalar(keys %{$eMemPool}) > 0 and
             $devdetails->isDevType('RFC2737_ENTITY_MIB') )
         {
             $devdetails->storeSnmpVars( $eMemPool );
@@ -195,7 +198,7 @@ sub discover
                 $session->get_table( -baseoid =>
                                      $dd->oiddef('ciscoMemoryPoolName') );
 
-            if( defined $MemoryPool and scalar( %{$MemoryPool} ) > 0 )
+            if( defined($MemoryPool) and scalar(keys %{$MemoryPool}) > 0 )
             {
                 $devdetails->storeSnmpVars( $MemoryPool );
                 $devdetails->setCap('ciscoMemoryPool');
@@ -223,7 +226,7 @@ sub discover
         }
     }
 
-    if( $devdetails->param('CiscoGeneric::disable-cpu-stats') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoGeneric::disable-cpu-stats') )
     {
         my $ciscoCpuStats =
             $session->get_table( -baseoid => $dd->oiddef('cpmCPUTotalTable') );
@@ -328,7 +331,7 @@ sub buildConfig
         my $subtreeName = 'Temperature_Sensors';
 
         my $fahrenheit =
-            $devdetails->param('CiscoGeneric::use-fahrenheit') eq 'yes';
+            $devdetails->paramEnabled('CiscoGeneric::use-fahrenheit');
 
         my $param = {
             'node-display-name' => 'Temperature Sensors',
@@ -336,7 +339,7 @@ sub buildConfig
         my $templates = [ 'CiscoGeneric::cisco-temperature-subtree' ];
         
         my $filePerSensor =
-            $devdetails->param('CiscoGeneric::file-per-sensor') eq 'yes';
+            $devdetails->paramEnabled('CiscoGeneric::file-per-sensor');
         
         $param->{'data-file'} = '%snmp-host%_sensors' .
             ($filePerSensor ? '_%sensor-index%':'') .
@@ -403,8 +406,8 @@ sub buildConfig
                 
         $param->{'data-file'} = '%system-id%_power.rrd';
 
-        my $monitor = $devdetails->param('CiscoGeneric::power-monitor');
-        if( length( $monitor ) > 0 )
+        my $monitor = $devdetails->paramString('CiscoGeneric::power-monitor');
+        if( $monitor ne '' )
         {
             $param->{'monitor'} = $monitor;
         }

@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::CiscoIOS_Docsis;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 # Sequence number is 600 - we depend on RFC2670_DOCS_IF and CiscoIOS

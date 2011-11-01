@@ -18,13 +18,12 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # Cisco IOS devices discovery
-# To do:
-#   SA Agent MIB
-#   DiffServ MIB
 
 package Torrus::DevDiscover::CiscoIOS;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -189,7 +188,7 @@ sub checkdevtype
     # On some Layer3 switching devices, VlanXXX interfaces give some
     # useful stats, while on others the stats are not relevant at all
     
-    if( $devdetails->param('CiscoIOS::enable-vlan-interfaces') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::enable-vlan-interfaces') )
     {
         $interfaceFilter->{'VlanN'} = {
             'ifType'  => 53,                     # propVirtual
@@ -198,8 +197,7 @@ sub checkdevtype
     }
 
     # same thing with unrouted VLAN interfaces
-    if( $devdetails->param('CiscoIOS::enable-unrouted-vlan-interfaces')
-        ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::enable-unrouted-vlan-interfaces'))
     {
         $interfaceFilter->{'unrouted VLAN N'} = {
             'ifType'  => 53,                     # propVirtual
@@ -208,8 +206,7 @@ sub checkdevtype
     }
 
     # sometimes we want Dialer interface stats
-    if( $devdetails->param('CiscoIOS::enable-dialer-interfaces')
-        ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::enable-dialer-interfaces') )
     {
         $interfaceFilter->{'DialerN'} = {
             'ifType'  => 23,                     # ppp
@@ -302,7 +299,7 @@ sub discover
         }
     }
 
-    if( $devdetails->param('CiscoIOS::enable-membuf-stats') eq 'yes' )
+    if( $devdetails->paramEnabled('CiscoIOS::enable-membuf-stats') )
     {
         # Old Memory Buffers, if we have bufferElFree we assume
         # the rest as they are "required"
@@ -315,7 +312,7 @@ sub discover
         }
     }
 
-    if( $devdetails->param('CiscoIOS::disable-ipsec-stats') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::disable-ipsec-stats') )
     {
         if( $dd->checkSnmpOID('cipSecGlobalHcInOctets') )
         {
@@ -332,12 +329,12 @@ sub discover
         }
     }
 
-    if( $devdetails->param('CiscoIOS::disable-bgp-stats') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::disable-bgp-stats') )
     {
         my $peerTable =
             $session->get_table( -baseoid =>
                                  $dd->oiddef('cbgpPeerAcceptedPrefixes') );
-        if( defined( $peerTable ) and scalar( %{$peerTable} ) > 0 )
+        if( defined($peerTable) and scalar(keys %{$peerTable}) > 0 )
         {
             $devdetails->storeSnmpVars( $peerTable );
             $devdetails->setCap('CiscoBGP');
@@ -376,9 +373,10 @@ sub discover
                 }
 
                 my $desc =
-                    $devdetails->param('peer-ipaddr-description-' .
-                                       join('_', split('\.', $peerIP)));
-                if( length( $desc ) > 0 )
+                    $devdetails->paramString
+                    ('peer-ipaddr-description-' .
+                     join('_', split('\.', $peerIP)));
+                if( $desc ne '' )
                 {
                     $peer->{'description'} = $desc;
                 }        
@@ -390,8 +388,9 @@ sub discover
                     $asNumbers{$peer->{'peerAS'}}++;
 
                     my $desc =
-                        $devdetails->param('bgp-as-description-' . $peerAS);
-                    if( length( $desc ) > 0 )
+                        $devdetails->paramString
+                        ('bgp-as-description-' . $peerAS);
+                    if( $desc ne '' )
                     {
                         if( defined( $peer->{'description'} ) )
                         {
@@ -465,12 +464,12 @@ sub discover
     }
 
     
-    if( $devdetails->param('CiscoIOS::disable-car-stats') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::disable-car-stats') )
     {
         my $carTable =
             $session->get_table( -baseoid =>
                                  $dd->oiddef('ccarConfigTable') );
-        if( defined( $carTable ) and scalar( %{$carTable} ) > 0 )
+        if( defined($carTable) and scalar(keys %{$carTable}) > 0 )
         {
             $devdetails->storeSnmpVars( $carTable );
             $devdetails->setCap('CiscoCAR');
@@ -526,7 +525,7 @@ sub discover
     }
 
 
-    if( $devdetails->param('CiscoIOS::disable-vpdn-stats') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::disable-vpdn-stats') )
     {
         if( $dd->checkSnmpTable( 'cvpdnSystemTunnelTotal' ) )
         {
@@ -554,13 +553,13 @@ sub discover
         }
     }
 
-    if( $devdetails->param('CiscoIOS::disable-3g-stats') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::disable-3g-stats') )
     {
         my $base = $dd->oiddef('c3gStandard');
         my $table = $session->get_table( -baseoid => $base );
         my $prefixLen = length( $base ) + 1;
         
-        if( defined( $table ) and scalar( %{$table} ) > 0 )
+        if( defined($table) )
         {            
             while( my( $oid, $val ) = each %{$table} )
             {
@@ -587,21 +586,21 @@ sub discover
             }
         }
 
-        my $tokenset = $devdetails->param('CiscoIOS::3g-stats-tokenset');
-        if( defined($tokenset) )
+        my $tokenset = $devdetails->paramString('CiscoIOS::3g-stats-tokenset');
+        if( $tokenset ne '')
         {
             $data->{'cisco3G_tokenset'} = $tokenset;
         }
     }
 
 
-    if( $devdetails->param('CiscoIOS::disable-port-qos-stats') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS::disable-port-qos-stats') )
     {
         my $base = $dd->oiddef('cportQosDropPkts');
         my $table = $session->get_table( -baseoid => $base );
         my $prefixLen = length( $base ) + 1;
         
-        if( defined( $table ) and scalar( %{$table} ) > 0 )
+        if( defined($table) and scalar(keys %{$table}) > 0 )
         {            
             $devdetails->setCap('CiscoPortQos');
             $data->{'ciscoPortQos'} = {};
@@ -622,7 +621,7 @@ sub discover
     }
     
     
-    if( $devdetails->param('CiscoIOS::short-device-comment') eq 'yes' )
+    if( $devdetails->paramEnabled('CiscoIOS::short-device-comment') )
     {
         # Remove serials from device comment
         # 1841 chassis, Hw Serial#: 3625140487, Hw Revision: 6.0
@@ -652,7 +651,7 @@ sub buildConfig
                              } );
 
         foreach my $INDEX ( sort
-                            { $data->{'cbgpPeers'}{$a}{'subtreeName'} <=>
+                            { $data->{'cbgpPeers'}{$a}{'subtreeName'} cmp
                                   $data->{'cbgpPeers'}{$b}{'subtreeName'} }
                             keys %{$data->{'cbgpPeers'}} )
         {

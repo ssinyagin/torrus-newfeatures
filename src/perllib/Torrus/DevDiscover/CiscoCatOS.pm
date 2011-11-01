@@ -25,6 +25,8 @@
 package Torrus::DevDiscover::CiscoCatOS;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -142,14 +144,14 @@ sub discover
     }
 
     # In large installations, only named ports may be of interest
-    if( $devdetails->param('CiscoCatOS::suppress-noname-ports') eq 'yes' )
+    if( $devdetails->paramEnabled('CiscoCatOS::suppress-noname-ports') )
     {
         my $nExcluded = 0;
         foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
-            if( not defined( $interface->{'portName'} ) or
-                length( $interface->{'portName'} ) == 0 )
+            if( not defined($interface->{'portName'}) or
+                $interface->{'portName'} eq '' )
             {
                 $interface->{'excluded'} = 1;
                 $nExcluded++;

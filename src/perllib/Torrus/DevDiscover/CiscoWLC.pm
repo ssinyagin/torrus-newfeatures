@@ -23,6 +23,8 @@
 package Torrus::DevDiscover::CiscoWLC;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -89,12 +91,13 @@ sub discover
 
     my $filter_ssid = 0;
     my %only_ssid;
-    if( defined($devdetails->param('CiscoWLC::only-ssid')) )
+    my $only_ssid_list = $devdetails->paramString('CiscoWLC::only-ssid');
+    if( $only_ssid_list ne '' )
     {
         $filter_ssid = 1;
         
         foreach my $ssid
-            (split(/\s*,\s*/, $devdetails->param('CiscoWLC::only-ssid')))
+            (split(/\s*,\s*/, $only_ssid_list))
         {
             $only_ssid{$ssid} = 1;
         }

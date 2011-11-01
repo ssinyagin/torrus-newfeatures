@@ -27,8 +27,9 @@
 package Torrus::DevDiscover::CiscoIOS_SAA;
 
 use strict;
-use Socket qw(inet_ntoa);
+use warnings;
 
+use Socket qw(inet_ntoa);
 use Torrus::Log;
 
 
@@ -178,7 +179,7 @@ sub checkdevtype
         my $rttAdminTable =
             $session->get_table( -baseoid =>
                                  $dd->oiddef('rttMonCtrlAdminTable') );
-        if( defined $rttAdminTable and scalar( %{$rttAdminTable} ) > 0 )
+        if( defined($rttAdminTable) and scalar(keys %{$rttAdminTable}) > 0 )
         {
             $devdetails->storeSnmpVars( $rttAdminTable );
             return 1;

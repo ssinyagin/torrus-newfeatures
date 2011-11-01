@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::CiscoFirewall;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -117,7 +119,7 @@ sub discover
     {
         my $oidsPerPDU =
             $devdetails->param('CiscoFirewall::snmp-oids-per-pdu');
-        if( $oidsPerPDU == 0 )
+        if( not defined($oidsPerPDU) or $oidsPerPDU == 0 )
         {
             $oidsPerPDU = 10;
         }

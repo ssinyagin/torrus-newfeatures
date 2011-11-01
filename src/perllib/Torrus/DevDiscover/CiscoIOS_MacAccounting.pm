@@ -68,7 +68,7 @@ sub discover
     my $table = $session->get_table( -baseoid =>
                                      $dd->oiddef('cipMacHCSwitchedBytes'));
     
-    if( not defined( $table ) or scalar( %{$table} ) == 0 )
+    if( not defined($table) or scalar(keys %{$table}) == 0 )
     {
         return 0;
     }
@@ -76,8 +76,8 @@ sub discover
 
     # External storage serviceid assignment
     my $extSrv =
-        $devdetails->param('CiscoIOS_MacAccounting::external-serviceid');
-    if( defined( $extSrv ) and length( $extSrv ) > 0 )
+        $devdetails->paramString('CiscoIOS_MacAccounting::external-serviceid');
+    if( $extSrv ne '' )
     {
         my $extStorage = {};
         my $extStorageTrees = {};
@@ -117,20 +117,17 @@ sub discover
     # tokenset members
     # Format: tokenset:ASXXXX,ASXXXX; tokenset:ASXXXX,ASXXXX;
     # Peer MAC or IP addresses could be used too
-    my $tsetMembership =
-        $devdetails->param('CiscoIOS_MacAccounting::tokenset-members');
-    if( defined( $tsetMembership ) and length( $tsetMembership ) > 0 )
+    $data->{'cipTokensetMember'} = {};
+    foreach my $memList
+        ( split( /\s*;\s*/,
+                 $devdetails->paramString
+                 ('CiscoIOS_MacAccounting::tokenset-members') ) )
     {
-        my $tsetMember = {};
-        foreach my $memList ( split( /\s*;\s*/, $tsetMembership ) )
+        my ($tset, $list) = split( /\s*:\s*/, $memList );
+        foreach my $peerName ( split( /\s*,\s*/, $list ) )
         {
-            my ($tset, $list) = split( /\s*:\s*/, $memList );
-            foreach my $peerName ( split( /\s*,\s*/, $list ) )
-            {
-                $tsetMember->{$peerName}{$tset} = 1;
-            }
+            $data->{'cipTokensetMember'}->{$peerName}{$tset} = 1;
         }
-        $data->{'cipTokensetMember'} = $tsetMember;
     }
     
     Torrus::DevDiscover::RFC2011_IP_MIB::discover($dd, $devdetails);
@@ -196,14 +193,16 @@ sub discover
             $interface->{$data->{'nameref'}{'ifReferenceName'}};
         $peer->{'ifNick'} =
             $interface->{$data->{'nameref'}{'ifNick'}};
-        
-        my $desc =
-            $devdetails->param('peer-ipaddr-description-' .
-                               join('_', split('\.', $peerIP)));
-        if( length( $desc ) > 0 )
+
         {
-            $peer->{'description'} = $desc;
-        }        
+            my $desc =
+                $devdetails->paramString('peer-ipaddr-description-' .
+                                         join('_', split('\.', $peerIP)));
+            if( $desc ne '' )
+            {
+                $peer->{'description'} = $desc;
+            }
+        }
         
         if( $devdetails->hasCap('bgpPeerTable') )
         {
@@ -213,8 +212,8 @@ sub discover
                 $peer->{'peerAS'} = $data->{'bgpPeerAS'}{$peerIP};
                 
                 my $desc =
-                    $devdetails->param('bgp-as-description-' . $peerAS);
-                if( length( $desc ) > 0 )
+                    $devdetails->paramString('bgp-as-description-' . $peerAS);
+                if( $desc ne '' )
                 {
                     if( defined( $peer->{'description'} ) )
                     {
@@ -224,13 +223,13 @@ sub discover
                     $peer->{'description'} = $desc;
                 }
             }
-            elsif( $devdetails->
-                    param('CiscoIOS_MacAccounting::bgponly') eq 'yes' )
+            elsif( $devdetails->paramEnabled
+                   ('CiscoIOS_MacAccounting::bgponly') )
             {
                 next;
             }
         }
-
+        
         if( defined( $peer->{'description'} ) )
         {
             $peer->{'description'} .= ' ';

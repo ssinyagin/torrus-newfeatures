@@ -23,6 +23,8 @@
 package Torrus::DevDiscover::CiscoVDSL;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

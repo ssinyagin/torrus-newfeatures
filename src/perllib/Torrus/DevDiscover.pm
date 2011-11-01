@@ -317,7 +317,7 @@ sub discover
     foreach my $key ( sort keys %legendValues )
     {
         my $text = $legendValues{$key}{'value'};
-        if( defined($text) and length($text) > 0 )
+        if( defined($text) and $text ne '' )
         {
             $text = $devdetails->screenSpecialChars( $text );
             $legend .= $legendValues{$key}{'name'} . ':' . $text . ';';
@@ -439,7 +439,7 @@ sub discover
             Error('Invalid name for tokenset: ' . $tset);
             $ok = 0;
         }
-        elsif( length( $description ) == 0 )
+        elsif( not defined($description) or $description eq '' )
         {
             Error('Missing description for tokenset: ' . $tset);
             $ok = 0;
@@ -548,10 +548,10 @@ sub buildConfig
 
             
             my $devNodeName = $devdetails->paramString('symbolic-name');
-            if( length( $devNodeName ) == 0 )
+            if( $devNodeName eq '' )
             {
                 $devNodeName = $devdetails->paramString('system-id');
-                if( length( $devNodeName ) == 0 )
+                if( $devNodeName eq '' )
                 {
                     $devNodeName = $devdetails->param('snmp-host');
                 }
@@ -702,7 +702,7 @@ sub checkSnmpTable
         # check if the returned oid shares the base of the query
         my $firstOid = (keys %{$result})[0];
         if( Net::SNMP::oid_base_match( $oid, $firstOid ) and
-            length( $result->{$firstOid} ) > 0 )
+            $result->{$firstOid} ne '' )
         {
             return 1;
         }
@@ -726,7 +726,7 @@ sub checkSnmpOID
     if( $session->error_status() == 0 and
         defined($result) and
         defined($result->{$oid}) and
-        length($result->{$oid}) > 0 )
+        $result->{$oid} ne '' )
     {
         return 1;
     }
@@ -902,7 +902,7 @@ sub storeSnmpVars
         {
             $self->{'snmpvars'}{$oid} = $value;
             
-            while( length( $oid ) > 0 )
+            while( $oid ne '' )
             {
                 $oid =~ s/\d+$//o;
                 $oid =~ s/\.$//o;
@@ -1098,7 +1098,7 @@ sub applySelectors
                       &{$treg->{'getObjectName'}}( $self, $object, $type ));
 
                 my $expr = $self->param( $sel . '-selector-expr' );
-                $expr = '1' if length( $expr ) == 0;
+                $expr = '1' if ($expr eq '');
 
                 my $callback = sub
                 {

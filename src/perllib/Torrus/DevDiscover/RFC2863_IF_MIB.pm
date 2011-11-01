@@ -544,7 +544,7 @@ sub buildConfig
 
         if( defined $data->{'nameref'}{'ifComment'} and
             not defined( $interface->{'param'}{'comment'} ) and
-            length( $interface->{$data->{'nameref'}{'ifComment'}} ) > 0 )
+            $interface->{$data->{'nameref'}{'ifComment'}} ne '' )
         {
             my $comment = $interface->{$data->{'nameref'}{'ifComment'}};
             $interface->{'param'}{'comment'} = $comment;
@@ -676,7 +676,7 @@ sub buildConfig
             }
         }
         
-        if( defined($intfName) and length($intfName) > 0 )
+        if( defined($intfName) and $intfName ne '' )
         {
             if( defined( $trees ) )
             {
@@ -758,7 +758,7 @@ sub buildConfig
     # Build configuration tree
 
     my $subtreeName = $devdetails->paramString('RFC2863_IF_MIB::subtree-name');
-    if( length( $subtreeName ) == 0 )
+    if( $subtreeName eq '' )
     {
         $subtreeName = 'Interface_Counters';
     }
@@ -767,7 +767,7 @@ sub buildConfig
     my $subtreeComment =
         $devdetails->paramString('RFC2863_IF_MIB::subtree-comment');
 
-    if( length( $subtreeComment ) > 0 )
+    if( $subtreeComment ne '' )
     {
         $subtreeParams->{'comment'} = $subtreeComment;
     }
@@ -814,7 +814,7 @@ sub buildConfig
             $nExplExcluded++;
             next;
         }
-        elsif( length( $subtreeName ) == 0 )
+        elsif( $subtreeName eq '' )
         {
             Warn('Excluding an interface with empty name: ifIndex=' .
                  $ifIndex);
@@ -1053,7 +1053,7 @@ sub buildConfig
                 my $val =
                     $devdetails->paramString('RFC2863_IF_MIB::' .
                                              $param . '::' . $subtreeName );
-                if( length( $val ) > 0 )
+                if( $val ne '' )
                 {
                     $interface->{'param'}{$param} = $val;
                 }
@@ -1083,7 +1083,7 @@ sub buildConfig
                             'ext-service-units' => 'bytes' };
                         
                         if( defined( $extStorageTrees{$serviceid} )
-                            and length( $extStorageTrees{$serviceid} ) > 0 )
+                            and $extStorageTrees{$serviceid} ne '' )
                         {
                             $params->{'ext-service-trees'} =
                                 $extStorageTrees{$serviceid};
@@ -1230,7 +1230,7 @@ sub buildGlobalConfig
             {
                 my $memRef = '{' . $cb->getElementPath($member) .
                     'Bytes_' . $dir . '}';
-                if( length( $rpn ) == 0 )
+                if( $rpn eq '' )
                 {
                     $rpn = $memRef;
                 }
@@ -1292,7 +1292,7 @@ sub validateReference
         my $interface = $data->{'interfaces'}{$ifIndex};
 
         my $entry = $interface->{$nameref};
-        if( not defined($entry) or length($entry) == 0 )
+        if( not defined($entry) or $entry eq '' )
         {
             Debug($nameref . ' contains empty entries');
             return 0;
@@ -1321,7 +1321,7 @@ sub uniqueEntries
         my $interface = $data->{'interfaces'}{$ifIndex};
         
         my $entry = $interface->{$nameref};
-        if( not defined($entry) or length($entry) == 0 )
+        if( not defined($entry) or $entry eq '' )
         {
             $entry = $interface->{$nameref} = '_';
         }
@@ -1356,7 +1356,7 @@ sub retrieveMacAddresses
         my $macaddr = $devdetails->snmpVar($dd->oiddef('ifPhysAddress') .
                                            '.' . $ifIndex);
 
-        if( defined( $macaddr ) and length( $macaddr ) > 0 )
+        if( defined( $macaddr ) and $macaddr ne '' )
         {
             $interface->{'MAC'} = $macaddr;
             $interface->{'param'}{'interface-macaddr'} = $macaddr;

@@ -1135,7 +1135,7 @@ sub buildConfig
               ' RFC2863_IF_MIB interfaces');
     }
 
-    if( scalar( %tsetMember ) > 0 )
+    if( scalar(keys %tsetMember) > 0 )
     {
         my @failedIntf;
         foreach my $intfName ( keys %tsetMember )

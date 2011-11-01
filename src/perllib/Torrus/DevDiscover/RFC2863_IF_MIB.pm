@@ -488,8 +488,10 @@ sub buildConfig
     if( $devdetails->paramEnabled('RFC2863_IF_MIB::bandwidth-usage') )
     {
         $bandwidthUsageConfigured = 1;
-        my $limits = $devdetails->param('RFC2863_IF_MIB::bandwidth-limits');
-        foreach my $intfLimit ( split( /\s*;\s*/, $limits ) )
+        foreach my $intfLimit
+            ( split( /\s*;\s*/,
+                     $devdetails->paramString
+                     ('RFC2863_IF_MIB::bandwidth-limits') ) )
         {
             my( $intf, $limitIn, $limitOut ) = split( /\s*:\s*/, $intfLimit );
             $bandwidthLimits{$intf}{'In'} = $limitIn;

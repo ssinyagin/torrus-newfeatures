@@ -61,6 +61,8 @@
 package Torrus::DevDiscover::Arbor_E;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -126,26 +128,26 @@ our %oiddef =
 
 our %eChassisName =
     (
-        '1'  => 'e16k',
-        '2'  => 'e4k',
-        '3'  => 'e30 Revision: R',
-        '4'  => 'e30 Revision: S',
-        '5'  => 'e30 Revision: T',
-        '6'  => 'e30 Revision: U',
-        '7'  => 'e30 Revision: V',
-	'8'  => 'Ellacoya e100',
-        '9'  => 'e100'
-    );
+     '1'  => 'e16k',
+     '2'  => 'e4k',
+     '3'  => 'e30 Revision: R',
+     '4'  => 'e30 Revision: S',
+     '5'  => 'e30 Revision: T',
+     '6'  => 'e30 Revision: U',
+     '7'  => 'e30 Revision: V',
+     '8'  => 'Ellacoya e100',
+     '9'  => 'e100'
+     );
 
 our %eCpuName =
     (
-        '1'  => 'Control Module',
-        '3'  => 'DPI Module 1 CPU 1',
-        '4'  => 'DPI Module 1 CPU 2',
-        '5'  => 'DPI Module 2 CPU 1',
-        '6'  => 'DPI Module 2 CPU 2',
-        '7'  => 'I/O Module'
-    );
+     '1'  => 'Control Module',
+     '3'  => 'DPI Module 1 CPU 1',
+     '4'  => 'DPI Module 1 CPU 2',
+     '5'  => 'DPI Module 2 CPU 1',
+     '6'  => 'DPI Module 2 CPU 2',
+     '7'  => 'I/O Module'
+     );
 
 sub checkdevtype
 {
@@ -157,7 +159,7 @@ sub checkdevtype
     {
         return 0;
     }
-   
+    
     $devdetails->setCap('interfaceIndexingPersistent');
 
     return 1;
@@ -174,15 +176,15 @@ sub discover
 
     # PROG: Grab versions, serials and type of chassis.
     my $eInfo = $dd->retrieveSnmpOIDs
-                   ( 'codeVer', 'sysIdSerialNum', 'sysObjectID' );
+        ( 'codeVer', 'sysIdSerialNum', 'sysObjectID' );
     $eInfo->{'modelNum'} = $eInfo->{'sysObjectID'};
     $eInfo->{'modelNum'} =~ s/.*(\d)$/$1/; # Last digit
 
     # SNMP: System comment
     $data->{'param'}{'comment'} =
-            "Arbor " . $eChassisName{$eInfo->{'modelNum'}} .
-            ", Hw Serial#: " . $eInfo->{'sysIdSerialNum'} .
-            ", Version: " .  $eInfo->{'codeVer'};
+        "Arbor " . $eChassisName{$eInfo->{'modelNum'}} .
+        ", Hw Serial#: " . $eInfo->{'sysIdSerialNum'} .
+        ", Version: " .  $eInfo->{'codeVer'};
 
     # ------------------------------------------------------------------------
     # Arbor_E e30 related material here
@@ -194,33 +196,35 @@ sub discover
         $devdetails->setCap('e30');
 
         # PROG: Check status oids
-        if( $devdetails->param('Arbor_E::disable-e30-buffers') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e30-buffers') )
 	{
             $devdetails->setCap('e30-buffers');
         }
 
-        if( $devdetails->param('Arbor_E::disable-e30-cpu') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e30-cpu') )
         {
             $devdetails->setCap('e30-cpu');
         }
 
-        if( $devdetails->param('Arbor_E::disable-e30-fwdTable') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e30-fwdTable') )
         {
             $devdetails->setCap('e30-fwdTable');
 
-            if( $devdetails->param('Arbor_E::disable-e30-fwdTable-login')
-                ne 'yes' )
+            if( $devdetails->paramDisabled
+                ('Arbor_E::disable-e30-fwdTable-login') )
             {
-                my $loginTable = $session->get_table(
-                       -baseoid => $dd->oiddef('loginRespOkStatsIndex') );
+                my $loginTable =
+                    $session->get_table
+                    (-baseoid => $dd->oiddef('loginRespOkStatsIndex') );
                 $devdetails->storeSnmpVars( $loginTable );
 
                 if( defined( $loginTable ) )
                 {
                     $devdetails->setCap('e30-fwdTable-login');
 
-                    foreach my $statsIdx ( $devdetails->getSnmpIndices(
-                                      $dd->oiddef('loginRespOkStatsIndex') ) )
+                    foreach my $statsIdx
+                        ( $devdetails->getSnmpIndices
+                          ($dd->oiddef('loginRespOkStatsIndex') ) )
                     {
                         push(@{$data->{'e30'}{'loginResp'}}, $statsIdx);
                     }
@@ -228,7 +232,7 @@ sub discover
             } # END hasCap disable-e30-fwdTable-login
         }
 
-        if( $devdetails->param('Arbor_E::disable-e30-hdd') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e30-hdd') )
         {
             $devdetails->setCap('e30-hdd');
 
@@ -240,13 +244,13 @@ sub discover
             $data->{'e30'}{'hddSerial'} = $eInfo->{'hDriveErrSerialNum'};
 
             # PROG: Do we want errors as well?
-            if( $devdetails->param('Arbor_E::enable-e30-hdd-errors') eq 'yes' )
+            if( $devdetails->paramEnabled('Arbor_E::enable-e30-hdd-errors') )
             {
                 $devdetails->setCap('e30-hdd-errors');
             }
 
             # PROG: Do we want to look at daily log files? (New in 7.6)
-            if( $devdetails->param('Arbor_E::disable-e30-hdd-logs') ne 'yes' )
+            if( $devdetails->paramDisabled('Arbor_E::disable-e30-hdd-logs') )
             {
                 $eInfo = $dd->retrieveSnmpOIDs( 'hDriveDailyLogSize' );
 
@@ -257,7 +261,7 @@ sub discover
             }
         } # END: if disable-e30-hdd
 
-        if( $devdetails->param('Arbor_E::disable-e30-l2tp') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e30-l2tp') )
         {
             # 1 - disabled, 2 - enabled, 3 - session aware
             $eInfo = $dd->retrieveSnmpOIDs('l2tpConfigEnabled');
@@ -266,44 +270,47 @@ sub discover
             {
                 $devdetails->setCap('e30-l2tp');
 
-                my $l2tpSecEndTable = $session->get_table(
-                       -baseoid => $dd->oiddef('l2tpSecureEndpointIpAddress') );
+                my $l2tpSecEndTable =
+                    $session->get_table
+                    (-baseoid => $dd->oiddef('l2tpSecureEndpointIpAddress') );
 		$devdetails->storeSnmpVars( $l2tpSecEndTable );
-
+                
                 Debug("e30: L2TP secure endpoints found:");
-                foreach my $SEP ( $devdetails->getSnmpIndices(
-                                  $dd->oiddef('l2tpSecureEndpointIpAddress') ) )
+                foreach my $SEP
+                    ( $devdetails->getSnmpIndices
+                      ($dd->oiddef('l2tpSecureEndpointIpAddress') ) )
 		{
-			next if( ! $SEP );
-			$data->{'e30'}{'l2tpSEP'}{$SEP} = 0;
-                        Debug("e30:    $SEP");
+                    next if( ! $SEP );
+                    $data->{'e30'}{'l2tpSEP'}{$SEP} = 0;
+                    Debug("e30:    $SEP");
 		}
             } # END: if l2tpConfigEnabled
         }
 
         # Memory usage on system
-        if( $devdetails->param('Arbor_E::disable-e30-mem') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e30-mem') )
         {
             $devdetails->setCap('e30-mem');
         }
 
         # Memory usage / individual blocks
-        if( $devdetails->param('Arbor_E::enable-e30-mempool') eq 'yes' )
+        if( $devdetails->paramEnabled('Arbor_E::enable-e30-mempool') )
         {
-            my $mempoolTable = $session->get_table(
-                                 -baseoid => $dd->oiddef('memPoolNameIndex') );
+            my $mempoolTable =
+                $session->get_table
+                (-baseoid => $dd->oiddef('memPoolNameIndex') );
             $devdetails->storeSnmpVars( $mempoolTable );
 
             if( defined( $mempoolTable ) )
             {
                 $devdetails->setCap('e30-mempool');
 
-                foreach my $memOID (
-                           $devdetails->getSnmpIndices(
-                                $dd->oiddef('memPoolNameIndex') ) )
+                foreach my $memOID
+                    ($devdetails->getSnmpIndices
+                     ($dd->oiddef('memPoolNameIndex') ) )
                 {
                     my $memName = $mempoolTable->{
-                               $dd->oiddef('memPoolNameIndex') . '.' . $memOID};
+                        $dd->oiddef('memPoolNameIndex') . '.' . $memOID};
 
                     Debug("e30:  Mempool: $memName");
                     $data->{'e30'}{'mempool'}{$memOID} = $memName;
@@ -312,31 +319,34 @@ sub discover
         }
 
         # Traffic statistics per Bundle
-        if( $devdetails->param('Arbor_E::disable-e30-bundle') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e30-bundle') )
         {
             # Set capability 
             $devdetails->setCap('e30-bundle');
 
             # Pull table information
-            my $bundleTable = $session->get_table(
-                                -baseoid => $dd->oiddef('bundleName') );
+            my $bundleTable =
+                $session->get_table
+                (-baseoid => $dd->oiddef('bundleName') );
             $devdetails->storeSnmpVars( $bundleTable );
 
             Debug("e30: Bundle Information id:name");
-            foreach my $bundleID (
-                       $devdetails->getSnmpIndices( $dd->oiddef('bundleName') ))
+            foreach my $bundleID
+                ($devdetails->getSnmpIndices( $dd->oiddef('bundleName') ))
             {
-                    my $bundleName = $bundleTable->{$dd->oiddef('bundleName') .
-                                        '.' . $bundleID};
-                    $data->{'e30'}{'bundleID'}{$bundleID} = $bundleName;
-	
-                    Debug("e30:    $bundleID $bundleName");
+                my $bundleName = $bundleTable->{$dd->oiddef('bundleName') .
+                                                    '.' . $bundleID};
+                $data->{'e30'}{'bundleID'}{$bundleID} = $bundleName;
+                
+                Debug("e30:    $bundleID $bundleName");
             } # END foreache my $bundleID
 
-            if( $devdetails->param('Arbor_E::disable-e30-bundle-deny') ne 'yes')
+            if( $devdetails->paramDisabled('Arbor_E::disable-e30-bundle-deny'))
             {
-                my $bundleDenyTable = $session->get_table(
-                     -baseoid => $dd->oiddef('bundleBytesSentDenyPolicyDrop') );
+                my $bundleDenyTable =
+                    $session->get_table
+                    (-baseoid => $dd->oiddef('bundleBytesSentDenyPolicyDrop')
+                     );
                 $devdetails->storeSnmpVars( $bundleDenyTable );
 
                 if( $bundleDenyTable )
@@ -345,10 +355,11 @@ sub discover
                 }
             }
 
-            if( $devdetails->param('Arbor_E::disable-e30-bundle-rate') ne 'yes')
+            if( $devdetails->paramDisabled('Arbor_E::disable-e30-bundle-rate'))
             {
-                my $bundleRateLimitTable = $session->get_table(
-                     -baseoid => $dd->oiddef('bundleBytesSentRateLimitDrop') );
+                my $bundleRateLimitTable =
+                    $session->get_table
+                    (-baseoid => $dd->oiddef('bundleBytesSentRateLimitDrop') );
                 $devdetails->storeSnmpVars( $bundleRateLimitTable );
 
                 if( $bundleRateLimitTable )
@@ -360,13 +371,13 @@ sub discover
         } # END if Arbor_E::disable-e30-bundle
 
         # PROG: Counters
-        if( $devdetails->param('Arbor_E::disable-e30-slowpath') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e30-slowpath') )
         {
             # Slowpath counters are available as of 7.5.x
-            my $counters = $session->get_table(
-                            -baseoid => $dd->oiddef('slowpathCounters') );
+            my $counters = $session->get_table
+                (-baseoid => $dd->oiddef('slowpathCounters') );
             $devdetails->storeSnmpVars( $counters );
-
+            
             if( defined( $counters ) )
             {
                 $devdetails->setCap('e30-slowpath');
@@ -387,113 +398,120 @@ sub discover
         $devdetails->setCap('e100');
 
         # CPU parameters ...
-        if( $devdetails->param('Arbor_E::disable-e100-cpu') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e100-cpu') )
         {
-          my $cpuNameTable = $session->get_table(
-                            -baseoid => $dd->oiddef('cpuName') );
-          $devdetails->storeSnmpVars( $cpuNameTable );
-
-          if( defined( $cpuNameTable ) )
-          {
-            $devdetails->setCap('e100-cpu');
-
-            # PROG: Find all the CPU's ..
-            foreach my $cpuIndex ( $devdetails->getSnmpIndices(
-                                   $dd->oiddef('cpuName') ) )
+            my $cpuNameTable =
+                $session->get_table
+                (-baseoid => $dd->oiddef('cpuName') );
+            $devdetails->storeSnmpVars( $cpuNameTable );
+            
+            if( defined( $cpuNameTable ) )
             {
-              my $cpuName = $cpuNameTable->{$dd->oiddef('cpuName') .
-                                                   '.' . $cpuIndex};
+                $devdetails->setCap('e100-cpu');
 
-              Debug("  CPU found: $cpuIndex, $cpuName");
-              $data->{'e100'}{'cpu'}{$cpuIndex} = $cpuName;
+                # PROG: Find all the CPU's ..
+                foreach my $cpuIndex
+                    ( $devdetails->getSnmpIndices
+                      ($dd->oiddef('cpuName') ) )
+                {
+                    my $cpuName = $cpuNameTable->{$dd->oiddef('cpuName') .
+                                                      '.' . $cpuIndex};
+
+                    Debug("  CPU found: $cpuIndex, $cpuName");
+                    $data->{'e100'}{'cpu'}{$cpuIndex} = $cpuName;
+                }
             }
-          }
         }
 
         # HDD Parameters
-        if( $devdetails->param('Arbor_E::disable-e100-hdd') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e100-hdd') )
         {
-          my $hddTable = $session->get_table(
-                           -baseoid => $dd->oiddef('partitionName') );
-          $devdetails->storeSnmpVars( $hddTable );
-
-          if( defined( $hddTable ) )
-          {
-            $devdetails->setCap('e100-hdd');
-
-            # PROG: Find all the paritions and names ..
-            foreach my $hddIndex ( $devdetails->getSnmpIndices(
-                                   $dd->oiddef('partitionName') ) )
+            my $hddTable =
+                $session->get_table
+                (-baseoid => $dd->oiddef('partitionName') );
+            $devdetails->storeSnmpVars( $hddTable );
+            
+            if( defined( $hddTable ) )
             {
-              my $partitionName = $hddTable->{$dd->oiddef('partitionName') .
-                                              '.' . $hddIndex};
-              Debug("HDD Partition: $hddIndex, $partitionName");
-              $data->{'e100'}{'hdd'}{$hddIndex} = $partitionName;
+                $devdetails->setCap('e100-hdd');
+
+                # PROG: Find all the paritions and names ..
+                foreach my $hddIndex
+                    ( $devdetails->getSnmpIndices
+                      ( $dd->oiddef('partitionName') ) )
+                {
+                    my $partitionName =
+                        $hddTable->{$dd->oiddef('partitionName') .
+                                        '.' . $hddIndex};
+                    Debug("HDD Partition: $hddIndex, $partitionName");
+                    $data->{'e100'}{'hdd'}{$hddIndex} = $partitionName;
+                }
             }
-          }
         }
 
         # MEM Parameters
-        if( $devdetails->param('Arbor_E::disable-e100-mem') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e100-mem') )
         {
-          my $cpuSdramTable = $session->get_table(
-                             -baseoid => $dd->oiddef('cpuSdramIndex') );
-          $devdetails->storeSnmpVars( $cpuSdramTable );
-
-          if( defined( $cpuSdramTable ) )
-          {
-            $devdetails->setCap('e100-mem');
-
-            # PROG: Find all memory indexes
-            foreach my $memIndex ( $devdetails->getSnmpIndices(
-                                   $dd->oiddef('cpuSdramIndex') ) )
+            my $cpuSdramTable =
+                $session->get_table
+                (-baseoid => $dd->oiddef('cpuSdramIndex') );
+            $devdetails->storeSnmpVars( $cpuSdramTable );
+            
+            if( defined( $cpuSdramTable ) )
             {
-              my $memName = $data->{'e100'}{'cpu'}{$memIndex};
-              Debug("MEM found: $memIndex, $memName");
-              $data->{'e100'}{'mem'}{$memIndex} = $memName;
+                $devdetails->setCap('e100-mem');
+
+                # PROG: Find all memory indexes
+                foreach my $memIndex
+                    ( $devdetails->getSnmpIndices
+                      ($dd->oiddef('cpuSdramIndex') ) )
+                {
+                    my $memName = $data->{'e100'}{'cpu'}{$memIndex};
+                    Debug("MEM found: $memIndex, $memName");
+                    $data->{'e100'}{'mem'}{$memIndex} = $memName;
+                }
             }
-          }
         }
 
         # Policy Mgmt parameters
-        if( $devdetails->param('Arbor_E::disable-e100-policymgmt') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e100-policymgmt') )
         {
-          my $policyTable = $session->get_table(
-                              -baseoid => $dd->oiddef('policyMgmt')
-                            );
-          $devdetails->storeSnmpVars( $policyTable );
+            my $policyTable =
+                $session->get_table
+                (-baseoid => $dd->oiddef('policyMgmt'));
+            $devdetails->storeSnmpVars( $policyTable );
 
-          if( defined( $policyTable ) )
-          {
-            $devdetails->setCap('e100-policymgmt');
-          }
+            if( defined( $policyTable ) )
+            {
+                $devdetails->setCap('e100-policymgmt');
+            }
         }
 
         # Subscriber Mgmt parameters
-        if( $devdetails->param('Arbor_E::disable-e100-submgmt') ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-e100-submgmt') )
         {
-          my $subTable = $session->get_table(
-                            -baseoid => $dd->oiddef('subscriberStateName')
-                         );
-          $devdetails->storeSnmpVars( $subTable );
-
-          if( defined( $subTable ) )
-          {
-            $devdetails->setCap('e100-submgmt');
-
-            # Sub: Find state name entries
-            foreach my $stateIDX ( $devdetails->getSnmpIndices( $dd->oiddef(
-					'subscriberStateName') ) )
+            my $subTable =
+                $session->get_table
+                (-baseoid => $dd->oiddef('subscriberStateName'));
+            $devdetails->storeSnmpVars( $subTable );
+            
+            if( defined( $subTable ) )
             {
-               my $state = $subTable->{
-                              $dd->oiddef('subscriberStateName') .
-                              '.' .  $stateIDX
-                           };
-               
-               Debug("  State index: $stateIDX, name: $state");
-               $data->{'e100'}{'submgmt'}{$stateIDX} = $state;
+                $devdetails->setCap('e100-submgmt');
+
+                # Sub: Find state name entries
+                foreach my $stateIDX
+                    ( $devdetails->getSnmpIndices
+                      ( $dd->oiddef('subscriberStateName') ) )
+                {
+                    my $state = $subTable->{
+                        $dd->oiddef('subscriberStateName') . '.' .  $stateIDX
+                        };
+                    
+                    Debug("  State index: $stateIDX, name: $state");
+                    $data->{'e100'}{'submgmt'}{$stateIDX} = $state;
+                }
             }
-          }
         }
     }
 
@@ -502,7 +520,7 @@ sub discover
     #
     # Common information between e30 and e100
 
-    if( $devdetails->param('Arbor_E::disable-flowdev') ne 'yes' )
+    if( $devdetails->paramDisabled('Arbor_E::disable-flowdev') )
     {
         $devdetails->setCap('arbor-flowLookup');
 
@@ -511,58 +529,64 @@ sub discover
         # ------------------------------------------------------------
         my $switchingModules = 2;
 
-        foreach my $flowModule (1 .. $switchingModules) {
+        foreach my $flowModule (1 .. $switchingModules)
+        {
             Debug("common:  Flow Lookup Device " . $flowModule);
 
             my $flowPoolOid  = 'flowPoolNameD' . $flowModule;
-            my $flowModTable = $session->get_table (
-                              -baseoid => $dd->oiddef($flowPoolOid) );
+            my $flowModTable =
+                $session->get_table
+                (-baseoid => $dd->oiddef($flowPoolOid) );
             $devdetails->storeSnmpVars ( $flowModTable );
-
+            
             # PROG: Look for pool names and indexes and store them.
-            if( $flowModTable ) {
-                foreach my $flowPoolIDX ( $devdetails->getSnmpIndices(
-                                            $dd->oiddef($flowPoolOid) ) )
+            if( $flowModTable )
+            {
+                foreach my $flowPoolIDX
+                    ( $devdetails->getSnmpIndices
+                      ($dd->oiddef($flowPoolOid) ) )
                 {
                     my $flowPoolName = $flowModTable->{
-                           $dd->oiddef($flowPoolOid) . '.' . $flowPoolIDX};
-
+                        $dd->oiddef($flowPoolOid) . '.' . $flowPoolIDX};
+                    
                     $data->{'arbor_e'}{'flowModule'}{$flowModule}{$flowPoolIDX}
-                          = $flowPoolName;
-
+                    = $flowPoolName;
+                    
                     Debug("common:    IDX: $flowPoolIDX  Pool: $flowPoolName");
-
+                    
                 } # END: foreach my $flowPoolIDX
             } # END: if $flowModTable
         } # END: foreach my $flowModule
     }
 
 
-    if( $devdetails->param('Arbor_E::disable-bundle-offer') ne 'yes' )
+    if( $devdetails->paramDisabled('Arbor_E::disable-bundle-offer') )
     {
-        my $boOfferNameTable = $session->get_table(
-                            -baseoid => $dd->oiddef('boOfferName') );
+        my $boOfferNameTable =
+            $session->get_table
+            ( -baseoid => $dd->oiddef('boOfferName') );
         $devdetails->storeSnmpVars( $boOfferNameTable );
-
-        my $boBundleNameTable = $session->get_table(
-                            -baseoid => $dd->oiddef('boBundleName') );
+        
+        my $boBundleNameTable =
+            $session->get_table(-baseoid => $dd->oiddef('boBundleName') );
         $devdetails->storeSnmpVars( $boBundleNameTable );
-
+        
         if( defined( $boOfferNameTable ) )
         {
             $devdetails->setCap('arbor-bundle');
 
-            foreach my $boOfferNameID ( $devdetails->getSnmpIndices(
-                                $dd->oiddef('boOfferName') ) )
+            foreach my $boOfferNameID
+                ( $devdetails->getSnmpIndices
+                  ($dd->oiddef('boOfferName') ) )
             {
-		my ($bundleID,$offerNameID) = split( /\./, $boOfferNameID );
+                my ($bundleID,$offerNameID) = split( /\./, $boOfferNameID );
 
                 my $offerName = $boOfferNameTable->{
-                                    $dd->oiddef('boOfferName')
-                                    . '.' . $boOfferNameID };
+                    $dd->oiddef('boOfferName')
+                        . '.' . $boOfferNameID };
                 my $bundleName = $boBundleNameTable->{
-                                    $dd->oiddef('boBundleName')
-                                    . '.' . $boOfferNameID };
+                    $dd->oiddef('boBundleName')
+                        . '.' . $boOfferNameID };
 
                 $data->{'arbor_e'}{'offerName'}{$offerNameID} = $offerName;
                 $data->{'arbor_e'}{'bundleName'}{$bundleID}   = $bundleName;
@@ -573,8 +597,8 @@ sub discover
         }
 
         # PROG: Subscribers using the bundle
-        if( $devdetails->param('Arbor_E::disable-bundle-offer-subcount')
-            ne 'yes' )
+        if( $devdetails->paramDisabled
+            ('Arbor_E::disable-bundle-offer-subcount') )
         {
             my $oidSubcount = $dd->oiddef('boBundleSubCount');
 
@@ -585,8 +609,7 @@ sub discover
         }
 
         # PROG: Packets sent on this bundle with a size
-        if( $devdetails->param('Arbor_E::disable-bundle-offer-pktsize')
-            ne 'yes' )
+        if($devdetails->paramDisabled('Arbor_E::disable-bundle-offer-pktsize'))
         {
             my $oidPktsize = $dd->oiddef('boPacketsSent64');
 
@@ -597,8 +620,7 @@ sub discover
         }
 
         # PROG: Bytes sent on this bundle for deny policy drop
-        if( $devdetails->param('Arbor_E::disable-bundle-offer-deny')
-            ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-bundle-offer-deny') )
         {
             my $oidDenypolicy = $dd->oiddef('boBundleBytesSentDenyPolicyDrop');
 
@@ -609,8 +631,7 @@ sub discover
         }
 
         # PROG: Bytes sent on this bundle for rate limit drop
-        if( $devdetails->param('Arbor_E::disable-bundle-offer-rate')
-            ne 'yes' )
+        if( $devdetails->paramDisabled('Arbor_E::disable-bundle-offer-rate') )
         {
             my $oidRatelimit = $dd->oiddef('boBundleBytesSentRateLimitDrop');
 
@@ -644,21 +665,22 @@ sub buildConfig
         if( $devdetails->hasCap('e30-bundle') )
         {
             # Create topLevel subtree
-            my $bundleNode = $cb->addSubtree( $devNode, 'Bundle_Stats',
-                                    { 'comment' => 'Bundle statistics' },
-                                    [ 'Arbor_E::e30-bundle-subtree' ] );
+            my $bundleNode =
+                $cb->addSubtree( $devNode, 'Bundle_Stats',
+                                 { 'comment' => 'Bundle statistics' },
+                                 [ 'Arbor_E::e30-bundle-subtree' ] );
 
             foreach my $bundleID
                 ( sort {$a <=> $b} keys %{$data->{'e30'}{'bundleID'} } )
             {
                 my $srvName     =  $data->{'e30'}{'bundleID'}{$bundleID};
                 my $subtreeName =  $srvName;
-                   $subtreeName =~ s/\W/_/g; 
+                $subtreeName =~ s/\W/_/g; 
                 my $bundleRRD	= $bundleID;
                 my @templates   = ( 'Arbor_E::e30-bundle' );
 
-                if( $devdetails->param('Arbor_E::enable-e30-bundle-name-rrd')
-                    eq 'yes' )
+                if( $devdetails->paramEnabled
+                    ('Arbor_E::enable-e30-bundle-name-rrd') )
                 {
                     # Filenames written out as the bundle name
                     $bundleRRD =  lc($srvName);
@@ -701,19 +723,20 @@ sub buildConfig
                 my $subtree  = "Forwarding_Table_Login_Stats";
                 my $comment  = "Discovery attempts statistics";
                 my $nodeTree = $cb->addSubtree( $devNode, $subtree, 
-                                              { 'comment' => $comment },
+                                                { 'comment' => $comment },
                                                 undef );
 
                 my @colors =
                     ('##one', '##two', '##three', '##four', '##five',
                      '##six', '##seven', '##eight', '##nine', '##ten'
-                    );
+                     );
 
+                my $descr = 'Summary of login attempt responses';
                 my $multiParam = {
                     'precedence'        => 1000,
-                    'comment'           => 'Summary of login attempt responses',
+                    'comment'           => $descr,
                     'graph-lower-limit' => 0,
-                    'graph-title'       => 'Summary of login attempt responses',
+                    'graph-title'       => $descr,
                     'rrd-hwpredict'     => 'disabled',
                     'vertical-label'    => 'Responses',
                     'ds-type'           => 'rrd-multigraph'
@@ -723,17 +746,18 @@ sub buildConfig
                 foreach my $sindex ( sort { $a <=> $b } 
                                      @{$data->{'e30'}{'loginResp'}} )
                 {
-		
-                    $cb->addLeaf( $nodeTree, 'Login_' . $sindex,
-                                { 'comment'    => 'Login attempt #' . $sindex,
-                                  'login-idx'  => $sindex,
-                                  'precedence' => 100 - $sindex },
-                                [ 'Arbor_E::e30-fwdTable-login' ] );
-
+                    
+                    $cb->addLeaf
+                        ( $nodeTree, 'Login_' . $sindex,
+                          { 'comment'    => "Login attempt \#" . $sindex,
+                            'login-idx'  => $sindex,
+                            'precedence' => 100 - $sindex },
+                          [ 'Arbor_E::e30-fwdTable-login' ] );
+                    
                     # Addition for multi-graph
                     my $dsName  = "Login_$sindex";
                     my $color   = shift @colors;
-                       $dsList .= $dsName . ',';
+                    $dsList .= $dsName . ',';
 
                     $multiParam->{"ds-expr-$dsName"}      = "{$dsName}";
                     $multiParam->{"graph-legend-$dsName"} = "Attempt $sindex";
@@ -756,7 +780,7 @@ sub buildConfig
         if( $devdetails->hasCap('e30-hdd') )
         {
             my $comment = "Model: "  . $data->{'e30'}{'hddModel'} . ", " .
-                          "Serial: " . $data->{'e30'}{'hddSerial'};
+                "Serial: " . $data->{'e30'}{'hddSerial'};
             my $subtree = "Hard_Drive";
             my @templates;
             push( @templates, 'Arbor_E::e30-hdd-subtree' );
@@ -775,8 +799,8 @@ sub buildConfig
             }
 
             my $hdNode = $cb->addSubtree($devNode, $subtree,
-                                        { 'comment' => $comment },
-                                        \@templates);
+                                         { 'comment' => $comment },
+                                         \@templates);
         }
 
         # e30 L2TP tunnel information
@@ -784,25 +808,28 @@ sub buildConfig
         {
             # PROG: First add the appropriate template
             my $l2tpNode = $cb->addSubtree( $devNode, 'L2TP', undef,
-                                          [ 'Arbor_E::e30-l2tp-subtree' ]);
+                                            [ 'Arbor_E::e30-l2tp-subtree' ]);
 
             # PROG: Cycle through the SECURE EndPoint devices
             if( $data->{'e30'}{'l2tpSEP'} )
             {
                 # PROG: Add the assisting template first
-                my $l2tpEndNode = $cb->addSubtree( $l2tpNode, 'Secure_Endpoint',
-                             { 'comment' => 'Secure endpoint parties' },
-                             [ 'Arbor_E::e30-l2tp-secure-endpoints-subtree' ] );
-
+                my $l2tpEndNode =
+                    $cb->addSubtree
+                    ( $l2tpNode, 'Secure_Endpoint',
+                      { 'comment' => 'Secure endpoint parties' },
+                      [ 'Arbor_E::e30-l2tp-secure-endpoints-subtree' ] );
+                
                 foreach my $SEP ( keys %{$data->{'e30'}{'l2tpSEP'}} )
                 {
-                  my $endPoint =  $SEP;
-                     $endPoint =~ s/\W/_/g;
-
-                  $cb->addSubtree($l2tpEndNode, $endPoint,
-                              { 'e30-l2tp-ep'   => $SEP,
-                                'e30-l2tp-file' => $endPoint },
-                              [ 'Arbor_E::e30-l2tp-secure-endpoints-leaf' ]);
+                    my $endPoint =  $SEP;
+                    $endPoint =~ s/\W/_/g;
+                    
+                    $cb->addSubtree
+                        ($l2tpEndNode, $endPoint,
+                         { 'e30-l2tp-ep'   => $SEP,
+                           'e30-l2tp-file' => $endPoint },
+                         [ 'Arbor_E::e30-l2tp-secure-endpoints-leaf' ]);
                 } # END: foreach
             }
         }
@@ -827,22 +854,23 @@ sub buildConfig
             foreach my $memIDX ( keys %{$memIndex} )
             {
                 my $leafName = $memIndex->{$memIDX};
-                my $dataFile = "%snmp-host%_mempool_" . $leafName . '.rrd';
+                my $dataFile = '%snmp-host%_mempool_' . $leafName . '.rrd';
 
-                my $nodeMem = $cb->addSubtree( $nodeTop, $leafName, 
-                                            { 'data-file'         => $dataFile,
-                                              'e30-mempool-index' => $memIDX,
-                                              'e30-mempool-name'  => $leafName
-                                            },
-                                            [ 'Arbor_E::e30-mempool' ] );
+                my $nodeMem = $cb->addSubtree
+                    ( $nodeTop, $leafName, 
+                      { 'data-file'         => $dataFile,
+                        'e30-mempool-index' => $memIDX,
+                        'e30-mempool-name'  => $leafName
+                        },
+                      [ 'Arbor_E::e30-mempool' ] );
             }
         }
-
+        
         # e30 slowpath counters
         if( $devdetails->hasCap('e30-slowpath') )
         {
             my $slowNode = $cb->addSubtree( $devNode, 'SlowPath', undef,
-                                          [ 'Arbor_E::e30-slowpath' ] );
+                                            [ 'Arbor_E::e30-slowpath' ] );
         }
     } # END: if e30 device
 
@@ -858,10 +886,10 @@ sub buildConfig
         {
             my @colors  = ( '##one', '##two', '##three', '##four', '##five',
                             '##six', '##seven', '##eight', '##nine', '##ten'
-                          );
+                            );
             my $subtree = "CPU_Usage";
             my $cpuTree = $cb->addSubtree( $devNode, $subtree, undef,
-                                         [ 'Arbor_E::e100-cpu-subtree' ] );
+                                           [ 'Arbor_E::e100-cpu-subtree' ] );
             my $multiParam = {
                 'precedence'        => 1000,
                 'comment'           => 'Summary of all CPU utilization',
@@ -876,7 +904,7 @@ sub buildConfig
             foreach my $cpuIndex ( sort keys %{$data->{'e100'}{'cpu'}} )
             {
                 my $cpuName = $data->{'e100'}{'cpu'}{$cpuIndex};
-  
+                
                 # Is there proper desc for the CPU index?
                 my $comment;
                 if( $eCpuName{$cpuIndex} )
@@ -885,17 +913,17 @@ sub buildConfig
                 } else {
                     $comment = "CPU: $cpuName";
                 }
-  
+                
                 $cb->addLeaf( $cpuTree, $cpuName,
-                            { 'comment'    => $comment,
-                              'cpu-index'  => $cpuIndex,
-                              'cpu-name'   => $cpuName,
-                              'precedence' => 1000 - $cpuIndex },
-                            [ 'Arbor_E::e100-cpu' ] );
-  
+                              { 'comment'    => $comment,
+                                'cpu-index'  => $cpuIndex,
+                                'cpu-name'   => $cpuName,
+                                'precedence' => 1000 - $cpuIndex },
+                              [ 'Arbor_E::e100-cpu' ] );
+                
                 # Multi-graph additions
                 my $color   = shift @colors;
-                   $dsList .= $cpuName . ',';
+                $dsList .= $cpuName . ',';
                 $multiParam->{"ds-expr-$cpuName"}      = "{$cpuName}";
                 $multiParam->{"graph-legend-$cpuName"} = "$cpuName";
                 $multiParam->{"line-style-$cpuName"}   = "LINE1";
@@ -914,17 +942,17 @@ sub buildConfig
         {
             my $subtree = "HDD_Usage";
             my $hddTree = $cb->addSubtree( $devNode, $subtree, undef,
-                                         [ 'Arbor_E::e100-hdd-subtree' ] );
+                                           [ 'Arbor_E::e100-hdd-subtree' ] );
 
             foreach my $hddIndex ( sort keys %{$data->{'e100'}{'hdd'}} )
             {
-              my $hddName = $data->{'e100'}{'hdd'}{$hddIndex};
-              $cb->addSubtree( $hddTree, $hddName,
-                             { 'comment'    => 'HDD: ' . $hddName,
-                               'hdd-index'  => $hddIndex,
-                               'hdd-name'   => $hddName,
-                               'precedence' => 1000 - $hddIndex },
-                             [ 'Arbor_E::e100-hdd' ] );
+                my $hddName = $data->{'e100'}{'hdd'}{$hddIndex};
+                $cb->addSubtree( $hddTree, $hddName,
+                                 { 'comment'    => 'HDD: ' . $hddName,
+                                   'hdd-index'  => $hddIndex,
+                                   'hdd-name'   => $hddName,
+                                   'precedence' => 1000 - $hddIndex },
+                                 [ 'Arbor_E::e100-hdd' ] );
             }
         }
 
@@ -933,18 +961,18 @@ sub buildConfig
         {
             my $subtree = "Memory_Usage";
             my $memTree = $cb->addSubtree( $devNode, $subtree, undef,
-                                         [ 'Arbor_E::e100-mem-subtree' ] );
+                                           [ 'Arbor_E::e100-mem-subtree' ] );
             foreach my $memIndex ( sort keys %{$data->{'e100'}{'mem'}} )
             {
-              my $memName = $data->{'e100'}{'cpu'}{$memIndex};
+                my $memName = $data->{'e100'}{'cpu'}{$memIndex};
 
-              my $comment = "Memory for $memName CPU";
-              $cb->addSubtree( $memTree, $memName,
-                             { 'comment'    => $comment,
-                               'mem-index'  => $memIndex,
-                               'mem-name'   => $memName,
-                               'precedence' => 1000 - $memIndex },
-                             [ 'Arbor_E::e100-mem' ] );
+                my $comment = "Memory for $memName CPU";
+                $cb->addSubtree( $memTree, $memName,
+                                 { 'comment'    => $comment,
+                                   'mem-index'  => $memIndex,
+                                   'mem-name'   => $memName,
+                                   'precedence' => 1000 - $memIndex },
+                                 [ 'Arbor_E::e100-mem' ] );
             }
         }
 
@@ -957,20 +985,20 @@ sub buildConfig
         # SubscriberMgmt: Information regarding subscriber counts, states, etc.
         if( $devdetails->hasCap('e100-submgmt') )
         {
-            my $subMgmtTree = $cb->addSubtree( $devNode, 'Subscribers', undef,
-                                      [ 'Arbor_E::e100-submgmt-subtree' ]
-                             );
+            my $subMgmtTree = $cb->addSubtree
+                ( $devNode, 'Subscribers', undef,
+                  [ 'Arbor_E::e100-submgmt-subtree' ] );
 
-            my $stateTree  = $cb->addSubtree( $subMgmtTree, 'Subscriber_State',
-                                        undef,
-                                      [ 'Arbor_E::e100-submgmt-state-subtree' ]
-                             );
+            my $stateTree  = $cb->addSubtree
+                ( $subMgmtTree, 'Subscriber_State',
+                  undef,
+                  [ 'Arbor_E::e100-submgmt-state-subtree' ] );
 
             # State: Multigraph display
             my @colors =
                 ('##one', '##two', '##three', '##four', '##five',
                  '##six', '##seven', '##eight', '##nine', '##ten'
-                );
+                 );
             my $multiParam = {
                 'precedence'        => 1000,
                 'graph-lower-limit' => 0,
@@ -979,7 +1007,7 @@ sub buildConfig
                 'vertical-label'    => 'Subscribers',
                 'comment'           => 'Summary of all states',
                 'ds-type'           => 'rrd-multigraph'
-            };
+                };
             my $dsList;
 
             foreach my $stateIDX ( sort keys %{$data->{'e100'}{'submgmt'}} )
@@ -987,17 +1015,18 @@ sub buildConfig
                 my $color        =  shift @colors;
                 my $stateName    =  $data->{'e100'}{'submgmt'}{$stateIDX};
                 my $stateNameRRD =  $stateName;
-                   $stateNameRRD =~ s/[^a-zA-Z_]/_/o;
+                $stateNameRRD =~ s/[^a-zA-Z_]/_/o;
 
-                my $stateNode = $cb->addLeaf( $stateTree, $stateName,
-                                   { 'comment'    => "State: $stateName",
-                                     'state-idx'  => $stateIDX,
-                                     'state-name' => $stateName,
-                                     'state-rrd'  => $stateNameRRD,
-                                     'precedence' => 100 - $stateIDX },
-                                   [ 'Arbor_E::e100-submgmt-state' ] );
+                my $stateNode = $cb->addLeaf
+                    ( $stateTree, $stateName,
+                      { 'comment'    => "State: $stateName",
+                        'state-idx'  => $stateIDX,
+                        'state-name' => $stateName,
+                        'state-rrd'  => $stateNameRRD,
+                        'precedence' => 100 - $stateIDX },
+                      [ 'Arbor_E::e100-submgmt-state' ] );
                 $dsList .= $stateName . ',';
-
+                
                 $multiParam->{"ds-expr-$stateName"}      = "{$stateName}";
                 $multiParam->{"graph-legend-$stateName"} = "$stateName";
                 $multiParam->{"line-style-$stateName"}   = "LINE1";
@@ -1020,7 +1049,7 @@ sub buildConfig
     {
         my $subtreeName = "Bundle_Offer_Stats";
         my $param       = { 'comment'    => 'Byte counts for each bundle ' . 
-                                            'per Offer' };
+                                'per Offer' };
         my $templates   = [ ];
         my $nodeTop     = $cb->addSubtree( $devNode, $subtreeName,
                                            $param, $templates );
@@ -1028,12 +1057,11 @@ sub buildConfig
         foreach my $offerNameID ( keys %{$data->{'arbor_e'}{'offerName'}} )
         {
             my $offerName   =  $data->{'arbor_e'}{'offerName'}{$offerNameID};
-               $offerName   =~ s/\W/_/g;
+            $offerName   =~ s/\W/_/g;
             my $offerBundle =  $data->{'arbor_e'}{'boOfferBundle'};
             my $offerRRD    =  $offerNameID;
 
-            if( $devdetails->param('Arbor_E::enable-bundle-name-rrd')
-                eq 'yes' )
+            if( $devdetails->paramEnabled('Arbor_E::enable-bundle-name-rrd') )
             {
                 # Filename will now be written as offer name
                 $offerRRD = lc($offerName);
@@ -1053,22 +1081,22 @@ sub buildConfig
             {
                 my @btemplates;
                 my $bundleName =  $data->{'arbor_e'}{'bundleName'}{$bundleID};
-                   $bundleName =~ s/\W/_/g;
+                $bundleName =~ s/\W/_/g;
                 my $bundleRRD  =  $bundleID;
 
                 Debug("      $bundleID: $bundleName");
 
-                if( $devdetails->param('Arbor_E::enable-bundle-name-rrd')
-                    eq 'yes' )
+                if( $devdetails->paramEnabled
+                    ('Arbor_E::enable-bundle-name-rrd') )
                 {
                     # Filename will now be written as bundle name
                     $bundleRRD = lc($bundleName);
                 }
 
+                my $datafile = '%system-id%_bo_%offer-rrd%_%bundle-rrd%.rrd';
+                
                 my $bparam     = { 'comment'     => 'Bundle ID: ' . $bundleID,
-                                   'data-file'   => '%system-id%_bo_' .
-                                                    '%offer-rrd%_' .
-                                                    '%bundle-rrd%.rrd',
+                                   'data-file'   => $datafile,
                                    'bundle-id'   => $bundleID,
                                    'bundle-name' => $bundleName,
                                    'bundle-rrd'  => $bundleRRD };
@@ -1110,31 +1138,33 @@ sub buildConfig
     {
         # PROG: Flow Lookup Device (pool names)
         my $flowNode = $cb->addSubtree( $devNode, 'Flow_Lookup',
-                                      { 'comment' => 'Switching modules' },
+                                        { 'comment' => 'Switching modules' },
                                         undef );
 
         my $flowLookup = $data->{'arbor_e'}{'flowModule'};
 
         foreach my $flowDevIdx ( keys %{$flowLookup} )
         {
-            my $flowNodeDev = $cb->addSubtree( $flowNode,
-                              'Flow_Lookup_' .  $flowDevIdx,
-                              { 'comment' => 'Switching module '
-                                              . $flowDevIdx },
-                              [ 'Arbor_E::arbor-flowlkup-subtree' ] );
-
+            my $flowNodeDev = $cb->addSubtree
+                ( $flowNode,
+                  'Flow_Lookup_' .  $flowDevIdx,
+                  { 'comment' => 'Switching module '
+                        . $flowDevIdx },
+                  [ 'Arbor_E::arbor-flowlkup-subtree' ] );
+            
             # PROG: Find all the pool names and add Subtree
             foreach my $flowPoolIdx ( keys %{$flowLookup->{$flowDevIdx}} )
             {
                 my $poolName = $flowLookup->{$flowDevIdx}{$flowPoolIdx};
 
-                my $poolNode = $cb->addSubtree( $flowNodeDev, $poolName,
-                               { 'comment'        => 'Flow Pool: ' . $poolName,
-                                 'flowdev-index'  => $flowDevIdx,
-                                 'flowpool-index' => $flowPoolIdx,
-                                 'flowpool-name'  => $poolName,
-                                 'precedence'     => 1000 - $flowPoolIdx},
-                               [ 'Arbor_E::arbor-flowlkup-leaf' ] );
+                my $poolNode = $cb->addSubtree
+                    ( $flowNodeDev, $poolName,
+                      { 'comment'        => 'Flow Pool: ' . $poolName,
+                        'flowdev-index'  => $flowDevIdx,
+                        'flowpool-index' => $flowPoolIdx,
+                        'flowpool-name'  => $poolName,
+                        'precedence'     => 1000 - $flowPoolIdx},
+                      [ 'Arbor_E::arbor-flowlkup-leaf' ] );
             } # END: foreach my $flowPoolIdx
         } # END: foreach my $flowDevIdx
     } # END: hasCap arbor-flowLookup

@@ -23,6 +23,8 @@
 package Torrus::DevDiscover::Foundry;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -292,7 +294,7 @@ sub discover
             
             while( my( $oid, $descr ) = each %{$table} )
             {
-                if( length($descr) > 0 )
+                if( $descr ne '' )
                 {
                     my $brdIndex = substr( $oid, $prefixLen );
                     

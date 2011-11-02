@@ -29,6 +29,8 @@
 package Torrus::DevDiscover::FTOS;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 $Torrus::DevDiscover::registry{'FTOS'} = {
@@ -174,7 +176,7 @@ sub discover
     }
 
     # PROG: CPU statistics
-    if( $devdetails->param('FTOS::disable-cpu') ne 'yes' )
+    if( $devdetails->paramDisabled('FTOS::disable-cpu') )
     {
         # Poll table to translate the CPU Index to a Name
         my $ftosCpuTable =
@@ -207,7 +209,7 @@ sub discover
 
 
     # PROG: Power Supplies
-    if( $devdetails->param('FTOS::disable-power') ne 'yes' )
+    if( $devdetails->paramDisabled('FTOS::disable-power') )
     {
         # Poll table of power supplies
         my $ftosPSUTable =
@@ -233,7 +235,7 @@ sub discover
 
 
     # PROG: Temperature
-    if( $devdetails->param('FTOS::disable-sensors') ne 'yes' )
+    if( $devdetails->paramDisabled('FTOS::disable-sensors') )
     {
         # Check if temperature sensors are supported
         my $sensorTable =
@@ -304,12 +306,11 @@ sub buildConfig
         my $param       = { 'comment'    => 'Power supplies status',
                             'precedence' => -600 };
         my $filePerSensor 
-            = $devdetails->param('FTOS::file-per-sensor') eq 'yes';
+            = $devdetails->paramEnabled('FTOS::file-per-sensor');
         my $templates   = [];
 
         $param->{'data-file'} = '%snmp-host%_power' .
-            ($filePerSensor ? '_%power-index%':'') .
-            '.rrd';
+            ($filePerSensor ? '_%power-index%':'') . '.rrd';
 
         my $nodeTop = $cb->addSubtree( $devNode, $subtreeName,
                                        $param, $templates );
@@ -331,9 +332,9 @@ sub buildConfig
     {
         my $subtreeName = "Temperature_Sensors";
         my $param       = {};
-        my $fahrenheit  = $devdetails->param('FTOS::use-fahrenheit') eq 'yes';
+        my $fahrenheit  = $devdetails->paramEnabled('FTOS::use-fahrenheit');
         my $filePerSensor 
-            = $devdetails->param('FTOS::file-per-sensor') eq 'yes';
+            = $devdetails->paramEnabled('FTOS::file-per-sensor');
         my $templates   = [ 'FTOS::ftos-temperature-subtree' ];
 
         $param->{'data-file'} = '%snmp-host%_sensors' .

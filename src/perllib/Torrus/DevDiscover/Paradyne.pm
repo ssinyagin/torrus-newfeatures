@@ -43,6 +43,8 @@
 package Torrus::DevDiscover::Paradyne;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -81,7 +83,7 @@ sub checkdevtype
         return 0;
     }
 
-    if( length( $devdetails->param('Paradyne::slot-name') ) == 0 )
+    if( not defined($devdetails->param('Paradyne::slot-name')) )
     {
         Error('Mandatory discovery parameter "Paradyne::slot-number" ' .
               'is not defined for a Paradyne device: ' .

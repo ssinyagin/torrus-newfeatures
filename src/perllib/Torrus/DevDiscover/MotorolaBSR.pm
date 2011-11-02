@@ -25,6 +25,8 @@
 package Torrus::DevDiscover::MotorolaBSR;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -124,7 +126,7 @@ sub buildConfig
         
         # Build All_Modems summary graph
         
-        my $param = {
+        $param = {
             'ds-type'              => 'rrd-multigraph',
             'ds-names'             => 'registered,unregistered,offline',
             'graph-lower-limit'    => '0',

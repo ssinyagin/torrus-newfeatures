@@ -25,6 +25,8 @@
 package Torrus::DevDiscover::RFC2662_ADSL_LINE;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -92,7 +94,7 @@ sub discover
         my $table = $session->get_table( -baseoid => $base );
         my $prefixLen = length( $base ) + 1;
         
-        if( defined( $table ) and scalar( %{$table} ) > 0 )
+        if( defined($table) )
         {            
             while( my( $oid, $val ) = each %{$table} )
             {

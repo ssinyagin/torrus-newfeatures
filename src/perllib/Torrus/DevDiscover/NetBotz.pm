@@ -21,6 +21,8 @@
 package Torrus::DevDiscover::NetBotz;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -159,7 +161,7 @@ sub discover
     }
     
     if( not defined($data->{'param'}{'comment'}) or
-        length($data->{'param'}{'comment'}) == 0 )
+        $data->{'param'}{'comment'} eq '')
     {
         $data->{'param'}{'comment'} = 'NetBotz environment sensors';
     }

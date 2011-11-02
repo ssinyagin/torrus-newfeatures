@@ -23,6 +23,7 @@ package Torrus::DevDiscover::RFC2863_IF_MIB;
 
 use strict;
 use warnings;
+
 use Torrus::Log;
 
 

@@ -25,6 +25,8 @@
 package Torrus::DevDiscover::Arista;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 $Torrus::DevDiscover::registry{'Arista'} = {

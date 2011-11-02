@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::NetApp;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

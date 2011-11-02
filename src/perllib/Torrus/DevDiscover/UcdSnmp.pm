@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::UcdSnmp;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -135,9 +137,9 @@ sub buildConfig
     # Hostresources MIB is optional in net-snmp. We try and use the same
     # subtree name for UCD and Hostresources statistics.
     
-    my $subtreeName =
-        $devdetails->param('RFC2790_HOST_RESOURCES::sysperf-subtree-name');
-    if( not defined( $subtreeName ) )
+    my $subtreeName = $devdetails->paramString
+        ('RFC2790_HOST_RESOURCES::sysperf-subtree-name');
+    if( $subtreeName eq '' )
     {
         $subtreeName = 'System_Performance';
         $devdetails->setParam

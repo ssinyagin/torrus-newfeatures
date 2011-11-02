@@ -24,6 +24,8 @@
 package Torrus::DevDiscover::RFC2737_ENTITY_MIB;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -122,7 +124,7 @@ sub discover
     {
         $data->{'entityChassisPhyIndex'} = $chassisIndex;
         my $chassisDescr = $data->{'entityPhysical'}{$chassisIndex}{'descr'};
-        if( length( $chassisDescr ) > 0 and
+        if( defined($chassisDescr) and $chassisDescr ne '' and
             not defined( $data->{'param'}{'comment'} ) )
         {
             Debug('ENTITY-MIB: found chassis description: ' . $chassisDescr);

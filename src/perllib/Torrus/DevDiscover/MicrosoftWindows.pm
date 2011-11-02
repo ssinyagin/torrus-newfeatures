@@ -25,6 +25,8 @@
 package Torrus::DevDiscover::MicrosoftWindows;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

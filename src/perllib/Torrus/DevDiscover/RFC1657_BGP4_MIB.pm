@@ -25,6 +25,8 @@
 package Torrus::DevDiscover::RFC1657_BGP4_MIB;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -48,7 +50,7 @@ sub discover
     my $table = $session->get_table( -baseoid =>
                                      $dd->oiddef('bgpPeerRemoteAs'));
     
-    if( not defined( $table ) or scalar( %{$table} ) == 0 )
+    if( not defined($table) or scalar(keys %{$table}) == 0 )
     {
         return 0;
     }

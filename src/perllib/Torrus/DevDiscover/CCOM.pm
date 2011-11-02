@@ -20,6 +20,8 @@
 package Torrus::DevDiscover::CCOM;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

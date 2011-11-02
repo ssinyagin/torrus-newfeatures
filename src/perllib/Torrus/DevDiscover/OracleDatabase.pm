@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::OracleDatabase;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

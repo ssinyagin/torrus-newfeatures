@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::RFC1697_RDBMS;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

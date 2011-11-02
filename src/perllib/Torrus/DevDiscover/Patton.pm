@@ -20,6 +20,8 @@
 package Torrus::DevDiscover::Patton;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

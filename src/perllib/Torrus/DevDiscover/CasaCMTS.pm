@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::CasaCMTS;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

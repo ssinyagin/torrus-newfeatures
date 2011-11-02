@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::NetScreen;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -88,7 +90,7 @@ sub discover
     if( not defined( $data->{'param'}{'snmp-oids-per-pdu'} ) )
     {
         my $oidsPerPDU = $devdetails->param('NetScreen::snmp-oids-per-pdu');
-        if( $oidsPerPDU == 0 )
+        if( not defined($oidsPerPDU) or $oidsPerPDU == 0 )
         {
             $oidsPerPDU = 10;
         }

@@ -34,6 +34,8 @@
 package Torrus::DevDiscover::AxxessIT;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -209,7 +211,8 @@ sub discover
 
                 $interface->{'axxInterfaceComment'} =
                     sprintf( $map{$type}{'ifComment'}, $slot, $port );
-                if( length( $desc ) > 0 )
+                
+                if( defined($desc) and $desc ne '' )
                 {
                     $interface->{'axxInterfaceComment'} .= ' (' . $desc . ')';
                 }
@@ -283,7 +286,8 @@ sub discover
                 sprintf( '%s %d', $type, $port );
             
             $interface->{'axxInterfaceComment'} = '';
-            if( length( $portName ) > 0 )
+            
+            if( defined($portName) and $portName ne '' )
             {
                 $interface->{'axxInterfaceComment'} = $portName;
             }

@@ -30,6 +30,8 @@
 package Torrus::DevDiscover::RFC1628_UPS_MIB;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -78,10 +80,12 @@ sub discover
     my $data = $devdetails->data();
     my $session = $dd->session();
 
-    my $upsInfo = $dd->retrieveSnmpOIDs('upsIdentManufacturer',
-                  'upsIdentModel', 'upsIdentUPSSoftwareVersion',
-                  'upsIdentAgentSoftwareVersion', 'upsIdentName',
-                  'upsInputNumLines', 'upsOutputNumLines', 'upsBypassNumLines');
+    my $upsInfo = $dd->retrieveSnmpOIDs
+        ('upsIdentManufacturer',
+         'upsIdentModel', 'upsIdentUPSSoftwareVersion',
+         'upsIdentAgentSoftwareVersion', 'upsIdentName',
+         'upsInputNumLines', 'upsOutputNumLines',
+         'upsBypassNumLines');
 
     $data->{'param'}{'comment'} = $upsInfo->{'upsIdentManufacturer'} . " " .
                             $upsInfo->{'upsIdentModel'} . " " . 
@@ -96,17 +100,17 @@ sub discover
                   ", Output: " . $data->{'numOutput'} .
                   ", Bypass: " . $data->{'numBypass'} );
 
-    if( $devdetails->param('RFC1628_UPS::disable-input') ne 'yes' )
+    if( $devdetails->paramDisabled('RFC1628_UPS::disable-input' ) )
     {
         $devdetails->setCap('UPS-input');
     }
 
-    if( $devdetails->param('RFC1628_UPS::disable-output') ne 'yes' )
+    if( $devdetails->paramDisabled('RFC1628_UPS::disable-output') )
     {
         $devdetails->setCap('UPS-output');
     }
 
-    if( $devdetails->param('RFC1628_UPS::disable-bypass') ne 'yes' )
+    if( $devdetails->paramDisabled('RFC1628_UPS::disable-bypass') )
     {
         $devdetails->setCap('UPS-bypass');
     }

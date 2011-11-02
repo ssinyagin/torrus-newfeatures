@@ -25,6 +25,8 @@
 package Torrus::DevDiscover::Alteon;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

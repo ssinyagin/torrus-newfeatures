@@ -371,37 +371,38 @@ sub buildConfig
                         }
                         
                         my $sapDescr = $sap->{'description'};
-                        if( length( $sapDescr ) == 0 )
+                        if( not defined($sapDescr) or $sapDescr eq '' )
                         {
-                            $sapDescr = $data->{'timetraSvc'}{$svcId}->{
-                                'description'};
+                            $sapDescr =
+                                $data->{'timetraSvc'}{$svcId}->{'description'};
                         }
 
                         my $subtreeName = $sap->{'name'};
                         $subtreeName =~ s/\W/_/go;
 
                         my $comment = '';
-                        if( length( $sapDescr ) > 0 )
+                        if( defined($sapDescr) and $sapDescr ne '' )
                         {
                             $comment = $sapDescr;
                         }
 
                         my $legend = '';                        
                         
-                        if( length($data->{'timetraCustDescr'}{$custId}) > 0 )
+                        my $custDescr = $data->{'timetraCustDescr'}{$custId};
+                        if( defined($custDescr) and $custDescr ne '' )
                         {
                             $legend .= 'Customer:' .
-                                $devdetails->screenSpecialChars
-                                ( $data->{'timetraCustDescr'}{$custId} ) . ';';
+                                $devdetails->screenSpecialChars( $custDescr ) .
+                                ';';
                         }
-                        
-                        if( length($data->{'timetraSvc'}{$svcId}->{
-                            'description'}) > 0 )
+
+                        my $svcDescr =
+                            $data->{'timetraSvc'}{$svcId}->{'description'};
+                        if( defined($svcDescr) and $svcDescr ne '' )
                         {
                             $legend .= 'Service:' .
-                                $devdetails->screenSpecialChars
-                                ( $data->{'timetraSvc'}{$svcId}->{
-                                    'description'} ) . ';';
+                                $devdetails->screenSpecialChars( $svcDescr ) .
+                                ';';
                         }
                         
                         $legend .= 'SAP: ' .

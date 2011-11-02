@@ -21,6 +21,8 @@
 package Torrus::DevDiscover::ATMEL;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

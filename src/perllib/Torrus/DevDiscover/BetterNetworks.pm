@@ -24,6 +24,8 @@
 package Torrus::DevDiscover::BetterNetworks;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -186,7 +188,7 @@ sub discover
             $data->{'BNEsensor'}{$INDEX}{'leafName'} = $leafName;            
         }
 
-        if( scalar( %{$data->{'BNEsensor'}} ) > 0 )
+        if( scalar(keys %{$data->{'BNEsensor'}}) > 0 )
         {
             $devdetails->setCap('BNEsensor');
 

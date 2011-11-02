@@ -24,6 +24,8 @@
 package Torrus::DevDiscover::AlliedTelesyn_PBC18;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -153,7 +155,7 @@ sub discover
         my $name = $devdetails->snmpVar
             ( $dd->oiddef('ATMCCommon-MIB::mcModuleName') .'.'.$INDEX );
 
-        if( length( $name ) > 0 )
+        if( defined($name) and $name ne '' )
         {
             $data->{'PBC18'}{$INDEX}{'moduleName'} = $name;
         }

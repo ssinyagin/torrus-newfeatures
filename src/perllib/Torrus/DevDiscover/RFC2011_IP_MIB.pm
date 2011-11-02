@@ -25,6 +25,8 @@
 package Torrus::DevDiscover::RFC2011_IP_MIB;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

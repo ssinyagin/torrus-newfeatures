@@ -21,6 +21,8 @@
 package Torrus::DevDiscover::RFC4319_HDSL2_SHDSL_LINE_MIB;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

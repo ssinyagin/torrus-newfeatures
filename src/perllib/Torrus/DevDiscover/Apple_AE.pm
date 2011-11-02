@@ -26,6 +26,8 @@
 package Torrus::DevDiscover::Apple_AE;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -102,7 +104,7 @@ sub discover
 
 
     # PROG: Find wireless clients
-    if( $devdetails->param('Apple_AE::disable-clients') ne 'yes' )
+    if( $devdetails->paramDisabled('Apple_AE::disable-clients') )
     {
         my $numWireless = $dd->retrieveSnmpOIDs('wirelessNumber');
 

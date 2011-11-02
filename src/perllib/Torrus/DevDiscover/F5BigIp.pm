@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::F5BigIp;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -140,7 +142,7 @@ sub discover
     if( not defined( $data->{'param'}{'snmp-oids-per-pdu'} ) )
     {
         my $oidsPerPDU = $devdetails->param('F5BigIp::snmp-oids-per-pdu');
-        if( $oidsPerPDU == 0 )
+        if( not defined($oidsPerPDU) or $oidsPerPDU == 0 )
         {
             $oidsPerPDU = 10;
         }
@@ -162,7 +164,6 @@ sub discover
         return 1;
     }
 
-    my $product_name;
     my $product_name;
     my $result = $dd->retrieveSnmpOIDs( '4.x_globalAttrProductCode' );
     my $product_code = $result->{'4.x_globalAttrProductCode'};
@@ -497,8 +498,9 @@ sub buildConfig
 
                 $server->{'precedence'} = '-100';
 
-                $cb->addSubtree( $poolMemberPoolTree, $server->{'nick'}, $server,
-                              [ 'F5BigIp::BigIp_4.x_poolMember' ] );
+                $cb->addSubtree( $poolMemberPoolTree, $server->{'nick'},
+                                 $server,
+                                 [ 'F5BigIp::BigIp_4.x_poolMember' ] );
             }
         }
     }

@@ -37,6 +37,8 @@
 package Torrus::DevDiscover::JunOS;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -193,7 +195,7 @@ sub discover
 
     # PROG: Class of Service
     #
-    if( $devdetails->param('JunOS::disable-cos') ne 'yes' )
+    if( $devdetails->paramDisabled('JunOS::disable-cos') )
     {
         # Poll table to translate the CoS Index to a Name
         my $cosQueueNumTable =
@@ -241,7 +243,7 @@ sub discover
 
     # PROG: Grab and store description of parts
     #
-    if( $devdetails->param('JunOS::disable-operating') ne 'yes' )
+    if( $devdetails->paramDisabled('JunOS::disable-operating') )
     {
         my $tableDesc = $session->get_table( -baseoid =>
                                              $dd->oiddef('jnxOperatingDescr'));
@@ -306,7 +308,7 @@ sub discover
 
 
     # PROG: Firewall statistics
-    if( $devdetails->param('JunOS::disable-firewall') ne 'yes' )
+    if( $devdetails->paramDisabled('JunOS::disable-firewall') )
     {
         my $tableFWFilter =
             $session->get_table( -baseoid =>
@@ -359,7 +361,7 @@ sub discover
 
 
     # PROG: Check for RPF availability
-    if( $devdetails->param('JunOS::disable-rpf') ne 'yes' )
+    if( $devdetails->paramDisabled('JunOS::disable-rpf') )
     {
         my $tableRPF =
             $session->get_table( -baseoid =>
@@ -412,9 +414,9 @@ sub buildConfig
 
 
     # PROG: Class of Service information
-    if( $devdetails->hasCap('jnxCoS') &&
-	( keys %{$data->{'jnxCos'}{'ifIndex'}} > 0 )
-       )
+    if( $devdetails->hasCap('jnxCoS')
+        and
+	scalar(keys %{$data->{'jnxCos'}{'ifIndex'}}) > 0 )
     {
 	# PROG: Add CoS information if it exists.
 	my $nodeTop = $cb->addSubtree( $devNode, 'CoS', undef,
@@ -457,14 +459,14 @@ sub buildConfig
                                        'precedence' => 1000 - $cosIndex },
                                      [ 'JunOS::junos-cos-leaf' ]);
 
-                if( $devdetails->param('JunOS::disable-cos-tail') ne 'yes' )
+                if( $devdetails->paramDisabled('JunOS::disable-cos-tail') )
                 {
                     $cb->addSubtree( $nodeIFCOS, "Tail_drop_stats",
                                      { 'comment'  => 'Tail drop statistics' },
                                      [ 'JunOS::junos-cos-tail' ]);
                 }
 
-                if( $devdetails->param('JunOS::disable-cos-red') ne 'yes' )
+                if( $devdetails->paramDisabled('JunOS::disable-cos-red') )
                 {
                     $cb->addSubtree
                         ( $nodeIFCOS, "RED_stats",

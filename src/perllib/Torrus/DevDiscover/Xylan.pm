@@ -31,6 +31,8 @@
 package Torrus::DevDiscover::Xylan;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

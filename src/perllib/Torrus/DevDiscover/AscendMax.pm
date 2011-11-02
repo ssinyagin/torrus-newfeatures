@@ -29,6 +29,8 @@
 package Torrus::DevDiscover::AscendMax;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

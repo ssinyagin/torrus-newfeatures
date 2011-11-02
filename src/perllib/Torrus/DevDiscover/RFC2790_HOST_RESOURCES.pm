@@ -27,6 +27,8 @@
 package Torrus::DevDiscover::RFC2790_HOST_RESOURCES;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 $Torrus::DevDiscover::registry{'RFC2790_HOST_RESOURCES'} = {
@@ -227,8 +229,9 @@ sub buildConfig
 
     { # Anon sub for System Performance
         my $subtreeName =
-            $devdetails->param('RFC2790_HOST_RESOURCES::sysperf-subtree-name');
-        if( not defined( $subtreeName ) )
+            $devdetails->paramString
+            ('RFC2790_HOST_RESOURCES::sysperf-subtree-name');
+        if( $subtreeName eq '' )
         {
             $subtreeName = 'System_Performance';
             $devdetails->setParam

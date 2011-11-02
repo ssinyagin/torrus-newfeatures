@@ -20,6 +20,8 @@
 package Torrus::DevDiscover::Thomson_xDSL;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

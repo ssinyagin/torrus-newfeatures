@@ -20,6 +20,8 @@
 package Torrus::DevDiscover::Actelis;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

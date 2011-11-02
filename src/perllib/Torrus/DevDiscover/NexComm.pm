@@ -20,6 +20,8 @@
 package Torrus::DevDiscover::NexComm;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

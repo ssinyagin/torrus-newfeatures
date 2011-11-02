@@ -20,6 +20,8 @@
 package Torrus::DevDiscover::EmpireSystemedge;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -182,8 +184,6 @@ sub checkdevtype
 
     my $session = $dd->session();
     my $data = $devdetails->data();
-
-    my $session = $dd->session();
 
     if( not $dd->checkSnmpTable( 'empire' ) )
     {
@@ -675,9 +675,9 @@ sub buildConfig
 
 
     # Performance Subtree
-    my $subtreeName= "System_Performance";
+    $subtreeName= "System_Performance";
 
-    my $param = {
+    $param = {
         'precedence'     => '-900',
         'comment'        => 'System, CPU and memory statistics'
         };

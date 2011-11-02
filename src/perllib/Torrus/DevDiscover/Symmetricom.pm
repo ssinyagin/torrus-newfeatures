@@ -26,6 +26,8 @@
 package Torrus::DevDiscover::Symmetricom;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

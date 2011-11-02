@@ -24,6 +24,8 @@
 package Torrus::DevDiscover::CompaqCIM;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

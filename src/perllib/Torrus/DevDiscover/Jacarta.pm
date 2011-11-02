@@ -22,9 +22,9 @@
 package Torrus::DevDiscover::Jacarta;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
-use Switch;
-use Data::Dumper;
 
 
 $Torrus::DevDiscover::registry{'Jacarta'} = {

@@ -22,6 +22,8 @@
 package Torrus::DevDiscover::RFC2670_DOCS_IF;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -138,7 +140,7 @@ sub discover
         }
     }
     
-    if( $devdetails->param('RFC2670_DOCS_IF::upstreams-only') eq 'yes' )
+    if( $devdetails->paramEnabled('RFC2670_DOCS_IF::upstreams-only') )
     {
         $data->{'docsCableMaclayer'} = [];
         $data->{'docsCableDownstream'} = [];

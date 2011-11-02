@@ -36,6 +36,8 @@
 package Torrus::DevDiscover::Liebert;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -107,11 +109,11 @@ sub discover
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
 
     # Temperature
-    if( $devdetails->param('Liebert::disable-temperature') ne 'yes' ) 
+    if( $devdetails->paramDisabled('Liebert::disable-temperature') ) 
     {
         $devdetails->setCap('env-temperature');
 
-        if( $devdetails->param('Liebert::use-fahrenheit') ne 'yes' )
+        if( $devdetails->paramDisabled('Liebert::use-fahrenheit') )
         {
             # ENV: Temperature in Celcius
             my $idTable = $session->get_table(
@@ -150,7 +152,7 @@ sub discover
     }
 
     # ENV: Humidity
-    if( $devdetails->param('Liebert::disable-humidity') ne 'yes' )
+    if( $devdetails->paramDisabled('Liebert::disable-humidity') )
     {
         my $idTable = $session->get_table(
                  -baseoid => $dd->oiddef('HumidityIdRel') );
@@ -169,7 +171,7 @@ sub discover
     }
 
     # ENV: State
-    if( $devdetails->param('Liebert::disable-state') ne 'yes' )
+    if( $devdetails->paramDisabled('Liebert::disable-state') )
     {
         my $stateTable = $session->get_table(
                  -baseoid => $dd->oiddef('lgpEnvState') );
@@ -188,7 +190,7 @@ sub discover
     }
 
     # Statistics
-    if( $devdetails->param('Liebert::disable-stats') ne 'yes' )
+    if( $devdetails->paramDisabled('Liebert::disable-stats') )
     {
         my $statsTable = $session->get_table(
                  -baseoid => $dd->oiddef('lgpEnvStatistics') );

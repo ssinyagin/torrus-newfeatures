@@ -373,7 +373,7 @@ sub listUserAttributes
 
     my $list = $self->{'db_users'}->get( 'uA:' . $uid );
 
-    return split( ',', $list );
+    return (defined($list) ? split( ',', $list ) : ());
 }
 
 
@@ -470,10 +470,9 @@ sub listGroupAttributes
 {
     my $self = shift;
     my $group = shift;
-
+    
     my $list = $self->{'db_users'}->get( 'gA:' . $group );
-
-    return split( ',', $list );
+    return (defined($list) ? split( ',', $list ) : ());
 }
 
 

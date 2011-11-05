@@ -896,7 +896,9 @@ sub storeSnmpVars
     {
         if( $oid !~ /^\d[0-9.]+\d$/o )
         {
-            Error("Invalid OID syntax: '$oid'");
+            Error('Invalid OID syntax: from ' .
+                  $self->paramString('snmp-host') .
+                  ': \'' . $oid . '\'');
         }
         else
         {

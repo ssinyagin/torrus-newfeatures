@@ -19,10 +19,11 @@
 
 package Torrus::DB;
 
+use strict;
+use warnings;
+
 use Torrus::Log;
 use BerkeleyDB;
-use strict;
-
 
 # This is an abstraction layer for BerkeleyDB database operations
 #

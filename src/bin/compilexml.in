@@ -18,10 +18,12 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+
+use strict;
+use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
 use Getopt::Long;
-use strict;
 
 use Torrus::ConfigTree::XMLCompiler;
 use Torrus::SiteConfig;

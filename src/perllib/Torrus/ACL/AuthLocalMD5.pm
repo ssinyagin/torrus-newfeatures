@@ -20,10 +20,11 @@
 
 package Torrus::ACL::AuthLocalMD5;
 
-use Torrus::Log;
-
-use Digest::MD5 qw(md5_hex);
 use strict;
+use warnings;
+
+use Torrus::Log;
+use Digest::MD5 qw(md5_hex);
 
 sub new
 {

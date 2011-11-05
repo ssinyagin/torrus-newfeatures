@@ -19,10 +19,12 @@
 
 package Torrus::TimeStamp;
 
+use strict;
+use warnings;
+
 use Torrus::DB;
 use Torrus::Log;
 
-use strict;
 
 $Torrus::TimeStamp::db = undef;
 

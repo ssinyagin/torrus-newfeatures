@@ -19,14 +19,13 @@
 
 
 package Torrus::ACL::Export;
+use strict;
+use warnings;
 
 use Torrus::ACL;
 use Torrus::ACL::Edit;
 use Torrus::Log;
-
 use Template;
-
-use strict;
 
 
 sub exportACL

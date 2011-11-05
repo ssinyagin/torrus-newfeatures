@@ -19,13 +19,14 @@
 
 
 package Torrus::ACL::Import;
+use strict;
+use warnings;
 
 use Torrus::ACL;
 use Torrus::ACL::Edit;
 use Torrus::Log;
 
 use XML::LibXML;
-use strict;
 
 my %formatsSupported = ('1.0' => 1,
                         '1.1' => 1);

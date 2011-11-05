@@ -30,9 +30,9 @@
 package Torrus::Log;
 
 use strict;
+use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use base 'Exporter';
 
 our @EXPORT = qw(Debug Warn Info Error Verbose isDebug);
 

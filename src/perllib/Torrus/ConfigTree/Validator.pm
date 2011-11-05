@@ -20,11 +20,13 @@
 
 package Torrus::ConfigTree::Validator;
 
+use strict;
+use warnings;
+
 use Torrus::ConfigTree;
 use Torrus::Log;
 use Torrus::RPN;
 use Torrus::SiteConfig;
-use strict;
 
 Torrus::SiteConfig::loadStyling();
 

@@ -20,11 +20,12 @@
 
 package Torrus::ConfigTree;
 
+use strict;
+use warnings;
+
 use Torrus::DB;
 use Torrus::Log;
 use Torrus::TimeStamp;
-
-use strict;
 
 
 

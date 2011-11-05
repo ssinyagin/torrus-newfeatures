@@ -19,13 +19,14 @@
 
 
 package Torrus::ACL::Edit;
+use strict;
+use warnings;
+
+use base 'Torrus::ACL';
 
 use Torrus::ACL;
 use Torrus::Log;
 
-use strict;
-
-@Torrus::ACL::Edit::ISA = qw(Torrus::ACL);
 
 sub new
 {
@@ -121,7 +122,7 @@ sub listGroups
 
     my $list = $self->{'db_users'}->get( 'G:' );
 
-    return split( ',', $list );
+    return (defined($list) ? split( ',', $list ) : ());
 }
 
 

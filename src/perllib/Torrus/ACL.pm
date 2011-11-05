@@ -20,10 +20,12 @@
 
 package Torrus::ACL;
 
+use strict;
+use warnings;
+
 use Torrus::DB;
 use Torrus::Log;
 
-use strict;
 
 BEGIN
 {

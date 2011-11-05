@@ -21,8 +21,10 @@
 
 package Torrus::SiteConfig;
 
-use Torrus::Log;
 use strict;
+use warnings;
+
+use Torrus::Log;
 
 our %validDaemonNames = ('collector' => 1,
                          'monitor'   => 1);

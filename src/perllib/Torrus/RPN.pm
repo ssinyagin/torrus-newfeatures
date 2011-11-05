@@ -27,6 +27,7 @@
 package Torrus::RPN;
 
 use strict;
+use warnings;
 
 use Torrus::Log;
 use Math::BigFloat;

@@ -23,15 +23,16 @@
 
 package Torrus::ConfigTree::Writer;
 
-use Torrus::ConfigTree;
-our @ISA=qw(Torrus::ConfigTree);
+use strict;
+use warnings;
+
+use base 'Torrus::ConfigTree';
 
 use Torrus::Log;
 use Torrus::TimeStamp;
 use Torrus::SiteConfig;
 use Torrus::ServiceID;
     
-use strict;
 use Digest::MD5 qw(md5); # needed as hash function
 
 

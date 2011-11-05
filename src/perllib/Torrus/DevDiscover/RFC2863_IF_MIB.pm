@@ -176,7 +176,8 @@ sub discover
     my $includeAdmDown =
         $devdetails->paramEnabled('RFC2863_IF_MIB::list-admindown-interfaces');
     my $includeNotpresent =
-        $devdetails->paramEnabled('RFC2863_IF_MIB::list-notpresent-interfaces');
+        $devdetails->paramEnabled
+        ('RFC2863_IF_MIB::list-notpresent-interfaces');
     my $excludeOperDown =
         $devdetails->paramEnabled('RFC2863_IF_MIB::exclude-down-interfaces');
 
@@ -217,7 +218,7 @@ sub discover
             {
                 my $iname = $devdetails->snmpVar($dd->oiddef('ifName') .
                                                  '.' . $ifIndex);
-                if( $iname !~ /\w/ )
+                if( not defined($iname) or $iname !~ /\w/ )
                 {
                     $iname = $interface->{'ifDescr'};
                     Warn('Empty or invalid ifName for interface ' . $iname);
@@ -241,7 +242,7 @@ sub discover
                 my $hiBW = 
                     $devdetails->snmpVar($dd->oiddef('ifHighSpeed') . '.' .
                                          $ifIndex);
-                if( $hiBW >= 10 )
+                if( defined($hiBW) and $hiBW >= 10 )
                 {
                     $bw = 1e6 * $hiBW;
                 }
@@ -254,7 +255,7 @@ sub discover
                                          $ifIndex);
             }
             
-            if( $bw > 0 )
+            if( defined($bw) and $bw > 0 )
             {
                 $interface->{'ifSpeed'} = $bw;
             }
@@ -1439,7 +1440,8 @@ sub checkSelectorAttribute
     {
         my $value;
         my $operator = '=~';
-        if( $attr eq 'ifComment' )
+        if( $attr eq 'ifComment' and
+            defined($data->{'nameref'}{'ifComment'}) )
         {
             $value = $interface->{$data->{'nameref'}{'ifComment'}};
         }

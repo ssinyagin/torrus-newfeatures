@@ -621,12 +621,14 @@ sub discover
     }
     
     
-    if( $devdetails->paramEnabled('CiscoIOS::short-device-comment') )
+    if( $devdetails->paramEnabled('CiscoIOS::short-device-comment')
+        and
+        defined($data->{'param'}{'comment'}) )
     {
         # Remove serials from device comment
         # 1841 chassis, Hw Serial#: 3625140487, Hw Revision: 6.0
         
-        $data->{'param'}{'comment'} =~ s/, Hw.*//o;        
+        $data->{'param'}{'comment'} =~ s/, Hw.*//o;
     }
 
     return 1;
@@ -718,15 +720,33 @@ sub buildConfig
             {
                 $legend .= sprintf("Access list: %d;", $car->{'accIdx'});
             }
+
+            if( defined($car->{'rate'}) )
+            {
+                $legend .= sprintf('Rate: %d bps;', $car->{'rate'});
+            }
             
-            $legend .=
-                sprintf("Rate: %d bps; Limit: %d bytes; Ext limit: %d bytes;" .
-                        "Conform action: %s; Exceed action: %s",
-                        $car->{'rate'},
-                        $car->{'limit'},
-                        $car->{'extLimit'},
-                        $car->{'conformAction'},
-                        $car->{'exceedAction'});
+            if( defined($car->{'limit'}) )
+            {
+                $legend .= sprintf('Limit: %d bytes;', $car->{'limit'});
+            }
+
+            if( defined($car->{'extLimit'}) )
+            {
+                $legend .= sprintf('Ext limit: %d bytes;', $car->{'extLimit'});
+            }
+
+            if( defined($car->{'conformAction'}) )
+            {
+                $legend .= sprintf('Conform action: %s;',
+                                   $car->{'conformAction'});
+            }
+
+            if( defined($car->{'exceedAction'}) )
+            {
+                $legend .= sprintf('Exceed action: %s',
+                                   $car->{'exceedAction'});
+            }
 
             $param->{'legend'} = $legend;
 

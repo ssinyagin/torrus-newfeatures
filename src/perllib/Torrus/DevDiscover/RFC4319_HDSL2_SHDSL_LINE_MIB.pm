@@ -192,10 +192,15 @@ sub buildConfig
 
         my $ifParam = {
             'collector-timeoffset-hashstring' =>'%system-id%:%interface-nick%',
-            'comment'        => $interface->{$data->{'nameref'}{'ifComment'}},
             'precedence'     => $precedence,
         };
         
+        if( defined($data->{'nameref'}{'ifComment'}) and
+            defined($interface->{$data->{'nameref'}{'ifComment'}}) )
+        {
+            $ifParam->{'comment'} =
+                $interface->{$data->{'nameref'}{'ifComment'}};
+        }
 
         $ifParam->{'interface-name'} =
             $interface->{$data->{'nameref'}{'ifReferenceName'}};

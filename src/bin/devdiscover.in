@@ -20,9 +20,12 @@
 
 # Collect the router information and create the XML file
 
-BEGIN { require '@devdiscover_config_pl@'; }
 
 use strict;
+use warnings;
+BEGIN { require '@devdiscover_config_pl@'; }
+
+
 use Getopt::Long;
 use XML::LibXML;
 
@@ -105,7 +108,7 @@ if( not $ok or scalar(@infiles) == 0 or
 
 if( $snmpdebug )
 {
-    $Net::SNMP::Transport::UDP::DEBUG = 1;
+    $Net::SNMP::Transport::DEBUG = 1;
     $Net::SNMP::Message::DEBUG = 1;
     $Net::SNMP::MessageProcessing::DEBUG = 1;
     $Net::SNMP::Dispatcher::DEBUG = 1;

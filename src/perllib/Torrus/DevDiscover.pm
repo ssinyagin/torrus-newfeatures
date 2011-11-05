@@ -41,6 +41,9 @@ BEGIN
     }
 }
 
+# Callback registry to inizialise multithreading before any threads are spawned
+our %threading_init_callbacks;
+
 # Custom overlays for templates
 # overlayName ->
 #     'Module::templateName' -> { 'name' => 'templateName',

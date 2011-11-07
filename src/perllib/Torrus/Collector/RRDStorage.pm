@@ -18,11 +18,11 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Collector::RRDStorage;
+use strict;
+use warnings;
 
 use Torrus::ConfigTree;
 use Torrus::Log;
-
-use strict;
 use RRDs;
 
 our $useThreads;

@@ -297,9 +297,10 @@ sub data
 #   -FastCycles => N        -- optional number of cycles to run immediately
 
 package Torrus::Scheduler::PeriodicTask;
+use strict;
+use warnings;
 
 use Torrus::Log;
-use strict;
 
 sub new
 {

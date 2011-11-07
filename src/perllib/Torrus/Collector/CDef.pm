@@ -25,6 +25,7 @@
 package Torrus::Collector::CDef;
 
 use strict;
+use warnings;
 
 use Torrus::Collector::CDef_Params;
 use Torrus::ConfigTree;

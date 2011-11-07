@@ -26,6 +26,8 @@
 package Torrus::Collector::ExtDBI;
 
 use strict;
+use warnings;
+
 use DBI;
 use Date::Format;
 

@@ -18,6 +18,8 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Collector::SNMP_Params;
+use strict;
+use warnings;
 
 ###  Initialize the configuration validator with module-specific parameters
 ###  Moved to a separate module to speed up the compiler initialization
@@ -160,7 +162,7 @@ sub initAdmInfo
     $map->{'ds-type'}{'collector'}{'collector-type'}{'snmp-reachable'} =
         \%reachable_admInfoLeafParams;
 
-    while( ($pname, $category) = each %admInfoParamCategories )
+    while( my ($pname, $category) = each %admInfoParamCategories )
     {
         $categories->{$pname} = $category;
     }

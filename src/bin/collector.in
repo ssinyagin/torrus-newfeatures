@@ -18,9 +18,11 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
-BEGIN { require '@torrus_config_pl@'; }
 
 use strict;
+use warnings;
+BEGIN { require '@torrus_config_pl@'; }
+
 use Proc::Daemon;
 use Getopt::Long;
 

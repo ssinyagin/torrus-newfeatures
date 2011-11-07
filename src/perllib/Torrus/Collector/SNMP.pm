@@ -17,13 +17,14 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Collector::SNMP;
+use strict;
+use warnings;
 
 use Torrus::Collector::SNMP_Params;
 use Torrus::ConfigTree;
 use Torrus::Log;
 use Torrus::SNMP_Failures;
 
-use strict;
 use Net::hostent;
 use Socket;
 use Net::SNMP qw(:snmp);
@@ -243,17 +244,17 @@ sub initTargetAttributes
     $cref->{'oids_per_pdu'}{$hosthash} =
         $collector->param($token, 'snmp-oids-per-pdu');
 
-    if( $collector->param($token, 'snmp-object-type') eq 'COUNTER64' )
+    if( $collector->paramString($token, 'snmp-object-type') eq 'COUNTER64' )
     {
         $cref->{'64bit_oid'}{$oid} = 1;
     }
 
-    if( $collector->param($token, 'snmp-check-sysuptime') eq 'no' )
+    if( $collector->paramDisabled($token, 'snmp-check-sysuptime') )
     {
         $cref->{'nosysuptime'}{$hosthash} = 1;
     }
 
-    if( $collector->param($token, 'snmp-ignore-mib-errors') eq 'yes' )
+    if( $collector->paramEnabled($token, 'snmp-ignore-mib-errors') )
     {
         $cref->{'ignoremiberrors'}{$hosthash}{$oid} = 1;
     }
@@ -268,9 +269,9 @@ sub getHostHash
     my $token = shift;
 
     my $hostname = $collector->param($token, 'snmp-host');
-    my $domain = $collector->param($token, 'domain-name');
+    my $domain = $collector->paramString($token, 'domain-name');
     
-    if( length( $domain ) > 0 and
+    if( $domain ne '' and
         index($hostname, '.') < 0 and
         index($hostname, ':') < 0 )
     {
@@ -323,9 +324,10 @@ sub snmpSessionArgs
     
     foreach my $arg ( qw(-localaddr -localport) )
     {
-        if( defined( $collector->param($token, 'snmp' . $arg) ) )
+        my $val = $collector->param($token, 'snmp' . $arg);
+        if( defined( $val ) )
         {
-            push( @{$ret}, $arg, $collector->param($token, 'snmp' . $arg) );
+            push( @{$ret}, $arg, $val );
         }
     }
             
@@ -340,10 +342,10 @@ sub snmpSessionArgs
         foreach my $arg ( qw(-authkey -authpassword -authprotocol
                              -privkey -privpassword -privprotocol) )
         {
-            if( defined( $collector->param($token, 'snmp' . $arg) ) )
+            my $val = $collector->param($token, 'snmp' . $arg);            
+            if( defined( $val ) )
             {
-                push( @{$ret},
-                      $arg, $collector->param($token, 'snmp' . $arg) );
+                push( @{$ret}, $arg, $val );
             }
         }
     }
@@ -408,7 +410,7 @@ sub openNonblockingSession
         my $refcount = $Net::SNMP::Transport::SOCKETS->{
             $sock_name}->[&Net::SNMP::Transport::_SHARED_REFC()];
                                                                       
-        if( $refcount == 1 )
+        if( defined($refcount) and $refcount == 1 )
         {
             my $buflen = int($Torrus::Collector::SNMP::RxBuffer);
             my $socket = $session->transport()->socket();

@@ -24,6 +24,7 @@
 package Torrus::Collector::CDef_Params;
 
 use strict;
+use warnings;
 
 ###  Initialize the configuration validator with module-specific parameters
 our %params =

@@ -21,11 +21,12 @@ package Torrus::Collector::Cisco_cbQoS;
 
 use Torrus::Collector::Cisco_cbQoS_Params;
 
+use strict;
+use warnings;
+
 use Torrus::ConfigTree;
 use Torrus::Collector::SNMP;
 use Torrus::Log;
-
-use strict;
 use Net::hostent;
 use Socket;
 use Net::SNMP qw(:snmp);

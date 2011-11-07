@@ -19,10 +19,13 @@
 
 package Torrus::Collector::ExternalStorage;
 
+use strict;
+use warnings;
+
 use Torrus::ConfigTree;
 use Torrus::Log;
 
-use strict;
+
 use Math::BigInt;
 use Math::BigFloat;
 

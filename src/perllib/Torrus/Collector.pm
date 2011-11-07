@@ -19,9 +19,12 @@
 
 
 package Torrus::Collector;
-@Torrus::Collector::ISA = qw(Torrus::Scheduler::PeriodicTask);
-
 use strict;
+use warnings;
+
+use Torrus::Scheduler;
+use base 'Torrus::Scheduler::PeriodicTask';
+
 use Torrus::ConfigTree;
 use Torrus::Log;
 use Torrus::RPN;
@@ -304,6 +307,37 @@ sub param
     return $self->{'targets'}{$token}{'params'}{$param};
 }
 
+# The following 3 methods get around undefined parameters and
+# make "use warnings" happy
+
+sub paramEnabled
+{
+    my $self = shift;
+    my $token = shift;
+    my $param = shift;
+    my $val = $self->param($token, $param);
+    return (defined($val) and ($val eq 'yes'));
+}
+
+sub paramDisabled
+{
+    my $self = shift;
+    my $token = shift;
+    my $param = shift;
+    my $val = $self->param($token, $param);
+    return (not defined($val) or ($val ne 'yes'));
+}
+
+sub paramString
+{
+    my $self = shift;
+    my $token = shift;
+    my $param = shift;
+    my $val = $self->param($token, $param);
+    return (defined($val) ? $val:'');    
+}
+
+
 sub setParam
 {
     my $self = shift;
@@ -583,7 +617,10 @@ sub configTree
 #######  Collector scheduler  ########
 
 package Torrus::CollectorScheduler;
-@Torrus::CollectorScheduler::ISA = qw(Torrus::Scheduler);
+use strict;
+use warnings;
+
+use base 'Torrus::Scheduler';
 
 use Torrus::ConfigTree;
 use Torrus::Log;

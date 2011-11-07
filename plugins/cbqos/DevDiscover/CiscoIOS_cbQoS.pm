@@ -26,6 +26,8 @@
 package Torrus::DevDiscover::CiscoIOS_cbQoS;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -254,7 +256,7 @@ sub discover
 
             # Suppress unneeded objects
             if( $takeit and
-                $devdetails->param('CiscoIOS_cbQoS::classmaps-only') eq 'yes'
+                $devdetails->paramEnabled('CiscoIOS_cbQoS::classmaps-only')
                 and
                 $objType ne 'policymap' and
                 $objType ne 'classmap' )
@@ -263,8 +265,9 @@ sub discover
             }
 
             if( $takeit and
-                $devdetails->param('CiscoIOS_cbQoS::suppress-match-statements')
-                eq 'yes' and
+                $devdetails->paramEnabled
+                ('CiscoIOS_cbQoS::suppress-match-statements')
+                and
                 $objType eq 'matchStatement' )
             {
                 $takeit = 0;
@@ -316,13 +319,11 @@ sub discover
     }
 
     # Prepare the list of DSCP values for RED
-    my @dscpValues;
-    if( defined( $devdetails->param('CiscoIOS_cbQoS::red-dscp-values') ) )
-    {
-        @dscpValues =
-            split(',', $devdetails->param('CiscoIOS_cbQoS::red-dscp-values'));
-    }
-    else
+    my @dscpValues =
+        split(',',
+              $devdetails->paramString('CiscoIOS_cbQoS::red-dscp-values'));
+    
+    if( scalar(@dscpValues) == 0 )
     {
         @dscpValues = @Torrus::DevDiscover::CiscoIOS_cbQoS::RedDscpValues;
     }
@@ -476,7 +477,7 @@ sub buildConfig
         $cb->addSubtree( $devNode, 'QoS_Stats', undef,
                          ['CiscoIOS_cbQoS::cisco-cbqos-subtree']);
 
-    if( $devdetails->param('CiscoIOS_cbQoS::suppress-dropnobuf') ne 'yes' )
+    if( $devdetails->paramDisabled('CiscoIOS_cbQoS::suppress-dropnobuf') )
     {
         $cb->setVar( $topNode, 'CiscoIOS_cbQoS::CMNoBufDrop', 'true' );
     }
@@ -509,7 +510,10 @@ sub buildChildrenConfigs
         ( sort { $a <=> $b } @{$data->{'cbqos_children'}{$parentObjIndex}} )
     {
         my $objectRef     = $data->{'cbqos_objects'}{$policyObjectIndex};
+        
         my $objConfIndex  = $objectRef->{'cbQosConfigIndex'};
+        next unless defined($objConfIndex);
+        
         my $objType       = $objectRef->{'cbQosObjectsType'};
         my $configRef     = $data->{'cbqos_objcfg'}{$objConfIndex};
 
@@ -965,9 +969,11 @@ my %cbQosValueTranslation =
          },
      
      'cbQosQueueingCfgBandwidthUnits'   => {
+         0 => 'bps',  # some routers return this when no bandwidth is defined
          1 => 'kbps',
          2 => 'percent',
-         3 => 'percent_remaining'
+         3 => 'percent_remaining',
+         4 => 'ratio_remaining'
          },
      
      'cbQosREDClassCfgThresholdUnit'    => $queueUnitTranslation,
@@ -1000,8 +1006,9 @@ sub translateCbQoSValue
     {
         if( not defined( $cbQosValueTranslation{$name}{$value} ) )
         {
-            die('Unknown value to translate for ' . $name .
-                ': "' . $value . '"');
+            Error('Unknown value to translate for ' . $name .
+                  ': "' . $value . '"');
+            return undef;
         }
 
         $value = $cbQosValueTranslation{$name}{$value};

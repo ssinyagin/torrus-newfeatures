@@ -482,6 +482,10 @@ sub discover
             {
                 my ($ifIndex, $dir, $carIndex) = split(/\./, $INDEX);
                 my $interface = $data->{'interfaces'}{$ifIndex};
+                if( not defined($interface) or $interface->{'excluded'} )
+                {
+                    next;
+                }
 
                 my $car = {
                     'ifIndex'   => $ifIndex,

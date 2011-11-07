@@ -33,6 +33,7 @@
 package Torrus::Scheduler;
 
 use strict;
+use warnings;
 use Torrus::SchedulerInfo;
 use Torrus::Log;
 
@@ -438,7 +439,7 @@ sub afterRun
     {
         $stats->setStatsValues( $self->id(), @{$pair} );
     }
-    @{$self->{'statValues'}} = [];
+    $self->{'statValues'} = [];
 }
 
 

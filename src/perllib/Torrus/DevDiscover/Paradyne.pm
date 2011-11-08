@@ -85,7 +85,7 @@ sub checkdevtype
 
     if( not defined($devdetails->param('Paradyne::slot-name')) )
     {
-        Error('Mandatory discovery parameter "Paradyne::slot-number" ' .
+        Error('Mandatory discovery parameter "Paradyne::slot-name" ' .
               'is not defined for a Paradyne device: ' .
               $devdetails->param('snmp-host') . ':' .
               $devdetails->param('snmp-port') . ':' .

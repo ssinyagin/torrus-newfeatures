@@ -188,6 +188,8 @@ sub discover
             $devdetails->snmpVar($dd->oiddef('ifAdminStatus') .'.'. $ifIndex);
         my $operStatus =
             $devdetails->snmpVar($dd->oiddef('ifOperStatus') .'.'. $ifIndex);
+
+        next unless (defined($admStatus) and defined($operStatus));
         
         if( ( $admStatus == 1 or $includeAdmDown ) and
             ( $operStatus != 6 or $includeNotpresent ) and

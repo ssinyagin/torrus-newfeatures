@@ -28,6 +28,8 @@
 package Torrus::DevDiscover::ALU_Timetra;
 
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 

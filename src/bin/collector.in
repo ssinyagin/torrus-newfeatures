@@ -29,11 +29,12 @@ use Getopt::Long;
 use Torrus::Log;
 use Torrus::ConfigTree;
 use Torrus::Collector;
+use Torrus::CollectorScheduler;
 use Torrus::SiteConfig;
 
 $| = 1;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 my $tree;
 my $instance;

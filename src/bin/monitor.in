@@ -18,17 +18,20 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
-BEGIN { require '@torrus_config_pl@'; }
 
 use strict;
+use warnings;
+BEGIN { require '@torrus_config_pl@'; }
+
 use Proc::Daemon;
 use Getopt::Long;
 
 use Torrus::Log;
 use Torrus::Monitor;
+use Torrus::MonitorScheduler;
 use Torrus::SiteConfig;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 our $tree;
 our $nodaemon;
@@ -154,7 +157,6 @@ $scheduler->run();
 if( not $options{'-RunOnce'} )
 {
     Error("Monitor process exited: nothing to collect");
-    unlink $pidfile;
 }
 
 exit;

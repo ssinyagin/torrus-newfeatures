@@ -51,7 +51,7 @@ sub discover
     my $table = $session->get_table( -baseoid =>
                                      $dd->oiddef('ipNetToMediaPhysAddress'));
     
-    if( not defined( $table ) or scalar( %{$table} ) == 0 )
+    if( not defined($table) or scalar(keys %{$table}) == 0 )
     {
         return 0;
     }

@@ -193,7 +193,7 @@ foreach my $infile ( @infiles )
         push( @{$perOutfileHostParams->{$outfile}}, $hostParams );
 
         my $outBundles = $hostParams->{'output-bundle'};
-        if( length( $outBundles ) > 0 )
+        if( defined($outBundles) )
         {
             foreach my $bundleName ( split( /\s*,\s*/, $outBundles ) )
             {

@@ -423,7 +423,7 @@ sub updateRRD
     &Torrus::DB::checkInterrupted();
 
     # Build the arguments for RRDs::update.
-    my $template;
+    my $template = '';
     my $values;
 
     # We will use the average timestamp

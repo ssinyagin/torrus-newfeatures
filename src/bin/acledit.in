@@ -99,10 +99,10 @@ if( not $ok or $help_needed or scalar(@ARGV) > 0 or
     ( ( @permitprivs or @denyprivs ) and not @forobjects ) or
     ( $adduser ? 1:0 ) + ( $deluser ? 1:0 ) + ( $moduser ? 1:0 ) > 1 or
     ( ( @addtogroups or @delfromgroups or
-        length($password) > 0 or
-        length($host_password) > 0 or
-        length($commonname) > 0 ) and
-      ( length($adduser) + length($addhost) + length($moduser) == 0 ) ) )
+        defined($password) or
+        defined($host_password) or
+        defined($commonname) ) and
+      not (defined($adduser) or defined($addhost) or defined($moduser)) ) )
 {
     print STDERR "Usage: $0 [options...]\n",
     "Group Options:\n",

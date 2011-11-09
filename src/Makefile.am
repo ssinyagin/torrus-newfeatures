@@ -115,7 +115,7 @@ PERLCRITIC_CMD = ${PERLCRITIC} --profile=critic.profile
 
 critic:
 	@if test ${PERLCRITIC} != no; then \
-	  ${PERLCRITIC_CMD} bin/[a-z]*.in; \
+	  ${PERLCRITIC_CMD} `ls bin/*.in | grep -v Makefile`; \
 	  ${PERLCRITIC_CMD} perllib/Torrus/; \
 	else \
 	  echo 'perlcritic command not found'; \

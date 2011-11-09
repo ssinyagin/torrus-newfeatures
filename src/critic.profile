@@ -45,3 +45,18 @@ severity = 1
 # they tell to use /x in every regexp, but we don't
 [RegularExpressions::RequireExtendedFormatting]
 severity = 1
+
+# they demand to have return statement at the end of each sub
+# we usually know what we do, probably needs to be changed later.
+[Subroutines::RequireFinalReturn]
+severity = 2
+
+
+# we use "my %options = @_;" in new() constructors, probably need to
+# change that later
+[Subroutines::RequireArgUnpacking]
+severity = 2
+
+# We use return undef very often as an indication that the value is undefined.
+[Subroutines::ProhibitExplicitReturnUndef]
+severity = 1

@@ -96,6 +96,7 @@ sub discover
               'CasaCMTS::casa-docsis-downstream-util' );
     }
     
+    $data->{'nameref'}{'ifNodeid'} = 'ifNameT';
     
     return 1;
 }

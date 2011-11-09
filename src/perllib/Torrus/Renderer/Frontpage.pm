@@ -18,8 +18,8 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Renderer::Frontpage;
-
 use strict;
+use warnings;
 
 use Torrus::ConfigTree;
 use Torrus::Search;

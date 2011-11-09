@@ -17,8 +17,9 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Renderer;
-
 use strict;
+use warnings;
+
 use Digest::MD5 qw(md5_hex);
 
 use Torrus::DB;

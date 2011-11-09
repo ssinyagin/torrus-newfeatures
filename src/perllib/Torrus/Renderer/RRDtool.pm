@@ -18,8 +18,8 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Renderer::RRDtool;
-
 use strict;
+use warnings;
 
 use Torrus::ConfigTree;
 use Torrus::RPN;
@@ -316,7 +316,7 @@ sub rrd_make_multigraph
             }
         }
 
-        my $legend;
+        my $legend = '';
         
         if( $dograph or $gprint_this )
         {
@@ -391,7 +391,7 @@ sub rrd_make_multigraph
             push( @{$obj->{'args'}{'line'}},
                   sprintf( '%s:%s%s%s%s', $linestyle, $dname,
                            $linecolor,
-                           length($legend) > 0 ? ':'.$legend.'\l' : '',
+                           ($legend ne '') ? ':'.$legend.'\l' : '',
                            $stack ) );
             
         }
@@ -517,7 +517,7 @@ sub rrd_make_graphline
     }
     
     my $styleval = $config_tree->getNodeParam($token, 'line-style');
-    if( not defined( $styleval ) or length( $styleval ) == 0 )
+    if( not defined($styleval)  )
     {
         $styleval = $config_tree->getParam($view, 'line-style');
     }
@@ -525,7 +525,7 @@ sub rrd_make_graphline
     my $linestyle = $self->mkline( $styleval );
 
     my $colorval = $config_tree->getNodeParam($token, 'line-color');
-    if( not defined( $colorval ) or length( $colorval ) == 0 )
+    if( not defined($colorval) )
     {
         $colorval = $config_tree->getParam($view, 'line-color');
     }
@@ -542,7 +542,7 @@ sub rrd_make_graphline
 
     push( @{$obj->{'args'}{'line'}},
           sprintf( '%s:%s%s%s', $linestyle, $obj->{'dname'}, $linecolor,
-                   length($legend) > 0 ? ':'.$legend.'\l' : '' ) );
+                   ($legend ne '') ? ':'.$legend.'\l' : '' ) );
 }
 
 
@@ -735,7 +735,7 @@ sub rrd_make_graph_opts
     if( not defined( $disable_title ) or $disable_title ne 'yes' )
     {
         my $title = $config_tree->getNodeParam($token, 'graph-title');
-        if( not defined( $title ) or length( $title ) == 0 )
+        if( not defined($title) )
         {
             $title = ' ';
         }
@@ -748,7 +748,7 @@ sub rrd_make_graph_opts
     {
         my $vertical_label =
             $config_tree->getNodeParam($token, 'vertical-label');
-        if( defined( $vertical_label ) and length( $vertical_label ) > 0 )
+        if( defined( $vertical_label ) )
         {
             push( @args, '--vertical-label', $vertical_label );
         }
@@ -762,7 +762,7 @@ sub rrd_make_graph_opts
         {
             my $limit =
                 $config_tree->getNodeParam($token, 'graph-lower-limit');
-            if( defined($limit) and length( $limit ) > 0 )
+            if( defined($limit) )
             {
                 push( @args, '--lower-limit', $limit );
             }
@@ -773,7 +773,7 @@ sub rrd_make_graph_opts
         {
             my $limit =
                 $config_tree->getNodeParam($token, 'graph-upper-limit');
-            if( defined($limit) and length( $limit ) > 0 )
+            if( defined($limit) )
             {
                 push( @args, '--upper-limit', $limit );
             }
@@ -865,7 +865,7 @@ sub rrd_make_cdef
             $cf = $function;
         }
         
-        my $leaf = length($noderef) > 0 ?
+        my $leaf = ($noderef ne '') ?
             $config_tree->getRelative($token, $noderef) : $token;
 
         my $varname = $dname . sprintf('%.2d', $ds_couter++);
@@ -917,7 +917,7 @@ sub rrd_make_gprint
     my @args = ();
 
     my $gprintValues = $config_tree->getParam($view, 'gprint-values');
-    if( defined( $gprintValues ) and length( $gprintValues ) > 0 )
+    if( defined( $gprintValues ) )
     {
         foreach my $gprintVal ( split(',', $gprintValues ) )
         {
@@ -940,10 +940,10 @@ sub rrd_make_gprint_header
     my $obj = shift;
 
     my $gprintValues = $config_tree->getParam($view, 'gprint-values');
-    if( defined( $gprintValues ) and length( $gprintValues ) > 0 )
+    if( defined( $gprintValues ) )
     {
         my $gprintHeader = $config_tree->getParam($view, 'gprint-header');
-        if( defined( $gprintHeader ) and length( $gprintHeader ) > 0 )
+        if( defined( $gprintHeader ) )
         {
             push( @{$obj->{'args'}{'line'}},
                   'COMMENT:' . $gprintHeader . '\l' );

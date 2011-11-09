@@ -18,8 +18,8 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Renderer::HTML;
-
 use strict;
+use warnings;
 
 use Torrus::ConfigTree;
 use Torrus::Search;
@@ -152,7 +152,7 @@ sub nodeName
     my $token = shift;
 
     my $n = $config_tree->getNodeParam($token, 'node-display-name', 1);
-    if( defined( $n ) and length( $n ) > 0 )
+    if( defined( $n ) and $n ne '' )
     {
         return $n;
     }

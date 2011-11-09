@@ -17,8 +17,8 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::Renderer::RPC;
-
 use strict;
+use warnings;
 
 use Torrus::ConfigTree;
 use Torrus::Log;

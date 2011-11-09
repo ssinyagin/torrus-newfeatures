@@ -1,4 +1,4 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2011  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,20 +18,20 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 
-# Task scheduler runtime information. Quite basic statistics access.
+# Search database interface
 
 package Torrus::Search;
+use strict;
+use warnings;
 
 use Torrus::DB;
 use Torrus::Log;
-use strict;
-
 
 sub new
 {
-    my $self = {};
     my $class = shift;
     my %options = @_;
+    my $self = {};
     bless $self, $class;
 
     %{$self->{'options'}} = %options;

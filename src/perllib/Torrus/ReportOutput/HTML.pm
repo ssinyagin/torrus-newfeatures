@@ -20,6 +20,9 @@
 package Torrus::ReportOutput::HTML;
 
 use strict;
+use warnings;
+use base 'Torrus::ReportOutput';
+
 use Template;
 use Date::Format;
 
@@ -27,7 +30,6 @@ use Torrus::Log;
 use Torrus::ReportOutput;
 use Torrus::SiteConfig;
 
-use base 'Torrus::ReportOutput';
 
 our @monthNames = qw
     (January February March April May June

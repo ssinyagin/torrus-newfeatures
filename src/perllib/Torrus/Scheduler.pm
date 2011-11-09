@@ -30,9 +30,9 @@
 
 
 package Torrus::Scheduler;
-
 use strict;
 use warnings;
+
 use Torrus::SchedulerInfo;
 use Torrus::Log;
 

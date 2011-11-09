@@ -23,6 +23,8 @@
 package Torrus::ReportGenerator;
 
 use strict;
+use warnings;
+
 use Date::Parse;
 
 use Torrus::Log;

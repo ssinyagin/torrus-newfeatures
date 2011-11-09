@@ -24,6 +24,8 @@
 package Torrus::SQL;
 
 use strict;
+use warnings;
+
 use DBI;
 use DBIx::Abstract;
 use DBIx::Sequence;

@@ -21,10 +21,11 @@
 
 package Torrus::ServiceID;
 
+use strict;
+use warnings;
+
 use Torrus::DB;
 use Torrus::Log;
-
-use strict;
 
 
 sub new

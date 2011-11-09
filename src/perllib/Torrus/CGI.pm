@@ -22,6 +22,8 @@
 package Torrus::CGI;
 
 use strict;
+use warnings;
+
 use CGI;
 use IO::File;
 use JSON ();

@@ -22,6 +22,8 @@
 package Torrus::Apache2Handler;
 
 use strict;
+use warnings;
+
 use Apache2::Const -compile => qw(:common);
 
 use Torrus::CGI;

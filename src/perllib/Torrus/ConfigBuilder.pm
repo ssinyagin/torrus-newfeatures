@@ -22,6 +22,8 @@
 package Torrus::ConfigBuilder;
 
 use strict;
+use warnings;
+
 use XML::LibXML;
 use IO::File;
 

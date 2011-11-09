@@ -21,6 +21,8 @@
 BEGIN { require '@torrus_config_pl@'; }
 
 use strict;
+use warnings;
+
 use Getopt::Long;
 use JSON;
     
@@ -29,12 +31,11 @@ use Torrus::DB;
 use Torrus::Log;
 use Torrus::SNMP_Failures;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 
 my $tree;
 my $print_details;
-
 my $help_needed;
 
 

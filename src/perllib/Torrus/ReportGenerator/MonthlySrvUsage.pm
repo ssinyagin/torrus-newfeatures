@@ -24,15 +24,17 @@
 package Torrus::ReportGenerator::MonthlySrvUsage;
 
 use strict;
+use warnings;
+
+use base 'Torrus::ReportGenerator';
+
 use POSIX qw(floor);
 use Date::Parse;
 use Math::BigFloat;
 
 use Torrus::Log;
-use Torrus::ReportGenerator;
 use Torrus::ServiceID;
 
-use base 'Torrus::ReportGenerator';
 
 sub isMonthly
 {

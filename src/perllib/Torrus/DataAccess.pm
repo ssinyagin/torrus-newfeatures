@@ -18,12 +18,13 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 package Torrus::DataAccess;
+use strict;
+use warnings;
 
 use Torrus::ConfigTree;
 use Torrus::Log;
 use Torrus::RPN;
 
-use strict;
 use RRDs;
 
 # The Torrus::DataAccess object contains cached values, and it does not

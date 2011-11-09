@@ -22,8 +22,9 @@
 package Torrus::ApacheHandler;
 
 use strict;
-use Apache;
+use warnings;
 
+use Apache;
 use Torrus::CGI;
 
 sub handler

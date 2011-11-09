@@ -24,6 +24,7 @@
 package Torrus::ReportOutput;
 
 use strict;
+use warnings;
 
 use Torrus::Log;
 use Torrus::SQL::Reports;
@@ -86,6 +87,11 @@ sub generate
     if( not $self->{'options'}->{'All_Service_IDs'} )
     {
         my $srvId = new Torrus::ServiceID;
+        if( not defined($srvId) )
+        {
+            die('Cannot initialize a Torrus::ServiceID object');
+        }
+        
         $srvIdList = $srvId->getAllForTree( $self->{'options'}->{'Tree'} );
     }
     

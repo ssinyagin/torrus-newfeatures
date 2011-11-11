@@ -19,6 +19,9 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 
+# disable Perl::Critic because this is not a Perl script
+## no critic
+
 # How soon the sessions expire
 EXPIRE=60
 

@@ -844,14 +844,17 @@ sub deleteTarget
     my $hosthash = $tref->{'hosthash'};    
     my $oid = $tref->{'oid'};
 
-    delete $cref->{'targets'}{$hosthash}{$oid}{$token};
-    if( not %{$cref->{'targets'}{$hosthash}{$oid}} )
+    if( defined($oid) )
     {
-        delete $cref->{'targets'}{$hosthash}{$oid};
-
-        if( not %{$cref->{'targets'}{$hosthash}} )
+        delete $cref->{'targets'}{$hosthash}{$oid}{$token};
+        if( scalar(keys %{$cref->{'targets'}{$hosthash}{$oid}}) == 0 )
         {
-            delete $cref->{'targets'}{$hosthash};
+            delete $cref->{'targets'}{$hosthash}{$oid};
+            
+            if( scalar(keys %{$cref->{'targets'}{$hosthash}}) == 0 )
+            {
+                delete $cref->{'targets'}{$hosthash};
+            }
         }
     }
 

@@ -135,9 +135,18 @@ sub render_rrgraph
     }
     Debug("RRDs::graph arguments: " . join(' ', @args));
 
-    $self->tz_set();
-    &RRDs::graph( $outfile, @args );
-    $self->tz_restore();
+    # localize the TZ enviromennt for the child process
+    {
+        my $tz = $self->{'options'}->{'variables'}->{'TZ'};
+        if( not defined($tz) )
+        {
+            $tz = $ENV{'TZ'};
+        }
+        
+        local $ENV{'TZ'} = $tz;
+        &RRDs::graph( $outfile, @args );
+    }
+
     my $ERR=RRDs::error;
     if( $ERR )
     {
@@ -228,9 +237,19 @@ sub render_rrprint
     Debug("RRDs::graph arguments: " . join(' ', @args));
 
     my $printout;
-    $self->tz_set();
-    ($printout, undef, undef) = RRDs::graph('/dev/null', @args);
-    $self->tz_restore();
+
+    # localize the TZ enviromennt for the child process
+    {
+        my $tz = $self->{'options'}->{'variables'}->{'TZ'};
+        if( not defined($tz) )
+        {
+            $tz = $ENV{'TZ'};
+        }
+        
+        local $ENV{'TZ'} = $tz;
+        ($printout, undef, undef) = RRDs::graph('/dev/null', @args);
+    }
+
     my $ERR=RRDs::error;
     if( $ERR )
     {
@@ -999,51 +1018,6 @@ sub mkline
 }
 
 
-sub tz_set
-{
-    my $self = shift;
-
-    if( defined $ENV{'TZ'} )
-    {
-        Debug("Previous TZ value: " . $ENV{'TZ'});
-        $self->{'tz_defined'} = 1;
-    }
-    else
-    {
-        $self->{'tz_defined'} = 0;
-    }
-
-    if( defined( my $newTZ = $self->{'options'}->{'variables'}->{'TZ'} ) )
-    {
-        Debug("Setting TZ to " . $newTZ);
-        $self->{'tz_old'} = $ENV{'TZ'};
-        $ENV{'TZ'} = $newTZ;
-        $self->{'tz_changed'} = 1;
-    }
-    else
-    {
-        $self->{'tz_changed'} = 0;
-    }
-}
-
-sub tz_restore
-{
-    my $self = shift;
-
-    if( $self->{'tz_changed'} )
-    {
-        if( $self->{'tz_defined'} )
-        {
-            Debug("Restoring TZ back to " . $self->{'tz_old'});
-            $ENV{'TZ'} = $self->{'tz_old'};
-        }
-        else
-        {
-            Debug("Restoring TZ back to undefined");
-            delete $ENV{'TZ'};
-        }
-    }
-}
 
 
 1;

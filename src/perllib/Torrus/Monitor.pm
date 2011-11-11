@@ -413,6 +413,13 @@ sub run_event_exec
         $cmd =~ s/\&gt\;/\>/;
         $cmd =~ s/\&lt\;/\</;
 
+        # Make a private copy of the whole elvironment
+        local %ENV = %ENV;
+
+        # disable Perl::Critic screams for %ENV manipulation
+        # because we know what we do
+        ## no critic(Variables::RequireLocalizedPunctuationVars)
+        
         $ENV{'TORRUS_BIN'}       = $Torrus::Global::pkgbindir;
         $ENV{'TORRUS_UPTIME'}    = time() - $self->whenStarted();
 
@@ -507,15 +514,6 @@ sub run_event_exec
         if( $status != 0 )
         {
             Error("$cmd executed with error: $!");
-        }
-
-        # Clean up the environment
-        foreach my $envName ( keys %ENV )
-        {
-            if( $envName =~ /^TORRUS_/ )
-            {
-                delete $ENV{$envName};
-            }
         }
     }
 }

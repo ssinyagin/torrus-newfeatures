@@ -72,9 +72,8 @@ foreach my $policy ( keys %Torrus::Notify::policies )
             my($protocol, $arg) = split(':', $target);
             if( defined( $Torrus::Notify::programs{$protocol} ) )
             {
-                $ENV{'ARG1'} = $arg;
+                local $ENV{'ARG1'} = $arg;
                 my $status = system( $Torrus::Notify::programs{$protocol} );
-                delete $ENV{'ARG1'};
 
                 if( $status != 0 )
                 {

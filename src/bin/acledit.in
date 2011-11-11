@@ -28,7 +28,7 @@ use Torrus::Log;
 use Torrus::ACL::Edit;
 use Torrus::SiteConfig;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 our %knownPrivileges =
     ( 'DisplayTree' => 'tree',

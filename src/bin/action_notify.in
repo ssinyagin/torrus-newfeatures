@@ -19,11 +19,12 @@
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # We need this for $Torrus::Global::templateDirs
-BEGIN { require '@torrus_config_pl@'; }
 
 use strict;
-use Date::Format;
+use warnings;
+BEGIN { require '@torrus_config_pl@'; }
 
+use Date::Format;
 use Torrus::Log;
 
 require '@notify_siteconfig_pl@';
@@ -40,6 +41,8 @@ our $nowHour = time2str('%H', $now);
 our $nowWeekday = time2str('%w', $now);
 
 my $severity = $ENV{'TORRUS_SEVERITY'};
+$severity = 0 unless defined($severity);
+
 my $ok = 1;
 
 foreach my $policy ( keys %Torrus::Notify::policies )

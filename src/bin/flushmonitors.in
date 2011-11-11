@@ -18,16 +18,16 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+use strict;
+use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
 use Getopt::Long;
-use strict;
-
 use Torrus::SiteConfig;
 use Torrus::ConfigTree;
 use Torrus::Log;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 our @trees;
 our $all_trees;

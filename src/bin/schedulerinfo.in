@@ -30,7 +30,7 @@ use Torrus::SiteConfig;
 use Torrus::SchedulerInfo;
 use Torrus::Log;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 my $tree;
 my $report_config;

@@ -29,7 +29,7 @@ use Torrus::Search;
 use Torrus::SiteConfig;
 use Torrus::Log;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 my @trees;
 my $build_global;

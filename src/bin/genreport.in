@@ -20,9 +20,11 @@
 
 # Collect the router information and create the XML file
 
-BEGIN { require '@torrus_config_pl@'; }
 
 use strict;
+use warnings;
+BEGIN { require '@torrus_config_pl@'; }
+
 use Getopt::Long;
 
 use Torrus::Log;

@@ -21,9 +21,10 @@
 # Generate the SNMP discovery instructions XML file out of plaintext
 # list of hosts.
 
+use strict;
+use warnings;
 BEGIN { require '@devdiscover_config_pl@'; }
 
-use strict;
 use Getopt::Long;
 use XML::LibXML;
 
@@ -216,7 +217,7 @@ foreach my $host ( @hosts )
     createParamsDom( \%hostParams, $doc, $hostNode );
 }
 
-my $ok = $doc->toFile( $outfile, 2 );
+$ok = $doc->toFile( $outfile, 2 );
 if( $ok )
 {
     print STDERR ("Wrote $outfile\n");

@@ -18,9 +18,10 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+use strict;
+use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
-use strict;
 use Getopt::Long;
 
 use Torrus::Log;
@@ -28,7 +29,7 @@ use Torrus::ConfigTree;
 use Torrus::SiteConfig;
 use Torrus::ConfigBuilder;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 my $tree;
 my $help_needed;
@@ -129,7 +130,7 @@ collect_tokensets( $config_tree, $cb );
 collect_definitions( $config_tree, $cb );
 collect_datasources( $config_tree, $cb );
 
-my $ok = $cb->toFile( $outfile );
+$ok = $cb->toFile( $outfile );
 if( $ok )
 {
     Verbose('Wrote ' . $outfile);

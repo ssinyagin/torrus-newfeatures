@@ -18,10 +18,12 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+
+use strict;
+use warnings;
 # We need this for $Torrus::Global::templateDirs
 BEGIN { require '@torrus_config_pl@'; }
 
-use strict;
 use Template;
 use Getopt::Long;
 

@@ -21,9 +21,10 @@
 # Generate Torrus XML configuration from a directory containing RRD files
 # 
 
+use strict;
+use warnings;
 BEGIN { require '@devdiscover_config_pl@'; }
 
-use strict;
 use Getopt::Long;
 use IO::Dir;
 use Fcntl qw(:mode);
@@ -223,7 +224,7 @@ foreach my $rrdfile ( sort keys %rrdinfos )
     }    
 }
 
-my $ok = $cb->toFile( $outfile );
+$ok = $cb->toFile( $outfile );
 if( $ok )
 {
     Verbose('Wrote ' . $outfile);

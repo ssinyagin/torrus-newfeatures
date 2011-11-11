@@ -23,9 +23,10 @@
 # Can also be used with lighttpd
 
 
+use strict;
+use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
-use strict;
 use CGI::Fast;
 use Torrus::Log;
 use Torrus::CGI;

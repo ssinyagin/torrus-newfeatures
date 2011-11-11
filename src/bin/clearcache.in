@@ -18,10 +18,11 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+use strict;
+use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
 use Torrus::Log;
-
 use Torrus::Renderer;
 
 &Torrus::DB::setSafeSignalHandlers();

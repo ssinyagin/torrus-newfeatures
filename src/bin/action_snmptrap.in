@@ -22,6 +22,8 @@
 # See Torrus-MIB.txt for reference
 
 use strict;
+use warnings;
+
 use Net::SNMP qw(:ALL);
 use Getopt::Long;
 

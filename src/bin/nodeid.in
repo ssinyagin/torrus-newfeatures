@@ -18,9 +18,11 @@
 # $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+use strict;
+use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
-use strict;
+
 use Getopt::Long;
 use JSON;
 use File::Copy;
@@ -30,7 +32,7 @@ use Torrus::SiteConfig;
 use Torrus::Renderer;
 use Torrus::Log;
 
-exit(1) if not Torrus::SiteConfig::verify();
+exit(1) unless Torrus::SiteConfig::verify();
 
 
 my %commands =

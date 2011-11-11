@@ -20,9 +20,11 @@
 
 # Combine SUM or MAX from several service IDs and create a new one
 
-BEGIN { require '@torrus_config_pl@'; }
 
 use strict;
+use warnings;
+BEGIN { require '@torrus_config_pl@'; }
+
 use POSIX qw(floor);
 use Getopt::Long;
 use Date::Parse;

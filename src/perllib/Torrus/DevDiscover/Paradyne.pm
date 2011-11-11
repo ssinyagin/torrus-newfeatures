@@ -94,6 +94,7 @@ sub checkdevtype
     }
     
     $devdetails->setCap('interfaceIndexingManaged');
+    $devdetails->setCap('interfaceIndexingPersistent');
 
     return 1;
 }
@@ -109,7 +110,6 @@ sub discover
 
     $data->{'nameref'}{'ifReferenceName'} = 'ifName';
     $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
-    $data->{'param'}{'ifindex-table'} = '$ifName';
     $data->{'nameref'}{'ifNick'} = 'ParadyneIfNick';
 
     $data->{'nameref'}{'ifComment'} = 'ifDescr';

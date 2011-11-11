@@ -142,9 +142,8 @@ sub translate
     my $callback = shift;
 
     # Debug("Translating RPN: $string");
-    my $item;
     my @new_items;
-    foreach $item ( split( /,/, $string ) )
+    foreach my $item ( split( /,/, $string ) )
     {
         if( $item =~ /^\{([^\}]*)\}$/ )
         {
@@ -187,8 +186,7 @@ sub run
         $string = $self->translate( $string, $callback );
     }
 
-    my $item;
-    foreach $item ( split( /,/, $string ) )
+    foreach my $item ( split( /,/, $string ) )
     {
         if( ref( $operators->{$item} ) )
         {

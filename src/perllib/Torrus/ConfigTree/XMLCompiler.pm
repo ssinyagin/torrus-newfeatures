@@ -88,8 +88,7 @@ sub compile
     my $ok = 1;
     my $parser = new XML::LibXML;
     my $doc;
-    eval { $doc = $parser->parse_file( $filename );  };
-    if( $@ )
+    if( not eval {$doc = $parser->parse_file($filename)} or $@ )
     {
         Error("Failed to parse $filename: $@");
         return 0;
@@ -100,10 +99,8 @@ sub compile
     # Initialize the '/' element
     $self->initRoot();
 
-    my $node;
-
     # First of all process all pre-required files
-    foreach $node ( $root->getElementsByTagName('include') )
+    foreach my $node ( $root->getElementsByTagName('include') )
     {
         my $incfile = $node->getAttribute('filename');
         if( not $incfile )
@@ -117,35 +114,35 @@ sub compile
         }
     }
 
-    foreach $node ( $root->getElementsByTagName('param-properties') )
+    foreach my $node ( $root->getElementsByTagName('param-properties') )
     {
         $ok = $self->compile_paramprops( $node ) ? $ok:0;
     }
 
     if( not $self->{'-NoDSRebuild'} )
     {
-        foreach $node ( $root->getElementsByTagName('definitions') )
+        foreach my $node ( $root->getElementsByTagName('definitions') )
         {
             $ok = $self->compile_definitions( $node ) ? $ok:0;
         }
 
-        foreach $node ( $root->getElementsByTagName('datasources') )
+        foreach my $node ( $root->getElementsByTagName('datasources') )
         {
             $ok = $self->compile_ds( $node ) ? $ok:0;
         }
     }
 
-    foreach $node ( $root->getElementsByTagName('monitors') )
+    foreach my $node ( $root->getElementsByTagName('monitors') )
     {
         $ok = $self->compile_monitors( $node ) ? $ok:0;
     }
 
-    foreach $node ( $root->getElementsByTagName('token-sets') )
+    foreach my $node ( $root->getElementsByTagName('token-sets') )
     {
         $ok = $self->compile_tokensets( $node ) ? $ok:0;
     }
 
-    foreach $node ( $root->getElementsByTagName('views') )
+    foreach my $node ( $root->getElementsByTagName('views') )
     {
         $ok = $self->compile_views( $node ) ? $ok:0;
     }

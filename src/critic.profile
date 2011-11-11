@@ -60,3 +60,12 @@ severity = 2
 # We use return undef very often as an indication that the value is undefined.
 [Subroutines::ProhibitExplicitReturnUndef]
 severity = 1
+
+# string eval is used rarely and in places where we really need it
+[BuiltinFunctions::ProhibitStringyEval]
+severity = 1
+
+# using oct(664) is just odd. Everyone knows what leading zero means
+[ValuesAndExpressions::ProhibitLeadingZeros]
+severity = 1
+

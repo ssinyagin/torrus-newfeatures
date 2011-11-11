@@ -800,11 +800,11 @@ sub buildConfig
         next if $interface->{'excluded'};
 
         # Create a subtree for the interface
-        my $subtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+        my $ifSubtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
 
         if( $onlyNamesDefined )
         {
-            if( not $onlyName{$subtreeName} )
+            if( not $onlyName{$ifSubtreeName} )
             {
                 $interface->{'excluded'} = 1;
                 $nExplExcluded++;
@@ -812,13 +812,13 @@ sub buildConfig
             }
         }
         
-        if( $excludeName{$subtreeName} )
+        if( $excludeName{$ifSubtreeName} )
         {
             $interface->{'excluded'} = 1;
             $nExplExcluded++;
             next;
         }
-        elsif( $subtreeName eq '' )
+        elsif( $ifSubtreeName eq '' )
         {
             Warn('Excluding an interface with empty name: ifIndex=' .
                  $ifIndex);
@@ -976,7 +976,7 @@ sub buildConfig
                 ( split('\s*,\s*',
                         $interface->{'selectorActions'}{'TokensetMember'}) )
             {
-                $tsetMember{$subtreeName}{$tset} = 1;
+                $tsetMember{$ifSubtreeName}{$tset} = 1;
             }
         }
         
@@ -1056,30 +1056,30 @@ sub buildConfig
             {
                 my $val =
                     $devdetails->paramString('RFC2863_IF_MIB::' .
-                                             $param . '::' . $subtreeName );
+                                             $param . '::' . $ifSubtreeName );
                 if( $val ne '' )
                 {
                     $interface->{'param'}{$param} = $val;
                 }
             }
 
-            if( defined( $tsetMember{$subtreeName} ) )
+            if( defined( $tsetMember{$ifSubtreeName} ) )
             {
                 my $tsetList =
-                    join( ',', sort keys %{$tsetMember{$subtreeName}} );
+                    join( ',', sort keys %{$tsetMember{$ifSubtreeName}} );
                 
                 $interface->{'childCustomizations'}->{'InOut_bps'}->{
                     'tokenset-member'} = $tsetList;
-                $tsetMemberApplied{$subtreeName} = 1;
+                $tsetMemberApplied{$ifSubtreeName} = 1;
             }
 
-            if( defined( $extStorage{$subtreeName} ) )
+            if( defined( $extStorage{$ifSubtreeName} ) )
             {
                 foreach my $dir ( 'In', 'Out' )
                 {
-                    if( defined( $extStorage{$subtreeName}{$dir} ) )
+                    if( defined( $extStorage{$ifSubtreeName}{$dir} ) )
                     {
-                        my $serviceid = $extStorage{$subtreeName}{$dir};
+                        my $serviceid = $extStorage{$ifSubtreeName}{$dir};
 
                         my $params = {
                             'storage-type'      => 'rrd,ext',
@@ -1103,7 +1103,7 @@ sub buildConfig
             }
             
             my $intfNode =
-                $cb->addSubtree( $countersNode, $subtreeName,
+                $cb->addSubtree( $countersNode, $ifSubtreeName,
                                  $interface->{'param'}, \@templates );
 
             if( defined( $interface->{'childCustomizations'} ) )
@@ -1122,9 +1122,9 @@ sub buildConfig
             }
 
             # If the interafce is a member of traffic summary
-            if( defined( $trafficSummary{$subtreeName} ) )
+            if( defined( $trafficSummary{$ifSubtreeName} ) )
             {
-                foreach my $summary ( keys %{$trafficSummary{$subtreeName}} )
+                foreach my $summary ( keys %{$trafficSummary{$ifSubtreeName}} )
                 {
                     addTrafficSummaryElement( $globalData,
                                               $summary, $intfNode );
@@ -1409,7 +1409,7 @@ sub getSelectorObjects
 {
     my $devdetails = shift;
     my $objType = shift;
-    return sort {$a<=>$b} keys ( %{$devdetails->data()->{'interfaces'}} );
+    return( sort {$a<=>$b} keys (%{$devdetails->data()->{'interfaces'}}) );
 }
 
 

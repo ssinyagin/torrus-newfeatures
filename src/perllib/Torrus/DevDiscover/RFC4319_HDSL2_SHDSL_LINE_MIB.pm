@@ -210,7 +210,12 @@ sub buildConfig
             $interface->{$data->{'nameref'}{'ifReferenceName'}};
         
                 
+        $ifParam->{'nodeid-dslinterface'} =
+            'dsl//%nodeid-device%//' .
+            $interface->{$data->{'nameref'}{'ifNodeid'}};
         
+        $ifParam->{'nodeid'} = '%nodeid-dslinterface%';
+                        
         my $ifSubtree = $cb->addSubtree
             ( $subtreeNode, $ifSubtreeName, $ifParam ,
               ['RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-interface']);
@@ -220,12 +225,25 @@ sub buildConfig
         my @snr_membernames;
         my $snr_mg_params = {
             'node-display-name' => 'SNR Margins overview',
-            'precedence' => 0,
+            'comment' => 'Summary graph for all SNR values',
+            'precedence' => 10010,
             'ds-type' => 'rrd-multigraph',
             'vertical-label' => 'dB',
             'graph-lower-limit' => 0,
+            'nodeid' => '%nodeid-dslinterface%//signal_ovw',
         };
         
+        my @err_membernames;
+        my $err_mg_params = {
+            'node-display-name' => 'Line errors overview',
+            'comment' => 'Summary graph for all errors',
+            'precedence' => 10000,
+            'ds-type' => 'rrd-multigraph',
+            'vertical-label' => 'Errors',
+            'graph-lower-limit' => 0,
+            'nodeid' => '%nodeid-dslinterface%//errors_ovw',
+        };
+
         my $linenum = 1;
         
         foreach my $INDEX (sort {$a cmp $b}
@@ -250,6 +268,7 @@ sub buildConfig
             $epNick =~ s/\./_/g;
 
             my $param = {
+                'comment' => 'Detailed endpoint statistics',
                 'node-display-name' => $endpoint,
                 'hdsl-index' => $INDEX,
                 'hdsl-endpoint-nick' => $epNick,
@@ -259,6 +278,11 @@ sub buildConfig
             $param->{'descriptive-nickname'} =
                 '%system-id%:%interface-name% ' . $endpoint;
 
+            $param->{'nodeid-dslendpoint'} =
+                '%nodeid-dslinterface%//' . $epSubtreeName;
+            
+            $param->{'nodeid'} = '%nodeid-dslendpoint%';
+                        
             $precedence--;
             
             $cb->addSubtree( $ifSubtree, $epSubtreeName, $param,
@@ -272,11 +296,28 @@ sub buildConfig
             $snr_mg_params->{'line-color-' . $epNick} = '##clr' . $linenum;
             $snr_mg_params->{'line-order-' . $epNick} = $linenum;
 
+
+            push( @err_membernames, $epNick );
+            $err_mg_params->{'ds-expr-' . $epNick} =
+                '{' . $epSubtreeName . '/Prev_15min_ES},' .
+                '{' . $epSubtreeName . '/Prev_15min_SES},+,' .
+                '{' . $epSubtreeName . '/Prev_15min_CRCA},+,' .
+                '{' . $epSubtreeName . '/Prev_15min_LOSWS},+,' .
+                '{' . $epSubtreeName . '/Prev_15min_UAS},+';
+            $err_mg_params->{'graph-legend-' . $epNick} =
+                $endpoint . ' line errors';
+            $err_mg_params->{'line-style-' . $epNick} = 'LINE2';
+            $err_mg_params->{'line-color-' . $epNick} = '##clr' . $linenum;
+            $err_mg_params->{'line-order-' . $epNick} = $linenum;
+
             $linenum++;
         }
 
         $snr_mg_params->{'ds-names'} = join(',', @snr_membernames);
         $cb->addLeaf( $ifSubtree, 'SNR_Summary', $snr_mg_params );
+
+        $err_mg_params->{'ds-names'} = join(',', @err_membernames);
+        $cb->addLeaf( $ifSubtree, 'Error_Summary', $err_mg_params );
     }
     
 }

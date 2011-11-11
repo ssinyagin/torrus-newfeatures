@@ -52,7 +52,7 @@
     <param name="graph-title"          value="%descriptive-nickname%" />
 
     <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="snr"/>
+    <param name="overview-shortcuts" value="snr,err"/>
     
     <param name="overview-subleave-name-snr" value="SNR_Summary"/>
     <param name="overview-direct-link-snr"      value="yes"/>
@@ -61,14 +61,23 @@
     <param name="overview-shortcut-title-snr"
            value="Show SNR margin graphs for all endpoints in one page"/>
     <param name="overview-page-title-snr"
-           value="Snr quality Graphs"/>
+           value="SNR quality Graphs"/>
+
+    <param name="overview-subleave-name-err" value="Error_Summary"/>
+    <param name="overview-direct-link-err"      value="yes"/>
+    <param name="overview-shortcut-text-err"
+           value="All line errors"/>
+    <param name="overview-shortcut-title-err"
+        value="Show line erro rsummary graphs for all endpoints in one page"/>
+    <param name="overview-page-title-err"
+           value="Line Error Graphs"/>
 
     <param name="rrd-hwpredict"     value="disabled" />
   </template>
 
   <template name="hdsl-interface">
     <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="signal"/>
+    <param name="overview-shortcuts" value="signal,err"/>
     
     <param name="overview-subleave-name-signal" value="Signal_Summary"/>
     <param name="overview-direct-link-signal"      value="yes"/>
@@ -79,13 +88,26 @@
            value="Show signal quality graphs for all endpoints in one page"/>
     <param name="overview-page-title-snr"
            value="Signal quality Graphs"/>
+
+    <param name="overview-subleave-name-err" value="Line_Errors_Summary"/>
+    <param name="overview-direct-link-err"      value="yes"/>
+    <param name="overview-direct-link-view-err" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-err"
+           value="All endpoint line errors"/>
+    <param name="overview-shortcut-title-err"
+           value="Show line error graphs for all endpoints in one page"/>
+    <param name="overview-page-title-snr"
+           value="Line Error Graphs"/>
+
   </template>
   
   <template name="hdsl-endpoint">
   
     <leaf name="Signal_Summary">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//signal" />
       <param name="comment"            value="Attenuation and SNR Margin" />
       <param name="precedence"         value="1000" />
+      <param name="node-display-name"  value="Signal Summary"/>
       <param name="ds-type"            value="rrd-multigraph" />
       <param name="ds-names"           value="atn,snr" />
 
@@ -105,7 +127,54 @@
       <param name="graph-lower-limit" value="0" />
     </leaf>
 
+    <!-- This is a graph whith a mixture of units: CRCA is in events/15min,
+         and the rest is in seconds/15min. Anyway we're interested in any of
+         those values being nonzero, so this graph still makes sense -->
+         
+    <leaf name="Line_Errors_Summary">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//errors" />
+      <param name="comment"            value="Line error graphs" />
+      <param name="precedence"         value="999" />
+      <param name="node-display-name"  value="Line Errors Summary"/>
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="es,ses,crca,losws,uas" />
+
+      <param name="ds-expr-es"       value="{Prev_15min_ES}" />
+      <param name="graph-legend-es"  value="ES in 15min" />
+      <param name="line-style-es"    value="LINE2" />
+      <param name="line-color-es"    value="##one" />
+      <param name="line-order-es"    value="1" />
+
+      <param name="ds-expr-ses"       value="{Prev_15min_SES}" />
+      <param name="graph-legend-ses"  value="SES in 15min" />
+      <param name="line-style-ses"    value="LINE2" />
+      <param name="line-color-ses"    value="##two" />
+      <param name="line-order-ses"    value="2" />
+
+      <param name="ds-expr-crca"       value="{Prev_15min_CRCA}" />
+      <param name="graph-legend-crca"  value="CRCA in 15min" />
+      <param name="line-style-crca"    value="LINE2" />
+      <param name="line-color-crca"    value="##three" />
+      <param name="line-order-crca"    value="3" />
+
+      <param name="ds-expr-losws"       value="{Prev_15min_LOSWS}" />
+      <param name="graph-legend-losws"  value="LOSWS in 15min" />
+      <param name="line-style-losws"    value="LINE2" />
+      <param name="line-color-losws"    value="##four" />
+      <param name="line-order-losws"    value="4" />
+
+      <param name="ds-expr-uas"       value="{Prev_15min_UAS}" />
+      <param name="graph-legend-uas"  value="UAS in 15min" />
+      <param name="line-style-uas"    value="LINE2" />
+      <param name="line-color-uas"    value="##five" />
+      <param name="line-order-uas"    value="5" />
+
+      <param name="vertical-label"    value="Errors or Seconds" />
+      <param name="graph-lower-limit" value="0" />
+    </leaf>
+
     <leaf name="Attenuation">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//atn" />
       <param name="comment"            value="Current loop attenuation" />
       <param name="snmp-object"
           value="$hdsl2ShdslEndpointCurrAtn.%hdsl-index%" />
@@ -119,6 +188,7 @@
     </leaf>
 
     <leaf name="SNR_Margin">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//snr" />
       <param name="comment"            value="Current SNR margin" />
       <param name="snmp-object"
           value="$hdsl2ShdslEndpointCurrSnrMgn.%hdsl-index%" />
@@ -133,8 +203,10 @@
     
     
     <leaf name="Prev_15min_ES">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//es" />
       <param name="comment"
          value="Errored Seconds during the previous 15min interval"/>
+      <param name="node-display-name"  value="ES in prev. 15min"/>
       <param name="snmp-object"
           value="$hdsl2Shdsl15MinIntervalES.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minES" />
@@ -146,8 +218,10 @@
     </leaf>
     
     <leaf name="Prev_15min_SES">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//ses" />    
       <param name="comment"
          value="Severely Errored Seconds during the previous 15min interval"/>
+      <param name="node-display-name"  value="SES in prev. 15min"/>
       <param name="snmp-object"
           value="$hdsl2Shdsl15MinIntervalSES.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minSES" />
@@ -159,8 +233,10 @@
     </leaf>
     
     <leaf name="Prev_15min_CRCA">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//crca" />    
       <param name="comment"
          value="CRC anomalies during the previous 15min interval"/>
+      <param name="node-display-name"  value="CRCA in prev. 15min"/>
       <param name="snmp-object"
           value="$hdsl2Shdsl15MinIntervalCRCanomalies.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minCRCA" />
@@ -172,8 +248,10 @@
     </leaf>
     
     <leaf name="Prev_15min_LOSWS">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//losws" />
       <param name="comment"
          value="Loss of Sync Word Seconds during the previous 15min interval"/>
+      <param name="node-display-name"  value="LOSWS in prev. 15min"/>
       <param name="snmp-object"
           value="$hdsl2Shdsl15MinIntervalLOSWS.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minLOSWS" />
@@ -185,8 +263,10 @@
     </leaf>
     
     <leaf name="Prev_15min_UAS">
+      <param name="nodeid"         value="%nodeid-dslendpoint%//uas" />
       <param name="comment"
          value="Unavailable Seconds during the previous 15min interval"/>
+      <param name="node-display-name"  value="UAS in prev. 15min"/>
       <param name="snmp-object"
           value="$hdsl2Shdsl15MinIntervalUAS.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minUAS" />

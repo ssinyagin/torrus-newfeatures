@@ -152,6 +152,7 @@ if( not $nodaemon and not $runonce )
         
         # At this point, we cannot tell anyone if "open" fails
         open(STDERR, '>>', $logfile);
+        *STDERR->autoflush();
     }
     
     my $fh = IO::File->new($pidfile, 'w');

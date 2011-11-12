@@ -51,6 +51,8 @@ my %syslogLevel =
      
 my $currentLogLevel = $logLevel{'info'};
 
+*STDERR->autoflush();
+
 # Thread ID
 our $TID = 0;
 sub setTID

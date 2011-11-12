@@ -1,8 +1,23 @@
+2011-11-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* configs/torrus-config.pl: New config variables for Syslog:
+	$Torrus::Log::syslogFacility = 'local0';
+	$Torrus::Collector::useSyslog = 1;
+	$Torrus::Monitor::useSyslog = 1;
+
+	* bin/monitor.in: disabled log rotation on SIGHUP. Syslog
+	logging enabled by default.
+
+	* bin/collector.in: disabled log rotation on SIGHUP. Syslog
+	logging enabled by default.
+
+	* perllib/Torrus/Log.pm: Syslog logging for daemons.
+
 2011-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
 	ifSpeed monitoring is triggered by $interface->{'ifSpeedMonitoring'}.
-	The bandwidth usage templates are updated accordingly. 
+	The bandwidth usage templates are updated accordingly.
 
 2011-10-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
@@ -11,7 +26,6 @@
 
 	* xmlconfig/generic/rfc2863.if-mib.xml: added templates for
 	ifSpeed and ifHighSpeed
-	
 
 2011-10-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 

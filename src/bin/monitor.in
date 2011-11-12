@@ -15,14 +15,17 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+# we cannot report a failure of STDERR reopening, as we are already a
+# forked child, so this Perl::Critic warning is disabled.
+## no critic (InputOutput::RequireCheckedOpen)
 
 use strict;
 use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
+use IO::File;
 use Proc::Daemon;
 use Getopt::Long;
 
@@ -85,15 +88,8 @@ elsif( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-my $logfile = $Torrus::Global::logDir . '/monitor.' . $tree . '.log';
-my $pidfile;
 
-my $rotateLogs = sub
-{
-    Info('Caught SIGHUP. Reopening log file');
-    close( STDERR );
-    open( STDERR, ">>$logfile" );
-};
+my $pidfile;
 
 if( not $nodaemon and not $runonce )
 {
@@ -102,25 +98,43 @@ if( not $nodaemon and not $runonce )
     
     if( -r $pidfilename )
     {
-        Error("Another monitor daemon is running, pid=",
-              `cat $pidfilename`);
+        my $oldpid;
+        my $fh = IO::File->new($pidfilename, 'r');
+        if( defined($fh) )
+        {
+            $oldpid = $fh->getline();
+        }
+        $fh->close();
+        
+        $oldpid = 'unknown' unless defined($oldpid);
+        
+        Error('Another monitor daemon is running, pid=', $oldpid);
         exit 1;
     }
 
     &Proc::Daemon::Init();
     umask 0017; # Proc::Daemon::Init sets the mask to all-writable
 
-    $SIG{'HUP'} = $rotateLogs;
-
-    # At this point, we cannot tell anyone if "open" fails
-    open(STDERR, ">>$logfile");
-
+    # now we're forked, save the PID file for the END block
     $pidfile = $pidfilename;
     
-    if( open( PID, ">$pidfile" ) )
+    if( $Torrus::Monitor::useSyslog )
     {
-        printf PID ( "%d", $$ );
-        close PID;
+        Torrus::Log::enableSyslog('monitor_' . $tree);
+    }
+    else
+    {
+        my $logfile = $Torrus::Global::logDir . '/monitor.' . $tree . '.log';
+        
+        # At this point, we cannot tell anyone if "open" fails
+        open(STDERR, '>>', $logfile);
+    }
+
+    my $fh = IO::File->new($pidfile, 'w');
+    if( defined($fh) )
+    {
+        $fh->printf('%d', $$);
+        $fh->close();
     }
     else
     {
@@ -130,7 +144,7 @@ if( not $nodaemon and not $runonce )
 
 Info(sprintf("Torrus version %s", '@VERSION@'));
 Info(sprintf("%s started for tree %s", $0, $tree));
-Debug(sprintf("Process ID %d", $$));
+Info(sprintf("Process ID %d", $$));
 
 if( $delay > 0 )
 {
@@ -156,7 +170,8 @@ $scheduler->run();
 
 if( not $options{'-RunOnce'} )
 {
-    Error("Monitor process exited: nothing to collect");
+    Error('Monitor process exited: ' .
+          'there is no datasource where monitoring is enabled');
 }
 
 exit;

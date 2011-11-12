@@ -15,14 +15,18 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+# we cannot report a failure of STDERR reopening, as we are already a
+# forked child, so this Perl::Critic warning is disabled.
+## no critic (InputOutput::RequireCheckedOpen)
 
 
 use strict;
 use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
+use IO::File;
 use Proc::Daemon;
 use Getopt::Long;
 
@@ -31,8 +35,6 @@ use Torrus::ConfigTree;
 use Torrus::Collector;
 use Torrus::CollectorScheduler;
 use Torrus::SiteConfig;
-
-$| = 1;
 
 exit(1) unless Torrus::SiteConfig::verify();
 
@@ -108,45 +110,55 @@ elsif( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-my $logfile =
-    $Torrus::Global::logDir . '/collector.' . $tree . '_' . $instance . '.log';
 my $pidfile;
-
-my $rotateLogs = sub
-{
-    Info('Caught SIGHUP. Reopening log file');
-    close( STDERR );
-    open( STDERR, ">>$logfile" );
-    $| = 1;
-};
 
 if( not $nodaemon and not $runonce )
 {
     my $pidfilename = 
         $Torrus::Global::pidDir . '/collector.' .
         $tree . '_' . $instance . '.pid';
-    
+            
     if( -r $pidfilename )
     {
-        Error("Another collector daemon is running, pid=",
-              `cat $pidfilename`);
+        my $oldpid;
+        my $fh = IO::File->new($pidfilename, 'r');
+        if( defined($fh) )
+        {
+            $oldpid = $fh->getline();
+        }
+        $fh->close();
+        
+        $oldpid = 'unknown' unless defined($oldpid);
+        
+        Error('Another collector daemon is running, pid=', $oldpid);
         exit 1;
     }
 
     &Proc::Daemon::Init();
     umask 0017; # Proc::Daemon::Init sets the mask to all-writable
-    
-    $SIG{'HUP'} = $rotateLogs;
 
-    # At this point, we cannot tell anyone if "open" fails
-    open(STDERR, ">>$logfile");
-
+    # now we're forked, save the PID file for the END block
     $pidfile = $pidfilename;
-    
-    if( open( PID, ">$pidfile" ) )
+
+    if( $Torrus::Collector::useSyslog )
     {
-        printf PID ( "%d", $$ );
-        close PID;
+        Torrus::Log::enableSyslog('collector_' . $tree . '_' . $instance);
+    }
+    else
+    {
+        my $logfile =
+            $Torrus::Global::logDir . '/collector.' .
+            $tree . '_' . $instance . '.log';
+        
+        # At this point, we cannot tell anyone if "open" fails
+        open(STDERR, '>>', $logfile);
+    }
+    
+    my $fh = IO::File->new($pidfile, 'w');
+    if( defined($fh) )
+    {
+        $fh->printf('%d', $$);
+        $fh->close();
     }
     else
     {
@@ -162,7 +174,7 @@ Torrus::Collector::initThreads();
 
 Info(sprintf("Torrus version %s", '@VERSION@'));
 Info(sprintf("%s started for tree %s, instance #%d", $0, $tree, $instance));
-Debug(sprintf("Process ID %d", $$));
+Info(sprintf("Process ID %d", $$));
 
 my %options =
     (
@@ -187,7 +199,6 @@ $scheduler->run();
 if( not $options{'-RunOnce'} )
 {
     Error("Collector process exited: nothing to collect");
-    unlink $pidfile;
 }
 
 exit;

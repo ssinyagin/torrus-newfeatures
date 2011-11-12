@@ -17,15 +17,8 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
-# 2002/06/25 11:35:00  ssinyagin
-# Taken from Cricket lib/Common/Log.pm
-#
-# 2004/06/25 ssinyagin
-# Finally reworked in 2 years!
-#
 
 package Torrus::Log;
 
@@ -33,21 +26,32 @@ use strict;
 use warnings;
 
 use base 'Exporter';
+use Sys::Syslog;
+
+## no critic (Modules::ProhibitAutomaticExportation)
 
 our @EXPORT = qw(Debug Warn Info Error Verbose isDebug);
 
 my @monthNames = ( 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
                    'Aug', 'Sep', 'Oct', 'Nov', 'Dec' );
 
-my %logLevel = (
-                'debug'    => 9,
-                'verbose'  => 8,
-                'info'     => 7,
-                'warn'     => 5,
-                'error'    => 1 );
+my %logLevel =
+    ( 'debug'    => 9,
+      'verbose'  => 8,
+      'info'     => 7,
+      'warn'     => 5,
+      'error'    => 1 );
 
+my %syslogLevel =
+    (9 => 'debug',
+     8 => 'info',
+     7 => 'notice',
+     5 => 'warning',
+     1 => 'err');
+     
 my $currentLogLevel = $logLevel{'info'};
 
+# Thread ID
 our $TID = 0;
 sub setTID
 {
@@ -55,55 +59,78 @@ sub setTID
 }
 
 
-sub Log
-{
-    my( $level, @msg ) = @_;    
+my $syslog_enabled = 0;
 
-    $level = $logLevel{$level};
-    
+sub enableSyslog
+{
+    my $ident = shift;   
+    openlog($ident, 'ndelay,pid', $Torrus::Log::syslogFacility);
+    $syslog_enabled = 1;
+}
+
+
+
+sub doLog
+{
+    my $level = shift;
+    my @msg = @_;    
+
     if( $level <= $currentLogLevel )
     {
-        if( $currentLogLevel >= 9 )
+        if( $syslog_enabled )
         {
-            unshift(@msg, $$ . '.' . $TID . ' ');
+            syslog($syslogLevel{$level}, join('', @msg));
         }
-        my $severity = ( $level <= $logLevel{'warn'} ) ? '*' : ' ';
-        printf STDERR ( "[%s%s] %s\n",
-                        timeStr( time() ), $severity, join( '', @msg ) );
+        else
+        {
+            if( $currentLogLevel >= 9 )
+            {
+                unshift(@msg, $$ . '.' . $TID . ' ');
+            }
+        
+            my $severity = ( $level <= 5 ) ? '*' : ' ';
+            
+            my $text = sprintf( "[%s%s] %s\n",
+                                timeStr(time()),
+                                $severity,
+                                join('', @msg) );
+            
+            *STDERR->write($text, length($text));
+        }
     }
-    return undef;
+    return;
 }
 
 
 sub Error
 {
-    Log( 'error', @_ );
+    doLog( 1, @_ );
 }
 
 sub Warn
 {
-    Log( 'warn', @_);
+    doLog( 5, @_);
 }
 
 sub Info
 {
-    Log( 'info', @_ );
+    doLog( 7, @_ );
 }
 
 sub Verbose
 {
-    Log( 'verbose', @_ );
+    doLog( 8, @_ );
 }
 
 sub Debug
 {
-    Log( 'debug', join('|', @_) );
+    doLog( 9, join('|', @_) );
 }
 
 
 sub isDebug
 {
-    return $currentLogLevel >= $logLevel{'debug'};
+    return ($currentLogLevel >= 9);
 }
 
 sub timeStr

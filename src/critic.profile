@@ -69,3 +69,7 @@ severity = 1
 [ValuesAndExpressions::ProhibitLeadingZeros]
 severity = 1
 
+# global signal handling is critical for correct BerkeleyDB functioning
+[Variables::RequireLocalizedPunctuationVars]
+allow = %SIG
+

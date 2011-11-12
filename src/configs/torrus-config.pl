@@ -61,6 +61,14 @@ $Torrus::Global::ConfigReadersWaitPeriod = 5;
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;
 
+# Syslog facility for collector and monitor daemons
+$Torrus::Log::syslogFacility = 'local0';
+
+# When true, daemon logging is sent to syslog instead of logfile.
+$Torrus::Collector::useSyslog = 1;
+$Torrus::Monitor::useSyslog = 1;
+
+
 # By default, there's an exclusive lock that allows only one collector
 # process to initialize at a time. This reduces the concurrency and
 # usually optimizes the initialization of multiple collector processes.

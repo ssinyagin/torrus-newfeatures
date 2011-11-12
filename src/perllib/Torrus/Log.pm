@@ -26,6 +26,7 @@ use strict;
 use warnings;
 
 use base 'Exporter';
+use IO::Handle;
 use Sys::Syslog;
 
 ## no critic (Modules::ProhibitAutomaticExportation)

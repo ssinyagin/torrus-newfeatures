@@ -117,8 +117,7 @@ sub discover
     {
         $devdetails->storeSnmpVars( $hrStorageTable );
 
-        my $ref = {};
-        $data->{'hrStorage'} = $ref;
+        $data->{'hrStorage'} = {};
 
         foreach my $INDEX
             ( $devdetails->getSnmpIndices($dd->oiddef('hrStorageIndex') ) )
@@ -196,12 +195,12 @@ sub discover
 
     # hrProcessor support
     {
-        my $oid = $dd->oiddef('hrProcessorLoad');
-        my $table = $session->get_table( -baseoid => $oid );
+        my $base = $dd->oiddef('hrProcessorLoad');
+        my $table = $session->get_table( -baseoid => $base );
         if( defined($table) )
         {
             $data->{'hrProcessors'} = [];
-            my $prefixLen = length( $oid ) + 1;
+            my $prefixLen = length( $base ) + 1;
         
             while( my( $oid, $load ) = each %{$table} )
             {
@@ -238,8 +237,6 @@ sub buildConfig
                 ('RFC2790_HOST_RESOURCES::sysperf-subtree-name', $subtreeName);
         }
 
-        my $param = {};
-
         my @templates =
             ('RFC2790_HOST_RESOURCES::hr-system-performance-subtree',
              'RFC2790_HOST_RESOURCES::hr-system-uptime');
@@ -254,13 +251,13 @@ sub buildConfig
         }
 
         my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
-                                           $param, \@templates );
+                                           {}, \@templates );
 
         if( $devdetails->hasCap('hrProcessor') )
         {
             foreach my $INDEX ( sort {$a<=>$b} @{$data->{'hrProcessors'}} )
             {
-                my $subtreeName = 'CPU_' . $INDEX . '_Load';
+                my $cpuName = 'CPU_' . $INDEX . '_Load';
                 
                 my $param = {
                     'cpu-id' => $INDEX,
@@ -268,7 +265,7 @@ sub buildConfig
                     'precedence' => sprintf("%d", 1000 - $INDEX),
                 };
                 
-                $cb->addLeaf( $subtreeNode, $subtreeName, $param,
+                $cb->addLeaf( $subtreeNode, $cpuName, $param,
                               ['RFC2790_HOST_RESOURCES::hr-processor-load']);
                 
             }
@@ -296,6 +293,8 @@ sub buildConfig
                           $ref->{'param'}, $ref->{'templates'} );
         }
     }
+
+    return;
 }
 
 

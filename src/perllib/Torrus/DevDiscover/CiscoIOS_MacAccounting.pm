@@ -20,8 +20,9 @@
 # Cisco IOS MAC accounting
 
 package Torrus::DevDiscover::CiscoIOS_MacAccounting;
-
 use strict;
+use warnings;
+
 use Torrus::Log;
 
 
@@ -373,6 +374,8 @@ sub buildConfig
             }
         }
     }
+
+    return;
 }
 
 

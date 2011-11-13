@@ -221,29 +221,29 @@ sub buildConfig
             {
                 my $interface = $data->{'interfaces'}{$ifIndex};
 
-                my $param = $interface->{'docsParams'};
+                my $ifParam = $interface->{'docsParams'};
 
-                $param->{'searchable'} = 'yes';
+                $ifParam->{'searchable'} = 'yes';
 
                 # Copy some parameters from IF-MIB discovery results
                 
                 foreach my $p ('interface-name', 'interface-nick',
                                'node-display-name', 'comment')
                 {
-                    $param->{$p} = $interface->{'param'}{$p};
+                    $ifParam->{$p} = $interface->{'param'}{$p};
                 }
                 
-                $param->{'nodeid-docsif'} =
+                $ifParam->{'nodeid-docsif'} =
                     $data->{'docsConfig'}{$category}{'nodeidCategory'} .
                     '//%nodeid-device%//' .
                     $interface->{$data->{'nameref'}{'ifNodeid'}};
                 
-                $param->{'nodeid'} = '%nodeid-docsif%';
+                $ifParam->{'nodeid'} = '%nodeid-docsif%';
                 
                 my $intfNode = $cb->addSubtree
                     ( $subtreeNode,
                       $interface->{$data->{'nameref'}{'ifSubtreeName'}},
-                      $param, 
+                      $ifParam, 
                       $interface->{'docsTemplates'} );
 
                 # Apply selector actions
@@ -296,6 +296,8 @@ sub buildConfig
             }
         }
     }
+
+    return;
 }
 
 

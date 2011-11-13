@@ -170,6 +170,8 @@ sub buildConfig
 
     # PROG: Adding global statistics
     $cb->addTemplateApplication( $devNode, 'Apple_AE::ae-global-stats');
+
+    return;
 }
 
 

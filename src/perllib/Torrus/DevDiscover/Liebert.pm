@@ -22,10 +22,10 @@
 #
 # NOTE: Options for this module
 #       Liebert::use-fahrenheit
-#	Liebert::disable-temperature
-#	Liebert::disable-humidity
-#	Liebert::disable-state
-#	Liebert::disable-stats
+#       Liebert::disable-temperature
+#       Liebert::disable-humidity
+#       Liebert::disable-state
+#       Liebert::disable-stats
 #
 # NOTE: This module supports both Fahrenheit and Celcius, but for ease of
 #       module and cleanliness we will convert Celcius into Fahrenheit
@@ -51,7 +51,7 @@ $Torrus::DevDiscover::registry{'Liebert'} = {
 our %oiddef =
     (
      # LIEBERT-GP-REGISTRATION-MIB
-     'GlobalProducts'	  => '1.3.6.1.4.1.476.1.42',
+     'GlobalProducts'     => '1.3.6.1.4.1.476.1.42',
 
      # LIEBERT-GP-AGENT-MIB
      'Manufacturer'       => '1.3.6.1.4.1.476.1.42.2.1.1.0',
@@ -228,7 +228,7 @@ sub buildConfig
         if( $devdetails->hasCap('env-temperature-fahrenheit') )
         {
             $dataFile   = "%system-id%_temperature_f.rrd";
-            $fahrenheit	= 1;
+            $fahrenheit = 1;
             $snmpVar    = 2;
             $tempUnit   = "F";
             $tempScale  = "Fahrenheit";
@@ -250,21 +250,22 @@ sub buildConfig
         my $nodeTemp = $cb->addSubtree( $devNode, 'Temperature', $paramSubTree,
                                       [ 'Liebert::temperature-subtree' ] );
 
-	# ----------------------------------------------------------------
+        # ----------------------------------------------------------------
         # PROG: Figure out how many indexes we have
         foreach my $index ( keys %{$data->{'liebert'}{'tempidx'}} )
         {
-            my $dataFile = "%system-id%_sensor_$index" . 
-                           ($fahrenheit ? '_fahrenheit':'') . ".rrd";
             Debug("Liebert: Temperature idx: $index : $tempScale");
             my $param = {
                 'comment'    => "Sensor: $index",
-                'data-file'  => $dataFile,
                 'sensor-idx' => $index
             };
 
+            $param->{'data-file'} =
+                '%system-id%_sensor_' . $index . 
+                ($fahrenheit ? '_fahrenheit':'') . '.rrd';
+
             $cb->addSubtree( $nodeTemp, 'sensor_' . $index, $param,
-                        [ @template ] );
+                             [ @template ] );
         } # END: foreach my $index
     } # END: env-temperature
 
@@ -304,6 +305,8 @@ sub buildConfig
                            [ 'Liebert::state-capacity' ] );
         }
     }
+
+    return;
 }
 
 1;

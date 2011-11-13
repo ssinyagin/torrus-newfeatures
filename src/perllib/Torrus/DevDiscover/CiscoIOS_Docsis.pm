@@ -274,6 +274,8 @@ sub buildConfig
 
         $cb->addParams( $upstrNode, $param );
     }
+
+    return;
 }
 
 

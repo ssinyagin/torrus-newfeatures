@@ -411,6 +411,8 @@ sub buildConfig
                              ['CiscoSCE::cisco-sce-rdr-category'] );
         }
     } # END hasCap sceRDR    
+
+    return;
 }
 
 1;

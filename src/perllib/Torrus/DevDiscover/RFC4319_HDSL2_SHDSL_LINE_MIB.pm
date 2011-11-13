@@ -172,12 +172,12 @@ sub buildConfig
     # Build SNR subtree
     my $subtreeName = 'DSL_Line_Stats';
 
-    my $param = {
+    my $subtreeParam = {
         'node-display-name'   => 'DSL line statistics',
     };
     
     my $subtreeNode =
-        $cb->addSubtree($devNode, $subtreeName, $param,
+        $cb->addSubtree($devNode, $subtreeName, $subtreeParam,
                         ['RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-subtree']);
 
     my $data = $devdetails->data();
@@ -320,6 +320,7 @@ sub buildConfig
         $cb->addLeaf( $ifSubtree, 'Error_Summary', $err_mg_params );
     }
     
+    return;
 }
 
 

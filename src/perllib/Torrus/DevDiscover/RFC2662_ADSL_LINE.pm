@@ -118,12 +118,12 @@ sub buildConfig
     # Build SNR subtree
     my $subtreeName = 'ADSL_Line_Stats';
 
-    my $param = {
+    my $subtreeParam = {
         'precedence'          => '-600',
         'node-display-name'   => 'ADSL line statistics'
         };
     
-    my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName, $param );
+    my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName, $subtreeParam );
 
     my $data = $devdetails->data();
     my $precedence = 1000;
@@ -177,6 +177,8 @@ sub buildConfig
                              $param, $templates );
         }
     }
+
+    return;
 }
 
 

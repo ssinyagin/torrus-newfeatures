@@ -299,6 +299,8 @@ sub buildConfig
         $cb->addSubtree( $subtreeNode, $subtreeName, $param,
                          ['CiscoIOS_SAA::cisco-rtt-echo-subtree']);
     }
+
+    return;
 }
 
 

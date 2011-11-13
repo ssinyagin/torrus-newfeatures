@@ -173,6 +173,7 @@ sub buildConfig
         }
     }
 
+    return;
 }
 
 1;

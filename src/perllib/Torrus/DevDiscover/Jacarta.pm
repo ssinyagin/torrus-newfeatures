@@ -196,6 +196,8 @@ sub buildConfig
         $cb->addLeaf( $sensorTree, $ref->{'leafName'}, $ref->{'param'},
                       [$ref->{'template'}] );
     }
+
+    return;
 }
 
 

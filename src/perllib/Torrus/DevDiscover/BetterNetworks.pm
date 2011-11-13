@@ -226,6 +226,8 @@ sub buildConfig
                           ['BetterNetworks::betternetworks-sensor'] );
         }
     }
+
+    return;
 }
 
 

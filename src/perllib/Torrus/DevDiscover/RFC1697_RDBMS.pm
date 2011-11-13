@@ -215,8 +215,7 @@ sub buildConfig
 
     my $appNode = $cb->addSubtree( $devNode, 'Applications', $appParam );
 
-    my $param = { };
-    my $oraNode = $cb->addSubtree( $appNode, 'Oracle', $param );
+    my $oraNode = $cb->addSubtree( $appNode, 'Oracle' );
 
     if( $devdetails->hasCap('RDBMS::DbTable') )
     {
@@ -230,6 +229,8 @@ sub buildConfig
         }
 
     }
+
+    return;
 }
 
 

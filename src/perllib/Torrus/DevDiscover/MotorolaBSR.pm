@@ -204,6 +204,8 @@ sub buildConfig
             exit 1;
         }
     }
+
+    return;
 }
 
 1;

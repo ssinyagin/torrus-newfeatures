@@ -155,6 +155,8 @@ sub buildConfig
                           [ 'CiscoWLC::ciscowlc-ess-leaf' ] );
         }
     }
+
+    return;
 }
 
 

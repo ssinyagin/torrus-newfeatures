@@ -1166,6 +1166,8 @@ sub buildConfig
     {
         $cb->{'statistics'}{'max-interfaces-per-host'} = $nInterfaces;
     }
+
+    return;
 }
 
 
@@ -1183,6 +1185,7 @@ sub addTrafficSummaryElement
 
     push( @{$globalData->{'RFC2863_IF_MIB::summaryMembers'}{$summary}},
           $node );
+    return;
 }
       
 
@@ -1253,6 +1256,8 @@ sub buildGlobalConfig
                           ['::cdef-collector-defaults'] );
         }
     }
+
+    return;
 }
 
                        
@@ -1278,6 +1283,7 @@ sub addInterfaceFilter
     }
 
     push( @{$data->{'interfaceFilter'}}, $filterHash );
+    return;
 }
 
 
@@ -1338,6 +1344,7 @@ sub uniqueEntries
         }
         $count{$entry}++;
     }
+    return;
 }
 
 # For devices which require MAC address-to-interface mapping,
@@ -1372,6 +1379,7 @@ sub retrieveMacAddresses
             delete $data->{'interfaces'}{$ifIndex};
         }
     }
+    return;
 }
 
 
@@ -1389,6 +1397,8 @@ sub storeIfIndexParams
         my $interface = $data->{'interfaces'}{$ifIndex};
         $interface->{'param'}{'interface-index'} = $ifIndex;        
     }
+
+    return;
 }
 
 #######################################
@@ -1521,6 +1531,8 @@ sub applySelectorAction
     {
         Error('Unknown RFC2863_IF_MIB selector action: ' . $action);
     }
+
+    return;
 }
    
 

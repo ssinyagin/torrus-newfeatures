@@ -14,7 +14,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id: CiscoIOS_Docsis.pm 439 2006-09-27 08:56:30Z ssinyagin $
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 # DOCSIS interface, CASA specific
@@ -258,6 +257,8 @@ sub buildConfig
         
         $cb->addParams( $downstrNode, $param );
     }
+
+    return;
 }
 
 

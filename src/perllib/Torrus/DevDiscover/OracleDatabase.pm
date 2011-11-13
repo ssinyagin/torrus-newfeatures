@@ -281,12 +281,13 @@ sub buildConfig
 
         if( $devdetails->hasCap('oraTableSpace') )
         {
-            my $tsParam = {
+            my $subtreeParam = {
                 'comment' => "Table space for $dbName",
                 'precedence' => "600",
             };
 
-            my $tsNode = $cb->addSubtree($dbNode, 'Table_Space', $tsParam );
+            my $tsNode =
+                $cb->addSubtree($dbNode, 'Table_Space', $subtreeParam );
 
             foreach my $tsName ( keys %{ $db->{'oraTableSpace'} } )
             {
@@ -316,12 +317,12 @@ sub buildConfig
 
         if( $devdetails->hasCap('oraDbDataFile') )
         {
-            my $dfParam = {
+            my $subtreeParam = {
                 'comment' => "Data Files for $dbName",
                 'precedence' => "500",
             };
 
-            my $dfNode = $cb->addSubtree($dbNode, 'Data_Files', $dfParam );
+            my $dfNode = $cb->addSubtree($dbNode, 'Data_Files', $subtreeParam );
 
             foreach my $dfName ( keys %{ $db->{'oraDbDataFile'} } )
             {
@@ -352,12 +353,13 @@ sub buildConfig
 
         if( $devdetails->hasCap('oraDbLibraryCache') )
         {
-            my $lcParam = {
+            my $subtreeParam = {
                 'comment' => "Library Cache for $dbName",
                 'precedence' => "400",
             };
 
-            my $lcNode = $cb->addSubtree($dbNode, 'Library_Cache', $lcParam );
+            my $lcNode =
+                $cb->addSubtree($dbNode, 'Library_Cache', $subtreeParam );
 
             foreach my $lcName ( keys %{ $db->{'oraDbLibraryCache'} } )
             {
@@ -384,6 +386,8 @@ sub buildConfig
             }
         }
     }
+
+    return;
 }
 
 

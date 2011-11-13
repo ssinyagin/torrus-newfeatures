@@ -189,6 +189,8 @@ sub buildConfig
         my $iisNode = $cb->addSubtree( $devNode, 'MS_IIS', $iisParam,
                                        \@iisTemplates );
     }
+
+    return;
 }
 
 

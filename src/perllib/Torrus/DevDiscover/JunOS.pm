@@ -649,6 +649,8 @@ sub buildConfig
             }
         }
     } # END: if jnxRPF
+
+    return;
 }
 
 

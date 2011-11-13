@@ -333,20 +333,21 @@ sub buildConfig
         my $fahrenheit =
             $devdetails->paramEnabled('CiscoGeneric::use-fahrenheit');
 
-        my $param = {
+        my $subtreeParam = {
             'node-display-name' => 'Temperature Sensors',
         };
-        my $templates = [ 'CiscoGeneric::cisco-temperature-subtree' ];
         
         my $filePerSensor =
             $devdetails->paramEnabled('CiscoGeneric::file-per-sensor');
         
-        $param->{'data-file'} = '%snmp-host%_sensors' .
+        $subtreeParam->{'data-file'} = '%snmp-host%_sensors' .
             ($filePerSensor ? '_%sensor-index%':'') .
             ($fahrenheit ? '_fahrenheit':'') . '.rrd';
 
-        my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
-                                           $param, $templates );
+        my $subtreeNode =
+            $cb->addSubtree( $devNode, $subtreeName,
+                             $subtreeParam,
+                             [ 'CiscoGeneric::cisco-temperature-subtree' ] );
         
         foreach my $sIndex ( sort {$a<=>$b} keys
                              %{$data->{'ciscoTemperatureSensors'}} )
@@ -369,8 +370,9 @@ sub buildConfig
                 'upper-limit'        => $threshold
                 };
 
-            my $templates = ['CiscoGeneric::cisco-temperature-sensor' .
-                             ($fahrenheit ? '-fahrenheit':'')];
+            my $templates =
+                ['CiscoGeneric::cisco-temperature-sensor' .
+                 ($fahrenheit ? '-fahrenheit':'')];
 
             my $monitor = $data->{'ciscoTemperatureSensors'}{$sIndex}->{
                 'selectorActions'}{'Monitor'};
@@ -397,23 +399,22 @@ sub buildConfig
         # Create a subtree for the power supplies
         my $subtreeName = 'Power_Supplies';
 
-        my $param = {
+        my $subtreeParam = {
             'node-display-name' => 'Power Supplies',
             'comment' => 'Power supplies status',
             'precedence' => -600,
         };
-        my $templates = [];
                 
-        $param->{'data-file'} = '%system-id%_power.rrd';
+        $subtreeParam->{'data-file'} = '%system-id%_power.rrd';
 
         my $monitor = $devdetails->paramString('CiscoGeneric::power-monitor');
         if( $monitor ne '' )
         {
-            $param->{'monitor'} = $monitor;
+            $subtreeParam->{'monitor'} = $monitor;
         }
 
-        my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
-                                           $param, $templates );
+        my $subtreeNode =
+            $cb->addSubtree( $devNode, $subtreeName, $subtreeParam );
         
         foreach my $sIndex ( sort {$a<=>$b} @{$data->{'ciscoPowerSupplies'}} )
         {
@@ -423,9 +424,8 @@ sub buildConfig
                 'power-index'       => $sIndex
                 };
 
-            my $templates = ['CiscoGeneric::cisco-power-supply'];
-
-            $cb->addLeaf( $subtreeNode, $leafName, $param, $templates );
+            $cb->addLeaf( $subtreeNode, $leafName, $param,
+                          ['CiscoGeneric::cisco-power-supply'] );
         }
     }
 
@@ -437,14 +437,14 @@ sub buildConfig
     {
         my $subtreeName = 'Memory_Usage';
 
-        my $param = {
+        my $subtreeParam = {
             'node-display-name' => 'Memory Usage',
             'precedence'        => '-100',
             'comment'           => 'Router memory utilization'
             };
 
         my $subtreeNode =
-            $cb->addSubtree( $devNode, $subtreeName, $param,
+            $cb->addSubtree( $devNode, $subtreeName, $subtreeParam,
                              ['CiscoGeneric::cisco-memusage-subtree']);
 
         if( $devdetails->hasCap('cempMemPool') )
@@ -527,14 +527,14 @@ sub buildConfig
     if( $devdetails->hasCap('ciscoCpuStats') )
     {
         my $subtreeName = 'CPU_Usage';
-        my $param = {
+        my $subtreeParam = {
             'node-display-name' => 'CPU Usage',
             'precedence'         => '-500',
             'comment'            => 'Overall CPU busy percentage'
             };
 
         my $subtreeNode =
-            $cb->addSubtree( $devNode, $subtreeName, $param,
+            $cb->addSubtree( $devNode, $subtreeName, $subtreeParam,
                              ['CiscoGeneric::cisco-cpu-usage-subtree']);
         
         foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'ciscoCpuStats'}} )
@@ -581,6 +581,8 @@ sub buildConfig
             }
         }
     }
+
+    return;
 }
 
 
@@ -732,6 +734,8 @@ sub applySelectorAction
     {
         Error('Unknown Cisco selector action: ' . $action);
     }
+
+    return;
 }   
 
 

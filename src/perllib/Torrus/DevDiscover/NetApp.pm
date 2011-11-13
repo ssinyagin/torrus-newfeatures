@@ -159,6 +159,8 @@ sub buildConfig
         Debug("Would add cifs here\n");
         #$cb->addTemplateApplication( $devNode, 'NetApp::cifs');
     }
+
+    return;
 }
 
 

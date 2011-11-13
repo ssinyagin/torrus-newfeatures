@@ -254,6 +254,8 @@ sub buildConfig
         $cb->addLeaf( $perfNode, 'Cpu_Stats',
                       $cpuMultiParam, \@cpuMultiTemplates );
     }
+
+    return;
 }
 
 

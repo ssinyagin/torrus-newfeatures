@@ -196,6 +196,8 @@ sub buildConfig
         $cb->addLeaf( $callStatsNode, $subtreeName, $param,
                       ['AscendMax::ascend-line-stats']);
     }
+    
+    return;
 }
 
 

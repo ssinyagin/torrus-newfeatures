@@ -39,9 +39,9 @@ $Torrus::DevDiscover::registry{'Arista'} = {
 
 our %oiddef =
     (
-     'sysDescr'		=> '1.3.6.1.2.1.1.1.0',
+     'sysDescr'         => '1.3.6.1.2.1.1.1.0',
      # Arista
-     'aristaProducts'	=> '1.3.6.1.4.1.30065.1'
+     'aristaProducts'   => '1.3.6.1.4.1.30065.1'
 
      );
 
@@ -120,7 +120,7 @@ sub discover
     my $data = $devdetails->data();
 
     # PROG: Add comment for sysDescr
-    my $desc	= $dd->retrieveSnmpOIDs('sysDescr');
+    my $desc    = $dd->retrieveSnmpOIDs('sysDescr');
     $data->{'param'}{'comment'} = $desc->{'sysDescr'};
     
     return 1;
@@ -134,6 +134,7 @@ sub buildConfig
     my $devNode = shift;
     my $data = $devdetails->data();
 
+    return;
 }
 
 

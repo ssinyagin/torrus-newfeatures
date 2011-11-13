@@ -167,6 +167,8 @@ sub buildConfig
     }
 
     $cb->addSubtree( $devNode, $fwStatsTree, $fwStatsParam, \@templates );
+
+    return;
 }
 
 

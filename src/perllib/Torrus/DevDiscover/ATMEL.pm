@@ -156,6 +156,7 @@ sub buildConfig
     {
         $cb->addTemplateApplication( $devNode, $tmpl );
     }
+    return;
 }
 
 

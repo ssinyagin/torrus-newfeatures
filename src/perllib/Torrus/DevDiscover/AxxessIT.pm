@@ -342,6 +342,7 @@ sub buildConfig
     my $cb = shift;
     my $devNode = shift;
 
+    return;
 }
 
 

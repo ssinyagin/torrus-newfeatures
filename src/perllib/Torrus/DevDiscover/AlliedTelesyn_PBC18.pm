@@ -87,9 +87,9 @@ sub discover
     
     # Modules table
 
-    my $oid = $dd->oiddef('ATMCCommon-MIB::mcModuleType');
+    my $base = $dd->oiddef('ATMCCommon-MIB::mcModuleType');
     
-    my $table = $session->get_table( -baseoid => $oid );    
+    my $table = $session->get_table( -baseoid => $base );    
     if( not defined( $table ) )
     {
         return 0;
@@ -97,9 +97,9 @@ sub discover
     
     $devdetails->storeSnmpVars( $table );
     
-    foreach my $INDEX ( $devdetails->getSnmpIndices($oid) )
+    foreach my $INDEX ( $devdetails->getSnmpIndices($base) )
     {
-        my $moduleType = $devdetails->snmpVar( $oid . '.' . $INDEX );
+        my $moduleType = $devdetails->snmpVar( $base . '.' . $INDEX );
         if( $moduleType == 0 )
         {
             next;
@@ -217,21 +217,22 @@ sub buildConfig
         
     foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'PBC18'}} )
     {
-        my $param = { 'pbc-module-index' => $INDEX };
+        my $modParam = { 'pbc-module-index' => $INDEX };
         
         if( defined( $data->{'PBC18'}{$INDEX}{'moduleDesc'} ) )
         {
-            $param->{'legend'} =
+            $modParam->{'legend'} =
                 'Module type: ' . $data->{'PBC18'}{$INDEX}{'moduleDesc'};
         }
 
         if( defined( $data->{'PBC18'}{$INDEX}{'moduleName'} ) )
         {
-            $param->{'comment'} =
+            $modParam->{'comment'} =
                 $data->{'PBC18'}{$INDEX}{'moduleName'};
         }
         
-        my $modNode = $cb->addSubtree( $devNode, 'Module_' . $INDEX, $param );
+        my $modNode =
+            $cb->addSubtree( $devNode, 'Module_' . $INDEX, $modParam );
 
         my $mgParam = {
             'ds-type'              => 'rrd-multigraph',
@@ -260,18 +261,19 @@ sub buildConfig
             $mgParam->{'line-order-' . $dsname} = $n;
             $mgParam->{'ds-expr-' . $dsname} = '{Port_' . $portName . '}';
             
-            my $param = {
+            my $portParam = {
                 'rrd-ds' => 'Port' . $portName,
                 'snmp-object' =>
                     $data->{'PBC18'}{$INDEX}{'portAvailable'}{$portName},
                 };
 
-            $cb->addLeaf( $modNode, 'Port_' . $portName, $param );
+            $cb->addLeaf( $modNode, 'Port_' . $portName, $portParam );
             $n++;
         }
 
         $cb->addLeaf( $modNode, 'AllPorts', $mgParam );        
     }
+    return;
 }
 
 

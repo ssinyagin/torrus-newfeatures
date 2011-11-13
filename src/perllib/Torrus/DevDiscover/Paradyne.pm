@@ -160,12 +160,13 @@ sub buildConfig
     {
         my $subtreeName = 'XDSL_Line_Stats';
 
-        my $param = {
+        my $subtreeParam = {
             'precedence'           => '-600',
             'comment'              => 'Paradyne XDSL line statistics',
             'xdsl-stats-interval'  => $statsInterval
-            };
-        my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName, $param );
+        };
+        my $subtreeNode =
+            $cb->addSubtree( $devNode, $subtreeName, $subtreeParam );
 
         my $data = $devdetails->data();
 
@@ -189,6 +190,8 @@ sub buildConfig
                              $param, $templates );
         }
     }
+
+    return;
 }
 
 

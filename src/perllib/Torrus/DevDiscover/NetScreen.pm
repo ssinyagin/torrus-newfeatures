@@ -141,6 +141,8 @@ sub buildConfig
 
     $cb->addTemplateApplication($devNode, 'NetScreen::netscreen-cpu-stats');
     $cb->addTemplateApplication($devNode, 'NetScreen::netscreen-memory-stats');
+
+    return;
 }
 
 

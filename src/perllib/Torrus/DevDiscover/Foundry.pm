@@ -288,9 +288,9 @@ sub discover
         
         # get module descriptions
         {
-            my $oid = $dd->oiddef('fdrySnAgentBrdMainBrdDescription');
-            my $table = $session->get_table( -baseoid => $oid );        
-            my $prefixLen = length( $oid ) + 1;
+            my $base = $dd->oiddef('fdrySnAgentBrdMainBrdDescription');
+            my $table = $session->get_table( -baseoid => $base );        
+            my $prefixLen = length( $base ) + 1;
             
             while( my( $oid, $descr ) = each %{$table} )
             {
@@ -451,17 +451,17 @@ sub buildConfig
             
         foreach my $brdIndex ( sort {$a <=> $b} keys %{$data->{'fdryBoard'}} )
         {
-            my $descr = $data->{'fdryBoard'}{$brdIndex}{'description'};
-            my $param = {
-                'comment'  => $descr,
+            my $brdDescr = $data->{'fdryBoard'}{$brdIndex}{'description'};
+            my $brdParam = {
+                'comment'  => $brdDescr,
                 'fdry-board-index' => $brdIndex,
-                'fdry-board-descr' => $descr,
+                'fdry-board-descr' => $brdDescr,
                 'nodeid' => 'module//%nodeid-device%//' . $brdIndex,
             };
             
             my $linecardNode =
                 $cb->addSubtree( $brdNode, 'Linecard_' . $brdIndex,
-                                 $param,
+                                 $brdParam,
                                  [ 'Foundry::fdry-board-subtree' ]);
             
             if( $data->{'fdryBoard'}{$brdIndex}{'memory'} )
@@ -561,6 +561,8 @@ sub buildConfig
             }
         }
     }
+
+    return;
 }
 
 

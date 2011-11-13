@@ -76,18 +76,18 @@ $Torrus::DevDiscover::registry{'Arbor_E'} = {
 our %oiddef =
     (
      # ELLACOYA-MIB
-     'eProducts'	     => '1.3.6.1.4.1.3813.2',
+     'eProducts'             => '1.3.6.1.4.1.3813.2',
      'codeVer'               => '1.3.6.1.4.1.3813.1.4.1.1.0',
-     'sysIdSerialNum'	     => '1.3.6.1.4.1.3813.1.4.1.5.2.0',
+     'sysIdSerialNum'        => '1.3.6.1.4.1.3813.1.4.1.5.2.0',
      'memPoolNameIndex'      => '1.3.6.1.4.1.3813.1.4.2.5.1.1',
      'hDriveErrModel'        => '1.3.6.1.4.1.3813.1.4.2.10.16.0',
      'hDriveErrSerialNum'    => '1.3.6.1.4.1.3813.1.4.2.10.17.0',
      'partitionName'         => '1.3.6.1.4.1.3813.1.4.2.11.1.2', # e100
      'cpuSdramIndex'         => '1.3.6.1.4.1.3813.1.4.2.12.1.1', # e100
      'hDriveDailyLogSize'    => '1.3.6.1.4.1.3813.1.4.2.13.0',
-     'cpuUtilization'	     => '1.3.6.1.4.1.3813.1.4.4.1.0',
+     'cpuUtilization'        => '1.3.6.1.4.1.3813.1.4.4.1.0',
      'cpuUtilTable'          => '1.3.6.1.4.1.3813.1.4.4.2',      # e100
-     'cpuIndex'		     => '1.3.6.1.4.1.3813.1.4.4.2.1.1',  # e100
+     'cpuIndex'              => '1.3.6.1.4.1.3813.1.4.4.2.1.1',  # e100
      'cpuName'               => '1.3.6.1.4.1.3813.1.4.4.2.1.2',  # e100
      'loginRespOkStatsIndex' => '1.3.6.1.4.1.3813.1.4.3.15.1.1',
 
@@ -197,7 +197,7 @@ sub discover
 
         # PROG: Check status oids
         if( $devdetails->paramDisabled('Arbor_E::disable-e30-buffers') )
-	{
+        {
             $devdetails->setCap('e30-buffers');
         }
 
@@ -273,17 +273,17 @@ sub discover
                 my $l2tpSecEndTable =
                     $session->get_table
                     (-baseoid => $dd->oiddef('l2tpSecureEndpointIpAddress') );
-		$devdetails->storeSnmpVars( $l2tpSecEndTable );
+                $devdetails->storeSnmpVars( $l2tpSecEndTable );
                 
                 Debug("e30: L2TP secure endpoints found:");
                 foreach my $SEP
                     ( $devdetails->getSnmpIndices
                       ($dd->oiddef('l2tpSecureEndpointIpAddress') ) )
-		{
+                {
                     next if( ! $SEP );
                     $data->{'e30'}{'l2tpSEP'}{$SEP} = 0;
                     Debug("e30:    $SEP");
-		}
+                }
             } # END: if l2tpConfigEnabled
         }
 
@@ -676,7 +676,7 @@ sub buildConfig
                 my $srvName     =  $data->{'e30'}{'bundleID'}{$bundleID};
                 my $subtreeName =  $srvName;
                 $subtreeName =~ s/\W/_/g; 
-                my $bundleRRD	= $bundleID;
+                my $bundleRRD   = $bundleID;
                 my @templates   = ( 'Arbor_E::e30-bundle' );
 
                 if( $devdetails->paramEnabled
@@ -768,7 +768,7 @@ sub buildConfig
                     Debug("  loginReps: $sindex, color: $color");
                 } # END: foreach $sindex
 
-                $dsList =~ s/,$//o;	# Remove final comma
+                $dsList =~ s/,$//o;     # Remove final comma
                 $multiParam->{'ds-names'} = $dsList;
 
                 $cb->addLeaf($nodeTree, 'Summary', $multiParam, undef );
@@ -1030,7 +1030,7 @@ sub buildConfig
                 $multiParam->{"ds-expr-$stateName"}      = "{$stateName}";
                 $multiParam->{"graph-legend-$stateName"} = "$stateName";
                 $multiParam->{"line-style-$stateName"}   = "LINE1";
-                $multiParam->{"line-color-$stateName"}   = $color,
+                $multiParam->{"line-color-$stateName"}   = $color;
                 $multiParam->{"line-order-$stateName"}   = $stateIDX;
             }
             $dsList =~ s/,$//o;
@@ -1169,6 +1169,7 @@ sub buildConfig
         } # END: foreach my $flowDevIdx
     } # END: hasCap arbor-flowLookup
 
+    return;
 }
 
 1;

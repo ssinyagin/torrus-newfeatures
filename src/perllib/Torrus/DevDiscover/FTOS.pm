@@ -255,13 +255,13 @@ sub discover
             foreach my $sensorIdx ( $devdetails->getSnmpIndices
                                     ( $dd->oiddef('chSysCardSlotIndex') ) )
             {
-                my $sensorCard =
+                my $sensor =
                     $devdetails->snmpVar( $dd->oiddef('chSysCardNumber') .
                                           '.' . $sensorIdx );
 
-                $data->{'ftosSensor'}{$sensorIdx} = $sensorCard;
+                $data->{'ftosSensor'}{$sensorIdx} = $sensor;
 
-                Debug("FTOS::Sensor index $sensorIdx, card $sensorCard");
+                Debug("FTOS::Sensor index $sensorIdx, card $sensor");
             }
         } # END if: $sensorTable
     } # END: disable-sensors
@@ -331,19 +331,19 @@ sub buildConfig
     if( $devdetails->hasCap('ftosSensor') )
     {
         my $subtreeName = "Temperature_Sensors";
-        my $param       = {};
+        my $subtreeParam       = {};
         my $fahrenheit  = $devdetails->paramEnabled('FTOS::use-fahrenheit');
         my $filePerSensor 
             = $devdetails->paramEnabled('FTOS::file-per-sensor');
-        my $templates   = [ 'FTOS::ftos-temperature-subtree' ];
 
-        $param->{'data-file'} = '%snmp-host%_sensors' .
+        $subtreeParam->{'data-file'} = '%snmp-host%_sensors' .
             ($filePerSensor ? '_%sensor-index%':'') .
             ($fahrenheit ? '_fahrenheit':'') . '.rrd';
 
-        my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName,
-                                           $param, $templates );
-
+        my $subtreeNode =
+            $cb->addSubtree( $devNode, $subtreeName, $subtreeParam,
+                             ['FTOS::ftos-temperature-subtree'] );
+        
         foreach my $sIndex ( sort {$a<=>$b} keys %{$data->{'ftosSensor'}} )
         {
             my $leafName   = sprintf( 'sensor_%.2d', $sIndex );
@@ -367,6 +367,8 @@ sub buildConfig
             $cb->addLeaf( $subtreeNode, $leafName, $param, $templates );
         } 
     }
+
+    return;
 }
 
 

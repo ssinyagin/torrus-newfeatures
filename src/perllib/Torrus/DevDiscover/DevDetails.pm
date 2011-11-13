@@ -52,6 +52,7 @@ sub setParams
     {
         $self->{'params'}->{$param} = $value;
     }
+    return;
 }
 
 
@@ -62,6 +63,7 @@ sub setParam
     my $value = shift;
 
     $self->{'params'}->{$param} = $value;
+    return;
 }
 
 
@@ -135,6 +137,7 @@ sub storeSnmpVars
 
     # Clean the cache of sorted OIDs
     $self->{'sortedoids'} = undef;
+    return;
 }
 
 ##
@@ -214,6 +217,7 @@ sub setDevType
     my $self = shift;
     my $type = shift;
     $self->{'devtype'}{$type} = 1;
+    return;
 }
 
 sub isDevType
@@ -240,6 +244,7 @@ sub setCap
     my $cap = shift;
     Debug('Device capability: ' . $cap);
     $self->{'caps'}{$cap} = 1;
+    return;
 }
 
 sub hasCap
@@ -258,6 +263,7 @@ sub clearCap
     {
         delete $self->{'caps'}{$cap};
     }
+    return;
 }
 
 
@@ -354,6 +360,8 @@ sub applySelectors
             }
         }
     }
+
+    return;
 }    
 
 1;

@@ -372,14 +372,16 @@ sub discover
                     push( @nonV4Unicast, $INDEX );
                 }
 
-                my $desc =
-                    $devdetails->paramString
-                    ('peer-ipaddr-description-' .
-                     join('_', split('\.', $peerIP)));
-                if( $desc ne '' )
                 {
-                    $peer->{'description'} = $desc;
-                }        
+                    my $desc =
+                        $devdetails->paramString
+                        ('peer-ipaddr-description-' .
+                         join('_', split('\.', $peerIP)));
+                    if( $desc ne '' )
+                    {
+                        $peer->{'description'} = $desc;
+                    }
+                }
                 
                 my $peerAS = $data->{'bgpPeerAS'}{$peerIP};
                 if( defined( $peerAS ) )
@@ -864,6 +866,8 @@ sub buildConfig
                 ['CiscoIOS::cisco-port-qos-packets']);
         }
     }
+
+    return;
 }
 
 

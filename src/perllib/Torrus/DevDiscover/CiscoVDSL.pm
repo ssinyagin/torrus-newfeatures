@@ -119,6 +119,8 @@ sub buildConfig
 
         $cb->addSubtree( $subtreeNode, $ifSubtreeName, $param, $templates );
     }
+
+    return;
 }
 
 

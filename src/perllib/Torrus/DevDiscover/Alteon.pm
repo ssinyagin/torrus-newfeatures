@@ -159,7 +159,8 @@ sub buildConfig
                          { 'alteon-maint-index' => $mIndex },
                          [ 'Alteon::alteon-maint'] ); 
     }
-
+    
+    return;
 }
 
 1;

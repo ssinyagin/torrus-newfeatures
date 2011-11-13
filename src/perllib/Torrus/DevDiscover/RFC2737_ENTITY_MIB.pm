@@ -141,6 +141,7 @@ sub buildConfig
     my $devdetails = shift;
     my $cb = shift;
     my $devNode = shift;
+    return;
 }
 
 

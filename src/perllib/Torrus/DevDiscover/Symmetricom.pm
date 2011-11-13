@@ -95,6 +95,7 @@ sub buildConfig
     my $data = $devdetails->data();
 
     $cb->addTemplateApplication($devNode, 'Symmetricom::ntp-stats');
+    return;
 }
 
 1;

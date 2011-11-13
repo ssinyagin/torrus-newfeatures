@@ -134,10 +134,10 @@ sub discover
 
     # Get port descriptions
     {
-        my $oid = $dd->oiddef('tmnxPortDescription');
+        my $base = $dd->oiddef('tmnxPortDescription');
         
-        my $portDescrTable = $session->get_table( -baseoid => $oid );        
-        my $prefixLen = length( $oid ) + 1;
+        my $portDescrTable = $session->get_table( -baseoid => $base );        
+        my $prefixLen = length( $base ) + 1;
 
         while( my( $oid, $descr ) = each %{$portDescrTable} )
         {
@@ -158,9 +158,9 @@ sub discover
     
     # Get customers
     {
-        my $oid = $dd->oiddef('custDescription');
-        my $custDescrTable = $session->get_table( -baseoid => $oid );        
-        my $prefixLen = length( $oid ) + 1;
+        my $base = $dd->oiddef('custDescription');
+        my $custDescrTable = $session->get_table( -baseoid => $base );        
+        my $prefixLen = length( $base ) + 1;
         
         while( my( $oid, $descr ) = each %{$custDescrTable} )
         {
@@ -172,9 +172,9 @@ sub discover
     
     # Get Service Descriptions
     {
-        my $oid = $dd->oiddef('svcDescription');
-        my $svcDescrTable = $session->get_table( -baseoid => $oid );        
-        my $prefixLen = length( $oid ) + 1;
+        my $base = $dd->oiddef('svcDescription');
+        my $svcDescrTable = $session->get_table( -baseoid => $base );        
+        my $prefixLen = length( $base ) + 1;
 
         while( my( $oid, $descr ) = each %{$svcDescrTable} )
         {
@@ -188,9 +188,9 @@ sub discover
 
     # Get mapping of Services to Customers
     {
-        my $oid = $dd->oiddef('svcCustId');
-        my $svcCustIdTable = $session->get_table( -baseoid => $oid );        
-        my $prefixLen = length( $oid ) + 1;
+        my $base = $dd->oiddef('svcCustId');
+        my $svcCustIdTable = $session->get_table( -baseoid => $base );        
+        my $prefixLen = length( $base ) + 1;
         
         while( my( $oid, $custId ) = each %{$svcCustIdTable} )
         {
@@ -204,10 +204,10 @@ sub discover
     
     # Get port encapsulations
     {
-        my $oid = $dd->oiddef('tmnxPortEncapType');
+        my $base = $dd->oiddef('tmnxPortEncapType');
         
-        my $portEncapTable = $session->get_table( -baseoid => $oid );        
-        my $prefixLen = length( $oid ) + 1;
+        my $portEncapTable = $session->get_table( -baseoid => $base );        
+        my $prefixLen = length( $base ) + 1;
 
         while( my( $oid, $encap ) = each %{$portEncapTable} )
         {
@@ -222,10 +222,10 @@ sub discover
     
     # Get SAP information
     {
-        my $oid = $dd->oiddef('sapDescription');
+        my $base = $dd->oiddef('sapDescription');
         
-        my $sapDescrTable = $session->get_table( -baseoid => $oid );        
-        my $prefixLen = length( $oid ) + 1;
+        my $sapDescrTable = $session->get_table( -baseoid => $base );        
+        my $prefixLen = length( $base ) + 1;
 
         while( my( $oid, $descr ) = each %{$sapDescrTable} )
         {
@@ -341,14 +341,14 @@ sub buildConfig
                 next;
             }
             
-            my $param = {
+            my $custParam = {
                 'precedence' => 100000 - $custId,
                 'comment'    => $data->{'timetraCustDescr'}{$custId},
                 'timetra-customer-id' => $custId,
             };
             
             my $custNode =
-                $cb->addSubtree( $customersNode, $custId, $param,
+                $cb->addSubtree( $customersNode, $custId, $custParam,
                                  ['ALU_Timetra::alu-timetra-customer']);
             
             my $precedence = 10000;
@@ -411,7 +411,7 @@ sub buildConfig
                             $devdetails->screenSpecialChars( $sap->{'name'} );
                         
                         
-                        my $param = {
+                        my $sapParam = {
                             'comment'          => $comment,
                             'timetra-sap-id'   => $sapID,
                             'timetra-sap-name' => $sap->{'name'},
@@ -420,13 +420,15 @@ sub buildConfig
                             'legend'           => $legend,
                         };
 
-                        $cb->addSubtree( $custNode, $subtreeName, $param,
+                        $cb->addSubtree( $custNode, $subtreeName, $sapParam,
                                          ['ALU_Timetra::alu-timetra-sap']);
                     }
                 }
             }                            
         }
-    }    
+    }
+    
+    return;
 }
 
 
@@ -514,8 +516,7 @@ sub checkSelectorAttribute
         Error('Unknown ALU_SAP selector attribute: ' . $attr);
         $value = '';
     }        
-        
-    
+          
     return eval( '$value' . ' ' . $operator . '$checkval' ) ? 1:0;
 }
 
@@ -547,7 +548,6 @@ sub applySelectorAction
     my $arg = shift;
 
     my $data = $devdetails->data();
-    my $objref;
     
     if( not $knownSelectorActions{$action} )
     {
@@ -559,6 +559,7 @@ sub applySelectorAction
     {
         $data->{'timetraSap'}{$object}{'excluded'} = 1;
     }
+    return;
 }   
 
 1;

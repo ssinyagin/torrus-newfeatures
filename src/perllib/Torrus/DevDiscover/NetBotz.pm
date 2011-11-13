@@ -185,6 +185,8 @@ sub buildConfig
         $cb->addLeaf( $devNode, $ref->{'leafName'}, $ref->{'param'},
                       [$ref->{'template'}] );
     }
+
+    return;
 }
 
 

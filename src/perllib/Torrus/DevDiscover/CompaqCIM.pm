@@ -201,6 +201,8 @@ sub buildConfig
                           [ 'CompaqCIM::cpq-cim-temperature-sensor' ] );
         }
     }
+
+    return;
 }
 
 

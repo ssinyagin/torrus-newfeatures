@@ -462,7 +462,7 @@ sub compile_monitors
         }
         else
         {
-            $ok = $self->addMonitor( $mname );
+            $self->addMonitor( $mname );
             $ok = $self->compile_params($monitor, $mname) ? $ok:0;
         }
     }
@@ -502,7 +502,7 @@ sub compile_tokensets
         else
         {
             $sname = 'S'. $sname;
-            $ok = $self->addTset( $sname );
+            $self->addTset( $sname );
             $ok = $self->compile_params($tokenset, $sname) ? $ok:0;
         }
     }

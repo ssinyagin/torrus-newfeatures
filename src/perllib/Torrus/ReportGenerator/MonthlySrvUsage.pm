@@ -209,6 +209,7 @@ sub generate
     &Torrus::DB::checkInterrupted();
 
     $self->{'backend'}->finalize( $self->{'reportId'} );
+    return;
 }
 
 

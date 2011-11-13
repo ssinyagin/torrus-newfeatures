@@ -106,6 +106,7 @@ sub operator
         }
     }
     $self->pushStack( $allDefined ? &{$action}(reverse @args) : undef );
+    return;
 }
 
 
@@ -132,6 +133,7 @@ sub pushStack
     my @items = @_;
 
     push( @{$self->{'stack'}}, @items );
+    return;
 }
 
 

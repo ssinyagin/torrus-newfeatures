@@ -29,8 +29,10 @@ use Torrus::Log;
 
 BEGIN
 {
-    eval( 'require ' . $Torrus::ACL::userAuthModule );
-    die( $@ ) if $@;
+    if( not eval('require ' . $Torrus::ACL::userAuthModule) or $@ )
+    {
+        die($@);
+    }
 }
 
 sub new
@@ -40,8 +42,11 @@ sub new
     my %options = @_;
     bless $self, $class;
 
-    eval( '$self->{"auth"} = new ' . $Torrus::ACL::userAuthModule );
-    die( $@ ) if $@;
+    if( not eval('$self->{"auth"} = new ' . $Torrus::ACL::userAuthModule)
+        or $@ )
+    {
+        die($@);
+    }
 
     my $writing = $options{'-WriteAccess'};
 
@@ -65,6 +70,7 @@ sub DESTROY
 
     undef $self->{'db_users'};
     undef $self->{'db_acl'};
+    return;
 }
 
 

@@ -62,6 +62,7 @@ sub addTarget
         $self->{'targets'} = [];
     }
     push( @{$self->{'targets'}}, $token );
+    return;
 }
 
 
@@ -116,6 +117,7 @@ sub run
     $self->cleanupExpired();
     
     undef $self->{'db_alarms'};
+    return;
 }
 
 
@@ -133,7 +135,6 @@ sub check_failures
     my ($value, $timestamp) = $obj->{'da'}->read_RRD_DS( $dir.'/'.$file,
                                                          'FAILURES', $ds );
     return( $value > 0 ? 1:0, $timestamp );
-
 }
 
 
@@ -325,6 +326,7 @@ sub setAlarm
                                                   $t_last_change)) );
         }
     }
+    return;
 }
 
 
@@ -357,6 +359,7 @@ sub cleanupExpired
     $self->{'db_alarms'}->c_close($cursor);
     
     &Torrus::DB::checkInterrupted();
+    return;
 }
     
 
@@ -386,6 +389,7 @@ sub run_event_tset
             $config_tree->tsetDelMember($tset, $token);
         }
     }
+    return;
 }
 
 
@@ -399,7 +403,6 @@ sub run_event_exec
     my $token = $obj->{'action_token'};
     my $event = $obj->{'event'};
     my $mname = $obj->{'mname'};
-    my $timestamp = $obj->{'timestamp'};
 
     my $launch_when = $config_tree->getParam($aname, 'launch-when');
     if( not defined $launch_when )
@@ -443,7 +446,7 @@ sub run_event_exec
         $ENV{'TORRUS_EVENT'}     = $event;
         $ENV{'TORRUS_MONITOR'}   = $mname;
         $ENV{'TORRUS_MCOMMENT'}  = $config_tree->getParam($mname, 'comment');
-        $ENV{'TORRUS_TSTAMP'}    = $timestamp;
+        $ENV{'TORRUS_TSTAMP'}    = $obj->{'timestamp'};
 
         if( defined( $obj->{'display_value'} ) )
         {
@@ -516,6 +519,7 @@ sub run_event_exec
             Error("$cmd executed with error: $!");
         }
     }
+    return;
 }
 
 

@@ -54,6 +54,7 @@ sub DESTROY
     my $self = shift;
     Debug('Destroyed ServiceID object');
     undef $self->{'db_params'};
+    return;
 }
 
 
@@ -98,6 +99,7 @@ sub add
             $self->{'db_params'}->addToList( 'P:'.$serviceid, $param );
         }
     }
+    return;
 }
 
 
@@ -172,6 +174,7 @@ sub cleanAllForTree
         }
         $self->{'db_params'}->deleteList('t:'.$tree);
     }
+    return;
 }
 
             

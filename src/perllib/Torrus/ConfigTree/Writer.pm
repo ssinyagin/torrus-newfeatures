@@ -14,7 +14,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 #
@@ -112,6 +111,7 @@ sub setParam
     $self->{'paramcache'}{$name}{$param} = $value;
     $self->{'db_otherconfig'}->put( 'P:'.$name.':'.$param, $value );
     $self->{'db_otherconfig'}->addToList('Pl:'.$name, $param);
+    return;
 }
 
 sub setNodeParam
@@ -129,6 +129,7 @@ sub setNodeParam
     $self->{'paramcache'}{$name}{$param} = $value;
     $self->{'db_dsconfig'}->put( 'P:'.$name.':'.$param, $value );
     $self->{'db_dsconfig'}->addToList('Pl:'.$name, $param);
+    return;
 }
 
 
@@ -141,6 +142,7 @@ sub setParamProperty
 
     $self->{'paramprop'}{$prop}{$param} = $value;
     $self->{'db_paramprops'}->put( $param . ':' . $prop, $value );
+    return;
 }
 
 
@@ -155,6 +157,7 @@ sub initRoot
         $self->{'db_dsconfig'}->put( 'n:'.$token, 0 );
         $self->{'nodetype_cache'}{$token} = 0;
     }
+    return;
 }
 
 sub addChild
@@ -277,6 +280,7 @@ sub addView
     {
         $self->{'viewparent'}{$vname} = $parent;
     }
+    return;
 }
 
 
@@ -285,6 +289,7 @@ sub addMonitor
     my $self = shift;
     my $mname = shift;
     $self->{'db_otherconfig'}->addToList('M:', $mname);
+    return;
 }
 
 
@@ -293,6 +298,7 @@ sub addAction
     my $self = shift;
     my $aname = shift;
     $self->{'db_otherconfig'}->addToList('A:', $aname);
+    return;
 }
 
 
@@ -303,6 +309,7 @@ sub addDefinition
     my $value = shift;
     $self->{'db_dsconfig'}->put( 'd:'.$name, $value );
     $self->{'db_dsconfig'}->addToList('D:', $name);
+    return;
 }
 
 
@@ -314,6 +321,7 @@ sub setVar
     my $value = shift;
     
     $self->{'setvar'}{$token}{$name} = $value;
+    return;
 }
 
 
@@ -379,6 +387,7 @@ sub finalize
         Torrus::TimeStamp::setNow($self->treeName() . ':configuration');
         Torrus::TimeStamp::release();
     }
+    return;
 }
 
 
@@ -724,6 +733,7 @@ sub propagateViewParams
 
     # mark this view as processed
     $self->{'viewParamsProcessed'}{$vname} = 1;
+    return;
 }
 
 

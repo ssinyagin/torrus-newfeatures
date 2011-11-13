@@ -26,6 +26,7 @@ use Torrus::Log;
 use Torrus::ACL;
 
 use Template;
+use IO::File;
 
 my %rrd_params =
     (
@@ -121,10 +122,17 @@ my %param_categories =
 
 foreach my $mod ( @Torrus::Renderer::loadAdmInfo )
 {
-    eval( 'require ' . $mod );
-    die( $@ ) if $@;
-    eval( '&' . $mod . '::initAdmInfo( \%leaf_params, \%param_categories )' );
-    die( $@ ) if $@;
+    if( not eval('require ' . $mod) or $@ )
+    {
+        die( $@ );
+    }
+
+    if( not eval('&' . $mod .
+                 '::initAdmInfo( \%leaf_params, \%param_categories ); 1;')
+        or $@ )
+    {
+        die($@);
+    }
 }
 
 
@@ -147,19 +155,21 @@ sub render_adminfo
     }
     else
     {
-        if( not open(OUT, ">$outfile") )
+        my $fh = IO::File->new($outfile, 'w');
+        if( not defined($fh) )
         {
             Error("Cannot open $outfile for writing: $!");
             return undef;
         }
         else
         {
-            print OUT "Cannot display admin information\n";
-            close OUT;
+            $fh->print("Cannot display admin information\n");
+            $fh->close();
         }
 
         return (300+time(), 'text/plain');
     }
+    return;
 }
 
 

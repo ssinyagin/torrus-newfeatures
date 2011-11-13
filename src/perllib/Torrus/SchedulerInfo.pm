@@ -53,6 +53,7 @@ sub DESTROY
 {
     my $self = shift;
     delete $self->{'db_stats'};
+    return;
 }
 
 
@@ -85,6 +86,7 @@ sub setValue
     my $value = shift;
 
     $self->{'db_stats'}->put( join('#', $id, $variable), $value );
+    return;
 }
 
 sub getValue
@@ -113,6 +115,7 @@ sub clearStats
         }
     }
     $self->{'db_stats'}->c_close($cursor);
+    return;
 }
 
 
@@ -120,6 +123,7 @@ sub clearAll
 {
     my $self = shift;
     $self->{'db_stats'}->trunc();
+    return;
 }
 
 
@@ -179,6 +183,7 @@ sub setStatsValues
         $expAverage = $alpha * $value + ( 1 - $alpha ) * $expAverage;
     }
     $self->setValue( $id, $expAvgName, $expAverage );
+    return;
 }
 
 
@@ -203,6 +208,7 @@ sub incStatsCounter
     }
     
     $self->setValue( $id, $name, $previous + $increment );
+    return;
 }
 
 

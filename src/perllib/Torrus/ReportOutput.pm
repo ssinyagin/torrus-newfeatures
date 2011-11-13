@@ -40,7 +40,7 @@ sub new
     bless ($self, $class);
     
     $self->{'options'} = $options;    
-    defined( $self->{'options'}->{'Tree'} ) or die;
+    defined( $self->{'options'}->{'Tree'} ) or die('Tree undefined');
     
     my $sqlRep = Torrus::SQL::Reports->new( $options->{'ReportsSqlSubtype'} );
     if( not defined( $sqlRep ) )
@@ -118,8 +118,10 @@ sub generate
                     {
                         my $class =
                             $Torrus::ReportGenerator::modules{$reportName};
-                        eval( 'require ' . $class );
-                        die( $@ ) if $@;
+                        if( not eval('require ' . $class) or $@ )
+                        {
+                            die($@);
+                        }
 
                         $monthlyReportNames{$reportName} =
                             $class->isMonthly() ? 1:0;

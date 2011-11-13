@@ -140,10 +140,16 @@ my %view_params =
 
 foreach my $mod ( @Torrus::Validator::loadLeafValidators )
 {
-    eval( 'require ' . $mod );
-    die( $@ ) if $@;
-    eval( '&' . $mod . '::initValidatorLeafParams( \%leaf_params )' );
-    die( $@ ) if $@;
+    if( not eval('require ' . $mod) or $@ )
+    {
+        die($@);
+    }
+    
+    if( not eval('&' . $mod . '::initValidatorLeafParams(\%leaf_params); 1;')
+        or $@ )
+    {
+        die($@);
+    }
 }
 
 
@@ -354,17 +360,20 @@ sub validateNode
             }
             foreach my $dname ( @dsNames )
             {
-                my $param = 'ds-expr-' . $dname;
-                my $expr = $config_tree->getNodeParam( $token, $param );
-                if( not defined( $expr ) )
                 {
-                    my $path = $config_tree->path( $token );
-                    Error("Parameter $param is not defined in $path");
-                    $ok = 0;
-                }
-                else
-                {
-                    $ok = validateRPN( $token, $expr, $config_tree ) ? $ok : 0;
+                    my $param = 'ds-expr-' . $dname;
+                    my $expr = $config_tree->getNodeParam( $token, $param );
+                    if( not defined( $expr ) )
+                    {
+                        my $path = $config_tree->path( $token );
+                        Error("Parameter $param is not defined in $path");
+                        $ok = 0;
+                    }
+                    else
+                    {
+                        $ok = validateRPN( $token, $expr, $config_tree ) ?
+                            $ok : 0;
+                    }
                 }
 
                 foreach my $paramprefix ( 'graph-legend-', 'line-style-',

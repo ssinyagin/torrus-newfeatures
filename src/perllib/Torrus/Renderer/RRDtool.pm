@@ -26,6 +26,7 @@ use Torrus::RPN;
 use Torrus::Log;
 
 use RRDs;
+use IO::File;
 
 # All our methods are imported by Torrus::Renderer;
 
@@ -258,15 +259,16 @@ sub render_rrprint
         return undef;
     }
 
-    if( not open(OUT, ">$outfile") )
+    my $fh = IO::File->new($outfile, 'w');
+    if( not defined($fh) )
     {
         Error("Cannot open $outfile for writing: $!");
         return undef;
     }
     else
     {
-        printf OUT ("%s\n", join(':', @{$printout}));
-        close OUT;
+        $fh->printf("%s\n", join(':', @{$printout}));
+        $fh->close();
     }
 
     return( $config_tree->getParam($view, 'expires')+time(), 'text/plain' );
@@ -415,6 +417,7 @@ sub rrd_make_multigraph
             
         }
     }
+    return;
 }
 
 
@@ -508,7 +511,10 @@ sub rrd_make_holtwinters
           sprintf( 'TICK:%sfail%s:1.0:%s',
                    $dname, $hw_fail_color,
                    $Torrus::Renderer::hwGraphLegend ? 'Failures':'') );
+    return;
 }
+
+
 
 sub rrd_make_graphline
 {
@@ -562,6 +568,7 @@ sub rrd_make_graphline
     push( @{$obj->{'args'}{'line'}},
           sprintf( '%s:%s%s%s', $linestyle, $obj->{'dname'}, $linecolor,
                    ($legend ne '') ? ':'.$legend.'\l' : '' ) );
+    return;
 }
 
 
@@ -604,6 +611,7 @@ sub rrd_make_hrules
             }
         }
     }
+    return;
 }
 
 
@@ -660,6 +668,7 @@ sub rrd_make_decorations
             push( @{$obj->{'args'}{$array}}, $decor->{$order}{'line'} );
         }
     }
+    return;
 }
 
 # Takes the parameters from the view, and composes the list of
@@ -947,6 +956,7 @@ sub rrd_make_gprint
     }
 
     push( @{$obj->{'args'}{'line'}}, @args );
+    return;
 }
             
 
@@ -968,6 +978,7 @@ sub rrd_make_gprint_header
                   'COMMENT:' . $gprintHeader . '\l' );
         }
     }
+    return;
 }
        
 

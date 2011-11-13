@@ -266,10 +266,10 @@ sub doGlobalSearch
     
     foreach my $element ( @{$sorted} )
     {
-        my $string = join( ':', $element->[0], $element->[1] );
-        if( not $seen{$string} )
+        my $str = join( ':', $element->[0], $element->[1] );
+        if( not $seen{$str} )
         {
-            $seen{$string} = 1;
+            $seen{$str} = 1;
             push( @{$ret}, $element );
         }
     }

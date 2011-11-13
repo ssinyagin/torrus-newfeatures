@@ -87,6 +87,7 @@ sub initThreads
         $thrUpdateThread->detach();
         $threadsInUse = 1;
     }
+    return;
 }
 
 
@@ -110,6 +111,7 @@ sub initTarget
 
     $sref->{'byfile'}{$filename}{$token} = 1;
     $sref->{'filename'}{$token} = $filename;
+    return 1;
 }
 
 
@@ -129,6 +131,7 @@ sub setValue
     my $sref = $collector->storageData( 'rrd' );
 
     $sref->{'values'}{$token} = [$value, $timestamp, $uptime];
+    return;
 }
 
 
@@ -169,6 +172,7 @@ sub storeData
     }
 
     delete $sref->{'values'};
+    return;
 }
 
 
@@ -178,6 +182,7 @@ sub semaphoreDown
     {
         $rrdtoolSemaphore->down();
     }
+    return;
 }
 
 sub semaphoreUp
@@ -186,6 +191,7 @@ sub semaphoreUp
     {
         $rrdtoolSemaphore->up();
     }
+    return;
 }
 
 
@@ -320,6 +326,7 @@ sub createRRD
     Error("ERROR creating $filename: $err") if $err;
     
     delete $sref->{'rrdinfo_ds'}{$filename};
+    return;
 }
 
 
@@ -519,6 +526,7 @@ sub updateRRD
             delete $sref->{'rrdinfo_ds'}{$filename};
         }
     }
+    return;
 }
 
 
@@ -526,7 +534,6 @@ sub updateRRD
 sub rrdUpdateThread
 {
     &Torrus::DB::setSafeSignalHandlers();
-    $| = 1;
     &Torrus::Log::setTID( threads->tid() );
     
     my $cmdlist;
@@ -556,6 +563,7 @@ sub rrdUpdateThread
             $thrErrorsQueue->enqueue( $cmdlist->[0] );
         }
     }
+    return;
 }
 
 
@@ -579,6 +587,7 @@ sub deleteTarget
     }
 
     delete $sref->{'values'}{$token};
+    return;
 }
 
 

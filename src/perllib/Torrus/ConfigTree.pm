@@ -274,6 +274,7 @@ sub DESTROY
     undef $self->{'db_sets'};
     undef $self->{'db_nodepcache'};
     undef $self->{'db_readers'};
+    return;
 }
 
 # Manage the readinness flag
@@ -283,6 +284,7 @@ sub setReady
     my $self = shift;
     my $ready = shift;
     $self->{'db_otherconfig'}->put( 'ConfigurationReady', $ready ? 1:0 );
+    return;
 }
 
 sub isReady
@@ -305,6 +307,7 @@ sub setReader
                                         time(),
                                         $self->{'ds_config_instance'},
                                         $self->{'other_config_instance'}) );
+    return;
 }
 
 sub clearReader
@@ -317,6 +320,7 @@ sub clearReader
         $self->{'db_readers'}->del( $self->{'reader_id'} );
         delete $self->{'reader_id'};
     }
+    return;
 }
 
 
@@ -329,19 +333,23 @@ sub waitReaders
     while( not $noReaders )
     {
         my @readers = ();
-        my $cursor = $self->{'db_readers'}->cursor();
-        while( my ($key, $val) = $self->{'db_readers'}->next( $cursor ) )
+        
         {
-            my( $timestamp, $dsInst, $otherInst ) = split( /:/o, $val );
-            if( $dsInst == $self->{'ds_config_instance'} or
-                $otherInst == $self->{'other_config_instance'} )
+            my $cursor = $self->{'db_readers'}->cursor();
+            while( my ($key, $val) = $self->{'db_readers'}->next( $cursor ) )
             {
-                push( @readers, {
-                    'reader' => $key,
-                    'timestamp' => $timestamp } );
+                my( $timestamp, $dsInst, $otherInst ) = split( /:/o, $val );
+                if( $dsInst == $self->{'ds_config_instance'} or
+                    $otherInst == $self->{'other_config_instance'} )
+                {
+                    push( @readers, {
+                        'reader' => $key,
+                        'timestamp' => $timestamp } );
+                }
             }
+            $self->{'db_readers'}->c_close($cursor);
         }
-        $self->{'db_readers'}->c_close($cursor);
+        
         if( @readers > 0 )
         {
             Info('Waiting for ' . scalar(@readers) . ' readers:');
@@ -391,6 +399,7 @@ sub waitReaders
             $noReaders = 1;
         }
     }
+    return;
 }
 
 
@@ -420,8 +429,16 @@ sub splitPath
     while( length($path) > 0 )
     {
         my $node;
-        $path =~ s/^([^\/]*\/?)//o; $node = $1;
-        push(@ret, $node);
+        $path =~ s/^([^\/]*\/?)//o;
+        if( defined($1) )
+        {
+            $node = $1;
+            push(@ret, $node);
+        }
+        else
+        {
+            last;
+        }
     }
     return @ret;
 }
@@ -913,7 +930,15 @@ sub getRelative
             else
             {
                 my $childName;
-                $relPath =~ s/^([^\/]*\/?)//o; $childName = $1;
+                $relPath =~ s/^([^\/]*\/?)//o;
+                if( defined($1) )
+                {
+                    $childName = $1;
+                }
+                else
+                {
+                    last;
+                }
                 my $path = $self->path( $token );
                 $token = $self->token( $path . $childName );
                 if( not defined $token )
@@ -1083,6 +1108,7 @@ sub addTset
     my $self = shift;
     my $tset = shift;
     $self->{'db_sets'}->addToList('S:', $tset);
+    return;
 }
 
 
@@ -1125,6 +1151,7 @@ sub tsetAddMember
 
     $self->{'db_sets'}->addToList('s:'.$tset, $token);
     $self->{'db_sets'}->put('o:'.$tset.':'.$token, $origin);
+    return;
 }
 
 
@@ -1136,6 +1163,7 @@ sub tsetDelMember
 
     $self->{'db_sets'}->delFromList('s:'.$tset, $token);
     $self->{'db_sets'}->del('o:'.$tset.':'.$token);
+    return;
 }
 
 # Definitions manipulation

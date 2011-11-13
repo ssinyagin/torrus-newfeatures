@@ -14,9 +14,10 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+# this policy is paranoic about our read() method
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 
 # SNMP failures statistics interface
 
@@ -58,6 +59,7 @@ sub DESTROY
 {
     my $self = shift;    
     $self->{'db_failures'}->closeNow();
+    return;
 }
 
 
@@ -72,6 +74,7 @@ sub init
     {
         $self->{'db_failures'}->put('c:' . $c, 0);
     }
+    return;
 }
 
 
@@ -84,6 +87,7 @@ sub host_failure
 
     $self->{'db_failures'}->put('h:' . $hosthash,
                                 $type . ':' . time());
+    return;
 }
 
 
@@ -103,6 +107,7 @@ sub set_counter
     my $count = shift;
 
     $self->{'db_failures'}->put('c:' . $type, $count);
+    return;
 }
     
 
@@ -112,6 +117,7 @@ sub remove_host
     my $hosthash = shift;
 
     $self->{'db_failures'}->del('h:' . $hosthash);
+    return;
 }
 
     
@@ -130,6 +136,7 @@ sub mib_error
 
     my $global_count = $self->{'db_failures'}->get('c:mib_errors');
     $self->{'db_failures'}->put('c:mib_errors', $global_count + 1);
+    return;
 }
 
 
@@ -203,6 +210,7 @@ sub read
         
         $self->{'db_failures'}->c_close($cursor);
     }
+    return;
 }
 
 

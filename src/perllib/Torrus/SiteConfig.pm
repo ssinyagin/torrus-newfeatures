@@ -324,6 +324,7 @@ sub loadStyling
     {
         require $Torrus::Renderer::stylingProfileOverlay;
     }
+    return;
 }
 
 

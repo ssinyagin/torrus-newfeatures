@@ -188,6 +188,7 @@ sub rpc_walk_leaves
                              'result' => $result});
         }
     }
+    return;
 }
 
 
@@ -309,6 +310,7 @@ sub rpc_aggregate_ds
     }
 
     $result->{'data'}{$token} = $data;
+    return;
 }
 
 
@@ -319,7 +321,6 @@ sub rpc_search_nodeid
     my $config_tree = shift;
     my $opts = shift;
 
-    my $token = $opts->{'token'};
     my $params = $opts->{'params'};
     my $result = $opts->{'result'};
 
@@ -365,6 +366,7 @@ sub rpc_search_nodeid
             $result->{'data'}{$token} = $data;
         }
     }
+    return;
 }
 
 

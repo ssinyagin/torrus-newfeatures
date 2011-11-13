@@ -208,6 +208,7 @@ sub setCache
     $self->{'db'}->put( $keystring,
                         join(':',
                              ($t_render, $t_expires, $filename, $mime_type)));
+    return;
 }
 
 
@@ -229,6 +230,7 @@ sub checkAndClearCache
         Torrus::TimeStamp::setNow($tree . ':renderer_cache');
     }
     Torrus::TimeStamp::release();
+    return;
 }
 
 
@@ -248,6 +250,7 @@ sub clearcache
     }
     $self->{'db'}->c_close($cursor);
     Debug('Renderer cache cleared');
+    return;
 }
 
 

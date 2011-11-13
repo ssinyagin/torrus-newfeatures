@@ -38,11 +38,13 @@ sub init
     not defined( $Torrus::TimeStamp::db ) or
         die('$Torrus::TimeStamp::db is defined at init');
     $Torrus::TimeStamp::db = new Torrus::DB('timestamps', -WriteAccess => 1);
+    return;
 }
 
 sub release
 {
     undef $Torrus::TimeStamp::db;
+    return;
 }
 
 sub setNow
@@ -51,6 +53,7 @@ sub setNow
     ref( $Torrus::TimeStamp::db ) or
         die('$Torrus::TimeStamp::db is not defined at setNow');
     $Torrus::TimeStamp::db->put( $tname, time() );
+    return;
 }
 
 sub get

@@ -32,8 +32,11 @@ use Math::BigFloat;
 # Pluggable backend module implements all storage-specific tasks
 BEGIN
 {
-    eval( 'require ' . $Torrus::Collector::ExternalStorage::backend );
-    die( $@ ) if $@;    
+    if( not eval('require ' . $Torrus::Collector::ExternalStorage::backend)
+        or $@ )
+    {
+        die($@);
+    }
 }
 
 # These variables must be set by the backend module
@@ -116,6 +119,7 @@ sub initTarget
     $sref->{'tokens'}{$token} = $processor;
 
     &{$backendInit}( $collector, $token );
+    return 1;
 }
 
 
@@ -153,6 +157,7 @@ sub setValue
     }
     
     $sref->{'prevTimestamp'}{$token} = $timestamp;
+    return;
 }
 
 
@@ -380,6 +385,7 @@ sub storeData
     
     undef $sref->{'values'};
     &{$backendCloseSession}();
+    return;
 }
 
 
@@ -405,6 +411,7 @@ sub deleteTarget
     }
     
     delete $sref->{'tokens'}{$token};
+    return;
 }
 
 

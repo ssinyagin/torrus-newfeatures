@@ -119,7 +119,7 @@ sub new
 
 sub generate
 {
-    die('Virtual method called');    
+    die('Virtual method Torrus::ReportGenerator::generate() called');    
 }
 
 

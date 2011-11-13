@@ -62,6 +62,7 @@ sub DESTROY
 {
     my $self = shift;
     delete $self->{'stats'};
+    return;
 }
 
 sub treeName
@@ -75,6 +76,7 @@ sub setProcessStatus
     my $self = shift;
     my $text = shift;
     $0 = $self->{'options'}{'-ProcessName'} . ' [' . $text . ']';
+    return;
 }
 
 sub addTask
@@ -90,6 +92,7 @@ sub addTask
     }
     $self->storeTask( $task, $when );
     $self->{'stats'}->clearStats( $task->id() );
+    return;
 }
 
 
@@ -104,6 +107,7 @@ sub storeTask
         $self->{'tasks'}{$when} = [];
     }
     push( @{$self->{'tasks'}{$when}}, $task );
+    return;
 }
     
 
@@ -122,6 +126,7 @@ sub flushTasks
         }
         undef $self->{'tasks'};
     }
+    return;
 }
 
 
@@ -235,6 +240,7 @@ sub run
             &Torrus::DB::setSafeSignalHandlers();
         }
     }
+    return;
 }
 
 
@@ -263,6 +269,7 @@ sub beforeTaskRun
         Verbose(sprintf('Task delayed %d seconds', $late));
         $self->{'stats'}->setStatsValues( $task->id(), 'LateStart', $late );
     }
+    return;
 }
 
 
@@ -276,6 +283,7 @@ sub afterTaskRun
     Verbose(sprintf('%s task finished in %d seconds', $task->name(), $len));
     
     $self->{'stats'}->setStatsValues( $task->id(), 'RunningTime', $len );
+    return;
 }
 
 

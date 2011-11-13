@@ -135,7 +135,8 @@ sub beforeRun
                     'Offset: %d:%.2d',
                     $self->name(),
                     int( $self->period() / 60 ), $self->period() % 60,
-                    int( $self->offset() / 60 ), $self->offset() % 60));    
+                    int( $self->offset() / 60 ), $self->offset() % 60));
+    return;
 }
 
 
@@ -170,6 +171,7 @@ sub afterRun
         $stats->setStatsValues( $self->id(), @{$pair} );
     }
     $self->{'statValues'} = [];
+    return;
 }
 
 
@@ -177,6 +179,7 @@ sub run
 {
     my $self = shift;
     Error("Dummy class Torrus::Scheduler::PeriodicTask was run");
+    return;
 }
 
 
@@ -240,6 +243,7 @@ sub setStatValue
     my $value = shift;
 
     push( @{$self->{'statValues'}}, [$name, $value] );
+    return;
 }
 
 1;

@@ -40,6 +40,7 @@ sub initValidatorLeafParams
     my $hashref = shift;
     $hashref->{'ds-type'}{'collector'}{'collector-type'}{'cdef'} =
         \%params;
+    return;
 }
 
 
@@ -62,6 +63,7 @@ sub initAdmInfo
     {
         $categories->{$pname} = $category;
     }
+    return;
 }
 
 

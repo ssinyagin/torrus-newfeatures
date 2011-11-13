@@ -14,8 +14,11 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+# this policy is paranoic about our next() method
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+
 
 package Torrus::DB;
 
@@ -112,8 +115,6 @@ sub new
 
     # we need this in DESTROY debug message
     $self->{'dbname'} = $filename;
-
-    my %hash;
 
     my $accmethod = $options{'-Btree'} ?
         'BerkeleyDB::Btree':'BerkeleyDB::Hash';
@@ -255,6 +256,7 @@ sub setSignalHandlers
     };
 
     $signalHandlersSet = 1;
+    return;
 }
 
 
@@ -262,6 +264,7 @@ sub setSafeSignalHandlers
 {
     setSignalHandlers();
     $safeSignals = 1;
+    return;
 }
 
 
@@ -269,6 +272,7 @@ sub setUnsafeSignalHandlers
 {
     setSignalHandlers();
     $safeSignals = 0;
+    return;
 }
     
 
@@ -281,6 +285,7 @@ sub checkInterrupted
         Warn('Stopping the process');
         exit(1);
     }
+    return;
 }
 
 
@@ -294,6 +299,7 @@ sub closeNow
     delete $Torrus::DB::dbPool{$filename};
     $self->{'dbh'}->db_close();
     delete $self->{'dbh'};
+    return;
 }
 
 sub cleanupEnvironment
@@ -316,6 +322,7 @@ sub cleanupEnvironment
             unlink $Torrus::DB::dbEnvErrFile;
         }
     }
+    return;
 }
 
 
@@ -323,6 +330,7 @@ sub delay
 {
     my $self = shift;
     $self->{'delay_list_commit'} = 1;
+    return;
 }
 
     
@@ -343,8 +351,8 @@ sub put
     my $key = shift;
     my $val = shift;
 
-    ref( $self->{'dbh'} ) or die( 'Fatal error: ' . $self->{'dbname'} );
-    return $self->{'dbh'}->db_put($key, $val) == 0;
+    $self->{'dbh'}->db_put($key, $val);
+    return;
 }
 
 sub get
@@ -364,7 +372,7 @@ sub del
     my $key = shift;
     my $val = undef;
 
-    return $self->{'dbh'}->db_del($key) == 0;
+    return ($self->{'dbh'}->db_del($key) == 0);
 }
 
 
@@ -401,6 +409,7 @@ sub c_del
 
     my $cnt = 0;
     $cursor->c_del( $cnt );
+    return;
 }
 
 
@@ -437,6 +446,7 @@ sub c_close
     my $self = shift;
     my $cursor = shift;
     $cursor->c_close();
+    return;
 }
 
 
@@ -608,6 +618,7 @@ sub _populateListCache
         }
         $self->{'listcache'}{$key} = $ref;
     }
+    return;
 }
 
 
@@ -620,6 +631,7 @@ sub _storeListCache
     {
         $self->put($key, join(',', keys %{$self->{'listcache'}{$key}}));
     }
+    return;
 }
 
     
@@ -634,6 +646,7 @@ sub addToList
     $self->{'listcache'}{$key}{$newval} = 1;
     
     $self->_storeListCache($key);
+    return;
 }
 
 
@@ -661,6 +674,7 @@ sub delFromList
     }
     
     $self->_storeListCache($key);
+    return;
 }
 
 
@@ -682,6 +696,7 @@ sub deleteList
 
     delete $self->{'listcache'}{$key};
     $self->del($key);
+    return;
 }
 
 
@@ -697,6 +712,7 @@ sub commit
             $self->put($key, join(',', keys %{$list}));
         }
     }
+    return;
 }
             
 

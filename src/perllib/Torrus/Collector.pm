@@ -31,8 +31,10 @@ BEGIN
 {
     foreach my $mod ( @Torrus::Collector::loadModules )
     {
-        eval( 'require ' . $mod );
-        die( $@ ) if $@;
+        if( not eval('require ' . $mod) or $@ )
+        {
+            die($@);
+        }
     }
 }
 
@@ -46,6 +48,7 @@ sub initThreads
             &{$Torrus::Collector::initThreadsHandlers{$key}}();
         }
     }
+    return;
 }
 
 
@@ -193,8 +196,9 @@ sub addTarget
             my $storage_string = $storage_type . '-storage';
             if( ref( $Torrus::Collector::initTarget{$storage_string} ) )
             {
-                &{$Torrus::Collector::initTarget{$storage_string}}($self,
-                                                                   $token);
+                $ok =
+                    &{$Torrus::Collector::initTarget{
+                        $storage_string}}($self, $token) ? $ok:0;
             }
         }
     }
@@ -203,6 +207,7 @@ sub addTarget
     {
         $self->deleteTarget( $token );
     }
+    return;
 }
 
 
@@ -270,6 +275,7 @@ sub fetchParams
         }
         @maps = @next_maps;
     }
+    return;
 }
 
 
@@ -292,6 +298,7 @@ sub fetchMoreParams
             $$ref->{$param} = $value;
         }
     }
+    return;
 }
 
 
@@ -343,6 +350,7 @@ sub setParam
     my $value = shift;
 
     $self->{'targets'}{$token}{'params'}{$param} = $value;
+    return;
 }
 
 
@@ -383,6 +391,7 @@ sub registerDeleteCallback
         $self->{'targets'}{$token}{'deleteProc'} = [];
     }
     push( @{$self->{'targets'}{$token}{'deleteProc'}}, $proc );
+    return;
 }
 
 sub deleteTarget
@@ -402,6 +411,7 @@ sub deleteTarget
         }
     }
     delete $self->{'targets'}{$token};
+    return;
 }
 
 # Returns a reference to token-specific local data
@@ -511,6 +521,7 @@ sub run
             }
         }
     }
+    return;
 }
 
 
@@ -531,10 +542,10 @@ sub setValue
             # Screen out the percent sign and $_
             $code =~ s/DOLLAR/\$/gm;
             $code =~ s/MOD/\%/gm;
-            Debug('Value before transformation: ' . $value);
+            Debug('Value before transformation: ' . $value);            
             $_ = $value;
-            $value = do { eval $code };
-            if( $@ )
+            $value = eval($code);
+            if( not defined($value) or $@ )
             {
                 Error('Fatal error in transformation code: ' . $@ );
                 $value = 'U';
@@ -592,6 +603,7 @@ sub setValue
                                                         $value, $timestamp,
                                                         $uptime );
     }
+    return;
 }
 
 

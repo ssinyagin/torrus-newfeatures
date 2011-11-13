@@ -57,6 +57,7 @@ sub backendInit
 {
     my $collector = shift;
     my $token = shift;
+    return;
 }
 
 sub backendOpenSession
@@ -71,6 +72,7 @@ sub backendOpenSession
             Error('Error preparing the SQL statement: ' . $dbh->errstr);
         }
     }
+    return;
 }
 
 
@@ -116,6 +118,7 @@ sub backendCloseSession
         $dbh->disconnect();
         undef $dbh;
     }
+    return;
 }
 
 

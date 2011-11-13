@@ -47,6 +47,7 @@ sub process
     my($class, $q) = @_;
     $class->do_process($q);
     &Torrus::DB::cleanupEnvironment();    
+    return;
 }
 
 sub do_process
@@ -172,13 +173,13 @@ sub do_process
             {
                 # create a session object based on the cookie we got from the
                 # browser, or a new session if we got no cookie
-                eval
+                my $eval_ret = eval
                 {
                     tie %session, 'Apache::Session::File', $ses_id, {
                         Directory     => $Torrus::Global::sesStoreDir,
                         LockDirectory => $Torrus::Global::sesLockDir }
                 };
-                if( not $@ )
+                if( $eval_ret and not $@ )
                 {
                     if( $options{'variables'}->{'LOGOUT'} )
                     {
@@ -417,6 +418,7 @@ sub do_process
     {
         &Torrus::Log::setLevel('info');
     }
+    return;
 }
 
 
@@ -440,6 +442,7 @@ sub report_error
         print $q->header('-type' => 'text/plain', '-expires' => 'now');
         print('Error: ' . $msg);
     }
+    return;
 }
 
 

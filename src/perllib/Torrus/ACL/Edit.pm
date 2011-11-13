@@ -337,6 +337,7 @@ sub delUserAttribute
         $self->setUserModified( $uid );
         Debug('Deleted ' . $attr . ' from ' . $uid);
     }
+    return;
 }
 
 
@@ -364,6 +365,7 @@ sub setUserModified
     my $uid = shift;
 
     $self->setUserAttribute( $uid, 'modified', scalar( localtime( time() ) ) );
+    return;
 }
 
 sub listUserAttributes
@@ -484,6 +486,7 @@ sub setGroupModified
 
     $self->setGroupAttribute( $group, 'modified',
                               scalar( localtime( time() ) ) );
+    return;
 }
 
 
@@ -579,11 +582,11 @@ sub exportACL
     my $self = shift;
     my $exportfile = shift;
     my $exporttemplate = shift;
-
-    my $ok;
-    eval 'require Torrus::ACL::Export;
-          $ok = Torrus::ACL::Export::exportACL( $self, $exportfile,
-                                              $exporttemplate );';
+    
+    my $ok = 
+        eval( 'require Torrus::ACL::Export;' . 
+              'Torrus::ACL::Export::exportACL($self, $exportfile,'.
+              '$exporttemplate)' );
     if( $@ )
     {
         Error($@);
@@ -600,10 +603,10 @@ sub importACL
     my $self = shift;
     my $importfile = shift;
 
-    my $ok;
-    eval 'require Torrus::ACL::Import;
-          $ok = Torrus::ACL::Import::importACL( $self, $importfile );';
-
+    my $ok =
+        eval('require Torrus::ACL::Import;' . 
+             'Torrus::ACL::Import::importACL($self, $importfile)');
+    
     if( $@ )
     {
         Error($@);

@@ -16,6 +16,12 @@
 
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+# this policy complains about accessing private methods in Net::SNMP
+## no critic (Variables::ProtectPrivateVars)
+
+# this policy complains about regexp result untested, although it is tested
+## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
+
 package Torrus::Collector::SNMP;
 use strict;
 use warnings;
@@ -147,6 +153,7 @@ sub initCollectorGlobals
     {
         $mapsExpire{$maphash} = int( $now + rand( $mapsUpdateInterval ) );
     }    
+    return;
 }
 
 
@@ -627,10 +634,10 @@ sub lookupMap
             if( defined ( $maps{$hosthash}{$map} ) )
             {
                 Error("Current map follows");
-                while( my($key, $val) = each
+                while( my($mkey, $mval) = each
                        %{$maps{$hosthash}{$map}} )
                 {
-                    Error("'$key' => '$val'");
+                    Error("'$mkey' => '$mval'");
                 }
             }
             return 'notfound';
@@ -828,6 +835,7 @@ sub hostReachableAgain
                                       scalar( keys %hostUnreachableSeen));
         }
     }
+    return;
 }
 
 
@@ -865,6 +873,7 @@ sub deleteTarget
         delete $cref->{'mapsDependentTokens'}{$maphash}{$token};
     }
     delete $cref->{'mapsRelatedMaps'}{$token};
+    return;
 }
 
 # Main collector cycle
@@ -1016,6 +1025,7 @@ sub runCollector
             %mapLookupScheduled = ();
         }
     }
+    return;
 }
 
 
@@ -1142,6 +1152,7 @@ sub callback
             }
         }
     }
+    return;
 }
 
 
@@ -1247,6 +1258,7 @@ sub postProcess
             $collector->deleteTarget($token);
         }
     }    
+    return;
 }
 
 
@@ -1319,6 +1331,7 @@ sub reachable_runCollector
             $collector->setValue( $token, $val, $timestamp, 0 );
         }
     }
+    return;
 }
 
         

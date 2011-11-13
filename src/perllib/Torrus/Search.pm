@@ -54,6 +54,7 @@ sub openTree
           -Truncate => $self->{'options'}{'-WriteAccess'} );
 
     $self->{'db_treewords'}{$tree} = $db;
+    return;
 }
 
 
@@ -63,6 +64,7 @@ sub closeTree
     my $tree = shift;
 
     $self->{'db_treewords'}{$tree}->closeNow();
+    return;
 }
 
 
@@ -78,6 +80,7 @@ sub openGlobal
           -Truncate => $self->{'options'}{'-WriteAccess'} );
 
     $self->{'db_globwords'} = $db;    
+    return;
 }
 
 
@@ -106,6 +109,7 @@ sub storeKeyword
 
         $self->{'stored'}{$lookupkey} = 1;
     }
+    return;
 }
 
 sub searchPrefix

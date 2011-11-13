@@ -111,6 +111,7 @@ sub addField
               ' ' . $field->{'units'});
     }
     $self->{'fields'}->add( $reportId, $field );
+    return;
 }
 
 
@@ -157,6 +158,7 @@ sub finalize
         'fields' => { $columns{'iscomplete'} => 1 } });
 
     $self->{'sql'}->commit();
+    return;
 }
 
 

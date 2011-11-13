@@ -113,6 +113,7 @@ sub runCollector
             }
         }
     }
+    return;
 }
 
 

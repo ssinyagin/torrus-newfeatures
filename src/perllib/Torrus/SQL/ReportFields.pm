@@ -49,6 +49,7 @@ sub add
                       $columns{'serviceid'}  => $attrs->{'serviceid'},
                       $columns{'value'}      => $attrs->{'value'},
                       $columns{'units'}      => $attrs->{'units'} } });
+    return;
 }
 
 
@@ -77,6 +78,7 @@ sub removeAll
     $self->{'sql'}->delete({
         'table' => $tableName,
         'where' => { $columns{'rep_id'} => $reportId }});
+    return;
 }    
     
     

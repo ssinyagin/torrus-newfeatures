@@ -38,9 +38,8 @@ sub importACL
 
     my $ok = 1;
     my $parser = new XML::LibXML;
-    my $doc;
-    eval { $doc = $parser->parse_file( $filename );  };
-    if( $@ )
+    my $doc;    
+    if(not eval {$doc = $parser->parse_file( $filename )} or $@ )
     {
         Error("Failed to parse $filename: $@");
         return 0;

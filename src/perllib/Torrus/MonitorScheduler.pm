@@ -182,6 +182,7 @@ sub cacheMonitors
             }
         }
     }
+    return;
 }
 
 

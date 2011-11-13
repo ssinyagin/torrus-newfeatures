@@ -63,6 +63,7 @@ sub setRegistryOverlays
     
     $self->{'registry_overlays'} = [];
     push( @{$self->{'registry_overlays'}}, @_ );
+    return;
 }
 
 
@@ -110,6 +111,7 @@ sub addCreatorInfo
     my $creatorNode = $self->{'doc'}->createElement('creator-info');
     $creatorNode->appendText( $creatorInfo );
     $self->{'docroot'}->insertBefore( $creatorNode, $self->{'datasources'} );
+    return;
 }
 
 
@@ -121,6 +123,7 @@ sub addRequiredFiles
     {
         $self->addFileInclusion( $file );
     }
+    return;
 }
 
 
@@ -132,6 +135,7 @@ sub addFileInclusion
     my $node = $self->{'doc'}->createElement('include');
     $node->setAttribute( 'filename', $file );
     $self->{'docroot'}->insertBefore( $node, $self->{'datasources'} );
+    return;
 }
 
 
@@ -156,6 +160,7 @@ sub addDefinition
     $node->setAttribute( 'name', $name );
     $node->setAttribute( 'value', $value );
     $definitionsNode->appendChild( $node );
+    return;
 }
 
 
@@ -182,6 +187,7 @@ sub addParamProp
     $node->setAttribute( 'prop', $prop );
     $node->setAttribute( 'value', $value );
     $propsNode->appendChild( $node );
+    return;
 }
 
 
@@ -324,6 +330,7 @@ sub addTemplateApplication
     my $tmplNode = $self->{'doc'}->createElement( 'apply-template' );
     $tmplNode->setAttribute( 'name', $template );
     $parentNode->appendChild( $tmplNode );
+    return;
 }
 
 
@@ -340,6 +347,7 @@ sub addParams
             $self->addParam( $parentNode, $paramName, $params->{$paramName} );
         }
     }
+    return;
 }
 
 
@@ -359,6 +367,7 @@ sub addParam
     $paramNode->setAttribute( 'name', $param );
     $paramNode->setAttribute( 'value', $value );
     $parentNode->appendChild( $paramNode );
+    return;
 }
 
 
@@ -376,6 +385,7 @@ sub addAlias
     my $aliasNode = $self->{'doc'}->createElement( 'alias' );
     $aliasNode->appendText( $aliasPath );
     $parentNode->appendChild( $aliasNode );
+    return;
 }
 
 
@@ -390,6 +400,7 @@ sub setVar
     $setvarNode->setAttribute( 'name', $name );
     $setvarNode->setAttribute( 'value', $value );
     $parentNode->appendChild( $setvarNode );
+    return;
 }
     
     
@@ -416,6 +427,7 @@ sub addMonitorAction
     $monitorsNode->appendChild( $node );
 
     $self->addParams( $node, $params );
+    return;
 }
 
 
@@ -431,6 +443,7 @@ sub addMonitor
     $monitorsNode->appendChild( $node );
 
     $self->addParams( $node, $params );
+    return;
 }
 
 
@@ -456,6 +469,7 @@ sub addTokenset
     $tsetsNode->appendChild( $node );
 
     $self->addParams( $node, $params );
+    return;
 }
 
 
@@ -470,6 +484,7 @@ sub addStatistics
         $node->setAttribute( 'value', $self->{'statistics'}{$stats} );
         $self->{'docroot'}->appendChild( $node );
     }
+    return;
 }
 
 

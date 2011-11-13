@@ -59,6 +59,7 @@ our $TID = 0;
 sub setTID
 {
     $TID = shift;
+    return;
 }
 
 
@@ -69,6 +70,7 @@ sub enableSyslog
     my $ident = shift;   
     openlog($ident, 'ndelay,pid', $Torrus::Log::syslogFacility);
     $syslog_enabled = 1;
+    return;
 }
 
 
@@ -108,26 +110,31 @@ sub doLog
 sub Error
 {
     doLog( 1, @_ );
+    return;
 }
 
 sub Warn
 {
     doLog( 5, @_);
+    return;
 }
 
 sub Info
 {
     doLog( 7, @_ );
+    return;
 }
 
 sub Verbose
 {
     doLog( 8, @_ );
+    return;
 }
 
 sub Debug
 {
     doLog( 9, join('|', @_) );
+    return;
 }
 
 
@@ -159,6 +166,7 @@ sub setLevel
         Error("Log level name '$level' unknown. Defaulting to 'info'");
         $currentLogLevel = $logLevel{'info'};
     }
+    return;
 }
 
 1;

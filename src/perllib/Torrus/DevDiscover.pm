@@ -33,8 +33,10 @@ BEGIN
 {
     foreach my $mod ( @Torrus::DevDiscover::loadModules )
     {
-        eval( 'require ' . $mod );
-        die( $@ ) if $@;
+        if( not eval('require ' . $mod) or $@ )
+        {
+            die($@);
+        }
     }
 }
 
@@ -135,11 +137,15 @@ sub new
     foreach my $module ( 'Torrus::DevDiscover',
                          @Torrus::DevDiscover::loadModules )
     {
-        while( my($name, $oid) = each %{eval('\%'.$module.'::oiddef')} )
+        my $oiddef_ref = eval('\%'.$module.'::oiddef');
+        die($@) if $@;
+        if( ref($oiddef_ref) )
         {
-            die( $@ ) if $@;
-            $self->{'oiddef'}->{$name} = $oid;
-            $self->{'oidrev'}->{$oid} = $name;
+            while( my($name, $oid) = each %{$oiddef_ref} )
+            {
+                $self->{'oiddef'}->{$name} = $oid;
+                $self->{'oidrev'}->{$oid} = $name;
+            }
         }
     }
 
@@ -613,6 +619,7 @@ sub buildConfig
                               $self->{'define-tokensets'}{$tset} );
         }
     }
+    return;
 }
 
 
@@ -798,6 +805,7 @@ sub setMaxMsgSize
         $self->session()->max_msg_size($msgsize);
         $devdetails->data()->{'param'}{'snmp-max-msg-size'} = $msgsize;
     }
+    return;
 }
 
     

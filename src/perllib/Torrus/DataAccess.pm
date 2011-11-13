@@ -14,8 +14,10 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+# this policy is paranoic about our read() method
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 
 package Torrus::DataAccess;
 use strict;
@@ -245,7 +247,6 @@ sub read_RPN
     my $t_start = shift;
 
     my @expr_list = split(',', $expr);
-    my @eval_expr;
     my $timestamp = $t_end > 0 ? $t_end : time();
 
     my $rpn = new Torrus::RPN;

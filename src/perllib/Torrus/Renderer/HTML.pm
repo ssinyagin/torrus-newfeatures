@@ -14,8 +14,10 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+# our sort block is a bit complicated here
+## no critic (BuiltinFunctions::RequireSimpleSortBlock)
 
 package Torrus::Renderer::HTML;
 use strict;
@@ -30,6 +32,7 @@ use Template;
 use POSIX qw(abs log floor pow);
 use Date::Parse;
 use Date::Format;
+use IO::File;
 
 Torrus::SiteConfig::loadStyling();
 
@@ -319,15 +322,16 @@ sub rrPrint
     }
     else
     {
-        if( not open(IN, $fname) )
+        my $fh = IO::File->new($fname, 'r');
+        if( not defined($fh) )
         {
             Error("Cannot open $fname for reading: $!");
         }
         else
         {
-            chomp(my $values = <IN>);
+            chomp(my $values = <$fh>);
             @ret = split(':', $values);
-            close IN;
+            $fh->close();
         }
     }
     return @ret;
@@ -383,8 +387,8 @@ sub userAttribute
 
     if( $self->{'options'}->{'uid'} and $self->{'options'}->{'acl'} )
     {
-        $self->{'options'}->{'acl'}->
-            userAttribute( $self->{'options'}->{'uid'}, $attr );
+        return ($self->{'options'}->{'acl'}->
+                userAttribute( $self->{'options'}->{'uid'}, $attr ));
     }
     else
     {
@@ -400,8 +404,9 @@ sub hasPrivilege
 
     if( $self->{'options'}->{'uid'} and $self->{'options'}->{'acl'} )
     {
-        $self->{'options'}->{'acl'}->
-            hasPrivilege( $self->{'options'}->{'uid'}, $object, $privilege );
+        return ($self->{'options'}->{'acl'}->
+                hasPrivilege( $self->{'options'}->{'uid'},
+                              $object, $privilege ));
     }
     else
     {

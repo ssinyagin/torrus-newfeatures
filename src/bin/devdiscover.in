@@ -33,8 +33,6 @@ use Torrus::Log;
 use Torrus::DevDiscover;
 use Torrus::ConfigBuilder;
 
-$| = 1;
-
 my @infiles;
 my $makedirs;
 my $limitre;
@@ -66,23 +64,25 @@ foreach my $arg ( @ARGV )
 }
 $creator .= "\n On " . scalar(localtime(time));
 
-my $ok = GetOptions(
-                    'in=s'        => \@infiles,
-                    'mkdir'       => \$makedirs,
-                    'limit=s'     => \$limitre,
-                    'forcebundle' => \$forcebundle,
-                    'fallback=i'  => \$fallback,
-                    'threads=i'   => \$workerThreads,
-                    'snmpdebug'   => \$snmpdebug,
-                    'verbose'     => \$verbose,
-                    'debug'       => \$debug
-                    );
-if( $ok and scalar( @ARGV ) > 0 )
+my $opts_ok = GetOptions
+    (
+     'in=s'        => \@infiles,
+     'mkdir'       => \$makedirs,
+     'limit=s'     => \$limitre,
+     'forcebundle' => \$forcebundle,
+     'fallback=i'  => \$fallback,
+     'threads=i'   => \$workerThreads,
+     'snmpdebug'   => \$snmpdebug,
+     'verbose'     => \$verbose,
+     'debug'       => \$debug
+    );
+
+if( $opts_ok and scalar( @ARGV ) > 0 )
 {
     push( @infiles, @ARGV );
 }
 
-if( not $ok or scalar(@infiles) == 0 or
+if( not $opts_ok or scalar(@infiles) == 0 or
     ($workerThreads > 1 and not $Torrus::Global::threadsEnabled ) )
 {
     print STDERR "Usage: $0 --in=filename.ddx options... [ddx files]\n",
@@ -149,8 +149,8 @@ foreach my $infile ( @infiles )
 
     my $parser = new XML::LibXML;
     my $doc;
-    eval { $doc = $parser->parse_file( $infile );  };
-    if( $@ )
+    
+    if( not eval {$doc = $parser->parse_file($infile)} or $@ )
     {
         Error("Failed to parse $infile: $@");
         exit 1;
@@ -426,7 +426,7 @@ sub absXmlFilename
     if( $offset >= 0 )
     {
         my $len = length( $subst );
-        substr( $filename, $offset, $len ) = $Torrus::Global::siteXmlDir;
+        substr( $filename, $offset, $len, $Torrus::Global::siteXmlDir );
     }
     else
     {
@@ -582,7 +582,7 @@ sub doDiscover
             }
             
             my ($login,$pass,$uid,$gid) = getpwnam('@torrus_user@')
-                or die "Cannot get user details for @torrus_user@";
+                or die("Cannot get user details for @torrus_user@\n");
             
             foreach my $dir ( $dd->listDataDirs() )
             {

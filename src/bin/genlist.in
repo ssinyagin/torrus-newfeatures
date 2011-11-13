@@ -84,42 +84,44 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 
 &Torrus::DB::setSafeSignalHandlers();
 
-my $config_tree = new Torrus::ConfigTree( -TreeName => $tree, -Wait => 1 );
-if( not defined( $config_tree ) )
 {
-    exit 1;
-}
-
-my $initToken = $config_tree->token( $initPath );
-if( not defined( $initToken ) )
-{
-    Error('No such subtree: ' . $initPath);
-    exit 1;
-}
-
-my $listing = {};
-
-my $listParams = {};
-if( $selectType eq 'all' )
-{
-    foreach my $type ( keys %{$listingsSupported{$listWhat}} )
+    my $config_tree = new Torrus::ConfigTree( -TreeName => $tree, -Wait => 1 );
+    if( not defined( $config_tree ) )
     {
-        if( $type ne 'all' )
+        exit 1;
+    }
+
+    my $initToken = $config_tree->token( $initPath );
+    if( not defined( $initToken ) )
+    {
+        Error('No such subtree: ' . $initPath);
+        exit 1;
+    }
+    
+    my $listing = {};
+    
+    my $listParams = {};
+    if( $selectType eq 'all' )
+    {
+        foreach my $type ( keys %{$listingsSupported{$listWhat}} )
         {
-            $listParams->{$type} = 1;
+            if( $type ne 'all' )
+            {
+                $listParams->{$type} = 1;
+            }
         }
     }
-}
-else
-{
-    $listParams->{$selectType} = 1;
-}
+    else
+    {
+        $listParams->{$selectType} = 1;
+    }
+    
+    pickup_data( $config_tree, $initToken, $listing, $listParams );
 
-pickup_data( $config_tree, $initToken, $listing, $listWhat, $listParams );
-
-foreach my $item ( sort keys %{$listing} )
-{
-    print $item, "\n";
+    foreach my $item ( sort keys %{$listing} )
+    {
+        print $item, "\n";
+    }
 }
 
 exit 0;
@@ -129,7 +131,6 @@ sub pickup_data
     my $config_tree = shift;
     my $token = shift;
     my $listing = shift;
-    my $listWhat = shift;
     my $listParams = shift;
 
     foreach my $ctoken ( $config_tree->getChildren( $token ) )
@@ -138,8 +139,7 @@ sub pickup_data
         
         if( $config_tree->isSubtree( $ctoken ) )
         {
-            pickup_data( $config_tree, $ctoken,
-                         $listing, $listWhat, $listParams );
+            pickup_data( $config_tree, $ctoken, $listing, $listParams );
         }
         elsif( $config_tree->isLeaf( $ctoken ) )
         {

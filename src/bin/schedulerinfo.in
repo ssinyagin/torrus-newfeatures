@@ -336,28 +336,28 @@ sub reportTimeline
     my $lcm = 0;
     foreach my $period ( keys %{$schedule} )
     {
-        my $a = $period;
-        my $b = $lcm;
-        my $c;
-        if( $b == 0 )
+        my $x = $period;
+        my $y = $lcm;
+        my $z;
+        if( $y == 0 )
         {
-            $lcm = $a;
+            $lcm = $x;
         }
         else
         {
-            if( $a < $b )
+            if( $x < $y )
             {
-                my $tmp = $b;
-                $b = $a;
-                $a = $tmp;
+                my $tmp = $y;
+                $y = $x;
+                $x = $tmp;
             }
-            while( $b != 0 )
+            while( $y != 0 )
             {
-                $c = $a % $b;
-                $a = $b;
-                $b = $c;
+                $z = $x % $y;
+                $x = $y;
+                $y = $z;
             }
-            $lcm = $lcm * $period / $a;
+            $lcm = $lcm * $period / $x;
         }
     }
 

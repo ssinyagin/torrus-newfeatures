@@ -24,6 +24,7 @@ use warnings;
 
 use Template;
 use Getopt::Long;
+use IO::File;
 
 my $template;
 my $outfile;
@@ -69,18 +70,20 @@ if( not $ok or not $template or not $outfile or not $nodelist)
 
 my @rawnodes;
 
-if( not open( NODES, $nodelist ) )
+my $nodesfh = IO::File->new($nodelist, 'r');
+if( not defined($nodesfh) )
 {
     print STDERR "Cannot open $nodelist: $!\n";
     exit 1;
 }
-while(<NODES>)
+
+while(<$nodesfh>)
 {
     s/^\s+//;
     s/\s+$//;
     push( @rawnodes, split( /\s+/ ) );
 }
-close( NODES );
+$nodesfh->close();
 
 my %nodes;
 foreach my $node ( @rawnodes )

@@ -41,16 +41,16 @@ our $debug;
 our $verbose;
 our $help_needed;
 
-my $ok = GetOptions ('tree=s'   => \@trees,
-                     'all'      => \$all_trees,
-                     'nods'     => \$no_ds,
-                     'noval'    => \$no_validation,
-                     'force'    => \$force,
-                     'debug'    => \$debug,
-                     'verbose'  => \$verbose,
-                     'help'     => \$help_needed);
+my $opts_ok = GetOptions ('tree=s'   => \@trees,
+                          'all'      => \$all_trees,
+                          'nods'     => \$no_ds,
+                          'noval'    => \$no_validation,
+                          'force'    => \$force,
+                          'debug'    => \$debug,
+                          'verbose'  => \$verbose,
+                          'help'     => \$help_needed);
 
-if( not $ok or not (scalar(@trees) or $all_trees) or
+if( not $opts_ok or not (scalar(@trees) or $all_trees) or
     $help_needed or scalar(@ARGV) > 0 )
 {
     print STDERR "Usage: $0 --tree=NAME [options...]\n",

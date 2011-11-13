@@ -103,8 +103,10 @@ elsif( $verbose )
 if( $report )
 {
     my $class = $Torrus::ReportGenerator::modules{$report};
-    eval( 'require ' . $class );
-    die( $@ ) if $@;
+    if( not eval('require ' . $class) or $@ )
+    {
+        die($@ . "\n");
+    }
     
     my $generator = $class->new({
         'Name' => $report,

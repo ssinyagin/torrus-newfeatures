@@ -90,21 +90,21 @@ foreach my $tree ( @trees )
         Error("Tree named \"" . $tree . "\" does not exist");
         exit(1);
     }
-
+    
     &Torrus::DB::checkInterrupted();
-
+    
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
     if( not defined($config_tree) )
     {
         print("Configuration is not ready\n");
         exit(1);
     }
-
+    
     Verbose("Processing the tree: $tree");
-
+        
     $search->openTree( $tree );
     
-    walkSubtree( $config_tree, $search, $config_tree->token('/') );
+    walkSubtree( $config_tree, $config_tree->token('/') );
     
     $search->closeTree( $tree );
     $config_tree = undef;
@@ -116,7 +116,6 @@ exit(0);
 sub walkSubtree
 {
     my $config_tree = shift;
-    my $search = shift;
     my $ptoken = shift;
 
     my $tree = $config_tree->treeName();
@@ -127,7 +126,7 @@ sub walkSubtree
         
         if( $config_tree->isSubtree( $token ) )
         {
-            walkSubtree( $config_tree, $search, $token );
+            walkSubtree( $config_tree, $token );
         }
 
         my $isSearchable =
@@ -170,7 +169,7 @@ sub splitAndStore
                 if( length( $word ) > 1 )
                 {
                     $search->storeKeyword( $tree, $word, $path, $param );
-                            
+                    
                     # Split the word by underscores and dashes
                     my @subwords = split( /[-_]+/o, $word );
                     if( scalar( @subwords ) > 1 )
@@ -191,7 +190,7 @@ sub splitAndStore
         }
     }
 }
-        
+
 
 
 # Local Variables:

@@ -112,7 +112,6 @@ foreach my $tree ( @trees )
     
     &Torrus::DB::checkInterrupted();
 
-    my @members;
     foreach my $ts ( $config_tree->getTsets() )
     {
         Debug('Processing tokenset: ' . $ts);

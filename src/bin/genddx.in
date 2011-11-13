@@ -27,6 +27,7 @@ BEGIN { require '@devdiscover_config_pl@'; }
 
 use Getopt::Long;
 use XML::LibXML;
+use IO::File;
 
 use Torrus::Log;
 
@@ -159,17 +160,19 @@ if( $globalParams{'host-subtree'} !~ /^\/[0-9A-Za-z_\-\.\/]*$/ or
 
 if( defined $hostfile )
 {
-    if( not open(HOSTS, $hostfile) )
+    my $fh = IO::File->new($hostfile, 'r');
+    if( not defined($fh) )
     {
         print STDERR "Cannot open $hostfile: $!";
         exit 1;
     }
-    while(<HOSTS>)
+    while(<$fh>)
     {
         s/^\s+//;
         s/\s+$//;
         push( @hosts, split( /\s+/ ) );
     }
+    $fh->close()
 }
 
 # Create XML DOM
@@ -234,12 +237,12 @@ exit($ok ? 0:1);
 sub createParamsDom
 {
     my $params = shift;
-    my $doc = shift;
+    my $document = shift;
     my $parentNode = shift;
 
     foreach my $param ( sort keys %{$params} )
     {
-        my $paramNode = $doc->createElement('param');
+        my $paramNode = $document->createElement('param');
         $paramNode->setAttribute( 'name', $param );
         $paramNode->setAttribute( 'value', $params->{$param} );
         $parentNode->appendChild( $paramNode );

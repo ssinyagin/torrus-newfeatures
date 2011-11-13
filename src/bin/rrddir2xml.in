@@ -51,7 +51,7 @@ foreach my $arg ( @ARGV )
 $creator .= "\nOn " . scalar(localtime(time));
 
 
-my $indir;
+my $start_dir;
 my $recursive = 0;
 my $filter = '.*';
 my $outfile = 'rrddir.xml';
@@ -65,7 +65,7 @@ my $verbose = 0;
 
 
 my $ok = GetOptions(
-                    'dir=s'       => \$indir,
+                    'dir=s'       => \$start_dir,
                     'recursive'   => \$recursive,
                     'filter=s'    => \$filter,
                     'out=s'       => \$outfile,
@@ -78,7 +78,7 @@ my $ok = GetOptions(
                     'debug'       => \$debug
                     );
 
-if( not $ok or not $indir or scalar( @ARGV ) > 0 )
+if( not $ok or not $start_dir or scalar( @ARGV ) > 0 )
 {
     print STDERR
         "Generate Torrus XML configuration from a directory with RRD files\n";
@@ -109,20 +109,20 @@ elsif( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-if( not -d $indir )
+if( not -d $start_dir )
 {
-    Error('No such directory: ' . $indir);
+    Error('No such directory: ' . $start_dir);
     exit 1;
 }
 
-if( $indir !~ /^\// )
+if( $start_dir !~ /^\// )
 {
-    Error('Input directory must be an absolute path: ' . $indir);
+    Error('Input directory must be an absolute path: ' . $start_dir);
     exit 1;
 }
 
-# remove trailing slash from $indir
-$indir =~ s/\/$//;
+# remove trailing slash from $start_dir
+$start_dir =~ s/\/$//;
 
 if( $topsubtree !~ /^\/[0-9A-Za-z_\-\.\/]*$/ or
     $topsubtree =~ /\.\./ )
@@ -138,7 +138,7 @@ if( $outfile !~ /^\// )
 }
 
 my %rrdinfos;
-read_rrd_dir( \%rrdinfos, $indir, $filter, $recursive );
+read_rrd_dir( \%rrdinfos, $start_dir );
 
 Verbose(sprintf('Found %d RRD files', scalar( keys( %rrdinfos ) ) ));
 
@@ -157,7 +157,7 @@ foreach my $subtreeName ( split( '/', $path ) )
     $topSubtreeNode = $cb->addSubtree( $topSubtreeNode, $subtreeName );
 }
 
-if( length( $comment ) > 0 )
+if( defined($comment) )
 {
     $cb->addParam( $topSubtreeNode, 'comment', $comment );
 }
@@ -242,8 +242,6 @@ sub read_rrd_dir
 {
     my $infos = shift;
     my $indir = shift;
-    my $filter = shift;
-    my $recursive = shift;
 
     Debug('Reading directory: ' . $indir);
     
@@ -299,8 +297,7 @@ sub read_rrd_dir
     {
         foreach my $subdir ( @subdirs )
         {
-            read_rrd_dir( $infos, $indir . '/' . $subdir,
-                          $filter, $recursive );
+            read_rrd_dir( $infos, $indir . '/' . $subdir );
         }
     }
 }

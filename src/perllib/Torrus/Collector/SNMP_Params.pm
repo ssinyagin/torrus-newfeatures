@@ -82,6 +82,7 @@ sub initValidatorLeafParams
 
     $hashref->{'ds-type'}{'collector'}{'collector-type'}{'snmp-reachable'} =
         \%reachable_validatorLeafparams;
+    return;
 }
 
 
@@ -166,6 +167,8 @@ sub initAdmInfo
     {
         $categories->{$pname} = $category;
     }
+    
+    return;
 }
 
 

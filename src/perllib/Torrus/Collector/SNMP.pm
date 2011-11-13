@@ -690,14 +690,17 @@ sub mapLookupCallback
         $session->close();
         probablyDead( $collector, $hosthash );
         return undef;
-    }    
+    }
+    return;
 }
+
 
 sub activeMappingSessions
 {
     return scalar( @mappingSessions );
 }
-    
+
+
 # The target host is unreachable. We try to reach it few more times and
 # give it the final diagnose.
 

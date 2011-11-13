@@ -46,11 +46,6 @@ severity = 1
 [RegularExpressions::RequireExtendedFormatting]
 severity = 1
 
-# they demand to have return statement at the end of each sub
-# we usually know what we do, probably needs to be changed later.
-[Subroutines::RequireFinalReturn]
-severity = 2
-
 
 # we use "my %options = @_;" in new() constructors, probably need to
 # change that later
@@ -70,6 +65,15 @@ severity = 1
 severity = 1
 
 # global signal handling is critical for correct BerkeleyDB functioning
+# also $0 is needed to set the process status
 [Variables::RequireLocalizedPunctuationVars]
-allow = %SIG
+allow = %SIG $0
+
+# we've got a few subroutines with too many arguments
+[Subroutines::ProhibitManyArgs]
+max_arguments = 7
+
+# maybe I should change it later
+[ErrorHandling::RequireCarping]
+severity = 1
 

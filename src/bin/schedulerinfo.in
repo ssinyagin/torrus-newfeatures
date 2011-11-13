@@ -324,6 +324,7 @@ sub collectStats
             }
         }
     }
+    return;
 }
 
 
@@ -423,6 +424,7 @@ sub reportTimeline
     }
     thinLine();
     printf("\n");
+    return;
 }
 
 
@@ -433,6 +435,7 @@ sub thickLine
         print '=';
     }
     print "\n";
+    return;
 }
 
 sub thinLine
@@ -442,6 +445,7 @@ sub thinLine
         print '-';
     }
     print "\n";
+    return;
 }
 
 

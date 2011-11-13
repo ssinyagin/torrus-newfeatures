@@ -413,6 +413,7 @@ sub normalizeParams
         $params->{'snmp-community'} =
             pack( 'A*', $params->{'snmp-community'} );
     }
+    return;
 }
 
 
@@ -506,6 +507,7 @@ sub discoveryThread
     }
     
     Debug('Finished thread #' . threads->tid());
+    return;
 }
 
 
@@ -582,7 +584,7 @@ sub doDiscover
             }
             
             my ($login,$pass,$uid,$gid) = getpwnam('@torrus_user@')
-                or die("Cannot get user details for @torrus_user@\n");
+                or die('Cannot get user details for @torrus_user@');
             
             foreach my $dir ( $dd->listDataDirs() )
             {
@@ -647,6 +649,7 @@ sub removeFromBundle
             }
         }
     }
+    return;
 }
 
 # Local Variables:

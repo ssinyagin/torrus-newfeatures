@@ -148,6 +148,7 @@ sub walkSubtree
             }
         }
     }
+    return;
 }
 
 
@@ -189,6 +190,7 @@ sub splitAndStore
             }
         }
     }
+    return;
 }
 
 

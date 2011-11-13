@@ -210,6 +210,7 @@ sub print_nodeid
     }
 
     print $json->encode(\@all);
+    return;    
 }
             
 
@@ -241,6 +242,7 @@ sub render_node
 
     print $json->encode({'Content-type' => $mimetype,
                          'Filename' => $fname});
+    return;
 }
         
 

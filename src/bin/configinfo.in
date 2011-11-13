@@ -139,6 +139,7 @@ sub collectStats
             }            
         }
     }
+    return;
 }
 
 
@@ -158,6 +159,7 @@ sub collectOtherStats
 
     $n = $config_tree->getTimestamp();
     $stats->{'compiled'} = $n if defined( $n );
+    return;
 }
 
 

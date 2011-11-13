@@ -186,6 +186,7 @@ sub pickup_data
             }
         }
     }
+    return;
 }
 
 

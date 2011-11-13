@@ -165,6 +165,7 @@ sub collect_monitors
         my $params = $config_tree->getParams( $monitor );
         $cb->addMonitor( $monitorsNode, $monitor, $params );
     }
+    return;
 }
 
 sub collect_tokensets
@@ -183,6 +184,7 @@ sub collect_tokensets
         $name =~ s/^S//;
         $cb->addTokenset( $tsetsNode, $name, $params );
     }
+    return;
 }
 
 
@@ -214,6 +216,7 @@ sub collect_definitions
                                $props->{$prop}{$param} );
         }
     }
+    return;
 }
 
 
@@ -236,6 +239,7 @@ sub collect_datasources
     }
     
     collect_subtrees( $config_tree, $cb, $topToken, $topNode );
+    return;
 }
         
 
@@ -306,6 +310,7 @@ sub collect_subtrees
             }
         }
     }
+    return;
 }
 
 

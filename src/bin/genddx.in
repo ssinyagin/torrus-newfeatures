@@ -247,6 +247,7 @@ sub createParamsDom
         $paramNode->setAttribute( 'value', $params->{$param} );
         $parentNode->appendChild( $paramNode );
     }
+    return;
 }
 
 

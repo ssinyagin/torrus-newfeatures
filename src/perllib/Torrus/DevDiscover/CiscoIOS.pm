@@ -228,6 +228,9 @@ sub checkdevtype
     }
 
     $devdetails->setCap('interfaceIndexingManaged');
+    # fix the file naming for backward compatibility.
+    # sometimes ifName is not unique, but we can live with that
+    $devdetails->setParam('RFC2863_IF_MIB::ifnick-from-ifname', 'yes');
 
     return 1;
 }
@@ -254,7 +257,7 @@ sub discover
 
     my $session = $dd->session();
     my $data = $devdetails->data();
-
+    
     # Old mkroutercfg used cisco-interface-counters
     if( $Torrus::DevDiscover::CiscoIOS::useCiscoInterfaceCounters )
     {
@@ -264,38 +267,6 @@ sub discover
             $interface->{'hasOctets'} = 0;
             push( @{$interface->{'templates'}},
                   'CiscoIOS::cisco-interface-counters' );
-        }
-    }
-    else
-    {
-        # This is a well-known bug in IOS: HC counters are implemented,
-        # but always zero. We can catch this only for active interfaces.
-
-        foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
-        {
-            my $interface = $data->{'interfaces'}{$ifIndex};
-
-            if( $interface->{'hasHCOctets'} and
-                ( (
-                   $devdetails->snmpVar( $dd->oiddef('ifHCInOctets')
-                                         . '.' . $ifIndex ) == 0 and
-                   $devdetails->snmpVar( $dd->oiddef('ifInOctets')
-                                         . '.' . $ifIndex ) > 0
-                  )
-                  or
-                  (
-                   $devdetails->snmpVar( $dd->oiddef('ifHCOutOctets')
-                                         . '.' . $ifIndex ) == 0 and
-                   $devdetails->snmpVar( $dd->oiddef('ifOutOctets')
-                                         . '.' . $ifIndex ) > 0
-                  ) ) )
-            {
-                Debug('Disabling HC octets for ' . $ifIndex . ': ' .
-                      $interface->{'ifDescr'});
-
-                $interface->{'hasHCOctets'} = 0;
-                $interface->{'hasHCUcastPkts'} = 0;
-            }
         }
     }
 

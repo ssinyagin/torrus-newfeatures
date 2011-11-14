@@ -82,41 +82,6 @@ sub discover
     
     my $session = $dd->session();
     
-    my $ifTable =
-        $session->get_table( -baseoid => $dd->oiddef('ifTable') );
-    if( not defined $ifTable )
-    {
-        Error('Cannot retrieve ifTable');
-        return 0;
-    }
-    $devdetails->storeSnmpVars( $ifTable );
-
-    if( not $devdetails->hasCap('disable_ifXTable') )
-    {
-        my $ifXTable =
-            $session->get_table( -baseoid => $dd->oiddef('ifXTable') );
-        if( defined $ifXTable )
-        {
-            $devdetails->storeSnmpVars( $ifXTable );
-            $devdetails->setCap('ifXTable');
-            
-            if( $devdetails->hasOID( $dd->oiddef('ifName') ) )
-            {
-                $devdetails->setCap('ifName');
-            }
-            
-            if( $devdetails->hasOID( $dd->oiddef('ifAlias') ) )
-            {
-                $devdetails->setCap('ifAlias');
-            }
-            
-            if( $devdetails->hasOID( $dd->oiddef('ifHighSpeed') ) )
-            {
-                $devdetails->setCap('ifHighSpeed');
-            }
-        }
-    }
-
     ## Fill in per-interface data. This is normally done within discover(),
     ## but in our case we want to give other modules more control as early
     ## as possible.
@@ -126,6 +91,116 @@ sub discover
     my $data = $devdetails->data();
 
     $data->{'param'}{'has-inout-leaves'} = 'yes';
+    
+    # Pre-populate the interfaces table, so that other modules may
+    # delete unneeded interfaces
+    my $includeAdmDown =
+        $devdetails->paramEnabled('RFC2863_IF_MIB::list-admindown-interfaces');
+    my $includeNotpresent =
+        $devdetails->paramEnabled
+        ('RFC2863_IF_MIB::list-notpresent-interfaces');
+    my $excludeOperDown =
+        $devdetails->paramEnabled('RFC2863_IF_MIB::exclude-down-interfaces');
+
+    my $ifAdminStatus = $dd->walkSnmpTable('ifAdminStatus');
+    my $ifOperStatus  = $dd->walkSnmpTable('ifOperStatus');
+    my $ifType        = $dd->walkSnmpTable('ifType');
+    my $ifDescr       = $dd->walkSnmpTable('ifDescr');
+    my $ifSpeed       = $dd->walkSnmpTable('ifSpeed');
+    
+    while( my($ifIndex, $admStatus) = each %{$ifAdminStatus} )
+    {
+        my $operStatus = $ifOperStatus->{$ifIndex};
+        next unless (defined($admStatus) and defined($operStatus));
+
+        if( ( $admStatus == 1 or $includeAdmDown ) and
+            ( $operStatus != 6 or $includeNotpresent ) and
+            ( $operStatus != 2 or not $excludeOperDown ) )
+        {
+            my $interface = {};
+            $data->{'interfaces'}{$ifIndex} = $interface;
+
+            $interface->{'param'} = {};
+            $interface->{'vendor_templates'} = [];
+
+            $interface->{'ifIndex'} = $ifIndex;
+            $interface->{'ifAdminStatus'} = $admStatus;
+            $interface->{'ifOperStatus'} = $operStatus;
+     
+            $interface->{'ifType'} = $ifType->{$ifIndex};
+
+            my $descr = $ifDescr->{$ifIndex};
+            if( defined($descr) )
+            {
+                $interface->{'ifDescr'} = $descr;
+                $descr =~ s/\W/_/g;
+                # Some SNMP agents send extra zero byte at the end
+                $descr =~ s/_+$//;
+                $interface->{'ifDescrT'} = $descr;
+            }
+
+            my $speed = $ifSpeed->{$ifIndex};
+            if( defined($speed) and $speed > 0 )
+            {
+                $interface->{'ifSpeed'} = $speed;
+            }
+        }
+    }
+
+    # Process IF-MIB::ifXTable
+    
+    if( not $devdetails->hasCap('disable_ifXTable') )
+    {
+        my $ifName      = $dd->walkSnmpTable('ifName');
+        my $ifAlias     = $dd->walkSnmpTable('ifAlias');
+        my $ifHighSpeed = $dd->walkSnmpTable('ifHighSpeed');
+
+        my $found_ifName = 0;
+        my $found_ifAlias = 0;
+        
+        while( my ($ifIndex, $interface) = each %{$data->{'interfaces'}} )
+        {
+            my $iname = $ifName->{$ifIndex};
+            if( defined($iname) )
+            {
+                if( $iname !~ /\w/ )
+                {
+                    $iname = $interface->{'ifDescr'};
+                    Warn('Empty or invalid ifName for interface: ' .
+                         $iname);
+                }
+                
+                $interface->{'ifName'} = $iname;
+                $iname =~ s/\W/_/g;
+                $interface->{'ifNameT'} = $iname;
+                $found_ifName = 1;
+            }
+
+            my $alias = $ifAlias->{$ifIndex};
+            if( defined($alias) )
+            {
+                $interface->{'ifAlias'} = $alias;
+                $found_ifAlias = 1;
+            }
+
+            my $hspeed = $ifHighSpeed->{$ifIndex};
+            if( defined($hspeed) and $hspeed > 0 )
+            {
+                $interface->{'ifHighSpeed'} = $hspeed;
+            }
+        }
+
+        if( $found_ifName )
+        {
+            $devdetails->setCap('ifName');
+        }
+
+        if( $found_ifAlias )
+        {
+            $devdetails->setCap('ifAlias');
+        }
+    }
+
 
     ## Set default interface index mapping
 
@@ -135,15 +210,15 @@ sub discover
     
     if( $valid_ifDescr )
     {
-        $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
-        $data->{'nameref'}{'ifReferenceName'}   = 'ifDescr';
+        $data->{'nameref'}{'ifSubtreeName'}   = 'ifDescrT';
+        $data->{'nameref'}{'ifReferenceName'} = 'ifDescr';
 
-        if( $devdetails->paramEnabled('RFC2863_IF_MIB::ifnick-from-ifname')
-            and $devdetails->hasCap('ifName') )
-        {
-            $data->{'nameref'}{'ifNick'} = 'ifNameT';
-        }
-        elsif( $valid_ifName )
+        # ifnick-from-ifname forces the indexing even if it's not unique
+        
+        if( ($devdetails->paramEnabled('RFC2863_IF_MIB::ifnick-from-ifname')
+             and $devdetails->hasCap('ifName'))
+            or
+            $valid_ifName )
         {
             $data->{'nameref'}{'ifNick'} = 'ifNameT';
         }
@@ -169,99 +244,6 @@ sub discover
     if( $devdetails->hasCap('ifAlias') )
     {
         $data->{'nameref'}{'ifComment'} = 'ifAlias';
-    }
-    
-    # Pre-populate the interfaces table, so that other modules may
-    # delete unneeded interfaces
-    my $includeAdmDown =
-        $devdetails->paramEnabled('RFC2863_IF_MIB::list-admindown-interfaces');
-    my $includeNotpresent =
-        $devdetails->paramEnabled
-        ('RFC2863_IF_MIB::list-notpresent-interfaces');
-    my $excludeOperDown =
-        $devdetails->paramEnabled('RFC2863_IF_MIB::exclude-down-interfaces');
-
-    foreach my $ifIndex
-        ( $devdetails->getSnmpIndices( $dd->oiddef('ifDescr') ) )
-    {
-        my $admStatus =
-            $devdetails->snmpVar($dd->oiddef('ifAdminStatus') .'.'. $ifIndex);
-        my $operStatus =
-            $devdetails->snmpVar($dd->oiddef('ifOperStatus') .'.'. $ifIndex);
-
-        next unless (defined($admStatus) and defined($operStatus));
-        
-        if( ( $admStatus == 1 or $includeAdmDown ) and
-            ( $operStatus != 6 or $includeNotpresent ) and
-            ( $operStatus != 2 or not $excludeOperDown ) )
-        {
-            my $interface = {};
-            $data->{'interfaces'}{$ifIndex} = $interface;
-
-            $interface->{'param'} = {};
-            $interface->{'vendor_templates'} = [];
-
-            $interface->{'ifIndex'} = $ifIndex;
-            $interface->{'ifAdminStatus'} = $admStatus;
-            $interface->{'ifOperStatus'} = $operStatus;
-            
-            $interface->{'ifType'} =
-                $devdetails->snmpVar($dd->oiddef('ifType') . '.' . $ifIndex);
-
-            my $descr = $devdetails->snmpVar($dd->oiddef('ifDescr') .
-                                             '.' . $ifIndex);
-            $interface->{'ifDescr'} = $descr;
-            $descr =~ s/\W/_/g;
-            # Some SNMP agents send extra zero byte at the end
-            $descr =~ s/_+$//;
-            $interface->{'ifDescrT'} = $descr;
-
-            if( $devdetails->hasCap('ifName') )
-            {
-                my $iname = $devdetails->snmpVar($dd->oiddef('ifName') .
-                                                 '.' . $ifIndex);
-                if( not defined($iname) or $iname !~ /\w/ )
-                {
-                    $iname = $interface->{'ifDescr'};
-                    Warn('Empty or invalid ifName for interface ' . $iname);
-                }
-                $interface->{'ifName'} = $iname;
-                $iname =~ s/\W/_/g;
-                $interface->{'ifNameT'} = $iname;
-            }
-
-            if( $devdetails->hasCap('ifAlias') )
-            {
-                $interface->{'ifAlias'} =
-                    $devdetails->snmpVar($dd->oiddef('ifAlias') .
-                                         '.' . $ifIndex);
-            }
-
-            my $bw = 0;
-            if( $devdetails->hasCap('ifHighSpeed') and
-                not $interface->{'ignoreHighSpeed'} )
-            {
-                my $hiBW = 
-                    $devdetails->snmpVar($dd->oiddef('ifHighSpeed') . '.' .
-                                         $ifIndex);
-                if( defined($hiBW) and $hiBW >= 10 )
-                {
-                    $bw = 1e6 * $hiBW;
-                }
-            }
-
-            if( $bw == 0 )
-            {
-                $bw = 
-                    $devdetails->snmpVar($dd->oiddef('ifSpeed') . '.' .
-                                         $ifIndex);
-            }
-            
-            if( defined($bw) and $bw > 0 )
-            {
-                $interface->{'ifSpeed'} = $bw;
-            }
-        }
     }
 
     ## Process hints on interface indexing
@@ -348,6 +330,7 @@ sub discover
 
     if( ref( $data->{'interfaceFilter'} ) )
     {
+        # sort is only needed for a nicer debug output
         foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
@@ -380,76 +363,98 @@ sub discover
             }
         }
     }
+    
+    ## Explore counters available for each interface
+
+    my $ifInOctets      = $dd->walkSnmpTable('ifInOctets');
+    my $ifOutOctets     = $dd->walkSnmpTable('ifOutOctets');
+    my $ifInUcastPkts   = $dd->walkSnmpTable('ifInUcastPkts');
+    my $ifOutUcastPkts  = $dd->walkSnmpTable('ifOutUcastPkts');
+    my $ifInDiscards    = $dd->walkSnmpTable('ifInDiscards');
+    my $ifOutDiscards   = $dd->walkSnmpTable('ifOutDiscards');
+    my $ifInErrors      = $dd->walkSnmpTable('ifInErrors');
+    my $ifOutErrors     = $dd->walkSnmpTable('ifOutErrors');
 
     my $suppressHCCounters =
         ($devdetails->paramEnabled('RFC2863_IF_MIB::suppress-hc-counters')
          or
          $devdetails->hasCap('suppressHCCounters'));
 
-    # Explore each interface capability
+    my $ifHCInOctets     = {};
+    my $ifHCOutOctets    = {};
+    my $ifHCInUcastPkts  = {};
+    my $ifHCOutUcastPkts = {};
 
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+    if( not $suppressHCCounters )
     {
-        my $interface = $data->{'interfaces'}{$ifIndex};
+        $ifHCInOctets     = $dd->walkSnmpTable('ifHCInOctets');
+        $ifHCOutOctets    = $dd->walkSnmpTable('ifHCOutOctets');
+        $ifHCInUcastPkts  = $dd->walkSnmpTable('ifHCInUcastPkts');
+        $ifHCOutUcastPkts = $dd->walkSnmpTable('ifHCOutUcastPkts');
+    }
 
-        if( $devdetails->hasOID( $dd->oiddef('ifInOctets') .
-                                 '.' . $ifIndex )
-            and
-            $devdetails->hasOID( $dd->oiddef('ifOutOctets') .
-                                 '.' . $ifIndex ) )
+    while( my ($ifIndex, $interface) = each %{$data->{'interfaces'}} )
+    {
+        if( defined($ifInOctets->{$ifIndex}) and
+            defined($ifOutOctets->{$ifIndex}) )
         {
             $interface->{'hasOctets'} = 1;
         }
 
-        if( $devdetails->hasOID( $dd->oiddef('ifInUcastPkts') .
-                                 '.' . $ifIndex )
-            and
-            $devdetails->hasOID( $dd->oiddef('ifOutUcastPkts') .
-                                 '.' . $ifIndex ) )
+        if( defined($ifInUcastPkts->{$ifIndex}) and
+            defined($ifOutUcastPkts->{$ifIndex}) )
         {
             $interface->{'hasUcastPkts'} = 1;
         }
-
-        if( $devdetails->hasOID( $dd->oiddef('ifInDiscards') .
-                                 '.' . $ifIndex ) )
+        
+        if( defined($ifInDiscards->{$ifIndex}) )
         {
             $interface->{'hasInDiscards'} = 1;
         }
 
-        if( $devdetails->hasOID( $dd->oiddef('ifOutDiscards') .
-                                 '.' . $ifIndex ) )
+        if( defined($ifOutDiscards->{$ifIndex}) )
         {
             $interface->{'hasOutDiscards'} = 1;
         }
 
-        if( $devdetails->hasOID( $dd->oiddef('ifInErrors') .
-                                 '.' . $ifIndex ) )
+        if( defined($ifInErrors->{$ifIndex}) )
         {
             $interface->{'hasInErrors'} = 1;
         }
 
-        if( $devdetails->hasOID( $dd->oiddef('ifOutErrors') .
-                                 '.' . $ifIndex ) )
+        if( defined($ifOutErrors->{$ifIndex}) )
         {
             $interface->{'hasOutErrors'} = 1;
         }
 
-        if( $devdetails->hasCap('ifXTable') and not $suppressHCCounters )
+        # A well-known bug in Cisco IOS: HC counters are implemented,
+        # but always zero. Catch it here if possible.
+
+        if(  not $suppressHCCounters )
         {
-            if( $devdetails->hasOID( $dd->oiddef('ifHCInOctets') .
-                                     '.' . $ifIndex )
-                and
-                $devdetails->hasOID( $dd->oiddef('ifHCOutOctets') .
-                                     '.' . $ifIndex ) )
+            if( defined($ifHCInOctets->{$ifIndex}) and
+                defined($ifHCOutOctets->{$ifIndex}) )
             {
-                $interface->{'hasHCOctets'} = 1;
+                if( not $interface->{'hasOctets'} )
+                {
+                    $interface->{'hasHCOctets'} = 1;
+                }
+                else
+                {
+                    if( ($ifInOctets->{$ifIndex} == 0 or
+                         $ifHCInOctets->{$ifIndex} > 0)
+                        and
+                        ($ifOutOctets->{$ifIndex} == 0 or
+                         $ifHCOutOctets->{$ifIndex} > 0) )
+                    {
+                        $interface->{'hasHCOctets'} = 1;
+                    }
+                }
             }
 
-            if( $devdetails->hasOID( $dd->oiddef('ifHCInUcastPkts') .
-                                     '.' . $ifIndex )
-                and
-                $devdetails->hasOID( $dd->oiddef('ifHCOutUcastPkts') .
-                                     '.' . $ifIndex ) )
+            if( $interface->{'hasHCOctets'} and
+                defined($ifHCInUcastPkts->{$ifIndex}) and
+                defined($ifHCOutUcastPkts->{$ifIndex}) )
             {
                 $interface->{'hasHCUcastPkts'} = 1;
             }
@@ -991,20 +996,22 @@ sub buildConfig
             }
         }
         
-        if( $interface->{'ifSpeedMonitoring'} and
-            defined($interface->{'ifSpeed'}) )
+        if( $interface->{'ifSpeedMonitoring'} )
         {
-            if( $devdetails->hasCap('ifHighSpeed') and
-                not $interface->{'ignoreHighSpeed'} )
+            my $speedDefined = 0;
+            if( not $interface->{'ignoreHighSpeed'} and
+                defined($interface->{'ifHighSpeed'}) )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-ifhighspeed' );
+                $speedDefined = 1;
             }
-            else
+            elsif( defined($interface->{'ifSpeed'}) )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-ifspeed' );
+                $speedDefined = 1;
             }
 
-            if( $bandwidthUsageConfigured )
+            if( $speedDefined and $bandwidthUsageConfigured )
             {
                 if( not defined($interface->{
                     'childCustomizations'}->{'InOut_bps'}) )
@@ -1309,11 +1316,13 @@ sub validateReference
         }
         if( $seen{$entry} )
         {
-            Debug($nameref . ' contains duplicate entries');
+            Debug($nameref . ' contains duplicate entries: "' . $entry . '"');
             return 0;
         }
         $seen{$entry} = 1;
     }
+
+    $devdetails->setCap('uniqueNames_' . $nameref);
     return 1;
 }
 

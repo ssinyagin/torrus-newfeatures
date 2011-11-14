@@ -1,3 +1,10 @@
+2011-11-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/DevDetails.pm:
+	The following methods are deprecated and will be phased out:
+	storeSnmpVars(), hasOID(), snmpVar(), getSnmpIndices().
+	$dd->walkSnmpTable() should be used instead.
+
 2011-11-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* configs/torrus-config.pl: New config variables for Syslog:

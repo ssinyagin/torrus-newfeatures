@@ -105,6 +105,7 @@ sub paramString
 
 ##
 # store the query results for later use
+# WARNING: this method is deprecated. Use $dd->walkSnmpTable() instead.
 
 sub storeSnmpVars
 {
@@ -141,7 +142,8 @@ sub storeSnmpVars
 }
 
 ##
-# check if the stored query results have such OID prefix
+# check if the stored query results have such OID prefi
+# WARNING: this method is deprecated. Use $dd->checkSnmpTable() instead.
 
 sub hasOID
 {
@@ -158,6 +160,7 @@ sub hasOID
 
 ##
 # get the value of stored SNMP variable
+# WARNING: this method is deprecated. 
 
 sub snmpVar
 {
@@ -168,6 +171,7 @@ sub snmpVar
 
 ##
 # get the list of table indices for the specified prefix
+# WARNING: this method is deprecated. Use $dd->walkSnmpTable() instead.
 
 sub getSnmpIndices
 {

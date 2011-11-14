@@ -722,6 +722,37 @@ sub checkSnmpTable
 
 
 ##
+# walk through the table, and return a hashref with index->value content
+
+sub walkSnmpTable
+{
+    my $self = shift;
+    my $oidname = shift;
+
+    my $session = $self->session();
+    my $base = $self->oiddef( $oidname );
+
+    my $table = $session->get_table( -baseoid => $base );
+    if( not defined($table) )
+    {
+        return {};
+    }
+    
+    my $prefixLen = length( $base ) + 1;
+    my $ret = {};
+    
+    while( my( $oid, $value ) = each %{$table} )
+    {
+        my $INDEX = substr( $oid, $prefixLen );
+        $ret->{$INDEX} = $value;
+    }
+
+    return $ret;
+}
+
+
+
+##
 # Check if given OID is present
 
 sub checkSnmpOID

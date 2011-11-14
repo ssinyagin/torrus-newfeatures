@@ -94,65 +94,52 @@ sub discover
 
     # Find all HDSL line ifIndex values and units
     {
-        my $base = $dd->oiddef('hdsl2ShdslStatusNumAvailRepeaters');
-        my $table = $session->get_table( -baseoid => $base );
-        my $prefixLen = length( $base ) + 1;
+        my $table = $dd->walkSnmpTable('hdsl2ShdslStatusNumAvailRepeaters');
         
-        if( defined($table) )
-        {            
-            while( my( $oid, $val ) = each %{$table} )
+        while( my( $ifIndex, $val ) = each %{$table} )
+        {
+            # xtuC and xtuR are always present
+            $unit_instances{$ifIndex}{1} = 1;
+            $unit_instances{$ifIndex}{2} = 1;
+            
+            # check the repeaters
+            my $unitId = 3;
+            my $nRepeaters = int($val);
+            $data->{'HDSLLineProps'}{$ifIndex}{'repeaters'} = $nRepeaters;
+            $data->{'HDSLLineProps'}{$ifIndex}{'wirepairs'} = 0;
+            
+            while( $nRepeaters > 0 )
             {
-                my $ifIndex = substr( $oid, $prefixLen );
-                
-                # xtuC and xtuR are always present
-                $unit_instances{$ifIndex}{1} = 1;
-                $unit_instances{$ifIndex}{2} = 1;
-                
-                # check the repeaters
-                my $unitId = 3;
-                my $nRepeaters = int($val);
-                $data->{'HDSLLineProps'}{$ifIndex}{'repeaters'} = $nRepeaters;
-                $data->{'HDSLLineProps'}{$ifIndex}{'wirepairs'} = 0;
-                
-                while( $nRepeaters > 0 )
-                {
-                    $unit_instances{$ifIndex}{$unitId} = 1;
-                    $unitId++;
-                    $nRepeaters--;
-                }
+                $unit_instances{$ifIndex}{$unitId} = 1;
+                $unitId++;
+                $nRepeaters--;
             }
         }
     }
 
     # Discover the available line stats
     {
-        my $base = $dd->oiddef('hdsl2ShdslEndpointCurrSnrMgn');
-        my $table = $session->get_table( -baseoid => $base );
-        my $prefixLen = length( $base ) + 1;
-        
-        if( defined($table) )
-        {            
-            while( my( $oid, $val ) = each %{$table} )
+        my $table = $dd->walkSnmpTable('hdsl2ShdslEndpointCurrSnrMgn');
+
+        while( my( $INDEX, $val ) = each %{$table} )
+        {
+            my($ifIndex, $unitId, $side, $wirepair) =
+                split(/\./, $INDEX);
+            if( $unit_instances{$ifIndex}{$unitId} )
             {
-                my $INDEX = substr( $oid, $prefixLen );
-                my($ifIndex, $unitId, $side, $wirepair) =
-                    split(/\./, $INDEX);
-                if( $unit_instances{$ifIndex}{$unitId} )
+                $data->{'HDSLLine'}{$ifIndex}{$INDEX} = {
+                    'hdsl-unit-id' => $unitId,
+                    'hdsl-unit' => $hdslUnitId{$unitId},
+                    'hdsl-side' => $hdslUnitSide{$side},
+                    'hdsl-wirepair' => 'Wirepair ' . $wirepair,
+                };
+                
+                # find out how many wirepairs this line consists of
+                if( $data->{'HDSLLineProps'}{$ifIndex}{'wirepairs'} <
+                    $wirepair )
                 {
-                    $data->{'HDSLLine'}{$ifIndex}{$INDEX} = {
-                        'hdsl-unit-id' => $unitId,
-                        'hdsl-unit' => $hdslUnitId{$unitId},
-                        'hdsl-side' => $hdslUnitSide{$side},
-                        'hdsl-wirepair' => 'Wirepair ' . $wirepair,
-                    };
-                    
-                    # find out how many wirepairs this line consists of
-                    if( $data->{'HDSLLineProps'}{$ifIndex}{'wirepairs'} <
-                        $wirepair )
-                    {
-                        $data->{'HDSLLineProps'}{$ifIndex}{'wirepairs'} =
-                            $wirepair;
-                    }
+                    $data->{'HDSLLineProps'}{$ifIndex}{'wirepairs'} =
+                        $wirepair;
                 }
             }
         }

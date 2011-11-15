@@ -68,6 +68,9 @@ $Torrus::Log::syslogFacility = 'local0';
 $Torrus::Collector::useSyslog = 1;
 $Torrus::Monitor::useSyslog = 1;
 
+# Optionally Syslog socket options can be specified. By default, the native
+# Syslog socket on the local host is used
+# $Torrus::Log::syslogSockOpt = ['unix', '/home/jsmith/tmp/syslog.sock'];
 
 # By default, there's an exclusive lock that allows only one collector
 # process to initialize at a time. This reduces the concurrency and

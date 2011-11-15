@@ -1,3 +1,8 @@
+2011-11-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Log.pm (enableSyslog): new config variable:
+	$Torrus::Log::syslogSockOpt
+
 2011-11-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/DevDetails.pm:

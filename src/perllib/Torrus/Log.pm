@@ -27,7 +27,7 @@ use warnings;
 
 use base 'Exporter';
 use IO::Handle;
-use Sys::Syslog;
+use Sys::Syslog qw(:standard :extended);
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 
@@ -67,12 +67,26 @@ my $syslog_enabled = 0;
 
 sub enableSyslog
 {
-    my $ident = shift;   
+    my $ident = shift;
+
+    if( defined($Torrus::Log::syslogSockOpt) )
+    {
+        setlogsock(@{$Torrus::Log::syslogSockOpt});
+    }
+    
     openlog($ident, 'ndelay,pid', $Torrus::Log::syslogFacility);
     $syslog_enabled = 1;
     return;
 }
 
+
+END
+{
+    if( $syslog_enabled )
+    {
+        closelog();
+    }
+}
 
 
 sub doLog

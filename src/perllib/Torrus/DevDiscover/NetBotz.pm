@@ -35,36 +35,61 @@ $Torrus::DevDiscover::registry{'NetBotz'} = {
 
 our %oiddef =
     (
-     'netBotzV2Products'     => '1.3.6.1.4.1.5528.100.20',
+     # NETBOTZV2-MIB
+     'netBotzV2Products'           => '1.3.6.1.4.1.5528.100.20',
+     'nb_enclosureId'              => '1.3.6.1.4.1.5528.100.2.1.1.1',
+     'nb_enclosureLabel'           => '1.3.6.1.4.1.5528.100.2.1.1.4',
+     'nb_tempSensorLabel'          => '1.3.6.1.4.1.5528.100.4.1.1.1.4',
+     'nb_tempSensorEncId'          => '1.3.6.1.4.1.5528.100.4.1.1.1.5',
+     'nb_humiSensorLabel'          => '1.3.6.1.4.1.5528.100.4.1.2.1.4',
+     'nb_humiSensorEncId'          => '1.3.6.1.4.1.5528.100.4.1.2.1.5',
+     'nb_dewPointSensorLabel'      => '1.3.6.1.4.1.5528.100.4.1.3.1.4',
+     'nb_dewPointSensorEncId'      => '1.3.6.1.4.1.5528.100.4.1.3.1.5',
+     'nb_audioSensorLabel'         => '1.3.6.1.4.1.5528.100.4.1.4.1.4',
+     'nb_audioSensorEncId'         => '1.3.6.1.4.1.5528.100.4.1.4.1.5',
+     'nb_airFlowSensorLabel'       => '1.3.6.1.4.1.5528.100.4.1.5.1.4',
+     'nb_airFlowSensorEncId'       => '1.3.6.1.4.1.5528.100.4.1.5.1.5',
+     'nb_ampDetectSensorLabel'     => '1.3.6.1.4.1.5528.100.4.1.6.1.4',
+     'nb_ampDetectSensorEncId'     => '1.3.6.1.4.1.5528.100.4.1.6.1.5',
+     'nb_otherNumericSensorLabel'  => '1.3.6.1.4.1.5528.100.4.1.10.1.4',
+     'nb_otherNumericSensorEncId'  => '1.3.6.1.4.1.5528.100.4.1.10.1.5',
+     'nb_dryContactSensorLabel'    => '1.3.6.1.4.1.5528.100.4.2.1.1.4',
+     'nb_dryContactSensorEncId'    => '1.3.6.1.4.1.5528.100.4.2.1.1.5',
+     'nb_doorSwitchSensorLabel'    => '1.3.6.1.4.1.5528.100.4.2.2.1.4',
+     'nb_doorSwitchSensorEncId'    => '1.3.6.1.4.1.5528.100.4.2.2.1.5',
+     'nb_cameraMotionSensorLabel'  => '1.3.6.1.4.1.5528.100.4.2.3.1.4',
+     'nb_cameraMotionSensorEncId'  => '1.3.6.1.4.1.5528.100.4.2.3.1.5',
+     'nb_otherStateSensorLabel'    => '1.3.6.1.4.1.5528.100.4.2.10.1.4',
+     'nb_otherStateSensorEncId'    => '1.3.6.1.4.1.5528.100.4.2.10.1.5',     
      );
 
 
 our %sensor_types =
     ('temp'   => {
-        'oid' => '1.3.6.1.4.1.5528.100.4.1.1.1',
+        'oidname' => 'temp',
         'template' => 'NetBotz::netbotz-temp-sensor',
         'max' => 'NetBotz::temp-max',
         },
      'humi'   => {
-         'oid' => '1.3.6.1.4.1.5528.100.4.1.2.1',
+         'oidname' => 'humi',
          'template' => 'NetBotz::netbotz-humi-sensor',
          'max' => 'NetBotz::humi-max',
          },
      'dew'    => {
-         'oid' => '1.3.6.1.4.1.5528.100.4.1.3.1',
+         'oidname' => 'dewPoint',
          'template' => 'NetBotz::netbotz-dew-sensor',
          'max' => 'NetBotz::dew-max',
          },
      'audio'  => {
-         'oid' => '1.3.6.1.4.1.5528.100.4.1.4.1',
+         'oidname' => 'audio',
          'template' => 'NetBotz::netbotz-audio-sensor'
          },
      'air' => {
-         'oid' => '1.3.6.1.4.1.5528.100.4.1.5.1',
+         'oidname' => 'airFlow',
          'template' => 'NetBotz::netbotz-air-sensor'
          },
      'door' => {
-         'oid' => '1.3.6.1.4.1.5528.100.4.2.2.1',
+         'oidname' => 'doorSwitch',
          'template' => 'NetBotz::netbotz-door-sensor'
          },
      );
@@ -97,65 +122,96 @@ sub discover
     my $data = $devdetails->data();
     my $session = $dd->session();
 
+    # retrieve enclosure IDs and names;
+    $data->{'NetBotz'} = {};
+
+    {
+        my $id_table = $dd->walkSnmpTable('nb_enclosureId');
+        my $label_table = $dd->walkSnmpTable('nb_enclosureLabel');
+
+        while( my($INDEX, $id) = each %{$id_table} )
+        {
+            my $label = $label_table->{$INDEX};
+            if( defined($label) )
+            {
+                $data->{'NetBotz'}{$id} = {
+                    'encl_label' => $label,
+                    'sensors' => {}};
+            }
+            else
+            {
+                Error('Cannot retrieve NetBotz enclosure label for id=' . $id);
+            }
+        }
+    }
+    
+    # store the sensor names to guarantee uniqueness
+    my %sensorNames;
+    
     foreach my $stype (sort keys %sensor_types)
     {
-        my $oid = $sensor_types{$stype}{'oid'};
+        my $oid_name_base = 'nb_' . $sensor_types{$stype}{'oidname'};
+
+        my $encl_table = $dd->walkSnmpTable($oid_name_base . 'SensorEncId');
+        my $label_table = $dd->walkSnmpTable($oid_name_base . 'SensorLabel');
         
-        my $sensorTable = $session->get_table( -baseoid => $oid );
-        
-        if( defined( $sensorTable ) )
+
+        foreach my $INDEX (sort {$a <=> $b} keys %{$encl_table})
         {
-            $devdetails->storeSnmpVars( $sensorTable );
-
-            # store the sensor names to guarantee uniqueness
-            my %sensorNames;
+            my $enclId = $encl_table->{$INDEX};
+            my $label = $label_table->{$INDEX};
             
-            foreach my $INDEX ($devdetails->getSnmpIndices($oid . '.1'))
-            {
-                my $label = $devdetails->snmpVar( $oid . '.4.' . $INDEX );
-                
-                if( $sensorNames{$label} )
-                {
-                    Warn('Duplicate sensor names: ' . $label);
-                    $sensorNames{$label}++;
-                }
-                else
-                {
-                    $sensorNames{$label} = 1;
-                }
-                
-                if( $sensorNames{$label} > 1 )
-                {
-                    $label .= sprintf(' %d', $sensorNames{$label});
-                }
-                
-                my $leafName = $label;
-                $leafName =~ s/\W/_/g;
+            next unless (defined($enclId) and defined($label));
 
-                my $param = {
-                    'netbotz-sensor-index' => $INDEX,
-                    'node-display-name' => $label,
-                    'graph-title' => $label,
-                    'precedence' => sprintf('%d', 1000 - $INDEX)
+            if( not defined($data->{'NetBotz'}{$enclId}) )
+            {
+                Error('Cannot associate sensor ' . $label .
+                      ' with enclosure ID');
+                next;
+            }
+            
+            if( $sensorNames{$label} )
+            {
+                Warn('Duplicate sensor names: ' . $label);
+                $sensorNames{$label}++;
+            }
+            else
+            {
+                $sensorNames{$label} = 1;
+            }
+            
+            if( $sensorNames{$label} > 1 )
+            {
+                $label .= sprintf(' %d', $sensorNames{$label});
+            }
+            
+            my $leafName = $label;
+            $leafName =~ s/\W/_/g;
+            $leafName =~ s/_+$//g;
+            
+            my $param = {
+                'netbotz-sensor-index' => $INDEX,
+                'node-display-name' => $label,
+                'graph-title' => $label,
+                'precedence' => sprintf('%d', 0 - $INDEX)
                 };
 
-                if( defined( $sensor_types{$stype}{'max'} ) )
-                {
-                    my $max =
-                        $devdetails->param($sensor_types{$stype}{'max'});
-                    
-                    if( defined($max) and $max > 0 )
-                    {
-                        $param->{'upper-limit'} = $max;
-                    }
-                }
+            if( defined( $sensor_types{$stype}{'max'} ) )
+            {
+                my $max =
+                    $devdetails->param($sensor_types{$stype}{'max'});
                 
-
-                $data->{'NetBotz'}{$INDEX} = {
-                    'param'    => $param,
-                    'leafName' => $leafName,
-                    'template' => $sensor_types{$stype}{'template'}};
+                if( defined($max) and $max > 0 )
+                {
+                    $param->{'upper-limit'} = $max;
+                }
             }
+            
+            
+            $data->{'NetBotz'}{$enclId}{'sensors'}{$INDEX} = {
+                'param'    => $param,
+                'leafName' => $leafName,
+                'template' => $sensor_types{$stype}{'template'}};
         }        
     }
     
@@ -177,14 +233,40 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    foreach my $INDEX ( sort {$a<=>$b} keys %{$data->{'NetBotz'}} )
-    {
-        my $ref = $data->{'NetBotz'}{$INDEX};
-        
-        $cb->addLeaf( $devNode, $ref->{'leafName'}, $ref->{'param'},
-                      [$ref->{'template'}] );
-    }
+    my $enclSubtree = $cb->addSubtree
+        ( $devNode, 'Sensor_Enclosures',
+          {'node-display-name' => 'Sensor Enclosures',
+           'comment' => 'NetBotz sensors arranged in enclosures',
+           'precedence' => 10000});
 
+    my $precedence = 1000;
+    
+    foreach my $enclId (sort keys %{$data->{'NetBotz'}} )
+    {
+        my $ref = $data->{'NetBotz'}{$enclId};
+
+        next if scalar(keys %{$ref->{'sensors'}}) == 0;
+                       
+        my $enclLabel = $ref->{'encl_label'};
+        my $subtreeName = $enclLabel;
+        $subtreeName =~ s/\W+/_/g;
+        $subtreeName =~ s/_+$//;
+        
+        my $enclNode =
+            $cb->addSubtree( $enclSubtree, $subtreeName,
+                             {'node-display-name' => $enclLabel,
+                              'precedence' => $precedence});
+        $precedence--;
+        
+        foreach my $INDEX ( sort {$a<=>$b} keys %{$ref->{'sensors'}} )
+        {
+            my $sensor = $ref->{'sensors'}{$INDEX};
+            
+            $cb->addLeaf( $enclNode, $sensor->{'leafName'}, $sensor->{'param'},
+                          [$sensor->{'template'}] );
+        }
+    }
+    
     return;
 }
 

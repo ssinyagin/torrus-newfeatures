@@ -10,7 +10,6 @@
 # Besides, "devdiscover" discovery tool will soon support most
 # of these vendor definitions.
 
-# $Id$
 # @(#) 10/18/03 torrus-siteconfig.pl 1.3 (10/18/03 18:44:31) sferry
 
 @Torrus::Global::xmlAlwaysIncludeFirst =

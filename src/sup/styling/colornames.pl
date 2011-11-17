@@ -1,6 +1,5 @@
 # Symbolic Color names
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
 

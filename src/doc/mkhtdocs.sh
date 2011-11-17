@@ -1,7 +1,6 @@
 #
 # Generate HTML files out of POD
 #
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 

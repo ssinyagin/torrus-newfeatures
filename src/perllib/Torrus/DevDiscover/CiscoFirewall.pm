@@ -14,7 +14,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# $Id$
 # Shawn Ferry <lalartu at obscure dot org> <sferry at sevenspace dot com>
 
 # Cisco Firewall devices discovery

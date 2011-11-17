@@ -4,7 +4,6 @@
 # Install it as /etc/init.d/torrus (most UNIXes),
 # or as /usr/local/etc/rc.d/torrus.sh (FreeBSD), or probably somewhere else.
 #
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 #

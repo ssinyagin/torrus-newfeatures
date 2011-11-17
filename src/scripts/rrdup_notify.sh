@@ -4,7 +4,6 @@
 # and email the warning message.
 # *.old.rrd files are ignored
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 #
 

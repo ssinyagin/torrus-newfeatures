@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # Configure script for FHC compliant setup (http://www.pathname.com/fhs/)
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
 if test ! -x ./configure; then

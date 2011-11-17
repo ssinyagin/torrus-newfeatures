@@ -3,7 +3,6 @@
 # with $Torrus::Renderer::stylingProfile in your torrus-siteconfig.pl
 # or better define your amendments in Torrus::Renderer::stylingProfileOverlay
 
-# $Id$
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
 

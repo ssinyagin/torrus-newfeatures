@@ -18,7 +18,6 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Id$
 # Jon Nistor <nistor at snickers.org>
 #
 # NOTE: This module has been tested against v7.5.x, v7.6.x, v9.0.x, v9.1.x

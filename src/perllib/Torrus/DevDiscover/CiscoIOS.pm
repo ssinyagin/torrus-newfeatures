@@ -228,9 +228,6 @@ sub checkdevtype
     }
 
     $devdetails->setCap('interfaceIndexingManaged');
-    # fix the file naming for backward compatibility.
-    # sometimes ifName is not unique, but we can live with that
-    $devdetails->setParam('RFC2863_IF_MIB::ifnick-from-ifname', 'yes');
 
     return 1;
 }
@@ -257,7 +254,13 @@ sub discover
 
     my $session = $dd->session();
     my $data = $devdetails->data();
-    
+
+    # fixing the interface indexing and referencing schema
+    $data->{'nameref'}{'ifSubtreeName'}   = 'ifDescrT';
+    $data->{'nameref'}{'ifReferenceName'} = 'ifDescr';
+    $data->{'nameref'}{'ifNick'} = 'ifNameT';
+    $data->{'nameref'}{'ifComment'} = 'ifAlias';
+
     # Old mkroutercfg used cisco-interface-counters
     if( $Torrus::DevDiscover::CiscoIOS::useCiscoInterfaceCounters )
     {

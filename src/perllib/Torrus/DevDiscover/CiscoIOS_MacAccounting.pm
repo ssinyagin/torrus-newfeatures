@@ -297,7 +297,12 @@ sub buildConfig
                         keys %{$data->{'cipMac'}} )
     {
         my $peer = $data->{'cipMac'}{$INDEX};
-    
+        my $asNum = $peer->{'peerAS'};
+        if( not defined($asNum) )
+        {
+            $asNum = 0;
+        }
+        
         my $param = {
             'peer-macaddr'         => $peer->{'phyAddr'},
             'peer-macoid'          => $peer->{'macAddrOID'},
@@ -306,7 +311,7 @@ sub buildConfig
             'interface-nick'       => $peer->{'ifNick'},
             'comment'              => $peer->{'description'},
             'descriptive-nickname' => $peer->{'subtreeName'},
-            'precedence'           => 65000 - $peer->{'peerAS'},
+            'precedence'           => 65000 - $asNum,
             'searchable'           => 'yes'
             };
 
@@ -319,62 +324,68 @@ sub buildConfig
         {
             my $extStorageApplied = 0;
             my $tsetMemberApplied = 0;
-            
-            foreach my $peerName ( 'AS'.$peer->{'peerAS'}, $peer->{'peerIP'},
-                                   $peer->{'phyAddr'} )
+
+            my @name_candidates;
+            if( $asNum > 0 )
             {
-                if( defined( $peerName ) )
+                push( @name_candidates, 'AS'.$asNum );
+            }
+            foreach my $attr ('peerIP', 'phyAddr')
+            {
+                if( defined( $peer->{$attr} ) )
                 {
-                    if( not $extStorageApplied and
-                        defined( $data->{'cipMacExtStorage'}{$peerName} ) )
-                    {
-                        my $extStorage =
-                            $data->{'cipMacExtStorage'}{$peerName};
-                        foreach my $dir ( 'In', 'Out' )
-                        {
-                            if( defined( $extStorage->{$dir} ) )
-                            {
-                                my $serviceid = $extStorage->{$dir};
-                                
-                                my $params = {
-                                    'storage-type' => 'rrd,ext',
-                                    'ext-service-units' => 'bytes',
-                                    'ext-service-id' => $serviceid };
-                                
-                                if( defined( $data->{'cipMacExtStoragetrees'}{
-                                    $serviceid}) and
-                                    length( $data->{'cipMacExtStoragetrees'}{
-                                        $serviceid}) > 0 )
-                                {
-                                    $params->{'ext-service-trees'} =
-                                        $data->{'cipMacExtStoragetrees'}{
-                                            $serviceid};
-                                }
-                                
-                                $cb->addLeaf
-                                    ( $peerNode, 'Bytes_' . $dir,
-                                      $params );
-                            }
-                        }
-                        $extStorageApplied = 1;
-                    }
-
-                    if( not $tsetMemberApplied and
-                        defined( $data->{'cipTokensetMember'}{$peerName} ) )
-                    {
-                        my $tsetList =
-                            join( ',', sort keys
-                                  %{$data->{'cipTokensetMember'}{$peerName}} );
-
-                        $cb->addLeaf
-                            ( $peerNode, 'InOut_bps',
-                              { 'tokenset-member' => $tsetList } );
-                    }                        
+                    push( @name_candidates, $peer->{$attr} );
                 }
+            }
+                
+            foreach my $peerName ( @name_candidates )
+            {
+                if( not $extStorageApplied and
+                    defined( $data->{'cipMacExtStorage'}{$peerName} ) )
+                {
+                    my $extStorage =
+                        $data->{'cipMacExtStorage'}{$peerName};
+                    foreach my $dir ( 'In', 'Out' )
+                    {
+                        if( defined( $extStorage->{$dir} ) )
+                        {
+                            my $serviceid = $extStorage->{$dir};
+                            
+                            my $params = {
+                                'storage-type' => 'rrd,ext',
+                                'ext-service-units' => 'bytes',
+                                'ext-service-id' => $serviceid };
+                            
+                            my $trees =
+                                $data->{'cipMacExtStoragetrees'}{$serviceid};
+                            
+                            if( defined($trees) and $trees ne '' )
+                            {
+                                $params->{'ext-service-trees'} = $trees;
+                            }
+                            
+                            $cb->addLeaf
+                                ( $peerNode, 'Bytes_' . $dir, $params );
+                        }
+                    }
+                    $extStorageApplied = 1;
+                }
+                
+                if( not $tsetMemberApplied and
+                    defined( $data->{'cipTokensetMember'}{$peerName} ) )
+                {
+                    my $tsetList =
+                        join( ',', sort keys
+                              %{$data->{'cipTokensetMember'}{$peerName}} );
+                    
+                    $cb->addLeaf
+                        ( $peerNode, 'InOut_bps',
+                              { 'tokenset-member' => $tsetList } );
+                }                        
             }
         }
     }
-
+    
     return;
 }
 

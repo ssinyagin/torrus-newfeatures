@@ -1,3 +1,8 @@
+2011-11-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/NetBotz.pm: added selector actions:
+	Monitor, TokensetMember
+
 2011-11-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Log.pm (enableSyslog): new config variable:

@@ -1081,6 +1081,17 @@ C<sapName> (exact match), C<sapPort> (exact match).
 Actions supported: C<RemoveSAP> (excludes a selected SAP from the datasources).
 
 
+=head3 NetBotzSensor selector
+
+A selector of this type selects sensors on a NetBotz environment
+monitoring appliances.
+
+Attributes supported: C<SensorLabel>, C<EnclosureLabel>,
+C<EnclosureID>. Arguments are matched as regular expressions.
+
+Actions supported: C<Monitor>, C<TokensetMember>.
+
+
 
 =head3 Examples
 

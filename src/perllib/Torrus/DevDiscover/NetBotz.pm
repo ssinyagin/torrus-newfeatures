@@ -123,7 +123,8 @@ sub discover
     my $session = $dd->session();
 
     # retrieve enclosure IDs and names;
-    $data->{'NetBotz'} = {};
+    $data->{'NetBotz_encl'} = {};
+    $data->{'NetBotz_sens'} = {};
 
     {
         my $id_table = $dd->walkSnmpTable('nb_enclosureId');
@@ -134,7 +135,7 @@ sub discover
             my $label = $label_table->{$INDEX};
             if( defined($label) )
             {
-                $data->{'NetBotz'}{$id} = {
+                $data->{'NetBotz_encl'}{$id} = {
                     'encl_label' => $label,
                     'sensors' => {}};
             }
@@ -163,7 +164,7 @@ sub discover
             
             next unless (defined($enclId) and defined($label));
 
-            if( not defined($data->{'NetBotz'}{$enclId}) )
+            if( not defined($data->{'NetBotz_encl'}{$enclId}) )
             {
                 Error('Cannot associate sensor ' . $label .
                       ' with enclosure ID');
@@ -191,6 +192,7 @@ sub discover
             
             my $param = {
                 'netbotz-sensor-index' => $INDEX,
+                'netbotz-enclosure-id' => $enclId,
                 'node-display-name' => $label,
                 'graph-title' => $label,
                 'precedence' => sprintf('%d', 0 - $INDEX)
@@ -207,11 +209,16 @@ sub discover
                 }
             }
             
+            my $ref = {
+                'param'       => $param,
+                'label'       => $label,
+                'leafName'    => $leafName,
+                'template'    => $sensor_types{$stype}{'template'},
+                'enclosureId' => $enclId,
+            };
             
-            $data->{'NetBotz'}{$enclId}{'sensors'}{$INDEX} = {
-                'param'    => $param,
-                'leafName' => $leafName,
-                'template' => $sensor_types{$stype}{'template'}};
+            $data->{'NetBotz_encl'}{$enclId}{'sensors'}{$INDEX} = $ref;
+            $data->{'NetBotz_sens'}{$INDEX} = $ref;
         }        
     }
     
@@ -241,9 +248,9 @@ sub buildConfig
 
     my $precedence = 1000;
     
-    foreach my $enclId (sort keys %{$data->{'NetBotz'}} )
+    foreach my $enclId (sort keys %{$data->{'NetBotz_encl'}} )
     {
-        my $ref = $data->{'NetBotz'}{$enclId};
+        my $ref = $data->{'NetBotz_encl'}{$enclId};
 
         next if scalar(keys %{$ref->{'sensors'}}) == 0;
                        
@@ -261,6 +268,21 @@ sub buildConfig
         foreach my $INDEX ( sort {$a<=>$b} keys %{$ref->{'sensors'}} )
         {
             my $sensor = $ref->{'sensors'}{$INDEX};
+
+            if( defined($sensor->{'selectorActions'}) )
+            {
+                my $monitor = $sensor->{'selectorActions'}{'Monitor'};
+                if( defined($monitor) )
+                {
+                    $sensor->{'param'}{'monitor'} = $monitor;
+                }
+
+                my $tset = $sensor->{'selectorActions'}{'TokensetMember'};
+                if( defined( $tset ) )
+                {
+                    $sensor->{'param'}{'tokenset-member'} = $tset;
+                }
+            }
             
             $cb->addLeaf( $enclNode, $sensor->{'leafName'}, $sensor->{'param'},
                           [$sensor->{'template'}] );
@@ -269,6 +291,112 @@ sub buildConfig
     
     return;
 }
+
+
+
+#######################################
+# Selectors interface
+#
+
+$Torrus::DevDiscover::selectorsRegistry{'NetBotzSensor'} = {
+    'getObjects'      => \&getSelectorObjects,
+    'getObjectName'   => \&getSelectorObjectName,
+    'checkAttribute'  => \&checkSelectorAttribute,
+    'applyAction'     => \&applySelectorAction,
+};
+
+
+sub getSelectorObjects
+{
+    my $devdetails = shift;
+    my $objType = shift;
+
+    my $data = $devdetails->data();
+    return( sort {$a<=>$b} keys %{$data->{'NetBotz_sens'}} );
+}
+
+
+sub checkSelectorAttribute
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $attr = shift;
+    my $checkval = shift;
+
+    my $data = $devdetails->data();
+    
+    my $value;
+    my $operator = '=~';
+    my $sensor = $data->{'NetBotz_sens'}{$object};
+    
+    if( $attr eq 'SensorLabel' )
+    {
+        $value = $sensor->{'label'};
+    }
+    elsif( $attr eq 'EnclosureLabel' )
+    {
+        my $enclId = $sensor->{'enclosureId'};
+        $value = $data->{'NetBotz_encl'}{$enclId}{'encl_label'};
+    }
+    elsif( $attr eq 'EnclosureID' )
+    {
+        $value = $sensor->{'enclosureId'};
+    }
+    else
+    {
+        Error('Unknown NetBotzSensor selector attribute: ' . $attr);
+        $value = '';
+    }
+        
+    return eval( '$value' . ' ' . $operator . '$checkval' ) ? 1:0;
+}
+
+
+sub getSelectorObjectName
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    
+    my $data = $devdetails->data();
+
+    return $data->{'NetBotz_sens'}{$object}{'label'};
+}
+
+
+my %knownSelectorActions =
+    (
+     'Monitor' => 1,
+     'TokensetMember' => 1,
+     );
+
+                            
+sub applySelectorAction
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $action = shift;
+    my $arg = shift;
+
+    my $data = $devdetails->data();
+    my $objref = $data->{'NetBotz_sens'}{$object};
+    
+    
+    if( $knownSelectorActions{$action} )
+    {
+        $objref->{'selectorActions'}{$action} = $arg;
+    }
+    else
+    {
+        Error('Unknown NetBotz selector action: ' . $action);
+    }
+
+    return;
+}   
+
+
 
 
 

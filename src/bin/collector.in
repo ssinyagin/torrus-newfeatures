@@ -142,7 +142,8 @@ if( not $nodaemon and not $runonce )
 
     if( $Torrus::Collector::useSyslog )
     {
-        Torrus::Log::enableSyslog('collector_' . $tree . '_' . $instance);
+        Torrus::Log::enableSyslog('torrus/collector_' .
+                                  $tree . '_' . $instance);
     }
     else
     {

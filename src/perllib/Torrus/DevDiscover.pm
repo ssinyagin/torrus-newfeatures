@@ -333,7 +333,7 @@ sub discover
         }
     }
     
-    if( $devdetails->paramEnabled('suppress-legend') )
+    if( $devdetails->paramDisabled('suppress-legend') )
     {
         $data->{'param'}{'legend'} = $legend;
     }

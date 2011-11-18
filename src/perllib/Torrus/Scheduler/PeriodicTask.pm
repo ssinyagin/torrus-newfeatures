@@ -85,8 +85,9 @@ sub whenNext
         
         if( not $self->initialized() )
         {
-            # Repeat immediately as many cycles as required at start
-            return $now;
+            # Repeat immediately  (after a small pause)
+            # as many cycles as required at start
+            return $now + 2;
         }
 
         my $period = $self->period();

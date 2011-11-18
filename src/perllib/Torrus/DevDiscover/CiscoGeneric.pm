@@ -604,7 +604,6 @@ $Torrus::DevDiscover::selectorsRegistry{'CiscoCPU'} = {
     'applyAction'     => \&applySelectorAction,
 };
 
-## Objects are interface indexes
 
 sub getSelectorObjects
 {

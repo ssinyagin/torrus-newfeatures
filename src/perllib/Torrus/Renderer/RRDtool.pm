@@ -142,8 +142,13 @@ sub render_rrgraph
         {
             $tz = $ENV{'TZ'};
         }
+
+        local $ENV{'TZ'};
+        if( defined($tz) and $tz ne '' )
+        {
+            $ENV{'TZ'} = $tz;
+        }
         
-        local $ENV{'TZ'} = $tz;
         &RRDs::graph( $outfile, @args );
     }
 

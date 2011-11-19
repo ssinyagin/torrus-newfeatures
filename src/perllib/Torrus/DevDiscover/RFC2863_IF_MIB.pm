@@ -200,51 +200,54 @@ sub discover
         }
     }
 
-
-    ## Set default interface index mapping
-
-    my $valid_ifDescr = validateReference($devdetails, 'ifDescr');
-    my $valid_ifName = ( $devdetails->hasCap('ifName') and
-                         validateReference($devdetails, 'ifName') );
-    
-    if( $valid_ifDescr )
+    if( not $devdetails->hasCap('interfaceNamingProprietary') )
     {
-        $data->{'nameref'}{'ifSubtreeName'}   = 'ifDescrT';
-        $data->{'nameref'}{'ifReferenceName'} = 'ifDescr';
+        ## Set default interface index mapping
 
-        # ifnick-from-ifname forces the indexing even if it's not unique
+        my $valid_ifDescr = validateReference($devdetails, 'ifDescr');
+        my $valid_ifName = ( $devdetails->hasCap('ifName') and
+                             validateReference($devdetails, 'ifName') );
         
-        if( ($devdetails->paramEnabled('RFC2863_IF_MIB::ifnick-from-ifname')
-             and $devdetails->hasCap('ifName'))
-            or
-            $valid_ifName )
+        if( $valid_ifDescr )
         {
+            $data->{'nameref'}{'ifSubtreeName'}   = 'ifDescrT';
+            $data->{'nameref'}{'ifReferenceName'} = 'ifDescr';
+
+            # ifnick-from-ifname forces the indexing even if it's not unique
+            
+            if( ($devdetails->paramEnabled
+                 ('RFC2863_IF_MIB::ifnick-from-ifname')
+                 and $devdetails->hasCap('ifName'))
+                or
+                $valid_ifName )
+            {
+                $data->{'nameref'}{'ifNick'} = 'ifNameT';
+            }
+            else
+            {
+                $data->{'nameref'}{'ifNick'} = 'ifDescrT';
+            }
+        }
+        elsif( $valid_ifName )
+        {
+            $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+            $data->{'nameref'}{'ifReferenceName'} = 'ifName';
             $data->{'nameref'}{'ifNick'} = 'ifNameT';
         }
         else
         {
-            $data->{'nameref'}{'ifNick'} = 'ifDescrT';
+            $devdetails->setCap('interfaceIndexingPersistent');
+            $data->{'nameref'}{'ifSubtreeName'} = 'ifIndex';
+            $data->{'nameref'}{'ifReferenceName'} = 'ifIndex';
+            $data->{'nameref'}{'ifNick'} = 'ifIndex';
         }
-    }
-    elsif( $valid_ifName )
-    {
-        $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
-        $data->{'nameref'}{'ifReferenceName'} = 'ifName';
-        $data->{'nameref'}{'ifNick'} = 'ifNameT';
-    }
-    else
-    {
-        $devdetails->setCap('interfaceIndexingPersistent');
-        $data->{'nameref'}{'ifSubtreeName'} = 'ifIndex';
-        $data->{'nameref'}{'ifReferenceName'} = 'ifIndex';
-        $data->{'nameref'}{'ifNick'} = 'ifIndex';
-    }
+        
+        if( $devdetails->hasCap('ifAlias') )
+        {
+            $data->{'nameref'}{'ifComment'} = 'ifAlias';
+        }
+    } 
     
-    if( $devdetails->hasCap('ifAlias') )
-    {
-        $data->{'nameref'}{'ifComment'} = 'ifAlias';
-    }
-
     ## Process hints on interface indexing
     ## The capability 'interfaceIndexingManaged' disables the hints
     ## and lets the vendor discovery module to operate the indexing

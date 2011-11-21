@@ -68,7 +68,7 @@
     <param name="overview-shortcut-text-err"
            value="All line errors"/>
     <param name="overview-shortcut-title-err"
-        value="Show line erro rsummary graphs for all endpoints in one page"/>
+        value="Show line error summary graphs for all endpoints in one page"/>
     <param name="overview-page-title-err"
            value="Line Error Graphs"/>
 

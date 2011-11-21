@@ -89,7 +89,7 @@ sub lookupRegistry
     
     if( not defined( $ret ) )
     {
-        if( scalar( %Torrus::ConfigBuilder::templateRegistry ) > 0 )
+        if( scalar(keys %Torrus::ConfigBuilder::templateRegistry) > 0 )
         {
             Warn('Template ' . $template .
                  ' is not listed in ConfigBuilder template registry');

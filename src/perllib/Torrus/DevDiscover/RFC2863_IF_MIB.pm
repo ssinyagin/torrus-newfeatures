@@ -534,6 +534,13 @@ sub buildConfig
         $interface->{'param'}{'interface-nick'} =
             $interface->{$data->{'nameref'}{'ifNick'}};
 
+        if( defined($data->{'nameref'}{'ifVendorSpecific'}) and
+            defined($interface->{$data->{'nameref'}{'ifVendorSpecific'}}) )
+        {
+            $interface->{'param'}{'interface-vendor-specific'} =
+                $interface->{$data->{'nameref'}{'ifVendorSpecific'}};
+        }
+
         if( not defined( $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} ) )
         {
             $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =

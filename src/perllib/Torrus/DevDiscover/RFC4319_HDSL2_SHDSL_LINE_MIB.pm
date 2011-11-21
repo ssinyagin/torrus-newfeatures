@@ -205,7 +205,7 @@ sub buildConfig
         {
             $oidname = $oidmapping->{$oidname};
         }
-        $subtreeParam->{$oidparam} = '$' . $oidname;
+        $subtreeParam->{$oidparam} = "\$" . $oidname;
     }
     
     my $subtreeNode =
@@ -239,8 +239,14 @@ sub buildConfig
             $interface->{$data->{'nameref'}{'ifNick'}};
         $ifParam->{'node-display-name'} =
             $interface->{$data->{'nameref'}{'ifReferenceName'}};
+
+        if( defined($data->{'nameref'}{'ifVendorSpecific'}) and
+            defined($interface->{$data->{'nameref'}{'ifVendorSpecific'}}) )
+        {
+            $ifParam->{'interface-vendor-specific'} =
+                $interface->{$data->{'nameref'}{'ifVendorSpecific'}};
+        }
         
-                
         $ifParam->{'nodeid-dslinterface'} =
             'dsl//%nodeid-device%//' .
             $interface->{$data->{'nameref'}{'ifNodeid'}};

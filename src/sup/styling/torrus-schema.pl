@@ -11,6 +11,10 @@
      'SingleGraph'     => {
          'color' => '##blue',
          'line'  => 'LINE2'
+         },     
+     'SingleGraphMax'  => {  # MAX value graph on top of the Average
+         'color' => '##cornflowerblue',
+         'line'  => 'LINE1'
          },
      'HWBoundary'     => {
          'color' => '##red',

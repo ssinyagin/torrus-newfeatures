@@ -76,13 +76,16 @@ sub render_rrgraph
           $self->rrd_make_graph_opts( $config_tree, $token, $view ) );
 
     my $dstype = $config_tree->getNodeParam($token, 'ds-type');
-
+        
     if( $dstype eq 'rrd-multigraph' )
     {
         $self->rrd_make_multigraph( $config_tree, $token, $view, $obj );
     }
     else
     {
+        my $showmax = 0;
+        my $max_dname = $obj->{'dname'} . 'Max';
+        
         my $leaftype = $config_tree->getNodeParam($token, 'leaf-type');
 
         # Handle DEFs and CDEFs
@@ -100,6 +103,18 @@ sub render_rrgraph
                 $self->rrd_make_holtwinters( $config_tree, $token,
                                              $view, $obj );
             }
+            else
+            {
+                if( $self->rrd_if_showmax($config_tree, $token, $view) )
+                {
+                    my $maxdef =
+                        $self->rrd_make_def( $config_tree, $token,
+                                             $max_dname, 'MAX' );
+                    
+                    push( @{$obj->{'args'}{'defs'}}, $maxdef );
+                    $showmax = 1;
+                }
+            }
         }
         elsif( $leaftype eq 'rrd-cdef' )
         {
@@ -115,6 +130,12 @@ sub render_rrgraph
         }
 
         $self->rrd_make_graphline( $config_tree, $token, $view, $obj );
+
+        if( $showmax )
+        {
+            $self->rrd_make_maxline( $max_dname, $config_tree,
+                                     $token, $view, $obj );
+        }            
     }
 
     return(undef) if $obj->{'error'};
@@ -576,6 +597,65 @@ sub rrd_make_graphline
 }
 
 
+sub rrd_make_maxline
+{
+    my $self = shift;
+    my $max_dname = shift;
+    my $config_tree = shift;
+    my $token = shift;
+    my $view = shift;
+    my $obj = shift;
+
+    my $legend;
+    
+    my $disable_legend = $config_tree->getParam($view, 'disable-legend');
+    if( not defined($disable_legend) or $disable_legend ne 'yes' )
+    {
+        $legend = $config_tree->getNodeParam($token, 'graph-legend');
+        if( defined( $legend ) )
+        {
+            $legend =~ s/:/\\:/g;
+        }
+    }
+
+    if( not defined( $legend ) )
+    {
+        $legend = '';
+    }
+    else
+    {
+        $legend = 'Max ' . $legend;
+    }
+    
+    my $styleval = $config_tree->getNodeParam($token, 'maxline-style');
+    if( not defined($styleval)  )
+    {
+        $styleval = $config_tree->getParam($view, 'maxline-style');
+    }
+    
+    my $linestyle = $self->mkline( $styleval );
+
+    my $colorval = $config_tree->getNodeParam($token, 'maxline-color');
+    if( not defined($colorval) )
+    {
+        $colorval = $config_tree->getParam($view, 'maxline-color');
+    }
+    
+    my $linecolor = $self->mkcolor( $colorval );
+
+    if( $self->rrd_if_gprint( $config_tree, $token ) )
+    {
+        $self->rrd_make_gprint( $max_dname, $legend,
+                                $config_tree, $token, $view, $obj );
+    }
+
+    push( @{$obj->{'args'}{'line'}},
+          sprintf( '%s:%s%s%s', $linestyle, $max_dname, $linecolor,
+                   ($legend ne '') ? ':'.$legend.'\l' : '' ) );
+    return;
+}
+
+
 # Generate RRDtool arguments for HRULE's
 
 sub rrd_make_hrules
@@ -935,6 +1015,36 @@ sub rrd_if_gprint
     }
     return 1;
 }
+
+
+# determine if MAX line should be drawn
+sub rrd_if_showmax
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $token = shift;
+    my $view = shift;
+
+    my $disable = $config_tree->getNodeParam($token, 'graph-disable-maxline');
+    if( defined( $disable ) and $disable eq 'yes' )
+    {
+        return 0;
+    }
+
+    if( $self->{'options'}->{'variables'}->{'Gmaxline'} )
+    {
+        return 1;
+    }
+
+    my $enable = $config_tree->getParam($view, 'draw-maxline');
+    if( defined($enable) and $enable eq 'yes' )
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 
 sub rrd_make_gprint
 {

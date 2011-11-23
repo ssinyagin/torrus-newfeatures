@@ -40,6 +40,14 @@
          'color' => '##blue',
          'line'  => 'LINE2'
          },
+     'BpsInMax'          => {
+         'color' => '##darkgreen',
+         'line'  => 'AREA'
+         },
+     'BpsOutMax'         => {
+         'color' => '##cornflowerblue',
+         'line'  => 'LINE1'
+         },
 
      'BusinessDay'    => {
          'color' => '##white',

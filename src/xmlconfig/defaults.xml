@@ -189,12 +189,14 @@
     <!-- Last week graph -->
     <view name="lastweek">
       <param name="start"         value="-7days" />
+      <param name="draw-maxline"  value="yes" />
       <param name="description"   value="Last week graph" />
     </view>
 
     <!-- Last month graph -->
     <view name="lastmonth">
       <param name="start"         value="-1month" />
+      <param name="draw-maxline"  value="yes" />
       <param name="rrd-hwpredict" value="disabled" />
       <param name="decorations"   value=""/>
       <param name="description"   value="Last month graph" />
@@ -203,6 +205,7 @@
     <!-- Last year graph -->
     <view name="lastyear">
       <param name="start"         value="-1year" />
+      <param name="draw-maxline"  value="yes" />
       <param name="rrd-hwpredict" value="disabled" />
       <param name="decorations"   value=""/>
       <param name="description"   value="Last year graph" />

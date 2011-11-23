@@ -179,12 +179,16 @@
       <param name="line-style-in"    value="##BpsIn" />
       <param name="line-color-in"    value="##BpsIn" />
       <param name="line-order-in"    value="1" />
+      <param name="maxline-style-in" value="##BpsInMax" />
+      <param name="maxline-color-in" value="##BpsInMax" />
 
       <param name="ds-expr-out"      value="{Bytes_Out},8,*" />
       <param name="graph-legend-out" value="Bits per second out" />
       <param name="line-style-out"   value="##BpsOut" />
       <param name="line-color-out"   value="##BpsOut" />
       <param name="line-order-out"   value="2" />
+      <param name="maxline-style-out" value="##BpsOutMax" />
+      <param name="maxline-color-out" value="##BpsOutMax" />
     </leaf>
   </template>
 
@@ -369,12 +373,16 @@
       <param name="line-style-in"    value="##BpsIn" />
       <param name="line-color-in"    value="##BpsIn" />
       <param name="line-order-in"    value="1" />
+      <param name="maxline-style-in" value="##BpsInMax" />
+      <param name="maxline-color-in" value="##BpsInMax" />
 
       <param name="ds-expr-out"      value="{Bytes_Out},8,*" />
       <param name="graph-legend-out" value="Bits per second out" />
       <param name="line-style-out"   value="##BpsOut" />
       <param name="line-color-out"   value="##BpsOut" />
       <param name="line-order-out"   value="2" />
+      <param name="maxline-style-out" value="##BpsOutMax" />
+      <param name="maxline-color-out" value="##BpsOutMax" />
     </leaf>
   </template>
 

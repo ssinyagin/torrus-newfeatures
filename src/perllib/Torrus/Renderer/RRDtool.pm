@@ -84,7 +84,7 @@ sub render_rrgraph
     else
     {
         my $showmax = 0;
-        my $max_dname = $obj->{'dname'} . 'Max';
+        my $max_dname = $obj->{'dname'} . '_Max';
         
         my $leaftype = $config_tree->getNodeParam($token, 'leaf-type');
 
@@ -315,6 +315,8 @@ sub rrd_make_multigraph
     # We need this to refer to some existing variable name
     $obj->{'dname'} = $dsNames[0];
 
+    my $showmax = $self->rrd_if_showmax($config_tree, $token, $view);
+        
     # Analyze the drawing order
     my %dsOrder;
     foreach my $dname ( @dsNames )
@@ -363,12 +365,13 @@ sub rrd_make_multigraph
         }
 
         my $legend = '';
+        my $ds_expr;
         
         if( $dograph or $gprint_this )
         {
-            my $expr = $config_tree->getNodeParam($token, 'ds-expr-'.$dname);
+            $ds_expr = $config_tree->getNodeParam($token, 'ds-expr-'.$dname);
             my @cdefs =
-                $self->rrd_make_cdef($config_tree, $token, $dname, $expr);
+                $self->rrd_make_cdef($config_tree, $token, $dname, $ds_expr);
             if( not scalar(@cdefs) )
             {
                 $obj->{'error'} = 1;
@@ -434,12 +437,49 @@ sub rrd_make_multigraph
                 $stack = '';
             }
                 
+            if( $showmax and ($stack eq '') )
+            {
+                my $max_dname = $dname . '_Max';
+                
+                my $p_maxlinestyle =
+                    $config_tree->getNodeParam($token, 'maxline-style-'.$dname);
+                
+                my $p_maxlinecolor =
+                    $config_tree->getNodeParam($token, 'maxline-color-'.$dname);
+                
+                if( defined($p_maxlinestyle) and defined($p_maxlinecolor) )
+                {
+                    my @cdefs =
+                        $self->rrd_make_cdef($config_tree, $token,
+                                             $max_dname, $ds_expr, 'MAX');
+                    if( not scalar(@cdefs) )
+                    {
+                        $obj->{'error'} = 1;
+                        next;
+                    }
+            
+                    push( @{$obj->{'args'}{'defs'}}, @cdefs );
+
+                    my $max_linestyle = $self->mkline( $p_maxlinestyle );
+                    my $max_linecolor = $self->mkcolor( $p_maxlinecolor );
+                    if( defined( $alpha ) )
+                    {
+                        $max_linecolor .= $alpha;
+                    }
+                    
+                    push( @{$obj->{'args'}{'line'}},
+                          sprintf( '%s:%s%s',
+                                   $max_linestyle,
+                                   $max_dname,
+                                   $max_linecolor ) );
+                }
+            }
+
             push( @{$obj->{'args'}{'line'}},
                   sprintf( '%s:%s%s%s%s', $linestyle, $dname,
                            $linecolor,
                            ($legend ne '') ? ':'.$legend.'\l' : '',
                            $stack ) );
-            
         }
     }
     return;
@@ -951,6 +991,7 @@ sub rrd_make_cdef
     my $token = shift;
     my $dname = shift;
     my $expr  = shift;
+    my $force_function = shift;
 
     my @args = ();
     my $ok = 1;
@@ -966,7 +1007,11 @@ sub rrd_make_cdef
         my ($noderef, $timeoffset) = @_;
 
         my $function;
-        if( $noderef =~ s/^(.+)\@// )
+        if( defined($force_function) )
+        {
+            $function = $force_function;
+        }
+        elsif( $noderef =~ s/^(.+)\@// )
         {
             $function = $1;
         }

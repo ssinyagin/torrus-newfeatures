@@ -62,6 +62,17 @@ my %hdslUnitSide =
      );
 
 
+my %default_hdsl_oids =
+    (
+     'hdsl-curr-atn-oid' => 'hdsl2ShdslEndpointCurrAtn',
+     'hdsl-curr-snr-oid' => 'hdsl2ShdslEndpointCurrSnrMgn',
+     'hdsl-intvl-es-oid' => 'hdsl2Shdsl15MinIntervalES',
+     'hdsl-intvl-ses-oid' => 'hdsl2Shdsl15MinIntervalSES',
+     'hdsl-intvl-crc-oid' => 'hdsl2Shdsl15MinIntervalCRCanomalies',
+     'hdsl-intvl-losws-oid' => 'hdsl2Shdsl15MinIntervalLOSWS',
+     'hdsl-intvl-uas-oid' => 'hdsl2Shdsl15MinIntervalUAS',
+     );
+
 
 sub checkdevtype
 {
@@ -87,6 +98,9 @@ sub discover
     my $data = $devdetails->data();
     my $session = $dd->session();
 
+    my $oidmapping = 
+        $data->{'RFC4319_HDSL2_SHDSL_LINE_MIB'}{'oidmapping'};
+    
     $data->{'HDSLLine'} = {};
     $data->{'HDSLLineProps'} = {};
 
@@ -94,7 +108,13 @@ sub discover
 
     # Find all HDSL line ifIndex values and units
     {
-        my $table = $dd->walkSnmpTable('hdsl2ShdslStatusNumAvailRepeaters');
+        my $oidname = 'hdsl2ShdslStatusNumAvailRepeaters';
+        if( defined($oidmapping) and defined($oidmapping->{$oidname}) )
+        {
+            $oidname = $oidmapping->{$oidname};
+        }
+            
+        my $table = $dd->walkSnmpTable($oidname);
         
         while( my( $ifIndex, $val ) = each %{$table} )
         {
@@ -119,7 +139,13 @@ sub discover
 
     # Discover the available line stats
     {
-        my $table = $dd->walkSnmpTable('hdsl2ShdslEndpointCurrSnrMgn');
+        my $oidname = 'hdsl2ShdslEndpointCurrSnrMgn';
+        if( defined($oidmapping) and defined($oidmapping->{$oidname}) )
+        {
+            $oidname = $oidmapping->{$oidname};
+        }
+
+        my $table = $dd->walkSnmpTable($oidname);
 
         while( my( $INDEX, $val ) = each %{$table} )
         {
@@ -156,18 +182,36 @@ sub buildConfig
     my $cb = shift;
     my $devNode = shift;
 
+    my $data = $devdetails->data();
+    
+    if( scalar(keys %{$data->{'HDSLLine'}}) == 0 )
+    {
+        return;
+    }
+        
     # Build SNR subtree
-    my $subtreeName = 'DSL_Line_Stats';
+    my $subtreeName = 'SHDSL_Line_Stats';
 
     my $subtreeParam = {
-        'node-display-name'   => 'DSL line statistics',
+        'node-display-name'   => 'SHDSL line statistics',
     };
+
+    my $oidmapping = 
+        $data->{'RFC4319_HDSL2_SHDSL_LINE_MIB'}{'oidmapping'};
+    
+    while(my ($oidparam, $oidname) = each %default_hdsl_oids)
+    {
+        if( defined($oidmapping) and defined($oidmapping->{$oidname}) )
+        {
+            $oidname = $oidmapping->{$oidname};
+        }
+        $subtreeParam->{$oidparam} = '$' . $oidname;
+    }
     
     my $subtreeNode =
         $cb->addSubtree($devNode, $subtreeName, $subtreeParam,
                         ['RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-subtree']);
 
-    my $data = $devdetails->data();
     my $precedence = 1000;
     
     foreach my $ifIndex ( sort {$a<=>$b} %{$data->{'HDSLLine'}} )

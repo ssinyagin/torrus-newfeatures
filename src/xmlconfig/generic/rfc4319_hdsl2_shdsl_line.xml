@@ -177,7 +177,7 @@
       <param name="nodeid"         value="%nodeid-dslendpoint%//atn" />
       <param name="comment"            value="Current loop attenuation" />
       <param name="snmp-object"
-          value="$hdsl2ShdslEndpointCurrAtn.%hdsl-index%" />
+          value="%hdsl-curr-atn-oid%.%hdsl-index%" />
       <param name="rrd-ds"             value="CurrAtn" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="dB" />
@@ -191,7 +191,7 @@
       <param name="nodeid"         value="%nodeid-dslendpoint%//snr" />
       <param name="comment"            value="Current SNR margin" />
       <param name="snmp-object"
-          value="$hdsl2ShdslEndpointCurrSnrMgn.%hdsl-index%" />
+          value="%hdsl-curr-snr-oid%.%hdsl-index%" />
       <param name="rrd-ds"             value="CurrSnrMgn" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="dB" />
@@ -208,7 +208,7 @@
          value="Errored Seconds during the previous 15min interval"/>
       <param name="node-display-name"  value="ES in prev. 15min"/>
       <param name="snmp-object"
-          value="$hdsl2Shdsl15MinIntervalES.%hdsl-index%.1" />
+          value="%hdsl-intvl-es-oid%.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minES" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="seconds" />
@@ -223,7 +223,7 @@
          value="Severely Errored Seconds during the previous 15min interval"/>
       <param name="node-display-name"  value="SES in prev. 15min"/>
       <param name="snmp-object"
-          value="$hdsl2Shdsl15MinIntervalSES.%hdsl-index%.1" />
+          value="%hdsl-intvl-ses-oid%.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minSES" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="seconds" />
@@ -238,7 +238,7 @@
          value="CRC anomalies during the previous 15min interval"/>
       <param name="node-display-name"  value="CRCA in prev. 15min"/>
       <param name="snmp-object"
-          value="$hdsl2Shdsl15MinIntervalCRCanomalies.%hdsl-index%.1" />
+          value="%hdsl-intvl-crc-oid%.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minCRCA" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="anomalies" />
@@ -253,7 +253,7 @@
          value="Loss of Sync Word Seconds during the previous 15min interval"/>
       <param name="node-display-name"  value="LOSWS in prev. 15min"/>
       <param name="snmp-object"
-          value="$hdsl2Shdsl15MinIntervalLOSWS.%hdsl-index%.1" />
+          value="%hdsl-intvl-losws-oid%.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minLOSWS" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="seconds" />
@@ -268,7 +268,7 @@
          value="Unavailable Seconds during the previous 15min interval"/>
       <param name="node-display-name"  value="UAS in prev. 15min"/>
       <param name="snmp-object"
-          value="$hdsl2Shdsl15MinIntervalUAS.%hdsl-index%.1" />
+          value="%hdsl-intvl-uas-oid%.%hdsl-index%.1" />
       <param name="rrd-ds"             value="15minUAS" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="vertical-label"     value="seconds" />

@@ -302,6 +302,23 @@ enough, for example:
   ./configure varprefix=/vol1/torrus_var
 
 
+=head2 Logging
+
+As of Torrus version 2.02, the collector and monitor daemons send their
+logs to a local SYSLOG server in "local0" facility by default.
+
+The SYSLOG facility can be altered in F<torrus-siteconfig.pl>:
+
+  $Torrus::Log::syslogFacility = 'local5';
+
+Also the following two statements would revert to the old behavior (log
+files written directly by the daemons). Please not that the daemons
+would not rotate the logs on SIGHUP:
+
+  $Torrus::Collector::useSyslog = 0;
+  $Torrus::Monitor::useSyslog = 0;
+
+
 =head2 Torrus directory layout
 
   @pkghome@/
@@ -380,6 +397,7 @@ path for service data files is recommended to be a subdirectory of F</srv>.
 The path F<@defrrddir@> is used as default by C<torrus genddx>
 utility, and you can always change it in the command line or in your 
 DDX files.
+
 
 =head2 Configuring Torrus
 
@@ -507,19 +525,6 @@ Torrus web interface is designed to run under mod_perl environment
 See the I<Torrus Web Interface Reference> document for detailed instructions on
 Apache configuration.
 
-In short, typical Apache configuration for mod_perl version 1.0 would look
-like follows:
-
-  Alias /torrus/plain "@webplaindir@"
-  PerlRequire "@cfgdefdir@/webmux.pl"
-  <Location /torrus>
-    SetHandler perl-script
-    PerlHandler Torrus::ApacheHandler
-  </Location>
-  <Location /torrus/plain/>
-    SetHandler default-handler
-    Options None
-  </Location>
 
 =head2 Access Control Lists
 
@@ -536,6 +541,7 @@ for detailed description. Example:
     --cn="John Smith" --addtogroup=staff
   torrus acledit --addgroup=admin \
     --permit=DisplayTree --permit=DisplayAdmInfo --for='*'
+
 
 =head2 Cron Job
 
@@ -640,4 +646,4 @@ and its comments in F<torrus-config.pl> for more details.
 
 =head1 Author
 
-Copyright (c) 2002-2007 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2002-2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -74,6 +74,12 @@ Tested with many different vendors.
 
 =over 
 
+=item * Alcatel-Lucent
+
+ESS 7450: full support for SAP, Services and Customer for VPLS services.
+ISAM: line termination statistics for various LT boards. The module is
+only available under NDA because of Alcatel-Lucent MIB privacy policy.
+
 =item * Alteon content switches
 
 Application switching and performance statistics.
@@ -85,6 +91,10 @@ Reports the line status for the manageable modular media converter.
 =item * Arbor Networks
 
 Provide statistics for Arbor eSeries devices. (e30, e100)
+
+=item * APC NetBotz
+
+Prvide statistics for various NetBotz environment sensors.
 
 =item * Ascend MAX
 

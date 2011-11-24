@@ -72,6 +72,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::F5BigIp',
      'Torrus::DevDiscover::Foundry',
      'Torrus::DevDiscover::FTOS',
+     'Torrus::DevDiscover::HPProCurve',
      'Torrus::DevDiscover::Jacarta',
      'Torrus::DevDiscover::JunOS',
      'Torrus::DevDiscover::Liebert',
@@ -1128,6 +1129,20 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'FTOS::ftos-temperature-sensor-fahrenheit' => {
          'name'     => 'ftos-temperature-sensor-fahrenheit',
          'source'   => 'vendor/ftos.xml',
+     },
+
+     #### HP ProCurve (by Dean Hamstead)
+     'HPProCurve::hp-procurve-cpu' => {
+         'name'     => 'hp-procurve-cpu',
+         'source'   => 'vendor/hp.procurve.xml',
+     },
+     'HPProCurve::hp-procurve-memory-subtree' => {
+         'name'     => 'hp-procurve-memory-subtree',
+         'source'   => 'vendor/hp.procurve.xml',
+     },
+     'HPProCurve::hp-procurve-memory-leaf' => {
+         'name'     => 'hp-procurve-memory-leaf',
+         'source'   => 'vendor/hp.procurve.xml',
      },
 
      #### Jacarta

@@ -52,6 +52,7 @@ dist_vendor_DATA = \
 	vendor/jacarta.xml \
 	vendor/junos.xml \
 	vendor/hp.hpux.xml \
+	vendor/hp.procurve.xml \
 	vendor/liebert.xml \
 	vendor/microsoft.windows.xml \
 	vendor/motorola.bsr.xml \

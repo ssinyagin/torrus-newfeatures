@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2011  Dean Hamstead
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+  Hp ProCurve Switch
+
+-->
+
+<configuration>
+<definitions>
+  <!-- hpSwitch                        1.3.6.1.4.1.11.2.14.11.5.1 -->
+  <!-- hpMem                       1.3.6.1.4.1.11.2.14.11.5.1.1.2 -->
+  <def name="hpLocalMemSlotIndex"
+       value="1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.1"/>
+  <def name="hpLocalMemSlabCnt"
+       value="1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.2"/>
+  <def name="hpLocalMemFreeSegCnt"
+       value="1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.3"/>
+  <def name="hpLocalMemAllocSegCnt"
+       value="1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.4"/>
+  <def name="hpLocalMemTotalBytes"
+       value="1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.5"/>
+  <def name="hpLocalMemFreeBytes"
+       value="1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.6"/>
+  <def name="hpLocalMemAllocBytes"
+       value="1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.7"/>
+
+  <!-- hpSwitchStatistics            1.3.6.1.4.1.11.2.14.11.5.1.9 -->
+  <def name="hpSwitchCpuStat"
+       value="1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0"/>
+
+</definitions>
+
+<datasources>
+
+  <template name="hp-procurve-cpu">
+    <param name="comment"             value="HP CPU Usage"/>
+    <leaf name="CPU_Usage">
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="data-file"
+             value="%system-id%_hp_cpu.rrd" />
+      <param name="precedence"         value="-200" />
+      <param name="snmp-object"
+             value="$hpSwitchCpuStat"/>
+      <param name="rrd-ds"             value="cpuUsage" />
+      <param name="comment">
+          The overall CPU busy percentage in the last 1 minute period
+      </param>
+      <param name="graph-legend"       value="CPU usage" />
+      <param name="graph-lower-limit"  value="0" />
+      <param name="graph-upper-limit"  value="100" />
+      <param name="upper-limit"        value="80" />
+      <param name="vertical-label"     value="Percent"/>
+    </leaf>
+  </template>
+
+  <template name="hp-procurve-memory-subtree">
+    <param name="comment"             value="HP Memory Usage"/>
+  </template>
+
+  <template name="hp-procurve-memory-leaf">
+    <param name="data-file"
+           value="%system-id%_hp_procurve_memory_%memslot-index%.rrd"/>
+    <param name="comment"            value="Local Slot %memslot-index%"/>
+    <param name="rrd-create-dstype"  value="GAUGE"/>
+    <param name="graph-lower-limit"  value="0" />
+    <param name="upper-limit"        value="100" />
+    <param name="vertical-label"     value="Percent"/>
+
+    <leaf name="Usage">
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="comment"  value="Total vs. Used Memory"/>
+      <param name="title"    value="Slot %memslot-index% Memory Usage"/>
+      <param name="ds-type"  value="rrd-multigraph"/>
+      <param name="ds-names" value="total,used"/>
+      <!-- total -->
+      <param name="ds-expr-total"      value="{Free},{Used},+"/>
+      <param name="graph-legend-total" value="Total"/>
+      <param name="line-style-total"   value="##totalresource"/>
+      <param name="line-color-total"   value="##totalresource"/>
+      <param name="line-order-total"   value="1"/>
+      <!-- used -->
+      <param name="ds-expr-used"      value="{Used}"/>
+      <param name="graph-legend-used" value="Used"/>
+      <param name="line-style-used"   value="##resourceusage"/>
+      <param name="line-color-used"   value="##resourceusage"/>
+      <param name="line-order-used"   value="2"/>
+    </leaf>
+    <leaf name="Free">
+      <param name="snmp-object"  value="$hpLocalMemFreeBytes.%memslot-index%"/>
+      <param name="rrd-ds"       value="Slot%memslot-index%Free"/>
+      <param name="graph-legend" value="Slot %memslot-name% memory free" />
+      <param name="comment"      value="Bytes Free in Slot %memslot-index%"/>
+    </leaf>
+    <leaf name="Used">
+      <param name="snmp-object"  value="$hpLocalMemAllocBytes.%memslot-index%"/>
+      <param name="rrd-ds"       value="Pool%memslot-index%Used"/>
+      <param name="graph-legend" value="Slot %memslot-index% memory free" />
+      <param name="comment"      value="Bytes Used in Slot %memslot-index%"/>
+    </leaf>
+  </template>
+
+</datasources>
+
+</configuration>

@@ -1,3 +1,9 @@
+2011-11-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm, perllib/Torrus/DevDiscover.pm:
+	new SNMP parameter: "snmp-maxrepetitions". The default value is 10.
+	Previously Net::SNMP was setting it to 25.
+
 2011-11-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/NetBotz.pm: added selector actions:

@@ -67,6 +67,7 @@ $Torrus::Collector::params{'snmp'} = {
     'snmp-object-type'  => 'OTHER',
     'snmp-check-sysuptime' => 'yes',
     'snmp-max-msg-size' => undef,
+    'snmp-maxrepetitions' => 10,
     'snmp-ignore-mib-errors' => undef,
     };
 
@@ -608,7 +609,9 @@ sub lookupMap
 
         # Retrieve the map table
 
+        my $maxrepetitions = $collector->param($token, 'snmp-maxrepetitions');
         $session->get_table( -baseoid => $map,
+                             -maxrepetitions => $maxrepetitions,
                              -callback => [\&mapLookupCallback,
                                            $collector, $hosthash, $map] );
 

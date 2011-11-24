@@ -56,6 +56,7 @@ my %validatorLeafParams =
      '+snmp-check-sysuptime' => { 'yes' => undef,
                                    'no'  => undef },
      '+snmp-max-msg-size' => undef,
+     '+snmp-maxrepetitions' => undef,
      '+snmp-ignore-mib-errors' => undef,
      );
 

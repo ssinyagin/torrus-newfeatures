@@ -311,6 +311,11 @@ finds SNMPv2-MIB::sysUpTime variable unavailable in the device.
 Optional. If defined, it sets the SNMP maximum message size different from
 default. The default value is 1470 (defined in Net::SNMP).
 
+=item * C<snmp-maxrepetitions>
+
+Optional. If defined, it sets the maximum number of objects to return in
+SNMP getBulkRequest. The default value is 10.
+
 =item * C<host-subtree>
 
 Optional. Defines the datasourse tree path under which the host-specific

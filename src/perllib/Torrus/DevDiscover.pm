@@ -71,7 +71,8 @@ $defaultParams{'snmp-check-sysuptime'} = 'yes';
 $defaultParams{'show-recursive'} = 'yes';
 $defaultParams{'snmp-ipversion'} = '4';
 $defaultParams{'snmp-transport'} = 'udp';
-
+$defaultParams{'snmp-maxrepetitions'} = 10;
+    
 our @copyParams =
     ( 'collector-period',
       'collector-timeoffset',
@@ -105,6 +106,7 @@ our @copyParams =
       'snmp-oids-per-pdu',
       'snmp-check-sysuptime',
       'snmp-max-msg-size',
+      'snmp-maxrepetitions',
       'snmp-reachability-rra',
       'system-id' );
 
@@ -211,15 +213,12 @@ sub discover
             return 0;
         }
         $snmpargs{'-community'} = $community;
-
-        # set maxMsgSize to a maximum value for better compatibility
         
         my $maxmsgsize = $devdetails->param('snmp-max-msg-size');
         if( defined( $maxmsgsize ) )
         {
-            $devdetails->setParam('snmp-max-msg-size', $maxmsgsize);
             $snmpargs{'-maxmsgsize'} = $maxmsgsize;
-        }        
+        }
     }
     elsif( $version eq '3' )        
     {
@@ -376,6 +375,7 @@ sub discover
     $self->{'datadirs'}{$devdetails->param('data-dir')} = 1;
 
     $self->{'session'} = $session;
+    $self->{'maxrepetitions'} = $devdetails->param('snmp-maxrepetitions');
 
     # some discovery modules need to be disabled on per-device basis
 
@@ -731,8 +731,11 @@ sub walkSnmpTable
 
     my $session = $self->session();
     my $base = $self->oiddef( $oidname );
-
-    my $table = $session->get_table( -baseoid => $base );
+    
+    my $table = $session->get_table
+        ( -baseoid => $base,
+          -maxrepetitions => $self->{'maxrepetitions'} );
+    
     if( not defined($table) )
     {
         return {};

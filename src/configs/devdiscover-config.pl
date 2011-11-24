@@ -1483,6 +1483,7 @@ $Torrus::DevDiscover::CiscoIOS::useCiscoInterfaceCounters = 0;
 # Read plugin configurations
 {
     my $dir = '@plugdevdisccfgdir@';
+    local *CFGDIR;
     opendir(CFGDIR, $dir) or die("Cannot open directory $dir: $!");
     my @files = grep { !/^\./ } readdir(CFGDIR);
     closedir( CFGDIR );

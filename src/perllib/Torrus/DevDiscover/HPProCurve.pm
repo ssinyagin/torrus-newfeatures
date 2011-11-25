@@ -72,9 +72,6 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    my $hpLocalMemTable =
-        $session->get_table( -baseoid => $dd->oiddef('hpLocalMemTable') );
-
     my $hpLocalMemTable = $dd->walkSnmpTable('hpLocalMemTable');
     if( scalar(keys %{$hpLocalMemTable}) > 0 )
     {

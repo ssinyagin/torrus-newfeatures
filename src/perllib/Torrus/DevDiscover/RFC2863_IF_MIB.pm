@@ -233,6 +233,7 @@ sub discover
             $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
             $data->{'nameref'}{'ifReferenceName'} = 'ifName';
             $data->{'nameref'}{'ifNick'} = 'ifNameT';
+            $data->{'param'}{'ifindex-table'} = '$ifName';
         }
         else
         {

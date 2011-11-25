@@ -16,6 +16,9 @@
 
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+## no critic (Modules::RequireFilenameMatchesPackage)
+
+
 package Torrus::Collector::Cisco_cbQoS;
 
 use Torrus::Collector::Cisco_cbQoS_Params;
@@ -619,6 +622,8 @@ sub postProcess
             }
         }
     }
+
+    return;
 }
 
 
@@ -634,7 +639,10 @@ sub deleteTarget
     delete $cref->{'QosEnabled'}{$token};
 
     Torrus::Collector::SNMP::deleteTarget( $collector, $token );
+
+    return;
 }
+
 
 
 1;

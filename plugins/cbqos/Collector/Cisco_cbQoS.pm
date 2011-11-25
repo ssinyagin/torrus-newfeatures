@@ -337,6 +337,8 @@ sub initTargetAttributes
         return 0;
     }
 
+    my $maxrepetitions = $collector->param($token, 'snmp-maxrepetitions');
+
     # Retrieve and translate cbQosServicePolicyTable
 
     if( not defined $ServicePolicyTable{$hosthash} )
@@ -347,8 +349,9 @@ sub initTargetAttributes
         $ServicePolicyTable{$hosthash} = $ref;
 
         my $result =
-            $session->get_table( -baseoid =>
-                                 $oiddef{'cbQosServicePolicyTable'} );
+            $session->get_table
+            ( -baseoid => $oiddef{'cbQosServicePolicyTable'},
+              -maxrepetitions => $maxrepetitions );
         if( not defined( $result ) )
         {
             Error('Error retrieving cbQosServicePolicyTable from ' .
@@ -410,7 +413,9 @@ sub initTargetAttributes
                             'cbQosMatchStmtName', 'cbQosQueueingCfgBandwidth',
                             'cbQosTSCfgRate', 'cbQosPoliceCfgRate' )
         {
-            my $result = $session->get_table( -baseoid => $oiddef{$table} );
+            my $result =
+                $session->get_table( -baseoid => $oiddef{$table},
+                                     -maxrepetitions => $maxrepetitions );
             if( defined( $result ) )
             {
                 while( my( $oid, $val ) = each %{$result} )
@@ -445,8 +450,8 @@ sub initTargetAttributes
         $ObjectsTable{$hosthash} = $ref;
 
         my $result =
-            $session->get_table( -baseoid =>
-                                 $oiddef{'cbQosObjectsTable'} );
+            $session->get_table( -baseoid => $oiddef{'cbQosObjectsTable'},
+                                 -maxrepetitions => $maxrepetitions );
         if( not defined( $result ) )
         {
             Error('Error retrieving cbQosObjectsTable from ' . $hosthash .

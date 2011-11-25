@@ -46,29 +46,16 @@ sub discover
     my $data = $devdetails->data();
     my $session = $dd->session();
 
-    my $table = $session->get_table( -baseoid =>
-                                     $dd->oiddef('bgpPeerRemoteAs'));
+    my $table = $dd->walkSnmpTable('bgpPeerRemoteAs');
     
-    if( not defined($table) or scalar(keys %{$table}) == 0 )
+    if( scalar(keys %{$table}) > 0 )
     {
-        return 0;
-    }
-    
-    $devdetails->storeSnmpVars( $table );
-    $devdetails->setCap('bgpPeerTable');
+        $devdetails->setCap('bgpPeerTable');
 
-
-    foreach my $INDEX
-        ( $devdetails->
-          getSnmpIndices( $dd->oiddef('bgpPeerRemoteAs') ) )
-    {
-        my $ipAddr = $INDEX;
-
-        my $asNum =
-            $devdetails->snmpVar($dd->oiddef('bgpPeerRemoteAs') .
-                                 '.' . $INDEX);
-
-        $data->{'bgpPeerAS'}{$ipAddr} = $asNum;
+        while( my ($ipAddr, $asNum) = each %{$table} )
+        {
+            $data->{'bgpPeerAS'}{$ipAddr} = $asNum;
+        }
     }
                             
     return 1;

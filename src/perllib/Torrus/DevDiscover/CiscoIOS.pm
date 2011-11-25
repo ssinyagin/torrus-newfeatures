@@ -53,7 +53,6 @@ our %oiddef =
      'cbgpPeerAcceptedPrefixes'          => '1.3.6.1.4.1.9.9.187.1.2.4.1.1',
      'cbgpPeerPrefixAdminLimit'          => '1.3.6.1.4.1.9.9.187.1.2.4.1.3',
      # CISCO-CAR-MIB
-     'ccarConfigTable'                   => '1.3.6.1.4.1.9.9.113.1.1.1',
      'ccarConfigType'                    => '1.3.6.1.4.1.9.9.113.1.1.1.1.3',
      'ccarConfigAccIdx'                  => '1.3.6.1.4.1.9.9.113.1.1.1.1.4',
      'ccarConfigRate'                    => '1.3.6.1.4.1.9.9.113.1.1.1.1.5',
@@ -196,7 +195,8 @@ sub checkdevtype
     }
 
     # same thing with unrouted VLAN interfaces
-    if( $devdetails->paramDisabled('CiscoIOS::enable-unrouted-vlan-interfaces'))
+    if( $devdetails->paramDisabled
+        ('CiscoIOS::enable-unrouted-vlan-interfaces'))
     {
         $interfaceFilter->{'unrouted VLAN N'} = {
             'ifType'  => 53,                     # propVirtual
@@ -232,12 +232,12 @@ sub checkdevtype
 }
 
 
-my %ccarConfigType =
+my %ccarConfigTypeTranslation =
     ( 1 => 'all',
       2 => 'quickAcc',
       3 => 'standardAcc' );
 
-my %ccarAction =
+my %ccarActionTranslation =
     ( 1 => 'drop',
       2 => 'xmit',
       3 => 'continue',
@@ -304,18 +304,12 @@ sub discover
 
     if( $devdetails->paramDisabled('CiscoIOS::disable-bgp-stats') )
     {
-        my $peerTable =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('cbgpPeerAcceptedPrefixes') );
-        if( defined($peerTable) and scalar(keys %{$peerTable}) > 0 )
+        my $peerTable = $dd->walkSnmpTable('cbgpPeerAcceptedPrefixes');
+        if( scalar(keys %{$peerTable}) > 0 )
         {
-            $devdetails->storeSnmpVars( $peerTable );
             $devdetails->setCap('CiscoBGP');
 
-            my $limitsTable =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('cbgpPeerPrefixAdminLimit') );
-            $limitsTable = {} if not defined( $limitsTable );
+            my $limitsTable = $dd->walkSnmpTable('cbgpPeerPrefixAdminLimit');
             
             $data->{'cbgpPeers'} = {};
             
@@ -328,9 +322,7 @@ sub discover
             # Number of peers for each AS
             my %asNumbers;    
 
-            foreach my $INDEX
-                ( $devdetails->
-                  getSnmpIndices( $dd->oiddef('cbgpPeerAcceptedPrefixes') ) )
+            foreach my $INDEX ( keys %{$peerTable} )
             {
                 my ($a1, $a2, $a3, $a4, $afi, $safi) = split(/\./, $INDEX);
                 my $peerIP = join('.', $a1, $a2, $a3, $a4);
@@ -387,9 +379,7 @@ sub discover
                 }
                 $peer->{'description'} .= '[' . $peerIP . ']';
 
-                $peer->{'prefixLimit'} =
-                    $limitsTable->{$dd->oiddef('cbgpPeerPrefixAdminLimit') .
-                                       '.' . $INDEX};
+                $peer->{'prefixLimit'} =  $limitsTable->{$INDEX};
                 
                 $data->{'cbgpPeers'}{$INDEX} = $peer;                
             }
@@ -397,17 +387,12 @@ sub discover
             if( scalar( @nonV4Unicast ) > 0 )
             {
                 my $addrFamTable =
-                    $session->get_table
-                    ( -baseoid => $dd->oiddef('cbgpPeerAddrFamilyName') );
+                    $dd->walkSnmpTable('cbgpPeerAddrFamilyName');
                 
                 foreach my $INDEX ( @nonV4Unicast )
                 {
                     my $peer = $data->{'cbgpPeers'}{$INDEX};
-
-                    my $fam = $addrFamTable->{
-                        $dd->oiddef('cbgpPeerAddrFamilyName') .
-                            '.' . $INDEX};
-
+                    my $fam = $addrFamTable->{$INDEX};
                     $peer->{'addrFamily'} = $fam;
                     $peer->{'otherAddrFamily'} = 1;
                     $peer->{'description'} .= ' ' . $fam;
@@ -441,19 +426,22 @@ sub discover
     
     if( $devdetails->paramDisabled('CiscoIOS::disable-car-stats') )
     {
-        my $carTable =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('ccarConfigTable') );
-        if( defined($carTable) and scalar(keys %{$carTable}) > 0 )
+        my $ccarConfigType = $dd->walkSnmpTable('ccarConfigType');
+        if( scalar(keys %{$ccarConfigType}) > 0 )
         {
-            $devdetails->storeSnmpVars( $carTable );
             $devdetails->setCap('CiscoCAR');
-
             $data->{'ccar'} = {};
 
-            foreach my $INDEX
-                ( $devdetails->
-                  getSnmpIndices( $dd->oiddef('ccarConfigType') ) )
+            my $ccarConfigAccIdx = $dd->walkSnmpTable('ccarConfigAccIdx');
+            my $ccarConfigRate = $dd->walkSnmpTable('ccarConfigRate');
+            my $ccarConfigLimit = $dd->walkSnmpTable('ccarConfigLimit');
+            my $ccarConfigExtLimit = $dd->walkSnmpTable('ccarConfigExtLimit');
+            my $ccarConfigConformAction =
+                $dd->walkSnmpTable('ccarConfigConformAction');
+            my $ccarConfigExceedAction =
+                $dd->walkSnmpTable('ccarConfigExceedAction');
+            
+            while( my($INDEX, $confType) = each %{$ccarConfigType} )
             {
                 my ($ifIndex, $dir, $carIndex) = split(/\./, $INDEX);
                 my $interface = $data->{'interfaces'}{$ifIndex};
@@ -468,35 +456,17 @@ sub discover
                     'carIndex'  => $carIndex };
 
                 $car->{'configType'} =
-                    $ccarConfigType{ $carTable->{$dd->oiddef
-                                                     ('ccarConfigType') .
-                                                     '.' . $INDEX} };
-
-                $car->{'accIdx'} = $carTable->{$dd->oiddef
-                                                   ('ccarConfigAccIdx') .
-                                                   '.' . $INDEX};
-                
-                $car->{'rate'} = $carTable->{$dd->oiddef
-                                                 ('ccarConfigRate') .
-                                                 '.' . $INDEX};
-
-                
-                $car->{'limit'} = $carTable->{$dd->oiddef
-                                                  ('ccarConfigLimit') .
-                                                  '.' . $INDEX};
-                
-                $car->{'extLimit'} = $carTable->{$dd->oiddef
-                                                     ('ccarConfigExtLimit') .
-                                                     '.' . $INDEX};
+                    $ccarConfigTypeTranslation{ $ccarConfigType->{$INDEX} };
+                $car->{'accIdx'} = $ccarConfigAccIdx->{$INDEX};
+                $car->{'rate'} = $ccarConfigRate->{$INDEX};
+                $car->{'limit'} = $ccarConfigLimit->{$INDEX};
+                $car->{'extLimit'} = $ccarConfigExtLimit->{$INDEX};
                 $car->{'conformAction'} =
-                    $ccarAction{ $carTable->{$dd->oiddef
-                                                 ('ccarConfigConformAction') .
-                                                 '.' . $INDEX} };
-                
+                    $ccarActionTranslation{
+                        $ccarConfigConformAction->{$INDEX} };
                 $car->{'exceedAction'} =
-                    $ccarAction{ $carTable->{$dd->oiddef
-                                                 ('ccarConfigExceedAction') .
-                                                 '.' . $INDEX} };
+                    $ccarActionTranslation{
+                        $ccarConfigExceedAction->{$INDEX} };
 
                 $data->{'ccar'}{$INDEX} = $car;
             }
@@ -509,23 +479,20 @@ sub discover
         if( $dd->checkSnmpTable( 'cvpdnSystemTunnelTotal' ) )
         {
             # Find the Tunnel type
-            my $tableTun = $session->get_table(
-                -baseoid => $dd->oiddef('cvpdnSystemTunnelTotal') );
-
-            if( $tableTun )
+            my $cvpdnSystemTunnelTotal =
+                $dd->walkSnmpTable('cvpdnSystemTunnelTotal');
+            
+            if( scalar(keys %{$cvpdnSystemTunnelTotal}) > 0 )
             {
                 $devdetails->setCap('ciscoVPDN');
 
-                $devdetails->storeSnmpVars( $tableTun );
-
                 # VPDN indexing: 1: l2f, 2: l2tp, 3: pptp
-                foreach my $typeIndex (
-                    $devdetails->getSnmpIndices(
-                        $dd->oiddef('cvpdnSystemTunnelTotal') ) )
+                foreach my $typeIndex
+                    (keys %{$cvpdnSystemTunnelTotal})
                 {
                     Debug("CISCO-VPDN-MGMT-MIB: found Tunnel type " .
                           $tunnelType{$typeIndex} );
-
+                    
                     $data->{'ciscoVPDN'}{$typeIndex} = $tunnelType{$typeIndex};
                 }
             }
@@ -534,34 +501,27 @@ sub discover
 
     if( $devdetails->paramDisabled('CiscoIOS::disable-3g-stats') )
     {
-        my $base = $dd->oiddef('c3gStandard');
-        my $table = $session->get_table( -baseoid => $base );
-        my $prefixLen = length( $base ) + 1;
-        
-        if( defined($table) )
-        {            
-            while( my( $oid, $val ) = each %{$table} )
+        my $table = $dd->walkSnmpTable('c3gStandard');        
+        while( my( $phy, $val ) = each %{$table} )
+        {
+            if( $val == 2 )
             {
-                if( $val == 2 )
+                $devdetails->setCap('Cisco3G');
+                my $phyName = $data->{'entityPhysical'}{$phy}{'name'};
+                if( not defined( $phyName ) )
                 {
-                    $devdetails->setCap('Cisco3G');
-                    my $phy = substr( $oid, $prefixLen );
-                    my $phyName = $data->{'entityPhysical'}{$phy}{'name'};
-                    if( not defined( $phyName ) )
-                    {
-                        $phyName = 'Cellular Modem';
-                    }
-                    
-                    $data->{'cisco3G'}{$phy} = {
-                        'name'   => $phyName,
-                        'standard' => 'gsm',
-                    };
+                    $phyName = 'Cellular Modem';
                 }
-                else
-                {
-                    Warn('CISCO-WAN-3G-MIB: CDMA statistics are ' .
-                         'not yet implemented');
-                }
+                
+                $data->{'cisco3G'}{$phy} = {
+                    'name'   => $phyName,
+                    'standard' => 'gsm',
+                };
+            }
+            else
+            {
+                Warn('CISCO-WAN-3G-MIB: CDMA statistics are ' .
+                     'not yet implemented');
             }
         }
 
@@ -575,18 +535,14 @@ sub discover
 
     if( $devdetails->paramDisabled('CiscoIOS::disable-port-qos-stats') )
     {
-        my $base = $dd->oiddef('cportQosDropPkts');
-        my $table = $session->get_table( -baseoid => $base );
-        my $prefixLen = length( $base ) + 1;
-        
-        if( defined($table) and scalar(keys %{$table}) > 0 )
+        my $table = $dd->walkSnmpTable('cportQosDropPkts');
+        if( scalar(keys %{$table}) > 0 )
         {            
             $devdetails->setCap('CiscoPortQos');
             $data->{'ciscoPortQos'} = {};
             
-            while( my( $oid, $val ) = each %{$table} )
+            foreach my $qos_entry (keys %{$table})
             {
-                my $qos_entry = substr( $oid, $prefixLen );
                 my($ifIndex, $direction, $qos_index) =
                     split(/\./o, $qos_entry);
                 

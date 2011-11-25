@@ -18,6 +18,8 @@
 
 # Cisco IOS Class-based QoS discovery
 
+## no critic (Modules::RequireFilenameMatchesPackage)
+
 # TODO:
 #  Is cbQosQueueingMaxQDepth constant or variable?
 #  RED statistics
@@ -163,19 +165,13 @@ sub checkdevtype
 
     my $session = $dd->session();
 
-    # cbQoS template use 64-bit counters, so SNMPv1 is explicitly unsupported
+    # cbQoS templates use 64-bit counters, so SNMPv1 is explicitly unsupported
     
     if( $devdetails->isDevType('CiscoIOS') and
-        $devdetails->param('snmp-version') ne '1' )
+        $devdetails->param('snmp-version') ne '1' and
+        $dd->checkSnmpTable('cbQosServicePolicyTable') )
     {
-        my $cbQosServicePolicyTable =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('cbQosServicePolicyTable') );
-        if( defined $cbQosServicePolicyTable )
-        {
-            $devdetails->storeSnmpVars( $cbQosServicePolicyTable );
-            return 1;
-        }
+        return 1;
     }
 
     return 0;
@@ -191,131 +187,114 @@ sub discover
     my $data = $devdetails->data();
 
     # Process cbQosServicePolicyTable
-
+    
     $data->{'cbqos_policies'} = {};
 
-    foreach my $policyIndex
-        ( $devdetails->getSnmpIndices( $dd->oiddef('cbQosIfType') ) )
+    foreach my $entryName
+        ('cbQosIfType', 'cbQosPolicyDirection', 'cbQosIfIndex',
+         'cbQosFrDLCI', 'cbQosAtmVPI', 'cbQosAtmVCI',
+         'cbQosEntityIndex', 'cbQosVlanIndex')
     {
-        $data->{'cbqos_policies'}{$policyIndex} = {};
-
-        foreach my $row ('cbQosIfType', 'cbQosPolicyDirection', 'cbQosIfIndex',
-                         'cbQosFrDLCI', 'cbQosAtmVPI', 'cbQosAtmVCI',
-                         'cbQosEntityIndex', 'cbQosVlanIndex')
+        my $table = $dd->walkSnmpTable($entryName);
+        while( my($policyIndex, $value) = each %{$table} )
         {
-            my $value = $devdetails->snmpVar($dd->oiddef($row) .
-                                             '.' . $policyIndex);
-            if( defined( $value ) )
-            {
-                $value = translateCbQoSValue( $value, $row );            
-                $data->{'cbqos_policies'}{$policyIndex}{$row} = $value;
-            }
+            $value = translateCbQoSValue( $value, $entryName );
+            $data->{'cbqos_policies'}{$policyIndex}{$entryName} = $value;
         }
     }
 
+    
     # Process cbQosObjectsTable
+    
     $data->{'cbqos_objects'} = {};
+    $data->{'cbqos_children'} = {};
+    
+    my $cbQosObjectsType = $dd->walkSnmpTable('cbQosObjectsType');
 
-    my $cbQosObjectsTable =
-        $session->get_table( -baseoid => $dd->oiddef('cbQosObjectsTable') );
-    if( not defined( $cbQosObjectsTable ) )
+    if( scalar(keys %{$cbQosObjectsType}) == 0 )
     {
         return 1;
     }
-    else
+    
+    while( my($INDEX, $value) = each %{$cbQosObjectsType} )
     {
-        $devdetails->storeSnmpVars( $cbQosObjectsTable );
+        $data->{'cbqos_objects'}{$INDEX}{'cbQosObjectsType'} =
+            translateCbQoSValue( $value, 'cbQosObjectsType' );
     }
 
+    my $cbQosConfigIndex =
+        $dd->walkSnmpTable('cbQosConfigIndex');
+    my $cbQosParentObjectsIndex =
+        $dd->walkSnmpTable('cbQosParentObjectsIndex');
+    
     my $needTables = {};
 
-    foreach my $policyIndex ( keys %{$data->{'cbqos_policies'}} )
+    foreach my $INDEX (keys %{$data->{'cbqos_objects'}})
     {
-        foreach my $objectIndex
-            ( $devdetails->getSnmpIndices( $dd->oiddef('cbQosConfigIndex') .
-                                           '.' . $policyIndex ) )
+        my ($policyIndex, $objectIndex) = split(/\./o, $INDEX);
+
+        if( not exists( $data->{'cbqos_policies'}{$policyIndex} ) )
         {
-            my $object = { 'cbQosPolicyIndex' => $policyIndex };
-            
-            foreach my $row ( 'cbQosConfigIndex',
-                              'cbQosObjectsType',
-                              'cbQosParentObjectsIndex' )
+            delete $data->{'cbqos_objects'}{$INDEX};
+            next;
+        }
+
+        my $object = $data->{'cbqos_objects'}{$INDEX};
+        $object->{'cbQosPolicyIndex'} = $policyIndex;
+        $object->{'cbQosConfigIndex'} = $cbQosConfigIndex->{$INDEX};
+
+        my $objType = $object->{'cbQosObjectsType'};
+
+        # Store only objects of supported types
+        my $takeit = $supportedObjectTypes{$objType};
+
+        # Suppress unneeded objects
+        if( $takeit and
+            $devdetails->paramEnabled('CiscoIOS_cbQoS::classmaps-only')
+            and
+            $objType ne 'policymap' and
+            $objType ne 'classmap' )
+        {
+            $takeit = 0;
+        }
+        
+        if( $takeit and
+            $devdetails->paramEnabled
+            ('CiscoIOS_cbQoS::suppress-match-statements')
+            and
+            $objType eq 'matchStatement' )
+        {
+            $takeit = 0;
+        }
+
+        if( $takeit )
+        {
+            # Store the hierarchy information
+            my $parent = $cbQosParentObjectsIndex->{$INDEX};
+            if( $parent ne '0' )
             {
-                my $value = $devdetails->snmpVar($dd->oiddef($row) .
-                                                 '.' . $policyIndex .
-                                                 '.' . $objectIndex);
-                $value = translateCbQoSValue( $value, $row );
-                $object->{$row} = $value;
+                $parent = $policyIndex .'.'. $parent;
             }
-
-            my $objType = $object->{'cbQosObjectsType'};
-
-            # Store only objects of supported types
-            my $takeit = $supportedObjectTypes{$objType};
-
-            # Suppress unneeded objects
-            if( $takeit and
-                $devdetails->paramEnabled('CiscoIOS_cbQoS::classmaps-only')
-                and
-                $objType ne 'policymap' and
-                $objType ne 'classmap' )
-            {
-                $takeit = 0;
-            }
-
-            if( $takeit and
-                $devdetails->paramEnabled
-                ('CiscoIOS_cbQoS::suppress-match-statements')
-                and
-                $objType eq 'matchStatement' )
-            {
-                $takeit = 0;
-            }
-
-            if( $takeit )
-            {
-                $data->{'cbqos_objects'}{$policyIndex .'.'. $objectIndex} =
-                    $object;
-
-                # Store the hierarchy information
-                my $parent = $object->{'cbQosParentObjectsIndex'};
-                if( $parent ne '0' )
-                {
-                    $parent = $policyIndex .'.'. $parent;
-                }
                 
-                if( not exists( $data->{'cbqos_children'}{$parent} ) )
-                {
-                    $data->{'cbqos_children'}{$parent} = [];
-                }
-                push( @{$data->{'cbqos_children'}{$parent}},
-                      $policyIndex .'.'. $objectIndex );
+            if( not exists( $data->{'cbqos_children'}{$parent} ) )
+            {
+                $data->{'cbqos_children'}{$parent} = [];
+            }
+            push( @{$data->{'cbqos_children'}{$parent}},
+                  $policyIndex .'.'. $objectIndex );
 
-                foreach my $tableName
-                    ( @{$cfgTablesForType{$object->{'cbQosObjectsType'}}} )
-                {
-                    $needTables->{$tableName} = 1;
-                }
+            foreach my $tableName
+                ( @{$cfgTablesForType{$object->{'cbQosObjectsType'}}} )
+            {
+                $needTables->{$tableName} = 1;
             }
         }
-    }
-
-    # Retrieve the needed SNMP tables
-
-    foreach my $tableName ( keys %{$needTables} )
-    {
-        my $table =
-            $session->get_table( -baseoid => $dd->oiddef( $tableName ) );
-        if( defined( $table ) )
+        else
         {
-            $devdetails->storeSnmpVars( $table );
-        }
-        elsif( not $cfgTablesOptional{$tableName} )
-        {
-            Error('Error retrieving ' . $tableName);
-            return 0;
+            delete $data->{'cbqos_objects'}{$INDEX};
         }
     }
+
 
     # Prepare the list of DSCP values for RED
     my @dscpValues =
@@ -326,6 +305,30 @@ sub discover
     {
         @dscpValues = @Torrus::DevDiscover::CiscoIOS_cbQoS::RedDscpValues;
     }
+
+    my $maxrepetitions = $devdetails->param('snmp-maxrepetitions');
+    my $cfgData = {};
+    
+    # Retrieve needed SNMP tables
+    foreach my $tableName ( keys %{$needTables} )
+    {
+        my $table =
+            $session->get_table( -baseoid => $dd->oiddef($tableName),
+                                 -maxrepetitions => $maxrepetitions );
+        if( defined( $table ) )
+        {
+            while( my($oid, $val) = each %{$table} )
+            {
+                $cfgData->{$oid} = $val;
+            }
+        }
+        elsif( not $cfgTablesOptional{$tableName} )
+        {
+            Error('Error retrieving ' . $tableName);
+            return 0;
+        }
+    }
+
 
     # Process cbQosxxxCfgTable
     $data->{'cbqos_objcfg'} = {};
@@ -416,9 +419,8 @@ sub discover
 
         foreach my $row ( @rows )
         {
-            my $value = $devdetails->snmpVar($dd->oiddef($row) .
-                                             '.' . $objConfIndex);
-            if( length( $value ) > 0 )
+            my $value = $cfgData->{$dd->oiddef($row) .'.'. $objConfIndex};
+            if( defined($value) and $value ne '' )
             {
                 $value = translateCbQoSValue( $value, $row );
                 $data->{'cbqos_objcfg'}{$objConfIndex}{$row} = $value;
@@ -446,10 +448,10 @@ sub discover
                                      cbQosREDClassCfgMaxThreshold) )
                 {
                     my $dscpN = translateDscpValue( $dscp );
-                    my $value = $devdetails->snmpVar($dd->oiddef($row) .
-                                                     '.' . $objConfIndex .
-                                                     '.' . $dscpN);
-                    if( length( $value ) > 0 )
+                    my $value = $cfgData->{$dd->oiddef($row) .
+                                               '.' . $objConfIndex .
+                                               '.' . $dscpN};
+                    if( defined($value) and $value ne '' )
                     {
                         $value = translateCbQoSValue( $value, $row );
                         $data->{'cbqos_redcfg'}{$objConfIndex}{$dscp}{$row} =
@@ -484,6 +486,7 @@ sub buildConfig
     # Recursively build a subtree for every policy
 
     buildChildrenConfigs( $data, $cb, $topNode, '0', '', '', '', '' );
+    return;
 }
 
 
@@ -869,14 +872,14 @@ sub buildChildrenConfigs
                     my $cfg = $ref->{$dscp};
                     my $dscpN = translateDscpValue( $dscp );
 
-                    my $param = {
+                    my $redParam = {
                         'comment' => sprintf('DSCP %d', $dscpN),
                         'cbqos-red-dscp' => $dscpN
                         };
 
                     if( defined( $cfg->{'cbQosREDClassCfgThresholdUnit'} ) )
                     {
-                        $param->{'legend'} =
+                        $redParam->{'legend'} =
                             sprintf('Min Threshold: %d %s;' .
                                     'Max Threshold: %d %s;',
                                     $cfg->{'cbQosREDClassCfgMinThreshold'},
@@ -886,7 +889,7 @@ sub buildChildrenConfigs
                     }
                     else
                     {
-                        $param->{'legend'} =
+                        $redParam->{'legend'} =
                             sprintf('Min Threshold: %d packets;' .
                                     'Max Threshold: %d packets;',
                                     $cfg->{'cbQosREDCfgMinThreshold'},
@@ -894,8 +897,8 @@ sub buildChildrenConfigs
                     }
                     
                     $cb->addSubtree
-                        ( $objectNode, $dscp,
-                          $param, ['CiscoIOS_cbQoS::cisco-cbqos-red-meters'] );
+                        ( $objectNode, $dscp, $redParam,
+                          ['CiscoIOS_cbQoS::cisco-cbqos-red-meters'] );
                 }
             }
             else
@@ -908,6 +911,8 @@ sub buildChildrenConfigs
             }
         }
     }
+
+    return;
 }
 
 

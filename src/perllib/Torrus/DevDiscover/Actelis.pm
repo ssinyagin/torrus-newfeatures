@@ -74,17 +74,24 @@ sub discover
     $data->{'nameref'}{'ifNick'} = 'ifName';
     $data->{'nameref'}{'ifNodeid'} = 'ifName';
     
-    # Exlcude MLP interfaces as they never update ifIn/Out octet
-    # counters anyway
     
     foreach my $ifIndex ( keys %{$data->{'interfaces'}})
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if $interface->{'excluded'};
 
+        # MLP interfaces never update ifIn/Out octet counters
+        # We remove the counters, and keep the ports non-excluded.
+        
         if( $interface->{'ifType'} == 169 ) # ifType: shdsl(169)
         {
-            $interface->{'excluded'} = 1;
+            foreach my $prop
+                ('hasOctets', 'hasUcastPkts', 'hasInDiscards',
+                 'hasOutDiscards', 'hasInErrors', 'hasOutErrors',
+                 'hasHCOctets', 'hasHCUcastPkts')
+            {
+                $interface->{$prop} = 0;
+            }
             next;
         }
         

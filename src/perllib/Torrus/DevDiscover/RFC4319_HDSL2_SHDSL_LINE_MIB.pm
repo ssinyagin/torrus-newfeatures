@@ -217,7 +217,7 @@ sub buildConfig
     foreach my $ifIndex ( sort {$a<=>$b} %{$data->{'HDSLLine'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
-        next if not defined($interface);
+        next if (not defined($interface) or $interface->{'excluded'});
         
         my $ifSubtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
 

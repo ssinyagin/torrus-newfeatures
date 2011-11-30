@@ -22,6 +22,7 @@
 package Torrus::DevDiscover::SIAMDD;
 
 use strict;
+use warnings;
 
 use Torrus::SIAM;
 use Torrus::Log;
@@ -163,8 +164,6 @@ sub discover
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if $interface->{'excluded'};
-
-        next unless ($interface->{'hasOctets'} or $interface->{'hasHCOctets'});
         
         $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
             $interface->{$orig_nameref_ifNodeidPrefix};

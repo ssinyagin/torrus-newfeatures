@@ -134,15 +134,25 @@ sub buildConfig
         
         my $ifSubtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
 
-        my $param = {
-            'interface-name' => $interface->{'param'}{'interface-name'},
-            'interface-nick' => $interface->{'param'}{'interface-nick'},
+        my $ifParam = {
             'data-file' => '%system-id%_%interface-nick%_adsl-stats.rrd',
-            'node-display-name' => $interface->{'param'}{'node-display-name'},
             'collector-timeoffset-hashstring' =>'%system-id%:%interface-nick%',
-            'comment'        => $interface->{'param'}{'comment'},
             'precedence'     => $precedence,
         };
+
+        $ifParam->{'interface-name'} =
+            $interface->{$data->{'nameref'}{'ifReferenceName'}};
+        $ifParam->{'interface-nick'} =
+            $interface->{$data->{'nameref'}{'ifNick'}};
+        $ifParam->{'node-display-name'} =
+            $interface->{$data->{'nameref'}{'ifReferenceName'}};
+
+        if( defined($data->{'nameref'}{'ifComment'}) and
+            defined($interface->{$data->{'nameref'}{'ifComment'}}) )
+        {
+            $ifParam->{'comment'} =
+                $interface->{$data->{'nameref'}{'ifComment'}};
+        }
         
         my $templates = [];
 
@@ -173,7 +183,7 @@ sub buildConfig
         if( scalar(@{$templates}) > 0 )
         {
             $cb->addSubtree( $subtreeNode, $ifSubtreeName,
-                             $param, $templates );
+                             $ifParam, $templates );
         }
     }
 

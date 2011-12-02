@@ -272,13 +272,24 @@ sub buildConfig
         
         my @err_membernames;
         my $err_mg_params = {
-            'node-display-name' => 'Line errors overview',
-            'comment' => 'Summary graph for all errors',
+            'node-display-name' => 'Line error seconds overview',
+            'comment' => 'Summary graph for all error seconds',
+            'precedence' => 10000,
+            'ds-type' => 'rrd-multigraph',
+            'vertical-label' => 'Seconds',
+            'graph-lower-limit' => 0,
+            'nodeid' => '%nodeid-dslinterface%//errors_ovw',
+        };
+
+        my @crc_membernames;
+        my $crc_mg_params = {
+            'node-display-name' => 'Line CRC errors overview',
+            'comment' => 'Summary graph for all CRC errors',
             'precedence' => 10000,
             'ds-type' => 'rrd-multigraph',
             'vertical-label' => 'Errors',
             'graph-lower-limit' => 0,
-            'nodeid' => '%nodeid-dslinterface%//errors_ovw',
+            'nodeid' => '%nodeid-dslinterface%//crc_ovw',
         };
 
         my $linenum = 1;
@@ -338,7 +349,6 @@ sub buildConfig
             $err_mg_params->{'ds-expr-' . $epNick} =
                 '{' . $epSubtreeName . '/Prev_15min_ES},' .
                 '{' . $epSubtreeName . '/Prev_15min_SES},+,' .
-                '{' . $epSubtreeName . '/Prev_15min_CRCA},+,' .
                 '{' . $epSubtreeName . '/Prev_15min_LOSWS},+,' .
                 '{' . $epSubtreeName . '/Prev_15min_UAS},+';
             $err_mg_params->{'graph-legend-' . $epNick} =
@@ -346,6 +356,16 @@ sub buildConfig
             $err_mg_params->{'line-style-' . $epNick} = 'LINE2';
             $err_mg_params->{'line-color-' . $epNick} = '##clr' . $linenum;
             $err_mg_params->{'line-order-' . $epNick} = $linenum;
+
+            
+            push( @crc_membernames, $epNick );
+            $crc_mg_params->{'ds-expr-' . $epNick} =
+                '{' . $epSubtreeName . '/Prev_15min_CRCA}';
+            $crc_mg_params->{'graph-legend-' . $epNick} =
+                $endpoint . ' crc errors';
+            $crc_mg_params->{'line-style-' . $epNick} = 'LINE2';
+            $crc_mg_params->{'line-color-' . $epNick} = '##clr' . $linenum;
+            $crc_mg_params->{'line-order-' . $epNick} = $linenum;
 
             $linenum++;
         }
@@ -355,6 +375,9 @@ sub buildConfig
 
         $err_mg_params->{'ds-names'} = join(',', @err_membernames);
         $cb->addLeaf( $ifSubtree, 'Error_Summary', $err_mg_params );
+        
+        $crc_mg_params->{'ds-names'} = join(',', @crc_membernames);
+        $cb->addLeaf( $ifSubtree, 'CRCA_Summary', $crc_mg_params );
     }
     
     return;

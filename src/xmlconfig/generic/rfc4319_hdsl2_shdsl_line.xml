@@ -52,7 +52,7 @@
     <param name="graph-title"          value="%descriptive-nickname%" />
 
     <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="snr,err"/>
+    <param name="overview-shortcuts" value="snr,err,crc"/>
     
     <param name="overview-subleave-name-snr" value="SNR_Summary"/>
     <param name="overview-direct-link-snr"      value="yes"/>
@@ -66,18 +66,27 @@
     <param name="overview-subleave-name-err" value="Error_Summary"/>
     <param name="overview-direct-link-err"      value="yes"/>
     <param name="overview-shortcut-text-err"
-           value="All line errors"/>
+           value="All line error seconds"/>
     <param name="overview-shortcut-title-err"
         value="Show line error summary graphs for all endpoints in one page"/>
     <param name="overview-page-title-err"
-           value="Line Error Graphs"/>
+           value="Line Error Seconds Graphs"/>
+           
+    <param name="overview-subleave-name-crc" value="CRCA_Summary"/>
+    <param name="overview-direct-link-crc"      value="yes"/>
+    <param name="overview-shortcut-text-crc"
+           value="All line CRC errors"/>
+    <param name="overview-shortcut-title-crc"
+     value="Show line CRC error summary graphs for all endpoints in one page"/>
+    <param name="overview-page-title-crc"
+           value="Line CRC Errors"/>
 
     <param name="rrd-hwpredict"     value="disabled" />
   </template>
 
   <template name="hdsl-interface">
     <param name="has-overview-shortcuts" value="yes"/>
-    <param name="overview-shortcuts" value="signal,err"/>
+    <param name="overview-shortcuts" value="signal,err,crc"/>
     
     <param name="overview-subleave-name-signal" value="Signal_Summary"/>
     <param name="overview-direct-link-signal"      value="yes"/>
@@ -86,18 +95,28 @@
            value="All endpoint signal levels"/>
     <param name="overview-shortcut-title-signal"
            value="Show signal quality graphs for all endpoints in one page"/>
-    <param name="overview-page-title-snr"
+    <param name="overview-page-title-signal"
            value="Signal quality Graphs"/>
 
     <param name="overview-subleave-name-err" value="Line_Errors_Summary"/>
     <param name="overview-direct-link-err"      value="yes"/>
     <param name="overview-direct-link-view-err" value="expanded-dir-html"/>
     <param name="overview-shortcut-text-err"
-           value="All endpoint line errors"/>
+           value="All endpoint line error seconds"/>
     <param name="overview-shortcut-title-err"
            value="Show line error graphs for all endpoints in one page"/>
-    <param name="overview-page-title-snr"
-           value="Line Error Graphs"/>
+    <param name="overview-page-title-err"
+           value="Line Error Seconds Graphs"/>
+           
+    <param name="overview-subleave-name-crc" value="Prev_15min_CRCA"/>
+    <param name="overview-direct-link-crc"      value="yes"/>
+    <param name="overview-direct-link-view-crc" value="expanded-dir-html"/>
+    <param name="overview-shortcut-text-crc"
+           value="All endpoint CRC errors"/>
+    <param name="overview-shortcut-title-crc"
+           value="Show line error graphs for all endpoints in one page"/>
+    <param name="overview-page-title-crc"
+           value="Line CRC Errors"/>
 
   </template>
   
@@ -126,10 +145,6 @@
       <param name="vertical-label"    value="dB" />
       <param name="graph-lower-limit" value="0" />
     </leaf>
-
-    <!-- This is a graph whith a mixture of units: CRCA is in events/15min,
-         and the rest is in seconds/15min. Anyway we're interested in any of
-         those values being nonzero, so this graph still makes sense -->
          
     <leaf name="Line_Errors_Summary">
       <param name="nodeid"         value="%nodeid-dslendpoint%//errors" />
@@ -137,7 +152,7 @@
       <param name="precedence"         value="999" />
       <param name="node-display-name"  value="Line Errors Summary"/>
       <param name="ds-type"            value="rrd-multigraph" />
-      <param name="ds-names"           value="es,ses,crca,losws,uas" />
+      <param name="ds-names"           value="es,ses,losws,uas" />
 
       <param name="ds-expr-es"       value="{Prev_15min_ES}" />
       <param name="graph-legend-es"  value="ES in 15min" />
@@ -151,12 +166,6 @@
       <param name="line-color-ses"    value="##two" />
       <param name="line-order-ses"    value="2" />
 
-      <param name="ds-expr-crca"       value="{Prev_15min_CRCA}" />
-      <param name="graph-legend-crca"  value="CRCA in 15min" />
-      <param name="line-style-crca"    value="LINE2" />
-      <param name="line-color-crca"    value="##three" />
-      <param name="line-order-crca"    value="3" />
-
       <param name="ds-expr-losws"       value="{Prev_15min_LOSWS}" />
       <param name="graph-legend-losws"  value="LOSWS in 15min" />
       <param name="line-style-losws"    value="LINE2" />
@@ -169,7 +178,7 @@
       <param name="line-color-uas"    value="##five" />
       <param name="line-order-uas"    value="5" />
 
-      <param name="vertical-label"    value="Errors or Seconds" />
+      <param name="vertical-label"    value="Seconds" />
       <param name="graph-lower-limit" value="0" />
     </leaf>
 

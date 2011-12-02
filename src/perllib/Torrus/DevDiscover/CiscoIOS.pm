@@ -638,17 +638,24 @@ sub buildConfig
                 $subtreeName .= '_' . $car->{'carIndex'};
             }
             
-            my $param = {
+            my $ifParam = {
                 'searchable' => 'yes',
                 'car-direction' => $car->{'direction'},
                 'car-index' => $car->{'carIndex'} };
             
-            $param->{'interface-name'} =
-                $interface->{'param'}{'interface-name'};            
-            $param->{'interface-nick'} =
-                $interface->{'param'}{'interface-nick'};            
-            $param->{'comment'} =
-                $interface->{'param'}{'comment'};
+            $ifParam->{'interface-name'} =
+                $interface->{$data->{'nameref'}{'ifReferenceName'}};
+            $ifParam->{'interface-nick'} =
+                $interface->{$data->{'nameref'}{'ifNick'}};
+            $ifParam->{'node-display-name'} =
+                $interface->{$data->{'nameref'}{'ifReferenceName'}};
+            
+            if( defined($data->{'nameref'}{'ifComment'}) and
+                defined($interface->{$data->{'nameref'}{'ifComment'}}) )
+            {
+                $ifParam->{'comment'} =
+                    $interface->{$data->{'nameref'}{'ifComment'}};
+            }
 
             my $legend = sprintf("Type: %s;", $car->{'configType'});
             if( $car->{'accIdx'} > 0 )
@@ -683,12 +690,12 @@ sub buildConfig
                                    $car->{'exceedAction'});
             }
 
-            $param->{'legend'} = $legend;
+            $ifParam->{'legend'} = $legend;
 
             $cb->addSubtree
                 ( $countersNode,
                   $subtreeName,
-                  $param, 
+                  $ifParam, 
                   ['CiscoIOS::cisco-car']);
         }
     }

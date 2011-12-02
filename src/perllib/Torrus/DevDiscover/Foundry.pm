@@ -271,15 +271,11 @@ sub discover
         # get only the modules with
         # snAgentBrdModuleStatus = moduleRunning(10)
         {
-            my $base = $dd->oiddef('fdrySnAgentBrdModuleStatus');
-            my $table = $session->get_table( -baseoid => $base );        
-            my $prefixLen = length( $base ) + 1;
-            
-            while( my( $oid, $status ) = each %{$table} )
+            my $table = $dd->walkSnmpTable('fdrySnAgentBrdModuleStatus');
+            while( my( $brdIndex, $status ) = each %{$table} )
             {
                 if( $status == 10 )
                 {
-                    my $brdIndex = substr( $oid, $prefixLen );
                     $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} = 1;
                 }
             }
@@ -287,21 +283,13 @@ sub discover
         
         # get module descriptions
         {
-            my $base = $dd->oiddef('fdrySnAgentBrdMainBrdDescription');
-            my $table = $session->get_table( -baseoid => $base );        
-            my $prefixLen = length( $base ) + 1;
-            
-            while( my( $oid, $descr ) = each %{$table} )
+            my $table = $dd->walkSnmpTable('fdrySnAgentBrdMainBrdDescription');
+            while( my( $brdIndex, $descr ) = each %{$table} )
             {
-                if( $descr ne '' )
+                if( $descr ne '' and
+                    $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
                 {
-                    my $brdIndex = substr( $oid, $prefixLen );
-                    
-                    if( $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
-                    {
-                        $data->{'fdryBoard'}{$brdIndex}{'description'} =
-                            $descr;
-                    }
+                    $data->{'fdryBoard'}{$brdIndex}{'description'} = $descr;
                 }
             }
         }
@@ -315,20 +303,13 @@ sub discover
 
         # check if memory statistics are available
         {
-            my $base = $dd->oiddef('fdrySnAgentBrdMemoryTotal');
-            my $table = $session->get_table( -baseoid => $base );        
-            my $prefixLen = length( $base ) + 1;
-            
-            while( my( $oid, $memory ) = each %{$table} )
+            my $table = $dd->walkSnmpTable('fdrySnAgentBrdMemoryTotal');
+            while( my( $brdIndex, $memory ) = each %{$table} )
             {
-                if( $memory > 0 )
+                if( $memory > 0 and
+                    $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
                 {
-                    my $brdIndex = substr( $oid, $prefixLen );
-                    
-                    if( $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
-                    {
-                        $data->{'fdryBoard'}{$brdIndex}{'memory'} = 1;
-                    }
+                    $data->{'fdryBoard'}{$brdIndex}{'memory'} = 1;
                 }
             }
         }
@@ -339,13 +320,9 @@ sub discover
         # FOUNDRY-SN-AGENT-MIB::snAgentCpuUtilValue.1.1.60 = Gauge32: 1
         # FOUNDRY-SN-AGENT-MIB::snAgentCpuUtilValue.1.1.300 = Gauge32: 1
         {
-            my $base = $dd->oiddef('fdrySnAgentCpuUtilValue');
-            my $table = $session->get_table( -baseoid => $base );
-            my $prefixLen = length( $base ) + 1;
-                
-            while( my( $oid, $val ) = each %{$table} )
+            my $table = $dd->walkSnmpTable('fdrySnAgentCpuUtilValue');
+            while( my( $brdIndex, $val ) = each %{$table} )
             {
-                my $brdIndex = substr( $oid, $prefixLen );
                 $brdIndex =~ s/\.(.+)$//o;
                 if( $1 eq '1.1' and
                     $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
@@ -360,13 +337,9 @@ sub discover
         # 04.3.01 and later, and FSX 04.3.00 and later.
         # snAgentCpuUtilValue is deprecated in these releases
         {
-            my $base = $dd->oiddef('fdrySnAgentCpuUtil100thPercent');
-            my $table = $session->get_table( -baseoid => $base );
-            my $prefixLen = length( $base ) + 1;
-                
-            while( my( $oid, $val ) = each %{$table} )
+            my $table = $dd->walkSnmpTable('fdrySnAgentCpuUtil100thPercent');
+            while( my( $brdIndex, $val ) = each %{$table} )
             {
-                my $brdIndex = substr( $oid, $prefixLen );
                 $brdIndex =~ s/\.(.+)$//o;
                 if( $1 eq '1.1' and
                     $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} )
@@ -379,20 +352,15 @@ sub discover
         # check if temperature stats are available
         # exclude the sensors which show zero
         {
-            my $base = $dd->oiddef('fdrySnAgentTempSensorDescr');
-            my $table = $session->get_table( -baseoid => $base );        
-            my $prefixLen = length( $base ) + 1;
-
-            my $baseVal = $dd->oiddef('fdrySnAgentTempValue');
-            my $values = $session->get_table( -baseoid => $baseVal );
+            my $table = $dd->walkSnmpTable('fdrySnAgentTempSensorDescr');
+            my $tempValues = $dd->walkSnmpTable('fdrySnAgentTempValue');
             
-            while( my( $oid, $descr ) = each %{$table} )
+            while( my( $INDEX, $descr ) = each %{$table} )
             {
-                my $index = substr( $oid, $prefixLen );
-                my ($brdIndex, $sensor) = split(/\./, $index);
+                my ($brdIndex, $sensor) = split(/\./, $INDEX);
                 
                 if( $data->{'fdryBoard'}{$brdIndex}{'moduleRunning'} and
-                    $values->{$baseVal . '.' . $index} > 0 )
+                    $tempValues->{$INDEX} > 0 )
                 {
                     $data->{'fdryBoard'}{$brdIndex}{'temperature'}{$sensor} =
                         $descr;

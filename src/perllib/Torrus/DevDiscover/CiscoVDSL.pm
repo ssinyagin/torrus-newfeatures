@@ -110,13 +110,23 @@ sub buildConfig
 
         my $templates = ['CiscoVDSL::cvdsl-interface'];
 
-        my $param = {
-            'interface-name' => $interface->{'param'}{'interface-name'},
-            'interface-nick' => $interface->{'param'}{'interface-nick'},
-            'comment'        => $interface->{'param'}{'comment'}
-        };
+        my $ifParam = {};
 
-        $cb->addSubtree( $subtreeNode, $ifSubtreeName, $param, $templates );
+        $ifParam->{'interface-name'} =
+            $interface->{$data->{'nameref'}{'ifReferenceName'}};
+        $ifParam->{'interface-nick'} =
+            $interface->{$data->{'nameref'}{'ifNick'}};
+        $ifParam->{'node-display-name'} =
+            $interface->{$data->{'nameref'}{'ifReferenceName'}};
+        
+        if( defined($data->{'nameref'}{'ifComment'}) and
+            defined($interface->{$data->{'nameref'}{'ifComment'}}) )
+        {
+            $ifParam->{'comment'} =
+                $interface->{$data->{'nameref'}{'ifComment'}};
+        }
+
+        $cb->addSubtree( $subtreeNode, $ifSubtreeName, $ifParam, $templates );
     }
 
     return;

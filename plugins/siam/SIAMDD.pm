@@ -22,6 +22,7 @@
 package Torrus::DevDiscover::SIAMDD;
 
 use strict;
+use warnings;
 
 use Torrus::SIAM;
 use Torrus::Log;
@@ -62,7 +63,9 @@ $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
         if( defined($siam) )
         {
             my $hostParams = shift;
-            if( $hostParams->{'siam-managed'} eq 'yes'
+            if( defined($hostParams->{'siam-managed'})
+                and
+                $hostParams->{'siam-managed'} eq 'yes'
                 and
                 defined($hostParams->{'SIAM::device-inventory-id'}) )
             {
@@ -96,7 +99,7 @@ sub checkdevtype
 
     my $data = $devdetails->data();
     
-    if( defined($siam) and $devdetails->param('SIAM::managed') eq 'yes' )
+    if( defined($siam) and $devdetails->paramEnabled('SIAM::managed') )
     {
         if( $devdetails->hasCap('nodeidReferenceManaged') )
         {
@@ -163,8 +166,6 @@ sub discover
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if $interface->{'excluded'};
-
-        next unless ($interface->{'hasOctets'} or $interface->{'hasHCOctets'});
         
         $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
             $interface->{$orig_nameref_ifNodeidPrefix};
@@ -309,8 +310,8 @@ sub discover
     # Admin-down interfaces which were not matched against SIAM have no
     # further interest, and we exclude them
     
-    if( $devdetails->param('SIAM::exclude-unmatched-admindown-interfaces')
-        eq 'yes' )
+    if( $devdetails->paramEnabled
+        ('SIAM::exclude-unmatched-admindown-interfaces') )
     {
         foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
         {

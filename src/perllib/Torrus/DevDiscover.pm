@@ -822,25 +822,6 @@ sub oidBaseMatch
     return Net::SNMP::oid_base_match( $base_oid, $oid );
 }
 
-##
-# some discovery modules need to adjust max-msg-size
-
-sub setMaxMsgSize
-{
-    my $self = shift;
-    my $devdetails = shift;
-    my $msgsize = shift;
-    my $opt = shift;
-
-    $opt = {} unless defined($opt);
-
-    if( (not $opt->{'only_v1_and_v2'}) or $self->session()->version() != 3 )
-    {
-        $self->session()->max_msg_size($msgsize);
-        $devdetails->data()->{'param'}{'snmp-max-msg-size'} = $msgsize;
-    }
-    return;
-}
 
     
 

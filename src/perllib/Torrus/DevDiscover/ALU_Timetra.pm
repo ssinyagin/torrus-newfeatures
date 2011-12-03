@@ -102,8 +102,6 @@ sub checkdevtype
             &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
                 ($devdetails, \%essInterfaceFilter);
 
-            $dd->setMaxMsgSize($devdetails, 65535, {'only_v1_and_v2' => 1});
-            
             return 1;
         }
         else
@@ -133,14 +131,9 @@ sub discover
 
     # Get port descriptions
     {
-        my $base = $dd->oiddef('tmnxPortDescription');
-        
-        my $portDescrTable = $session->get_table( -baseoid => $base );        
-        my $prefixLen = length( $base ) + 1;
-
-        while( my( $oid, $descr ) = each %{$portDescrTable} )
+        my $table = $dd->walkSnmpTable('tmnxPortDescription');
+        while( my( $ifIndex, $descr ) = each %{$table} )
         {
-            my $ifIndex = substr( $oid, $prefixLen );
             if( defined( $data->{'interfaces'}{$ifIndex} ) )
             {
                 $data->{'interfaces'}{$ifIndex}{'tmnxPortDescription'} =
@@ -157,13 +150,9 @@ sub discover
     
     # Get customers
     {
-        my $base = $dd->oiddef('custDescription');
-        my $custDescrTable = $session->get_table( -baseoid => $base );        
-        my $prefixLen = length( $base ) + 1;
-        
-        while( my( $oid, $descr ) = each %{$custDescrTable} )
+        my $table = $dd->walkSnmpTable('custDescription');
+        while( my( $custId, $descr ) = each %{$table} )
         {
-            my $custId = substr( $oid, $prefixLen );
             $data->{'timetraCustDescr'}{$custId} = $descr;
         }
     }
@@ -171,13 +160,9 @@ sub discover
     
     # Get Service Descriptions
     {
-        my $base = $dd->oiddef('svcDescription');
-        my $svcDescrTable = $session->get_table( -baseoid => $base );        
-        my $prefixLen = length( $base ) + 1;
-
-        while( my( $oid, $descr ) = each %{$svcDescrTable} )
+        my $table = $dd->walkSnmpTable('svcDescription');
+        while( my( $svcId, $descr ) = each %{$table} )
         {
-            my $svcId = substr( $oid, $prefixLen );
             $data->{'timetraSvc'}{$svcId} = {
                 'description' => $descr,
                 'sap' => [],
@@ -187,14 +172,9 @@ sub discover
 
     # Get mapping of Services to Customers
     {
-        my $base = $dd->oiddef('svcCustId');
-        my $svcCustIdTable = $session->get_table( -baseoid => $base );        
-        my $prefixLen = length( $base ) + 1;
-        
-        while( my( $oid, $custId ) = each %{$svcCustIdTable} )
+        my $table = $dd->walkSnmpTable('svcCustId');
+        while( my( $svcId, $custId ) = each %{$table} )
         {
-            my $svcId = substr( $oid, $prefixLen );
-            
             $data->{'timetraCustSvc'}{$custId}{$svcId} = 1;
             $data->{'timetraSvcCust'}{$svcId} = $custId;
         }
@@ -203,14 +183,9 @@ sub discover
     
     # Get port encapsulations
     {
-        my $base = $dd->oiddef('tmnxPortEncapType');
-        
-        my $portEncapTable = $session->get_table( -baseoid => $base );        
-        my $prefixLen = length( $base ) + 1;
-
-        while( my( $oid, $encap ) = each %{$portEncapTable} )
+        my $table = $dd->walkSnmpTable('tmnxPortEncapType');
+        while( my( $ifIndex, $encap ) = each %{$table} )
         {
-            my $ifIndex = substr( $oid, $prefixLen );
             if( defined( $data->{'interfaces'}{$ifIndex} ) )
             {
                 $data->{'interfaces'}{$ifIndex}{'tmnxPortEncapType'} = $encap;
@@ -221,15 +196,9 @@ sub discover
     
     # Get SAP information
     {
-        my $base = $dd->oiddef('sapDescription');
-        
-        my $sapDescrTable = $session->get_table( -baseoid => $base );        
-        my $prefixLen = length( $base ) + 1;
-
-        while( my( $oid, $descr ) = each %{$sapDescrTable} )
+        my $table = $dd->walkSnmpTable('sapDescription');
+        while( my( $sapFullID, $descr ) = each %{$table} )
         {
-            my $sapFullID = substr( $oid, $prefixLen );
-
             my ($svcId, $ifIndex, $sapEncapValue) =
                 split(/\./o, $sapFullID);
 
@@ -470,7 +439,7 @@ sub getSelectorObjects
     my $data = $devdetails->data();
     my @ret = keys %{$data->{'timetraSap'}};
 
-    return( sort {$a<=>$b} @ret );
+    return( sort @ret );
 }
 
 

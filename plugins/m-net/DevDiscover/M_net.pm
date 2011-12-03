@@ -22,6 +22,7 @@
 package Torrus::DevDiscover::M_net;
 
 use strict;
+use warnings;
 use Torrus::Log;
 
 
@@ -85,13 +86,11 @@ sub discover
     my $data = $devdetails->data();
 
     my %skip_interfaces;
-    my $str = $devdetails->param('M_net::skip-interfaces');
-    if( defined( $str ) )
+    foreach my $name
+        ( split( /\s*,\s*/,
+                 $devdetails->paramString('M_net::skip-interfaces') ) )
     {
-        foreach my $name ( split( /\s*,\s*/, $str ) )
-        {
-            $skip_interfaces{$name} = 1;
-        }
+        $skip_interfaces{$name} = 1;
     }
 
     # Copy the old nodeid values into a new reference map
@@ -121,15 +120,14 @@ sub discover
     
     foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
     {
-        my $interface = $data->{'interfaces'}{$ifIndex};
-        
+        my $interface = $data->{'interfaces'}{$ifIndex};        
         next if $interface->{'excluded'};
 
         my $comment;
         
-        if( defined $data->{'nameref'}{'ifComment'} and
-            not defined( $interface->{'param'}{'comment'} ) and
-            length( $interface->{$data->{'nameref'}{'ifComment'}} ) > 0 )
+        if( defined( $data->{'nameref'}{'ifComment'} ) and
+            defined( $interface->{$data->{'nameref'}{'ifComment'}} ) and
+            $interface->{$data->{'nameref'}{'ifComment'}} ne '' )
         {
             $comment = $interface->{$data->{'nameref'}{'ifComment'}};
         }
@@ -147,10 +145,10 @@ sub discover
         my $mnet_attr = {};
         foreach my $pair ( split( /\s*;\s*/, $comment ) )
         {
-            my ($key, $val) = split( /\s*=\s*/, $pair );
-
-            if( defined( $key ) and defined( $val ) )
+            if( $pair =~ /([a-zA-Z][a-zA-Z0-9]*)\s*=\s*(.+)\s*$/o )
             {
+                my $key = $1;
+                my $val = $2;
                 $mnet_attr->{lc $key} = $val;
             }
         }
@@ -169,9 +167,9 @@ sub discover
         }
         else
         {
-            if( defined( $interface->{'ifSpeed'} ) )
+            if( defined( $interface->{'NormalizedSpeed'} ) )
             {
-                $bw = $interface->{'ifSpeed'};
+                $bw = $interface->{'NormalizedSpeed'};
             }
         }
         
@@ -227,6 +225,7 @@ sub buildConfig
     my $devNode = shift;
 
     my $data = $devdetails->data();
+    return;
 }
 
 

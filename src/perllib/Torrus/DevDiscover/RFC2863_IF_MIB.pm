@@ -142,6 +142,7 @@ sub discover
             if( defined($speed) and $speed > 0 )
             {
                 $interface->{'ifSpeed'} = $speed;
+                $interface->{'NormalizedSpeed'} = $speed;
             }
         }
     }
@@ -186,6 +187,10 @@ sub discover
             if( defined($hspeed) and $hspeed > 0 )
             {
                 $interface->{'ifHighSpeed'} = $hspeed;
+                if( not $interface->{'ignoreHighSpeed'} )
+                {
+                    $interface->{'NormalizedSpeed'} = $hspeed * 1000000;
+                }
             }
         }
 

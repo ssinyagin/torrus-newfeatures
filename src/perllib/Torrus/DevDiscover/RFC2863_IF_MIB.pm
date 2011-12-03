@@ -561,8 +561,9 @@ sub buildConfig
         
         $interface->{'param'}{'nodeid'} = '%nodeid-interface%';        
 
-        if( defined $data->{'nameref'}{'ifComment'} and
+        if( defined( $data->{'nameref'}{'ifComment'} ) and
             not defined( $interface->{'param'}{'comment'} ) and
+            defined( $interface->{$data->{'nameref'}{'ifComment'}} ) and
             $interface->{$data->{'nameref'}{'ifComment'}} ne '' )
         {
             my $comment = $interface->{$data->{'nameref'}{'ifComment'}};

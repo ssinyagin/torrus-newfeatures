@@ -18,7 +18,7 @@
 #
 
 
-AC_INIT(tp-m-net, 2.01.01, ssinyagin@users.sourceforge.net)
+AC_INIT(tp-m-net, 2.02.01dev, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)

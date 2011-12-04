@@ -247,7 +247,7 @@ sub read_RPN
     my $t_start = shift;
 
     my @expr_list = split(',', $expr);
-    my $timestamp = $t_end > 0 ? $t_end : time();
+    my $timestamp = (defined($t_end) and $t_end > 0) ? $t_end : time();
 
     my $rpn = new Torrus::RPN;
 

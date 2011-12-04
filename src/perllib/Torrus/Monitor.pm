@@ -105,12 +105,17 @@ sub run
             my( $alarm, $timestamp ) = $self->$method( $config_tree, $obj );
             $obj->{'alarm'} = $alarm;
             $obj->{'timestamp'} = $timestamp;
-            
-            Debug("Monitor $mname returned ($alarm, $timestamp) ".
-                  "for token $token");
-            
-            $self->setAlarm( $config_tree, $obj );
-            undef $obj;
+
+            if( defined($alarm) )
+            {
+                Debug("Monitor $mname returned ($alarm, $timestamp) ".
+                      "for token $token");
+                $self->setAlarm( $config_tree, $obj );
+            }
+            else
+            {
+                Debug("Monitor $mname returned undefined alarm value");
+            }
         }
     }
 
@@ -220,7 +225,7 @@ sub substitute_vars
                 }
                 else
                 {
-                    $expr =~ s/\#$var/$val$1/g;
+                    $expr =~ s/\#$var/$val/g;
                 }
             }
         }

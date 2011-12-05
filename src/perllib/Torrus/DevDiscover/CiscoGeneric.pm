@@ -560,7 +560,8 @@ sub buildConfig
             
             my @templates;
 
-            if( $cpu->{'stats-type'} eq 'revised' )
+            if( defined($cpu->{'stats-type'}) and
+                $cpu->{'stats-type'} eq 'revised' )
             {
                 push( @templates, 'CiscoGeneric::cisco-cpu-revised' );
             }

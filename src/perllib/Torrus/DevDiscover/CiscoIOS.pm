@@ -705,7 +705,8 @@ sub buildConfig
     { 
         my $tunnelNode = $cb->addSubtree
             ( $devNode, 'VPDN_Statistics',
-              {'node-display-name' => 'VPDN Statistics'},
+              {'node-display-name' => 'VPDN Statistics',
+               'comment' => 'VPDN tunnel and session counters'},
               [ 'CiscoIOS::cisco-vpdn-subtree' ] );
 
         foreach my $INDEX ( sort keys %{$data->{'ciscoVPDN'}} )

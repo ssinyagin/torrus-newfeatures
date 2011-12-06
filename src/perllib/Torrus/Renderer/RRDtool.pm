@@ -251,7 +251,12 @@ sub render_rrprint
             $tz = $ENV{'TZ'};
         }
         
-        local $ENV{'TZ'} = $tz;
+        local $ENV{'TZ'};
+        if( defined($tz) )
+        {
+            $ENV{'TZ'} = $tz;
+        }
+        
         ($printout, undef, undef) = RRDs::graph('/dev/null', @args);
     }
 

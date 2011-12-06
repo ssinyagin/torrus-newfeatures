@@ -239,6 +239,20 @@ RRDTool manuals).
 
 Optional vaiables that override the ones defined in the view.
 
+=item Gmaxline
+
+If set to a true value, the renderer tries to draw the maximum value
+alongside with the average. The aggregation period is 1 day unless
+specified by C<Gmaxlinestep>. Single-line graphs are all displayed
+immediately with the maximum line. Multigraphs require
+C<maxline-style-X> and C<maxline-color-X> parameters to be defined in
+order for the maximum line to be properly displayed.
+
+=item Gmaxlinestep
+
+Aggregation period, in seconds, for the maximum line. If the variable is
+not specified, the line displays daily maximums.
+
 =item DEBUG
 
 Optional. If true, turns on the debug level of logging. The debug messages

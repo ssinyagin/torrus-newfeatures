@@ -1006,6 +1006,13 @@ in a multigraph.
 
 Optional. When set to C<yes>, this datasource is not included in GPRINT output.
 
+=item * C<maxline-style-X> and C<maxline-color-X>
+
+Optional parameters that define the style and color for the I<maximum>
+line. The maxim line usually displays daily or hourly maximums, and the
+color needs to be contrast enough to be distinctively visible on the
+graph.
+
 =back
 
 =head2 View definitions

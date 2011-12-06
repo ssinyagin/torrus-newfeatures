@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (C) 2009 Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+   Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+   APC PowerNet products
+
+-->
+
+
+<configuration>
+  <definitions>
+   <def name="rPDU2DeviceStatusPower"
+        value="1.3.6.1.4.1.318.1.1.26.4.3.1.5"/>
+   <def name="rPDU2PhaseStatusCurrent"
+        value="1.3.6.1.4.1.318.1.1.26.6.3.1.5"/>
+   <def name="rPDU2PhaseStatusVoltage"
+        value="1.3.6.1.4.1.318.1.1.26.6.3.1.6"/>
+   <def name="rPDU2PhaseStatusPower"
+        value="1.3.6.1.4.1.318.1.1.26.6.3.1.7"/>
+   <def name="rPDU2BankStatusCurrent"
+        value="1.3.6.1.4.1.318.1.1.26.8.3.1.5"/>
+  </definitions>
+
+  <datasources>
+
+   <template name="apc-pdu2-subtree">
+    <param name="comment" value="Power, current, and voltage statistics" />
+
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="all"/>
+    <param name="overview-subleave-name-all" value="Power,Current"/>     
+    <param name="overview-shortcut-text-all" value="Overview"/>
+     <param name="overview-shortcut-title-all"
+           value="All important graphs on one page"/>
+     <param name="overview-page-title-all"
+           value="PDU overview"/>
+     <param name="overview-direct-link-all" value="yes"/>
+    
+    <subtree name="Device">
+      <param name="data-file"  value="%system-id%_pdu_device.rrd"/>
+      <param name="precedence" value="2000"/>
+      <param name="comment" value="Statistics for the whole PDU"/>
+      
+      <leaf name="Power_raw">
+        <param name="hidden" value="yes"/>
+        <param name="comment" value="Power consumed at this PDU"/>
+        <param name="snmp-object"       value="$rPDU2DeviceStatusPower.1" />
+        <param name="collector-scale"   value="0.01,*" />
+        <param name="rrd-ds"            value="Power"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+        <param name="graph-title" value="%system-id%" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="graph-legend"      value="total power"/>
+        <param name="vertical-label"    value="Kilowatt" />
+      </leaf>
+
+      <leaf name="Power">
+        <param name="comment"   value="Power consumed at this PDU"/>
+                
+        <param name="ds-type"           value="rrd-multigraph" />
+        <param name="ds-names"          value="usage,max" />
+
+        <param name="graph-lower-limit" value="0" />
+        <param name="nodeid"
+               value="pdu//%nodeid-device%//device///power"/>
+
+        <!-- RPN requires to refer to at least one valid datasource, so we
+             multiply it by zero -->
+        <param name="ds-expr-max">%rpdu2-crit-pwr%,{Power_raw},0,*,+</param>
+        <param name="graph-legend-max"    value="maximum" />
+        <param name="line-style-max"      value="##totalresource" />
+        <param name="line-color-max"      value="##totalresource" />
+        <param name="line-order-max"      value="1" />
+      
+        <param name="ds-expr-usage">{Power_raw}</param>
+        <param name="graph-legend-usage"  value="total power consumtion" />
+        <param name="line-style-usage"    value="##resourceusage" />
+        <param name="line-color-usage"    value="##resourceusage" />
+        <param name="line-order-usage"    value="2" />
+
+        <param name="graph-title" value="%system-id%" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="vertical-label"    value="Kilowatt" />
+        <param name="upper-limit"       value="%rpdu2-warn-pwr%" />
+      </leaf>
+      
+    </subtree>
+   </template>
+
+
+   <template name="apc-pdu2-phase">
+      <param name="data-file"
+              value="%system-id%_pdu_phase_%rpdu2-phasenum%.rrd"/>
+      <param name="graph-title" value="%system-id% phase %rpdu2-phasenum%" />
+      <param name="comment" value="Statistics for the inlet phase"/>
+
+      <leaf name="Current_raw">
+        <param name="hidden" value="yes"/>
+        <param name="comment" value="Current draw on the phase"/>
+        <param name="snmp-object"
+                value="$rPDU2PhaseStatusCurrent.%rpdu2-phase-index%" />
+        <param name="collector-scale"   value="0.1,*" />
+        <param name="rrd-ds"            value="Current"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+        <param name="graph-lower-limit" value="0" />
+        <param name="graph-legend"      value="phase current draw"/>
+        <param name="vertical-label"    value="Ampere" />
+      </leaf>
+
+      <leaf name="Current">
+        <param name="comment" value="Current draw on the phase"/>
+        
+        <param name="ds-type"           value="rrd-multigraph" />
+        <param name="ds-names"          value="usage,max" />
+
+        <param name="nodeid"
+               value="pdu//%nodeid-device%//phase%rpdu2-phasenum%///current"/>
+        <param name="graph-lower-limit" value="0" />
+        
+        <!-- RPN requires to refer to at least one valid datasource, so we
+             multiply it by zero -->
+        <param name="ds-expr-max">
+             %rpdu2-crit-currnt%,{Current_raw},0,*,+
+        </param>
+        <param name="graph-legend-max"    value="maximum" />
+        <param name="line-style-max"      value="##totalresource" />
+        <param name="line-color-max"      value="##totalresource" />
+        <param name="line-order-max"      value="1" />
+      
+        <param name="ds-expr-usage">{Current_raw}</param>
+        <param name="graph-legend-usage"  value="phase current draw" />
+        <param name="line-style-usage"    value="##resourceusage" />
+        <param name="line-color-usage"    value="##resourceusage" />
+        <param name="line-order-usage"    value="2" />
+
+        <param name="vertical-label"    value="Ampere" />
+        <param name="upper-limit"       value="%rpdu2-warn-currnt%" />
+      </leaf>
+
+      <leaf name="Voltage">
+        <param name="comment" value="Phase voltage"/>
+        <param name="snmp-object"
+                value="$rPDU2PhaseStatusVoltage.%rpdu2-phase-index%" />
+        <param name="rrd-ds"            value="Voltage"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+        <param name="nodeid"
+               value="pdu//%nodeid-device%//phase%rpdu2-phasenum%///voltage"/>
+        <param name="graph-lower-limit" value="0" />
+        <param name="graph-legend"      value="phase voltage"/>
+        <param name="vertical-label"    value="Volt" />
+      </leaf>
+
+      <leaf name="PhasePower">
+        <param name="node-display-name" value="Power "/>
+        <param name="comment" value="Phase load power "/>
+        <param name="snmp-object"
+                value="$rPDU2PhaseStatusPower.%rpdu2-phase-index%" />
+        <param name="collector-scale"   value="0.01,*" />
+        <param name="rrd-ds"            value="Power"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+        <param name="nodeid"
+               value="pdu//%nodeid-device%//phase%rpdu2-phasenum%///power"/>
+        <param name="graph-lower-limit" value="0" />
+        <param name="graph-legend"      value="phase power consumption"/>
+        <param name="vertical-label"    value="Kilowatt" />
+      </leaf>
+   </template>
+
+
+   <template name="apc-pdu2-bank">
+      <param name="data-file"
+              value="%system-id%_pdu_bank_%rpdu2-banknum%.rrd"/>
+      <param name="graph-title" value="%system-id% bank %rpdu2-banknum%" />
+      <param name="comment" value="Statistics for the outlet bank"/>
+      
+      <leaf name="Current_raw">
+        <param name="hidden" value="yes"/>
+        <param name="comment" value="Current draw on the bank"/>
+        <param name="snmp-object"
+                value="$rPDU2BankStatusCurrent.%rpdu2-bank-index%" />
+        <param name="collector-scale"   value="0.1,*" />
+        <param name="rrd-ds"            value="Current"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+        <param name="graph-lower-limit" value="0" />
+        <param name="graph-legend"      value="bank current"/>
+        <param name="vertical-label"    value="Ampere" />
+      </leaf>
+
+      <leaf name="Current">
+        <param name="comment" value="Current draw on the bank"/>
+        
+        <param name="ds-type"           value="rrd-multigraph" />
+        <param name="ds-names"          value="usage,max" />
+
+        <param name="nodeid"
+               value="pdu//%nodeid-device%//bank%rpdu2-banknum%///current"/>
+        <param name="graph-lower-limit" value="0" />
+        
+        <!-- RPN requires to refer to at least one valid datasource, so we
+             multiply it by zero -->
+        <param name="ds-expr-max">
+          %rpdu2-crit-currnt%,{Current_raw},0,*,+
+        </param>
+        <param name="graph-legend-max"    value="maximum" />
+        <param name="line-style-max"      value="##totalresource" />
+        <param name="line-color-max"      value="##totalresource" />
+        <param name="line-order-max"      value="1" />
+      
+        <param name="ds-expr-usage">{Current_raw}</param>
+        <param name="graph-legend-usage"  value="bank current draw" />
+        <param name="line-style-usage"    value="##resourceusage" />
+        <param name="line-color-usage"    value="##resourceusage" />
+        <param name="line-order-usage"    value="2" />
+
+        <param name="vertical-label"    value="Ampere" />
+        <param name="upper-limit"       value="%rpdu2-warn-currnt%" />
+      </leaf>
+
+   </template>
+
+  </datasources>
+</configuration>

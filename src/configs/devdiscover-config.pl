@@ -43,11 +43,12 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::RFC2670_DOCS_IF',
      'Torrus::DevDiscover::RFC2737_ENTITY_MIB',
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
-     'Torrus::DevDiscover::RFC4319_HDSL2_SHDSL_LINE_MIB',
+     'Torrus::DevDiscover::RFC4319_HDSL2_SHDSL_LINE_MIB',     
      'Torrus::DevDiscover::Actelis',
      'Torrus::DevDiscover::Alteon',
      'Torrus::DevDiscover::ALU_Timetra',
      'Torrus::DevDiscover::AlliedTelesyn_PBC18',
+     'Torrus::DevDiscover::APC_PowerNet',
      'Torrus::DevDiscover::Apple_AE',
      'Torrus::DevDiscover::Arbor_E',
      'Torrus::DevDiscover::Arista',
@@ -339,6 +340,20 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'alu-timetra-sap',
          'source' => 'vendor/alu-timetra.xml'
          },     
+
+     #### APC Powernet
+     'APC_PowerNet::apc-pdu2-subtree' => {
+         'name'   => 'apc-pdu2-subtree',
+         'source' => 'vendor/apc.powernet.xml'
+         },
+     'APC_PowerNet::apc-pdu2-phase' => {
+         'name'   => 'apc-pdu2-phase',
+         'source' => 'vendor/apc.powernet.xml'
+         },
+     'APC_PowerNet::apc-pdu2-bank' => {
+         'name'   => 'apc-pdu2-bank',
+         'source' => 'vendor/apc.powernet.xml'
+         },
      
      #### Apple Airport Extreme
      'Apple_AE::ae-wireless-clients-subtree' => {

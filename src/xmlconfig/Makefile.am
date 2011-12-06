@@ -28,6 +28,7 @@ vendordir      = $(distxmldir)/vendor
 dist_vendor_DATA = \
 	vendor/alteon.xml \
 	vendor/alu-timetra.xml \
+	vendor/apc.powernet.xml \
 	vendor/apc.ups.xml  \
 	vendor/apple.ae.xml \
 	vendor/arbor_e.xml \

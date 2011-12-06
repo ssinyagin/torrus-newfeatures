@@ -33,7 +33,7 @@
          'color' => '##darkmagenta'
          },
      'BpsIn'          => {
-         'color' => '##green',
+         'color' => '#01ca00',
          'line'  => 'AREA'
          },
      'BpsOut'         => {
@@ -41,11 +41,11 @@
          'line'  => 'LINE2'
          },
      'BpsInMax'          => {
-         'color' => '##darkgreen',
+         'color' => '#b7ea8c',
          'line'  => 'AREA'
          },
      'BpsOutMax'         => {
-         'color' => '##cornflowerblue',
+         'color' => '#017eb5',
          'line'  => 'LINE1'
          },
 

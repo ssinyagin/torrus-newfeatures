@@ -1,5 +1,13 @@
 2011-12-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* sup/styling/torrus-schema.pl: BpsIn now uses a slightly darker
+	green, so that maxline can have a better contrast.
+
+	* perllib/Torrus/Renderer/RRDtool.pm: MAX lines can now be
+	displayed in graphs. New URL variables: Gmaxline,
+	Gmaxlinestep. New multigraphs parameters: maxline-style-XX,
+	maxline-color-XX.
+
 	* perllib/Torrus/DevDiscover/APC_PowerNet.pm: new discovery module
 
 2011-11-24  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>

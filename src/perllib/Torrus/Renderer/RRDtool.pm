@@ -107,9 +107,13 @@ sub render_rrgraph
             {
                 if( $self->rrd_if_showmax($config_tree, $token, $view) )
                 {
+                    my $step =
+                        $self->rrd_maxline_step( $config_tree, $view );
+
                     my $maxdef =
                         $self->rrd_make_def( $config_tree, $token,
-                                             $max_dname, 'MAX' );
+                                             $max_dname, 'MAX',
+                                             {'step' => $step});
                     
                     push( @{$obj->{'args'}{'defs'}}, $maxdef );
                     $showmax = 1;
@@ -122,6 +126,20 @@ sub render_rrgraph
             push( @{$obj->{'args'}{'defs'}},
                   $self->rrd_make_cdef($config_tree, $token,
                                        $obj->{'dname'}, $expr) );
+            
+            if( $self->rrd_if_showmax($config_tree, $token, $view) )
+            {
+                my $step =
+                    $self->rrd_maxline_step( $config_tree, $view );
+                
+                push( @{$obj->{'args'}{'defs'}}, 
+                      $self->rrd_make_cdef( $config_tree, $token,
+                                            $max_dname, $expr,
+                                            {'force_function' => 'MAX',
+                                             'step' => $step} ) );
+                
+                $showmax = 1;
+            }
         }
         else
         {
@@ -165,7 +183,7 @@ sub render_rrgraph
         }
 
         local $ENV{'TZ'};
-        if( defined($tz) and $tz ne '' )
+        if( defined($tz) )
         {
             $ENV{'TZ'} = $tz;
         }
@@ -272,7 +290,12 @@ sub render_rrprint
             $tz = $ENV{'TZ'};
         }
         
-        local $ENV{'TZ'} = $tz;
+        local $ENV{'TZ'};
+        if( defined($tz) )
+        {
+            $ENV{'TZ'} = $tz;
+        }
+        
         ($printout, undef, undef) = RRDs::graph('/dev/null', @args);
     }
 
@@ -446,12 +469,17 @@ sub rrd_make_multigraph
                 
                 my $p_maxlinecolor =
                     $config_tree->getNodeParam($token, 'maxline-color-'.$dname);
-                
+
+                my $step =
+                    $self->rrd_maxline_step( $config_tree, $view );
+                    
                 if( defined($p_maxlinestyle) and defined($p_maxlinecolor) )
                 {
                     my @cdefs =
                         $self->rrd_make_cdef($config_tree, $token,
-                                             $max_dname, $ds_expr, 'MAX');
+                                             $max_dname, $ds_expr,
+                                             {'force_function' => 'MAX',
+                                              'step' => $step});
                     if( not scalar(@cdefs) )
                     {
                         $obj->{'error'} = 1;
@@ -955,6 +983,7 @@ sub rrd_make_def
     my $token = shift;
     my $dname = shift;
     my $cf = shift;
+    my $opts = shift;
 
     my $datafile = $config_tree->getNodeParam($token, 'data-file');
     my $dataddir = $config_tree->getNodeParam($token, 'data-dir');
@@ -971,8 +1000,15 @@ sub rrd_make_def
     {
         $cf = $config_tree->getNodeParam($token, 'rrd-cf');
     }
-    return sprintf( 'DEF:%s=%s:%s:%s',
-                    $dname, $rrdfile, $ds, $cf );
+
+    my $def_options = '';
+    if( defined($opts) and defined($opts->{'step'}) )
+    {
+        $def_options .= ':step=' . $opts->{'step'};
+    }
+    
+    return sprintf( 'DEF:%s=%s:%s:%s%s',
+                    $dname, $rrdfile, $ds, $cf, $def_options );
 }
 
 
@@ -991,7 +1027,7 @@ sub rrd_make_cdef
     my $token = shift;
     my $dname = shift;
     my $expr  = shift;
-    my $force_function = shift;
+    my $opts = shift;
 
     my @args = ();
     my $ok = 1;
@@ -1007,9 +1043,9 @@ sub rrd_make_cdef
         my ($noderef, $timeoffset) = @_;
 
         my $function;
-        if( defined($force_function) )
+        if( defined($opts) and defined($opts->{'force_function'}) )
         {
-            $function = $force_function;
+            $function = $opts->{'force_function'};
         }
         elsif( $noderef =~ s/^(.+)\@// )
         {
@@ -1034,6 +1070,10 @@ sub rrd_make_cdef
         }
         else
         {
+            if( defined($opts) and defined($opts->{'step'}) )
+            {
+                $defstring .= ':step=' . $opts->{'step'};
+            }
             push( @args, $defstring );
         }
         return $varname;
@@ -1090,6 +1130,31 @@ sub rrd_if_showmax
     return 0;
 }
 
+# determine the aggregation step for MAX line
+sub rrd_maxline_step
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $view = shift;
+
+    my $step = $config_tree->getParam($view, 'maxline-step');    
+    if( not defined($step) )
+    {
+        $step = 86400;
+    }
+
+    my $var = $self->{'options'}->{'variables'}->{'Gmaxlinestep'};
+
+    if( defined($var) )
+    {
+        $step = $var;
+    }
+
+    return $step;
+}
+    
+
+    
 
 sub rrd_make_gprint
 {

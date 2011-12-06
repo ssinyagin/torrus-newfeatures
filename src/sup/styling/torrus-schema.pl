@@ -11,6 +11,10 @@
      'SingleGraph'     => {
          'color' => '##blue',
          'line'  => 'LINE2'
+         },     
+     'SingleGraphMax'  => {  # MAX value graph on top of the Average
+         'color' => '##cornflowerblue',
+         'line'  => 'LINE1'
          },
      'HWBoundary'     => {
          'color' => '##red',
@@ -29,12 +33,20 @@
          'color' => '##darkmagenta'
          },
      'BpsIn'          => {
-         'color' => '##green',
+         'color' => '#01ca00',
          'line'  => 'AREA'
          },
      'BpsOut'         => {
          'color' => '##blue',
          'line'  => 'LINE2'
+         },
+     'BpsInMax'          => {
+         'color' => '#b7ea8c',
+         'line'  => 'AREA'
+         },
+     'BpsOutMax'         => {
+         'color' => '#017eb5',
+         'line'  => 'LINE1'
          },
 
      'BusinessDay'    => {

@@ -76,13 +76,16 @@ sub render_rrgraph
           $self->rrd_make_graph_opts( $config_tree, $token, $view ) );
 
     my $dstype = $config_tree->getNodeParam($token, 'ds-type');
-
+        
     if( $dstype eq 'rrd-multigraph' )
     {
         $self->rrd_make_multigraph( $config_tree, $token, $view, $obj );
     }
     else
     {
+        my $showmax = 0;
+        my $max_dname = $obj->{'dname'} . '_Max';
+        
         my $leaftype = $config_tree->getNodeParam($token, 'leaf-type');
 
         # Handle DEFs and CDEFs
@@ -100,6 +103,22 @@ sub render_rrgraph
                 $self->rrd_make_holtwinters( $config_tree, $token,
                                              $view, $obj );
             }
+            else
+            {
+                if( $self->rrd_if_showmax($config_tree, $token, $view) )
+                {
+                    my $step =
+                        $self->rrd_maxline_step( $config_tree, $view );
+
+                    my $maxdef =
+                        $self->rrd_make_def( $config_tree, $token,
+                                             $max_dname, 'MAX',
+                                             {'step' => $step});
+                    
+                    push( @{$obj->{'args'}{'defs'}}, $maxdef );
+                    $showmax = 1;
+                }
+            }
         }
         elsif( $leaftype eq 'rrd-cdef' )
         {
@@ -107,6 +126,20 @@ sub render_rrgraph
             push( @{$obj->{'args'}{'defs'}},
                   $self->rrd_make_cdef($config_tree, $token,
                                        $obj->{'dname'}, $expr) );
+            
+            if( $self->rrd_if_showmax($config_tree, $token, $view) )
+            {
+                my $step =
+                    $self->rrd_maxline_step( $config_tree, $view );
+                
+                push( @{$obj->{'args'}{'defs'}}, 
+                      $self->rrd_make_cdef( $config_tree, $token,
+                                            $max_dname, $expr,
+                                            {'force_function' => 'MAX',
+                                             'step' => $step} ) );
+                
+                $showmax = 1;
+            }
         }
         else
         {
@@ -115,6 +148,12 @@ sub render_rrgraph
         }
 
         $self->rrd_make_graphline( $config_tree, $token, $view, $obj );
+
+        if( $showmax )
+        {
+            $self->rrd_make_maxline( $max_dname, $config_tree,
+                                     $token, $view, $obj );
+        }            
     }
 
     return(undef) if $obj->{'error'};
@@ -144,7 +183,7 @@ sub render_rrgraph
         }
 
         local $ENV{'TZ'};
-        if( defined($tz) and $tz ne '' )
+        if( defined($tz) )
         {
             $ENV{'TZ'} = $tz;
         }
@@ -299,6 +338,8 @@ sub rrd_make_multigraph
     # We need this to refer to some existing variable name
     $obj->{'dname'} = $dsNames[0];
 
+    my $showmax = $self->rrd_if_showmax($config_tree, $token, $view);
+        
     # Analyze the drawing order
     my %dsOrder;
     foreach my $dname ( @dsNames )
@@ -347,12 +388,13 @@ sub rrd_make_multigraph
         }
 
         my $legend = '';
+        my $ds_expr;
         
         if( $dograph or $gprint_this )
         {
-            my $expr = $config_tree->getNodeParam($token, 'ds-expr-'.$dname);
+            $ds_expr = $config_tree->getNodeParam($token, 'ds-expr-'.$dname);
             my @cdefs =
-                $self->rrd_make_cdef($config_tree, $token, $dname, $expr);
+                $self->rrd_make_cdef($config_tree, $token, $dname, $ds_expr);
             if( not scalar(@cdefs) )
             {
                 $obj->{'error'} = 1;
@@ -418,12 +460,54 @@ sub rrd_make_multigraph
                 $stack = '';
             }
                 
+            if( $showmax and ($stack eq '') )
+            {
+                my $max_dname = $dname . '_Max';
+                
+                my $p_maxlinestyle =
+                    $config_tree->getNodeParam($token, 'maxline-style-'.$dname);
+                
+                my $p_maxlinecolor =
+                    $config_tree->getNodeParam($token, 'maxline-color-'.$dname);
+
+                my $step =
+                    $self->rrd_maxline_step( $config_tree, $view );
+                    
+                if( defined($p_maxlinestyle) and defined($p_maxlinecolor) )
+                {
+                    my @cdefs =
+                        $self->rrd_make_cdef($config_tree, $token,
+                                             $max_dname, $ds_expr,
+                                             {'force_function' => 'MAX',
+                                              'step' => $step});
+                    if( not scalar(@cdefs) )
+                    {
+                        $obj->{'error'} = 1;
+                        next;
+                    }
+            
+                    push( @{$obj->{'args'}{'defs'}}, @cdefs );
+
+                    my $max_linestyle = $self->mkline( $p_maxlinestyle );
+                    my $max_linecolor = $self->mkcolor( $p_maxlinecolor );
+                    if( defined( $alpha ) )
+                    {
+                        $max_linecolor .= $alpha;
+                    }
+                    
+                    push( @{$obj->{'args'}{'line'}},
+                          sprintf( '%s:%s%s',
+                                   $max_linestyle,
+                                   $max_dname,
+                                   $max_linecolor ) );
+                }
+            }
+
             push( @{$obj->{'args'}{'line'}},
                   sprintf( '%s:%s%s%s%s', $linestyle, $dname,
                            $linecolor,
                            ($legend ne '') ? ':'.$legend.'\l' : '',
                            $stack ) );
-            
         }
     }
     return;
@@ -576,6 +660,65 @@ sub rrd_make_graphline
 
     push( @{$obj->{'args'}{'line'}},
           sprintf( '%s:%s%s%s', $linestyle, $obj->{'dname'}, $linecolor,
+                   ($legend ne '') ? ':'.$legend.'\l' : '' ) );
+    return;
+}
+
+
+sub rrd_make_maxline
+{
+    my $self = shift;
+    my $max_dname = shift;
+    my $config_tree = shift;
+    my $token = shift;
+    my $view = shift;
+    my $obj = shift;
+
+    my $legend;
+    
+    my $disable_legend = $config_tree->getParam($view, 'disable-legend');
+    if( not defined($disable_legend) or $disable_legend ne 'yes' )
+    {
+        $legend = $config_tree->getNodeParam($token, 'graph-legend');
+        if( defined( $legend ) )
+        {
+            $legend =~ s/:/\\:/g;
+        }
+    }
+
+    if( not defined( $legend ) )
+    {
+        $legend = '';
+    }
+    else
+    {
+        $legend = 'Max ' . $legend;
+    }
+    
+    my $styleval = $config_tree->getNodeParam($token, 'maxline-style');
+    if( not defined($styleval)  )
+    {
+        $styleval = $config_tree->getParam($view, 'maxline-style');
+    }
+    
+    my $linestyle = $self->mkline( $styleval );
+
+    my $colorval = $config_tree->getNodeParam($token, 'maxline-color');
+    if( not defined($colorval) )
+    {
+        $colorval = $config_tree->getParam($view, 'maxline-color');
+    }
+    
+    my $linecolor = $self->mkcolor( $colorval );
+
+    if( $self->rrd_if_gprint( $config_tree, $token ) )
+    {
+        $self->rrd_make_gprint( $max_dname, $legend,
+                                $config_tree, $token, $view, $obj );
+    }
+
+    push( @{$obj->{'args'}{'line'}},
+          sprintf( '%s:%s%s%s', $linestyle, $max_dname, $linecolor,
                    ($legend ne '') ? ':'.$legend.'\l' : '' ) );
     return;
 }
@@ -840,6 +983,7 @@ sub rrd_make_def
     my $token = shift;
     my $dname = shift;
     my $cf = shift;
+    my $opts = shift;
 
     my $datafile = $config_tree->getNodeParam($token, 'data-file');
     my $dataddir = $config_tree->getNodeParam($token, 'data-dir');
@@ -856,8 +1000,15 @@ sub rrd_make_def
     {
         $cf = $config_tree->getNodeParam($token, 'rrd-cf');
     }
-    return sprintf( 'DEF:%s=%s:%s:%s',
-                    $dname, $rrdfile, $ds, $cf );
+
+    my $def_options = '';
+    if( defined($opts) and defined($opts->{'step'}) )
+    {
+        $def_options .= ':step=' . $opts->{'step'};
+    }
+    
+    return sprintf( 'DEF:%s=%s:%s:%s%s',
+                    $dname, $rrdfile, $ds, $cf, $def_options );
 }
 
 
@@ -876,6 +1027,7 @@ sub rrd_make_cdef
     my $token = shift;
     my $dname = shift;
     my $expr  = shift;
+    my $opts = shift;
 
     my @args = ();
     my $ok = 1;
@@ -891,7 +1043,11 @@ sub rrd_make_cdef
         my ($noderef, $timeoffset) = @_;
 
         my $function;
-        if( $noderef =~ s/^(.+)\@// )
+        if( defined($opts) and defined($opts->{'force_function'}) )
+        {
+            $function = $opts->{'force_function'};
+        }
+        elsif( $noderef =~ s/^(.+)\@// )
         {
             $function = $1;
         }
@@ -914,6 +1070,10 @@ sub rrd_make_cdef
         }
         else
         {
+            if( defined($opts) and defined($opts->{'step'}) )
+            {
+                $defstring .= ':step=' . $opts->{'step'};
+            }
             push( @args, $defstring );
         }
         return $varname;
@@ -940,6 +1100,61 @@ sub rrd_if_gprint
     }
     return 1;
 }
+
+
+# determine if MAX line should be drawn
+sub rrd_if_showmax
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $token = shift;
+    my $view = shift;
+
+    my $disable = $config_tree->getNodeParam($token, 'graph-disable-maxline');
+    if( defined( $disable ) and $disable eq 'yes' )
+    {
+        return 0;
+    }
+
+    if( $self->{'options'}->{'variables'}->{'Gmaxline'} )
+    {
+        return 1;
+    }
+
+    my $enable = $config_tree->getParam($view, 'draw-maxline');
+    if( defined($enable) and $enable eq 'yes' )
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+# determine the aggregation step for MAX line
+sub rrd_maxline_step
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $view = shift;
+
+    my $step = $config_tree->getParam($view, 'maxline-step');    
+    if( not defined($step) )
+    {
+        $step = 86400;
+    }
+
+    my $var = $self->{'options'}->{'variables'}->{'Gmaxlinestep'};
+
+    if( defined($var) )
+    {
+        $step = $var;
+    }
+
+    return $step;
+}
+    
+
+    
 
 sub rrd_make_gprint
 {

@@ -201,6 +201,8 @@ Example:
          RRA:AVERAGE:0.25:288:732    RRA:MAX:0.25:288:732
        </param>
 
+       <param name="host-copy-params" value="rrd-create-rra"/>
+
       </host>
     </snmp-discovery>
 

@@ -185,6 +185,22 @@ Example:
       <host>
         <param name="snmp-host" value="10.0.1.1"/>
         <param name="symbolic-name" value="10.0.1.1"/>
+
+        <!--
+         Example of extended RRA definition.
+         The RRD files are approximately 8 times bigger than standard.
+         5-minute stats: 366 days
+         60-minute max and average: 190 days
+         daily max and average: 732 days
+         In hourly aggregates, 20 minutes missing is allowed.
+         In daily aggregates, 6 hours missing is allowed.
+        -->
+       <param name="rrd-create-rra">
+         RRA:AVERAGE:0:1:105408
+         RRA:AVERAGE:0.34:12:4560     RRA:MAX:0.34:12:4560
+         RRA:AVERAGE:0.25:288:732    RRA:MAX:0.25:288:732
+       </param>
+
       </host>
     </snmp-discovery>
 

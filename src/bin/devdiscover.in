@@ -371,8 +371,11 @@ sub parseParams
         }
 
         # Remove spaces in the head and tail.
-        $value =~ s/^\s+//;
-        $value =~ s/\s+$//;
+        $value =~ s/^\s+//o;
+        $value =~ s/\s+$//o;
+
+        # Replace linebreaks with spaces
+        $value =~ s/\n|\r/ /mgo;
 
         $ret->{$param} = $value;
     }

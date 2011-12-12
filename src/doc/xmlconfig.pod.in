@@ -579,12 +579,6 @@ Mandatory when a leaf refers to an RRD file (C<storage-type=rrd> in
 C<collector> leaves or C<leaf-type=rrd-def> in C<rrd-file> leaves). The
 parameter Specifies the RRD datasource name within a file.
 
-=item * C<rrd-ds>
-
-Mandatory when a leaf refers to an RRD file (C<storage-type=rrd> in
-C<collector> leaves or C<leaf-type=rrd-def> in C<rrd-file> leaves). The
-parameter Specifies the RRD datasource name within a file.
-
 =item * C<rrd-cf>
 
 Mandatory under the same conditios as C<rrd-ds>. Defines the default

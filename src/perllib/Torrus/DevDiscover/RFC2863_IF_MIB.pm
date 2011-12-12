@@ -638,8 +638,8 @@ sub buildConfig
     my %onlyName;
  
     foreach my $name
-        ( split( /\s*,\s*/,
-                 $devdetails->paramString('RFC2863_IF_MIB::only-interfaces') ) )
+        ( split( /\s*,\s*/, $devdetails->paramString
+                 ('RFC2863_IF_MIB::only-interfaces') ) )
     {
         $onlyName{$name} = 1;
     }

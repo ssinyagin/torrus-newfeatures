@@ -37,7 +37,10 @@ dist_webplain_DATA = \
 	webplain/explain-rrdgraph.html \
 	webplain/torrus.css \
 	webplain/torrus-printer.css \
-	webplain/torrus-report.css
+	webplain/torrus-report.css \
+	webplain/jquery.min.js \
+	webplain/jquery.ba-bbq.min.js \
+	webplain/torrus.js
 
 
 install-data-local:

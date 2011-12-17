@@ -25,6 +25,12 @@ window.open('[%url(token) _ '&view=helptext-html'%]','helpwindow',
 } 
 //--> 
 </SCRIPT>
+<SCRIPT type="text/javascript" src="[% plainURL _ javascript('jquery') %]">
+</SCRIPT>
+<SCRIPT type="text/javascript" src="[% plainURL _ javascript('jquery-bbq') %]">
+</SCRIPT>
+<SCRIPT type="text/javascript" src="[% plainURL _ javascript('torrus') %]">
+</SCRIPT>
 <TITLE>[% title %]</TITLE>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
 [% IF expires %]<META HTTP-EQUIV="Refresh" CONTENT="[% expires %]"/>[% END %]
@@ -223,6 +229,7 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
 <DIV CLASS="GraphImage">
 <IMG SRC="[%url(token, view, vars)%]"
      ALT="[% param(view, 'description') %]">
+<DIV CLASS="GraphControls"></DIV>
 </DIV>
 [% END %]
 

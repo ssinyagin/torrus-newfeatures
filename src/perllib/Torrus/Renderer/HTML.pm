@@ -91,6 +91,7 @@ sub render_html
         'tsetMembers' => sub { $config_tree->tsetMembers($_[0]); },
         'tsetList'   => sub { $config_tree->getTsets(); },
         'style'      => sub { return $self->style($_[0]); },
+        'javascript' => sub { return $self->javascript($_[0]); },
         'companyName'=> $Torrus::Renderer::companyName,
         'companyLogo'=> $Torrus::Renderer::companyLogo,
         'companyURL' => $Torrus::Renderer::companyURL,
@@ -378,6 +379,13 @@ sub style
     return  $Torrus::Renderer::styling{$media}{$object};
 }
 
+sub javascript
+{
+    my $self = shift;
+    my $object = shift;
+
+    return  $Torrus::Renderer::javascript{$object};
+}
 
 
 sub userAttribute

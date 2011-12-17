@@ -222,6 +222,10 @@ DIV.ShortGraph *.NodeDescr {
   float : none;
 }
 
+DIV.GraphControls {
+  display: none;
+}
+
 
 /* In tokenset display, short graphs are placed in two
    columns on the screen, but one column on printer */

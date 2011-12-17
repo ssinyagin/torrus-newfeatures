@@ -71,6 +71,9 @@ sub do_process
             {
                 $type = 'text/css';
             }
+            elsif( $path_info =~ /\.js$/o ) {
+                $type = 'application/javascript';
+            }
             else
             {
                 $type = 'text/html';

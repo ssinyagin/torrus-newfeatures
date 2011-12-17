@@ -199,6 +199,13 @@ $Torrus::Monitor::alarmTimeout = 1209600;
       'report'  => {'stylesheet'   => 'torrus-report.css'}
       );
 
+# The JavaScript files used in the web interface.
+%Torrus::Renderer::javascript =
+    ( 'jquery'      => 'jquery.min.js',
+      'jquery-bbq'  => 'jquery.ba-bbq.min.js',
+      'torrus'      => 'torrus.js'
+      );
+
 # Color schema for RRDtool graph. It can be extended by setting
 # $Torrus::Renderer::stylingProfileOverlay. The overlay should
 # be an absolute file name. You can use $Torrus::Global::cfgSiteDir

@@ -308,6 +308,23 @@ sub compile_subtrees
     
     my $ok = 1;
 
+    # setting of compile-time variables
+    
+    foreach my $setvar ( $node->getChildrenByTagName('setvar') )        
+    {
+        my $name = $setvar->getAttribute('name');
+        my $value = $setvar->getAttribute('value');
+        if( not defined( $name ) or not defined( $value ) )
+        {
+            my $path = $self->path($token);
+            Error("Setvar statement without name or value in $path"); $ok = 0;
+        }
+        else
+        {
+            $self->setVar( $token, $name, $value );
+        }
+    }
+
     # Apply templates
 
     foreach my $templateapp ( $node->getChildrenByTagName('apply-template') )
@@ -345,22 +362,8 @@ sub compile_subtrees
         $ok = $self->setAlias($token, $apath) ? $ok:0;
     }
 
-    foreach my $setvar ( $node->getChildrenByTagName('setvar') )        
-    {
-        my $name = $setvar->getAttribute('name');
-        my $value = $setvar->getAttribute('value');
-        if( not defined( $name ) or not defined( $value ) )
-        {
-            my $path = $self->path($token);
-            Error("Setvar statement without name or value in $path"); $ok = 0;
-        }
-        else
-        {
-            $self->setVar( $token, $name, $value );
-        }
-    }
 
-    # Compile-time variables
+    # applying compile-time variables
     
     foreach my $iftrue ( $node->getChildrenByTagName('iftrue') )        
     {

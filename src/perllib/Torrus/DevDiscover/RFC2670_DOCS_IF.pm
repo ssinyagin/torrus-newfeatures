@@ -93,7 +93,8 @@ sub discover
     $data->{'docsCableMaclayer'} = [];
     $data->{'docsCableDownstream'} = [];
     $data->{'docsCableUpstream'} = [];
-
+    $data->{'docsCableUpstreamPhy'} = [];
+    
     foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
@@ -129,15 +130,13 @@ sub discover
                       'RFC2670_DOCS_IF::docsis-upstream-stats' );
                 
             }
+            else
+            {
+                push( @{$data->{'docsCableUpstreamPhy'}}, $ifIndex );
+            }
         }
     }
     
-    if( $devdetails->paramEnabled('RFC2670_DOCS_IF::upstreams-only') )
-    {
-        $data->{'docsCableMaclayer'} = [];
-        $data->{'docsCableDownstream'} = [];
-    }
-
     $data->{'docsConfig'} = {
         'docsCableMaclayer' => {
             'subtreeName' => 'Docsis_MAC_Layer',
@@ -164,6 +163,27 @@ sub discover
             },            
         },
     };
+
+    if( $devdetails->paramEnabled
+        ('RFC2670_DOCS_IF::suppress-all-cable-stats') )
+    {
+        # Completely exclude all DOCSIS interfaces from any collection
+        foreach my $category ( keys %{$data->{'docsConfig'}},
+                               'docsCableUpstreamPhy' )
+        {
+            foreach my $ifIndex ( @{$data->{$category}} )
+            {
+                my $interface = $data->{'interfaces'}{$ifIndex};
+                $interface->{'excluded'} = 1;
+            }
+        }
+    }
+
+    if( $devdetails->paramEnabled('RFC2670_DOCS_IF::upstreams-only') )
+    {
+        $data->{'docsCableMaclayer'} = [];
+        $data->{'docsCableDownstream'} = [];
+    }
 
     if( $devdetails->hasCap('docsDownstreamUtil') )
     {

@@ -1,3 +1,8 @@
+2011-12-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2670_DOCS_IF.pm (discover):
+	new discovery parameter: RFC2670_DOCS_IF::suppress-all-cable-stats
+
 2011-12-06  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* sup/styling/torrus-schema.pl: BpsIn now uses a slightly darker

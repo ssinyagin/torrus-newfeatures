@@ -682,6 +682,11 @@ and memory statistics are located. Default: C<System_Performance>.
 If set to C<yes>, only the DOCSIS upstream statistics are enabled, and
 downstream and MAC layer stats are skipped.
 
+=item * C<RFC2670_DOCS_IF::suppress-all-cable-stats>
+
+If set to C<yes>, all DOCSIS interfaces are excluded from any cable or
+interface statistics.
+
 =back
 
 =head3 Vendor parameters

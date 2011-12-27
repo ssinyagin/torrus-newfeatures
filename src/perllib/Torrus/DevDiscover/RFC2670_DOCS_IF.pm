@@ -88,13 +88,7 @@ sub discover
         $devdetails->setCap('docsDownstreamUtil');
     }
 
-    my $snrTable =
-        $session->get_table( -baseoid =>
-                             $dd->oiddef('docsIfSigQSignalNoise') );
-    if( defined( $snrTable ) )
-    {
-        $devdetails->storeSnmpVars( $snrTable );
-    }
+    my $snrTable = $dd->walkSnmpTable('docsIfSigQSignalNoise');
     
     $data->{'docsCableMaclayer'} = [];
     $data->{'docsCableDownstream'} = [];
@@ -128,8 +122,7 @@ sub discover
         }
         elsif( $ifType == 129 or $ifType == 205 )
         {
-            if( $devdetails->hasOID( $dd->oiddef('docsIfSigQSignalNoise') .
-                                     '.' . $ifIndex ) )
+            if( defined($snrTable->{$ifIndex}) )
             {
                 push( @{$data->{'docsCableUpstream'}}, $ifIndex );
                 push( @{$interface->{'docsTemplates'}},

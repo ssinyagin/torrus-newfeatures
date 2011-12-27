@@ -905,6 +905,13 @@ sub getRelative
     my $token = shift;
     my $relPath = shift;
 
+    if( $relPath =~ s/^\[\[(.+)\]\]//o )
+    {
+        my $nodeid = $1;
+        $token = $self->getNodeByNodeid( $nodeid );
+        return(undef) unless defined($token);        
+    }
+    
     if( $relPath =~ /^\//o )
     {
         return $self->token( $relPath );

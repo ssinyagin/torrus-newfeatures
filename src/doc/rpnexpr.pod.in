@@ -87,12 +87,14 @@ the following functions affect the graph shape: C<AVERAGE@>, C<MIN@>,
 C<MAX@>, and C<LAST@>. They cause the corresponding Consolidation Function
 being used when creating a graph.
 
-C<PATH> specifies the relative name for the data source.
-If omitted, the current leaf value is taken. If starts with C</>,
-the path is considered as absolute.
-Path starting with letter denotes the child of the parent subtree.
-Double dot (C<../>) in the beginning of the path is interpreted as
-current parent's parent subtree.
+C<PATH> specifies the relative name for the data source.  If omitted,
+the current leaf value is taken. If starts with C</>, the path is
+considered as absolute.  Path starting with letter denotes the child of
+the parent subtree.  Double dot (C<../>) in the beginning of the path is
+interpreted as current parent's parent subtree. If C<PATH> starts with a
+string enclosed in double square brackets (C<[[> and C<]]>), the string
+is interpreted as a NodeID value for referring to the node in the
+datasource tree.
 
 C<(OFFSET)> determines the time reference, as described in C<rrdtool fetch>
 manual. In addition, the word C<LAST> refers to the latest data timestamp

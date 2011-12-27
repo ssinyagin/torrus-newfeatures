@@ -19,7 +19,7 @@ severity = 1
 severity = 1
 
 
-# there is a lot of whitespace garnage, but removing all of it will make
+# there is a lot of whitespace garbage, but removing all of it will make
 # the code unmanageable
 [CodeLayout::ProhibitTrailingWhitespace]
 severity = 1

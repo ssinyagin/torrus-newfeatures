@@ -27,16 +27,34 @@ enterprise-specific inventory database and various programs, such as
 Torrus. SIAM is supposed to be used with an enterprise-specific driver
 which maps the inventory data into SIAM objects and attributes.
 
-The C<tp-siam> plugin consists of a command-line utility which generates
-DDX files from SIAM data, and a DevDiscover module which tries to match
-the IF-MIB interface names in SIAM against those on the network
-devices. The resulting configuration contains I<nodeid> values imported
-from SIAM, and those values would be typically based on service
-identifiers in the inventory database. Thus the external programs can
-fetch Torrus data by using the enterprise-specific service identifiers.
+The C<tp-siam> plugin consists of a command-line utility and a
+DevDiscover module.
 
-The command-line utility reads the device list and their attributes from
-SIAM and creates corresponding discovery instruction (DDX) files:
+The C<siam> command-line utility performs the following steps:
+
+=over 4
+
+=item * Retrieve the SNMP devices matching the C<torrus.server> attribute;
+
+=item * Create discovery instruction (DDX) files for each Torrus tree
+as found in SIAM data;
+
+=item * Get all SIAM::Service objects having the C<siam.svc.type>
+attribute set to C<TrafficAggregate>. For those services matching the
+C<torrus.server> attribute, create Torrus configuration XML files that
+present total aggregate traffic from several IF-MIB interfaces.
+
+=back
+
+
+The discovery module C<Torrus::DevDiscover::SIAMDD> tries to match the
+IF-MIB interface names in SIAM against those on the network devices. The
+resulting configuration contains I<nodeid> values imported from SIAM and
+assigned to corresponding device interfaces. As a result, external
+programs can fetch Torrus data by using the enterprise-specific service
+identifiers.
+
+Command-line arguments:
 
   torrus siam [options...]
 
@@ -44,18 +62,26 @@ SIAM and creates corresponding discovery instruction (DDX) files:
      --server=HOSTNAME       Torrus server to match in SIAM
      --pddx=PATH             Path to store DDX files
      --pbundles=PATH         Path to store bundles XML
+     --paggr=PATH            Path to store aggregates XML
      --pnodes=PATH           Path to store per-node XML
      --prrd=PATH             RRD data storage path
      --verbose               print extra information
      --debug                 print debugging information
 
-By default, the pluginSIAM utility retrieves all devices for the local server's
-I<hostname>, and stores the resulting DDX files in the default
-I<discovery> directory. The DDX files are named as "siam-I<TREE>.ddx"
-for each given tree name supplied by SIAM parameters. The DDX files
-would store the generated bundle files in I<xmlconfig/bundles/>, and
-deviec-specific XML files in I<xmlconfig/nodes/> subdirectories of the
-standard XML configuration location.
+By default, the local server's hostname is matched against the
+C<torrus.server> attribute. The resulting DDX files are stored in the
+default I<discovery> directory. The DDX files are named as
+"siam-I<TREE>.ddx" for each given tree name supplied by SIAM
+parameters. The DDX files would store the generated bundle files in
+I<xmlconfig/bundles/>, and device-specific XML files in
+I<xmlconfig/nodes/> subdirectories of the standard XML configuration
+location. The traffic aggregate XML files are stored by default in
+I<xmlconfig/bundles/>.
+
+
+The file C<siam-config.pl> defines all default values and DDX
+parameters. These values can be modified in your site-specific
+F<siam-siteconfig.pl>.
 
 
 =head2 SIAM Attributes
@@ -63,6 +89,10 @@ standard XML configuration location.
 SIAM::Device object attributes used by the plugin:
 
 =over 4
+
+=item * siam.object.complete
+
+Only complete device objects are processed. The incomplete devices are ignored.
 
 =item * torrus.server
 
@@ -105,6 +135,11 @@ SIAM::ServiceUnit object attributes used by the discovery module:
 
 =over 4
 
+=item * siam.object.complete
+
+Only complete service unit objects are processed. The incomplete ones
+are ignored.
+
 =item * siam.svcunit.type
 
 Type of service unit. Supported value: C<IFMIB.Port>
@@ -126,6 +161,59 @@ corresponding bandwidth limit parameters are applied to the interface
 configuration.
 
 =back
+
+
+
+SIAM::Service attributes used for traffic aggregate graphs:
+
+=over 4
+
+=item * siam.object.complete
+
+Only complete service objects are processed. The incomplete ones are ignored.
+
+=item * siam.svc.type
+
+By default, only service object with C<siam.svc.type> set to
+C<TrafficAggregate> are treated as traffic aggregation services. Other
+values can be configured in F<siam-siteconfig.pl>.
+
+=item * torrus.aggregate.name
+
+Human-readable name for the aggregate. It is used as a subtree name in
+Torrus tree.
+
+=item * torrus.aggregate.nodeid
+
+The value of this parameter is used as the base for NodeID for the
+aggregate leafs.
+
+=item * torrus.aggregate.description
+
+[Optional] human-readable description of the aggregate.
+
+=back
+
+
+
+Siam::ServiceUnit attributes used in traffic aggregates:
+
+=over 4
+
+=item * siam.svcunit.type
+
+Only C<IFMIB.Port> is supported.
+
+=item * torrus.port.nodeid
+
+Port NodeID values are used to compose the aggregate graphs.
+
+=item * siam.svcunit.name
+
+The value is used to build the legend text for the aggregate.
+
+=back
+
 
 
 =head2 SIAM conditions

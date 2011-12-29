@@ -34,6 +34,26 @@ $Torrus::SIAM::ddx_defaults = {
 };
 
 
+####   Traffic aggregation graphs
+
+# Default location for aggregation XML files
+$Torrus::SIAM::aggr_xml_path = '@sitexmldir@/bundles';
+
+# Values of siam.svc.type attribute that build up the aggregates
+@Torrus::SIAM::aggr_svc_types = ('TrafficAggregate');
+
+# Attribute that defines the Torrus subtree name for the aggregate
+$Torrus::SIAM::aggr_subtree_name_attr = 'torrus.aggregate.name';
+
+# Attribute that defines the description for the aggregate
+$Torrus::SIAM::aggr_descr_attr = 'torrus.aggregate.description';
+
+# Subtree path where the aggregates are placed
+$Torrus::SIAM::aggr_tree_location = '/Aggregates';
+
+
+####  SNMP discovery matching
+
 @Torrus::SIAMDD::match_port_name_attributes =
     ('torrus.port.name',
      'torrus.port.shortname');

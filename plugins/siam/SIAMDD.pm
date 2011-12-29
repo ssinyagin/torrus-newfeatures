@@ -204,6 +204,8 @@ sub discover
     my $svcunits = $devobj->get_all_service_units();
     foreach my $unit ( @{$svcunits} )
     {
+        next unless $unit->is_complete();
+        
         my $unit_type = $unit->attr('siam.svcunit.type');
 
         if( $unit_type eq 'IFMIB.Port' )
@@ -337,6 +339,8 @@ sub buildConfig
     my $devdetails = shift;
     my $cb = shift;
     my $devNode = shift;
+
+    return;
 }
 
 

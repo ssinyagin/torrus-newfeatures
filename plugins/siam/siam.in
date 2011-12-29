@@ -17,23 +17,28 @@
 
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
+use strict;
+use warnings;
+
 BEGIN { require '@siam_config_pl@'; }
 
 
-use strict;
 use Getopt::Long;
 use Sys::Hostname;
 use XML::LibXML;
 
 use Torrus::SIAM;
+use Torrus::ConfigBuilder;
 use Torrus::Log;
 
 my $server = hostname();
 
 my $ddx_path = $Torrus::SIAM::ddx_path;
 my $bundles_path = $Torrus::SIAM::bundles_path;
+my $aggr_path = $Torrus::SIAM::aggr_xml_path;
 my $nodes_path = $Torrus::SIAM::nodes_path;
 my $rrd_path = $Torrus::SIAM::rrd_path;
+
 
 my $debug = 0;
 my $verbose = 0;
@@ -43,6 +48,7 @@ my $verbose = 0;
 my $ok = GetOptions( 'server=s'    => \$server,
                      'pddx=s'      => \$ddx_path,
                      'pbundles=s'  => \$bundles_path,
+                     'paggr=s'     => \$aggr_path,
                      'pnodes=s'    => \$nodes_path,
                      'prrd=s'      => \$rrd_path,
                      'verbose'     => \$verbose,
@@ -59,6 +65,8 @@ if( not $ok or scalar( @ARGV ) > 0 )
          "    [" . $ddx_path . "]\n",
          " --pbundles=PATH         Path to store bundles XML\n",
          "    [" . $bundles_path . "]\n",
+         " --paggr=PATH            Path to store aggregates XML\n",
+         "    [" . $aggr_path . "]\n",
          " --pnodes=PATH           Path to store per-node XML\n",
          "    [" . $nodes_path . "]\n",
          " --prrd=PATH             RRD data storage path\n",
@@ -88,143 +96,472 @@ if( not -d $nodes_path )
     Error('No such directory: ' . $nodes_path);
 }
 
+my @tree_names;
+my %tree_for_deviceid;
+my $success = 1;
+
 my $siam = Torrus::SIAM->open();
 exit(1) unless defined($siam);
 
 Verbose('Connected to SIAM');
 
-my $devices = $siam->get_contained_objects
-    ('SIAM::Device', {'match_attribute' => ['torrus.server', [$server]]});
-
-Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
-
-
-# Distribute devices into bundles by torrus.tree attribute
-my %bundles;
-foreach my $device (@{$devices})
+# Generate discovery files
 {
-    next unless $device->attr('snmp.managed');
-    
-    my $tree = $device->attr('torrus.tree');
-    if( not defined($tree) )
+    my $devices = $siam->get_contained_objects
+        ('SIAM::Device', {'match_attribute' => ['torrus.server', [$server]]});
+
+    Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
+
+
+    # Distribute devices into bundles by torrus.tree attribute
+    my %bundles;
+    foreach my $device (@{$devices})
     {
-        Error('SIAM::Device "' . $device->id .
-              '" does not define "torrus.tree" attribute. Aborting.');
-        exit(1);
-    }
-   
-    if( not defined($bundles{$tree}) )
-    {
-        $bundles{$tree} = [];
+        next unless $device->is_complete();
+        next unless $device->attr('snmp.managed');
+
+        my $tree = $device->attr('torrus.tree');
+        if( not defined($tree) )
+        {
+            Error('SIAM::Device "' . $device->id .
+                  '" does not define "torrus.tree" attribute. Aborting.');
+            exit(1);
+        }
+
+        $tree_for_deviceid{$device->id} = $tree;
+
+        if( not defined($bundles{$tree}) )
+        {
+            $bundles{$tree} = [];
+        }
+
+        push(@{$bundles{$tree}}, $device);
     }
 
-    push(@{$bundles{$tree}}, $device);
+    @tree_names = sort keys %bundles;
+
+    Verbose('Preparing to generate ' . scalar(keys %bundles) . ' bundles');
+
+    foreach my $tree ( @tree_names )
+    {
+        Verbose('Bundle ' . $tree . ': ' . scalar(@{$bundles{$tree}}) .
+                ' devices');
+
+        my $outfile = $ddx_path . 'siam-' . $tree . '.ddx';
+        Verbose('Preparing to write ' . $outfile);
+
+        my $doc = XML::LibXML->createDocument( "1.0", "UTF-8" );
+        my $root = $doc->createElement('snmp-discovery');
+        $doc->setDocumentElement( $root );
+
+        {
+            my $fileInfoNode = $doc->createElement('file-info');
+            $root->appendChild( $fileInfoNode );
+
+            my $formatNode = $doc->createElement('format-version');
+            $formatNode->appendText('1.0');
+            $fileInfoNode->appendChild( $formatNode );
+        }
+
+        {
+            my $creatorNode = $doc->createElement('creator-info');
+            $creatorNode->appendText
+                ("This file is generated from SIAM\n" .
+                 'for Torrus tree ' . $tree . ' on ' .
+                 scalar(localtime(time())));
+            $root->appendChild( $creatorNode );
+        }
+
+        my $globalParams = {
+            'output-bundle'  => $bundles_path . '/siam-' . $tree . '.xml',
+            'data-dir'       => $rrd_path,
+            'SIAM::managed'   => 'yes',
+        };
+
+        foreach my $p (keys %{$Torrus::SIAM::ddx_defaults})
+        {
+            $globalParams->{$p} = $Torrus::SIAM::ddx_defaults->{$p};
+        }
+
+        createParamsDom( $globalParams, $doc, $root );
+
+
+        foreach my $device (sort {$a->attr('siam.device.name') cmp
+                                      $b->attr('siam.device.name')}
+                            @{$bundles{$tree}})
+        {
+            my $name = $device->attr('siam.device.name');
+
+            my $params = {
+                'output-file' => $nodes_path . '/' . $name . '.xml',
+                'system-id' => $name,
+            };
+
+            $params->{'SIAM::device-inventory-id'} =
+                $device->attr('siam.device.inventory_id');
+
+            my $host = $device->attr('snmp.host');
+            if( not defined($host) )
+            {
+                $host = $name;
+            }
+
+            $params->{'snmp-host'} = $host;
+
+            foreach my $p ('version', 'community', 'timeout', 'retries')
+            {
+                my $v = $device->attr('snmp.' . $p);
+                if( defined($v) )
+                {
+                    $params->{'snmp-' . $p} = $v;
+                }
+            }
+
+            my $subtree = $device->attr('torrus.subtree-path');
+            if( defined($subtree) )
+            {
+                $params->{'host-subtree'} = $subtree;
+            }
+
+            my $hostNode = $doc->createElement('host');
+            $root->appendChild( $hostNode );
+
+            createParamsDom( $params, $doc, $hostNode );
+        }
+
+        if( $doc->toFile( $outfile, 2 ) )
+        {
+            Info("Wrote $outfile");
+        }
+        else
+        {
+            Error("Cannot write $outfile: $!");
+            $success = 0;
+        }
+    }
 }
 
 
-my $success = 1;
-
-Verbose('Preparing to generate ' . scalar(keys %bundles) . ' bundles');
-
-foreach my $tree (sort keys %bundles)
+# Generate traffic aggregate graphs
 {
-    Verbose('Bundle ' . $tree . ': ' . scalar(@{$bundles{$tree}}) .
-            ' devices');
-
-    my $outfile = $ddx_path . 'siam-' . $tree . '.ddx';
-    Verbose('Preparing to write ' . $outfile);
+    my %aggr_elements;
+    my %aggr_tree;
+    my %aggr_name;
+    my %aggr_description;
+    my %aggr_unit_type;
+    my %aggr_nodeid;
+    my %unit_name;
     
-    my $doc = XML::LibXML->createDocument( "1.0", "UTF-8" );
-    my $root = $doc->createElement('snmp-discovery');
-    $doc->setDocumentElement( $root );
-
+    foreach my $svctype ( @Torrus::SIAM::aggr_svc_types )
     {
-        my $fileInfoNode = $doc->createElement('file-info');
-        $root->appendChild( $fileInfoNode );
-        
-        my $formatNode = $doc->createElement('format-version');
-        $formatNode->appendText('1.0');
-        $fileInfoNode->appendChild( $formatNode );
-    }
+        my $services =
+            $siam->get_objects_by_attribute
+            ('SIAM::Service', 'siam.svc.type', $svctype );
 
-    {
-        my $creatorNode = $doc->createElement('creator-info');
-        $creatorNode->appendText
-            ("This file is generated from SIAM\n" .
-             'for Torrus tree ' . $tree . ' on ' . scalar(localtime(time())));
-        $root->appendChild( $creatorNode );
-    }
-
-    my $globalParams = {
-        'output-bundle'  => $bundles_path . '/siam-' . $tree . '.xml',
-        'data-dir'       => $rrd_path,
-        'SIAM::managed'   => 'yes',
-    };
-
-    foreach my $p (keys %{$Torrus::SIAM::ddx_defaults})
-    {
-        $globalParams->{$p} = $Torrus::SIAM::ddx_defaults->{$p};
-    }
-    
-    createParamsDom( $globalParams, $doc, $root );
-
-    
-    foreach my $device (sort {$a->attr('siam.device.name') cmp
-                                  $b->attr('siam.device.name')}
-                        @{$bundles{$tree}})
-    {
-        my $name = $device->attr('siam.device.name');
-        
-        my $params = {
-            'output-file' => $nodes_path . '/' . $name . '.xml',
-            'system-id' => $name,
-        };
-
-        $params->{'SIAM::device-inventory-id'} =
-            $device->attr('siam.device.inventory_id');
-        
-        my $host = $device->attr('snmp.host');
-        if( not defined($host) )
+        foreach my $service ( @{$services} )
         {
-            $host = $name;
-        }
+            next unless $service->is_complete();
 
-        $params->{'snmp-host'} = $host;
-
-        foreach my $p ('version', 'community', 'timeout', 'retries')
-        {
-            my $v = $device->attr('snmp.' . $p);
-            if( defined($v) )
+            my $svc_server = $service->attr('torrus.server');
+            if( not defined($svc_server) )
             {
-                $params->{'snmp-' . $p} = $v;
+                Error('Attribute "torrus.server" is undefined for the ' .
+                      'traffic aggregate SIAM::Service ' . $service->id);
+                $success = 0;
+                next;
+            }
+
+            next unless $svc_server eq $server;
+
+            my $aggr_id = $service->id();
+            
+            $aggr_name{$aggr_id} =
+                $service->attr($Torrus::SIAM::aggr_subtree_name_attr);
+            if( not defined($aggr_name{$aggr_id}) )
+            {
+                Error('Cannot determine the subtree path for aggregate ' .
+                      'SIAM::Service ' . $service->id);
+                $success = 0;
+                next;
+            }
+
+            $aggr_nodeid{$aggr_id} =
+                $service->attr('torrus.aggregate.nodeid');
+
+            my $units = $service->get_service_units();
+            foreach my $unit (@{$units})
+            {
+                next unless $unit->is_complete();
+                
+                my $device_id = $unit->attr('siam.svcunit.device_id');
+                my $tree = $tree_for_deviceid{$device_id};
+
+                if( not defined($tree) )
+                {
+                    Error('SIAM::Device "' . $device_id .
+                          '" does not define "torrus.tree" attribute. ' .
+                          'It will not be a part of ' . $aggr_id .
+                          ' aggregate');
+                    $success = 0;
+                    next;
+                }
+
+                # Make sure that the aggregate is built from elements
+                # of the same tree
+                if( not defined($aggr_tree{$aggr_id}) )
+                {
+                    $aggr_tree{$aggr_id} = $tree;
+                }
+                elsif( $aggr_tree{$aggr_id} ne $tree )
+                {
+                    Error('Aggregate ' . $aggr_id . ' is defined for ' .
+                          'devices from different trees: ' . $tree .
+                          ', ' . $aggr_tree{$aggr_id});
+                    $success = 0;
+                    next;
+                }
+
+                my $unit_type = $unit->attr('siam.svcunit.type');
+                if( not defined($aggr_unit_type{$aggr_id}) )
+                {
+                    $aggr_unit_type{$aggr_id} = $unit_type;
+                }
+                elsif( $aggr_unit_type{$aggr_id} ne $unit_type )
+                {
+                    Error('Aggregate ' . $aggr_id . ' is defined for ' .
+                          'service units of different types: ' . $unit_type .
+                          ', ' . $aggr_unit_type{$aggr_id});
+                    $success = 0;
+                    next;            
+                }
+
+                my $nodeid = $unit->attr('torrus.port.nodeid');
+                if( not defined($nodeid) )
+                {
+                    Error('SIAM::ServiceUnit, id="' . $unit->id .
+                          '" does not define torrus.port.nodeid');
+                    $success = 0;
+                    next;
+                }
+
+                $aggr_elements{$tree}{$aggr_id}{$nodeid} = 1;
+                
+                my $descr =
+                    $service->attr($Torrus::SIAM::aggr_descr_attr);
+                if( defined($descr) )
+                {
+                    $aggr_description{$aggr_id} = $descr;
+                }
+
+                $unit_name{$nodeid} = $unit->attr('siam.svcunit.name');
+            }
+        }
+    }
+
+    if( not $success )
+    {
+        Error('Skipping generation of aggregate XML ' .
+              'because of previous errors');
+        $siam->disconnect();
+        exit(1);
+    }
+    
+    foreach my $tree ( @tree_names )
+    {
+        my $outfile = $aggr_path . '/siam-aggr-' . $tree . '.xml';
+        Verbose('Preparing to write ' . $outfile);
+
+        # we write the XML in any case, even if it's empty
+        my $cb = new Torrus::ConfigBuilder;
+        $cb->addCreatorInfo( "This file was generated by:\n" . $0 . "\n");
+
+        my $aggregates = $aggr_elements{$tree};
+        if( defined($aggregates) )
+        {
+            # Build the subtree containing all our aggregates
+            my $path = $Torrus::SIAM::aggr_tree_location;
+            
+            # Chop the first and last slashes
+            $path =~ s/^\///;
+            $path =~ s/\/$//;
+    
+            # generate subtree path XML
+            my $aggrTopNode = undef;
+            foreach my $subtreeName ( split( '/', $path ) )
+            {
+                $aggrTopNode = $cb->addSubtree( $aggrTopNode, $subtreeName );
+            }
+
+            $cb->addParams($aggrTopNode, {
+                'has-overview-shortcuts' => 'yes',
+                'overview-shortcuts' => 'traffic',
+                'overview-subleave-name-traffic' => 'InOut_bps',
+                'overview-shortcut-text-traffic' => 'All traffic',
+                'overview-shortcut-title-traffic' =>
+                    'Traffic for all aggregates',
+                    'overview-page-title-traffic' =>
+                    'Aggregate Input/Output Graphs',
+            });
+
+            foreach my $aggr_id (sort keys %{$aggregates})
+            {
+                my $unit_type = $aggr_unit_type{$aggr_id};
+                if( $unit_type eq 'IFMIB.Port' )
+                {
+                    # remove all invalid characters
+                    my $name_translated = $aggr_name{$aggr_id};
+                    $name_translated =~ s/\W/_/go;
+    
+                    Debug('Building aggregate: ' . $path . '/' .
+                          $name_translated);
+
+                    my $aggrParam = {
+                        'node-display-name' => $aggr_name{$aggr_id},
+                        'nodeid' => $aggr_nodeid{$aggr_id},
+                    };
+                    
+                    if( defined($aggr_description{$aggr_id}) )
+                    {
+                        $aggrParam->{'comment'} = 
+                            $aggr_description{$aggr_id};
+                    }
+
+                    # build the legend from aggregate members
+                    {
+                        my $legend = '';
+                        foreach my $port_nodeid
+                            ( sort keys %{$aggr_elements{$tree}{$aggr_id}} )
+                        {
+                            my $name = $unit_name{$port_nodeid};
+                            $name =~ s/:/{COLON}/og;
+                            $name =~ s/;/{SEMICOL}/og;
+                            $name =~ s/%/{PERCENT}/og;
+                            
+                            $legend .= 'member: ' . $name . ';';
+                        }
+                        $aggrParam->{'legend'} = $legend;
+                    }
+
+                    my $aggrSubtreeNode = $cb->addSubtree
+                        ( $aggrTopNode, $name_translated, $aggrParam );
+                            
+                    my %rpnexpr;
+                    
+                    # Add the Bytes_In and Bytes_Out leaves. They are needed
+                    # for the monitor mostly.
+                    
+                    foreach my $dir ('In', 'Out')
+                    {
+                        my $dirsmall = lc($dir);
+                        
+                        my $rpn = '';
+                        foreach my $port_nodeid
+                            ( sort keys %{$aggr_elements{$tree}{$aggr_id}} )
+                        {
+                            my $nodeid =
+                                $port_nodeid . '//' . $dirsmall . 'bytes';
+
+                            # if value is unknown, it is treated as zero
+                            my $memRef =
+                                '{[[' . $nodeid . ']]}';
+                            
+                            if( $rpn eq '' )
+                            {
+                                $rpn = $memRef;
+                            }
+                            else
+                            {
+                                $rpn .= ',' . $memRef . ',ADDNAN';
+                            }
+                        }
+            
+                        my $param = {
+                            'comment' => $dir . 'put bytes',
+                            'graph-legend' => $dir . 'put bytes',
+                            'vertical-label' => 'Bps',
+                            'ds-type' => 'rrd-file',
+                            'leaf-type' => 'rrd-cdef',
+                            'rpn-expr' => $rpn,
+                            'graph-lower-limit' => 0,
+                        };
+
+                        if( defined($aggr_nodeid{$aggr_id}) )
+                        {
+                            $param->{'nodeid'} =
+                                $aggr_nodeid{$aggr_id} . '//' .
+                                $dirsmall . 'bytes';
+                        }
+                        
+                        $cb->addLeaf( $aggrSubtreeNode,
+                                      'Bytes_' . $dir, $param );
+
+                        # store the RPN for the multigraph
+                        $rpnexpr{$dir} = $rpn;
+                    }
+
+                    # Add the InOut_bps multigraph
+                    {
+                        my $param = {
+                            'comment' => 'In/Out bits per second graphs',
+                            'vertical-label' => 'bps',
+                            'graph-lower-limit' => 0,
+                            'ds-type' => 'rrd-multigraph',
+                            'ds-names' => 'in,out',
+                        };
+
+                        if( defined($aggr_nodeid{$aggr_id}) )
+                        {
+                            $param->{'nodeid'} =
+                                $aggr_nodeid{$aggr_id} . '//inoutbit';
+                        }
+                        
+                        foreach my $dir ('In', 'Out')
+                        {
+                            my $ds = lc($dir);
+                            $param->{'ds-expr-' . $ds} =
+                                $rpnexpr{$dir} . ',8,*';
+                            $param->{'graph-legend-' . $ds} =
+                                'Bits per second ' . $ds;
+                            $param->{'line-style-' . $ds} = '##Bps' . $dir;
+                            $param->{'line-color-' . $ds} = '##Bps' . $dir;
+                            $param->{'maxline-style-' . $ds} =
+                                '##Bps' . $dir . 'Max';
+                            $param->{'maxline-color-' . $ds} = 
+                                '##Bps' . $dir . 'Max';
+                        }
+
+                        $param->{'line-order-in'} = 1;
+                        $param->{'line-order-out'} = 2;
+                        
+                        $cb->addLeaf( $aggrSubtreeNode, 'InOut_bps', $param );
+                    }
+
+                }
+                else
+                {
+                    Error('Service unit type ' . $unit_type .
+                          ' is not supported for aggregates');
+                    $success = 0;
+                }
             }
         }
 
-        my $subtree = $device->attr('torrus.subtree-path');
-        if( defined($subtree) )
+        if( $cb->toFile( $outfile ) )
         {
-            $params->{'host-subtree'} = $subtree;
+            Info('Wrote ' . $outfile);
         }
-        
-        my $hostNode = $doc->createElement('host');
-        $root->appendChild( $hostNode );
-        
-        createParamsDom( $params, $doc, $hostNode );            
-    }
+        else
+        {
+            Error('Cannot write aggregates to ' . $outfile . ': ' . $!);
+            $success = 0;
+        }
 
-    my $ok = $doc->toFile( $outfile, 2 );
-    if( $ok )
-    {
-        Info("Wrote $outfile");
-    }
-    else
-    {
-        Error("Cannot write $outfile: $!");
-        $success = 0;
-    }
+    }    
 }
 
-exit($success ? 0:1);    
+$siam->disconnect();
+
+exit($success ? 0:1);
 
 
 
@@ -236,7 +573,7 @@ sub createParamsDom
     my $params = shift;
     my $doc = shift;
     my $parentNode = shift;
-    
+
     foreach my $param ( sort keys %{$params} )
     {
         my $paramNode = $doc->createElement('param');
@@ -244,9 +581,12 @@ sub createParamsDom
         $paramNode->setAttribute( 'value', $params->{$param} );
         $parentNode->appendChild( $paramNode );
     }
+    
+    return;
 }
 
-    
+
+
 # Local Variables:
 # mode: perl
 # indent-tabs-mode: nil

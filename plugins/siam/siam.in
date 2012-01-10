@@ -499,6 +499,7 @@ Verbose('Connected to SIAM');
                         $rpnexpr{$dir} = $rpn;
                     }
 
+                    
                     # Add the InOut_bps multigraph
                     {
                         my $param = {
@@ -536,6 +537,65 @@ Verbose('Connected to SIAM');
                         $cb->addLeaf( $aggrSubtreeNode, 'InOut_bps', $param );
                     }
 
+
+                    # Add the Rainbow_In and Rainbow_Out leaves.
+                    foreach my $dir ('In', 'Out')
+                    {
+                        my $dirsmall = lc($dir);
+                        
+                        my $param = {
+                            'comment' => 'Per-port traffic summary graphs',
+                            'vertical-label' => 'bps',
+                            'graph-lower-limit' => 0,
+                            'ds-type' => 'rrd-multigraph',
+                        };
+
+                        if( defined($aggr_nodeid{$aggr_id}) )
+                        {
+                            $param->{'nodeid'} =
+                                $aggr_nodeid{$aggr_id} . '//' .
+                                $dirsmall . 'rainbow' ;
+                        }
+
+                        my $ds_num = 1;
+                        
+                        foreach my $port_nodeid
+                            ( sort keys %{$aggr_elements{$tree}{$aggr_id}} )
+                        {
+                            my $nodeid =
+                                $port_nodeid . '//' . $dirsmall . 'bytes';
+
+                            my $memRef =
+                                '{[[' . $nodeid . ']]}';
+
+                            my $ds = sprintf('ds%.2d', $ds_num);
+
+                            if( $ds_num == 1 )
+                            {
+                                $param->{'ds-names'} = $ds;
+                            }
+                            else
+                            {
+                                $param->{'ds-names'} .= ',' . $ds;
+                                $param->{'line-stack-' . $ds} = 'yes';
+                            }
+
+                            # Undefined values treated as zero
+                            $param->{'ds-expr-' . $ds} =
+                                '0,' . $memRef . ',ADDNAN,8,*';
+                            $param->{'graph-legend-' . $ds} =
+                                $unit_name{$port_nodeid};
+                            $param->{'line-style-' . $ds} = 'AREA';
+                            $param->{'line-color-' . $ds} =
+                                sprintf('##clr%d', $ds_num);
+                            $param->{'line-order-' . $ds} = $ds_num;
+                            
+                            $ds_num++;
+                        }
+                        
+                        $cb->addLeaf( $aggrSubtreeNode,
+                                      'Rainbow_' . $dir, $param );
+                    }
                 }
                 else
                 {

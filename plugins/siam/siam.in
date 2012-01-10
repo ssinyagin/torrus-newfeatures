@@ -582,7 +582,7 @@ Verbose('Connected to SIAM');
 
                             # Undefined values treated as zero
                             $param->{'ds-expr-' . $ds} =
-                                '0,' . $memRef . ',ADDNAN,8,*';
+                                $memRef . ',8,*';
                             $param->{'graph-legend-' . $ds} =
                                 $unit_name{$port_nodeid};
                             $param->{'line-style-' . $ds} = 'AREA';

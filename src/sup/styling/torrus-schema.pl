@@ -118,16 +118,24 @@
      'nine'     => {'color'   => '##darkmagenta'},
      'ten'      => {'color'   => '##orangered'},
 
-     'clr1'     => {'color'   => '##one'},
-     'clr2'     => {'color'   => '##two'},
-     'clr3'     => {'color'   => '##three'},
-     'clr4'     => {'color'   => '##four'},
-     'clr5'     => {'color'   => '##five'},
-     'clr6'     => {'color'   => '##six'},
-     'clr7'     => {'color'   => '##seven'},
-     'clr8'     => {'color'   => '##eight'},
-     'clr9'     => {'color'   => '##nine'},
-     'clr10'    => {'color'   => '##ten'},
+     # Numbered palette to make dynamically assembled stacked charts
+     # dark28 and accent8 color schemes, from
+     # http://bloodgate.com/perl/graph/manual/att_colors.html
+     'clr1'     => {'color'   => '#1b9e77'},
+     'clr2'     => {'color'   => '#d95f02'},
+     'clr3'     => {'color'   => '#7570b3'},
+     'clr4'     => {'color'   => '#e7298a'},
+     'clr5'     => {'color'   => '#66a61e'},
+     'clr6'     => {'color'   => '#e6ab02'},
+     'clr7'     => {'color'   => '#a6761d'},
+     'clr8'     => {'color'   => '#666666'},
+     'clr9'     => {'color'   => '#7fc97f'},
+     'clr10'    => {'color'   => '#beaed4'},
+     'clr11'    => {'color'   => '#fdc086'},
+     'clr12'    => {'color'   => '#ffd92f'},
+     'clr13'    => {'color'   => '#386cb0'},
+     'clr14'    => {'color'   => '#f0027f'},
+     'clr15'    => {'color'   => '#bf5b17'},
      
      # definitions for combinatorial graphing
 

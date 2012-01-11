@@ -392,16 +392,36 @@ Verbose('Connected to SIAM');
                 $aggrTopNode = $cb->addSubtree( $aggrTopNode, $subtreeName );
             }
 
-            $cb->addParams($aggrTopNode, {
+            my $topParam = {
                 'has-overview-shortcuts' => 'yes',
-                'overview-shortcuts' => 'traffic',
-                'overview-subleave-name-traffic' => 'InOut_bps',
-                'overview-shortcut-text-traffic' => 'All traffic',
-                'overview-shortcut-title-traffic' =>
-                    'Traffic for all aggregates',
-                    'overview-page-title-traffic' =>
-                    'Aggregate Input/Output Graphs',
-            });
+                'overview-shortcuts' => 'traffic,inrainbow,outrainbow',
+            };
+
+            $topParam->{'overview-subleave-name-traffic'} = 'InOut_bps';
+            $topParam->{'overview-shortcut-text-traffic'} = 'All traffic';
+            $topParam->{'overview-shortcut-title-traffic'} = 
+                'Traffic for all aggregates';
+            $topParam->{'overview-page-title-traffic'} =
+                'Aggregate Input/Output Graphs';
+
+            foreach my $dir ('In', 'Out')
+            {
+                my $el = lc($dir) . 'rainbow';
+                
+                $topParam->{'overview-subleave-name-' . $el} =
+                    'Rainbow_' . $dir;
+
+                $topParam->{'overview-shortcut-text-' . $el} =
+                    'All ' . lc($dir) . 'put';
+                
+                $topParam->{'overview-shortcut-title-' . $el} = 
+                    $dir . 'put traffic for all aggregates';
+                
+                $topParam->{'overview-page-title-' . $el} =
+                    'Aggregate ' . $dir . 'put Graphs';
+            }
+            
+            $cb->addParams($aggrTopNode, $topParam);
 
             foreach my $aggr_id (sort keys %{$aggregates})
             {
@@ -478,6 +498,7 @@ Verbose('Connected to SIAM');
                         my $param = {
                             'comment' => $dir . 'put bytes',
                             'graph-legend' => $dir . 'put bytes',
+                            'graph-title' => $aggr_name{$aggr_id},
                             'vertical-label' => 'Bps',
                             'ds-type' => 'rrd-file',
                             'leaf-type' => 'rrd-cdef',
@@ -504,6 +525,7 @@ Verbose('Connected to SIAM');
                     {
                         my $param = {
                             'comment' => 'In/Out bits per second graphs',
+                            'graph-title' => $aggr_name{$aggr_id},
                             'vertical-label' => 'bps',
                             'graph-lower-limit' => 0,
                             'ds-type' => 'rrd-multigraph',
@@ -544,8 +566,9 @@ Verbose('Connected to SIAM');
                         my $dirsmall = lc($dir);
                         
                         my $param = {
-                            'comment' => 'Per-port traffic summary graphs',
-                            'vertical-label' => 'bps',
+                            'comment' => 'Per-port ' . $dir . 'put summary',
+                            'graph-title' => $aggr_name{$aggr_id},
+                            'vertical-label' => $dir . 'put bps',
                             'graph-lower-limit' => 0,
                             'ds-type' => 'rrd-multigraph',
                         };

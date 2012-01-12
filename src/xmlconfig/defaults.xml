@@ -74,6 +74,7 @@
   <prop param="rrd-create-max"        prop="expand" value="1"/>
   <prop param="rrd-create-min"        prop="expand" value="1"/>
   <prop param="rrd-ds"                prop="expand" value="1"/>
+  <prop param="system-id"             prop="expand" value="1"/>
   <prop param="transform-value"       prop="expand" value="1"/>
   <prop param="upper-limit"           prop="expand" value="1"/>
 
@@ -81,7 +82,6 @@
   <prop param="comment"               prop="search" value="1"/>
   <prop param="legend"                prop="search" value="1"/>
 
-  
 </param-properties>
 
 <datasources>

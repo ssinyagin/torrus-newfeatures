@@ -24,6 +24,7 @@ use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
 use Date::Format;
+use Data::Dumper;
 use Torrus::Log;
 
 require '@notify_siteconfig_pl@';
@@ -38,6 +39,12 @@ if( not $ENV{'TORRUS_TREE'} )
 our $now = time();
 our $nowHour = time2str('%H', $now);
 our $nowWeekday = time2str('%w', $now);
+
+if( isDebug() )
+{
+    Debug("action_notify launched with the following environment: " .
+          Dumper(\%ENV));
+}
 
 my $severity = $ENV{'TORRUS_SEVERITY'};
 $severity = 0 unless defined($severity);
@@ -72,12 +79,14 @@ foreach my $policy ( keys %Torrus::Notify::policies )
             if( defined( $Torrus::Notify::programs{$protocol} ) )
             {
                 local $ENV{'ARG1'} = $arg;
-                my $status = system( $Torrus::Notify::programs{$protocol} );
+                my $prog = $Torrus::Notify::programs{$protocol};
+
+                Debug("Executing command: " . $prog);
+                my $status = system( $prog );
 
                 if( $status != 0 )
                 {
-                    Error('The command "' .
-                          $Torrus::Notify::programs{$protocol} .
+                    Error('The command "' . $prog .
                           '" returned error code ' . $status);
                     $ok = 0;
                 }

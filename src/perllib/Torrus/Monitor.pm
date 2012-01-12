@@ -45,7 +45,6 @@ sub new
 
     $self->{'tree_name'} = $options{'-TreeName'};
     $self->{'sched_data'} = $options{'-SchedData'};
-    $self->{'delay'} = $options{'-Delay'} * 60;
     
     return $self;
 }
@@ -252,6 +251,7 @@ sub setAlarm
     
     my $prev_values = $self->{'db_alarms'}->get( $key );
     my ($t_set, $t_expires, $prev_status, $t_last_change);
+    $t_expires = 0;    
     if( defined($prev_values) )
     {
         Debug("Previous state found, Alarm: $alarm, ".

@@ -103,7 +103,7 @@ function graphControls(index, object) {
 
     // Initialize controls box.
     // We place the controls box on the right side of every graph.
-    // controls.hide();
+    controls.hide();
     var width = graph.width();
     var height = graph.height();
     div.css("height", height + "px");

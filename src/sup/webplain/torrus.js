@@ -2,15 +2,25 @@
  * Parameter definitions - list of parameters the server supports.
  */
 var torrusParams = [
-    { name:     "Gstart",
-      type:     "number",
-      desc:     "Starting hour",
-      args:     [ ["min", 0], ["max", 22] ],
+    // { name:     "Gstart",
+    //   type:     "number",
+    //   desc:     "Starting hour",
+    //   args:     [ ["min", 0], ["max", 22] ],
+    // },
+    // { name:     "Gend",
+    //   type:     "number",
+    //   desc:     "Ending hour",
+    //   args:     [ ["min", 1], ["max", 23] ],
+    // },
+    { name:     "Gmaxline",
+      type:     "checkbox",
+      desc:     "Draw maximum value",
+      args:     [ ],
     },
-    { name:     "Gend",
+    { name:     "Gmaxlinestep",
       type:     "number",
-      desc:     "Ending hour",
-      args:     [ ["min", 1], ["max", 23] ],
+      desc:     "Aggregation period (secs)",
+      args:     [ ["min", 1] ],
     },
 ];
 
@@ -58,12 +68,18 @@ function graphControls(index, object) {
 
         // Set callback for updating image 
         input.change(function() {
-            var field = $(this);
-            var param = field.attr("name");
-            var value = field.val();
-            var old_url = graph.attr("src");
-            var new_url = $.param.querystring(old_url, param + '=' + value); 
-            graph.attr("src", new_url);
+            var value, field = $(this);
+
+            if(field.attr("type") == "checkbox") {
+                value = field.filter(":checked").length;
+            } else {
+                value = field.val();
+            }
+            
+            graph.attr("src", 
+                $.param.querystring(
+                    graph.attr("src"),
+                    field.attr("name") + '=' + value)); 
         });
 
         controls.append("<br/><br/>");

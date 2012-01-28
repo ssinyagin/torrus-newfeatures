@@ -300,13 +300,17 @@ DIV.Graph, DIV.ShortGraph  {
   width : 100%;
 }
 
+DIV.GraphImage {
+    width: 100%;
+}
+
 DIV.GraphImage IMG {
   display: block;
 }
 
 DIV.GraphControls {
   width: 20em;
-  position: absolute;
+  position: relative;
   padding-left: 1em;
   padding-right: 1em;
   border: dashed 1px #999;

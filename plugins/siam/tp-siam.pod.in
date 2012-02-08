@@ -19,7 +19,7 @@ unpacked plugin directory:
   torrus install_plugin tp-siam-1.X
 
 
-=head2 Usage
+=head2 Overview
 
 Service Inventory Abstraction Model (SIAM) is a Perl library
 available at CPAN. It is designed to be an abstraction interface between
@@ -27,42 +27,31 @@ enterprise-specific inventory database and various programs, such as
 Torrus. SIAM is supposed to be used with an enterprise-specific driver
 which maps the inventory data into SIAM objects and attributes.
 
-The C<tp-siam> plugin consists of a command-line utility and a
+The C<tp-siam> plugin consists of command-line utilities and a
 DevDiscover module.
 
-The C<siam> command-line utility performs the following steps:
+
+=head2 siam_genddx utility
+
+The C<siam_genddx> command-line utility performs the following steps:
 
 =over 4
 
 =item * Retrieve the SNMP devices matching the C<torrus.server> attribute;
 
 =item * Create discovery instruction (DDX) files for each Torrus tree
-as found in SIAM data;
-
-=item * Get all SIAM::Service objects having the C<siam.svc.type>
-attribute set to C<TrafficAggregate>. For those services matching the
-C<torrus.server> attribute, create Torrus configuration XML files that
-present total aggregate traffic from several IF-MIB interfaces.
+as found in SIAM data.
 
 =back
 
-
-The discovery module C<Torrus::DevDiscover::SIAMDD> tries to match the
-IF-MIB interface names in SIAM against those on the network devices. The
-resulting configuration contains I<nodeid> values imported from SIAM and
-assigned to corresponding device interfaces. As a result, external
-programs can fetch Torrus data by using the enterprise-specific service
-identifiers.
-
 Command-line arguments:
 
-  torrus siam [options...]
+  torrus siam_genddx [options...]
 
     Options:
      --server=HOSTNAME       Torrus server to match in SIAM
      --pddx=PATH             Path to store DDX files
      --pbundles=PATH         Path to store bundles XML
-     --paggr=PATH            Path to store aggregates XML
      --pnodes=PATH           Path to store per-node XML
      --prrd=PATH             RRD data storage path
      --verbose               print extra information
@@ -75,13 +64,41 @@ default I<discovery> directory. The DDX files are named as
 parameters. The DDX files would store the generated bundle files in
 I<xmlconfig/bundles/>, and device-specific XML files in
 I<xmlconfig/nodes/> subdirectories of the standard XML configuration
-location. The traffic aggregate XML files are stored by default in
-I<xmlconfig/bundles/>.
+location. 
 
 
 The file C<siam-config.pl> defines all default values and DDX
 parameters. These values can be modified in your site-specific
 F<siam-siteconfig.pl>.
+
+
+
+=head2 siam_genxml utility
+
+The C<siam_genxml> reads the SIAM data, and takes all SIAM::Service
+objects having the C<siam.svc.type> attribute set to
+C<TrafficAggregate>. For those services matching the C<torrus.server>
+attribute, it creates Torrus configuration XML files that present total
+aggregate traffic from several IF-MIB interfaces.
+
+
+The traffic aggregate XML files are stored by default in
+I<xmlconfig/bundles/>.
+
+
+
+
+=head2 Torrus::DevDiscover::SIAMDD module
+
+The discovery module C<Torrus::DevDiscover::SIAMDD> tries to match the
+IF-MIB interface names in SIAM against those on the network devices. The
+resulting configuration contains I<nodeid> values imported from SIAM and
+assigned to corresponding device interfaces. As a result, external
+programs can fetch Torrus data by using the enterprise-specific service
+identifiers.
+
+
+
 
 
 =head2 SIAM Attributes

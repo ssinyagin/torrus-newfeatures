@@ -1,0 +1,181 @@
+#!@PERL@
+#  Copyright (C) 2012  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+use strict;
+use warnings;
+
+BEGIN { require '@siam_config_pl@'; }
+
+
+use Getopt::Long;
+use Sys::Hostname;
+
+use Torrus::SIAM;
+use Torrus::ConfigTree;
+use Torrus::SiteConfig;
+use Torrus::Log;
+
+my $server = hostname();
+
+my $debug = 0;
+my $verbose = 0;
+
+
+my $ok = GetOptions( 'server=s'    => \$server,
+                     'verbose'     => \$verbose,
+                     'debug'       => \$debug );
+
+if( not $ok or scalar( @ARGV ) > 0 )
+{
+    print STDERR
+        ("Usage: $0 [options...]\n",
+         "Options:\n",
+         " --server=HOSTNAME       Torrus server to match in SIAM [" .
+         $server . "]\n",
+         " --verbose               print extra information\n",
+         " --debug                 print debugging information\n",
+         "\n");
+    exit 1;
+}
+
+if( $debug )
+{
+    Torrus::Log::setLevel('debug');
+}
+elsif( $verbose )
+{
+    Torrus::Log::setLevel('verbose');
+}
+
+
+my $siam = Torrus::SIAM->open();
+exit(1) unless defined($siam);
+
+Verbose('Connected to SIAM');
+
+
+my $devices = $siam->get_contained_objects
+    ('SIAM::Device', {'match_attribute' => ['torrus.server', [$server]]});
+
+Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
+
+
+# Group devices by torrus.tree attribute
+my %tree_devices;
+foreach my $device (@{$devices})
+{
+    next unless $device->is_complete();
+    next unless $device->attr('snmp.managed');
+
+    my $tree = $device->attr('torrus.tree');
+    if( not defined($tree) )
+    {
+        Error('FATAL: SIAM::Device "' . $device->id .
+              '" does not define "torrus.tree" attribute');
+        exit(1);
+    }
+
+    if( not Torrus::SiteConfig::treeExists( $tree ) )
+    {
+        Error('FATAL: Non-existing tree ' . $tree . ' is referred to ' .
+              'in "torrus.tree" attribute for device ' . $device->id);
+        exit 1;
+    }
+    
+    if( not defined($tree_devices{$tree}) )
+    {
+        $tree_devices{$tree} = [];
+    }
+
+    push(@{$tree_devices{$tree}}, $device);
+}
+
+
+&Torrus::DB::setSafeSignalHandlers();
+
+
+foreach my $tree ( sort keys %tree_devices )
+{
+    my $devices = $tree_devices{$tree};
+    Verbose('Tree ' . $tree . ': ' . scalar(@{$devices}) . ' devices');
+    
+    &Torrus::DB::checkInterrupted();
+    my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
+    if( not defined($config_tree) )
+    {
+        Error("Configuration is not ready");
+        exit 1;
+    }
+
+    foreach my $devobj (@{$devices})
+    {
+        &Torrus::DB::checkInterrupted();
+
+        my $svcunits = $devobj->get_all_service_units();
+        foreach my $unit ( @{$svcunits} )
+        {
+            next unless $unit->is_complete();
+            
+            my $dataelements = $unit->get_data_elements();
+            foreach my $el (@{$dataelements})
+            {
+                if( $el->attr('siam.svcdata.driver') eq 'Torrus.TimeSeries')
+                {
+                    &Torrus::DB::checkInterrupted();
+                    fetch_data($config_tree, $el);
+                }
+            }
+        }
+    }
+}
+
+
+$siam->disconnect();
+
+exit(0);
+
+
+sub fetch_data
+{
+    my $config_tree = shift;
+    my $el = shift;
+
+    my $nodeid = $el->attr('torrus.nodeid');
+    if( not defined($nodeid) )
+    {
+        Error('SIAM::ServiceDataElement ' . $el->id . ' does not have ' .
+              '"torrus.nodeid" attribute');
+        return;
+    }
+
+    Debug('Fetching data for ' . $nodeid);
+}
+
+
+
+
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:
+
+

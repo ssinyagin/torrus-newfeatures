@@ -151,6 +151,7 @@
 /plugins/siam/configure
 /plugins/siam/configure.lineno
 /plugins/siam/config.status.lineno
+/plugins/siam/siam_rrdfetch
 /plugins/siam/siam_genddx
 /plugins/siam/siam_genxml
 /plugins/siam/substvars.sh

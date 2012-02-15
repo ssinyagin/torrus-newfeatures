@@ -275,7 +275,7 @@ sub discover
                         }
                     }
 
-                    if( $bw > 0 )
+                    if( defined($bw) and $bw > 0 )
                     {
                         $interface->{'param'}{'bandwidth-limit-in'} =
                             $bw / 1e6;

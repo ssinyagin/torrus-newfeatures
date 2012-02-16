@@ -1,3 +1,8 @@
+2012-02-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover.pm: rrd-create-rra is added to the
+	list of copied parameters.
+
 2011-12-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/ConfigTree.pm (getRelative): now leaves can be

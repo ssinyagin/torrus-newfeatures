@@ -85,6 +85,7 @@ our @copyParams =
       'monitor-period',
       'monitor-timeoffset',
       'nodeid-device',
+      'rrd-create-rra',
       'show-recursive',
       'snmp-host',
       'snmp-port',

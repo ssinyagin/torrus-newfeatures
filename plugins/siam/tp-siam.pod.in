@@ -75,12 +75,20 @@ F<siam-siteconfig.pl>.
 
 =head2 siam_genxml utility
 
-The C<siam_genxml> reads the SIAM data, and takes all SIAM::Service
+C<siam_genxml> reads the SIAM data, and takes all SIAM::Service
 objects having the C<siam.svc.type> attribute set to
 C<TrafficAggregate>. For those services matching the C<torrus.server>
 attribute, it creates Torrus configuration XML files that present total
 aggregate traffic from several IF-MIB interfaces.
 
+Command-line arguments:
+
+  torrus siam_genxml [options...]
+  Options:
+    --server=HOSTNAME       Torrus server to match in SIAM
+    --paggr=PATH            Path to store aggregates XML
+    --verbose               print extra information
+    --debug                 print debugging information
 
 The traffic aggregate XML files are stored by default in
 I<xmlconfig/bundles/>.
@@ -97,6 +105,23 @@ assigned to corresponding device interfaces. As a result, external
 programs can fetch Torrus data by using the enterprise-specific service
 identifiers.
 
+
+
+=head2 siam_rrd_fetch utility
+
+C<siam_rrd_fetch> retrieves a list of devices and their corresponding
+service data elements, and then retrieves the aggregated data from RRD
+files. The aggregated data is returned to SIAM via a condition
+"torrus.fetch.data" on the SIAM::ServiceDataElement objects.
+
+Usage:
+  
+  torrus siam_rrdfetch [options...]
+
+  Options:
+    --server=HOSTNAME       Torrus server to match in SIAM
+    --verbose               print extra information
+    --debug                 print debugging information
 
 
 
@@ -213,7 +238,7 @@ aggregate leafs.
 
 
 
-Siam::ServiceUnit attributes used in traffic aggregates:
+SIAM::ServiceUnit attributes used in traffic aggregates:
 
 =over 4
 
@@ -230,6 +255,36 @@ Port NodeID values are used to compose the aggregate graphs.
 The value is used to build the legend text for the aggregate.
 
 =back
+
+
+
+SIAM::ServiceDataElement attributes used by siam_rrdfetch:
+
+=over 4
+
+=item * siam.svcdata.driver
+
+Only data elements with the driver set to 'Torrus.TimeSeries' are processed.
+
+=item * torrus.nodeid
+
+NodeID prefix -- all leaf nodes which match this prefix are collected
+for this data element object.
+
+=item * torrus.fetch.max_intervals
+
+(Optional) maximum number of aggregation intervals to retrieve. Default: 14.
+
+=item * torrus.fetch.aggr_interval
+
+(Optional) aggregation interval. Default: 86400 (24 hours).
+
+=back
+
+
+SIAM::ServiceDataElement computable 'torrus.fetch.latest_available' is
+used to determine the UNIX timestamp of the latest data already fetched
+in a previous run.
 
 
 
@@ -255,6 +310,11 @@ The condition is applied to SIAM::ServiceUnit in case of non-critical
 problems. The supplied value is a message string with the warning
 message.
 
+=item torrus.fetch.data
+
+This condition is set by siam_rrdfetch on SIAM::ServiceDataElement objects.
+It contains a JSON object with the retrieved data:
+timestamp->counter->CF->value
 
 =back
 

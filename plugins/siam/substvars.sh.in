@@ -33,6 +33,7 @@ styldir=@supdir@/styling
 
 siam_config_pl=@cfgdefdir@/siam-config.pl
 siam_siteconfig_pl=@siteconfdir@/siam-siteconfig.pl
+torrus_config_pl=@cfgdefdir@/torrus-config.pl
 
 @SED@ \
     -e "s,\@FIND\@,@FIND@,g" \
@@ -77,6 +78,7 @@ siam_siteconfig_pl=@siteconfdir@/siam-siteconfig.pl
     -e "s,\@webplaindir\@,@webplaindir@,g" \
     -e "s,\@siam_config_pl\@,$siam_config_pl,g" \
     -e "s,\@siam_siteconfig_pl\@,$siam_siteconfig_pl,g" \
+    -e "s,\@torrus_config_pl\@,$torrus_config_pl,g" \
     $1
 
 # Local Variables:

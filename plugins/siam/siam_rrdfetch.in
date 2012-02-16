@@ -20,16 +20,21 @@
 use strict;
 use warnings;
 
-BEGIN { require '@siam_config_pl@'; }
+BEGIN { require '@torrus_config_pl@'; require '@siam_config_pl@'; }
 
 
 use Getopt::Long;
 use Sys::Hostname;
+use JSON;
+use Date::Format;
+use Date::Parse;
 
+use Torrus::Log;
 use Torrus::SIAM;
 use Torrus::ConfigTree;
 use Torrus::SiteConfig;
-use Torrus::Log;
+use Torrus::DataAccess;
+     
 
 my $server = hostname();
 
@@ -64,6 +69,9 @@ elsif( $verbose )
 }
 
 
+# Calculate the start of today in local timezone
+my $today = str2time(time2str('%Y-%m-%d 00:00', time()));
+
 my $siam = Torrus::SIAM->open();
 exit(1) unless defined($siam);
 
@@ -75,9 +83,12 @@ my $devices = $siam->get_contained_objects
 
 Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
 
+my $c_devices;
+my $c_ports;
 
 # Group devices by torrus.tree attribute
 my %tree_devices;
+my %error_tree_reported;
 foreach my $device (@{$devices})
 {
     next unless $device->is_complete();
@@ -91,24 +102,28 @@ foreach my $device (@{$devices})
         exit(1);
     }
 
-    if( not Torrus::SiteConfig::treeExists( $tree ) )
+    if( Torrus::SiteConfig::treeExists($tree) )
     {
-        Error('FATAL: Non-existing tree ' . $tree . ' is referred to ' .
-              'in "torrus.tree" attribute for device ' . $device->id);
-        exit 1;
+        if( not defined($tree_devices{$tree}) )
+        {
+            $tree_devices{$tree} = [];
+        }
+        
+        push(@{$tree_devices{$tree}}, $device);
     }
-    
-    if( not defined($tree_devices{$tree}) )
+    else
     {
-        $tree_devices{$tree} = [];
+        if( not $error_tree_reported{$tree} )
+        {
+            Error('Non-existent tree ' . $tree . ' is referred to ' .
+                  'in "torrus.tree" attribute for device ' . $device->id);
+            $error_tree_reported{$tree} = 1;
+        }
     }
-
-    push(@{$tree_devices{$tree}}, $device);
 }
 
 
 &Torrus::DB::setSafeSignalHandlers();
-
 
 foreach my $tree ( sort keys %tree_devices )
 {
@@ -141,13 +156,21 @@ foreach my $tree ( sort keys %tree_devices )
                     fetch_data($config_tree, $el);
                 }
             }
+            
+            $c_ports++;
         }
+        
+        $c_devices++;
     }
-}
 
+    $config_tree = undef;
+    &Torrus::DB::cleanupEnvironment();
+}
 
 $siam->disconnect();
 
+Info(sprintf('siam_rrdfetch finished: %d ports on %d devices',
+             $c_ports, $c_devices));
 exit(0);
 
 
@@ -156,15 +179,122 @@ sub fetch_data
     my $config_tree = shift;
     my $el = shift;
 
-    my $nodeid = $el->attr('torrus.nodeid');
-    if( not defined($nodeid) )
+    my $nodeid_prefix = $el->attr('torrus.nodeid');
+    if( not defined($nodeid_prefix) )
     {
         Error('SIAM::ServiceDataElement ' . $el->id . ' does not have ' .
               '"torrus.nodeid" attribute');
         return;
     }
 
-    Debug('Fetching data for ' . $nodeid);
+    my $prefix_len = length($nodeid_prefix);
+
+    Debug('Fetching data for ' . $nodeid_prefix);
+
+    my $child_nodes = $config_tree->searchNodeidPrefix($nodeid_prefix);
+    if( not defined($child_nodes) or scalar(@{$child_nodes}) == 0 )
+    {
+        Debug('Cannot find Torrus nodes for nodeid prefix ' . $nodeid_prefix);
+        return;
+    }
+
+    # Aggregation attributes
+    my $max_intvl = $el->attr('torrus.fetch.max_intervals');
+    if( not defined($max_intvl) )
+    {
+        $max_intvl = 14;
+    }
+
+    my $aggr_intvl = $el->attr('torrus.fetch.aggr_interval');
+    if( not defined($aggr_intvl) )
+    {
+        # by default, we aggregate by 24 hours
+        $aggr_intvl = 86400;
+    }
+
+    # Timestamp of latest fetched data
+    my $latest_available = $el->computable('torrus.fetch.latest_available');
+
+    # timestamp in the past to start fetching from
+    my $fetch_start;
+    if( defined($latest_available) and
+        length($latest_available) > 0 and
+        $latest_available > ($today - $aggr_intvl*$max_intvl) )
+    {
+        $fetch_start = $latest_available;
+        # aligh it to our aggregation schedule
+        $fetch_start -= ($today - $latest_available) % $aggr_intvl;
+    }
+    else
+    {
+        $fetch_start = $today - $aggr_intvl * $max_intvl;
+    }
+    
+    my $da = new Torrus::DataAccess;
+
+    my $data = {};
+
+    # retrieve data from RRD
+    foreach my $item (@{$child_nodes})
+    {
+        my $token = $item->[1];
+        my $nodeid = $item->[0];
+        
+        if( not $config_tree->isLeaf( $token ) )
+        {
+            next;
+        }
+
+        my $ds_type = $config_tree->getNodeParam( $token, 'ds-type' );
+        if( $ds_type ne 'rrd-file' and $ds_type ne 'collector' )
+        {
+            next;
+        }
+        
+        my $leaf_type = $config_tree->getNodeParam( $token, 'leaf-type' );
+        if( $leaf_type ne 'rrd-def' )
+        {
+            next;
+        }
+
+        my $data_accessor = substr($nodeid, $prefix_len + 2);
+            
+        Debug('Fetching data for ' . $nodeid);
+        
+        my $file = $config_tree->getNodeParam( $token, 'data-file' );
+        my $dir = $config_tree->getNodeParam( $token, 'data-dir' );
+
+        my $rrd_file = $dir . '/' . $file;        
+        if( not -r $rrd_file )
+        {
+            next;
+        }
+        
+        my $ds = $config_tree->getNodeParam( $token, 'rrd-ds' );
+        
+        my $t_start = $fetch_start;
+        my $t_end = $t_start + $aggr_intvl;
+        while( $t_end <= $today )
+        {
+            foreach my $cf ('MAX', 'AVERAGE')
+            {
+                my ( $ret_val, $ret_time ) =
+                    $da->read_RRD_DS( $rrd_file, $cf, $ds, $t_end, $t_start );
+
+                if( not defined($ret_val) )
+                {
+                    $ret_val = 'NaN';
+                }
+
+                $data->{$t_end}{$data_accessor}{$cf} = $ret_val;
+            }
+            
+            $t_start += $aggr_intvl;
+            $t_end += $aggr_intvl;
+        }
+    }
+
+    $el->set_condition('torrus.fetch.data', encode_json($data));
 }
 
 

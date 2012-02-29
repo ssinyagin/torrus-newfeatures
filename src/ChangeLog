@@ -1,5 +1,7 @@
 2012-02-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* NEWS: Torrus bugfix release 2.01bf01
+
 	* perllib/Torrus/Collector.pm, perllib/Torrus/Monitor.pm:
 	undef $hash{$key} is deprecated, replaced with delete
 

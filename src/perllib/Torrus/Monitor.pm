@@ -111,13 +111,12 @@ sub run
                   "for token $token");
             
             $self->setAlarm( $config_tree, $obj );
-            undef $obj;
         }
     }
 
     $self->cleanupExpired();
     
-    undef $self->{'db_alarms'};
+    delete $self->{'db_alarms'};
 }
 
 
@@ -566,7 +565,7 @@ sub beforeRun
         Info("Rebuilding monitor cache");
         Debug("Config TS: $actual_ts, Monitor TS: $known_ts");
 
-        undef $data->{'targets'};
+        delete $data->{'targets'};
         $need_new_tasks = 1;
 
         $data->{'db_tokens'} = new Torrus::DB( 'monitor_tokens',
@@ -577,7 +576,7 @@ sub beforeRun
         # explicitly close, since we don't need it often, and sometimes
         # open it in read-only mode
         $data->{'db_tokens'}->closeNow();
-        undef $data->{'db_tokens'};
+        delete $data->{'db_tokens'};
 
         # Set the timestamp
         &Torrus::TimeStamp::setNow($tree . ':monitor_cache');
@@ -607,7 +606,7 @@ sub beforeRun
         $data->{'db_tokens'}->c_close($cursor);
         undef $cursor;
         $data->{'db_tokens'}->closeNow();
-        undef $data->{'db_tokens'};
+        delete $data->{'db_tokens'};
     }
 
     &Torrus::DB::checkInterrupted();
@@ -681,8 +680,13 @@ sub cacheMonitors
                 
                 $data->{'db_tokens'}->put( $ctoken,
                                            $period.':'.$offset.':'.$mlist );
-                
+
+                if( not exists($data->{'targets'}{$period}{$offset}) )
+                {
+                    $data->{'targets'}{$period}{$offset} = [];
+                }
                 push( @{$data->{'targets'}{$period}{$offset}}, $ctoken );
+                
                 $data->{'mlist'}{$ctoken} = [];
                 push( @{$data->{'mlist'}{$ctoken}}, split(',', $mlist) );
             }

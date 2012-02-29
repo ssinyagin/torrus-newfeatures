@@ -408,8 +408,6 @@ sub storageData
 sub run
 {
     my $self = shift;
-
-    undef $self->{'values'};
     
     foreach my $collector_type ( @{$self->{'types_sorted'}} )
     {
@@ -430,7 +428,7 @@ sub run
         
         if( defined( $self->{'config_tree'} ) )
         {
-            undef $self->{'config_tree'};
+            delete $self->{'config_tree'};
         }
     }
 
@@ -452,7 +450,7 @@ sub run
 
         if( defined( $self->{'config_tree'} ) )
         {
-            undef $self->{'config_tree'};
+            delete $self->{'config_tree'};
         }        
     }
     
@@ -476,7 +474,7 @@ sub run
 
             if( defined( $self->{'config_tree'} ) )
             {
-                undef $self->{'config_tree'};
+                delete $self->{'config_tree'};
             }
         }
     }

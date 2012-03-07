@@ -120,7 +120,7 @@ sub run
 
     $self->cleanupExpired();
     
-    undef $self->{'db_alarms'};
+    delete $self->{'db_alarms'};
     return;
 }
 

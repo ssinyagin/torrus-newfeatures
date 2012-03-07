@@ -25,7 +25,6 @@ BEGIN { require '@torrus_config_pl@'; require '@siam_config_pl@'; }
 
 use Getopt::Long;
 use Sys::Hostname;
-use JSON;
 use Date::Format;
 use Date::Parse;
 
@@ -221,8 +220,8 @@ sub fetch_data
         length($latest_available) > 0 and
         $latest_available > ($today - $aggr_intvl*$max_intvl) )
     {
-        $fetch_start = $latest_available;
-        # aligh it to our aggregation schedule
+        $fetch_start = $latest_available + $aggr_intvl;
+        # align it to our aggregation schedule
         $fetch_start -= ($today - $latest_available) % $aggr_intvl;
     }
     else
@@ -281,12 +280,10 @@ sub fetch_data
                 my ( $ret_val, $ret_time ) =
                     $da->read_RRD_DS( $rrd_file, $cf, $ds, $t_end, $t_start );
 
-                if( not defined($ret_val) )
+                if( defined($ret_val) )
                 {
-                    $ret_val = 'NaN';
+                    $data->{$t_start}{$data_accessor}{$cf} = $ret_val;
                 }
-
-                $data->{$t_end}{$data_accessor}{$cf} = $ret_val;
             }
             
             $t_start += $aggr_intvl;
@@ -294,7 +291,7 @@ sub fetch_data
         }
     }
 
-    $el->set_condition('torrus.fetch.data', encode_json($data));
+    $el->set_condition('torrus.fetch.data', $data);
 }
 
 

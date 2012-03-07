@@ -313,7 +313,7 @@ message.
 =item torrus.fetch.data
 
 This condition is set by siam_rrdfetch on SIAM::ServiceDataElement objects.
-It contains a JSON object with the retrieved data:
+It contains a hashref with the retrieved data:
 timestamp->counter->CF->value
 
 =back

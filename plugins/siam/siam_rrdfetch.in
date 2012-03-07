@@ -257,6 +257,15 @@ sub fetch_data
         }
 
         my $data_accessor = substr($nodeid, $prefix_len + 2);
+        my $multiplier = 1.0;
+
+        # convert byte rate into bit rate
+        if( $data_accessor =~ /bytes$/o )
+        {
+            $data_accessor =~ s/bytes$/bits/o;
+            $multiplier = 8.0;
+        }
+        
             
         Debug('Fetching data for ' . $nodeid);
         
@@ -282,7 +291,8 @@ sub fetch_data
 
                 if( defined($ret_val) )
                 {
-                    $data->{$t_start}{$data_accessor}{$cf} = $ret_val;
+                    $data->{$t_start}{$data_accessor}{$cf} =
+                        $ret_val * $multiplier;
                 }
             }
             

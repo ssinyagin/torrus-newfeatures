@@ -576,8 +576,12 @@ sub buildConfig
             $interface->{'param'}{'interface-comment'} = $comment;
         }
 
-        # Order the interfaces by ifIndex, not by interface name
-        $interface->{'param'}{'precedence'} = sprintf('%d', 100000-$ifIndex);
+        if( $devdetails->paramDisabled('RFC2863_IF_MIB::sort-by-name') )
+        {
+            # Order the interfaces by ifIndex, not by interface name
+            $interface->{'param'}{'precedence'} =
+                sprintf('%d', 100000-$ifIndex);
+        }
 
         $interface->{'param'}{'devdiscover-nodetype'} =
             'RFC2863_IF_MIB::interface';

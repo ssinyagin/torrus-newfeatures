@@ -610,6 +610,13 @@ C<RFC2863_IF_MIB::ifindex-map-hint>. This parameter can change the
 reference table for nodeid. Valid values are:
 C<ifDescr>, C<ifName>, C<ifAlias>, C<ifIndex>.
 
+=item * C<RFC2863_IF_MIB::sort-by-name>
+
+Optional. By default, interfaces are ordered by their ifindex, which can
+lead to not being ordered at all on devices where interfaces can come
+and go. Setting this parameter to C<yes> drops the auto-generated
+I<precedence> values and makes Torrus sort the interfaces
+alphabetically.
 
 =item * C<RFC2863_IF_MIB::noout>
 

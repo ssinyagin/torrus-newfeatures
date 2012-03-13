@@ -1,3 +1,8 @@
+2012-03-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm: new parameter
+	RFC2863_IF_MIB::sort-by-name
+
 2012-03-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Monitor*.pm, Collector*.pm: undef $hash{$key} is deprecated,

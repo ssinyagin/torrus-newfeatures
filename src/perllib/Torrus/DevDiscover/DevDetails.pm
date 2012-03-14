@@ -327,7 +327,10 @@ sub applySelectors
                       &{$treg->{'getObjectName'}}( $self, $object, $type ));
 
                 my $expr = $self->param( $sel . '-selector-expr' );
-                $expr = '1' if ($expr eq '');
+                if( not defined($expr) or $expr eq '' )
+                {
+                    $expr = '1';
+                }
 
                 my $callback = sub
                 {

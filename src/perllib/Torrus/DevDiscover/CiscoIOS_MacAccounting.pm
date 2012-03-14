@@ -291,7 +291,7 @@ sub buildConfig
                          {'node-display-name' => 'MAC Accounting'},
                          ['CiscoIOS_MacAccounting::cisco-macacc-subtree']);
     
-    foreach my $INDEX ( sort { $data->{'cipMac'}{$a}{'subtreeName'} <=>
+    foreach my $INDEX ( sort { $data->{'cipMac'}{$a}{'subtreeName'} cmp
                                    $data->{'cipMac'}{$b}{'subtreeName'} }
                         keys %{$data->{'cipMac'}} )
     {

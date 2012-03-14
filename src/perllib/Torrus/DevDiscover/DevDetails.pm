@@ -326,11 +326,8 @@ sub applySelectors
                 Debug('Checking object: ' .
                       &{$treg->{'getObjectName'}}( $self, $object, $type ));
 
-                my $expr = $self->param( $sel . '-selector-expr' );
-                if( not defined($expr) or $expr eq '' )
-                {
-                    $expr = '1';
-                }
+                my $expr = $self->paramString( $sel . '-selector-expr' );
+                $expr = 1 if ($expr eq '');
 
                 my $callback = sub
                 {
@@ -351,12 +348,13 @@ sub applySelectors
                 Debug('Selector result: ' . $result);
                 if( $result )
                 {
-                    my $actions = $self->param( $sel . '-selector-actions' );
+                    my $actions =
+                        $self->paramString( $sel . '-selector-actions' );
                     foreach my $action ( split('\s*,\s*', $actions) )
                     {
                         my $arg =
-                            $self->param( $sel . '-' . $action . '-arg' );
-                        $arg = 1 if not defined( $arg );
+                            $self->paramString( $sel . '-' . $action . '-arg' );
+                        $arg = 1 if ($arg eq '');
                         
                         Debug('Applying action: ' . $action .
                               ' with argument: ' . $arg);

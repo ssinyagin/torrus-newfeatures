@@ -124,7 +124,7 @@ sub flushTasks
                 $self->{'stats'}->clearStats( $task->id() );
             }
         }
-        undef $self->{'tasks'};
+        delete $self->{'tasks'};
     }
     return;
 }

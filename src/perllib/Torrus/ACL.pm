@@ -67,8 +67,8 @@ sub DESTROY
 
     Debug('Destroying ACL object');
 
-    undef $self->{'db_users'};
-    undef $self->{'db_acl'};
+    delete $self->{'db_users'};
+    delete $self->{'db_acl'};
     return;
 }
 

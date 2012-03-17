@@ -77,7 +77,7 @@ sub discover
     $data->{'nameref'}{'ifNick'} = 'ifIndex';
     $data->{'nameref'}{'ifNodeid'} = 'ifIndex';
 
-    undef $data->{'nameref'}{'ifComment'};
+    $data->{'nameref'}{'ifComment'} = undef;
     
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
     return 1;

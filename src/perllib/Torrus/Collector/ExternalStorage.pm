@@ -286,6 +286,8 @@ sub storeData
 
     &Torrus::DB::checkInterrupted();
 
+    return unless defined($sref->{'values'});
+    
     my $nTokens = scalar( keys %{$sref->{'values'}} );
 
     if( $nTokens == 0 )
@@ -382,7 +384,7 @@ sub storeData
         }
     }    
     
-    undef $sref->{'values'};
+    delete $sref->{'values'};
     &{$backendCloseSession}();
     return;
 }

@@ -1,3 +1,15 @@
+2012-03-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: tp-siam plugin release 2.02.01
+
+2012-03-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* siam_rrdfetch.in: new command-line utility
+
+2012-02-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* split siam.in into siam_genddx.in, siam_genxml.in
+
 2011-12-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* siam.in: aggregate traffic graphs

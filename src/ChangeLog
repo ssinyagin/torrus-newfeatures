@@ -1,3 +1,7 @@
+2012-03-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 2.02
+
 2012-03-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm: new parameter

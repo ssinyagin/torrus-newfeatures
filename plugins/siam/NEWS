@@ -1,1 +1,6 @@
+20-MAR-2012: Plugin release 2.02.01
+
+The "siam" command is split into siam_genddx and siam_genxml. Also a new
+command: siam_rrdfetch
+
 04-SEP-2011: Plugin release 2.01.01

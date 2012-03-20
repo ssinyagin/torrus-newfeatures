@@ -1,3 +1,44 @@
+20-MAR-2012: Torrus release 2.02
+
+In this release:
+
+-- Collector and Monitor daemons now send logs to Syslog facility local0
+   by default. torrus-siteconfig.pl can be used to change the facility
+   or revert to the file logging (file logging is not recommended
+   because of no rotation mechanism). File log rotation on SIGHUP is
+   removed (it never was stable anyway). Syslog to a custom UNIX socket
+   is also supported.
+
+-- WebUI: In/Out graphs now use a slightly darker green area. Also new
+   URL arguments are supported to display the maximums alongside
+   averages: Gmaxline, Gmaxlinestep
+
+-- RPN expressions can now refer to leaves by their NodeID: [[nodeid]]
+
+-- Discovery modules refactored: $dd->walkSnmpTable() is the only
+   recommended way to walk SNMP tables. Older methods are still
+   supported, but deprecated.
+
+-- New parameter: "snmp-maxrepetitions", with default value: 10. This
+   ensures proper work of the Collector and Devdiscover when retrieving
+   interface names.
+
+-- RFC2863_IF_MIB: interface speed can be monitored (used for Actelis
+   SHDSL modems).
+
+-- New parameter "RFC2863_IF_MIB::sort-by-name" disables the sorting by
+   ifIndex.
+
+-- New discovery modules: RFC4319_HDSL2_SHDSL_LINE_MIB, APC_PowerNet
+
+-- Improved discovery modules: NetBotz, RFC2670_DOCS_IF
+
+-- "rrd-create-rra" is now automatically copied from DDX into Torrus
+   configuration.
+
+-- Minor bugfixes and improvements to increase the database stability.
+
+
 04-SEP-2011: Torrus release 2.01
 
 In this release:
@@ -29,7 +70,7 @@ In this release:
 
 -- MicrosoftWindows discovery module is improved and lots of unneeded
    IF-MIB interfaces are eliminated.
-   
+
 -- New feature: SNMP reachability statistics for devices.
 
 -- FastCGI handler is automatically re-spawning every 5000 requests.
@@ -53,7 +94,7 @@ In this release:
    service inventory. See docs/nodeid_usage.pod for more details.
 
 
-   
+
 24-OCT-2010: Torrus release 1.0.9
 
 It is recommended to re-run discovery and compilation immediately after
@@ -136,7 +177,7 @@ In this release:
 In this release:
 
 -- Added and improved vendor support for Symmetricom, Juniper JunOS,
-   Cisco SCE, 
+   Cisco SCE,
 
 -- New discovery parameters, selectors and selector actions.
 
@@ -345,7 +386,7 @@ In this release, compared to RRFW release 0.1.8:
      IF-MIB indexing hints for unknown devices
      Docsis downstream utilization
      Selector actions for IF-MIB, Docsis, and temperature sensor objects
-     Line cards and modules memory stats for modular Ciscso routers     
+     Line cards and modules memory stats for modular Ciscso routers
 
 -- Improved performance of monitor daemon
 

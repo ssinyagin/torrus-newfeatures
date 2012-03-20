@@ -23,7 +23,7 @@
 SUBST = @abs_top_builddir@/substvars.sh
 
 noinst_SCRIPTS = substvars.sh
-EXTRA_DIST = siam.in siam-config.pl siam-siteconfig.pl
+EXTRA_DIST = siam-config.pl siam-siteconfig.pl
 
 
 #####   Perl modules  #####

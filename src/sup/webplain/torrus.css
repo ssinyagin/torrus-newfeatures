@@ -309,15 +309,40 @@ DIV.GraphImage IMG {
 }
 
 DIV.GraphControls {
-  width: 20em;
-  position: relative;
-  padding-left: 1em;
-  padding-right: 1em;
-  border: dashed 1px #999;
-  overflow: auto;
-  background-color: #eee;
+  padding: 0.5em;
+  padding-bottom: 0.5em;
+  top: 0px;
+  right: 0px;
+  background: #eee;
+  border: dotted 1px black;
+  border-right: none;
+  border-top: none;
+  position: fixed;
+  display: none;
+  font-weight: bold;
+  font-size: 1em;
 }
 
+UL.OptionsMenu {
+  list-style-type: none;
+  padding-left: 0.5em;
+  padding-bottom: 0em;
+  display: none;
+  margin: 0;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-size: 0.8em;
+  font-weight: normal;
+}
+
+UL.OptionsMenu LI UL {
+  list-style-type: none;
+  padding-left: 2em;
+}
+
+UL.OptionsMenu LI UL LI.Selected {
+  font-weight: bold;
+}
 
 DIV.ShortGraph *.NodeName, DIV.ShortGraph *.NodeDescr {
   clear : both;

@@ -26,6 +26,8 @@ function graphControls() {
  * Function to update the given graphs.
  */
 function updateGraphs(hash) {
+    if(hash.indexOf('#') < 0) return;
+
     var params = hash.split('#')[1];
     var graphs = $('div.GraphImage img');
 

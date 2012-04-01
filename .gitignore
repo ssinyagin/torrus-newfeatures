@@ -1,3 +1,6 @@
+# Vim backup & swap files
+*~
+.*.swp
 
 # /htdocs/
 /htdocs/*.pod.html

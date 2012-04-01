@@ -308,36 +308,26 @@ DIV.GraphImage IMG {
   display: block;
 }
 
-DIV.GraphControls {
-  padding: 0.5em;
-  padding-bottom: 0.5em;
-  top: 0px;
-  right: 0px;
-  background: #eee;
-  border: dotted 1px black;
-  border-right: none;
-  border-top: none;
-  position: fixed;
+SPAN.GraphControls {
   display: none;
-  font-weight: bold;
-  font-size: 1em;
+  position: relative;
 }
 
 UL.OptionsMenu {
-  list-style-type: none;
-  padding-left: 0.5em;
-  padding-bottom: 0em;
-  display: none;
   margin: 0;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-  font-size: 0.8em;
-  font-weight: normal;
+  width: 10em;
+  position: absolute;
+  list-style-type: none;
+  display: none;
+  background: #eee;
+  padding: 1em;
+  padding-top: 0.8em;
+  border: dashed 1px #999;
 }
 
 UL.OptionsMenu LI UL {
   list-style-type: none;
-  padding-left: 2em;
+  padding-left: 1em;
 }
 
 UL.OptionsMenu LI UL LI.Selected {

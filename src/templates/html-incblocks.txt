@@ -100,11 +100,9 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
    END
 %]
 
-</DIV>
-[% END %]
-<DIV CLASS="[%contentClass%]">
-<DIV CLASS="GraphControls">
-Graph Display Options
+<SPAN CLASS="GraphControls">
+[% INCLUDE shortcut url="javascript:" text="Options" 
+                    title="Graph display options" %]
 <UL CLASS="OptionsMenu">
   <LI>
     Show maximums
@@ -115,7 +113,10 @@ Graph Display Options
     </UL>
   </LI>
 </UL>
+</SPAN>
 </DIV>
+[% END %]
+<DIV CLASS="[%contentClass%]">
 [% global.contentFinished = 0 %]
 [% IF global.printError %]
 <DIV CLASS="ErrorMessage">[% global.printError %]</DIV>

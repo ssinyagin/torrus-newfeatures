@@ -3,7 +3,7 @@
  */
 function graphControls() {
     // Initialize event handlers on menu
-    var controls = $('div.GraphControls');
+    var controls = $('span.GraphControls');
     var options = $('ul.OptionsMenu');
 
     controls.hover(

@@ -114,6 +114,11 @@ ALT=[%companyName%] STYLE="border:0">[% ELSE; companyName; END %]</A>
   </LI>
 </UL>
 </SPAN>
+[%   IF showInteractiveViewLink %]
+[%   INCLUDE shortcut url="" text="Interactive" 
+                      title="Open interactive graph view"
+                      newwindow=1 %]
+[%   END %]
 </DIV>
 [% END %]
 <DIV CLASS="[%contentClass%]">

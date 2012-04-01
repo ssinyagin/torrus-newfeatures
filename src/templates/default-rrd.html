@@ -1,6 +1,7 @@
 [% PROCESS 'html-incblocks.txt' %]
 [% INCLUDE setdate %]
-[% INCLUDE htmlstart title='Graphs for ' _ path(token) printpath=1 %]
+[% INCLUDE htmlstart title='Graphs for ' _ path(token) printpath=1 
+                     showInteractiveViewLink=1 %]
 
 [% parentComment = nodeParam(parent(token),'comment') %]
 [% IF parentComment %]<H1>Graphs for [% xmlnorm(parentComment) %]</H1>[% END %]

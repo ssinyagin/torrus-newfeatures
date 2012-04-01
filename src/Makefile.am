@@ -52,7 +52,8 @@ dist_tmpl_DATA = \
 	templates/html-incblocks.txt \
 	templates/iframe-rrd.html \
 	templates/tset-list.html \
-	templates/email-alarm.txt
+	templates/email-alarm.txt \
+	templates/interactive.html
 
 
 

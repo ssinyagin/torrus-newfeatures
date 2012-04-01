@@ -1,0 +1,9 @@
+[% PROCESS 'html-incblocks.txt' %]
+[% INCLUDE setdate %]
+[% INCLUDE htmlstart title='Graph for ' _ path(token) printpath=1 
+                     noTopMenu=1 %]
+
+<P>This is HTML code</P>
+
+[% INCLUDE bottomline %]
+[% INCLUDE htmlend %]

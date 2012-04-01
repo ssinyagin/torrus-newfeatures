@@ -90,7 +90,7 @@
   <param name="default-subtree-view" value="default-dir-html" />
   <param name="default-leaf-view" value="default-rrd-html" />
   <param name="rrgraph-views">
-    short,last24h,lastweek,lastmonth,lastyear
+    short,last24h,lastweek,lastmonth,lastyear,interactive-html
   </param>
 
   <!-- Minimum set of parameters if we use
@@ -244,6 +244,13 @@
     </view>
   </view>
 
+  <!-- This is the HTML page with a single, interactive RRD graph on it.
+       Use the specified HTML file as a template with special tags in it -->
+  <view name="interactive-html">
+    <param name="view-type"     value="html" />
+    <param name="expires"       value="300" />
+    <param name="html-template" value="interactive.html" />
+  </view>
 
   <!-- This is the HTML page for tree browsing -->
   <view name="default-dir-html">

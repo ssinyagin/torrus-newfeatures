@@ -282,8 +282,17 @@ if( @showusers )
     {
         if( $aclEdit->userExists( $uid ) )
         {
-            printf("User: %s (%s)\n",
-                   $uid, $aclEdit->userAttribute( $uid, 'cn' ) );
+            my $cn = $aclEdit->userAttribute( $uid, 'cn' );
+            if( defined($cn) )
+            {
+                $cn = '(' . $cn . ')';
+            }
+            else
+            {
+                $cn = '';
+            }
+            printf("User: %s %s\n", $uid, $cn );
+
             foreach my $group ( sort $aclEdit->memberOf( $uid ) )
             {
                 printf("Member of: %s\n", $group);

@@ -95,6 +95,11 @@ sub checkdevtype
     my $devdetails = shift;
 
     my $sysObjID = $devdetails->snmpVar( $dd->oiddef('sysObjectID') );
+    if( not defined($sysObjID) )
+    {
+        return 0;
+    }
+    
     if( index( $sysObjID, $dd->oiddef('axxEdgeTypes') ) == 0 )
     {
         $devdetails->setCap('axxEdge');

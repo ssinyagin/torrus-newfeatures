@@ -816,6 +816,11 @@ sub oidBaseMatch
     my $base_oid = shift;
     my $oid = shift;
 
+    if( not defined($oid) )
+    {
+        return undef;
+    }
+    
     if( $base_oid =~ /^\D/ )
     {
         $base_oid = $self->oiddef( $base_oid );

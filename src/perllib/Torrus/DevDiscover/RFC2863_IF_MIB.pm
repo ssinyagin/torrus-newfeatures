@@ -1389,12 +1389,13 @@ sub retrieveMacAddresses
 
     my $data = $devdetails->data();
 
+    my $ifPhysAddress = $dd->walkSnmpTable('ifPhysAddress');
+
     foreach my $ifIndex ( sort {$a<=>$b} keys %{$data->{'interfaces'}} )
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
-        my $macaddr = $devdetails->snmpVar($dd->oiddef('ifPhysAddress') .
-                                           '.' . $ifIndex);
+        my $macaddr = $ifPhysAddress->{$ifIndex};
 
         if( defined( $macaddr ) and $macaddr ne '' )
         {

@@ -594,7 +594,7 @@ sub buildConfig
             {
                 &{$reg->{$devtype}{'buildConfig'}}
                 ( $devdetails, $cb, $devNode, $self->{'globalData'} );
-            }
+          }
 
             $cb->{'statistics'}{'hosts'}++;
         }
@@ -732,10 +732,15 @@ sub walkSnmpTable
 
     my $session = $self->session();
     my $base = $self->oiddef( $oidname );
+
+    my @arg = ( -baseoid => $base );
+
+    if( $session->version() > 0 )
+    {
+        push(@arg, -maxrepetitions => $self->{'maxrepetitions'});
+    }
     
-    my $table = $session->get_table
-        ( -baseoid => $base,
-          -maxrepetitions => $self->{'maxrepetitions'} );
+    my $table = $session->get_table( @arg );
     
     if( not defined($table) )
     {

@@ -201,7 +201,20 @@ sub setSignalHandlers
     {
         return;
     }
-    
+
+    $SIG{'HUP'} = sub {
+        if( $safeSignals )
+        {
+            Warn('Received SIGHUP. Scheduling to exit.');
+            $interrupted = 1;
+        }
+        else
+        {
+            Warn('Received SIGHUP. Stopping the process.');
+            exit(1);
+        }            
+    };
+
     $SIG{'TERM'} = sub {
         if( $safeSignals )
         {

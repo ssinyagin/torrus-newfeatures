@@ -894,7 +894,7 @@ sub storeSnmpVars
     }
 
     # Clean the cache of sorted OIDs
-    $self->{'sortedoids'} = undef;
+    delete $self->{'sortedoids'};
 }
 
 ##

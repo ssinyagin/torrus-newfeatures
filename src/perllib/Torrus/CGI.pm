@@ -371,7 +371,7 @@ sub do_process
 
     if( defined( $options{'acl'} ) )
     {
-        undef $options{'acl'};
+        delete $options{'acl'};
     }
 
     if( defined($fname) )

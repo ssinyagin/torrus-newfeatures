@@ -267,12 +267,12 @@ sub DESTROY
         $self->clearReader();
     }
 
-    undef $self->{'db_dsconfig'};
-    undef $self->{'db_otherconfig'};
-    undef $self->{'db_aliases'};
-    undef $self->{'db_sets'};
-    undef $self->{'db_nodepcache'};
-    undef $self->{'db_readers'};
+    delete $self->{'db_dsconfig'};
+    delete $self->{'db_otherconfig'};
+    delete $self->{'db_aliases'};
+    delete $self->{'db_sets'};
+    delete $self->{'db_nodepcache'};
+    delete $self->{'db_readers'};
 }
 
 # Manage the readinness flag

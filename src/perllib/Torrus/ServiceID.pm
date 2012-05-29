@@ -52,7 +52,7 @@ sub DESTROY
 {
     my $self = shift;
     Debug('Destroyed ServiceID object');
-    undef $self->{'db_params'};
+    delete $self->{'db_params'};
 }
 
 

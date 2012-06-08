@@ -64,6 +64,7 @@ sub initThreads
     $thrUpdateQueue = new Thread::Queue;
     $thrUpdateThread = threads->create( \&rawUpdateThread );
     $thrUpdateThread->detach();
+    return;
 }
 
 
@@ -115,6 +116,8 @@ sub initTarget
             $sref->{'maxrate'}{$token} = Math::BigFloat->new($maxrate);
         }
     }
+
+    return 1;
 }
 
 
@@ -142,6 +145,7 @@ sub deleteTarget
     delete $sref->{'values'}{$token};
     delete $sref->{'base'}{$token};
     delete $sref->{'maxrate'}{$token};
+    return;
 }
 
 
@@ -161,6 +165,7 @@ sub setValue
     my $sref = $collector->storageData('raw');
 
     $sref->{'values'}{$token} = [$value, $timestamp];
+    return;
 }
 
 
@@ -285,6 +290,7 @@ sub storeData
     }
     
     delete $sref->{'values'};
+    return;
 }
 
 

@@ -43,6 +43,7 @@ sub initValidatorLeafParams
 
   $hashref->{'ds-type'}{'collector'}{'@storage-type'}{'raw'} =
       $validatorLeafParams;
+  return;
 }
 
 

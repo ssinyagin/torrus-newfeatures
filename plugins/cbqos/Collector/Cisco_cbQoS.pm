@@ -55,7 +55,6 @@ my %oiddef =
 
      # CISCO-CLASS-BASED-QOS-MIB
      'cbQosServicePolicyTable'         => '1.3.6.1.4.1.9.9.166.1.1.1',
-     'cbQosPolicyIndex'                => '1.3.6.1.4.1.9.9.166.1.1.1.1.1',
      'cbQosIfType'                     => '1.3.6.1.4.1.9.9.166.1.1.1.1.2',
      'cbQosPolicyDirection'            => '1.3.6.1.4.1.9.9.166.1.1.1.1.3',
      'cbQosIfIndex'                    => '1.3.6.1.4.1.9.9.166.1.1.1.1.4',
@@ -68,7 +67,6 @@ my %oiddef =
      'cbQosVlanIndex'                  => '1.3.6.1.4.1.9.9.166.1.1.1.1.9',
 
      'cbQosObjectsTable'               => '1.3.6.1.4.1.9.9.166.1.5.1',
-     'cbQosObjectsIndex'               => '1.3.6.1.4.1.9.9.166.1.5.1.1.1',
      'cbQosConfigIndex'                => '1.3.6.1.4.1.9.9.166.1.5.1.1.2',
      'cbQosObjectsType'                => '1.3.6.1.4.1.9.9.166.1.5.1.1.3',
      'cbQosParentObjectsIndex'         => '1.3.6.1.4.1.9.9.166.1.5.1.1.4',
@@ -124,10 +122,6 @@ my %cbQosValueTranslation =
          'trafficShaping' => 6,
          'police'         => 7,
          'set'            => 8 },
-
-     'cbQosPoliceCfgConformAction'  => $policyActionTranslation,
-     'cbQosPoliceCfgExceedAction'   => $policyActionTranslation,
-     'cbQosPoliceCfgViolateAction'  => $policyActionTranslation
      );
 
 
@@ -136,15 +130,22 @@ sub translateCbQoSValue
     my $value = shift;
     my $name = shift;
 
-    if( defined( $cbQosValueTranslation{$name} ) )
+    if( defined($value) )
     {
-        if( not defined( $cbQosValueTranslation{$name}{$value} ) )
+        if( defined( $cbQosValueTranslation{$name} ) )
         {
-            die('Unknown value to translate for ' . $name .
-                ': "' . $value . '"');
+            if( not defined( $cbQosValueTranslation{$name}{$value} ) )
+            {
+                die('Unknown value to translate for ' . $name .
+                    ': "' . $value . '"');
+            }
+            
+            $value = $cbQosValueTranslation{$name}{$value};
         }
-
-        $value = $cbQosValueTranslation{$name}{$value};
+    }
+    else
+    {
+        $value = 0;
     }
 
     return $value;
@@ -212,8 +213,7 @@ my %CfgTable;
 
 # This is first executed per target
 
-$Torrus::Collector::initTarget{'cisco-cbqos'} =
-    \&Torrus::Collector::Cisco_cbQoS::initTarget;
+$Torrus::Collector::initTarget{'cisco-cbqos'} = \&initTarget;
 
 # Derive 'snmp-object' from cbQoS maps and pass the control to SNMP collector
 
@@ -227,8 +227,7 @@ sub initTarget
 
     $cref->{'QosEnabled'}{$token} = 1;
     
-    $collector->registerDeleteCallback
-        ( $token, \&Torrus::Collector::Cisco_cbQoS::deleteTarget );
+    $collector->registerDeleteCallback( $token, \&deleteTarget );
     
     my $hosthash = 
         Torrus::Collector::SNMP::getHostHash( $collector, $token );
@@ -239,8 +238,7 @@ sub initTarget
     }
     $tref->{'hosthash'} = $hosthash;
 
-    return Torrus::Collector::Cisco_cbQoS::initTargetAttributes
-        ( $collector, $token );
+    return initTargetAttributes( $collector, $token );
 }
 
 
@@ -574,8 +572,7 @@ $Torrus::Collector::runCollector{'cisco-cbqos'} =
 
 # Execute this after the collector has finished
 
-$Torrus::Collector::postProcess{'cisco-cbqos'} =
-    \&Torrus::Collector::Cisco_cbQoS::postProcess;
+$Torrus::Collector::postProcess{'cisco-cbqos'} = \&postProcess;
 
 sub postProcess
 {
@@ -615,8 +612,7 @@ sub postProcess
         {
             delete $scref->{'needsRemapping'}{$token};
             delete $cref->{'cbQoSNeedsRemapping'}{$token};
-            if( not Torrus::Collector::Cisco_cbQoS::initTargetAttributes
-                ( $collector, $token ) )
+            if( not initTargetAttributes( $collector, $token ) )
             {
                 $collector->deleteTarget($token);
             }

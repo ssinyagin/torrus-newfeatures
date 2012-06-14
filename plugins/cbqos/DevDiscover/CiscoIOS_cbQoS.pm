@@ -429,7 +429,8 @@ sub discover
             {
                 Warn('Object with missing mandatory configuration: ' .
                      'cbQosPolicyIndex=' . $objectRef->{'cbQosPolicyIndex'} .
-                     ', cbQosObjectsIndex=' . $policyObjectIndex);
+                     ', cbQosObjectsIndex=' . $policyObjectIndex .
+                     ', row=' . $row);
                 delete $data->{'cbqos_objects'}{$policyObjectIndex};
                 $objType = 'DELETED';
             }
@@ -621,7 +622,7 @@ sub buildChildrenConfigs
                                   
                     my $ifComment =
                         $interface->{$data->{'nameref'}{'ifComment'}};
-                    if( length( $ifComment ) > 0 )
+                    if( defined($ifComment) and $ifComment ne '' )
                     {
                         $subtreeComment .= ' (' . $ifComment . ')';
                     }
@@ -682,7 +683,6 @@ sub buildChildrenConfigs
         {
             my $name = $configRef->{'cbQosMatchStmtName'};
             $objectName = $name;
-
             $subtreeName = $name;
             $subtreeComment = 'Match statement statistics';
             $objectNick = 'ms_' . $name;
@@ -750,6 +750,7 @@ sub buildChildrenConfigs
         elsif( $objType eq 'randomDetect')
         {
             $subtreeName = 'WRED';
+            $objectName = 'WRED';
             $subtreeComment = 'Weighted Random Early Detect Statistics';
             $param->{'legend'} =
                 sprintf('Exponential Weight: %d;',
@@ -834,7 +835,7 @@ sub buildChildrenConfigs
 
             if( $objectNick )
             {
-                if( $parentObjNick )
+                if( $parentObjNick ne '' )
                 {
 		    $objectNick = $parentObjNick . '_' . $objectNick;
                 }
@@ -851,9 +852,9 @@ sub buildChildrenConfigs
 
             $param->{'cbqos-full-name'} = $fullName;
             $param->{'comment'} = $subtreeComment;
-            
             $param->{'cbqos-object-descr'} = $subtreeComment;
-            if( (length($parentObjType) > 0) and (length($parentObjName) > 0) )
+            
+            if( ($parentObjType ne '') and ($parentObjName ne '') )
             {
                 $param->{'cbqos-object-descr'} .= ' in ' .
                     $parentObjType . ': ' . $parentObjName;

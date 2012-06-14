@@ -229,14 +229,15 @@ sub createRRD
             $RRA_hash{$rra_string} = 1;
         }
 
-        if( $collector->param($token, 'rrd-hwpredict') eq 'enabled' )
+        if( $collector->paramString($token, 'rrd-hwpredict') eq 'enabled' )
         {
             $needs_hw = 1;
 
             foreach my $param ( 'alpha', 'beta', 'gamma', 'winlen', 'failth',
                                 'season', 'rralen' )
             {
-                my $value = $collector->param($token, 'rrd-create-hw-'.$param);
+                my $value =
+                    $collector->paramString($token, 'rrd-create-hw-'.$param);
 
                 if( defined( $hwparam{$param} ) and
                     $hwparam{$param} != $value )

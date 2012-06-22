@@ -53,23 +53,29 @@ our %sensorTypes =
     (
      1 => {
          'comment' => 'Temperature sensor',
+         'legend' => 'Temperature',
      },
      2 => {
          'comment' => 'Brightness sensor',
          'label' => 'Lux',
+         'legend' => 'Brightness',
      },
      3 => {
          'comment' => 'Humidity sensor',
          'label' => 'Percent RH',
+         'legend' => 'Humidity',
      },
      4 => {
          'comment' => 'Switch contact',
+         'legend' => 'On/Off',
      },
      5 => {
          'comment' => 'Voltage meter',
+         'legend' => 'Voltage',
      },
      6 => {
          'comment' => 'Smoke sensor',
+         'legend' => 'Smoke indicator',
      },
      );
 
@@ -157,6 +163,7 @@ sub discover
             my $param = {
                 'bne-sensor-index' => $INDEX,
                 'node-display-name' => $name,
+                'graph-title' => $name,
                 'precedence' => sprintf('%d', 1000 - $INDEX)
                 };
             
@@ -164,6 +171,8 @@ sub discover
             {
                 $param->{'comment'} =
                     sprintf('%s: %s', $sensorTypes{$type}{'comment'}, $name);
+                $param->{'graph-legend'} = $sensorTypes{$type}{'legend'}
+
                 if( $type != 1 )
                 {
                     if( defined( $sensorTypes{$type}{'label'} ) )

@@ -1,0 +1,11 @@
+Dummy plugin for Torrus
+
+This package is only a template for real plugins.
+
+Use the follwing command for plugin installation:
+
+  torrus install_plugin <PLUGIN-SRC-DIR>
+
+See http://torrus.org for more details
+
+(C) 2003, 2004  Stanislav Sinyagin <ssinyagin@yahoo.com>

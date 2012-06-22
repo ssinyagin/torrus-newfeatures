@@ -1,0 +1,30 @@
+=head1 RRDfit plugin for Torrus
+
+
+=head2 Installation
+
+Follow the Torrus installation guide for the main software installation.
+
+Install the RRD::Editor Perl module from CPAN:
+
+  perl -MCPAN -e 'install RRD::Editor'
+
+Unpack the plugin distribution package in some directory:
+
+  gzip -dc tp-rrdfit-1.X.tar.gz | tar xvf -
+
+Then run the Torrus plugin installation utility, pointing to the
+unpacked plugin directory:
+
+  torrus install_plugin tp-rrdfit-1.X
+
+
+=head2 Usage
+
+
+
+
+
+=head1 Author
+
+Copyright (c) 2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

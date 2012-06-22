@@ -141,6 +141,23 @@
 /plugins/rawexport/pod2htmd.tmp
 /plugins/rawexport/*.txt
 
+# /plugins/rrdfit/
+/plugins/rrdfit/aclocal.m4
+/plugins/rrdfit/autom4te.cache
+/plugins/rrdfit/config.log
+/plugins/rrdfit/config.status
+/plugins/rrdfit/Makefile
+/plugins/rrdfit/Makefile.in
+/plugins/rrdfit/configure
+/plugins/rrdfit/configure.lineno
+/plugins/rrdfit/config.status.lineno
+/plugins/rrdfit/rrdfit
+/plugins/rrdfit/substvars.sh
+/plugins/rrdfit/tp-*.tar.gz
+/plugins/rrdfit/*.txt
+/plugins/rrdfit/*.pod
+/plugins/rrdfit/*.tmp
+
 # /plugins/siam/
 /plugins/siam/aclocal.m4
 /plugins/siam/autom4te.cache

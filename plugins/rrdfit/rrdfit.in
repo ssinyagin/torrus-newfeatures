@@ -1,0 +1,594 @@
+#!@PERL@
+#  Copyright (C) 2011  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+use strict;
+use warnings;
+BEGIN { require '@torrus_config_pl@'; }
+
+use Getopt::Long;
+use File::Copy ();
+use Date::Format;
+use RRD::Tweak;
+use Torrus::Log;
+use Torrus::ConfigTree;
+use Torrus::SiteConfig;
+
+use Data::Dumper;
+
+exit(1) unless Torrus::SiteConfig::verify();
+
+my $tree;
+my $initPath = '/';
+my $initNodeid;
+my $dataloss_allowed;
+my $readonly;
+my $backupdir;
+my $nobackup;
+
+my $debug;
+my $help_needed;
+
+
+my $ok = GetOptions ('tree=s'      => \$tree,
+                     'path=s'      => \$initPath,
+                     'nodeid=s'    => \$initNodeid,
+                     'readonly'    => \$readonly,
+                     'loss'        => \$dataloss_allowed,
+                     'backupdir=s' => \$backupdir,
+                     'nobackup'    => \$nobackup,
+                     'debug'       => \$debug,
+                     'help'        => \$help_needed);
+
+if( not $ok or not $tree or $help_needed or scalar(@ARGV) > 0 )
+{
+    print STDERR "Usage: $0 --tree=NAME [options...]\n",
+    "Options:\n",
+    "  --tree=NAME     tree name\n",
+    "  --path=/PATH    [".$initPath."] subtree name\n",
+    "  --readonly      only report the changes, but do not apply them\n",
+    "  --backupdir=DIR directory for backup files\n",
+    "  --loss          allow data loss\n",
+    "  --nobackup      do not back up the old files\n",
+    "  --debug         print debugging information\n",
+    "  --help          this help message\n";
+    exit 1;
+}
+
+if( defined($backupdir) and not -d $backupdir )
+{
+    Error('--backupdir points to a nonexistent path: ' . $backupdir);
+    exit 1;
+}
+
+
+if( $debug )
+{
+    Torrus::Log::setLevel('debug');
+}
+
+
+if( not Torrus::SiteConfig::treeExists( $tree ) )
+{
+    Error('Tree ' . $tree . ' does not exist');
+    exit 1;
+}
+
+if( $readonly )
+{
+    Info('Running in read-only mode. No changes are applied to the data files');
+}
+else
+{
+    # check if any collectors or monitors are running for this tree
+    local *DIR;
+    opendir(DIR, $Torrus::Global::pidDir) or
+        die('Cannot open directory ' . $Torrus::Global::pidDir . ': ' . $!);
+
+    while(my $filename = readdir(DIR))
+    {
+        foreach my $daemon ('collector', 'monitor')
+        {
+            if( index($filename, $daemon . '.' . $tree) == 0 )
+            {
+                Error('A ' . $daemon . ' process is running for this tree. ' .
+                      'Aborting');
+                exit 1;
+            }
+        }
+    }
+    closedir(DIR);
+}
+
+
+
+&Torrus::DB::setSafeSignalHandlers();
+
+my $c_total_rrd = 0;
+my $c_updated_rrd = 0;
+my $c_skipped_rrd = 0;
+my $c_changes_not_applied = 0;
+
+{
+    my $config_tree = new Torrus::ConfigTree( -TreeName => $tree, -Wait => 1 );
+    if( not defined( $config_tree ) )
+    {
+        exit 1;
+    }
+
+    my $initToken;
+
+    if( defined($initNodeid) )
+    {
+        $initToken = $config_tree->getNodeByNodeid($initNodeid);
+        if( not defined( $initToken ) )
+        {
+            Error('No such NodeID: ' . $initNodeid);
+            exit 1;
+        }
+
+        if( not $config_tree->isSubtree($initToken) )
+        {
+            Error('NodeID ' . $initNodeid . ' points to a non-subtree node');
+            exit 1;
+        }
+    }
+    else
+    {
+        $initToken= $config_tree->token( $initPath );
+        if( not defined( $initToken ) )
+        {
+            Error('No such subtree: ' . $initPath);
+            exit 1;
+        }
+    }
+
+    my $rrd_files = {};
+    walk_tree( $config_tree, $initToken, $rrd_files );
+
+    while( my($datafile, $ref) = each %{$rrd_files} )
+    {
+        &Torrus::DB::checkInterrupted();
+        fit_rrd( $config_tree, $datafile, [keys %{$ref}] );
+    }
+}
+
+Info('Processed files: ' . $c_total_rrd);
+Info('Updated files: ' . $c_updated_rrd);
+Info('Skipped files: ' . $c_skipped_rrd);
+Info('Changes required, but not applied: ' . $c_changes_not_applied);
+exit 0;
+
+
+sub walk_tree
+{
+    my $config_tree = shift;
+    my $parent_token = shift;
+    my $rrd_files = shift;
+
+    foreach my $ctoken ( $config_tree->getChildren( $parent_token ) )
+    {
+        &Torrus::DB::checkInterrupted();
+
+        if( $config_tree->isSubtree( $ctoken ) )
+        {
+            walk_tree( $config_tree, $ctoken, $rrd_files );
+        }
+        elsif( $config_tree->isLeaf( $ctoken ) )
+        {
+            if( $config_tree->getNodeParam( $ctoken, 'ds-type' ) eq
+                'collector' )
+            {
+                my $storage =
+                    $config_tree->getNodeParam( $ctoken, 'storage-type' );
+
+                if( grep {$_ eq 'rrd'} split(/,/, $storage) )
+                {
+                    my $datafile =
+                        $config_tree->getNodeParam( $ctoken, 'data-dir' ) .
+                        '/' .
+                        $config_tree->getNodeParam( $ctoken, 'data-file' );
+
+                    $rrd_files->{$datafile}{$ctoken} = 1;
+                }
+            }
+        }
+    }
+    return;
+}
+
+
+sub fit_rrd
+{
+    my $config_tree = shift;
+    my $datafile = shift;
+    my $tokens_array = shift;
+
+    Debug('Processing RRD file: ' . $datafile);
+    Debug('Using ' . scalar(@{$tokens_array}) . ' tokens');
+
+    my $rrd = RRD::Tweak->new();
+    eval { $rrd->load_file($datafile) };
+    if( $@  )
+    {
+        Error('Could not open RRD file: ' . $@);
+        Error('Skipping file: ' . $datafile);
+        $c_skipped_rrd++;
+        return;
+    }
+
+    $c_total_rrd++;
+
+    my $rrd_info = $rrd->info();
+    my $rrdfile_step = $rrd_info->{'step'};
+
+    foreach my $token (@{$tokens_array})
+    {
+        my $cfg_step =
+            $config_tree->getNodeParam($token, 'collector-period');
+        if( $rrdfile_step != $cfg_step )
+        {
+
+            Error(sprintf('%s: RRD file step (%d) is different from ' .
+                          'collector-period (%d) for %s. Skipping the file',
+                          $rrdfile_step,
+                          $cfg_step,
+                          $config_tree->path($token)));
+            $c_skipped_rrd++;
+            return;
+        }
+    }
+
+    # Get the RRA and DS parameters from the Torrus config
+    my %cfg_ds;
+    my %cfg_rra_strings;
+    my @cfg_rra;
+
+    foreach my $token (@{$tokens_array})
+    {
+        my $ds_name = $config_tree->getNodeParam($token, 'rrd-ds');
+
+        my $r = {};
+
+        $r->{'type'} = $config_tree->getNodeParam($token, 'rrd-create-dstype');
+        $r->{'heartbeat'} =
+            $config_tree->getNodeParam($token, 'rrd-create-heartbeat');
+        $r->{'min'} = $config_tree->getNodeParam($token, 'rrd-create-min');
+        $r->{'max'} = $config_tree->getNodeParam($token, 'rrd-create-max');
+
+        $cfg_ds{$ds_name} = $r;
+
+        foreach my $rra_string
+            ( split(/\s+/,
+                    $config_tree->getNodeParam($token, 'rrd-create-rra')) )
+        {
+            $cfg_rra_strings{$rra_string} = 1;
+        }
+    }
+
+    # parse RRA definitions from Torrus config
+
+    foreach my $string (keys %cfg_rra_strings)
+    {
+        if ($string !~
+            /^RRA:(AVERAGE|MAX|MIN|LAST):([0-9\.]+):([0-9]+):([0-9]+)$/)
+        {
+            Error('Invalid RRA definition in Torrus config for ' .
+                  $datafile . ': "' . $string . '". Skipping the file');
+
+            $c_skipped_rrd++;
+            return;
+        }
+        else
+        {
+            push( @cfg_rra,
+                  {'cf' => $1,
+                   'xff' => $2,
+                   'steps' => $3,
+                   'rows' => $4 });
+        }
+    }
+
+    # Start comparing the file against Torrus config
+    my $changed = 0;
+
+    # Check if any DS needs to be deleted or updated
+
+    my %file_ds_name;
+    for( my $ds_idx=0; $ds_idx < scalar(@{$rrd_info->{'ds'}}); $ds_idx++ )
+    {
+        my $ds_def = $rrd_info->{'ds'}[$ds_idx];
+        my $ds_name = $ds_def->{'name'};
+        $file_ds_name{$ds_name} = $ds_idx;
+
+        if( not exists $cfg_ds{$ds_name} )
+        {
+            if( $dataloss_allowed )
+            {
+                $rrd->del_ds($ds_idx);
+                Info($datafile . ': deleted DS "' . $ds_name . '"');
+                $changed = 1;
+            }
+            else
+            {
+                Info($datafile . ': DS "' . $ds_name .
+                     '" needs to be deleted, but --loss option ' .
+                     'is not set. Skipping the update.');
+                $c_changes_not_applied++;
+            }
+        }
+        else
+        {
+            if( $cfg_ds{$ds_name}{'type'} ne $ds_def->{'type'} )
+            {
+                $rrd->modify_ds($ds_idx, {'type' =>
+                                              $cfg_ds{$ds_name}{'type'}});
+
+                Info($datafile . ': changed DS type from ' .
+                     $ds_def->{'type'} . ' to ' .
+                     $cfg_ds{$ds_name}{'type'} .
+                     ' for "' . $ds_name . '"');
+                $changed = 1;
+            }
+
+            if( $cfg_ds{$ds_name}{'heartbeat'} != $ds_def->{'heartbeat'} )
+            {
+                $rrd->modify_ds($ds_idx, {'heartbeat' =>
+                                              $cfg_ds{$ds_name}{'heartbeat'}});
+
+                Info($datafile . ': changed DS heartbit from ' .
+                     $ds_def->{'heartbeat'} . ' to ' .
+                     $cfg_ds{$ds_name}{'heartbeat'} .
+                     ' for "' . $ds_name . '"');
+                $changed = 1;
+            }
+
+            foreach my $p ('min', 'max')
+            {
+                my $cfg_val = $cfg_ds{$ds_name}{$p};
+                my $file_val = $ds_def->{$p};
+
+                my $diff = 0;
+                if( $cfg_val eq 'U' )
+                {
+                    if( $file_val !~ /nan/io )
+                    {
+                        $diff = 1;
+                        $cfg_val = 'nan';
+                    }
+                }
+                elsif( $file_val =~ /nan/io )
+                {
+                    $diff = 1;
+                }
+                elsif( $cfg_val != $file_val )
+                {
+                    $diff = 1;
+                }
+
+                if( $diff )
+                {
+                    $rrd->modify_ds($ds_idx, {$p => $cfg_val});
+
+                    Info($datafile . ': changed DS ' . $p . ' from ' .
+                         $file_val . ' to ' . $cfg_val .
+                         ' for "' . $ds_name . '"');
+                    $changed = 1;
+                }
+            }
+        }
+    }
+
+    # Check if any DS needs to be created
+
+    foreach my $ds_name (keys %cfg_ds)
+    {
+        if( not exists $file_ds_name{$ds_name} )
+        {
+            $rrd->add_ds({name => $ds_name,
+                          type=> $cfg_ds{$ds_name}{'type'},
+                          heartbeat => $cfg_ds{$ds_name}{'heartbeat'},
+                          min => $cfg_ds{$ds_name}{'min'},
+                          max => $cfg_ds{$ds_name}{'max'}});
+            Info($datafile . ': added DS "' . $ds_name . '"');
+            $changed = 1;
+        }
+    }
+
+    # Check if any RRA needs to be deleted or updated
+    my @file_rra_idx_to_delete;
+
+    for( my $file_rra_idx=0; $file_rra_idx < scalar(@{$rrd_info->{'rra'}});
+         $file_rra_idx++ )
+    {
+        my $f_rra = $rrd_info->{'rra'}[$file_rra_idx];
+        my $found = 0;
+
+        foreach my $cfg_rra_idx (0 .. $#cfg_rra)
+        {
+            my $c_rra = $cfg_rra[$cfg_rra_idx];
+
+            if( ($c_rra->{'cf'} eq $f_rra->{'cf'})
+                and
+                ($c_rra->{'steps'} == $f_rra->{'steps'}) )
+            {
+                $found = 1;
+
+                if( $c_rra->{'xff'} != $f_rra->{'xff'} )
+                {
+                    $rrd->modify_rra( $file_rra_idx, {xff => $c_rra->{'xff'}} );
+                    Info($datafile . ': changed XFF from ' .
+                         $f_rra->{'xff'} . ' to ' . $c_rra->{'xff'} .
+                         ' for RRA#' . $file_rra_idx);
+                    $changed = 1;
+                }
+
+                if( $c_rra->{'rows'} > $f_rra->{'rows'} )
+                {
+                    $rrd->modify_rra( $file_rra_idx,
+                                      {rows =>  $c_rra->{'rows'}} );
+                    Info($datafile . ': increased the number of rows from ' .
+                         $f_rra->{'rows'} . ' to ' . $c_rra->{'rows'} .
+                         ' for RRA#' . $file_rra_idx);
+                    $changed = 1;
+                }
+                elsif( $c_rra->{'rows'} < $f_rra->{'rows'} )
+                {
+                    if( $dataloss_allowed )
+                    {
+                        $rrd->modify_rra( $file_rra_idx,
+                                          {rows =>  $c_rra->{'rows'}} );
+                        Info($datafile .
+                             ': decreased the number of rows from ' .
+                             $f_rra->{'rows'} . ' to ' . $c_rra->{'rows'} .
+                             ' for RRA#' . $file_rra_idx);
+                        $changed = 1;
+                    }
+                    else
+                    {
+                        Info($datafile . ': RRA#' . $file_rra_idx .
+                             '" needs to be decreased in size, ' .
+                             'but --loss option is not set. ' .
+                             'Skipping the update.');
+                        $c_changes_not_applied++;
+                    }
+                }
+            }
+        }
+
+        if( not $found )
+        {
+            push( @file_rra_idx_to_delete, $file_rra_idx );
+        }
+    }
+
+    # Check if any RRA needs to be added
+
+    foreach my $cfg_rra_idx (0 .. $#cfg_rra)
+    {
+        my $c_rra = $cfg_rra[$cfg_rra_idx];
+        my $found = 0;
+
+        for( my $file_rra_idx=0;
+             $file_rra_idx < scalar(@{$rrd_info->{'rra'}});
+             $file_rra_idx++ )
+        {
+            my $f_rra = $rrd_info->{'rra'}[$file_rra_idx];
+
+            if( ($c_rra->{'cf'} eq $f_rra->{'cf'})
+                and
+                ($c_rra->{'steps'} == $f_rra->{'steps'}) )
+            {
+                $found = 1;
+                last;
+            }
+        }
+
+        if( not $found )
+        {
+            $rrd->add_rra($c_rra);
+            Info($datafile . ': added ' .
+                 sprintf('RRA:%s:%e:%d:%d',
+                         $c_rra->{'cf'},
+                         $c_rra->{'xff'},
+                         $c_rra->{'steps'},
+                         $c_rra->{'rows'}));
+                 $changed = 1;
+        }
+    }
+
+    # go through RRA indices which need to be deleted
+
+    if( scalar( @file_rra_idx_to_delete ) > 0 )
+    {
+        # some RRA are present in the file, but not defined in the config
+        if( $dataloss_allowed )
+        {
+            # iterate from highest index to lowest
+            foreach my $idx (sort {$b <=> $a} @file_rra_idx_to_delete )
+            {
+                $rrd->del_rra( $idx );
+                Info($datafile . ': deleted RRA#' . $idx);
+                $changed = 1;
+            }
+        }
+        else
+        {
+            Info($datafile . ': RRA #' . join(',', @file_rra_idx_to_delete) .
+                 '" should to be deleted, ' .
+                 'but --loss option is not set. ' .
+                 'Skipping the update.');
+            $c_changes_not_applied++;
+        }
+    }
+
+    # If any changes detected, save the file
+
+    if( $changed and not $readonly )
+    {
+        if( not $nobackup )
+        {
+            # back up the old file
+            my $backup_name = $datafile;
+            if( defined($backupdir) )
+            {
+                # remove the old path and insert the backup path
+                $backup_name =~ s/^.+\/([^\/]+)$/$1/;
+                $backup_name = $backupdir . '/' . $backup_name;
+            }
+
+            $backup_name .= time2str('.%Y%m%d%H%M%S.bk', time());
+
+            if( File::Copy::copy($datafile, $backup_name) )
+            {
+                Info($datafile . ': copied backup to ' . $backup_name);
+            }
+            else
+            {
+                Error($datafile . ': cannot copy backup to ' .
+                      $backup_name . ': ' . $!);
+                Error('Skipping file: ' . $datafile);
+                $c_skipped_rrd++;
+                return;
+            }
+        }
+
+        eval { $rrd->save_file($datafile) };
+        if( $@ )
+        {
+            Error($datafile . ': cannot update the file: ' . $@);
+            Error('Skipping file: ' . $datafile);
+            $c_skipped_rrd++;
+            return;
+        }
+
+        Info($datafile . ': saved updated file');
+        $c_updated_rrd++;
+    }
+}
+
+
+
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:
+

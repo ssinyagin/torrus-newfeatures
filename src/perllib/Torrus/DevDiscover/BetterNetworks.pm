@@ -171,7 +171,7 @@ sub discover
             {
                 $param->{'comment'} =
                     sprintf('%s: %s', $sensorTypes{$type}{'comment'}, $name);
-                $param->{'graph-legend'} = $sensorTypes{$type}{'legend'}
+                $param->{'graph-legend'} = $sensorTypes{$type}{'legend'};
 
                 if( $type != 1 )
                 {

@@ -1,30 +1,74 @@
 =head1 RRDfit plugin for Torrus
 
+=head2 Introduction
+
+The "tp-rrdfit" plugin introduces a new utility, "rrdfit", designed to
+adjust your existing RRD files to an updated Torrus configuration. It
+reads the RRD files from the file system, compares the DS and RRA
+definitions with those in Torrus configuration, and applies the changes
+if needed.
+
+The utility relies on the RRD::Tweak perl module available from CPAN.
+
 
 =head2 Installation
 
 Follow the Torrus installation guide for the main software installation.
 
-Install the RRD::Editor Perl module from CPAN:
+Install the RRD::Tweak Perl module from CPAN:
 
-  perl -MCPAN -e 'install RRD::Editor'
+  perl -MCPAN -e 'install RRD::Tweak'
 
 Unpack the plugin distribution package in some directory:
 
-  gzip -dc tp-rrdfit-1.X.tar.gz | tar xvf -
+  gzip -dc tp-rrdfit-2.X.X.tar.gz | tar xvf -
 
 Then run the Torrus plugin installation utility, pointing to the
 unpacked plugin directory:
 
-  torrus install_plugin tp-rrdfit-1.X
+  torrus install_plugin tp-rrdfit-2.X.X
 
 
 =head2 Usage
 
 
+  torrus rrdfit  --tree=NAME [options...]
+  Options:
+    --tree=NAME     tree name
+    --path=/PATH    [/] start subtree name
+    --nodeid=X      NodeId of a start subtree
+    --readonly      only report the changes, but do not apply them
+    --backupdir=DIR directory for backup files
+    --loss          allow data loss
+    --nobackup      do not back up the old files
+    --debug         print debugging information
+    --help          this help message
 
+
+Unless --readonly is specified, rrdfit will abort if a collector is
+runnig for this tree.
+
+By default rrdfit will walk the entire tree and apply changes which do
+not incur data loss (such as adding or extending RRA, adding DS). All
+changes related to data loss will be reported but not executed.
+
+The --loss option enables the changes which cause data loss. This
+includes reducing the size of RRA, deleting RRA, or deleting DS.
+
+By default rrdfit saves backup copies of changed RRD files in the same
+directory as the original files. The options --nobackup and --backupdir
+would change this behavior accordingly.
+
+Only a part of the tree would be processed if --path or --nodeid options
+are specified.
+
+The --readonly option allows you to see what is going to be changed
+without changing any RRD files.
+
+In any case, it is recommended to make a full backup of all RRD files
+before using the utility.
 
 
 =head1 Author
 
-Copyright (c) 2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2012 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

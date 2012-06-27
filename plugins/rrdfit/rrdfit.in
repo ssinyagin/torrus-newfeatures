@@ -60,7 +60,8 @@ if( not $ok or not $tree or $help_needed or scalar(@ARGV) > 0 )
     print STDERR "Usage: $0 --tree=NAME [options...]\n",
     "Options:\n",
     "  --tree=NAME     tree name\n",
-    "  --path=/PATH    [".$initPath."] subtree name\n",
+    "  --path=/PATH    [".$initPath."] start subtree name\n",
+    "  --nodeid=X      NodeId of a start subtree\n",
     "  --readonly      only report the changes, but do not apply them\n",
     "  --backupdir=DIR directory for backup files\n",
     "  --loss          allow data loss\n",
@@ -91,7 +92,8 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 
 if( $readonly )
 {
-    Info('Running in read-only mode. No changes are applied to the data files');
+    Info('Running in read-only mode. ' .
+         'No changes are applied to the data files');
 }
 else
 {
@@ -310,6 +312,7 @@ sub fit_rrd
     # Check if any DS needs to be deleted or updated
 
     my %file_ds_name;
+    my @delete_ds;
     for( my $ds_idx=0; $ds_idx < scalar(@{$rrd_info->{'ds'}}); $ds_idx++ )
     {
         my $ds_def = $rrd_info->{'ds'}[$ds_idx];
@@ -318,19 +321,7 @@ sub fit_rrd
 
         if( not exists $cfg_ds{$ds_name} )
         {
-            if( $dataloss_allowed )
-            {
-                $rrd->del_ds($ds_idx);
-                Info($datafile . ': deleted DS "' . $ds_name . '"');
-                $changed = 1;
-            }
-            else
-            {
-                Info($datafile . ': DS "' . $ds_name .
-                     '" needs to be deleted, but --loss option ' .
-                     'is not set. Skipping the update.');
-                $c_changes_not_applied++;
-            }
+            push(@delete_ds, $ds_idx);
         }
         else
         {
@@ -394,6 +385,27 @@ sub fit_rrd
         }
     }
 
+    if( scalar(@delete_ds) )
+    {
+        foreach my $ds_idx (sort {$b <=> $a} @delete_ds )
+        {
+            my $ds_name = $rrd_info->{'ds'}[$ds_idx]{'name'};
+            if( $dataloss_allowed )
+            {
+                $rrd->del_ds($ds_idx);
+                Info($datafile . ': deleted DS "' . $ds_name . '"');
+                $changed = 1;
+            }
+            else
+            {
+                Info($datafile . ': DS "' . $ds_name .
+                     '" needs to be deleted, but --loss option ' .
+                     'is not set. Skipping the update.');
+                $c_changes_not_applied++;
+            }
+        }
+    }
+    
     # Check if any DS needs to be created
 
     foreach my $ds_name (keys %cfg_ds)
@@ -431,7 +443,8 @@ sub fit_rrd
 
                 if( $c_rra->{'xff'} != $f_rra->{'xff'} )
                 {
-                    $rrd->modify_rra( $file_rra_idx, {xff => $c_rra->{'xff'}} );
+                    $rrd->modify_rra( $file_rra_idx,
+                                      {xff => $c_rra->{'xff'}} );
                     Info($datafile . ': changed XFF from ' .
                          $f_rra->{'xff'} . ' to ' . $c_rra->{'xff'} .
                          ' for RRA#' . $file_rra_idx);

@@ -1,3 +1,7 @@
+2012-07-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/RRDtool.pm: new RRD graph parameter: border
+
 2012-04-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Release 2.03 (bugfix release)

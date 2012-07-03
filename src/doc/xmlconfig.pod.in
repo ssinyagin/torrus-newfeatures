@@ -1187,7 +1187,7 @@ The following parameters are mandatory for this kind of view:
 
 =over 8
 
-=item * C<width>, C<height>, C<start>
+=item * C<width>, C<height>, C<start>, C<end>, C<imgformat>, C<border>
 
 Correspond to same parameters in RRD Graph command.
 C<end> can also be given, it defaults to I<C<now>>.

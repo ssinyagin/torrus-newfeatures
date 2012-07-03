@@ -36,7 +36,8 @@ my %rrd_graph_opts =
      'width'  => '--width',
      'height' => '--height',
      'imgformat' => '--imgformat', 
-     );
+     'border' => '--border',
+    );
 
 my %mime_type =
     ('PNG' => 'image/png',

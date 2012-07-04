@@ -1,12 +1,4 @@
-2011-12-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+2012-07-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
-	* siam.in: aggregate traffic graphs
-
-2011-09-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
-
-	* SIAMDD.pm (checkdevtype): Improved error handling
-
-2011-09-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
-
-	* NEWS: Plugin release 2.01.01
+	* NEWS: tp-rrdfit release 2.03.01
 

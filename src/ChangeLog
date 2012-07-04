@@ -1,5 +1,7 @@
 2012-07-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* xmlconfig/defaults.xml: new graph view: embedded-small
+
 	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_graph_opts): new
 	view parameter 'graph-colors' and URL variable Gcolors
 

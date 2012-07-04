@@ -230,6 +230,11 @@
         <param name="start"         value="-1month" />
         <param name="description"   value="Last month graph" />
       </view>
+      <view name="embedded-small">
+        <param name="start"         value="-24hours" />
+        <param name="description"   value="" />
+        <param name="rrd-params"   value="--full-size-mode" />
+      </view>
     </view>
   </view>
 

@@ -1183,30 +1183,39 @@ Returns current Torrus package version.
 Generates the RRD Graph representation of the given I<leaf> (remember,
 subtrees are only logical grouping of the real data).
 
-The following parameters are mandatory for this kind of view:
+The following parameters are recognized for this kind of view:
 
 =over 8
 
 =item * C<width>, C<height>, C<start>, C<end>, C<imgformat>, C<border>
 
-Correspond to same parameters in RRD Graph command.
+These view parameters correspond to same parameters in RRD Graph command.
 C<end> can also be given, it defaults to I<C<now>>.
+The following parameters are mandatory: C<width>, C<height>, and C<start>.
 
 =item * C<line-style>
 
-Line specification in RRD graph. May be I<C<LINE1>>, I<C<LINE2>> etc.
+Mandatory line specification in RRD graph. May be I<C<LINE1>>, I<C<LINE2>> etc.
 Two hashes in the beginning and a name refer to the line style from
 the styling profile, e.g. C<##SingleGraph>.
 
 =item * C<line-color>
 
-Line color. Must have the hash symbol in the beginning, like I<C<#0000FF>>.
+Mandatory line color. Must have the hash symbol in the beginning, like
+I<C<#0000FF>>.
 Two hashes in the beginning and a name refer to the color from
 the styling profile, e.g. C<##SingleGraph>.
 
+=item * C<graph-colors>
+
+Optional. The parameter defines the values for the C<--color> options in RRD
+Graph command. The value is an even number of color tags and color values,
+separated by colon (:). For example, "BACK:00FFFF:FONT:AA55DD" corresponds to
+an ugly cyan background and magenta text.
+
 =item * C<rrd-hwpredict>
 
-If equals to C<disabled>, HWPREDICT display is disabled for this view.
+Optional. If equals to C<disabled>, HWPREDICT display is disabled for this view.
 Note that if the datasource has C<rrd-hwpredict> parameter set to C<enabled>,
 this emplies that the view would contain Holt-Winters boundaries and failures
 graph.

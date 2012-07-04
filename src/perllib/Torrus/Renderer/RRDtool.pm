@@ -968,6 +968,48 @@ sub rrd_make_graph_opts
         }
     }
 
+    # take colors from view and URL params
+    my $colorval =
+        $self->{'options'}->{'variables'}->{'Gcolors'};
+    
+    if( not defined( $colorval ) )
+    {
+        $colorval = $config_tree->getParam( $view, 'graph-colors' );
+    }
+        
+    if( defined( $colorval ) )
+    {
+        my @values = split( /:/, $colorval );
+        if( (scalar(@values) % 2) != 0 )
+        {
+            Error("Graph colors should be an even number of " .
+                  "elements separated by colon: " . $colorval);
+        }
+        else
+        {
+            while( scalar(@values) )
+            {
+                my $tag = shift @values;
+                my $color = shift @values;
+                if( $tag !~ /^[A-Z]+$/o )
+                {
+                    Error("Invalid format for color tag in graph colors: " .
+                          $colorval);
+                }
+                elsif( $color !~ /^[0-9A-F]{6}([0-9A-F]{2})?$/io )
+                {
+                    Error("Invalid format for color value in graph colors: " .
+                          $colorval);
+                }
+                else
+                {
+                    push( @args, '--color', $tag . '#' . $color );
+                }
+            }
+        }
+        
+    }
+
     if( scalar( @Torrus::Renderer::graphExtraArgs ) > 0 )
     {
         push( @args, @Torrus::Renderer::graphExtraArgs );

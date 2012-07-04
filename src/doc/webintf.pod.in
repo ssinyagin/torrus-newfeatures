@@ -253,6 +253,14 @@ order for the maximum line to be properly displayed.
 Aggregation period, in seconds, for the maximum line. If the variable is
 not specified, the line displays daily maximums.
 
+=item Gcolors
+
+Graph colors, overriding the C<graph-colors> view parameter. This
+variable defines the values for the C<--color> options in RRD Graph
+command. The value is an even number of color tags and color values,
+separated by colon (:). For example, "BACK:00FFFF:FONT:AA55DD"
+corresponds to an ugly cyan background and magenta text.
+
 =item DEBUG
 
 Optional. If true, turns on the debug level of logging. The debug messages

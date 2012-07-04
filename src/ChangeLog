@@ -1,3 +1,8 @@
+2012-07-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_graph_opts): new
+	view parameter 'graph-colors' and URL variable Gcolors
+
 2012-07-03  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm: new RRD graph parameter: border

@@ -447,7 +447,7 @@ sub fit_rrd
                                       {xff => $c_rra->{'xff'}} );
                     Info($datafile . ': changed XFF from ' .
                          $f_rra->{'xff'} . ' to ' . $c_rra->{'xff'} .
-                         ' for RRA#' . $file_rra_idx);
+                         ' for ' . $rrd->rra_descr($file_rra_idx));
                     $changed = 1;
                 }
 
@@ -457,7 +457,7 @@ sub fit_rrd
                                       {rows =>  $c_rra->{'rows'}} );
                     Info($datafile . ': increased the number of rows from ' .
                          $f_rra->{'rows'} . ' to ' . $c_rra->{'rows'} .
-                         ' for RRA#' . $file_rra_idx);
+                         ' for ' . $rrd->rra_descr($file_rra_idx));
                     $changed = 1;
                 }
                 elsif( $c_rra->{'rows'} < $f_rra->{'rows'} )
@@ -469,13 +469,15 @@ sub fit_rrd
                         Info($datafile .
                              ': decreased the number of rows from ' .
                              $f_rra->{'rows'} . ' to ' . $c_rra->{'rows'} .
-                             ' for RRA#' . $file_rra_idx);
+                             ' for ' . $rrd->rra_descr($file_rra_idx));
                         $changed = 1;
                     }
                     else
                     {
-                        Info($datafile . ': RRA#' . $file_rra_idx .
-                             '" needs to be decreased in size, ' .
+                        Info($datafile . ': ' .
+                             $rrd->rra_descr($file_rra_idx) .
+                             ' needs to be decreased to ' .
+                             $c_rra->{'rows'} . ' rows, ' .
                              'but --loss option is not set. ' .
                              'Skipping the update.');
                         $c_changes_not_applied++;
@@ -535,15 +537,21 @@ sub fit_rrd
             # iterate from highest index to lowest
             foreach my $idx (sort {$b <=> $a} @file_rra_idx_to_delete )
             {
+                my $descr = $rrd->rra_descr($idx);
                 $rrd->del_rra( $idx );
-                Info($datafile . ': deleted RRA#' . $idx);
+                Info($datafile . ': deleted ' . $descr);
                 $changed = 1;
             }
         }
         else
         {
-            Info($datafile . ': RRA #' . join(',', @file_rra_idx_to_delete) .
-                 '" should to be deleted, ' .
+            my @descr;
+            foreach my $idx (sort {$b <=> $a} @file_rra_idx_to_delete )
+            {
+                push(@descr, $rrd->rra_descr($idx));
+            }
+            Info($datafile . ': ' . join(', ', @descr) .
+                 ' should to be deleted, ' .
                  'but --loss option is not set. ' .
                  'Skipping the update.');
             $c_changes_not_applied++;

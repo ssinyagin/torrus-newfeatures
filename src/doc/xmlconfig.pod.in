@@ -1192,6 +1192,7 @@ The following parameters are recognized for this kind of view:
 These view parameters correspond to same parameters in RRD Graph command.
 C<end> can also be given, it defaults to I<C<now>>.
 The following parameters are mandatory: C<width>, C<height>, and C<start>.
+C<border> is only supported in RRDtool version 1.3.9 or higher.
 
 =item * C<line-style>
 

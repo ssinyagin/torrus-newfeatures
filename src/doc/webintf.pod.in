@@ -237,7 +237,8 @@ RRDTool manuals).
 
 =item Gstart, Gend, Gwidth, Gheight, Gimgformat, Gborder
 
-Optional vaiables that override the ones defined in the view.
+Optional vaiables that override the ones defined in the view. Gborder is
+only supported in RRDtool version 1.3.9 or higher.
 
 =item Gmaxline
 

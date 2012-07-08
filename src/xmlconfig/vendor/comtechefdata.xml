@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2012 Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+  Comtech EF Data satellite modems
+
+-->
+
+<configuration>
+<definitions>
+  <def name="cdm570TxPowerLevel"     value="1.3.6.1.4.1.6247.24.1.2.2.10.0"/>
+  <def name="cdm570RxSignalLevel"    value="1.3.6.1.4.1.6247.24.1.3.2.4.0"/>
+  <def name="cdm570BufferFillState"  value="1.3.6.1.4.1.6247.24.1.3.2.2.0"/>
+</definitions>
+
+<datasources>
+
+  <template name="cdm570">
+    <subtree name="Radio">
+      <param name="comment"           value="Satellite link statistics"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="rrd-create-min"    value="U"/>
+      <param name="data-file" value="%system-id%_cdm570_radio.rrd"/>
+
+      <leaf name="SignalSummary">
+        <param name="ds-type"           value="rrd-multigraph" />
+        <param name="ds-names"          value="tx,rx" />
+        <param name="graph-lower-limit" value="-100"/>
+        <param name="graph-upper-limit" value="0"/>
+        <param name="precedence"        value="1000"/>
+        <param name="comment"           value="Tx/Rx Signal levels"/>
+        <param name="vertical-label"    value="dBm"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/summary"/>
+        
+        <param name="ds-expr-tx">{TxPower}</param>
+        <param name="graph-legend-tx"  value="Tx Power" />
+        <param name="line-style-tx"      value="##nearend" />
+        <param name="line-color-tx"      value="##nearend" />
+        <param name="line-order-tx"      value="1" />
+
+        <param name="ds-expr-rx">{RxSignal}</param>
+        <param name="graph-legend-rx"  value="Rx Signal" />
+        <param name="line-style-rx"      value="##farend" />
+        <param name="line-color-rx"      value="##farend" />
+        <param name="line-order-rx"      value="2" />
+      </leaf>
+        
+      <leaf name="TxPower">
+        <param name="comment"      value="Transmit output power level"/>
+        <param name="rrd-ds"       value="TxPower"/>
+        <param name="snmp-object"  value="$cdm570TxPowerLevel"/>
+        <param name="graph-legend" value="Transmit Power"/>
+        <param name="graph-lower-limit" value="-40"/>
+        <param name="graph-upper-limit" value="0"/>
+        <param name="vertical-label"  value="dBm"/>
+        <param name="collector-scale" value="10,/" />
+        <param name="precedence"   value="900"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/txpower"/>
+      </leaf>
+
+      <leaf name="RxSignal">
+        <param name="comment"      value="Receive signal level"/>
+        <param name="rrd-ds"       value="RxSignal"/>
+        <param name="snmp-object"  value="$cdm570RxSignalLevel"/>
+        <param name="graph-legend" value="Receive Signal"/>
+        <param name="graph-lower-limit" value="-100"/>
+        <param name="graph-upper-limit" value="0"/>
+        <param name="vertical-label"  value="dBm"/>
+        <param name="precedence"   value="800"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/rxsignal"/>
+      </leaf>
+
+      <leaf name="BufferFill">
+        <param name="comment"      value="Buffer fill state"/>
+        <param name="rrd-ds"       value="BufferFill"/>
+        <param name="snmp-object"  value="$cdm570BufferFillState"/>
+        <param name="graph-legend" value="Buffer Fill State"/>
+        <param name="graph-lower-limit" value="0"/>
+        <param name="graph-upper-limit" value="100"/>
+        <param name="vertical-label"  value="Percent"/>
+        <param name="precedence"   value="700"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/buffer"/>
+      </leaf>
+    </subtree>
+  </template>
+
+</datasources>
+
+</configuration>

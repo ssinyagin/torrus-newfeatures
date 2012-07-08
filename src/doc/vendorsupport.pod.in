@@ -162,6 +162,10 @@ Service Control Engine performance statistics.
 
 Temperature and memory health information statistics for Compaq servers.
 
+=item * Comtech EF Data
+
+Satellite modem statistics.
+
 =item * Empire (Concord) SystemEDGE
 
 Provides lots of statistics and information that a SystemEDGE agent

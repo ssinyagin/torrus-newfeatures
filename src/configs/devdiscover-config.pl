@@ -69,6 +69,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CiscoVDSL',
      'Torrus::DevDiscover::CiscoWLC',
      'Torrus::DevDiscover::CompaqCIM',
+     'Torrus::DevDiscover::ComtechEFData',
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
      'Torrus::DevDiscover::Foundry',
@@ -771,6 +772,12 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'CompaqCIM::cpq-cim-corr-mem-errs' => {
          'name'     => 'cpq-cim-corr-mem-errs',
          'source'   => 'vendor/compaq.cim.xml',
+     },
+
+     ### Comtech EF Data
+     'ComtechEFData::cdm570' => {
+         'name'     => 'cdm570',
+         'source'   => 'vendor/comtechefdata.xml',
      },
 
      #### Empire Sysedge

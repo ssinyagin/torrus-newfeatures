@@ -224,6 +224,13 @@ sub fit_rrd
     Debug('Processing RRD file: ' . $datafile);
     Debug('Using ' . scalar(@{$tokens_array}) . ' tokens');
 
+    if( not -r $datafile )
+    {
+        Error('File is unreadable. Skipping it: ' . $datafile);
+        $c_skipped_rrd++;
+        return;
+    }
+        
     my $rrd = RRD::Tweak->new();
     eval { $rrd->load_file($datafile) };
     if( $@  )

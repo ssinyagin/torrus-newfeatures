@@ -22,9 +22,12 @@
 
 <configuration>
 <definitions>
-  <def name="cdm570TxPowerLevel"     value="1.3.6.1.4.1.6247.24.1.2.2.10.0"/>
-  <def name="cdm570RxSignalLevel"    value="1.3.6.1.4.1.6247.24.1.3.2.4.0"/>
-  <def name="cdm570BufferFillState"  value="1.3.6.1.4.1.6247.24.1.3.2.2.0"/>
+  <def name="cdm570TxPowerLevel"      value="1.3.6.1.4.1.6247.24.1.2.2.10.0"/>  
+  <def name="cdm570RxBERMultiplier"   value="1.3.6.1.4.1.6247.24.1.3.2.1.0"/>
+  <def name="cdm570BufferFillState"   value="1.3.6.1.4.1.6247.24.1.3.2.2.0"/>
+  <def name="cdm570RxFrequencyOffset" value="1.3.6.1.4.1.6247.24.1.3.2.3.0"/>
+  <def name="cdm570RxSignalLevel"     value="1.3.6.1.4.1.6247.24.1.3.2.4.0"/>
+  <def name="cdm570RxEbNo"            value="1.3.6.1.4.1.6247.24.1.3.2.5.0"/>
 </definitions>
 
 <datasources>
@@ -35,53 +38,19 @@
       <param name="rrd-create-dstype" value="GAUGE"/>
       <param name="rrd-create-min"    value="U"/>
       <param name="data-file" value="%system-id%_cdm570_radio.rrd"/>
-
-      <leaf name="SignalSummary">
-        <param name="ds-type"           value="rrd-multigraph" />
-        <param name="ds-names"          value="tx,rx" />
-        <param name="graph-lower-limit" value="-100"/>
-        <param name="graph-upper-limit" value="0"/>
-        <param name="precedence"        value="1000"/>
-        <param name="comment"           value="Tx/Rx Signal levels"/>
-        <param name="vertical-label"    value="dBm"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/summary"/>
         
-        <param name="ds-expr-tx">{TxPower}</param>
-        <param name="graph-legend-tx"  value="Tx Power" />
-        <param name="line-style-tx"      value="##nearend" />
-        <param name="line-color-tx"      value="##nearend" />
-        <param name="line-order-tx"      value="1" />
 
-        <param name="ds-expr-rx">{RxSignal}</param>
-        <param name="graph-legend-rx"  value="Rx Signal" />
-        <param name="line-style-rx"      value="##farend" />
-        <param name="line-color-rx"      value="##farend" />
-        <param name="line-order-rx"      value="2" />
-      </leaf>
-        
-      <leaf name="TxPower">
-        <param name="comment"      value="Transmit output power level"/>
-        <param name="rrd-ds"       value="TxPower"/>
-        <param name="snmp-object"  value="$cdm570TxPowerLevel"/>
-        <param name="graph-legend" value="Transmit Power"/>
-        <param name="graph-lower-limit" value="-40"/>
-        <param name="graph-upper-limit" value="0"/>
-        <param name="vertical-label"  value="dBm"/>
-        <param name="collector-scale" value="10,/" />
+      <leaf name="BER">
+        <param name="comment"      value="Estimated corrected BER"/>
+        <param name="rrd-ds"       value="BER"/>
+        <param name="snmp-object"  value="$cdm570RxBERMultiplier"/>
+        <param name="graph-legend" value="BER"/>
+        <param name="collector-scale"   value="10e-10,*" />
+        <param name="graph-lower-limit" value="0"/>
+        <param name="graph-upper-limit" value="0.2"/>
+        <param name="vertical-label"  value="bit error rate"/>
         <param name="precedence"   value="900"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/txpower"/>
-      </leaf>
-
-      <leaf name="RxSignal">
-        <param name="comment"      value="Receive signal level"/>
-        <param name="rrd-ds"       value="RxSignal"/>
-        <param name="snmp-object"  value="$cdm570RxSignalLevel"/>
-        <param name="graph-legend" value="Receive Signal"/>
-        <param name="graph-lower-limit" value="-100"/>
-        <param name="graph-upper-limit" value="0"/>
-        <param name="vertical-label"  value="dBm"/>
-        <param name="precedence"   value="800"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/rxsignal"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/ber"/>
       </leaf>
 
       <leaf name="BufferFill">
@@ -92,9 +61,60 @@
         <param name="graph-lower-limit" value="0"/>
         <param name="graph-upper-limit" value="100"/>
         <param name="vertical-label"  value="Percent"/>
-        <param name="precedence"   value="700"/>
+        <param name="precedence"   value="800"/>
         <param name="nodeid"   value="radio//%nodeid-device%//0/buffer"/>
       </leaf>
+
+      <leaf name="RxFrequencyOffset">
+        <param name="comment"      value="Measured frequency offset"/>
+        <param name="rrd-ds"       value="FreqOffset"/>
+        <param name="snmp-object"  value="$cdm570RxFrequencyOffset"/>
+        <param name="graph-legend" value="RX Frequency Offset"/>
+        <param name="graph-lower-limit" value="U"/>
+        <param name="graph-upper-limit" value="U"/>
+        <param name="vertical-label"  value="Hz"/>
+        <param name="precedence"   value="700"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/freqoffset"/>
+      </leaf>
+
+      <leaf name="RxSignalLevel">
+        <param name="comment"      value="Receive signal level"/>
+        <param name="rrd-ds"       value="RxSignal"/>
+        <param name="snmp-object"  value="$cdm570RxSignalLevel"/>
+        <param name="graph-legend" value="Receive Signal"/>
+        <param name="graph-lower-limit" value="-100"/>
+        <param name="graph-upper-limit" value="0"/>
+        <param name="vertical-label"  value="dBm"/>
+        <param name="precedence"   value="600"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/rxsignal"/>
+      </leaf>
+
+      <leaf name="RxEbNo">
+        <param name="comment"      value="Eb/No"/>
+        <param name="rrd-ds"       value="EbNo"/>
+        <param name="snmp-object"  value="$cdm570RxEbNo"/>
+        <param name="collector-scale" value="0.1,*" />
+        <param name="graph-legend" value="Eb/No"/>
+        <param name="graph-lower-limit" value="0"/>
+        <param name="graph-upper-limit" value="U"/>
+        <param name="vertical-label"  value="dB"/>
+        <param name="precedence"   value="500"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/ebno"/>
+      </leaf>
+      
+      <leaf name="TxPower">
+        <param name="comment"      value="Transmit output power level"/>
+        <param name="rrd-ds"       value="TxPower"/>
+        <param name="snmp-object"  value="$cdm570TxPowerLevel"/>
+        <param name="collector-scale" value="0.1,*" />
+        <param name="graph-legend" value="Transmit Power"/>
+        <param name="graph-lower-limit" value="-40"/>
+        <param name="graph-upper-limit" value="0"/>
+        <param name="vertical-label"  value="dBm"/>
+        <param name="precedence"   value="400"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0/txpower"/>
+      </leaf>
+
     </subtree>
   </template>
 

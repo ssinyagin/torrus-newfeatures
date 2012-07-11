@@ -226,7 +226,7 @@ sub fit_rrd
 
     if( not -r $datafile )
     {
-        Error('File is unreadable. Skipping it: ' . $datafile);
+        Error('Cannot read file. Skipping it: ' . $datafile);
         $c_skipped_rrd++;
         return;
     }

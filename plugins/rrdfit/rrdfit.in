@@ -558,7 +558,7 @@ sub fit_rrd
                 push(@descr, $rrd->rra_descr($idx));
             }
             Info($datafile . ': ' . join(', ', @descr) .
-                 ' should to be deleted, ' .
+                 ' should be deleted, ' .
                  'but --loss option is not set. ' .
                  'Skipping the update.');
             $c_changes_not_applied++;

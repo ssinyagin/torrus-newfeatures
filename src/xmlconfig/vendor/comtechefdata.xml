@@ -50,7 +50,7 @@
         <param name="graph-upper-limit" value="0.2"/>
         <param name="vertical-label"  value="bit error rate"/>
         <param name="precedence"   value="900"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/ber"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0//ber"/>
       </leaf>
 
       <leaf name="BufferFill">
@@ -62,7 +62,7 @@
         <param name="graph-upper-limit" value="100"/>
         <param name="vertical-label"  value="Percent"/>
         <param name="precedence"   value="800"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/buffer"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0//buffer"/>
       </leaf>
 
       <leaf name="RxFrequencyOffset">
@@ -74,7 +74,7 @@
         <param name="graph-upper-limit" value="U"/>
         <param name="vertical-label"  value="Hz"/>
         <param name="precedence"   value="700"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/freqoffset"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0//freqoffset"/>
       </leaf>
 
       <leaf name="RxSignalLevel">
@@ -86,7 +86,7 @@
         <param name="graph-upper-limit" value="0"/>
         <param name="vertical-label"  value="dBm"/>
         <param name="precedence"   value="600"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/rxsignal"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0//rxsignal"/>
       </leaf>
 
       <leaf name="RxEbNo">
@@ -99,7 +99,7 @@
         <param name="graph-upper-limit" value="U"/>
         <param name="vertical-label"  value="dB"/>
         <param name="precedence"   value="500"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/ebno"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0//ebno"/>
       </leaf>
       
       <leaf name="TxPower">
@@ -112,7 +112,7 @@
         <param name="graph-upper-limit" value="0"/>
         <param name="vertical-label"  value="dBm"/>
         <param name="precedence"   value="400"/>
-        <param name="nodeid"   value="radio//%nodeid-device%//0/txpower"/>
+        <param name="nodeid"   value="radio//%nodeid-device%//0//txpower"/>
       </leaf>
 
     </subtree>

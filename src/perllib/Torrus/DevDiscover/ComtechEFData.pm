@@ -35,9 +35,21 @@ $Torrus::DevDiscover::registry{'ComtechEFData'} = {
 our %oiddef =
     (
      'ComtechEFData'     => '1.3.6.1.4.1.6247',
-     'CDM-570::cdm570'   => '1.3.6.1.4.1.6247.24',
+     'cdm570'            => '1.3.6.1.4.1.6247.24',
+     'cdm570TxFrequency' => '1.3.6.1.4.1.6247.24.1.2.2.1.0',
+     'cdm570TxDataRate'  => '1.3.6.1.4.1.6247.24.1.2.2.2.0',
+     'cdm570RxFrequency' => '1.3.6.1.4.1.6247.24.1.2.3.1.0',
+     'cdm570RxDataRate'  => '1.3.6.1.4.1.6247.24.1.2.3.2.0',
+     'cdmipWanFpgaRxPayLoadCount' => '1.3.6.1.4.1.6247.4.8.5.6.0',
      );
 
+
+my %cdm570_OID = (
+    'cdm570TxFrequency' => 'cdm-wan-tx-freq',
+    'cdm570TxDataRate'  => 'cdm-wan-tx-rate',
+    'cdm570RxFrequency' => 'cdm-wan-rx-freq',
+    'cdm570RxDataRate'  => 'cdm-wan-rx-rate',
+    );
 
 sub checkdevtype
 {
@@ -51,7 +63,7 @@ sub checkdevtype
         return 0;
     }
 
-    if( $dd->oidBaseMatch( 'CDM-570::cdm570', $sysObjectID ) )
+    if( $dd->oidBaseMatch( 'cdm570', $sysObjectID ) )
     {
         $devdetails->setCap('cdm570');
     }
@@ -81,6 +93,46 @@ sub discover
     
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
 
+    # Get TX/RX frequency and data rate
+    if( $devdetails->hasCap('cdm570') )
+    {
+        my @oids = ();
+        foreach my $var ( sort keys %cdm570_OID )
+        {
+            push( @oids, $dd->oiddef($var) );
+        }
+
+        my $result = $session->get_request( -varbindlist => \@oids );
+        if( not defined $result )
+        {
+            Error('Failed to get CDM570 radio parameters');
+            return 0;
+        }
+        
+        foreach my $var ( keys %cdm570_OID )
+        {
+            my $val = $result->{$dd->oiddef($var)};
+            if( not defined($val) )
+            {
+                $val = 0;
+            }
+            $data->{'cdm570'}{$var} = $val;
+            $data->{'param'}{$cdm570_OID{$var}} = $val;
+        }
+    }
+        
+    # Check if IP cotroller is present
+    {
+        my $oid = $dd->oiddef('cdmipWanFpgaRxPayLoadCount');        
+        my $result = $session->get_request( -varbindlist => [$oid] );
+        
+        if( $session->error_status() == 0 and
+            defined( $result ) and
+            defined($result->{$oid}) )
+        {
+            $devdetails->setCap('CDMIPController');
+        }
+    }
     return 1;
 }
 
@@ -94,6 +146,11 @@ sub buildConfig
     if( $devdetails->hasCap('cdm570') )
     {
         $cb->addTemplateApplication($devNode, 'ComtechEFData::cdm570');
+    }
+    
+    if( $devdetails->hasCap('CDMIPController') )
+    {
+        $cb->addTemplateApplication($devNode, 'ComtechEFData::cdmip');
     }
     
     return;

@@ -28,6 +28,10 @@
   <def name="cdm570RxFrequencyOffset" value="1.3.6.1.4.1.6247.24.1.3.2.3.0"/>
   <def name="cdm570RxSignalLevel"     value="1.3.6.1.4.1.6247.24.1.3.2.4.0"/>
   <def name="cdm570RxEbNo"            value="1.3.6.1.4.1.6247.24.1.3.2.5.0"/>
+  <def name="cdmipWanFpgaRxPayLoadCount" value="1.3.6.1.4.1.6247.4.8.5.6.0"/>
+  <def name="cdmipWanFpgaRxHeaderCount"  value="1.3.6.1.4.1.6247.4.8.5.7.0"/>
+  <def name="cdmipWanFpgaTxHeaderCount"  value="1.3.6.1.4.1.6247.4.8.5.9.0"/>
+  <def name="cdmipWanFpgaTxPayLoadCount" value="1.3.6.1.4.1.6247.4.8.5.10.0"/>
 </definitions>
 
 <datasources>
@@ -114,10 +118,121 @@
         <param name="precedence"   value="400"/>
         <param name="nodeid"   value="radio//%nodeid-device%//0//txpower"/>
       </leaf>
-
     </subtree>
   </template>
 
+
+
+  <template name="cdmip">
+    <subtree name="IPController">
+      <param name="comment"           value="IP Controller statistics"/>
+      <param name="rrd-create-dstype" value="COUNTER"/>
+      <param name="data-file" value="%system-id%_cdm_ip.rrd"/>
+
+      <leaf name="Bandwidth_Usage">
+        <param name="comment" value="Radio channel bandwidth usage" />
+        <param name="vertical-label"   value="percent" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="graph-upper-limit" value="100" />
+        <param name="upper-limit"      value="100" />
+        <param name="rrd-hwpredict"    value="disabled" />
+        <param name="precedence"       value="1000" />
+        <param name="nodeid"   value="hdlc//%nodeid-device%//0//bwusage"/>
+        <param name="ds-type"          value="rrd-multigraph" />
+        <param name="ds-names"         value="rx,tx" />
+        
+        <param name="ds-expr-rx">
+          {RxHeaderBytes},{RxPayloadBytes},+,800,*,%cdm-wan-rx-rate%,/
+        </param>
+        <param name="graph-legend-rx"
+               value="RX use of %cdm-wan-rx-rate% bps" />
+        <param name="line-style-rx"    value="##BpsIn" />
+        <param name="line-color-rx"    value="##BpsIn" />
+        <param name="line-order-rx"    value="1" />        
+
+        <param name="ds-expr-tx">
+          {TxHeaderBytes},{TxPayloadBytes},+,800,*,%cdm-wan-tx-rate%,/
+        </param>
+        <param name="graph-legend-tx"
+               value="TX use of %cdm-wan-tx-rate% bps" />
+        <param name="line-style-tx"    value="##BpsOut" />
+        <param name="line-color-tx"    value="##BpsOut" />
+        <param name="line-order-tx"    value="2" />        
+      </leaf>
+      
+      
+      <leaf name="RX_bps">
+        <param name="comment"
+               value="Total RX data"/>
+        <param name="graph-legend"    value="Total RX data"/>
+        <param name="vertical-label"  value="bps"/>
+        <param name="ds-type"         value="rrd-file" />
+        <param name="leaf-type"       value="rrd-cdef" />
+        <param name="rpn-expr"
+               value="{RxHeaderBytes},{RxPayloadBytes},+,8,*" />
+        <param name="upper-limit"    value="%cdm-wan-rx-rate%"/>
+        <param name="precedence"      value="900"/>
+        <param name="nodeid"   value="hdlc//%nodeid-device%//0//rx//totalbps"/>
+      </leaf>
+
+      <leaf name="TX_bps">
+        <param name="comment"
+               value="Total TX data"/>
+        <param name="graph-legend"    value="Total TX data"/>
+        <param name="vertical-label"  value="bps"/>
+        <param name="ds-type"         value="rrd-file" />
+        <param name="leaf-type"       value="rrd-cdef" />
+        <param name="rpn-expr"
+               value="{TxHeaderBytes},{TxPayloadBytes},+,8,*" />    
+        <param name="upper-limit"    value="%cdm-wan-tx-rate%"/>
+        <param name="precedence"      value="800"/>
+        <param name="nodeid"   value="hdlc//%nodeid-device%//0//tx//totalbps"/>
+      </leaf>
+      
+      <leaf name="RxHeaderBytes">
+        <param name="comment"      value="HDLC header bytes received"/>
+        <param name="rrd-ds"       value="RxHeader"/>
+        <param name="snmp-object"  value="$cdmipWanFpgaRxHeaderCount"/>
+        <param name="graph-legend" value="Rx Header Bytes"/>
+        <param name="vertical-label"  value="Bps"/>
+        <param name="precedence"   value="500"/>
+        <param name="nodeid"   value="hdlc//%nodeid-device%//0//rx//headers"/>
+      </leaf>
+
+      <leaf name="RxPayloadBytes">
+        <param name="comment"      value="Payload bytes received"/>
+        <param name="rrd-ds"       value="RxPayload"/>
+        <param name="snmp-object"  value="$cdmipWanFpgaRxPayLoadCount"/>
+        <param name="graph-legend" value="Rx Payload Bytes"/>
+        <param name="vertical-label"  value="Bps"/>
+        <param name="precedence"   value="400"/>
+        <param name="nodeid"   value="hdlc//%nodeid-device%//0//rx//payload"/>
+      </leaf>
+
+      <leaf name="TxHeaderBytes">
+        <param name="comment"      value="HDLC header bytes sent"/>
+        <param name="rrd-ds"       value="TxHeader"/>
+        <param name="snmp-object"  value="$cdmipWanFpgaTxHeaderCount"/>
+        <param name="graph-legend" value="Tx Header Bytes"/>
+        <param name="vertical-label"  value="Bps"/>
+        <param name="precedence"   value="300"/>
+        <param name="nodeid"   value="hdlc//%nodeid-device%//0//tx//headers"/>
+      </leaf>
+
+      <leaf name="TxPayloadBytes">
+        <param name="comment"      value="Payload bytes sent"/>
+        <param name="rrd-ds"       value="TxPayload"/>
+        <param name="snmp-object"  value="$cdmipWanFpgaTxPayLoadCount"/>
+        <param name="graph-legend" value="Tx Payload Bytes"/>
+        <param name="vertical-label"  value="Bps"/>
+        <param name="precedence"   value="200"/>
+        <param name="nodeid"   value="hdlc//%nodeid-device%//0//tx//payload"/>
+      </leaf>      
+      
+    </subtree>    
+  </template>
+  
+  
 </datasources>
 
 </configuration>

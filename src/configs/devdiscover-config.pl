@@ -779,6 +779,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'cdm570',
          'source'   => 'vendor/comtechefdata.xml',
      },
+     'ComtechEFData::cdmip' => {
+         'name'     => 'cdmip',
+         'source'   => 'vendor/comtechefdata.xml',
+     },
 
      #### Empire Sysedge
      'EmpireSystemedge::sysedge_opmode' => {

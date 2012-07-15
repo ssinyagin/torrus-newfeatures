@@ -355,6 +355,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'apc-pdu2-bank',
          'source' => 'vendor/apc.powernet.xml'
          },
+     'APC_PowerNet::apc-pdu-subtree' => {
+         'name'   => 'apc-pdu-subtree',
+         'source' => 'vendor/apc.powernet.xml'
+         },
+     'APC_PowerNet::apc-pdu-phase' => {
+         'name'   => 'apc-pdu-phase',
+         'source' => 'vendor/apc.powernet.xml'
+         },
      
      #### Apple Airport Extreme
      'Apple_AE::ae-wireless-clients-subtree' => {

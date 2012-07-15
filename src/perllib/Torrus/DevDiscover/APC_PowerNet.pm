@@ -43,6 +43,8 @@ our %oiddef =
     (
      # PowerNet-MIB
      'apc_products' => '1.3.6.1.4.1.318.1',
+     
+     # rPDU2, the newer hardware and firmware
      'rPDU2IdentFirmwareRev' => '1.3.6.1.4.1.318.1.1.26.2.1.6',
      'rPDU2IdentModelNumber' => '1.3.6.1.4.1.318.1.1.26.2.1.8',
      'rPDU2IdentSerialNumber' => '1.3.6.1.4.1.318.1.1.26.2.1.9',
@@ -82,6 +84,20 @@ our %oiddef =
      'rPDU2BankConfigOverloadCurrentThreshold' =>
      '1.3.6.1.4.1.318.1.1.26.8.1.1.7',
 
+
+     # rPDU, the older hardware and firmware
+     'sPDUIdentFirmwareRev'   => '1.3.6.1.4.1.318.1.1.4.1.2.0',
+     'sPDUIdentModelNumber'   => '1.3.6.1.4.1.318.1.1.4.1.4.0',
+     'sPDUIdentSerialNumber'  => '1.3.6.1.4.1.318.1.1.4.1.5.0',
+     'rPDUIdentDeviceRating'  => '1.3.6.1.4.1.318.1.1.12.1.7.0',
+     'rPDUIdentDeviceNumOutlets' => '1.3.6.1.4.1.318.1.1.12.1.8.0',
+     'rPDUIdentDeviceNumPhases' => '1.3.6.1.4.1.318.1.1.12.1.9.0',
+
+     'rPDULoadPhaseConfigNearOverloadThreshold' =>
+     '1.3.6.1.4.1.318.1.1.12.2.2.1.1.3',
+     'rPDULoadPhaseConfigOverloadThreshold' =>
+     '1.3.6.1.4.1.318.1.1.12.2.2.1.1.4',
+     
      );
 
 
@@ -103,6 +119,12 @@ foreach my $name
 }
 
 
+my @rpdu_system_oid =
+    ('sPDUIdentFirmwareRev', 'sPDUIdentModelNumber',
+     'sPDUIdentSerialNumber', 'rPDUIdentDeviceRating',
+     'rPDUIdentDeviceNumOutlets', 'rPDUIdentDeviceNumPhases');
+
+    
 my $apcInterfaceFilter = {
     'LOOPBACK' => {
         'ifType'  => 24,                     # softwareLoopback
@@ -145,14 +167,14 @@ sub discover
         my $result = $session->get_request
             ( -varbindlist => [values %rpdu2_system_oid] );
 
+        my $oid = $rpdu2_system_oid{'rPDU2IdentFirmwareRev'};
+    
         if( defined($result) and
-            defined($result->{$rpdu2_system_oid{'rPDU2IdentFirmwareRev'}}) )
+            defined($result->{$oid}) and length($result->{$oid}) > 0 )
         {
             $devdetails->setCap('apc_rPDU2');
 
-            $data->{'apc_rPDU2'}{'system'} = {};
-            my $sysref = $data->{'apc_rPDU2'}{'system'};
-
+            my $sysref = {};
             while( my($name, $oid) = each %rpdu2_system_oid )
             {
                 $sysref->{$name} = $result->{$oid};
@@ -165,7 +187,13 @@ sub discover
                 $sysref->{'rPDU2IdentFirmwareRev'} .
                 ', S/N ' .
                 $sysref->{'rPDU2IdentSerialNumber'};
-
+            
+            $data->{'param'}{'rpdu2-warn-pwr'} =
+                $sysref->{'rPDU2DeviceConfigNearOverloadPowerThreshold'};
+            
+            $data->{'param'}{'rpdu2-crit-pwr'} =
+                $sysref->{'rPDU2DeviceConfigOverloadPowerThreshold'};
+            
             if( $devdetails->paramDisabled('suppress-legend') )
             {
                 my $legend = $data->{'param'}{'legend'};
@@ -187,9 +215,6 @@ sub discover
             }
         }
     }
-
-    # in the future, place here other PowerNet-MIB checkups
-
 
     if( $devdetails->hasCap('apc_rPDU2') )
     {
@@ -229,6 +254,78 @@ sub discover
             }
         }
     }
+    else
+    {
+        # This is an old firmware, fall back to rPDU MIB
+        my @oids;
+        foreach my $oidname ( @rpdu_system_oid )
+            
+        {
+            push( @oids, $dd->oiddef($oidname) );
+        }
+        
+        my $result = $session->get_request( -varbindlist => \@oids );
+        if( defined($result) )
+        {
+            my $sysref = {};
+            foreach my $oidname ( @rpdu_system_oid )
+            {
+                my $oid = $dd->oiddef($oidname);
+                my $val = $result->{$oid};
+                if( defined($val) and length($val) > 0 )
+                {
+                    $sysref->{$oidname} = $val;
+                }
+                else
+                {
+                    $sysref->{$oidname} = 'N/A';
+                }
+            }
+
+            $data->{'param'}{'comment'} =
+                'APC PDU ' .
+                $sysref->{'sPDUIdentModelNumber'} .
+                ', Firmware ' .
+                $sysref->{'sPDUIdentFirmwareRev'} .
+                ', S/N ' .
+                $sysref->{'sPDUIdentSerialNumber'};
+
+            if( $devdetails->paramDisabled('suppress-legend') )
+            {
+                my $legend = $data->{'param'}{'legend'};
+                $legend = '' unless defined($legend);
+
+                $legend .= 'Phases:' .
+                    $sysref->{'rPDUIdentDeviceNumPhases'} . ';';
+
+                $legend .= 'Outlets:' .
+                    $sysref->{'rPDUIdentDeviceNumOutlets'} . ';';
+
+                $legend .= 'Max current:' .
+                    $sysref->{'rPDUIdentDeviceRating'} . 'A;';
+                
+                $data->{'param'}{'legend'} = $legend;
+            }
+        }
+
+        # Discover PDU phases
+        {
+            my $warn_thr = $dd->walkSnmpTable
+                ('rPDULoadPhaseConfigNearOverloadThreshold');
+            my $crit_thr = $dd->walkSnmpTable
+                ('rPDULoadPhaseConfigOverloadThreshold');
+
+            while( my( $INDEX, $val ) = each %{$warn_thr} )
+            {
+                $data->{'apc_rPDU'}{'phases'}{$INDEX} = {
+                    'rpdu-phasenum' => $INDEX,
+                    'rpdu-warn-currnt' => $val,
+                    'rpdu-crit-currnt' => $crit_thr->{$INDEX},
+                };
+            }
+        }
+
+    }
 
     return 1;
 }
@@ -242,28 +339,29 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
+    my @templates;
     if( $devdetails->hasCap('apc_rPDU2') )
     {
-        my $sysref = $data->{'apc_rPDU2'}{'system'};
+        push(@templates, 'APC_PowerNet::apc-pdu2-subtree');
+    }
+    else
+    {
+        push(@templates, 'APC_PowerNet::apc-pdu-subtree');
+    }
 
-        my $devParam = {
-            'node-display-name' => 'PDU Statistics',
-            'comment' => 'PDU current and power load',
-            'precedence' => 10000,
-        };
-
-        $devParam->{'rpdu2-warn-pwr'} =
-            $sysref->{'rPDU2DeviceConfigNearOverloadPowerThreshold'};
-
-        $devParam->{'rpdu2-crit-pwr'} =
-            $sysref->{'rPDU2DeviceConfigOverloadPowerThreshold'};
-
-        my $pduSubtree = $cb->addSubtree
-            ( $devNode, 'PDU_Stats', $devParam,
-              ['APC_PowerNet::apc-pdu2-subtree']);
-
-        my $precedence = 1000;
-
+    my $devParam = {
+        'node-display-name' => 'PDU Statistics',
+        'comment' => 'PDU current and power load',
+        'precedence' => 10000,
+    };
+    
+    my $pduSubtree =
+        $cb->addSubtree( $devNode, 'PDU_Stats', $devParam, \@templates );
+    
+    my $precedence = 1000;
+    
+    if( $devdetails->hasCap('apc_rPDU2') )
+    {
         # phases
 
         foreach my $INDEX ( sort {$a <=> $b}
@@ -313,7 +411,33 @@ sub buildConfig
 
             $precedence--;
         }
+    }
+    else
+    {
+        # Old rPDU MIB
+        
+        foreach my $INDEX ( sort {$a <=> $b}
+                            keys %{$data->{'apc_rPDU'}{'phases'}} )
+        {
+            my $ref = $data->{'apc_rPDU'}{'phases'}{$INDEX};
 
+            my $param = {
+                'rpdu-phase-index' => $INDEX,
+                'node-display-name' => 'Phase ' . $ref->{'rpdu-phasenum'},
+                'precedence' => $precedence,
+            };
+
+            while (my($key, $val) = each %{$ref})
+            {
+                $param->{$key} = $val;
+            }
+            
+            $cb->addSubtree
+                ( $pduSubtree, 'Phase_' . $ref->{'rpdu-phasenum'}, $param,
+                  ['APC_PowerNet::apc-pdu-phase'] );
+            
+            $precedence--;
+        }        
     }
 
     return;

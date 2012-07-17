@@ -102,7 +102,7 @@ $Torrus::Collector::fastCycles = 3;
 $Torrus::Collector::SNMP::RxBuffer = 131071;
 
 # The time period after which we give up to reach the host being unreachable
-$Torrus::Collector::SNMP::unreachableTimeout = 21600; # 6 hours
+$Torrus::Collector::SNMP::unreachableTimeout = 0; # never give up
 
 # For unreachable host, we retry SNMP query not earlier than this
 $Torrus::Collector::SNMP::unreachableRetryDelay = 600; # 10 min

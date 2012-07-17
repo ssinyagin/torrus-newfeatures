@@ -1,3 +1,9 @@
+2012-07-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* configs/torrus-config.pl: default value for
+	$Torrus::Collector::SNMP::unreachableTimeout is set to 0 instead
+	of 6 hours (never give up on unreachable hosts)
+
 2012-07-08  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/ComtechEFData.pm: new discovery

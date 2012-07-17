@@ -359,8 +359,8 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'apc-pdu-subtree',
          'source' => 'vendor/apc.powernet.xml'
          },
-     'APC_PowerNet::apc-pdu-phase' => {
-         'name'   => 'apc-pdu-phase',
+     'APC_PowerNet::apc-pdu-stat' => {
+         'name'   => 'apc-pdu-stat',
          'source' => 'vendor/apc.powernet.xml'
          },
      

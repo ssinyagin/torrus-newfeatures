@@ -242,7 +242,7 @@
    <!-- ******  Older rPDU MIB ***** -->
    
    <template name="apc-pdu-subtree">
-    <param name="comment" value="Power, current, and voltage statistics" />
+    <param name="comment" value="Current and Power statistics" />
     
     <param name="has-overview-shortcuts" value="yes"/>
     <param name="overview-shortcuts" value="all"/>
@@ -252,7 +252,6 @@
        value="All important graphs on one page"/>
     <param name="overview-page-title-all"
        value="PDU overview"/>
-    <param name="overview-direct-link-all" value="yes"/>
      
     <subtree name="Device">
       <param name="data-file"  value="%system-id%_pdu_device.rrd"/>
@@ -274,33 +273,31 @@
     </subtree>
    </template>
 
-   <template name="apc-pdu-phase">
+   <template name="apc-pdu-stat">
       <param name="data-file"
-              value="%system-id%_pdu_phase_%rpdu-phasenum%.rrd"/>
-      <param name="graph-title" value="%system-id% phase %rpdu-phasenum%" />
-      <param name="comment" value="Statistics for the inlet phase"/>
+              value="%system-id%_pdu_phase_%rpdu-statusidx%.rrd"/>
 
       <leaf name="Current_raw">
         <param name="hidden" value="yes"/>
-        <param name="comment" value="Current draw on the phase"/>
+        <param name="comment" value="Current draw"/>
         <param name="snmp-object"
-                value="$rPDULoadStatusLoad.%rpdu-phase-index%" />
+                value="$rPDULoadStatusLoad.%rpdu-statusidx%" />
         <param name="collector-scale"   value="0.1,*" />
         <param name="rrd-ds"            value="Current"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="graph-lower-limit" value="0" />
-        <param name="graph-legend"      value="phase current draw"/>
+        <param name="graph-legend"      value="current draw"/>
         <param name="vertical-label"    value="Ampere" />
       </leaf>
 
       <leaf name="Current">
-        <param name="comment" value="Current draw on the phase"/>
+        <param name="comment" value="Current draw"/>
         
         <param name="ds-type"           value="rrd-multigraph" />
         <param name="ds-names"          value="usage,max" />
 
         <param name="nodeid"
-               value="pdu//%nodeid-device%//phase%rpdu-phasenum%//current"/>
+               value="pdu//%nodeid-device%//%rpdu-statusidx%//current"/>
         <param name="graph-lower-limit" value="0" />
         
         <!-- RPN requires to refer to at least one valid datasource, so we

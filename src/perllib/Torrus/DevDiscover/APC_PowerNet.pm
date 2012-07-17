@@ -93,10 +93,19 @@ our %oiddef =
      'rPDUIdentDeviceNumOutlets' => '1.3.6.1.4.1.318.1.1.12.1.8.0',
      'rPDUIdentDeviceNumPhases' => '1.3.6.1.4.1.318.1.1.12.1.9.0',
 
+     'rPDULoadStatusPhaseNumber' => '1.3.6.1.4.1.318.1.1.12.2.3.1.1.4',
+     'rPDULoadStatusBankNumber'  => '1.3.6.1.4.1.318.1.1.12.2.3.1.1.5',
+     
      'rPDULoadPhaseConfigNearOverloadThreshold' =>
      '1.3.6.1.4.1.318.1.1.12.2.2.1.1.3',
      'rPDULoadPhaseConfigOverloadThreshold' =>
      '1.3.6.1.4.1.318.1.1.12.2.2.1.1.4',
+
+     'rPDULoadBankConfigNearOverloadThreshold' =>
+     '1.3.6.1.4.1.318.1.1.12.2.4.1.1.3',
+     
+     'rPDULoadBankConfigOverloadThreshold' =>
+     '1.3.6.1.4.1.318.1.1.12.2.4.1.1.4',
      
      );
 
@@ -310,18 +319,62 @@ sub discover
 
         # Discover PDU phases
         {
-            my $warn_thr = $dd->walkSnmpTable
+            my $phases = $dd->walkSnmpTable('rPDULoadStatusPhaseNumber');
+            my $banks = $dd->walkSnmpTable('rPDULoadStatusBankNumber');
+            
+            my $phase_warn_thr = $dd->walkSnmpTable
                 ('rPDULoadPhaseConfigNearOverloadThreshold');
-            my $crit_thr = $dd->walkSnmpTable
+            my $phase_crit_thr = $dd->walkSnmpTable
                 ('rPDULoadPhaseConfigOverloadThreshold');
+            
+            my $bank_warn_thr = $dd->walkSnmpTable
+                ('rPDULoadBankConfigNearOverloadThreshold');
+            my $bank_crit_thr = $dd->walkSnmpTable
+                ('rPDULoadBankConfigOverloadThreshold');
 
-            while( my( $INDEX, $val ) = each %{$warn_thr} )
+            $data->{'apc_rPDU'} = [];
+            
+            foreach my $INDEX ( keys %{$phases} )
             {
-                $data->{'apc_rPDU'}{'phases'}{$INDEX} = {
-                    'rpdu-phasenum' => $INDEX,
-                    'rpdu-warn-currnt' => $val,
-                    'rpdu-crit-currnt' => $crit_thr->{$INDEX},
-                };
+                my $phasenum = $phases->{$INDEX};
+                my $banknum = $banks->{$INDEX};
+
+                my $param = {'rpdu-statusidx' => $INDEX};
+                my $name;
+                my $take = 0;
+                
+                if( $banknum > 0 )
+                {
+                    if( defined($bank_warn_thr->{$banknum}) and
+                        $bank_warn_thr->{$banknum} > 0 )
+                    {
+                        $name = 'Bank ' . $banknum;
+                        $param->{'rpdu-warn-currnt'} =
+                            $bank_warn_thr->{$banknum};
+                        $param->{'rpdu-crit-currnt'} =
+                            $bank_crit_thr->{$banknum};
+                        $take = 1;
+                    }
+                }
+                else                  
+                {
+                    if( defined($phase_warn_thr->{$phasenum}) and
+                        $phase_warn_thr->{$phasenum} > 0 )
+                    {
+                        $name = 'Phase ' . $phasenum;
+                        $param->{'rpdu-warn-currnt'} =
+                            $phase_warn_thr->{$phasenum};
+                        $param->{'rpdu-crit-currnt'} =
+                            $phase_crit_thr->{$phasenum};
+                        $take = 1;
+                    }
+                }
+
+                if( $take )
+                {
+                    push( @{$data->{'apc_rPDU'}},
+                          {'param' => $param, 'name' => $name} );
+                }
             }
         }
 
@@ -357,11 +410,11 @@ sub buildConfig
     
     my $pduSubtree =
         $cb->addSubtree( $devNode, 'PDU_Stats', $devParam, \@templates );
-    
-    my $precedence = 1000;
-    
+        
     if( $devdetails->hasCap('apc_rPDU2') )
     {
+        my $precedence = 1000;
+
         # phases
 
         foreach my $INDEX ( sort {$a <=> $b}
@@ -416,27 +469,25 @@ sub buildConfig
     {
         # Old rPDU MIB
         
-        foreach my $INDEX ( sort {$a <=> $b}
-                            keys %{$data->{'apc_rPDU'}{'phases'}} )
+        foreach my $ref (@{$data->{'apc_rPDU'}})
         {
-            my $ref = $data->{'apc_rPDU'}{'phases'}{$INDEX};
+            my $param = {};
 
-            my $param = {
-                'rpdu-phase-index' => $INDEX,
-                'node-display-name' => 'Phase ' . $ref->{'rpdu-phasenum'},
-                'precedence' => $precedence,
-            };
-
-            while (my($key, $val) = each %{$ref})
+            while (my($key, $val) = each %{$ref->{'param'}})
             {
                 $param->{$key} = $val;
             }
-            
+
+            $param->{'precedence'} = 1000 - $param->{'rpdu-statusidx'};
+            $param->{'node-display-name'} = $ref->{'name'};
+            $param->{'graph-title'} = '%system-id% ' . $ref->{'name'};
+
+            my $subtreeName = $ref->{'name'};
+            $subtreeName =~ s/\W/_/go;
+                
             $cb->addSubtree
-                ( $pduSubtree, 'Phase_' . $ref->{'rpdu-phasenum'}, $param,
-                  ['APC_PowerNet::apc-pdu-phase'] );
-            
-            $precedence--;
+                ( $pduSubtree, $subtreeName, $param,
+                  ['APC_PowerNet::apc-pdu-stat'] );
         }        
     }
 

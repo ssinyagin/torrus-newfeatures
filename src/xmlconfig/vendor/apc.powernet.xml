@@ -35,8 +35,8 @@
         value="1.3.6.1.4.1.318.1.1.26.6.3.1.7"/>
    <def name="rPDU2BankStatusCurrent"
         value="1.3.6.1.4.1.318.1.1.26.8.3.1.5"/>
-   <def name="rPDUIdentDevicePowerVA"
-        value="1.3.6.1.4.1.318.1.1.12.1.18.0"/>
+   <def name="rPDUIdentDevicePowerWatts"
+        value="1.3.6.1.4.1.318.1.1.12.1.16.0"/>
    <def name="rPDULoadStatusLoad"
         value="1.3.6.1.4.1.318.1.1.12.2.3.1.1.2"/>
   </definitions>
@@ -61,8 +61,7 @@
       <param name="precedence" value="2000"/>
       <param name="comment" value="Statistics for the whole PDU"/>
       
-      <leaf name="Power_raw">
-        <param name="hidden" value="yes"/>
+      <leaf name="Power">
         <param name="comment" value="Power consumed at this PDU"/>
         <param name="snmp-object"       value="$rPDU2DeviceStatusPower.1" />
         <param name="collector-scale"   value="0.01,*" />
@@ -71,39 +70,13 @@
         <param name="graph-title" value="%system-id%" />
         <param name="graph-lower-limit" value="0" />
         <param name="graph-legend"      value="total power"/>
-        <param name="vertical-label"    value="Kilowatt" />
-      </leaf>
-
-      <leaf name="Power">
-        <param name="comment"   value="Power consumed at this PDU"/>
-                
-        <param name="ds-type"           value="rrd-multigraph" />
-        <param name="ds-names"          value="usage,max" />
-
-        <param name="graph-lower-limit" value="0" />
+        <param name="vertical-label"    value="Kilowatts" />
+        <param name="upper-limit"       value="%rpdu2-crit-pwr%" />
+        <param name="normal-level"      value="%rpdu2-warn-pwr%" />
+        <param name="graph-upper-limit" value="%rpdu2-crit-pwr%" />
         <param name="nodeid"
                value="pdu//%nodeid-device%//device//power"/>
-
-        <!-- RPN requires to refer to at least one valid datasource, so we
-             multiply it by zero -->
-        <param name="ds-expr-max">%rpdu2-crit-pwr%,{Power_raw},0,*,+</param>
-        <param name="graph-legend-max"    value="maximum" />
-        <param name="line-style-max"      value="##totalresource" />
-        <param name="line-color-max"      value="##totalresource" />
-        <param name="line-order-max"      value="1" />
-      
-        <param name="ds-expr-usage">{Power_raw}</param>
-        <param name="graph-legend-usage"  value="total power consumtion" />
-        <param name="line-style-usage"    value="##resourceusage" />
-        <param name="line-color-usage"    value="##resourceusage" />
-        <param name="line-order-usage"    value="2" />
-
-        <param name="graph-title" value="%system-id%" />
-        <param name="graph-lower-limit" value="0" />
-        <param name="vertical-label"    value="Kilowatt" />
-        <param name="upper-limit"       value="%rpdu2-warn-pwr%" />
-      </leaf>
-      
+      </leaf>      
     </subtree>
    </template>
 
@@ -114,8 +87,7 @@
       <param name="graph-title" value="%system-id% phase %rpdu2-phasenum%" />
       <param name="comment" value="Statistics for the inlet phase"/>
 
-      <leaf name="Current_raw">
-        <param name="hidden" value="yes"/>
+      <leaf name="Current">
         <param name="comment" value="Current draw on the phase"/>
         <param name="snmp-object"
                 value="$rPDU2PhaseStatusCurrent.%rpdu2-phase-index%" />
@@ -124,37 +96,12 @@
         <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="graph-lower-limit" value="0" />
         <param name="graph-legend"      value="phase current draw"/>
-        <param name="vertical-label"    value="Ampere" />
-      </leaf>
-
-      <leaf name="Current">
-        <param name="comment" value="Current draw on the phase"/>
-        
-        <param name="ds-type"           value="rrd-multigraph" />
-        <param name="ds-names"          value="usage,max" />
-
+        <param name="vertical-label"    value="Amperes" />
+        <param name="upper-limit"       value="%rpdu2-crit-currnt%" />
+        <param name="normal-level"      value="%rpdu2-warn-currnt%" />
+        <param name="graph-upper-limit" value="%rpdu2-crit-currnt%" />
         <param name="nodeid"
                value="pdu//%nodeid-device%//phase%rpdu2-phasenum%//current"/>
-        <param name="graph-lower-limit" value="0" />
-        
-        <!-- RPN requires to refer to at least one valid datasource, so we
-             multiply it by zero -->
-        <param name="ds-expr-max">
-             %rpdu2-crit-currnt%,{Current_raw},0,*,+
-        </param>
-        <param name="graph-legend-max"    value="maximum" />
-        <param name="line-style-max"      value="##totalresource" />
-        <param name="line-color-max"      value="##totalresource" />
-        <param name="line-order-max"      value="1" />
-      
-        <param name="ds-expr-usage">{Current_raw}</param>
-        <param name="graph-legend-usage"  value="phase current draw" />
-        <param name="line-style-usage"    value="##resourceusage" />
-        <param name="line-color-usage"    value="##resourceusage" />
-        <param name="line-order-usage"    value="2" />
-
-        <param name="vertical-label"    value="Ampere" />
-        <param name="upper-limit"       value="%rpdu2-warn-currnt%" />
       </leaf>
 
       <leaf name="Voltage">
@@ -193,8 +140,7 @@
       <param name="graph-title" value="%system-id% bank %rpdu2-banknum%" />
       <param name="comment" value="Statistics for the outlet bank"/>
       
-      <leaf name="Current_raw">
-        <param name="hidden" value="yes"/>
+      <leaf name="Current">
         <param name="comment" value="Current draw on the bank"/>
         <param name="snmp-object"
                 value="$rPDU2BankStatusCurrent.%rpdu2-bank-index%" />
@@ -203,39 +149,13 @@
         <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="graph-lower-limit" value="0" />
         <param name="graph-legend"      value="bank current"/>
-        <param name="vertical-label"    value="Ampere" />
-      </leaf>
-
-      <leaf name="Current">
-        <param name="comment" value="Current draw on the bank"/>
-        
-        <param name="ds-type"           value="rrd-multigraph" />
-        <param name="ds-names"          value="usage,max" />
-
+        <param name="vertical-label"    value="Amperes" />
+        <param name="upper-limit"       value="%rpdu2-crit-currnt%" />
+        <param name="normal-level"      value="%rpdu2-warn-currnt%" />
+        <param name="graph-upper-limit" value="%rpdu2-crit-currnt%" />
         <param name="nodeid"
                value="pdu//%nodeid-device%//bank%rpdu2-banknum%//current"/>
-        <param name="graph-lower-limit" value="0" />
-        
-        <!-- RPN requires to refer to at least one valid datasource, so we
-             multiply it by zero -->
-        <param name="ds-expr-max">
-          %rpdu2-crit-currnt%,{Current_raw},0,*,+
-        </param>
-        <param name="graph-legend-max"    value="maximum" />
-        <param name="line-style-max"      value="##totalresource" />
-        <param name="line-color-max"      value="##totalresource" />
-        <param name="line-order-max"      value="1" />
-      
-        <param name="ds-expr-usage">{Current_raw}</param>
-        <param name="graph-legend-usage"  value="bank current draw" />
-        <param name="line-style-usage"    value="##resourceusage" />
-        <param name="line-color-usage"    value="##resourceusage" />
-        <param name="line-order-usage"    value="2" />
-
-        <param name="vertical-label"    value="Ampere" />
-        <param name="upper-limit"       value="%rpdu2-warn-currnt%" />
       </leaf>
-
    </template>
 
    
@@ -260,13 +180,14 @@
       
       <leaf name="Power">
         <param name="comment" value="Power consumed at this PDU"/>
-        <param name="snmp-object"       value="$rPDUIdentDevicePowerVA" />
+        <param name="snmp-object"       value="$rPDUIdentDevicePowerWatts" />
+        <param name="collector-scale"   value="0.001,*" />
         <param name="rrd-ds"            value="Power"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="graph-title" value="%system-id%" />
         <param name="graph-lower-limit" value="0" />
         <param name="graph-legend"      value="total power"/>
-        <param name="vertical-label"    value="VA" />
+        <param name="vertical-label"    value="Kilowatts" />
         <param name="nodeid"
                value="pdu//%nodeid-device%//device//power"/>
       </leaf>
@@ -277,8 +198,7 @@
       <param name="data-file"
               value="%system-id%_pdu_phase_%rpdu-statusidx%.rrd"/>
 
-      <leaf name="Current_raw">
-        <param name="hidden" value="yes"/>
+      <leaf name="Current">
         <param name="comment" value="Current draw"/>
         <param name="snmp-object"
                 value="$rPDULoadStatusLoad.%rpdu-statusidx%" />
@@ -287,37 +207,10 @@
         <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="graph-lower-limit" value="0" />
         <param name="graph-legend"      value="current draw"/>
-        <param name="vertical-label"    value="Ampere" />
-      </leaf>
-
-      <leaf name="Current">
-        <param name="comment" value="Current draw"/>
+        <param name="vertical-label"    value="Amperes" />
         
-        <param name="ds-type"           value="rrd-multigraph" />
-        <param name="ds-names"          value="usage,max" />
-
         <param name="nodeid"
-               value="pdu//%nodeid-device%//%rpdu-statusidx%//current"/>
-        <param name="graph-lower-limit" value="0" />
-        
-        <!-- RPN requires to refer to at least one valid datasource, so we
-             multiply it by zero -->
-        <param name="ds-expr-max">
-             %rpdu-crit-currnt%,{Current_raw},0,*,+
-        </param>
-        <param name="graph-legend-max"    value="maximum" />
-        <param name="line-style-max"      value="##totalresource" />
-        <param name="line-color-max"      value="##totalresource" />
-        <param name="line-order-max"      value="1" />
-      
-        <param name="ds-expr-usage">{Current_raw}</param>
-        <param name="graph-legend-usage"  value="phase current draw" />
-        <param name="line-style-usage"    value="##resourceusage" />
-        <param name="line-color-usage"    value="##resourceusage" />
-        <param name="line-order-usage"    value="2" />
-
-        <param name="vertical-label"    value="Ampere" />
-        <param name="upper-limit"       value="%rpdu-warn-currnt%" />
+               value="pdu//%nodeid-device%//%nodeid-rpdu-ref%//current"/>
       </leaf>
    </template>
    

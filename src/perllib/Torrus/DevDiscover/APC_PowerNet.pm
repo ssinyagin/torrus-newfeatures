@@ -341,40 +341,37 @@ sub discover
 
                 my $param = {'rpdu-statusidx' => $INDEX};
                 my $name;
-                my $take = 0;
                 
                 if( $banknum > 0 )
                 {
+                    $name = 'Bank ' . $banknum;
+                    $param->{'nodeid-rpdu-ref'} = 'bank' . $banknum;
+                    
                     if( defined($bank_warn_thr->{$banknum}) and
                         $bank_warn_thr->{$banknum} > 0 )
                     {
-                        $name = 'Bank ' . $banknum;
                         $param->{'rpdu-warn-currnt'} =
                             $bank_warn_thr->{$banknum};
                         $param->{'rpdu-crit-currnt'} =
                             $bank_crit_thr->{$banknum};
-                        $take = 1;
                     }
                 }
                 else                  
                 {
+                    $name = 'Phase ' . $phasenum;
+                    $param->{'nodeid-rpdu-ref'} = 'phase' . $phasenum;
                     if( defined($phase_warn_thr->{$phasenum}) and
                         $phase_warn_thr->{$phasenum} > 0 )
                     {
-                        $name = 'Phase ' . $phasenum;
                         $param->{'rpdu-warn-currnt'} =
                             $phase_warn_thr->{$phasenum};
                         $param->{'rpdu-crit-currnt'} =
                             $phase_crit_thr->{$phasenum};
-                        $take = 1;
                     }
                 }
 
-                if( $take )
-                {
-                    push( @{$data->{'apc_rPDU'}},
-                          {'param' => $param, 'name' => $name} );
-                }
+                push( @{$data->{'apc_rPDU'}},
+                      {'param' => $param, 'name' => $name} );
             }
         }
 
@@ -481,6 +478,17 @@ sub buildConfig
             $param->{'precedence'} = 1000 - $param->{'rpdu-statusidx'};
             $param->{'node-display-name'} = $ref->{'name'};
             $param->{'graph-title'} = '%system-id% ' . $ref->{'name'};
+
+            if( defined($param->{'rpdu-crit-currnt'}) )
+            {
+                $param->{'upper-limit'} = $param->{'rpdu-crit-currnt'};
+                $param->{'graph-upper-limit'} = $param->{'rpdu-crit-currnt'};
+            }
+
+            if( defined($param->{'rpdu-warn-currnt'}) )
+            {
+                $param->{'normal-level'} = $param->{'rpdu-warn-currnt'};
+            }
 
             my $subtreeName = $ref->{'name'};
             $subtreeName =~ s/\W/_/go;

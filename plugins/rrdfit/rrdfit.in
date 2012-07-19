@@ -45,6 +45,46 @@ my $debug;
 my $help_needed;
 
 
+# Holt-Winters stuff
+my %hw_rra_name =
+    ('HWPREDICT'    => 1,
+     'MHWPREDICT'   => 1,
+     'DEVPREDICT'   => 1,
+     'SEASONAL'     => 1,
+     'DEVSEASONAL'  => 1,
+     'FAILURES'     => 1,
+     );
+
+my %hw_torrus_param_to_tweak_attr =
+    ('rrd-create-hw-alpha' => 'hw_alpha',
+     'rrd-create-hw-beta'  => 'hw_beta',
+     'rrd-create-hw-gamma' => 'seasonal_gamma',
+     'rrd-create-hw-winlen' => 'window_len',
+     'rrd-create-hw-failth' => 'failure_threshold',
+     'rrd-create-hw-season' => 'season_len',
+     'rrd-create-hw-rralen' => 'hwpredict_len',
+     );
+
+my %hw_attributes =
+    ('HWPREDICT'    => ['hw_alpha', 'hw_beta', 'hwpredict_len'],
+     'MHWPREDICT'   => ['hw_alpha', 'hw_beta', 'hwpredict_len'],
+     'DEVPREDICT'   => ['hwpredict_len'],
+     'SEASONAL'     => ['seasonal_gamma', 'season_len'],
+     'DEVSEASONAL'  => ['seasonal_gamma', 'season_len'],
+     'FAILURES'     => ['window_len', 'failure_threshold', 'hwpredict_len'],
+     );
+
+my %hw_attr_defaults =
+    ('hw_alpha' => 0.1,
+     'hw_beta'  => 0.0035,
+     'seasonal_gamma' => 0.1,
+     'window_len' => 9,
+     'failure_threshold' => 6,
+     'season_len' => 288,
+     );
+
+
+
 my $ok = GetOptions ('tree=s'      => \$tree,
                      'path=s'      => \$initPath,
                      'nodeid=s'    => \$initNodeid,
@@ -215,6 +255,7 @@ sub walk_tree
 }
 
 
+
 sub fit_rrd
 {
     my $config_tree = shift;
@@ -312,6 +353,44 @@ sub fit_rrd
                    'rows' => $4 });
         }
     }
+
+    # Check if Holt-Winters prediction is configured
+    my $cfg_has_hw = 0;
+    my %cfg_hwparam;
+    
+    foreach my $token (@{$tokens_array})
+    {
+        my $hw_enabled = $config_tree->getNodeParam($token, 'rrd-hwpredict');
+        if( defined($hw_enabled) and $hw_enabled eq 'enabled' )
+        {
+            $cfg_has_hw = 1;
+            
+            foreach my $p ( 'alpha', 'beta', 'gamma', 'winlen', 'failth',
+                            'season', 'rralen' )
+            {
+                my $param = 'rrd-create-hw-' . $p;
+                
+                my $value = $config_tree->getNodeParam($token, $param);
+
+                if( defined($value) )
+                {
+                    my $rrdparam = $hw_torrus_param_to_tweak_attr{$param};
+                    
+                    if( defined( $cfg_hwparam{$rrdparam} ) and
+                        $cfg_hwparam{$rrdparam} != $value )
+                    {
+                        Error("Parameter " . $param . " is defined " .
+                              "with different values for " . $datafile);
+                        $c_skipped_rrd++;
+                        return;
+                    }
+                    
+                    $cfg_hwparam{$rrdparam} = $value;
+                }
+            }
+        }
+    }
+
 
     # Start comparing the file against Torrus config
     my $changed = 0;
@@ -431,6 +510,8 @@ sub fit_rrd
 
     # Check if any RRA needs to be deleted or updated
     my @file_rra_idx_to_delete;
+    my $file_has_hw = 0;
+    my %file_hw_rra;
 
     for( my $file_rra_idx=0; $file_rra_idx < scalar(@{$rrd_info->{'rra'}});
          $file_rra_idx++ )
@@ -438,56 +519,69 @@ sub fit_rrd
         my $f_rra = $rrd_info->{'rra'}[$file_rra_idx];
         my $found = 0;
 
-        foreach my $cfg_rra_idx (0 .. $#cfg_rra)
+        if( $hw_rra_name{$f_rra->{'cf'}} )
         {
-            my $c_rra = $cfg_rra[$cfg_rra_idx];
-
-            if( ($c_rra->{'cf'} eq $f_rra->{'cf'})
-                and
-                ($c_rra->{'steps'} == $f_rra->{'steps'}) )
+            $file_has_hw = 1;
+            if( $cfg_has_hw )
             {
+                $file_hw_rra{$f_rra->{'cf'}} = $file_rra_idx;
                 $found = 1;
-
-                if( $c_rra->{'xff'} != $f_rra->{'xff'} )
+            }
+        }
+        else
+        {
+            foreach my $cfg_rra_idx (0 .. $#cfg_rra)
+            {
+                my $c_rra = $cfg_rra[$cfg_rra_idx];
+                
+                if( ($c_rra->{'cf'} eq $f_rra->{'cf'})
+                    and
+                    ($c_rra->{'steps'} == $f_rra->{'steps'}) )
                 {
-                    $rrd->modify_rra( $file_rra_idx,
-                                      {xff => $c_rra->{'xff'}} );
-                    Info($datafile . ': changed XFF from ' .
-                         $f_rra->{'xff'} . ' to ' . $c_rra->{'xff'} .
-                         ' for ' . $rrd->rra_descr($file_rra_idx));
-                    $changed = 1;
-                }
-
-                if( $c_rra->{'rows'} > $f_rra->{'rows'} )
-                {
-                    $rrd->modify_rra( $file_rra_idx,
-                                      {rows =>  $c_rra->{'rows'}} );
-                    Info($datafile . ': increased the number of rows from ' .
-                         $f_rra->{'rows'} . ' to ' . $c_rra->{'rows'} .
-                         ' for ' . $rrd->rra_descr($file_rra_idx));
-                    $changed = 1;
-                }
-                elsif( $c_rra->{'rows'} < $f_rra->{'rows'} )
-                {
-                    if( $dataloss_allowed )
+                    $found = 1;
+                    
+                    if( $c_rra->{'xff'} != $f_rra->{'xff'} )
                     {
                         $rrd->modify_rra( $file_rra_idx,
-                                          {rows =>  $c_rra->{'rows'}} );
-                        Info($datafile .
-                             ': decreased the number of rows from ' .
-                             $f_rra->{'rows'} . ' to ' . $c_rra->{'rows'} .
+                                          {xff => $c_rra->{'xff'}} );
+                        Info($datafile . ': changed XFF from ' .
+                             $f_rra->{'xff'} . ' to ' . $c_rra->{'xff'} .
                              ' for ' . $rrd->rra_descr($file_rra_idx));
                         $changed = 1;
                     }
-                    else
+                    
+                    if( $c_rra->{'rows'} > $f_rra->{'rows'} )
                     {
-                        Info($datafile . ': ' .
-                             $rrd->rra_descr($file_rra_idx) .
-                             ' needs to be decreased to ' .
-                             $c_rra->{'rows'} . ' rows, ' .
-                             'but --loss option is not set. ' .
-                             'Skipping the update.');
-                        $c_changes_not_applied++;
+                        $rrd->modify_rra( $file_rra_idx,
+                                          {rows =>  $c_rra->{'rows'}} );
+                        Info($datafile . ': increased the number of rows ' .
+                             'from ' . $f_rra->{'rows'} . ' to ' .
+                             $c_rra->{'rows'} . ' for ' .
+                             $rrd->rra_descr($file_rra_idx));
+                        $changed = 1;
+                    }
+                    elsif( $c_rra->{'rows'} < $f_rra->{'rows'} )
+                    {
+                        if( $dataloss_allowed )
+                        {
+                            $rrd->modify_rra( $file_rra_idx,
+                                              {rows =>  $c_rra->{'rows'}} );
+                            Info($datafile .
+                                 ': decreased the number of rows from ' .
+                                 $f_rra->{'rows'} . ' to ' . $c_rra->{'rows'} .
+                                 ' for ' . $rrd->rra_descr($file_rra_idx));
+                            $changed = 1;
+                        }
+                        else
+                        {
+                            Info($datafile . ': ' .
+                                 $rrd->rra_descr($file_rra_idx) .
+                                 ' needs to be decreased to ' .
+                                 $c_rra->{'rows'} . ' rows, ' .
+                                 'but --loss option is not set. ' .
+                                 'Skipping the update.');
+                            $c_changes_not_applied++;
+                        }
                     }
                 }
             }
@@ -565,6 +659,139 @@ sub fit_rrd
         }
     }
 
+    # Check if Holt-winters arrays need to be created or modified
+    if( $cfg_has_hw )
+    {
+        if( $file_has_hw )
+        {
+            # check if any array needs an update
+            while(my ($cf, $file_rra_idx) = each %file_hw_rra)
+            {
+                my $f_rra = $rrd_info->{'rra'}[$file_rra_idx];
+
+                foreach my $attr ( @{$hw_attributes{$cf}} )
+                {
+                    if( defined($cfg_hwparam{$attr}) )
+                    {
+                        if( $attr eq 'season_len' or
+                            $attr eq 'hwpredict_len' )
+                        {
+                            my $newlen = $cfg_hwparam{$attr};
+                            if( $newlen > $f_rra->{'rows'} )
+                            {
+                                $rrd->modify_rra
+                                    ( $file_rra_idx, {rows => $newlen} );
+                                Info($datafile .
+                                     ': increased the number of rows ' .
+                                     'from ' . $f_rra->{'rows'} . ' to ' .
+                                     $newlen . ' for ' .
+                                     $rrd->rra_descr($file_rra_idx));
+                                $changed = 1;
+                            }
+                            elsif( $newlen < $f_rra->{'rows'} )
+                            {
+                                if( $dataloss_allowed )
+                                {
+                                    $rrd->modify_rra
+                                        ( $file_rra_idx, {rows => $newlen} );
+                                    Info($datafile .
+                                         ': decreased the number of rows ' .
+                                         'from ' . $f_rra->{'rows'} . ' to ' .
+                                         $newlen . ' for ' .
+                                         $rrd->rra_descr($file_rra_idx));
+                                    $changed = 1;
+                                }
+                                else
+                                {
+                                    Info($datafile . ': ' .
+                                         $rrd->rra_descr($file_rra_idx) .
+                                         ' needs to be decreased to ' .
+                                         $newlen . ' rows, ' .
+                                         'but --loss option is not set. ' .
+                                         'Skipping the update.');
+                                    $c_changes_not_applied++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            my $newval = $cfg_hwparam{$attr};
+                            if( $f_rra->{$attr} != $newval )
+                            {
+                                $rrd->modify_rra( $file_rra_idx,
+                                                  {$attr => $newval} );
+                                Info($datafile . ': changed ' . $attr .
+                                     ' from ' . $f_rra->{$attr} . ' to ' .
+                                     $newval . ' for ' .
+                                     $rrd->rra_descr($file_rra_idx));
+                                $changed = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            # HW arrays need to be created
+
+            # take defaults for undefined parameters
+            foreach my $attr ( keys %hw_attr_defaults )
+            {
+                if( not defined($cfg_hwparam{$attr}) )
+                {
+                    $cfg_hwparam{$attr} = $hw_attr_defaults{$attr};
+                }
+            }
+
+            my $hwpredict_rran   = scalar(@{$rrd_info->{'rra'}}) + 1;
+            my $seasonal_rran    = $hwpredict_rran + 1;
+            my $devseasonal_rran = $hwpredict_rran + 2;
+            my $devpredict_rran  = $hwpredict_rran + 3;
+            my $failures_rran    = $hwpredict_rran + 4;
+
+            $rrd->add_rra({'cf'        => 'HWPREDICT',
+                           'steps'     => 1,
+                           'rows'      => $cfg_hwparam{'hwpredict_len'},
+                           'hw_alpha'  => $cfg_hwparam{'hw_alpha'},
+                           'hw_beta'   => $cfg_hwparam{'hw_beta'},
+                           'dependent_rra_idx' => $seasonal_rran});
+
+            $rrd->add_rra({'cf'        => 'SEASONAL',
+                           'steps'     => 1,
+                           'rows'      => $cfg_hwparam{'season_len'},
+                           'seasonal_gamma' => $cfg_hwparam{'seasonal_gamma'},
+                           'seasonal_smooth_idx' => 0,
+                           'dependent_rra_idx' => $hwpredict_rran});
+            
+            $rrd->add_rra({'cf'        => 'DEVSEASONAL',
+                           'steps'     => 1,
+                           'rows'      => $cfg_hwparam{'season_len'},
+                           'seasonal_gamma' => $cfg_hwparam{'seasonal_gamma'},
+                           'seasonal_smooth_idx' => 0,
+                           'dependent_rra_idx' => $hwpredict_rran});
+
+            $rrd->add_rra({'cf'        => 'DEVPREDICT',
+                           'steps'     => 1,
+                           'rows'      => $cfg_hwparam{'hwpredict_len'},
+                           'dependent_rra_idx' => $devseasonal_rran});
+
+            $rrd->add_rra
+                ({'cf'        => 'FAILURES',
+                  'steps'     => 1,
+                  'rows'      => $cfg_hwparam{'hwpredict_len'},
+                  'window_len' => $cfg_hwparam{'window_len'},
+                  'failure_threshold' => $cfg_hwparam{'failure_threshold'},
+                  'delta_pos' => 2.0,
+                  'delta_neg' => 2.0,
+                  'dependent_rra_idx' => $devseasonal_rran});
+            
+            Info($datafile . ': added Holt-Winters prediction arrays');
+            $changed = 1;
+        }
+    }
+                            
+                          
     # If any changes detected, save the file
 
     if( $changed and not $readonly )

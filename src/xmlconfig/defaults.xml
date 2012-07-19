@@ -65,6 +65,7 @@
   <prop param="descriptive-nickname"  prop="expand" value="1"/>
   <prop param="graph-legend"          prop="expand" value="1"/>
   <prop param="graph-title"           prop="expand" value="1"/>
+  <prop param="graph-upper-limit"     prop="expand" value="1"/>
   <prop param="lower-limit"           prop="expand" value="1"/>
   <prop param="monitor-vars"          prop="expand" value="1"/>
   <prop param="nodeid"                prop="expand" value="1"/>

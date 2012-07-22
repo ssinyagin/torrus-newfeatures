@@ -507,7 +507,7 @@ sub rrd_make_multigraph
             push( @{$obj->{'args'}{'line'}},
                   sprintf( '%s:%s%s%s%s', $linestyle, $dname,
                            $linecolor,
-                           ($legend ne '') ? ':'.$legend.'\l' : '',
+                           ($legend ne '') ? ':'.$legend.'\l' : ':\l',
                            $stack ) );
         }
     }
@@ -662,6 +662,11 @@ sub rrd_make_graphline
     push( @{$obj->{'args'}{'line'}},
           sprintf( '%s:%s%s%s', $linestyle, $obj->{'dname'}, $linecolor,
                    ($legend ne '') ? ':'.$legend.'\l' : '' ) );
+    if( $legend eq '' )
+    {
+        push( @{$obj->{'args'}{'line'}}, 'COMMENT:\l' );
+    }
+    
     return;
 }
 
@@ -689,7 +694,7 @@ sub rrd_make_maxline
 
     if( not defined( $legend ) )
     {
-        $legend = '';
+        $legend = 'Max';
     }
     else
     {
@@ -720,7 +725,7 @@ sub rrd_make_maxline
 
     push( @{$obj->{'args'}{'line'}},
           sprintf( '%s:%s%s%s', $linestyle, $max_dname, $linecolor,
-                   ($legend ne '') ? ':'.$legend.'\l' : '' ) );
+                   ($legend ne '') ? ':'.$legend.'\l' : ':\l' ) );
     return;
 }
 

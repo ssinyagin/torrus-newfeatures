@@ -1,4 +1,4 @@
-#  Copyright (C) 2003 Shawn Ferry
+#  Copyright (C) 2003-2012 Shawn Ferry
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,9 @@
 
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
 
-# there are lots of errors, but we cannot re-test the module yet.
-## no critic (Variables::ProhibitReusedNames)
-
 package Torrus::DevDiscover::EmpireSystemedge;
 
 use strict;
-use warnings;
-
 use Torrus::Log;
 
 
@@ -154,6 +149,16 @@ our %osTranslate =
      23 => { 'name' => 'nt50Alpha',    'ident' => 'nt',   'template' => 0, },
      25 => { 'name' => 'aix5RS6000',   'ident' => 'unix', 'template' => 1, },
      26 => { 'name' => 'nt52Intel',    'ident' => 'nt',   'template' => 0, },
+     # linuxIA64
+     27 => { 'name' => 'linuxIntel',   'ident' => 'unix', 'template' => 1, },
+     28 => { 'name' => 'hpux11IA64',   'ident' => 'unix', 'template' => 0, },
+     # nt52IA64 Windows 2003 Itanium
+     29 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
+     # nt52X64  Windows 2003 x64 (AMD64 or EMT64)
+     30 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
+     31 => { 'name' => 'linuxIntel',   'ident' => 'unix', 'template' => 1, },
+     # nt52IA64 Windows 2003 Itanium
+     35 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
      );
 
 # Solaris Virtual Interface Filtering
@@ -192,8 +197,7 @@ sub checkdevtype
         return 0;
     }
 
-    my $result = $dd->retrieveSnmpOIDs( 'sysedge_opmode',
-                                        'empireSystemType' );
+    my $result = $dd->retrieveSnmpOIDs( 'sysedge_opmode' );
     if( $result->{'sysedge_opmode'} == 2 )
     {
         Error("Sysedge Agent NOT Licensed");
@@ -201,23 +205,26 @@ sub checkdevtype
     }
 
     # Empire OS Type (Needed here for interface filtering)
-    
-    my $empireOsType = $result->{'empireSystemType'};
-    if( defined($empireOsType) and $empireOsType > 0 )
+    my $empireOsType =
+        $session->get_request( -varbindlist =>
+                               [ $dd->oiddef('empireSystemType') ] );
+
+    if( $session->error_status() == 0 )
     {
-        $devdetails->setCap('EmpireSystemedge::' .
-                            $osTranslate{$empireOsType}{ident} );
-        
-        $devdetails->{'os_ident'} = $osTranslate{$empireOsType}{ident};
 
-        
-        $devdetails->setCap('EmpireSystemedge::' .
-                            $osTranslate{$empireOsType}{name} );
-        
-        $devdetails->{'os_name'} = $osTranslate{$empireOsType}{name};
+        $devdetails->setCap('EmpireSystemedge::' . $osTranslate{
+            $empireOsType->{$dd->oiddef('empireSystemType')} }{ident} );
+        $devdetails->{'os_ident'} = $osTranslate{
+            $empireOsType->{$dd->oiddef('empireSystemType')} }{ident};
 
-        $devdetails->{'os_name_template'} =
-            $osTranslate{$empireOsType}{template};
+        $devdetails->setCap('EmpireSystemedge::' . $osTranslate{
+            $empireOsType->{$dd->oiddef('empireSystemType')} }{name} );
+        $devdetails->{'os_name'} = $osTranslate{
+            $empireOsType->{$dd->oiddef('empireSystemType')} }{name};
+
+        $devdetails->{'os_name_template'} = $osTranslate{
+            $empireOsType->{$dd->oiddef('empireSystemType')} }{template};
+
     }
 
     # Exclude Virtual Interfaces on Solaris
@@ -241,7 +248,13 @@ sub discover
     my $session = $dd->session();
 
 
-    if( $dd->checkSnmpOID('empireCpuTotalWait') )
+
+    # Empire Cpu Totals
+    my $empireCpuTotalWait =
+        $session->get_request( -varbindlist =>
+                               [ $dd->oiddef('empireCpuTotalWait') ] );
+
+    if( $session->error_status() == 0 )
     {
         $devdetails->setCap('EmpireSystemedge::CpuTotal::Wait');
     }
@@ -314,7 +327,7 @@ sub discover
         $devdetails->setCap('EmpireSystemedge::Devices');
         $devdetails->storeSnmpVars( $empireDevTable );
 
-        my $ref= {};
+        my $ref= {'indices' => []};
         $data->{'empireDev'} = $ref;
 
         foreach my $INDEX
@@ -405,7 +418,7 @@ sub discover
         $devdetails->setCap('EmpireSystemedge::CpuStats');
         $devdetails->storeSnmpVars( $empireCpuStatsTable );
 
-        my $ref= {};
+        my $ref= {'indices' => []};
         $data->{'empireCpuStats'} = $ref;
 
         foreach my $INDEX
@@ -433,21 +446,35 @@ sub discover
 
     # Empire Load Average
 
-    if( $dd->checkSnmpOID('empireLoadAverage') )
+    my $empireLoadAverage =
+        $session->get_request( -varbindlist =>
+                               [ $dd->oiddef('empireLoadAverage') ] );
+
+    if( $session->error_status() == 0 )
     {
         $devdetails->setCap('EmpireSystemedge::LoadAverage');
+        my $ref = {'indices' => []};
+        $data->{'empireLoadAverage'} = $ref;
     }
 
     # Empire Swap Counters
 
-    if( $dd->checkSnmpOID('empireNumPageSwapIns') )
+    my $empireNumPageSwapIns =
+        $session->get_request( -varbindlist =>
+                               [ $dd->oiddef('empireNumPageSwapIns') ] );
+
+    if( $session->error_status() == 0 )
     {
         $devdetails->setCap('EmpireSystemedge::SwapCounters');
     }
 
     # Empire Counter Traps
 
-    if( $dd->checkSnmpOID('empireNumTraps') )
+    my $empireNumTraps =
+        $session->get_request( -varbindlist =>
+                               [ $dd->oiddef('empireNumTraps') ] );
+
+    if( $session->error_status() == 0 )
     {
         $devdetails->setCap('EmpireSystemedge::CounterTraps');
     }
@@ -459,6 +486,7 @@ sub discover
 
     if( defined( $empirePerformance ) )
     {
+
         $devdetails->setCap('EmpireSystemedge::Performance');
         $devdetails->storeSnmpVars( $empirePerformance );
 
@@ -492,10 +520,11 @@ sub discover
         $session->get_table( -baseoid => $dd->oiddef('empireNTREGPERF') );
     if( defined $empireNTREGPERF )
     {
+        next;
         $devdetails->setCap('empireNTREGPERF');
         $devdetails->storeSnmpVars( $empireNTREGPERF );
 
-        my $ref = {};
+        my $ref = {'indices' => []};
         $data->{'empireNTREGPERF'} = $ref;
         foreach my $INDEX
             ( $devdetails->getSnmpIndices($dd->oiddef('empireNTREGPERF') ) )
@@ -677,9 +706,9 @@ sub buildConfig
 
 
     # Performance Subtree
-    $subtreeName= "System_Performance";
+    my $subtreeName= "System_Performance";
 
-    $param = {
+    my $param = {
         'precedence'     => '-900',
         'comment'        => 'System, CPU and memory statistics'
         };

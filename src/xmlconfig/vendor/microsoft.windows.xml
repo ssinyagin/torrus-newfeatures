@@ -119,6 +119,7 @@
         <param name="graph-title" value="%descriptive-nickname%" />
 
         <leaf name="Bytes_Sent">
+            <param name="node-display-name"  value="Bytes Sent"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="bytes_sent_low"/>
             <param name="snmp-object" value="$msFtptotalBytesSentLowWord"/>
@@ -127,6 +128,7 @@
             <param name="comment" value="Bytes Sent"/>
         </leaf>
         <leaf name="Bytes_Received">
+            <param name="node-display-name"  value="Bytes Received"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="bytes_received_low"/>
             <param name="snmp-object" value="$msFtptotalBytesReceivedLowWord"/>
@@ -135,6 +137,7 @@
             <param name="comment" value="Bytes Received"/>
         </leaf>
         <leaf name="Current_Anon_Users">
+            <param name="node-display-name"  value="Current Anon Users"/>
             <!-- mib says counter -->
             <param name="rrd-create-dstype" value="GAUGE"/>
             <param name="rrd-ds" value="curr_anon_users"/>
@@ -144,6 +147,7 @@
             <param name="comment" value="Current Anon Users"/>
         </leaf>
         <leaf name="Current_Known_Users">
+            <param name="node-display-name"  value="Current Known Users"/>
             <!-- mib says counter -->
             <param name="rrd-create-dstype" value="GAUGE"/>
             <param name="rrd-ds" value="curr_known_users"/>
@@ -153,6 +157,7 @@
             <param name="comment" value="Current Known Users"/>
         </leaf>
         <leaf name="Anon_Users">
+            <param name="node-display-name"  value="Anon Users"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="total_anon_users"/>
             <param name="snmp-object" value="$msFtptotalAnonymousUsers"/>
@@ -161,6 +166,7 @@
             <param name="comment" value="Anon Users/s"/>
         </leaf>
         <leaf name="Known_Users">
+            <param name="node-display-name"  value="Known Users"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="total_known_users"/>
             <param name="snmp-object" value="$msFtptotalNonAnonymousUsers"/>
@@ -169,6 +175,7 @@
             <param name="comment" value="Known Users/s"/>
         </leaf>
         <leaf name="Current_Connections">
+            <param name="node-display-name"  value="Current Connections"/>
             <param name="rrd-create-dstype" value="GAUGE"/>
             <param name="rrd-ds" value="current_connections"/>
             <param name="snmp-object" value="$msFtpcurrentConnections"/>
@@ -177,6 +184,7 @@
             <param name="comment" value="Current Connections"/>
         </leaf>
         <leaf name="Attempted_Connection">
+            <param name="node-display-name"  value="Attempted Connection"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="connection_attempts"/>
             <param name="snmp-object" value="$msFtpconnectionAttempts"/>
@@ -185,6 +193,7 @@
             <param name="comment" value="Connection Rate"/>
         </leaf>
         <leaf name="Attempted_Logons">
+            <param name="node-display-name"  value="Attempted Logons"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="logon_attempts"/>
             <param name="snmp-object" value="$msFtplogonAttempts"/>
@@ -212,6 +221,7 @@
         <param name="graph-title" value="%descriptive-nickname%" />
 
         <leaf name="Bytes_Sent">
+            <param name="node-display-name"  value="Bytes Sent"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="bytes_sent_low"/>
             <param name="snmp-object" value="$msHttptotalBytesSentLowWord"/>
@@ -220,6 +230,7 @@
             <param name="comment" value="Bytes Sent"/>
         </leaf>
         <leaf name="Bytes_Received">
+            <param name="node-display-name"  value="Bytes Received"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="bytes_received_low"/>
             <param name="snmp-object"
@@ -229,6 +240,7 @@
             <param name="comment" value="Bytes Received"/>
         </leaf>
         <leaf name="Files_Sent">
+            <param name="node-display-name"  value="Files Sent"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="files_sent"/>
             <param name="snmp-object" value="$msHttptotalFilesSent"/>
@@ -237,6 +249,7 @@
             <param name="comment" value="Files Sent"/>
         </leaf>
         <leaf name="Files_Received">
+            <param name="node-display-name"  value="Files Received"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="files_received"/>
             <param name="snmp-object" value="$msHttptotalFilesReceived"/>
@@ -245,6 +258,7 @@
             <param name="comment" value="Files Received"/>
         </leaf>
         <leaf name="Current_Anon_Users">
+            <param name="node-display-name"  value="Current Anon Users"/>
             <!-- mib says counter -->
             <param name="rrd-create-dstype" value="GAUGE"/>
             <param name="rrd-ds" value="curr_anon_users"/>
@@ -254,6 +268,7 @@
             <param name="comment" value="Current Anon Users"/>
         </leaf>
         <leaf name="Current_Known_Users">
+            <param name="node-display-name"  value="Current Known Users"/>
             <!-- mib says counter -->
             <param name="rrd-create-dstype" value="GAUGE"/>
             <param name="rrd-ds" value="curr_known_users"/>
@@ -263,6 +278,7 @@
             <param name="comment" value="Current Known Users"/>
         </leaf>
         <leaf name="Anon_Users">
+            <param name="node-display-name"  value="Anon Users"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="total_anon_users"/>
             <param name="snmp-object" value="$msHttptotalAnonymousUsers"/>
@@ -271,6 +287,7 @@
             <param name="comment" value="Anon Users/s"/>
         </leaf>
         <leaf name="Known_Users">
+            <param name="node-display-name"  value="Known Users"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="total_known_users"/>
             <param name="snmp-object" value="$msHttptotalNonAnonymousUsers"/>
@@ -279,6 +296,7 @@
             <param name="comment" value="Known Users/s"/>
         </leaf>
         <leaf name="Current_Connections">
+            <param name="node-display-name"  value="Current Connections"/>
             <param name="rrd-create-dstype" value="GAUGE"/>
             <param name="rrd-ds" value="current_connections"/>
             <param name="snmp-object" value="$msHttpcurrentConnections"/>
@@ -287,6 +305,7 @@
             <param name="comment" value="Current Connections"/>
         </leaf>
         <leaf name="Attempted_Connection">
+            <param name="node-display-name"  value="Attempted Connections"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="connection_attempts"/>
             <param name="snmp-object" value="$msHttpconnectionAttempts"/>
@@ -295,6 +314,7 @@
             <param name="comment" value="Connection Rate"/>
         </leaf>
         <leaf name="Attempted_Logons">
+            <param name="node-display-name"  value="Attempted Logons"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="logon_attempts"/>
             <param name="snmp-object" value="$msHttplogonAttempts"/>
@@ -303,86 +323,103 @@
             <param name="comment" value="Logon Rate"/>
         </leaf>
         <leaf name="Request_OPTION">
+            <param name="node-display-name"  value="Request OPTION"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="OPTION"/>
             <param name="snmp-object" value="$msHttptotalOptions"/>
         </leaf>
         <leaf name="Request_GET">
+            <param name="node-display-name"  value="Request GET"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="GET"/>
             <param name="snmp-object" value="$msHttptotalGets"/>
         </leaf>
         <leaf name="Request_POST">
+            <param name="node-display-name"  value="Request POST"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="POST"/>
             <param name="snmp-object" value="$msHttptotalPosts"/>
         </leaf>
         <leaf name="Request_HEAD">
+            <param name="node-display-name"  value="Request HEAD"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="HEAD"/>
             <param name="snmp-object" value="$msHttptotalHeads"/>
         </leaf>
         <leaf name="Request_PUT">
+            <param name="node-display-name"  value="Request PUT"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="PUT"/>
             <param name="snmp-object" value="$msHttptotalPuts"/>
         </leaf>
         <leaf name="Request_DELETE">
+            <param name="node-display-name"  value="Request DELETE"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="DELETE"/>
             <param name="snmp-object" value="$msHttptotalDeletes"/>
         </leaf>
         <leaf name="Request_TRACE">
+            <param name="node-display-name"  value="Request TRACE"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="TRACE"/>
             <param name="snmp-object" value="$msHttptotalTraces"/>
         </leaf>
         <leaf name="Request_MOVE">
+            <param name="node-display-name"  value="Request MOVE"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="MOVE"/>
             <param name="snmp-object" value="$msHttptotalMove"/>
         </leaf>
         <leaf name="Request_COPY">
+            <param name="node-display-name"  value="Request COPY"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="COPY"/>
             <param name="snmp-object" value="$msHttptotalCopy"/>
         </leaf>
         <leaf name="Request_MKCOL">
+            <param name="node-display-name"  value="Request MKCOL"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="MKCOL"/>
             <param name="snmp-object" value="$msHttptotalMkcol"/>
         </leaf>
         <leaf name="Request_PROPFIND">
+            <param name="node-display-name"  value="Request PROPFIND"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="PROPFIND"/>
             <param name="snmp-object" value="$msHttptotalPropfind"/>
         </leaf>
         <leaf name="Request_PROPPATCH">
+            <param name="node-display-name"  value="Request PROPPATCH"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="PROPPATCH"/>
             <param name="snmp-object" value="$msHttptotalProppatch"/>
         </leaf>
         <leaf name="Request_SEARCH">
+            <param name="node-display-name"  value="Request SEARCH"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="SEARCH"/>
             <param name="snmp-object" value="$msHttptotalSearch"/>
         </leaf>
         <leaf name="Request_LOCK">
+            <param name="node-display-name"  value="Request LOCK"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="LOCK"/>
             <param name="snmp-object" value="$msHttptotalLock"/>
         </leaf>
         <leaf name="Request_UNLOCK">
+            <param name="node-display-name"  value="Request UNLOCK"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="UNLOCK"/>
             <param name="snmp-object" value="$msHttptotalUnlock"/>
         </leaf>
         <leaf name="Request_OTHER">
+            <param name="node-display-name"  value="Request OTHER"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="OTHER"/>
             <param name="snmp-object" value="$msHttptotalOthers"/>
         </leaf>
         <leaf name="Current_CGI">
+            <param name="node-display-name"  value="Current CGI"/>
             <param name="rrd-create-dstype" value="GAUGE"/>
             <!-- mib say counter -->
             <param name="rrd-ds" value="current_cgi"/>
@@ -392,6 +429,7 @@
             <param name="comment" value="Current CGI Requests"/>
         </leaf>
         <leaf name="Current_BGI">
+            <param name="node-display-name"  value="Current BGI"/>
             <param name="rrd-create-dstype" value="GAUGE"/>
             <!-- mib say counter -->
             <param name="rrd-ds" value="current_bgi"/>
@@ -401,16 +439,19 @@
             <param name="comment" value="Current BGI Requests"/>
         </leaf>
         <leaf name="Request_CGI">
+            <param name="node-display-name"  value="Request CGI"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="CGI"/>
             <param name="snmp-object" value="$msHttptotalCGIRequests"/>
         </leaf>
         <leaf name="Request_BGI">
+            <param name="node-display-name"  value="Request BGI"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="BGI"/>
             <param name="snmp-object" value="$msHttptotalBGIRequests"/>
         </leaf>
         <leaf name="Throttle_Current">
+            <param name="node-display-name"  value="Throttle Current"/>
             <param name="rrd-create-dstype" value="GAUGE"/>
             <!-- mib say counter -->
             <param name="rrd-ds" value="throttle_blocked"/>
@@ -420,6 +461,7 @@
             <param name="comment" value="Blocked Requests due to Throttling"/>
         </leaf>
         <leaf name="Throttle_Rate">
+            <param name="node-display-name"  value="Throttle Rate"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="throttle_rate"/>
             <param name="snmp-object" value="$msHttptotalBlockedRequests"/>
@@ -428,6 +470,7 @@
             <param name="comment" value="Throttle Rate"/>
         </leaf>
         <leaf name="Throttle_Allowed">
+            <param name="node-display-name"  value="Throttle Allowed"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="throttle_allowed"/>
             <param name="snmp-object" value="$msHttptotalAllowedRequests"/>
@@ -436,6 +479,7 @@
             <param name="comment" value="Allowed Rate"/>
         </leaf>
         <leaf name="Throttle_Rejected">
+            <param name="node-display-name"  value="Throttle Rejected"/>
             <param name="rrd-create-dstype" value="COUNTER"/>
             <param name="rrd-ds" value="throttle_rejected"/>
             <param name="snmp-object" value="$msHttptotalRejectedRequests"/>
@@ -444,18 +488,21 @@
             <param name="comment" value="Rejected Rate"/>
         </leaf>
         <leaf name="Requests_NotFound">
+            <param name="node-display-name"  value="Requests NotFound"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="NotFound"/>
             <param name="snmp-object" value="$msHttptotalNotFoundErrors"/>
         </leaf>
         <leaf name="Requests_Locked">
+            <param name="node-display-name"  value="Requests Locked"/>
             <apply-template name="microsoft-iis-http-requests"/>
             <param name="iis-req-type" value="LockedResource"/>
             <param name="snmp-object" value="$msHttptotalLockedErrors"/>
         </leaf>
         <leaf name="IO_Bandwidth">
-            <param name="rrd-create-dstype" value="GAUGE"/>
+            <param name="node-display-name"  value="IO Bandwidth"/>
             <!-- mib says counter -->
+            <param name="rrd-create-dstype" value="GAUGE"/>
             <param name="rrd-ds" value="measuredbandwidth"/>
             <param name="snmp-object" value="$msHttpmeasuredBandwidth"/>
             <param name="vertical-label" value="bps"/>

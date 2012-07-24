@@ -1776,6 +1776,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
     </template>
     <template name="empire-device">
       <leaf name="DiskSpace">
+        <param name="node-display-name"  value="Disk Space"/>
         <param name="vertical-label" value="Bytes"/>
         <param name="rrd-scaling-base" value="1024"/>
         <param name="graph-lower-limit" value="0"/>

@@ -713,6 +713,7 @@ sub buildConfig
         my $param = {
             'precedence'    => '-1000',
             'comment'       => 'Physical/Logical Volume Information',
+            'node-display-name' => 'Volume Informations',
         };
 
         my $subtreeNode =
@@ -738,8 +739,9 @@ sub buildConfig
         my $subtreeName = "DiskInfo";
 
         my $param = {
-            'precedence'    => '-1000',
-            'comment'       => 'Physical/Logical Disk Information',
+            'precedence'        => '-1000',
+            'comment'           => 'Physical/Logical Disk Information',
+            'node-display-name' => 'Disk Informations',
         };
 
         my $subtreeNode =

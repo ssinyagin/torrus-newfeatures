@@ -130,6 +130,11 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <def name="empire_diskStatsWrites" value="1.3.6.1.4.1.546.12.1.1.8"/>
     <def name="empire_diskStatsHostIndex" value="1.3.6.1.4.1.546.12.1.1.9"/>
     <def name="empire_disk_stats_IDX" value="M($empire_diskStatsHostIndex,%HRINDEX%)"/>
+    <!-- Service Response Table -->
+    <def name="empire_svcTable" value="1.3.6.1.4.1.546.16.6.10.1."/>
+    <def name="empire_svcIndex" value="1.3.6.1.4.1.546.16.6.10.1.1"/>
+    <def name="empire_svcTotRespTime" value="1.3.6.1.4.1.546.16.6.10.1.12"/>
+    <def name="empire_svc_IDX" value="M($empire_svcIndex,%INDEX%)"/>
   </definitions>
   <datasources>
 
@@ -2028,5 +2033,37 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="line-order-write" value="2"/>
         </leaf>
     </template>
+
+    <template name="empire-svc-subtree">
+      <!-- 
+      <param name="comment" value="Service Response Checks"/>
+      <param name="precedence" value="-1200"/>
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="svc"/>
+      <param name="overview-subleave-name-svc" value="empire-svc-response"/>
+      <param name="overview-shortcut-text-svc" value="All Responders"/>
+      <param name="overview-shortcut-title-svc" value="SHORTCUT TITLE"/>
+      <param name="overview-page-title-svc" value="PAGE TITLE"/>
+      -->
+    </template>
+    <template name="empire-svc-response">
+        <param name="graph-lower-limit" value="0"/>
+        <param name="graph-legend" value="ms"/>
+        <param name="vertical-label" value="Milliseconds"/>
+        <param name="data-file" value="%system-id%_empire-svc%INDEX%.rrd"/>
+        <param name="hidden" value="no"/>
+        <param name="leaf-type" value="rrd-def"/>
+        <param name="snmp-object" value="$empire_svcTotRespTime.$empire_svc_IDX"/>
+        <param name="rrd-ds" value="SvcTotRespTime"/>
+        <param name="rrd-cf" value="MAX"/>
+        <param name="rrd-cf" value="AVERAGE"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+        <param name="comment">
+          Service Response Time in ms
+        </param>
+    </template>
+
   </datasources>
 </configuration>
+
+

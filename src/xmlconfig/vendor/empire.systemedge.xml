@@ -200,7 +200,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
 
     -->
     <template name="empire-memory">
-      <subtree name="System">
+      <subtree name="Memory_Swap">
     <!--
         <apply-template name="1min_collection"/>
     -->

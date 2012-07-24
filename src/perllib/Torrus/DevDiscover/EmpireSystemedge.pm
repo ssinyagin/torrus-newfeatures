@@ -784,10 +784,10 @@ sub buildConfig
     }
 
     push( @perfTemplates,
-          'EmpireSystemedge::empire-counters-' . $os_target,
-          'EmpireSystemedge::empire-swap-counters-' . $os_target,
-          'EmpireSystemedge::empire-total-cpu-' .  $os_target,
-          'EmpireSystemedge::empire-total-cpu-raw-' .  $os_target,
+          'EmpireSystemedge::empire-counters-' . $devdetails->{'os_name'},
+          'EmpireSystemedge::empire-swap-counters-' . $devdetails->{'os_name'},
+          'EmpireSystemedge::empire-total-cpu-' .  $devdetails->{'os_name'},
+          'EmpireSystemedge::empire-total-cpu-raw-' .  $devdetails->{'os_name'},
           );
 
     if( $devdetails->hasCap('EmpireSystemedge::RunQ') )

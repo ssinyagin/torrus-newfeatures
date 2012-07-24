@@ -201,10 +201,11 @@ http://www.concord.com/solutions/products/sysedge.shtml
     -->
     <template name="empire-memory">
       <subtree name="Memory_Swap">
+        <param name="node-display-name"  value="Memory and Swap"/>
+        <param name="comment" value="System Stats and Usage"/>
     <!--
         <apply-template name="1min_collection"/>
     -->
-        <param name="comment" value="System Stats and Usage"/>
         <leaf name="MemoryUsage">
           <param name="vertical-label" value="Bytes"/>
           <param name="rrd-scaling-base" value="1024"/>

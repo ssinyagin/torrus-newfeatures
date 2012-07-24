@@ -168,8 +168,9 @@ sub buildConfig
     if( $devdetails->hasCap( 'msIIS' ) )
     {
         my $iisParam = {
-            'precedence'    =>  -100000,
-            'comment'       => 'Microsoft Internet Information Server'
+            'precedence'        =>  -100000,
+            'comment'           => 'Microsoft Internet Information Server',
+            'node-display-name' => 'MS IIS',
             };
 
         my @iisTemplates;

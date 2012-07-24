@@ -164,7 +164,11 @@ our %osTranslate =
 # Solaris Virtual Interface Filtering
 our $interfaceFilter;
 my %solarisVirtualInterfaceFilter;
+my %winNTInterfaceFilter;
 
+# Key is some unique symbolic name, does not mean anything
+# ifType is the number to match the interface type
+# ifDescr is the regexp to match the interface description
 %solarisVirtualInterfaceFilter = (
     'Virtual Interface (iana 62)' => {
         'ifType'    =>  62,             # Obsoleted
@@ -178,6 +182,37 @@ my %solarisVirtualInterfaceFilter;
                                         # e.g. eri:1 eri1:2
         },
     );
+
+
+# Key is some unique symbolic name, does not mean anything
+# ifType is the number to match the interface type
+# ifDescr is the regexp to match the interface description
+# shameless rip-off from MicrsoftWindows.pm
+%winNTInterfaceFilter =
+    (
+     'MS TCP Loopback interface' => {
+         'ifType'  => 24                        # softwareLoopback
+         },
+     
+     'Tunnel' => {
+         'ifType'  => 131                       # tunnel
+         },
+     
+     'PPP' => {
+         'ifType'  => 23                        # ppp
+         },
+     
+     'WAN Miniport Ethernet' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => '^WAN\s+Miniport'
+         },
+     
+     'QoS Packet Scheduler' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => 'QoS\s+Packet\s+Scheduler'
+         },
+     );
+ 
 
 our $storageGraphTop;
 our $storageHiMark;
@@ -235,6 +270,16 @@ sub checkdevtype
             ($devdetails, $interfaceFilter);
     }
 
+    # Exclude strange interfaces on Windows
+    # shameless rip-off from MicrsoftWindows.pm
+    if( ( $devdetails->{'os_name'} =~ /nt40/i ) or ( $devdetails->{'os_name'} =~ /nt50/i )) {
+
+        $interfaceFilter = \%winNTInterfaceFilter;
+        &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+            ($devdetails, $interfaceFilter);
+        $devdetails->setCap('interfaceIndexingManaged');
+    }
+
     return 1;
 }
 
@@ -244,9 +289,20 @@ sub discover
     my $dd = shift;
     my $devdetails = shift;
 
-    my $data = $devdetails->data();
     my $session = $dd->session();
+    my $data = $devdetails->data();
 
+
+    # Exclude strange interfaces on Windows
+    # shameless rip-off from MicrsoftWindows.pm
+    if( ( $devdetails->{'os_name'} =~ /nt40Intel/i ) or ( $devdetails->{'os_name'} =~ /nt50Intel/i )) {
+
+        $data->{'nameref'}{'ifComment'} = ''; # suggest?
+        $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
+        Torrus::DevDiscover::RFC2863_IF_MIB::retrieveMacAddresses( $dd, $devdetails );
+        $data->{'nameref'}{'ifNick'} = 'MAC';
+        $data->{'nameref'}{'ifNodeid'} = 'MAC';    
+    }
 
 
     # Empire Cpu Totals

@@ -62,6 +62,8 @@
   <datasources>
 
     <template name="hr-system-performance-subtree">
+      <param name="node-display-name"
+                               value="System Performance" />
       <param name="comment"    value="System, CPU and memory statistics" />
       <param name="devdiscover-nodetype"
                                value="RFC2790_HOST_RESOURCES::sysPerf" />
@@ -147,6 +149,8 @@
     </template>
 
     <template name="hr-storage-subtree">
+      <param name="node-display-name"
+                               value="Storage Used" />
       <param name="comment"    value="Storage Devices Usage" />
       <param name="devdiscover-nodetype"
                                value="RFC2790_HOST_RESOURCES::storageUsed" />

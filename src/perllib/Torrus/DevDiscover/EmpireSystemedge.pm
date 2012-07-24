@@ -20,7 +20,7 @@ package Torrus::DevDiscover::EmpireSystemedge;
 
 use strict;
 use Torrus::Log;
-
+use Data::Dumper;
 
 $Torrus::DevDiscover::registry{'EmpireSystemedge'} = {
     'sequence'     => 500,
@@ -88,6 +88,18 @@ our %oiddef =
      'empireMon'                => '1.3.6.1.4.1.546.6.1.1',
      'empirePmon'               => '1.3.6.1.4.1.546.15.1.1',
      'empireLog'                => '1.3.6.1.4.1.546.11.1.1',
+     
+     # Empire Service Response Extension
+     'empireSvcTable'           => '1.3.6.1.4.1.546.16.6.10.1',
+     'empireSvcIndex'           => '1.3.6.1.4.1.546.16.6.10.1.1',
+     'empireSvcDescr'           => '1.3.6.1.4.1.546.16.6.10.1.2',
+     'empireSvcType'            => '1.3.6.1.4.1.546.16.6.10.1.3',
+     'empireSvcTotRespTime'     => '1.3.6.1.4.1.546.16.6.10.1.12',
+     'empireSvcAvailability'    => '1.3.6.1.4.1.546.16.6.10.1.17',
+     'empireSvcConnTime'        => '1.3.6.1.4.1.546.16.6.10.1.23',
+     'empireSvcTransTime'       => '1.3.6.1.4.1.546.16.6.10.1.28',
+     'empireSvcThroughput'      => '1.3.6.1.4.1.546.16.6.10.1.37',
+     'empireSvcDestination'     => '1.3.6.1.4.1.546.16.6.10.1.45',
      );
 
 our %storageDescTranslate =  ( '/' => {'subtree' => 'root' } );
@@ -602,6 +614,57 @@ sub discover
         }
     }
 
+
+    my $empireServiceResponse = 
+        $session->get_table( -baseoid => $dd->oiddef('empireSvcTable') );
+    if ( defined $empireServiceResponse ) {
+        $devdetails->setCap('EmpireSystemedge::ServiceResponse');
+        $devdetails->storeSnmpVars( $empireServiceResponse );
+
+        my $ref= {'indices' => []};
+        $data->{'empireSvcStats'} = $ref;
+
+
+        foreach my $INDEX ( $devdetails->getSnmpIndices( 
+                                $dd->oiddef('empireSvcIndex') ) )
+        {
+            next if( $INDEX < 1 );
+
+            push( @{ $ref->{'indices'} }, $INDEX);
+
+            my $svcType = 
+                $devdetails->snmpVar( 
+                    $dd->oiddef('empireSvcType') . '.' . $INDEX );
+            
+            if ( $svcType eq "4" ) {
+
+                my $svcDescr =
+                    $devdetails->snmpVar( 
+                        $dd->oiddef('empireSvcDescr') . '.' . $INDEX );
+                my $svcTotRespTime =
+                    $devdetails->snmpVar( 
+                        $dd->oiddef('empireSvcTotRespTime') . '.' . $INDEX );
+
+#            my $ref = { 'param' => {}, 'templates' => [] };
+            my $ref = { 'param' => {} };
+            $data->{'empireSvcStats'}{$INDEX} = $ref;
+            my $param = $ref->{'param'};
+
+            $param->{'id'} = 'Responder_' . $INDEX;
+            $param->{'descr'} = $svcDescr;
+            $param->{'INDEX'} = $INDEX;
+            if (defined $devdetails->{'params'}->{'symbolic-name'} ) {
+                $param->{'name'} = $devdetails->{'params'}->{'symbolic-name'};
+            }
+            else {
+                $param->{'name'} = $data->{'param'}->{'snmp-host'};
+            }
+            }
+        }
+        
+    }
+
+
 #NOT CONFIGURED## Empire DNLC
 #NOT CONFIGURED#    my $empireDnlc = $session->get_table( -baseoid =>
 #NOT CONFIGURED#        $dd->oiddef('empireDnlc') );
@@ -878,6 +941,41 @@ sub buildConfig
 
         }
 
+    }
+
+    if( $devdetails->hasCap('EmpireSystemedge::ServiceResponse') )
+    {
+        Debug("Empire SysEdge ServiceResponse");
+
+        my $ref = $data->{'empireSvcStats'};
+        
+        my $subtreeName = "Service_Response_Checks";
+        my $param = {
+            'precedence'        => '-1200',
+            'comment'           => 'Service Response Statistics',
+            'node-display-name' => 'Service Response Checks',
+        };
+
+        my $subtreeNode =
+            $cb->addSubtree( $devNode, $subtreeName, $param,
+                             [ 'EmpireSystemedge::empire-svc-subtree' ] );
+        
+        foreach my $INDEX
+            ( sort {$a<=>$b} @{$data->{'empireSvcStats'}{'indices'} } )
+        {
+            my $ref = $data->{'empireSvcStats'}{$INDEX};
+
+            # Display in index order
+            $ref->{'param'}->{'precedence'} = sprintf("%d", 1000 - $INDEX);
+            $ref->{'param'}->{'node-display-name'} = "Responder " . $ref->{'param'}{'descr'};
+            $ref->{'param'}->{'graph-title'} = $ref->{'param'}{'name'} . " - " . $ref->{'param'}{'descr'} . " - Responsetime";
+
+            $cb->addLeaf
+                ( $subtreeNode, $ref->{'param'}{'id'},
+                  $ref->{'param'},
+                  ['EmpireSystemedge::empire-svc-response'],
+                  );
+        }
     }
 
     return;

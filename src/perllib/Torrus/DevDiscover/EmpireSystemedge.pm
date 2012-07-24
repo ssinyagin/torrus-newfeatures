@@ -211,6 +211,11 @@ my %winNTInterfaceFilter;
          'ifType'  => 6,                        # ethernetCsmacd
          'ifDescr' => 'QoS\s+Packet\s+Scheduler'
          },
+
+     'LightWeight Filter' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => 'WFP\s+LightWeight\s+Filter'
+         },
      );
  
 
@@ -713,7 +718,7 @@ sub buildConfig
         my $param = {
             'precedence'    => '-1000',
             'comment'       => 'Physical/Logical Volume Information',
-            'node-display-name' => 'Volume Informations',
+            'node-display-name' => 'Volume Information',
         };
 
         my $subtreeNode =
@@ -741,7 +746,7 @@ sub buildConfig
         my $param = {
             'precedence'        => '-1000',
             'comment'           => 'Physical/Logical Disk Information',
-            'node-display-name' => 'Disk Informations',
+            'node-display-name' => 'Disk Information',
         };
 
         my $subtreeNode =

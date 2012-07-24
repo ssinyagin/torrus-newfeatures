@@ -1905,6 +1905,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
 
     <template name="empire-disk-stats-queuelength">
       <leaf name="QueueLength">
+        <param name="node-display-name"  value="Queuelength"/>
         <param name="data-file" value="%system-id%_empire-%disk-stats-nick%.rrd"/>
         <param name="vertical-label" value="Count"/>
         <param name="hidden" value="no"/>
@@ -1919,6 +1920,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
     </template>
     <template name="empire-disk-stats-servicetime">
       <leaf name="ServiceTime">
+        <param name="node-display-name"  value="Servicetime"/>
         <param name="data-file" value="%system-id%_empire-%disk-stats-nick%.rrd"/>
         <param name="vertical-label" value="Time"/>
         <param name="hidden" value="no"/>
@@ -1947,6 +1949,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
     </template>
     <template name="empire-disk-stats-bytestransfered">
       <leaf name="BytesTransfered">
+        <param name="node-display-name"  value="Bytes Transferred"/>
         <param name="data-file" value="%system-id%_empire-%disk-stats-nick%.rrd"/>
         <param name="vertical-label" value="Bytes"/>
         <param name="hidden" value="no"/>
@@ -2024,6 +2027,5 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="line-order-write" value="2"/>
         </leaf>
     </template>
-    
   </datasources>
 </configuration>

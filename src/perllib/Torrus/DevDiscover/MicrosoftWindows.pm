@@ -90,6 +90,11 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 6,                        # ethernetCsmacd
          'ifDescr' => 'QoS\s+Packet\s+Scheduler'
          },
+
+     'LightWeight Filter' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => 'WFP\s+LightWeight\s+Filter'
+         },
      );
 
 sub checkdevtype

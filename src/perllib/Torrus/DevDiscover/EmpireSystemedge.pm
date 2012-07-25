@@ -160,16 +160,12 @@ our %osTranslate =
      22 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
      23 => { 'name' => 'nt50Alpha',    'ident' => 'nt',   'template' => 0, },
      25 => { 'name' => 'aix5RS6000',   'ident' => 'unix', 'template' => 1, },
-     26 => { 'name' => 'nt52Intel',    'ident' => 'nt',   'template' => 0, },
-     # linuxIA64
+     26 => { 'name' => 'nt52Intel',    'ident' => 'nt',   'template' => 0, }, # linuxIA64
      27 => { 'name' => 'linuxIntel',   'ident' => 'unix', 'template' => 1, },
-     28 => { 'name' => 'hpux11IA64',   'ident' => 'unix', 'template' => 0, },
-     # nt52IA64 Windows 2003 Itanium
-     29 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
-     # nt52X64  Windows 2003 x64 (AMD64 or EMT64)
+     28 => { 'name' => 'hpux11IA64',   'ident' => 'unix', 'template' => 0, }, # nt52IA64 Windows 2003 Itanium
+     29 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, }, # nt52X64  Windows 2003 x64 (AMD64 or EMT64)
      30 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
-     31 => { 'name' => 'linuxIntel',   'ident' => 'unix', 'template' => 1, },
-     # nt52IA64 Windows 2003 Itanium
+     31 => { 'name' => 'linuxIntel',   'ident' => 'unix', 'template' => 1, }, # nt52IA64 Windows 2003 Itanium
      35 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
      );
 
@@ -814,6 +810,24 @@ sub buildConfig
             'node-display-name' => 'Disk Information',
         };
 
+        # dynamically make overview-subleaves links visible
+        if ( $os_target =~ /nt40/i or $os_target =~ /nt50/i or $os_target =~ /solaris/i ) {
+            $param->{'has-overview-shortcuts'} = 'yes';
+            $param->{'overview-shortcuts'} = 'rw,util,qlen';
+        }
+        elsif ( $os_target =~ /aix/i ) {
+            $param->{'has-overview-shortcuts'} = 'yes';
+            $param->{'overview-shortcuts'} = 'rw,util';
+        }
+        elsif ( $os_target =~ /linux/i or $os_target =~ /unix/i ) {
+            $param->{'has-overview-shortcuts'} = 'yes';
+            $param->{'overview-shortcuts'} = 'rw';
+        }
+        else {
+            # basically we should never get down here...
+            $param->{'has-overview-shortcuts'} = 'no';
+        }
+
         my $subtreeNode =
             $cb->addSubtree( $StorageNode, $subtreeName, $param,
                              ['EmpireSystemedge::empire-disk-stats-subtree']);
@@ -829,6 +843,7 @@ sub buildConfig
                              $ref->{'param'},
                              [ 'EmpireSystemedge::empire-disk-stats-' .
                                $os_target, ] );
+
         }
     }
 

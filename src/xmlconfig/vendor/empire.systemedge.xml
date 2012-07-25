@@ -1842,20 +1842,21 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-disk-stats-subtree">
       <param name="comment" value="Per-Disk Utilization"/>
       <param name="precedence" value="-400"/>
-      <param name="has-overview-shortcuts" value="yes"/>
-      <param name="overview-shortcuts" value="util,qlen,rw"/>
+      <!-- these two are beeing set in buildConfig(); -->
+      <!-- <param name="has-overview-shortcuts" value="yes"/> -->
+      <!-- <param name="overview-shortcuts" value="rw,util,qlen"/> -->
       <param name="overview-subleave-name-util" value="Utilization"/>
       <param name="overview-shortcut-text-util" value="Utilization"/>
       <param name="overview-shortcut-title-util" value="Show Stats for all Disks"/>
       <param name="overview-page-title-util" value="Utilization for all Disks"/>
-      <param name="overview-subleave-name-qlen" value="QueueLength"/>
-      <param name="overview-shortcut-text-qlen" value="Queuelength"/>
-      <param name="overview-shortcut-title-qlen" value="Show Stats for all Disks"/>
-      <param name="overview-page-title-qlen" value="Queuelength for all Disks"/>
       <param name="overview-subleave-name-rw" value="DiskReadWrite"/>
       <param name="overview-shortcut-text-rw" value="Read/Write"/>
       <param name="overview-shortcut-title-rw" value="Show Stats for all Disks"/>
       <param name="overview-page-title-rw" value="Disk Read/Write for all Disks"/>
+      <param name="overview-subleave-name-qlen" value="QueueLength"/>
+      <param name="overview-shortcut-text-qlen" value="Queuelength"/>
+      <param name="overview-shortcut-title-qlen" value="Show Stats for all Disks"/>
+      <param name="overview-page-title-qlen" value="Queuelength for all Disks"/>
     </template>
 
     <template name="empire-disk-stats-unix">

@@ -645,23 +645,25 @@ sub discover
                     $devdetails->snmpVar( 
                         $dd->oiddef('empireSvcTotRespTime') . '.' . $INDEX );
 
-#            my $ref = { 'param' => {}, 'templates' => [] };
-            my $ref = { 'param' => {} };
-            $data->{'empireSvcStats'}{$INDEX} = $ref;
-            my $param = $ref->{'param'};
+#                my $ref = { 'param' => {}, 'templates' => [] };
+                my $ref = { 'param' => {} };
+                $data->{'empireSvcStats'}{$INDEX} = $ref;
+                my $param = $ref->{'param'};
 
-            $param->{'id'} = 'Responder_' . $INDEX;
-            $param->{'descr'} = $svcDescr;
-            $param->{'INDEX'} = $INDEX;
-            if (defined $devdetails->{'params'}->{'symbolic-name'} ) {
-                $param->{'name'} = $devdetails->{'params'}->{'symbolic-name'};
-            }
-            else {
-                $param->{'name'} = $data->{'param'}->{'snmp-host'};
-            }
+                $param->{'id'} = 'Responder_' . $INDEX;
+                $param->{'descr'} = $svcDescr;
+                $param->{'INDEX'} = $INDEX;
+                if ( defined $devdetails->{'params'}->{'node-display-name'} ) {
+                    $param->{'name'} = $devdetails->{'params'}->{'node-display-name'};
+                }
+                elsif ( defined $devdetails->{'params'}->{'symbolic-name'} ) {
+                    $param->{'name'} = $devdetails->{'params'}->{'symbolic-name'};
+                }
+                else {
+                    $param->{'name'} = $data->{'param'}->{'snmp-host'};
+                }
             }
         }
-        
     }
 
 

@@ -1790,6 +1790,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
       <leaf name="DiskSpace">
         <param name="nodeid" value="sysedge//%nodeid-device%//dsk-space-%storage-nick%"/>
         <param name="node-display-name"  value="Disk Space"/>
+        <param name="graph-title"  value="%nodeid-device% - %storage-nick% - Disk Space Usage"/>
         <param name="vertical-label" value="Bytes"/>
         <param name="rrd-scaling-base" value="1024"/>
         <param name="graph-lower-limit" value="0"/>
@@ -1929,6 +1930,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-disk-stats-queuelength">
       <leaf name="QueueLength">
         <param name="node-display-name"  value="Queuelength"/>
+        <param name="graph-title"  value="%nodeid-device% - %disk-stats-nick% - Disk Queuelength"/>
         <param name="nodeid" value="sysedge//%nodeid-device%//dsk-stat-qlen-%disk-stats-nick%"/>
         <param name="data-file" value="%system-id%_empire-%disk-stats-nick%.rrd"/>
         <param name="vertical-label" value="Count"/>
@@ -1945,6 +1947,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-disk-stats-servicetime">
       <leaf name="ServiceTime">
         <param name="node-display-name"  value="Servicetime"/>
+        <param name="graph-title"  value="%nodeid-device% - %disk-stats-nick% - Disk Servicetime"/>
         <param name="nodeid" value="sysedge//%nodeid-device%//dsk-stat-srvt-%disk-stats-nick%"/>
         <param name="data-file" value="%system-id%_empire-%disk-stats-nick%.rrd"/>
         <param name="vertical-label" value="Time"/>
@@ -1961,6 +1964,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-disk-stats-utilization">
       <leaf name="Utilization">
         <param name="data-file" value="%system-id%_empire-%disk-stats-nick%.rrd"/>
+        <param name="graph-title"  value="%nodeid-device% - %disk-stats-nick% - Disk Utilization"/>
         <param name="nodeid" value="sysedge//%nodeid-device%//dsk-stat-util-%disk-stats-nick%"/>
         <param name="vertical-label" value="Percent"/>
         <param name="hidden" value="no"/>
@@ -1976,6 +1980,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-disk-stats-bytestransfered">
       <leaf name="BytesTransfered">
         <param name="node-display-name"  value="Bytes Transferred"/>
+        <param name="graph-title"  value="%nodeid-device% - %disk-stats-nick% - Disk Bytes Transfered"/>
         <param name="nodeid" value="sysedge//%nodeid-device%//dsk-stat-btra-%disk-stats-nick%"/>
         <param name="data-file" value="%system-id%_empire-%disk-stats-nick%.rrd"/>
         <param name="vertical-label" value="Bytes"/>
@@ -1993,7 +1998,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
     </template>
     <template name="empire-disk-stats-transferes">
       <leaf name="Transfers">
-          <param name="nodeid" value="sysedge//%nodeid-device%//dsk-stat-trans-%disk-stats-nick%"/>
+        <param name="nodeid" value="sysedge//%nodeid-device%//dsk-stat-trans-%disk-stats-nick%"/>
+        <param name="graph-title"  value="%nodeid-device% - %disk-stats-nick% - Disk Transfers"/>
         <param name="data-file" value="%system-id%_empire-%disk-stats-nick%.rrd"/>
         <param name="vertical-label" value="Count"/>
         <param name="hidden" value="no"/>
@@ -2037,6 +2043,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
     <template name="empire-disk-stats-readwrite">
         <leaf name="DiskReadWrite">
           <param name="node-display-name"  value="Disk Read/Write"/>
+          <param name="graph-title"  value="%nodeid-device% - %disk-stats-nick% - Disk Read/Write"/>
           <param name="nodeid" value="sysedge//%nodeid-device%//dsk-stat-rw-%disk-stats-nick%"/>
           <param name="vertical-label" value="Count"/>
           <param name="comment" value="Disk reads and writes"/>

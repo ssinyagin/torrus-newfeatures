@@ -214,6 +214,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
         <leaf name="MemoryUsage">
           <param name="vertical-label" value="Bytes"/>
           <param name="rrd-scaling-base" value="1024"/>
+          <param name="graph-lower-limit" value="0"/>
           <param name="comment" value="Memory: Total, Used and Active"/>
           <param name="ds-type" value="rrd-multigraph"/>
           <param name="ds-names" value="total,inuse,active"/>
@@ -239,6 +240,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
         <leaf name="MemoryActive">
           <param name="vertical-label" value="Bytes"/>
           <param name="rrd-scaling-base" value="1024"/>
+          <param name="graph-lower-limit" value="0"/>
           <param name="comment" value="Memory, Used vs Active"/>
           <param name="ds-type" value="rrd-multigraph"/>
           <param name="ds-names" value="active,inuse"/>
@@ -258,6 +260,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
         <leaf name="SwapUsage">
           <param name="vertical-label" value="Bytes"/>
           <param name="rrd-scaling-base" value="1024"/>
+          <param name="graph-lower-limit" value="0"/>
           <param name="comment" value="Swap, Total vs Used"/>
           <param name="ds-type" value="rrd-multigraph"/>
           <param name="ds-names" value="total,used"/>
@@ -352,6 +355,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="graph-legend" value="ActiveMem"/>
         </leaf>
         <leaf name="SwapCapacity">
+          <param name="graph-lower-limit" value="0"/>
+          <param name="graph-upper-limit" value="100"/>
           <param name="data-file" value="%system-id%_empire-swap.rrd"/>
           <param name="vertical-label" value="Percent Used"/>
           <param name="comment" value="Percentage of Swap Used"/>
@@ -365,6 +370,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="graph-legend" value="SwapCapacity"/>
         </leaf>
         <leaf name="MemInUseCapacity">
+          <param name="graph-lower-limit" value="0"/>
+          <param name="graph-upper-limit" value="100"/>
           <param name="data-file" value="%system-id%_empire-memory.rrd"/>
           <param name="vertical-label" value="Percent Used"/>
           <param name="comment" value="Percentage of Memory Used"/>

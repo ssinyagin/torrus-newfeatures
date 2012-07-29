@@ -212,7 +212,7 @@ my %winNTInterfaceFilter;
      
      'WAN Miniport Ethernet' => {
          'ifType'  => 6,                        # ethernetCsmacd
-         'ifDescr' => '^WAN\s+Miniport'
+         'ifDescr' => '^WAN[-|\s+]Miniport'
          },
      
      'QoS Packet Scheduler' => {

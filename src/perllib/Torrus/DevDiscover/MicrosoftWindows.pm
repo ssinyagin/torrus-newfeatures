@@ -83,9 +83,9 @@ if( not defined( $interfaceFilter ) )
      
      'WAN Miniport Ethernet' => {
          'ifType'  => 6,                        # ethernetCsmacd
-         'ifDescr' => '^WAN\s+Miniport'
+         'ifDescr' => '^WAN[-|\s+]Miniport'
          },
-     
+
      'QoS Packet Scheduler' => {
          'ifType'  => 6,                        # ethernetCsmacd
          'ifDescr' => 'QoS\s+Packet\s+Scheduler'

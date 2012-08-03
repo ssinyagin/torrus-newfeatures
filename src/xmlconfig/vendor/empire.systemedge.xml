@@ -212,6 +212,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
         <apply-template name="1min_collection"/>
     -->
         <leaf name="MemoryUsage">
+          <param name="node-display-name"  value="Memory Usage"/>
+          <param name="graph-title"  value="%nodeid-device% - Memory Usage"/>
           <param name="vertical-label" value="Bytes"/>
           <param name="rrd-scaling-base" value="1024"/>
           <param name="graph-lower-limit" value="0"/>
@@ -238,6 +240,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="line-order-active" value="3"/>
         </leaf>
         <leaf name="MemoryActive">
+          <param name="node-display-name"  value="Memory Active"/>
+          <param name="graph-title"  value="%nodeid-device% - Memory Active"/>
           <param name="vertical-label" value="Bytes"/>
           <param name="rrd-scaling-base" value="1024"/>
           <param name="graph-lower-limit" value="0"/>
@@ -258,6 +262,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="line-order-inuse" value="1"/>
         </leaf>
         <leaf name="SwapUsage">
+          <param name="node-display-name"  value="Swap Usage"/>
+          <param name="graph-title"  value="%nodeid-device% - Swap Usage"/>
           <param name="vertical-label" value="Bytes"/>
           <param name="rrd-scaling-base" value="1024"/>
           <param name="graph-lower-limit" value="0"/>
@@ -355,6 +361,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="graph-legend" value="ActiveMem"/>
         </leaf>
         <leaf name="SwapCapacity">
+          <param name="node-display-name"  value="Swap Capacity"/>
+          <param name="graph-title"  value="%nodeid-device% - Swap Capacity"/>
           <param name="graph-lower-limit" value="0"/>
           <param name="graph-upper-limit" value="100"/>
           <param name="data-file" value="%system-id%_empire-swap.rrd"/>
@@ -370,6 +378,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="graph-legend" value="SwapCapacity"/>
         </leaf>
         <leaf name="MemInUseCapacity">
+          <param name="node-display-name"  value="Memory In Use Capacity"/>
+          <param name="graph-title"  value="%nodeid-device% - Memory In Use Capacity"/>
           <param name="graph-lower-limit" value="0"/>
           <param name="graph-upper-limit" value="100"/>
           <param name="data-file" value="%system-id%_empire-memory.rrd"/>

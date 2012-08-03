@@ -378,8 +378,8 @@ http://www.concord.com/solutions/products/sysedge.shtml
           <param name="graph-legend" value="SwapCapacity"/>
         </leaf>
         <leaf name="MemInUseCapacity">
-          <param name="node-display-name"  value="Memory In Use Capacity"/>
-          <param name="graph-title"  value="%nodeid-device% - Memory In Use Capacity"/>
+          <param name="node-display-name"  value="Memory Capacity"/>
+          <param name="graph-title"  value="%nodeid-device% - Memory Capacity"/>
           <param name="graph-lower-limit" value="0"/>
           <param name="graph-upper-limit" value="100"/>
           <param name="data-file" value="%system-id%_empire-memory.rrd"/>

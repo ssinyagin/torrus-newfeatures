@@ -1037,6 +1037,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'      => 'empire-disk-stats-nt40Intel',
          'source'    => 'vendor/empire.systemedge.xml',
      },
+     'EmpireSystemedge::empire-disk-stats-nt50Intel' => {
+         'name'      => 'empire-disk-stats-nt50Intel',
+         'source'    => 'vendor/empire.systemedge.xml',
+     },
      'EmpireSystemedge::empire-svc-subtree' => {
          'name'      => 'empire-svc-subtree',
          'source'    => 'vendor/empire.systemedge.xml',

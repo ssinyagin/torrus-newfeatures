@@ -550,40 +550,35 @@ sub discover
 
     # Empire Performance
 
-    my $empirePerformance =
-        $session->get_table( -baseoid => $dd->oiddef('empirePerformance') );
-
-    if( defined( $empirePerformance ) )
-    {
-
+    if($dd->checkSnmpTable('empirePerformance')) {
         $devdetails->setCap('EmpireSystemedge::Performance');
-        $devdetails->storeSnmpVars( $empirePerformance );
 
-        if( defined $devdetails->snmpVar($dd->oiddef('empireRunq') ) )
+        if($dd->checkSnmpTable('empireRunq'))
         {
             $devdetails->setCap('EmpireSystemedge::RunQ');
         }
-
-        if( defined $devdetails->snmpVar($dd->oiddef('empireDiskWait') ) )
+        
+        if($dd->checkSnmpTable('empireDiskWait'))
         {
             $devdetails->setCap('EmpireSystemedge::DiskWait');
         }
-
-        if( defined $devdetails->snmpVar($dd->oiddef('empirePageWait') ) )
+        
+        if($dd->checkSnmpTable('empirePageWait'))
         {
             $devdetails->setCap('EmpireSystemedge::PageWait');
         }
-
-        if( defined $devdetails->snmpVar($dd->oiddef('empireSwapActive') ) )
+        
+        if($dd->checkSnmpTable('empireSwapActive'))
         {
             $devdetails->setCap('EmpireSystemedge::SwapActive');
         }
-
-        if( defined $devdetails->snmpVar($dd->oiddef('empireSleepActive') ) )
+        
+        if($dd->checkSnmpTable('empireSleepActive'))
         {
             $devdetails->setCap('EmpireSystemedge::SleepActive');
         }
     }
+
 
     my $empireNTREGPERF =
         $session->get_table( -baseoid => $dd->oiddef('empireNTREGPERF') );
@@ -627,7 +622,6 @@ sub discover
             push(@{$data->{'empireSvcStats'}{'indices'}}, $index);
 
             if($table->{$svcType . '.' . $index} eq "4") {
-                print "I am here\n";
                 $data->{'empireSvcStats'}{$index}{'param'}{'INDEX'} = $index;
                 $data->{'empireSvcStats'}{$index}{'param'}{'id'} = 'Responder_' . $index;
                 $data->{'empireSvcStats'}{$index}{'param'}{'descr'} = $table->{$svcDescr . '.' . $index};

@@ -611,55 +611,39 @@ sub discover
     }
 
 
-    my $empireServiceResponse = 
-        $session->get_table( -baseoid => $dd->oiddef('empireSvcTable') );
-    if ( defined $empireServiceResponse ) {
+    if($dd->checkSnmpTable('empireSvcTable')) {
         $devdetails->setCap('EmpireSystemedge::ServiceResponse');
-        $devdetails->storeSnmpVars( $empireServiceResponse );
+        $data->{'empireSvcStats'} = {};
+        $data->{'empireSvcStats'}{'indices'} = [];
 
-        my $ref= {'indices' => []};
-        $data->{'empireSvcStats'} = $ref;
+        my $indices = $dd->walkSnmpTable('empireSvcIndex');
+        my $table = $dd->walkSnmpTable('empireSvcTable');
 
+        my $svcDescr = 2;
+        my $svcType = 3;
+        my $svcTotRespTime = 12;
 
-        foreach my $INDEX ( $devdetails->getSnmpIndices( 
-                                $dd->oiddef('empireSvcIndex') ) )
-        {
-            next if( $INDEX < 1 );
+        while( my( $index, $value ) = each %{$indices} ) {
+            push(@{$data->{'empireSvcStats'}{'indices'}}, $index);
 
-            push( @{ $ref->{'indices'} }, $INDEX);
+            if($table->{$svcType . '.' . $index} eq "4") {
+                print "I am here\n";
+                $data->{'empireSvcStats'}{$index}{'param'}{'INDEX'} = $index;
+                $data->{'empireSvcStats'}{$index}{'param'}{'id'} = 'Responder_' . $index;
+                $data->{'empireSvcStats'}{$index}{'param'}{'descr'} = $table->{$svcDescr . '.' . $index};
+                $data->{'empireSvcStats'}{$index}{'param'}{'descr'} = $table->{$svcDescr . '.' . $index};
 
-            my $svcType = 
-                $devdetails->snmpVar( 
-                    $dd->oiddef('empireSvcType') . '.' . $INDEX );
-            
-            if ( $svcType eq "4" ) {
-
-                my $svcDescr =
-                    $devdetails->snmpVar( 
-                        $dd->oiddef('empireSvcDescr') . '.' . $INDEX );
-                my $svcTotRespTime =
-                    $devdetails->snmpVar( 
-                        $dd->oiddef('empireSvcTotRespTime') . '.' . $INDEX );
-
-#                my $ref = { 'param' => {}, 'templates' => [] };
-                my $ref = { 'param' => {} };
-                $data->{'empireSvcStats'}{$INDEX} = $ref;
-                my $param = $ref->{'param'};
-
-                $param->{'id'} = 'Responder_' . $INDEX;
-                $param->{'descr'} = $svcDescr;
-                $param->{'INDEX'} = $INDEX;
                 if ( defined $devdetails->{'params'}->{'node-display-name'} ) {
-                    $param->{'name'} = $devdetails->{'params'}->{'node-display-name'};
+                    $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $devdetails->{'params'}->{'node-display-name'};
                 }
                 elsif ( defined $devdetails->{'params'}->{'symbolic-name'} ) {
-                    $param->{'name'} = $devdetails->{'params'}->{'symbolic-name'};
+                    $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $devdetails->{'params'}->{'symbolic-name'};
                 }
                 else {
-                    $param->{'name'} = $data->{'param'}->{'snmp-host'};
+                    $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $data->{'param'}->{'snmp-host'};
                 }
             }
-        }
+        } 
     }
 
 

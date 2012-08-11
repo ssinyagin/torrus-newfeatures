@@ -500,8 +500,6 @@ sub discover
 
         }
     }
-    print Dumper $devdetails;
-    print Dumper $data->{'empireCpuStats'};
 
 
     # Empire Load Average

@@ -478,40 +478,30 @@ sub discover
 
     # Empire Per - Cpu Table
 
-    my $empireCpuStatsTable =
-        $session->get_table( -baseoid =>
-                             $dd->oiddef('empireCpuStatsTable') );
-
-    if( defined( $empireCpuStatsTable ) )
-    {
+    if($dd->checkSnmpTable('empireCpuStatsTable')) {
         $devdetails->setCap('EmpireSystemedge::CpuStats');
-        $devdetails->storeSnmpVars( $empireCpuStatsTable );
+        
+        $data->{'empireCpuStats'} = {};
+        $data->{'empireCpuStats'}{'indices'} = [];
+        
+        my $indices = $dd->walkSnmpTable('empireCpuStatsIndex');
+        my $table = $dd->walkSnmpTable('empireCpuStatsTable');
 
-        my $ref= {'indices' => []};
-        $data->{'empireCpuStats'} = $ref;
+        my $cpuStatsDescr = 2;
 
-        foreach my $INDEX
-            ( $devdetails->
-              getSnmpIndices( $dd->oiddef('empireCpuStatsIndex') ) )
-        {
-            next if( $INDEX < 1 );
+        while( my( $index, $value ) = each %{$indices} ) {
+            push(@{$data->{'empireCpuStats'}{'indices'}}, $index);
 
-            push( @{ $ref->{'indices'} }, $INDEX);
+            $data->{'empireCpuStats'}{$index}{'templates'} = [];
+            $data->{'empireCpuStats'}{$index}{'param'}{'INDEX'} = $index;
+            $data->{'empireCpuStats'}{$index}{'param'}{'cpu'} = 'CPU' . $index;
+            $data->{'empireCpuStats'}{$index}{'param'}{'descr'} = $table->{$cpuStatsDescr . '.' . $index};
+            $data->{'empireCpuStats'}{$index}{'param'}{'comment'} = $data->{'empireCpuStats'}{$index}{'param'}{'descr'} . ' (' . 'CPU ' . $index . ')';
 
-            my $descr =
-                $devdetails->snmpVar( $dd->oiddef('empireCpuStatsDescr') .
-                                      '.' . $INDEX );
-
-            my $ref = { 'param' => {}, 'templates' => [] };
-            $data->{'empireCpuStats'}{$INDEX} = $ref;
-            my $param = $ref->{'param'};
-
-            $param->{'cpu'} = 'CPU' . $INDEX;
-            $param->{'descr'} = $descr;
-            $param->{'INDEX'} = $INDEX;
-            $param->{'comment'} = $descr . ' (' . 'CPU ' . $INDEX . ')';
         }
     }
+    print Dumper $devdetails;
+    print Dumper $data->{'empireCpuStats'};
 
 
     # Empire Load Average

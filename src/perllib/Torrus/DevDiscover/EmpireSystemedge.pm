@@ -513,40 +513,29 @@ sub discover
         }
     }
 
+
     # Empire Load Average
 
-    my $empireLoadAverage =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireLoadAverage') ] );
-
-    if( $session->error_status() == 0 )
-    {
+    if($dd->checkSnmpTable('empireLoadAverage')) {
         $devdetails->setCap('EmpireSystemedge::LoadAverage');
         my $ref = {'indices' => []};
         $data->{'empireLoadAverage'} = $ref;
     }
+    
 
     # Empire Swap Counters
 
-    my $empireNumPageSwapIns =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireNumPageSwapIns') ] );
-
-    if( $session->error_status() == 0 )
-    {
+    if($dd->checkSnmpTable('empireNumPageSwapIns')) {
         $devdetails->setCap('EmpireSystemedge::SwapCounters');
     }
+    
 
     # Empire Counter Traps
 
-    my $empireNumTraps =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireNumTraps') ] );
-
-    if( $session->error_status() == 0 )
-    {
+    if($dd->checkSnmpTable('empireNumTraps')) {
         $devdetails->setCap('EmpireSystemedge::CounterTraps');
     }
+    
 
     # Empire Performance
 
@@ -580,6 +569,8 @@ sub discover
     }
 
 
+    # Empire NTREGPERF
+
     my $empireNTREGPERF =
         $session->get_table( -baseoid => $dd->oiddef('empireNTREGPERF') );
     if( defined $empireNTREGPERF )
@@ -605,6 +596,8 @@ sub discover
         }
     }
 
+
+    # Empire Service Checks
 
     if($dd->checkSnmpTable('empireSvcTable')) {
         $devdetails->setCap('EmpireSystemedge::ServiceResponse');

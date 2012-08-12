@@ -360,93 +360,64 @@ sub discover
 
     # Empire Dev Table
 
-    my $empireDevTable = $session->get_table( -baseoid =>
-                                              $dd->oiddef('empireDevTable') );
-
-    if( defined( $empireDevTable ) )
-    {
-
+    if($dd->checkSnmpTable('empireDevTable')) {
         $devdetails->setCap('EmpireSystemedge::Devices');
-        $devdetails->storeSnmpVars( $empireDevTable );
 
-        my $ref= {'indices' => []};
-        $data->{'empireDev'} = $ref;
+        $data->{'empireDev'} = {};
+        $data->{'empireDev'}{'indices'} = [];
 
-        foreach my $INDEX
-            ( $devdetails->getSnmpIndices($dd->oiddef('empireDevIndex') ) )
-        {
-            next if( $INDEX < 1 );
+        my $indices = $dd->walkSnmpTable('empireDevIndex');
+        my $types = $dd->walkSnmpTable('empireDevType');
+        my $descr = $dd->walkSnmpTable('empireDevMntPt');
+        my $bsize = $dd->walkSnmpTable('empireDevBsize');
+        my $device = $dd->walkSnmpTable('empireDevDevice');
+        my $size = $dd->walkSnmpTable('empireDevTblks');
+        
+        while( my( $index, $value ) = each %{$indices} ) {
+            if ($bsize->{$index} and defined ($descr->{$index})) {
+                push(@{$data->{'empireDev'}{'indices'}}, $index);
 
+                $data->{'empireDev'}{$index}{'param'}{'storage-description'} = $descr->{$index};
+                $data->{'empireDev'}{$index}{'param'}{'storage-device'} = $device->{$index};
 
-            my $type = $devdetails->snmpVar( $dd->oiddef('empireDevType') .
-                                             '.' . $INDEX );
-
-            my $descr = $devdetails->snmpVar($dd->oiddef('empireDevMntPt') .
-                                             '.' . $INDEX );
-
-            my $bsize =  $devdetails->snmpVar($dd->oiddef('empireDevBsize') .
-                                              '.' . $INDEX );
-
-            # NFS has a block size of 0, it will be skipped
-            if( $bsize and defined( $descr ) )
-            {
-                push( @{ $data->{'empireDev'}->{'indices'} }, $INDEX);
-
-                my $ref = { 'param' => {}, 'templates' => [] };
-                $data->{'empireDev'}{$INDEX} = $ref;
-                my $param = $ref->{'param'};
-
-                $param->{'storage-description'} = $descr;
-                $param->{'storage-device'} =
-                    $devdetails->snmpVar($dd->oiddef('empireDevDevice')
-                                         . '.' . $INDEX );
-
-                my $comment = $type;
-                if( $descr =~ /^\// )
+                my $comment = $types->{$index};
+                if( $descr->{$index} =~ /^\// )
                 {
-                    $comment .= ' (' . $descr . ')';
+                    $comment .= ' (' . $descr->{$index} . ')';
                 }
-                $param->{'comment'} = $comment;
+                $data->{'empireDev'}{$index}{'param'}{'comment'} = $comment;
 
-                if( $storageDescTranslate{$descr}{'subtree'} )
+                my $descr = $descr->{$index};
+                if( $storageDescTranslate{$descr->{$index}}{'subtree'} )
                 {
-                    $descr = $storageDescTranslate{$descr}{'subtree'};
+                    $descr = $storageDescTranslate{$descr->{$index}}{'subtree'};
                 }
                 $descr =~ s/^\///;
                 $descr =~ s/\W/_/g;
-                $param->{'storage-nick'} = $descr;
+                $data->{'empireDev'}{$index}{'param'}{'storage-nick'} = $descr;
 
-                my $units = $bsize;
+                my $units = $bsize->{$index};
+                $data->{'empireDev'}{$index}{'param'} = sprintf('%d,*', $units);
 
-                $param->{'collector-scale'} = sprintf('%d,*', $units);
-
-                my $size =
-                    $devdetails->snmpVar
-                    ($dd->oiddef('empireDevTblks') . '.' . $INDEX);
-
-                if( $size )
-                {
-                    if( $storageGraphTop > 0 )
+                if($size->{$index}) {
+                    if($storageGraphTop > 0)
                     {
-                        $param->{'graph-upper-limit'} =
-                            sprintf('%e',
-                                    $units * $size * $storageGraphTop / 100 );
+                        $data->{'empireDev'}{$index}{'param'}{'graph-upper-limit'} = sprintf('%e', $units * $size * $storageGraphTop / 100 );
                     }
 
                     if( $storageHiMark > 0 )
                     {
-                        $param->{'upper-limit'} =
-                            sprintf('%e',
-                                    $units * $size * $storageHiMark / 100 );
+                        $data->{'empireDev'}{$index}{'param'}{'upper-limit'} = sprintf('%e', $units * $size * $storageHiMark / 100 );
                     }
                 }
 
             }
         }
 
-        $devdetails->clearCap( 'hrStorage' );
+        $devdetails->clearCap('hrStorage');
+    }
 
-    } # end empireDevTable
+    print Dumper $data->{'empireDev'};
 
 
     # Empire Per - Cpu Table

@@ -319,15 +319,11 @@ sub discover
 
 
     # Empire Cpu Totals
-    my $empireCpuTotalWait =
-        $session->get_request( -varbindlist =>
-                               [ $dd->oiddef('empireCpuTotalWait') ] );
 
-    if( $session->error_status() == 0 )
-    {
+    if($dd->checkSnmpTable('empireCpuTotalWait')) {
         $devdetails->setCap('EmpireSystemedge::CpuTotal::Wait');
     }
-
+    
     # Empire Dev Stats Table
 
     my $empireDiskStatsTable =

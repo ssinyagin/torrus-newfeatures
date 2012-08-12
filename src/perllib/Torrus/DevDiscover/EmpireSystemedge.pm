@@ -324,62 +324,38 @@ sub discover
         $devdetails->setCap('EmpireSystemedge::CpuTotal::Wait');
     }
     
+    
     # Empire Dev Stats Table
 
-    my $empireDiskStatsTable =
-        $session->get_table( -baseoid =>
-                             $dd->oiddef('empireDiskStatsTable') );
-
-    my $hrDeviceDescr = $session->get_table( -baseoid =>
-                                             $dd->oiddef('hrDeviceDescr') );
-
-    if( defined($empireDiskStatsTable) and defined($hrDeviceDescr) )
-    {
+    if($dd->checkSnmpTable('empireDiskStatsTable') && $dd->checkSnmpTable('hrDeviceDescr')) {
         $devdetails->setCap('EmpireSystemedge::DiskStats');
-        $devdetails->storeSnmpVars( $empireDiskStatsTable );
-        $devdetails->storeSnmpVars( $hrDeviceDescr );
+        $data->{'empireDiskStats'} = {};
+        $data->{'empireDiskStats'}{'indices'} = [];
+        
+        my $indices = $dd->walkSnmpTable('empireDiskStatsIndex');
+        my $dshostindex = $dd->walkSnmpTable('empireDiskStatsHostIndex');
+        my $hrtable = $dd->walkSnmpTable('hrDeviceDescr');
 
-        my $ref= {'indices' => []};
-        $data->{'empireDiskStats'} = $ref;
+        while( my( $index, $value ) = each %{$indices} ) {
+            push(@{$data->{'empireDiskStats'}{'indices'}}, $index);
 
-        foreach my $INDEX
-            ( $devdetails->
-              getSnmpIndices( $dd->oiddef('empireDiskStatsIndex') ) )
-        {
-            next if( $INDEX < 1 );
+            $data->{'empireDiskStats'}{$index}{'templates'} = [];
+            $data->{'empireDiskStats'}{$index}{'param'}{'HRINDEX'} = $dshostindex->{$index};
+            $data->{'empireDiskStats'}{$index}{'param'}{'comment'} = $hrtable->{$dshostindex->{$index}};
 
-            my $hrindex =
-                $devdetails->snmpVar( $dd->oiddef('empireDiskStatsHostIndex') .
-                                      '.' . $INDEX );
-
-            next if( $hrindex < 1 );
-
-            push( @{ $ref->{'indices'} }, $INDEX );
-
-            my $descr = $devdetails->snmpVar($dd->oiddef('hrDeviceDescr') .
-                                             '.' . $hrindex );
-
-            my $ref = { 'param' => {}, 'templates' => [] };
-            $data->{'empireDiskStats'}{$INDEX} = $ref;
-            my $param = $ref->{'param'};
-
-
-            $param->{'comment'} = $descr;
-
-            $param->{'HRINDEX'} = $hrindex;
-
-            if ( not defined $descr )
-            {
-                $descr = "Index $hrindex";
+            if(not defined($hrtable->{$dshostindex->{$index}})) {
+                $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-description'} = 'Index ' . $dshostindex->{$index};
+            } else {
+                $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-description'} = $hrtable->{$dshostindex->{$index}};                
             }
-            $param->{'disk-stats-description'} = $descr;
 
-            $descr =~ s/^\///;
-            $descr =~ s/\W/_/g;
-            $param->{'disk-stats-nick'} = $descr;
-
+            my $nick = $hrtable->{$dshostindex->{$index}};
+            $nick =~ s/^\///;
+            $nick =~ s/\W/_/g;
+            $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-nick'} = $nick;
         }
-    } # end empireDiskStatsTable
+    }
+
 
     # Empire Dev Table
 

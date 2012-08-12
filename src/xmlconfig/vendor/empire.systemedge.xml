@@ -1800,7 +1800,7 @@ http://www.concord.com/solutions/products/sysedge.shtml
       <leaf name="DiskSpace">
         <param name="nodeid" value="sysedge//%nodeid-device%//dsk-space-%storage-nick%"/>
         <param name="node-display-name"  value="Disk Space"/>
-        <param name="graph-title"  value="%nodeid-device% - %storage-nick% - Disk Space Usage"/>
+        <param name="graph-title"  value="%nodeid-device% - %storage-description% - Disk Space Usage"/>
         <param name="vertical-label" value="Bytes"/>
         <param name="rrd-scaling-base" value="1024"/>
         <param name="graph-lower-limit" value="0"/>

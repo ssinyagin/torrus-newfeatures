@@ -500,34 +500,6 @@ sub discover
     }
 
 
-    # Empire NTREGPERF
-
-    my $empireNTREGPERF =
-        $session->get_table( -baseoid => $dd->oiddef('empireNTREGPERF') );
-    if( defined $empireNTREGPERF )
-    {
-        next;
-        $devdetails->setCap('empireNTREGPERF');
-        $devdetails->storeSnmpVars( $empireNTREGPERF );
-
-        my $ref = {'indices' => []};
-        $data->{'empireNTREGPERF'} = $ref;
-        foreach my $INDEX
-            ( $devdetails->getSnmpIndices($dd->oiddef('empireNTREGPERF') ) )
-        {
-            # This is all configured on a per site basis.
-            # The xml will be site specific
-            push( @{ $ref->{'indices'} }, $INDEX);
-            my $template = {};
-            $Torrus::ConfigBuilder::templateRegistry->
-            {'EmpireSystemedge::NTREGPERF_' . $INDEX} = $template;
-            $template->{'name'}='EmpireSystemedge::NTREGPERF_' . $INDEX;
-            $template->{'source'}='vendor/empire.systemedge.ntregperf.xml';
-
-        }
-    }
-
-
     # Empire Service Checks
 
     if($dd->checkSnmpTable('empireSvcTable')) {
@@ -561,6 +533,25 @@ sub discover
                     $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $data->{'param'}->{'snmp-host'};
                 }
             }
+        } 
+    }
+
+
+    # Empire NTREGPERF
+
+    if($dd->checkSnmpTable('empireNTREGPERF')) {
+        $devdetails->setCap('EmpireSystemedge::empireNTREGPERF');
+        $data->{'empireNTREGPERF'} = {};
+        $data->{'empireNTREGPERF'}{'indices'} = [];
+
+        my $indices = $dd->walkSnmpTable('empireNTREGPERF');
+
+        while( my( $index, $value ) = each %{$indices} ) {
+            push(@{$data->{'empireSvcStats'}{'indices'}}, $index);
+
+            $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index} = {};
+            $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index}{'name'}='EmpireSystemedge::NTREGPERF_' . $index;
+            $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index}{'source'}='vendor/empire.systemedge.ntregperf.xml';
         } 
     }
 
@@ -840,9 +831,9 @@ sub buildConfig
         }
     }
 
-    if( $devdetails->hasCap('empireNTREGPERF') )
+    if( $devdetails->hasCap('EmpireSystemedge::empireNTREGPERF') )
     {
-        Debug("NTREGPERF");
+        Debug("EmpireSystemedge::NTREGPERF");
         my $ntregTree = "NT_REG_PERF";
         my $ntregParam = {
             'precedence'    => '-10000',

@@ -1,4 +1,4 @@
-#  Copyright (C) 2003-2012 Shawn Ferry
+#  Copyright (C) 2003-2012 Shawn Ferry, Roman Hochuli
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
+# Roman Hochuli <roman dot hochuli at nexellent dot ch> <roman at hochu dot li>
 
 package Torrus::DevDiscover::EmpireSystemedge;
 
@@ -323,124 +324,136 @@ sub discover
     if($dd->checkSnmpTable('empireCpuTotalWait')) {
         $devdetails->setCap('EmpireSystemedge::CpuTotal::Wait');
     }
-    
+
+
+    # The layout of these discover-procedures look somewhat nuts but walking the tables first and testing later if it returns
+    # values uses one less snmp-request than checking for the existance of the tables first and walking them again later. 
+    # This brings a whopping ~0.0090s/device faster discovery. See discussion here:
+    # https://github.com/medea61/torrus-newfeatures/commit/ba958bd27011243a3daa55c8bd657d4c8bf9d04c#commitcomment-1702848
     
     # Empire Dev Stats Table
 
-    if($dd->checkSnmpTable('empireDiskStatsTable') && $dd->checkSnmpTable('hrDeviceDescr')) {
-        $devdetails->setCap('EmpireSystemedge::DiskStats');
-        $data->{'empireDiskStats'} = {};
-        $data->{'empireDiskStats'}{'indices'} = [];
-        
+    {
         my $indices = $dd->walkSnmpTable('empireDiskStatsIndex');
-        my $dshostindex = $dd->walkSnmpTable('empireDiskStatsHostIndex');
         my $hrtable = $dd->walkSnmpTable('hrDeviceDescr');
 
-        while( my( $index, $value ) = each %{$indices} ) {
-            push(@{$data->{'empireDiskStats'}{'indices'}}, $index);
+        if((scalar(keys %{$indices}) > 0) && (scalar(keys %{$hrtable}) > 0)) {
+            my $dshostindex = $dd->walkSnmpTable('empireDiskStatsHostIndex');
 
-            $data->{'empireDiskStats'}{$index}{'templates'} = [];
-            $data->{'empireDiskStats'}{$index}{'param'}{'HRINDEX'} = $dshostindex->{$index};
-            $data->{'empireDiskStats'}{$index}{'param'}{'comment'} = $hrtable->{$dshostindex->{$index}};
+            $devdetails->setCap('EmpireSystemedge::DiskStats');
+            $data->{'empireDiskStats'} = {};
+            $data->{'empireDiskStats'}{'indices'} = [];
 
-            if(not defined($hrtable->{$dshostindex->{$index}})) {
-                $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-description'} = 'Index ' . $dshostindex->{$index};
-            } else {
-                $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-description'} = $hrtable->{$dshostindex->{$index}};                
+
+            while( my( $index, $value ) = each %{$indices} ) {
+                push(@{$data->{'empireDiskStats'}{'indices'}}, $index);
+
+                $data->{'empireDiskStats'}{$index}{'templates'} = [];
+                $data->{'empireDiskStats'}{$index}{'param'}{'HRINDEX'} = $dshostindex->{$index};
+                $data->{'empireDiskStats'}{$index}{'param'}{'comment'} = $hrtable->{$dshostindex->{$index}};
+
+                if(not defined($hrtable->{$dshostindex->{$index}})) {
+                    $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-description'} = 'Index ' . $dshostindex->{$index};
+                } else {
+                    $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-description'} = $hrtable->{$dshostindex->{$index}};                
+                }
+
+                my $nick = $hrtable->{$dshostindex->{$index}};
+                $nick =~ s/^\///;
+                $nick =~ s/\W/_/g;
+                $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-nick'} = $nick;
             }
-
-            my $nick = $hrtable->{$dshostindex->{$index}};
-            $nick =~ s/^\///;
-            $nick =~ s/\W/_/g;
-            $data->{'empireDiskStats'}{$index}{'param'}{'disk-stats-nick'} = $nick;
         }
     }
 
 
     # Empire Dev Table
 
-    if($dd->checkSnmpTable('empireDevTable')) {
-        $devdetails->setCap('EmpireSystemedge::Devices');
-
-        $data->{'empireDev'} = {};
-        $data->{'empireDev'}{'indices'} = [];
-
+    {
         my $indices = $dd->walkSnmpTable('empireDevIndex');
-        my $types = $dd->walkSnmpTable('empireDevType');
-        my $descr = $dd->walkSnmpTable('empireDevMntPt');
-        my $bsize = $dd->walkSnmpTable('empireDevBsize');
-        my $device = $dd->walkSnmpTable('empireDevDevice');
-        my $size = $dd->walkSnmpTable('empireDevTblks');
 
-        while( my( $index, $value ) = each %{$indices} ) {
-            if ($bsize->{$index} and defined ($descr->{$index})) {
-                push(@{$data->{'empireDev'}{'indices'}}, $index);
+        if(scalar(keys %{$indices}) > 0) {
+            my $types = $dd->walkSnmpTable('empireDevType');
+            my $descr = $dd->walkSnmpTable('empireDevMntPt');
+            my $bsize = $dd->walkSnmpTable('empireDevBsize');
+            my $device = $dd->walkSnmpTable('empireDevDevice');
+            my $size = $dd->walkSnmpTable('empireDevTblks');
 
-                $data->{'empireDev'}{$index}{'templates'} = [];
-                $data->{'empireDev'}{$index}{'param'}{'storage-description'} = $descr->{$index};
-                $data->{'empireDev'}{$index}{'param'}{'storage-device'} = $device->{$index};
-                $data->{'empireDev'}{$index}{'param'}{'node-display-name'} = $device->{$index};
+            $devdetails->setCap('EmpireSystemedge::Devices');
+            $data->{'empireDev'} = {};
+            $data->{'empireDev'}{'indices'} = [];
 
-                my $comment = $types->{$index};
-                if( $descr->{$index} =~ /^\// )
-                {
-                    $comment .= ' (' . $descr->{$index} . ')';
-                }
-                $data->{'empireDev'}{$index}{'param'}{'comment'} = $comment;
+            while( my( $index, $value ) = each %{$indices} ) {
+                if ($bsize->{$index} and defined ($descr->{$index})) {
+                    push(@{$data->{'empireDev'}{'indices'}}, $index);
 
-                my $devdescr = $descr->{$index};
-                if( $storageDescTranslate{$descr->{$index}}{'subtree'} )
-                {
-                    $devdescr = $storageDescTranslate{$descr->{$index}}{'subtree'};
-                }
-                $devdescr =~ s/^\///;
-                $devdescr =~ s/\W/_/g;
-                $data->{'empireDev'}{$index}{'param'}{'storage-nick'} = $devdescr;
+                    $data->{'empireDev'}{$index}{'templates'} = [];
+                    $data->{'empireDev'}{$index}{'param'}{'storage-description'} = $descr->{$index};
+                    $data->{'empireDev'}{$index}{'param'}{'storage-device'} = $device->{$index};
+                    $data->{'empireDev'}{$index}{'param'}{'node-display-name'} = $device->{$index};
 
-                my $units = $bsize->{$index};
-                $data->{'empireDev'}{$index}{'param'}{'collector-scale'} = sprintf('%d,*', $units);
-
-                if($size->{$index}) {
-                    if($storageGraphTop > 0)
+                    my $comment = $types->{$index};
+                    if( $descr->{$index} =~ /^\// )
                     {
-                        $data->{'empireDev'}{$index}{'param'}{'graph-upper-limit'} = sprintf('%e', $units * $size->{$index} * $storageGraphTop / 100 );
+                        $comment .= ' (' . $descr->{$index} . ')';
+                    }
+                    $data->{'empireDev'}{$index}{'param'}{'comment'} = $comment;
+
+                    my $devdescr = $descr->{$index};
+                    if( $storageDescTranslate{$descr->{$index}}{'subtree'} )
+                    {
+                        $devdescr = $storageDescTranslate{$descr->{$index}}{'subtree'};
+                    }
+                    $devdescr =~ s/^\///;
+                    $devdescr =~ s/\W/_/g;
+                    $data->{'empireDev'}{$index}{'param'}{'storage-nick'} = $devdescr;
+
+                    my $units = $bsize->{$index};
+                    $data->{'empireDev'}{$index}{'param'}{'collector-scale'} = sprintf('%d,*', $units);
+
+                    if($size->{$index}) {
+                        if($storageGraphTop > 0)
+                        {
+                            $data->{'empireDev'}{$index}{'param'}{'graph-upper-limit'} = sprintf('%e', $units * $size->{$index} * $storageGraphTop / 100 );
+                        }
+
+                        if( $storageHiMark > 0 )
+                        {
+                            $data->{'empireDev'}{$index}{'param'}{'upper-limit'} = sprintf('%e', $units * $size->{$index} * $storageHiMark / 100 );
+                        }
                     }
 
-                    if( $storageHiMark > 0 )
-                    {
-                        $data->{'empireDev'}{$index}{'param'}{'upper-limit'} = sprintf('%e', $units * $size->{$index} * $storageHiMark / 100 );
-                    }
                 }
-
             }
-        }
 
-        $devdetails->clearCap('hrStorage');
+            $devdetails->clearCap('hrStorage');
+        }
     }
 
 
     # Empire Per - Cpu Table
 
-    if($dd->checkSnmpTable('empireCpuStatsTable')) {
-        $devdetails->setCap('EmpireSystemedge::CpuStats');
-        
-        $data->{'empireCpuStats'} = {};
-        $data->{'empireCpuStats'}{'indices'} = [];
-        
+    {
         my $indices = $dd->walkSnmpTable('empireCpuStatsIndex');
-        my $table = $dd->walkSnmpTable('empireCpuStatsTable');
 
-        my $cpuStatsDescr = 2;
+        if(scalar(keys %{$indices}) > 0) {
+            my $table = $dd->walkSnmpTable('empireCpuStatsTable');
+            my $cpuStatsDescr = 2;
 
-        while( my( $index, $value ) = each %{$indices} ) {
-            push(@{$data->{'empireCpuStats'}{'indices'}}, $index);
+            $devdetails->setCap('EmpireSystemedge::CpuStats');
+            $data->{'empireCpuStats'} = {};
+            $data->{'empireCpuStats'}{'indices'} = [];
 
-            $data->{'empireCpuStats'}{$index}{'templates'} = [];
-            $data->{'empireCpuStats'}{$index}{'param'}{'INDEX'} = $index;
-            $data->{'empireCpuStats'}{$index}{'param'}{'cpu'} = 'CPU' . $index;
-            $data->{'empireCpuStats'}{$index}{'param'}{'descr'} = $table->{$cpuStatsDescr . '.' . $index};
-            $data->{'empireCpuStats'}{$index}{'param'}{'comment'} = $data->{'empireCpuStats'}{$index}{'param'}{'descr'} . ' (' . 'CPU ' . $index . ')';
+            while( my( $index, $value ) = each %{$indices} ) {
+                push(@{$data->{'empireCpuStats'}{'indices'}}, $index);
 
+                $data->{'empireCpuStats'}{$index}{'templates'} = [];
+                $data->{'empireCpuStats'}{$index}{'param'}{'INDEX'} = $index;
+                $data->{'empireCpuStats'}{$index}{'param'}{'cpu'} = 'CPU' . $index;
+                $data->{'empireCpuStats'}{$index}{'param'}{'descr'} = $table->{$cpuStatsDescr . '.' . $index};
+                $data->{'empireCpuStats'}{$index}{'param'}{'comment'} = $data->{'empireCpuStats'}{$index}{'param'}{'descr'} . ' (' . 'CPU ' . $index . ')';
+
+            }
         }
     }
 
@@ -502,59 +515,62 @@ sub discover
 
     # Empire Service Checks
 
-    if($dd->checkSnmpTable('empireSvcTable')) {
-        $devdetails->setCap('EmpireSystemedge::ServiceResponse');
-        $data->{'empireSvcStats'} = {};
-        $data->{'empireSvcStats'}{'indices'} = [];
-
+    {
         my $indices = $dd->walkSnmpTable('empireSvcIndex');
-        my $table = $dd->walkSnmpTable('empireSvcTable');
 
-        my $svcDescr = 2;
-        my $svcType = 3;
-        my $svcTotRespTime = 12;
+        if(scalar(keys %{$indices}) > 0) {
+            my $table = $dd->walkSnmpTable('empireSvcTable');
+            my $svcDescr = 2;
+            my $svcType = 3;
+            my $svcTotRespTime = 12;
 
-        while( my( $index, $value ) = each %{$indices} ) {
-            push(@{$data->{'empireSvcStats'}{'indices'}}, $index);
+            $devdetails->setCap('EmpireSystemedge::ServiceResponse');
+            $data->{'empireSvcStats'} = {};
+            $data->{'empireSvcStats'}{'indices'} = [];
 
-            if($table->{$svcType . '.' . $index} eq "4") {
-                $data->{'empireSvcStats'}{$index}{'param'}{'INDEX'} = $index;
-                $data->{'empireSvcStats'}{$index}{'param'}{'id'} = 'Responder_' . $index;
-                $data->{'empireSvcStats'}{$index}{'param'}{'descr'} = $table->{$svcDescr . '.' . $index};
-                $data->{'empireSvcStats'}{$index}{'param'}{'descr'} = $table->{$svcDescr . '.' . $index};
 
-                if ( defined $devdetails->{'params'}->{'node-display-name'} ) {
-                    $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $devdetails->{'params'}->{'node-display-name'};
+            while( my( $index, $value ) = each %{$indices} ) {
+                push(@{$data->{'empireSvcStats'}{'indices'}}, $index);
+
+                if($table->{$svcType . '.' . $index} eq "4") {
+                    $data->{'empireSvcStats'}{$index}{'param'}{'INDEX'} = $index;
+                    $data->{'empireSvcStats'}{$index}{'param'}{'id'} = 'Responder_' . $index;
+                    $data->{'empireSvcStats'}{$index}{'param'}{'descr'} = $table->{$svcDescr . '.' . $index};
+                    $data->{'empireSvcStats'}{$index}{'param'}{'descr'} = $table->{$svcDescr . '.' . $index};
+
+                    if ( defined $devdetails->{'params'}->{'node-display-name'} ) {
+                        $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $devdetails->{'params'}->{'node-display-name'};
+                    }
+                    elsif ( defined $devdetails->{'params'}->{'symbolic-name'} ) {
+                        $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $devdetails->{'params'}->{'symbolic-name'};
+                    }
+                    else {
+                        $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $data->{'param'}->{'snmp-host'};
+                    }
                 }
-                elsif ( defined $devdetails->{'params'}->{'symbolic-name'} ) {
-                    $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $devdetails->{'params'}->{'symbolic-name'};
-                }
-                else {
-                    $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $data->{'param'}->{'snmp-host'};
-                }
-            }
-        } 
+            } 
+        }
     }
 
 
     # Empire NTREGPERF
 
-    if($dd->checkSnmpTable('empireNTREGPERF')) {
-        $devdetails->setCap('EmpireSystemedge::empireNTREGPERF');
-        $data->{'empireNTREGPERF'} = {};
-        $data->{'empireNTREGPERF'}{'indices'} = [];
-
+    {
         my $indices = $dd->walkSnmpTable('empireNTREGPERF');
+        if(scalar(keys %{$indices}) > 0) {
+            $devdetails->setCap('EmpireSystemedge::empireNTREGPERF');
+            $data->{'empireNTREGPERF'} = {};
+            $data->{'empireNTREGPERF'}{'indices'} = [];
 
-        while( my( $index, $value ) = each %{$indices} ) {
-            push(@{$data->{'empireSvcStats'}{'indices'}}, $index);
+            while( my( $index, $value ) = each %{$indices} ) {
+                push(@{$data->{'empireSvcStats'}{'indices'}}, $index);
 
-            $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index} = {};
-            $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index}{'name'}='EmpireSystemedge::NTREGPERF_' . $index;
-            $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index}{'source'}='vendor/empire.systemedge.ntregperf.xml';
-        } 
+                $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index} = {};
+                $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index}{'name'}='EmpireSystemedge::NTREGPERF_' . $index;
+                $Torrus::ConfigBuilder::templateRegistry->{'EmpireSystemedge::NTREGPERF_' . $index}{'source'}='vendor/empire.systemedge.ntregperf.xml';
+            } 
+        }
     }
-
 
 #NOT CONFIGURED## Empire DNLC
 #NOT CONFIGURED#    my $empireDnlc = $session->get_table( -baseoid =>

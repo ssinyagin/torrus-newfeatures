@@ -1,3 +1,25 @@
+16-AUG-2012: Torrus release 2.04
+
+In this release:
+
+-- Default value for $Torrus::Collector::SNMP::unreachableTimeout is set
+   to 0 instead of 6 hours, and now collector never gives up on
+   unreachable hosts.
+        
+-- CA eHealth SystemEDGE support is significantly refactored by Roman
+   Hochuli.
+
+-- New URL parameters: Gborder, Gcolors.
+
+-- New graph view for embedding into external websites:
+   "embedded-small", in addition to the existing "embedded" view.
+
+-- Added support for Comtech EF Data satellite modems.
+
+-- New plugin: "tp-rrdfit" for updating the existing RRD files to match
+   the torrus conbfiguration.
+
+
 22-APR-2012: Torrus release 2.03
 
 This is a bugfix release. No new features are added. 

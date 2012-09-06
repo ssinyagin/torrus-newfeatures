@@ -538,24 +538,23 @@ sub buildConfig
             else
             {
                 push( @{$data->{'templates'}}, '::snmp-defaults' );
+
+                if( $devdetails->paramDisabled('disable-reachability-stats') 
+                    and
+                    (
+                     (not defined($devdetails->param('only-devtypes')))
+                     or
+                     $devdetails->paramEnabled('enable-reachability-stats') 
+                    ) )
+                {
+                    push( @{$data->{'templates'}}, '::snmp-reachability' );
+                }
             }
 
             if( $devdetails->paramEnabled('rrd-hwpredict' ) )
             {
                 push( @{$data->{'templates'}}, '::holt-winters-defaults' );
-            }
-            
-            if( $devdetails->paramDisabled('disable-reachability-stats') 
-                and
-                (
-                 (not defined($devdetails->param('only-devtypes')))
-                 or
-                 $devdetails->paramEnabled('enable-reachability-stats') 
-                ) )
-            {
-                push( @{$data->{'templates'}}, '::snmp-reachability' );
-            }
-
+            }            
             
             my $devNodeName = $devdetails->paramString('symbolic-name');
             if( $devNodeName eq '' )

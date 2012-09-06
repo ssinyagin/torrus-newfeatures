@@ -169,6 +169,8 @@
     <param name="leaf-type" value="rrd-def" />
     <param name="rrd-cf"    value="AVERAGE" />
     <param name="system-id" value="%snmp-host%" />
+    <param name="nodeid-device" value="%system-id%__RO_" />
+    <param name="nodeid" value="device//%nodeid-device%" />
   </template>
 
   <!-- Device reachability statistics -->

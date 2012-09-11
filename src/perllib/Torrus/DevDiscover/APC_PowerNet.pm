@@ -21,6 +21,7 @@
 #
 # Currently supported:
 #   PDU firmware 5.x (tested with: AP8853 firmware v5.1.1)
+#   NB200 environment sensors (tested with NBRK0200)
 
 
 package Torrus::DevDiscover::APC_PowerNet;
@@ -106,6 +107,20 @@ our %oiddef =
      
      'rPDULoadBankConfigOverloadThreshold' =>
      '1.3.6.1.4.1.318.1.1.12.2.4.1.1.4',
+
+     # Modular Environmental Manager (MEM)
+     'memModulesStatusModuleName'     => '1.3.6.1.4.1.318.1.1.10.4.1.2.1.2',
+     'memModulesStatusModuleLocation' => '1.3.6.1.4.1.318.1.1.10.4.1.2.1.3',
+     'memModulesStatusModelNumber'    => '1.3.6.1.4.1.318.1.1.10.4.1.2.1.4',
+     'memModulesStatusSerialNumber'   => '1.3.6.1.4.1.318.1.1.10.4.1.2.1.5',
+     'memModulesStatusFirmwareRev'    => '1.3.6.1.4.1.318.1.1.10.4.1.2.1.6',
+     'memSensorsStatusSysTempUnits'   => '1.3.6.1.4.1.318.1.1.10.4.2.1.0',
+     'memSensorsStatusSensorName'     => '1.3.6.1.4.1.318.1.1.10.4.2.3.1.3',
+     'memSensorsStatusSensorLocation' => '1.3.6.1.4.1.318.1.1.10.4.2.3.1.4',
+     'memSensorsTempHighThresh'       => '1.3.6.1.4.1.318.1.1.10.4.2.5.1.7',
+     'memSensorsTempLowThresh'        => '1.3.6.1.4.1.318.1.1.10.4.2.5.1.8',
+     'memSensorsHumidityHighThresh'   => '1.3.6.1.4.1.318.1.1.10.4.2.5.1.20',
+     'memSensorsHumidityLowThresh'    => '1.3.6.1.4.1.318.1.1.10.4.2.5.1.21',
      
      );
 
@@ -383,6 +398,69 @@ sub discover
         }
     }
 
+    # Modular Environmental Manager (MEM)
+    
+    my $mod_names = $dd->walkSnmpTable('memModulesStatusModuleName');
+    if( scalar(keys %{$mod_names}) > 0 )
+    {
+        $devdetails->setCap('apc_MEM');
+
+        my $temp_units;
+        {
+            my $oid = $dd->oiddef('memSensorsStatusSysTempUnits');
+            my $result = $session->get_request( -varbindlist => [$oid] );
+            $temp_units =
+                (defined($result->{$oid}) and $result->{$oid} == 2) ?
+                'Fahrenheit':'Celsius';
+        }
+        
+        my $mod_locations =
+            $dd->walkSnmpTable('memModulesStatusModuleLocation');
+
+        my $mod_models = $dd->walkSnmpTable('memModulesStatusModelNumber');
+        my $mod_serials = $dd->walkSnmpTable('memModulesStatusSerialNumber');
+        my $mod_firmware = $dd->walkSnmpTable('memModulesStatusFirmwareRev');
+
+        my $modules = {};
+        foreach my $INDEX (keys %{$mod_names})
+        {
+            my $ref = {};
+            $ref->{'name'} = $mod_names->{$INDEX};
+            $ref->{'location'} = $mod_locations->{$INDEX};            
+            $ref->{'model'} = $mod_models->{$INDEX};
+            $ref->{'serial'} = $mod_serials->{$INDEX};
+            $ref->{'firmware'} = $mod_firmware->{$INDEX};
+            $ref->{'temp-units'} = $temp_units;
+            
+            $modules->{$INDEX}{'sys'} = $ref;           
+        }
+
+        my $s_names = $dd->walkSnmpTable('memSensorsStatusSensorName');
+        my $s_locations = $dd->walkSnmpTable('memSensorsStatusSensorLocation');
+        my $s_temp_hi = $dd->walkSnmpTable('memSensorsTempHighThresh');
+        my $s_temp_lo = $dd->walkSnmpTable('memSensorsTempLowThresh');
+        my $s_hum_hi = $dd->walkSnmpTable('memSensorsHumidityHighThresh');
+        my $s_hum_lo = $dd->walkSnmpTable('memSensorsHumidityLowThresh');
+
+        foreach my $INDEX (keys %{$s_names})
+        {
+            my ($mod_idx, $sens_idx) = split(/\./o, $INDEX);
+            my $ref = {};
+            $ref->{'sensor-name'} = $s_names->{$INDEX};
+            $ref->{'sensor-location'} = $s_locations->{$INDEX};
+            $ref->{'sensor-temp-hi'} = $s_temp_hi->{$INDEX};
+            $ref->{'sensor-temp-lo'} = $s_temp_lo->{$INDEX};
+            $ref->{'sensor-hum-hi'} = $s_hum_hi->{$INDEX};
+            $ref->{'sensor-hum-lo'} = $s_hum_lo->{$INDEX};
+            $ref->{'sensor-num'} = $sens_idx;
+
+            $modules->{$mod_idx}{'sensors'}{$INDEX} = $ref;
+        }
+
+        $data->{'apc_MEM'} = $modules;
+        $data->{'param'}{'comment'} = 'APC ' . $mod_models->{0};
+    }    
+    
     return 1;
 }
 
@@ -397,17 +475,15 @@ sub buildConfig
         
     if( $devdetails->hasCap('apc_rPDU2') )
     {
-        my @templates;
-        push(@templates, 'APC_PowerNet::apc-pdu2-subtree');
-        
-        my $devParam = {
+        my $pduParam = {
             'node-display-name' => 'PDU Statistics',
             'comment' => 'PDU current and power load',
             'precedence' => 10000,
         };
         
         my $pduSubtree =
-            $cb->addSubtree( $devNode, 'PDU_Stats', $devParam, \@templates );
+            $cb->addSubtree( $devNode, 'PDU_Stats', $pduParam,
+                             ['APC_PowerNet::apc-pdu2-subtree'] );
         
         my $precedence = 1000;
 
@@ -465,17 +541,15 @@ sub buildConfig
     {
         # Old rPDU MIB
         
-        my @templates;
-        push(@templates, 'APC_PowerNet::apc-pdu-subtree');
-        
-        my $devParam = {
+        my $pduParam = {
             'node-display-name' => 'PDU Statistics',
             'comment' => 'PDU current and power load',
             'precedence' => 10000,
         };
         
         my $pduSubtree =
-            $cb->addSubtree( $devNode, 'PDU_Stats', $devParam, \@templates );
+            $cb->addSubtree( $devNode, 'PDU_Stats', $pduParam,
+                             ['APC_PowerNet::apc-pdu-subtree'] );
         
         foreach my $ref (@{$data->{'apc_rPDU'}})
         {
@@ -510,6 +584,66 @@ sub buildConfig
         }        
     }
 
+
+    if( $devdetails->hasCap('apc_MEM') )
+    {
+        # Modular Environmental Manager (MEM)
+
+        my $mod_precedence = 5000;
+        
+        foreach my $mod_idx (sort {$a <=>$b} keys %{$data->{'apc_MEM'}})
+        {
+            my $mod_data = $data->{'apc_MEM'}{$mod_idx};
+            $mod_precedence--;
+
+            my $modSubtreeName = $mod_data->{'sys'}{'name'};
+            $modSubtreeName =~ s/\W/_/go;
+            
+            my $modParam = {
+                'node-display-name' => $mod_data->{'sys'}{'name'},
+                'precedence' => $mod_precedence,
+                'sensor-temp-units' => $mod_data->{'sys'}{'temp-units'},
+            };
+            
+            $modParam->{'comment'} = 'Environment sensors, Location: ' .
+                $mod_data->{'sys'}{'location'} . ', Model: ' .
+                $mod_data->{'sys'}{'model'} . ', Serial: ' .
+                $mod_data->{'sys'}{'serial'} . ', Firmware: ' .
+                $mod_data->{'sys'}{'firmware'};
+
+            my $modSubtree =
+                $cb->addSubtree( $devNode, $modSubtreeName, $modParam,
+                                 ['APC_PowerNet::apc-mem-subtree'] );
+            
+            foreach my $INDEX (sort keys %{$mod_data->{'sensors'}})
+            {
+                my $sens_data = $mod_data->{'sensors'}{$INDEX};
+
+                my $senSubtreeName = $sens_data->{'sensor-name'};
+                $senSubtreeName =~ s/\W/_/go;
+
+                my $sensParam = {};
+                foreach my $p ('sensor-temp-hi', 'sensor-temp-lo',
+                               'sensor-hum-hi', 'sensor-hum-lo',
+                               'sensor-name')
+                {
+                    $sensParam->{$p} = $sens_data->{$p};
+                }
+
+                $sensParam->{'node-display-name'} =
+                    $sens_data->{'sensor-name'};
+                $sensParam->{'comment'} =
+                    'Location: ' . $sens_data->{'sensor-location'};
+                $sensParam->{'precedence'} =
+                    1000 - $sens_data->{'sensor-num'};
+                $sensParam->{'sensor-index'} = $INDEX;
+                
+                $cb->addSubtree( $modSubtree, $senSubtreeName, $sensParam,
+                                 ['APC_PowerNet::apc-mem-sensor'] );
+            }
+        }
+    }
+    
     return;
 }
 

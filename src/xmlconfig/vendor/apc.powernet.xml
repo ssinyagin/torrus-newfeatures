@@ -24,6 +24,11 @@
 
 
 <configuration>
+
+  <param-properties>
+    <prop param="vertical-label"           prop="expand" value="1"/>
+  </param-properties>
+
   <definitions>
    <def name="rPDU2DeviceStatusPower"
         value="1.3.6.1.4.1.318.1.1.26.4.3.1.5"/>
@@ -39,6 +44,10 @@
         value="1.3.6.1.4.1.318.1.1.12.1.16.0"/>
    <def name="rPDULoadStatusLoad"
         value="1.3.6.1.4.1.318.1.1.12.2.3.1.1.2"/>
+   <def name="memSensorsTemperature"
+        value="1.3.6.1.4.1.318.1.1.10.4.2.3.1.5"/>
+   <def name="memSensorsHumidity"
+        value="1.3.6.1.4.1.318.1.1.10.4.2.3.1.6"/>
   </definitions>
 
   <datasources>
@@ -50,11 +59,11 @@
     <param name="overview-shortcuts" value="all"/>
     <param name="overview-subleave-name-all" value="Power,Current"/>     
     <param name="overview-shortcut-text-all" value="Overview"/>
-     <param name="overview-shortcut-title-all"
+    <param name="overview-shortcut-title-all"
            value="All important graphs on one page"/>
-     <param name="overview-page-title-all"
+    <param name="overview-page-title-all"
            value="PDU overview"/>
-     <param name="overview-direct-link-all" value="yes"/>
+    <param name="overview-direct-link-all" value="yes"/>
     
     <subtree name="Device">
       <param name="data-file"  value="%system-id%_pdu_device.rrd"/>
@@ -212,6 +221,67 @@
         <param name="nodeid"
                value="pdu//%nodeid-device%//%nodeid-rpdu-ref%//current"/>
       </leaf>
+   </template>
+
+
+   <template name="apc-mem-subtree">
+     <param name="has-overview-shortcuts" value="yes"/>
+     <param name="overview-shortcuts" value="temp,humi"/>
+     
+     <param name="overview-subleave-name-temp" value="Temperature"/>
+     <param name="overview-shortcut-text-temp" value="All Temperature"/>
+     <param name="overview-shortcut-title-temp"
+            value="All temperature graphs on one page"/>
+     <param name="overview-page-title-temp"
+            value="All temperature sensors"/>
+     <param name="overview-direct-link-temp" value="yes"/>
+
+     <param name="overview-subleave-name-humi" value="Humidity"/>
+     <param name="overview-shortcut-text-humi" value="All Humiduty"/>
+     <param name="overview-shortcut-title-humi"
+            value="All humidity graphs on one page"/>
+     <param name="overview-page-title-humi"
+            value="All humidity sensors"/>
+     <param name="overview-direct-link-humi" value="yes"/>
+   </template>
+
+   <template name="apc-mem-sensor">
+     <param name="collector-timeoffset-hashstring"
+            value="%system-id%:%sensor-index%" />
+     <param name="data-file"
+            value="%system-id%_sensor_%sensor-index%.rrd"/>
+     <param name="rrd-create-dstype" value="GAUGE"/>
+     <param name="graph-lower-limit" value="0" />
+     <param name="graph-upper-limit" value="100" />
+     <param name="graph-title" value="%system-id%:%sensor-name%"/>
+     <param name="nodeid"
+            value="sensor//%nodeid-device%//%sensor-index%"/>
+
+     <leaf name="Temperature">
+       <param name="rrd-ds"            value="Temperature"/>
+       <param name="snmp-object"
+              value="$memSensorsTemperature.%sensor-index%"/>       
+       <param name="lower-limit" value="%sensor-temp-lo%"/>
+       <param name="upper-limit" value="%sensor-temp-hi%"/>
+       <param name="vertical-label" value="Degrees %sensor-temp-units%"/>
+       <param name="graph-legend"   value="Temperature"/>
+
+       <param name="nodeid"
+              value="sensor//%nodeid-device%//%sensor-index%//temperature"/>
+     </leaf>
+     
+     <leaf name="Humidity">
+       <param name="rrd-ds"            value="Humidity"/>
+       <param name="snmp-object"
+              value="$memSensorsHumidity.%sensor-index%"/>       
+       <param name="lower-limit" value="%sensor-hum-lo%"/>
+       <param name="upper-limit" value="%sensor-hum-hi%"/>
+       <param name="vertical-label" value="Percent" />
+       <param name="graph-legend"   value="Humidity"/>
+
+       <param name="nodeid"
+              value="sensor//%nodeid-device%//%sensor-index%//humidity"/>
+     </leaf>
    </template>
    
   </datasources>

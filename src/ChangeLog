@@ -1,3 +1,8 @@
+2012-09-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/APC_PowerNet.pm: added support for
+	Modular Environmental Manager (MEM)
+
 2012-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/EmpireSystemedge.pm: CA eHealth

@@ -274,8 +274,15 @@ sub discover
         }
         
         my $result = $session->get_request( -varbindlist => \@oids );
-        if( defined($result) )
+
+        my $model_oid = $dd->oiddef('sPDUIdentModelNumber');
+        
+        if( defined($result) and
+            defined($result->{$model_oid}) and
+            length($result->{$model_oid}) > 0 )
         {
+            $devdetails->setCap('apc_rPDU');
+
             my $sysref = {};
             foreach my $oidname ( @rpdu_system_oid )
             {
@@ -315,10 +322,10 @@ sub discover
                 
                 $data->{'param'}{'legend'} = $legend;
             }
-        }
+        
 
-        # Discover PDU phases
-        {
+            # Discover PDU phases
+        
             my $phases = $dd->walkSnmpTable('rPDULoadStatusPhaseNumber');
             my $banks = $dd->walkSnmpTable('rPDULoadStatusBankNumber');
             
@@ -374,7 +381,6 @@ sub discover
                       {'param' => $param, 'name' => $name} );
             }
         }
-
     }
 
     return 1;
@@ -388,28 +394,21 @@ sub buildConfig
     my $devNode = shift;
 
     my $data = $devdetails->data();
-
-    my @templates;
-    if( $devdetails->hasCap('apc_rPDU2') )
-    {
-        push(@templates, 'APC_PowerNet::apc-pdu2-subtree');
-    }
-    else
-    {
-        push(@templates, 'APC_PowerNet::apc-pdu-subtree');
-    }
-
-    my $devParam = {
-        'node-display-name' => 'PDU Statistics',
-        'comment' => 'PDU current and power load',
-        'precedence' => 10000,
-    };
-    
-    my $pduSubtree =
-        $cb->addSubtree( $devNode, 'PDU_Stats', $devParam, \@templates );
         
     if( $devdetails->hasCap('apc_rPDU2') )
     {
+        my @templates;
+        push(@templates, 'APC_PowerNet::apc-pdu2-subtree');
+        
+        my $devParam = {
+            'node-display-name' => 'PDU Statistics',
+            'comment' => 'PDU current and power load',
+            'precedence' => 10000,
+        };
+        
+        my $pduSubtree =
+            $cb->addSubtree( $devNode, 'PDU_Stats', $devParam, \@templates );
+        
         my $precedence = 1000;
 
         # phases
@@ -462,9 +461,21 @@ sub buildConfig
             $precedence--;
         }
     }
-    else
+    elsif( $devdetails->hasCap('apc_rPDU') )
     {
         # Old rPDU MIB
+        
+        my @templates;
+        push(@templates, 'APC_PowerNet::apc-pdu-subtree');
+        
+        my $devParam = {
+            'node-display-name' => 'PDU Statistics',
+            'comment' => 'PDU current and power load',
+            'precedence' => 10000,
+        };
+        
+        my $pduSubtree =
+            $cb->addSubtree( $devNode, 'PDU_Stats', $devParam, \@templates );
         
         foreach my $ref (@{$data->{'apc_rPDU'}})
         {

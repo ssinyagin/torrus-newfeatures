@@ -5,6 +5,10 @@
 
 2012-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* NEWS: Release 2.04
+
+2012-08-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
 	* perllib/Torrus/DevDiscover/EmpireSystemedge.pm: CA eHealth
 	SystemEDGE support is significantly refactored by Roman Hochuli
 

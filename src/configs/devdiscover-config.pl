@@ -71,7 +71,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::ComtechEFData',
      'Torrus::DevDiscover::EmpireSystemedge',
-     'Torrus::DevDiscover::F5BigIp',
      'Torrus::DevDiscover::Foundry',
      'Torrus::DevDiscover::FTOS',
      'Torrus::DevDiscover::Jacarta',
@@ -1073,56 +1072,6 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'     => 'motorola-bsr-docsis-upstream-util',
          'source'   => 'vendor/motorola.bsr.xml',
      },     
-     
-     #### F5 BigIp
-     'F5BigIp::BigIp_4.x' => {
-         'name'     => 'BigIp_4.x',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_virtualServer' => {
-         'name'     => 'BigIp_4.x_virtualServer',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_virtualServer-connrate-overview' => {
-         'name'     => 'BigIp_4.x_virtualServer-connrate-overview',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_virtualServer-actvconn-overview' => {
-         'name'     => 'BigIp_4.x_virtualServer-connrate-overview',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_pool-actvconn-overview' => {
-         'name'     => 'BigIp_4.x_pool-actvconn-overview',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_pool' => {
-         'name'     => 'BigIp_4.x_pool',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_poolMember-actvconn-overview' => {
-         'name'     => 'BigIp_4.x_poolMember-actvconn-overview',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_poolMember' => {
-         'name'     => 'BigIp_4.x_poolMember',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_sslProxy_Global' => {
-         'name'     => 'BigIp_4.x_sslProxy_Global',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_sslProxy-currconn-overview' => {
-         'name'     => 'BigIp_4.x_sslProxy-currconn-overview',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_4.x_sslProxy' => {
-         'name'     => 'BigIp_4.x_sslProxy',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
-     'F5BigIp::BigIp_3.x' => {
-         'name'     => 'BigIp_3.x',
-         'source'   => 'vendor/f5.bigip.xml',
-     },
 
      ##### Foundry/Brocade
      'Foundry::fdry-chass-temperature' => {

@@ -71,6 +71,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::ComtechEFData',
      'Torrus::DevDiscover::EmpireSystemedge',
+     'Torrus::DevDiscover::F5BigIp',
      'Torrus::DevDiscover::Foundry',
      'Torrus::DevDiscover::FTOS',
      'Torrus::DevDiscover::Jacarta',

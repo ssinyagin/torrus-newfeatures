@@ -182,6 +182,7 @@ sub discover
                 $data->{'ltm'}{$partition}{'Nodes'}{$node} = {
                     'f5-object-fullname' => $fullname,
                     'f5-object-nameidx' => $INDEX,
+                    'f5-object-shortname' => $node,
                 };
             }
         }
@@ -207,6 +208,7 @@ sub discover
                 $data->{'ltm'}{$partition}{'Pools'}{$pool} = {
                     'f5-object-fullname' => $fullname,
                     'f5-object-nameidx' => $INDEX,
+                    'f5-object-shortname' => $pool,
                 };
             }
         }
@@ -220,11 +222,19 @@ sub discover
             if( $fullname =~ /^\/([^\/]+)\/(.+)$/o )
             {
                 my $partition = $1;
+                # the full name may consist of 3 parts if it's generated
+                # by application template. We drop the middle part
+                # (template name)
                 my $srv = $2;
+                if( $srv =~ /^[^\/]+\/(.+)$/ )
+                {
+                    $srv = $1;
+                }
                 
                 $data->{'ltm'}{$partition}{'VServers'}{$srv} = {
                     'f5-object-fullname' => $fullname,
                     'f5-object-nameidx' => $INDEX,
+                    'f5-object-shortname' => $srv,
                 };
             }
         }

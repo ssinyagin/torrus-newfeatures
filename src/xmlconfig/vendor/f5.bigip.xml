@@ -38,6 +38,7 @@
       <param name="f5-nodeid-prefix"
              value="f5-node//%nodeid-device%//%f5-object-md5%//"/>
       <param name="data-file" value="%system-id%_f5node_%f5-object-md5%.rrd" />
+      <param name="graph-title" value="Node: %f5-object-shortname%" />
     </template>
     
     <template name="ltm-pool-statistics">
@@ -50,6 +51,7 @@
       <param name="f5-nodeid-prefix"
              value="f5-pool//%nodeid-device%//%f5-object-md5%//"/>
       <param name="data-file" value="%system-id%_f5pool_%f5-object-md5%.rrd" />
+      <param name="graph-title" value="Pool: %f5-object-shortname%" />
     </template>
 
     <template name="ltm-vserver-statistics">
@@ -62,6 +64,7 @@
       <param name="f5-nodeid-prefix"
              value="f5-vserver//%nodeid-device%//%f5-object-md5%//"/>
       <param name="data-file" value="%system-id%_f5vsrv_%f5-object-md5%.rrd" />
+      <param name="graph-title" value="VServer: %f5-object-shortname%" />
     </template>
 
     

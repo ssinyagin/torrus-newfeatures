@@ -21,10 +21,10 @@ package Torrus::DevDiscover::F5BigIp;
 
 use strict;
 use warnings;
+use Digest::MD5 qw(md5_hex);
 
 use Torrus::Log;
 
-use Data::Dumper;
 
 $Torrus::DevDiscover::registry{'F5BigIp'} = {
     'sequence'     => 500,
@@ -67,6 +67,16 @@ my $f5InterfaceFilter = {
     },
 };
 
+
+my %ltm_category_templates =
+    (
+     'Nodes' => ['F5BigIp::ltm-node-statistics',
+                 'F5BigIp::f5-object-statistics'],
+     'Pools' => ['F5BigIp::ltm-pool-statistics',
+                 'F5BigIp::f5-object-statistics'],
+     'VServers' => ['F5BigIp::ltm-vserver-statistics',
+                    'F5BigIp::f5-object-statistics'],
+    );
 
 sub checkdevtype
 {
@@ -170,8 +180,8 @@ sub discover
                 my $node = $2;
                 
                 $data->{'ltm'}{$partition}{'Nodes'}{$node} = {
-                    'fullname' => $fullname,
-                    'nameidx' => $INDEX,
+                    'f5-object-fullname' => $fullname,
+                    'f5-object-nameidx' => $INDEX,
                 };
             }
         }
@@ -185,11 +195,18 @@ sub discover
             if( $fullname =~ /^\/([^\/]+)\/(.+)$/o )
             {
                 my $partition = $1;
+                # the full name may consist of 3 parts if it's generated
+                # by application template. We drop the middle part
+                # (template name)
                 my $pool = $2;
+                if( $pool =~ /^[^\/]+\/(.+)$/ )
+                {
+                    $pool = $1;
+                }
                 
                 $data->{'ltm'}{$partition}{'Pools'}{$pool} = {
-                    'fullname' => $fullname,
-                    'nameidx' => $INDEX,
+                    'f5-object-fullname' => $fullname,
+                    'f5-object-nameidx' => $INDEX,
                 };
             }
         }
@@ -205,16 +222,14 @@ sub discover
                 my $partition = $1;
                 my $srv = $2;
                 
-                $data->{'ltm'}{$partition}{'Servers'}{$srv} = {
-                    'fullname' => $fullname,
-                    'nameidx' => $INDEX,
+                $data->{'ltm'}{$partition}{'VServers'}{$srv} = {
+                    'f5-object-fullname' => $fullname,
+                    'f5-object-nameidx' => $INDEX,
                 };
             }
         }
     }
 
-    print STDERR Dumper($data->{'ltm'});
-    
     return 1;
 }
 
@@ -225,6 +240,56 @@ sub buildConfig
     my $cb = shift;
     my $devNode = shift;
 
+    my $data = $devdetails->data();
+
+    my $p_precedence = 10000;
+    
+    foreach my $partition (sort keys %{$data->{'ltm'}})
+    {
+        $p_precedence--;
+        
+        my $partParams = {
+            'node-display-name' => $partition,
+            'precedence' => $p_precedence,
+            'comment' => 'BigIP partition',
+        };
+
+        my $partSubtree = $partition;
+        $partSubtree =~ s/\W+/_/g;
+        
+        my $partitionNode =
+            $cb->addSubtree( $devNode, $partSubtree, $partParams );
+
+        foreach my $category (sort keys %{$data->{'ltm'}{$partition}})
+        {
+            my $categoryNode =
+                $cb->addSubtree( $partitionNode, $category, {},
+                                 ['F5BigIp::f5-category-subtree'] );
+            
+            foreach my $object
+                (sort keys %{$data->{'ltm'}{$partition}{$category}})
+            {
+                my $objParam = {
+                    'node-display-name' => $object,
+                };
+
+                my $ref = $data->{'ltm'}{$partition}{$category}{$object};
+                while( my($p, $v) = each %{$ref} )
+                {
+                    $objParam->{$p} = $v;
+                }
+
+                $objParam->{'f5-object-md5'} =
+                    md5_hex($objParam->{'f5-object-fullname'});
+                
+                my $objSubtree = $object;
+                $objSubtree =~ s/\W/_/g;
+                $cb->addSubtree( $categoryNode, $objSubtree, $objParam,
+                                 $ltm_category_templates{$category});
+            }
+        }
+    }
+    
     return;
 }
 

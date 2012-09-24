@@ -1058,6 +1058,28 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source'    => 'vendor/empire.systemedge.xml',
      },
 
+     #### F5 BigIP
+     'F5BigIp::f5-object-statistics' => {
+         'name'      => 'f5-object-statistics',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
+     'F5BigIp::ltm-node-statistics' => {
+         'name'      => 'ltm-node-statistics',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
+     'F5BigIp::ltm-pool-statistics' => {
+         'name'      => 'ltm-pool-statistics',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
+     'F5BigIp::ltm-vserver-statistics' => {
+         'name'      => 'ltm-vserver-statistics',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
+     'F5BigIp::f5-category-subtree' => {
+         'name'      => 'f5-category-subtree',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
+     
      #### MicrosoftWindows
      'MicrosoftWindows::microsoft-iis-ftp-stats' => {
          'name'     => 'microsoft-iis-ftp-stats',

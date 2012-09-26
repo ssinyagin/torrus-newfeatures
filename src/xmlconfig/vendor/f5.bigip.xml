@@ -54,6 +54,20 @@
       <param name="graph-title" value="Pool: %f5-object-shortname%" />
     </template>
 
+    <template name="ltm-poolmember-statistics">
+      <!-- F5-BIGIP-LOCAL-MIB::ltmPoolStatTable -->
+      <param name="f5-oid-pktsin"   value="1.3.6.1.4.1.3375.2.2.5.4.3.1.5"/>
+      <param name="f5-oid-pktsout"  value="1.3.6.1.4.1.3375.2.2.5.4.3.1.7"/>
+      <param name="f5-oid-bytesin"  value="1.3.6.1.4.1.3375.2.2.5.4.3.1.6"/>
+      <param name="f5-oid-bytesout" value="1.3.6.1.4.1.3375.2.2.5.4.3.1.8"/>
+      <param name="f5-oid-curconns" value="1.3.6.1.4.1.3375.2.2.5.4.3.1.11"/>
+      <param name="f5-nodeid-prefix"
+             value="f5-pool//%nodeid-device%//%f5-object-md5%"/>
+      <param name="data-file" value="%system-id%_f5pool_%f5-object-md5%.rrd" />
+      <param name="graph-title" value="Pool member: %f5-object-shortname%" />
+    </template>
+
+    
     <template name="ltm-vserver-statistics">
       <!-- F5-BIGIP-LOCAL-MIB::ltmVirtualServStatTable -->
       <param name="f5-oid-pktsin"   value="1.3.6.1.4.1.3375.2.2.10.2.3.1.6"/>

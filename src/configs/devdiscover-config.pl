@@ -1071,6 +1071,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'      => 'ltm-pool-statistics',
          'source'    => 'vendor/f5.bigip.xml',
      },
+     'F5BigIp::ltm-poolmember-statistics' => {
+         'name'      => 'ltm-poolmember-statistics',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
      'F5BigIp::ltm-vserver-statistics' => {
          'name'      => 'ltm-vserver-statistics',
          'source'    => 'vendor/f5.bigip.xml',

@@ -45,12 +45,15 @@ our %oiddef =
      'f5_sysProductBuild'              => '1.3.6.1.4.1.3375.2.1.4.3.0',
 
      # F5-BIGIP-LOCAL-MIB -- LTM stats
-     'ltmNodeAddrNumber'        => '1.3.6.1.4.1.3375.2.2.4.1.1.0',
-     'ltmNodeAddrStatNodeName'  => '1.3.6.1.4.1.3375.2.2.4.2.3.1.20',
-     'ltmPoolNumber'            => '1.3.6.1.4.1.3375.2.2.5.1.1.0',
-     'ltmPoolStatName'          => '1.3.6.1.4.1.3375.2.2.5.2.3.1.1',
-     'ltmVirtualServNumber'     => '1.3.6.1.4.1.3375.2.2.10.1.1.0',
-     'ltmVirtualServStatName'   => '1.3.6.1.4.1.3375.2.2.10.2.3.1.1',
+     'ltmNodeAddrNumber'         => '1.3.6.1.4.1.3375.2.2.4.1.1.0',
+     'ltmNodeAddrStatNodeName'   => '1.3.6.1.4.1.3375.2.2.4.2.3.1.20',
+     'ltmPoolNumber'             => '1.3.6.1.4.1.3375.2.2.5.1.1.0',
+     'ltmPoolStatName'           => '1.3.6.1.4.1.3375.2.2.5.2.3.1.1',
+     'ltmPoolMemberStatPoolName' => '1.3.6.1.4.1.3375.2.2.5.4.3.1.1',
+     'ltmPoolMemberStatNodeName' => '1.3.6.1.4.1.3375.2.2.5.4.3.1.28',
+     'ltmPoolMemberStatPort'     => '1.3.6.1.4.1.3375.2.2.5.4.3.1.4',
+     'ltmVirtualServNumber'      => '1.3.6.1.4.1.3375.2.2.10.1.1.0',
+     'ltmVirtualServStatName'    => '1.3.6.1.4.1.3375.2.2.10.2.3.1.1',
      );
 
 
@@ -108,6 +111,9 @@ sub discover
     my $session = $dd->session();
 
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
+
+    my $old_maxrepetitions = $dd->{'maxrepetitions'};
+    $dd->{'maxrepetitions'} = 3;
     
     # Common system information
     {
@@ -212,6 +218,47 @@ sub discover
                 };
             }
         }
+
+        # Get the pool members
+        my $poolnames = $dd->walkSnmpTable('ltmPoolMemberStatPoolName');
+        my $nodenames = $dd->walkSnmpTable('ltmPoolMemberStatNodeName');
+        my $ports = $dd->walkSnmpTable('ltmPoolMemberStatPort');
+        
+        while( my( $INDEX, $poolname ) = each %{$poolnames} )
+        {
+            if( $poolname !~ /^\/([^\/]+)\/(.+)$/o )
+            {
+                next;
+            }            
+            my $partition = $1;
+            # the full name may consist of 3 parts if it's generated
+            # by application template. We drop the middle part
+            # (template name)
+            my $pool = $2;
+            if( $pool =~ /^[^\/]+\/(.+)$/ )
+            {
+                $pool = $1;
+            }
+
+            my $nodename = $nodenames->{$INDEX};
+            # Node name consists of /Partition/Name
+            if( $nodename !~ /^\/([^\/]+)\/(.+)$/o )
+            {
+                next;
+            }
+            my $node = $2;
+
+            my $port = $ports->{$INDEX};
+            next unless (defined($port) and $port > 0 );
+
+            $data->{'ltm_poolmembers'}{$partition}{$pool}{$node}{$port} = {
+                'f5-object-fullname' => join(':', $partition,
+                                             $pool,$node,$port),
+                'f5-object-nameidx' => $INDEX,
+                'f5-object-shortname' => $node . ':' . $port,
+            };
+            
+        }
     }
 
     if( $devdetails->hasCap('F5_LTM_VServers') )
@@ -240,6 +287,8 @@ sub discover
         }
     }
 
+    $dd->{'maxrepetitions'} = $old_maxrepetitions;
+    
     return 1;
 }
 
@@ -298,6 +347,61 @@ sub buildConfig
                                  $ltm_category_templates{$category});
             }
         }
+
+        # Pool members
+        if( defined($data->{'ltm_poolmembers'}{$partition}) and
+            scalar(keys %{$data->{'ltm_poolmembers'}{$partition}}) > 0 )
+        {
+            my $m_precedence = 1000;
+            
+            my $membersNode =
+                $cb->addSubtree( $partitionNode, 'Pool_Members',
+                                 {
+                                     'node-display-name' => 'Pool Members',
+                                 } );
+            foreach my $pool
+                (sort keys %{$data->{'ltm_poolmembers'}{$partition}})
+            {
+                my $ref1 = $data->{'ltm_poolmembers'}{$partition}{$pool};
+
+                my $poolSubtree = $pool;
+                $poolSubtree =~ s/\W/_/g;
+
+                my $poolNode =
+                    $cb->addSubtree( $membersNode, $poolSubtree,
+                                     {
+                                         'node-display-name' => $pool,
+                                     },
+                                     ['F5BigIp::f5-category-subtree'] );
+                
+                foreach my $node (sort keys %{$ref1})
+                {
+                    foreach my $port (sort {$a <=> $b} keys %{$ref1->{$node}})
+                    {
+                        $m_precedence--;
+                        my $objParam = {
+                            'node-display-name' => $node . ':' . $port,
+                            'precedence' => $m_precedence,
+                        };
+                        
+                        my $ref = $ref1->{$node}{$port};
+                        while( my($p, $v) = each %{$ref} )
+                        {
+                            $objParam->{$p} = $v;
+                        }
+
+                        $objParam->{'f5-object-md5'} =
+                            md5_hex($objParam->{'f5-object-fullname'});
+                
+                        my $objSubtree = $node . ':' . $port;
+                        $objSubtree =~ s/\W/_/g;
+                        $cb->addSubtree( $poolNode, $objSubtree, $objParam,
+                                         ['F5BigIp::ltm-poolmember-statistics',
+                                          'F5BigIp::f5-object-statistics']);
+                    }
+                }
+            }
+        }            
     }
     
     return;

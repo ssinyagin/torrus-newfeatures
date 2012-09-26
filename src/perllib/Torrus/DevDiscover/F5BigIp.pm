@@ -81,6 +81,13 @@ my %ltm_category_templates =
                     'F5BigIp::f5-object-statistics'],
     );
 
+my %ltm_category_comment =
+    (
+     'Nodes' => 'Per-node statistics',
+     'Pools' => 'Pool statistics',
+     'VServers' => 'Virtual server statistics',
+    );
+
 sub checkdevtype
 {
     my $dd = shift;
@@ -321,8 +328,12 @@ sub buildConfig
 
         foreach my $category (sort keys %{$data->{'ltm'}{$partition}})
         {
+            my $catParams = {
+                'comment' => $ltm_category_comment{$category},
+            };
+            
             my $categoryNode =
-                $cb->addSubtree( $partitionNode, $category, {},
+                $cb->addSubtree( $partitionNode, $category, $catParams,
                                  ['F5BigIp::f5-category-subtree'] );
             
             foreach my $object
@@ -358,6 +369,7 @@ sub buildConfig
                 $cb->addSubtree( $partitionNode, 'Pool_Members',
                                  {
                                      'node-display-name' => 'Pool Members',
+                                     'comment' => 'Pool member statistics',
                                  } );
             foreach my $pool
                 (sort keys %{$data->{'ltm_poolmembers'}{$partition}})

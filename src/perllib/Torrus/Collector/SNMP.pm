@@ -609,11 +609,20 @@ sub lookupMap
 
         # Retrieve the map table
 
-        my $maxrepetitions = $collector->param($token, 'snmp-maxrepetitions');
-        $session->get_table( -baseoid => $map,
-                             -maxrepetitions => $maxrepetitions,
-                             -callback => [\&mapLookupCallback,
-                                           $collector, $hosthash, $map] );
+        {
+            my @arg = ( -baseoid => $map,
+                        -callback => [\&mapLookupCallback,
+                                      $collector, $hosthash, $map] );
+            
+            if( $session->version() > 0 )
+            {
+                my $maxrepetitions =
+                    $collector->param($token, 'snmp-maxrepetitions');
+                push( @arg, '-maxrepetitions',  $maxrepetitions );
+            }
+            
+            $session->get_table( @arg );
+        }
 
         $mapLookupScheduled{$maphash} = 1;
 

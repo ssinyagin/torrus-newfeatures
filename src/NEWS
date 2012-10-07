@@ -1,3 +1,17 @@
+07-OCT-2012: Torrus release 2.05
+
+In this release:
+
+-- Important bugfixes: collector worked incorrectly with SNMPv1 devices
+   (maxrepetitions parameter is incompatible with v1);
+   "disable-snmpcollector" in DDX produced invalid configuration.
+
+-- APC PowerNet: added support for Modular Environmental Manager
+
+-- Removed support for F5 BigIP version 4.x because it's end of life and
+   outdated. Support for version 11 is in development.
+
+
 16-AUG-2012: Torrus release 2.04
 
 In this release:

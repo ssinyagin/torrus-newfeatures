@@ -92,9 +92,9 @@ Reports the line status for the manageable modular media converter.
 
 Provide statistics for Arbor eSeries devices. (e30, e100)
 
-=item * APC NetBotz
+=item * APC PowerNet and NetBotz
 
-Prvide statistics for various NetBotz environment sensors.
+Prvide statistics for various environment sensors and power meters.
 
 =item * Ascend MAX
 
@@ -170,10 +170,6 @@ Satellite modem statistics.
 
 Provides lots of statistics and information that a SystemEDGE agent
 may provide about the server health and performance.
-
-=item * F5 BigIp Load Balancer
-
-In-detail traffic statistics.
 
 =item * Force10 Networks
 

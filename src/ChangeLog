@@ -1,3 +1,10 @@
+2012-10-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 2.05
+
+	* Removed support for F5 BigIP version 4.x because it's end of
+	life and outdated. Support for Version 11 is in development.
+
 2012-09-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/APC_PowerNet.pm: added support for

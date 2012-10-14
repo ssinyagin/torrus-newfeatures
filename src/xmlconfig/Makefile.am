@@ -48,6 +48,7 @@ dist_vendor_DATA = \
 	vendor/comtechefdata.xml \
 	vendor/empire.systemedge.xml \
 	vendor/empire.systemedge.ntregperf.xml \
+	vendor/f5.bigip.xml \
 	vendor/foundry.xml \
 	vendor/ftos.xml \
 	vendor/jacarta.xml \

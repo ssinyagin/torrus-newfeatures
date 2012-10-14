@@ -1,3 +1,8 @@
+2012-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/F5BigIp.pm: New implementation for F5
+	BigIP support
+
 2012-10-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Release 2.05

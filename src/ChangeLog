@@ -1,3 +1,8 @@
+2012-10-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/action_snmpv1trap.in, bin/action_snmptrap.in:
+	$ENV{'TORRUS_SEVERITY'} is now treated properly
+
 2012-10-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/F5BigIp.pm: New implementation for F5

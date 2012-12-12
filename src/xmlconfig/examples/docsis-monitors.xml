@@ -78,7 +78,7 @@
     <param name="action"        value="docs-tset-warnings" />
     <param name="expires"       value="1800" />
     <param name="comment">
-      Signal/Noise-Ratio lower than 30dB
+      Signal/Noise-Ratio lower than 24dB
     </param>
   </monitor>
 
@@ -89,7 +89,7 @@
     <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
     <param name="comment">
-      Signal/Noise-Ratio lower than 25dB
+      Signal/Noise-Ratio lower than 22dB
     </param>
   </monitor>
 
@@ -127,8 +127,8 @@
     <param name="rpn-expr">
     DUP,
     {Error-Free},{Uncorrectable},+,+,
-    /,100,*,
-    20,GT
+    /,100,*,DUP,
+    20,GT,EXC,100,LE,AND
     </param>
     <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
@@ -176,8 +176,8 @@
     <param name="rpn-expr">
     DUP,
     {Error-Free},{Correctable},+,+,
-    /,100,*,
-    2,GT
+    /,100,*,DUP,
+    2,GT,100,EXC,LE,AND
     </param>
     <param name="action"        value="docs-tset-major" />
     <param name="expires"       value="21600" />
@@ -393,7 +393,7 @@
     <param name="monitor-type"  value="expression" />
     <param name="rpn-expr">
     {Packets_In},/,100,*,DUP,
-    50,GT
+    50,GT,EXC,100,LE,AND
     </param>
     <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />
@@ -419,7 +419,7 @@
     <param name="monitor-type"  value="expression" />
     <param name="rpn-expr">
     {Packets_Out},/,100,*,DUP,
-    50,GT
+    50,GT,EXC,100,LE,AND
     </param>
     <param name="action"        value="docs-tset-minor" />
     <param name="expires"       value="21600" />

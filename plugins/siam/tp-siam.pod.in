@@ -148,7 +148,7 @@ configuration.
 
 =item * siam.device.name
 
-Unique device name which is used for C<sustem-id> parameter in Torrus.
+Unique device name which is used for C<system-id> parameter in Torrus.
 
 =item * siam.device.inventory_id
 

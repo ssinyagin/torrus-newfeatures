@@ -58,13 +58,13 @@ Command-line arguments:
      --debug                 print debugging information
 
 By default, the local server's hostname is matched against the
-C<torrus.server> attribute. The resulting DDX files are stored in the
-default I<discovery> directory. The DDX files are named as
-"siam-I<TREE>.ddx" for each given tree name supplied by SIAM
+C<torrus.server> attribute in device objects. The resulting DDX files
+are stored in the default I<discovery> directory. The DDX files are
+named as "siam-I<TREE>.ddx" for each given tree name supplied by SIAM
 parameters. The DDX files would store the generated bundle files in
 I<xmlconfig/bundles/>, and device-specific XML files in
 I<xmlconfig/nodes/> subdirectories of the standard XML configuration
-location. 
+location.
 
 
 The file C<siam-config.pl> defines all default values and DDX
@@ -75,11 +75,9 @@ F<siam-siteconfig.pl>.
 
 =head2 siam_genxml utility
 
-C<siam_genxml> reads the SIAM data, and takes all SIAM::Service
-objects having the C<siam.svc.type> attribute set to
-C<TrafficAggregate>. For those services matching the C<torrus.server>
-attribute, it creates Torrus configuration XML files that present total
-aggregate traffic from several IF-MIB interfaces.
+C<siam_genxml> reads the SIAM data, and looks for C<torrus.aggregate.*>
+attributes in SIAM::ServiceUnit objects. Then it produces Torrus XML
+configuration with aggregate graphs of corresponding types.
 
 Command-line arguments:
 
@@ -110,9 +108,9 @@ identifiers.
 =head2 siam_rrd_fetch utility
 
 C<siam_rrd_fetch> retrieves a list of devices and their corresponding
-service data elements, and then retrieves the aggregated data from RRD
+service components, and then retrieves the aggregated data from RRD
 files. The aggregated data is returned to SIAM via a condition
-"torrus.fetch.data" on the SIAM::ServiceDataElement objects.
+"torrus.fetch.data" on the SIAM::ServiceComponent objects.
 
 Usage:
   
@@ -173,18 +171,18 @@ placed.
 
 
 
-SIAM::ServiceUnit object attributes used by the discovery module:
+SIAM::ServiceComponent object attributes used by the discovery module:
 
 =over 4
 
 =item * siam.object.complete
 
-Only complete service unit objects are processed. The incomplete ones
-are ignored.
+Only complete service component objects are processed. The incomplete
+ones are ignored.
 
-=item * siam.svcunit.type
+=item * siam.svcc.type
 
-Type of service unit. Supported value: C<IFMIB.Port>
+Type of service component. Supported value: C<IFMIB.Port>
 
 =item * torrus.port.name, torrus.port.shortname
 
@@ -206,7 +204,7 @@ configuration.
 
 
 
-SIAM::Service attributes used for traffic aggregate graphs:
+SIAM::ServiceUnit attributes used for traffic aggregate graphs:
 
 =over 4
 
@@ -214,11 +212,11 @@ SIAM::Service attributes used for traffic aggregate graphs:
 
 Only complete service objects are processed. The incomplete ones are ignored.
 
-=item * siam.svc.type
+=item * torrus.aggregate.traffic
 
-By default, only service object with C<siam.svc.type> set to
-C<TrafficAggregate> are treated as traffic aggregation services. Other
-values can be configured in F<siam-siteconfig.pl>.
+Only service unit objects with this attribute set to 1 are processed for
+traffic aggregates. The resulting aggregates take the service components
+of type C<IFMIB.Port>.
 
 =item * torrus.aggregate.name
 
@@ -238,11 +236,11 @@ aggregate leafs.
 
 
 
-SIAM::ServiceUnit attributes used in traffic aggregates:
+SIAM::ServiceComponent attributes used in traffic aggregates:
 
 =over 4
 
-=item * siam.svcunit.type
+=item * siam.svcc.type
 
 Only C<IFMIB.Port> is supported.
 
@@ -250,7 +248,7 @@ Only C<IFMIB.Port> is supported.
 
 Port NodeID values are used to compose the aggregate graphs.
 
-=item * siam.svcunit.name
+=item * siam.svcc.name
 
 The value is used to build the legend text for the aggregate.
 
@@ -258,18 +256,19 @@ The value is used to build the legend text for the aggregate.
 
 
 
-SIAM::ServiceDataElement attributes used by siam_rrdfetch:
+SIAM::ServiceComponent attributes used by siam_rrdfetch:
 
 =over 4
 
-=item * siam.svcdata.driver
+=item * torrus.fetch.activated
 
-Only data elements with the driver set to 'Torrus.TimeSeries' are processed.
+siam_rrdfetch processes only service components where this attribute is
+set to 1.
 
-=item * torrus.nodeid
+=item * torrus.fetch.nodeid
 
 NodeID prefix -- all leaf nodes which match this prefix are collected
-for this data element object.
+for this service component object.
 
 =item * torrus.fetch.max_intervals
 
@@ -282,7 +281,7 @@ for this data element object.
 =back
 
 
-SIAM::ServiceDataElement computable 'torrus.fetch.latest_available' is
+SIAM::ServiceComponent computable 'torrus.fetch.latest_available' is
 used to determine the UNIX timestamp of the latest data already fetched
 in a previous run.
 
@@ -319,8 +318,28 @@ timestamp->counter->CF->value
 =back
 
 
+=head2 Other attributes
+
+The following attributes are related to Torrus, but not used by the
+plugin itself:
+
+=over 4
+
+=item stats.torrus.available
+
+Third-party programs (e.g. I<Extopus>) are encouraged to retrieve Torrus
+statistics for SIAM objects that have this attribute set to 1.
+
+=item stats.torrus.nodeid
+
+This attribute contains the NodeID prefix that external programs can use
+for retrieving Torrus data for a given object.
+
+=back
+
+
 
 
 =head1 Author
 
-Copyright (c) 2011 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2011-2013 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>

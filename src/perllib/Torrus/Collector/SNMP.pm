@@ -707,9 +707,19 @@ sub mapLookupCallback
 }
 
 
-sub activeMappingSessions
+
+sub isMapReady
 {
-    return scalar( @mappingSessions );
+    my $hosthash = shift;
+    my $map = shift;
+
+    if( defined($maps{$hosthash}{$map}) and
+        scalar(%{$maps{$hosthash}{$map}}) )
+    {
+        return 1;
+    }
+
+    return 0;
 }
 
 

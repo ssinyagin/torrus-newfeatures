@@ -292,15 +292,16 @@ sub initTargetAttributes
 
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'cisco-cbqos' );
-
-    if( Torrus::Collector::SNMP::activeMappingSessions() > 0 )
+    my $hosthash = $tref->{'hosthash'};
+        
+    if( not Torrus::Collector::SNMP::isMapReady($hosthash,
+                                                $oiddef{'ifDescr'}) )
     {
         # ifDescr mapping tables are not yet ready
         $cref->{'cbQoSNeedsRemapping'}{$token} = 1;
         return 1;
     }
 
-    my $hosthash = $tref->{'hosthash'};
     
     if( Torrus::Collector::SNMP::isHostDead( $collector, $hosthash ) )
     {

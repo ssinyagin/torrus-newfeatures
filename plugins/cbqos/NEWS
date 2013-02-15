@@ -1,3 +1,8 @@
+15-FEB-2013: Release 2.06.01
+
+Bugfix: unreachable devices could block the QoS collector from
+initialization.
+
 20-MAR-2012: Release 2.02.02
 
 A minor fix for Cisco 7600 compatibility. Also some minor cosmetic changes.

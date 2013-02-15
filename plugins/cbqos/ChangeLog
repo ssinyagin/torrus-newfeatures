@@ -1,3 +1,8 @@
+2013-02-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Collector/Cisco_cbQoS.pm: Bugfix: unreachable devices could
+	block the QoS collector from initialization.
+
 2012-06-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Collector/Cisco_cbQoS.pm (deleteTarget): reduced the number of

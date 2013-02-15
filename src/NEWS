@@ -1,3 +1,15 @@
+15-FEB-2013: Torrus release 2.06
+
+In this release:
+
+-- F5 BigIP LTM support added
+
+-- action_snmptrap now sends the severity level properly
+
+-- Bugfix in Cisco QoS plugin: unreachable devices could block the QoS
+   collector from initialization.
+
+
 07-OCT-2012: Torrus release 2.05
 
 In this release:

@@ -39,8 +39,13 @@ our %requiredLeafParams =
          'atmPVC'         => {
              'cbqos-atm-vpi' => undef,
              'cbqos-atm-vci' => undef },
-         'controlPlane'  => undef,
-         'vlanPort'      => undef },
+         'controlPlane'   => {
+             'cbqos-phy-ent-idx' => undef },
+         'vlanPort'       => {
+             'cbqos-vlan-idx' => undef },
+         'evc'            => {
+             'cbqos-evc' => undef },
+     },
      
      'cbqos-object-type'            => {
          'policymap'      => undef,

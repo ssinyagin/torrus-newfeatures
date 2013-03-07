@@ -61,10 +61,9 @@ my %oiddef =
      'cbQosFrDLCI'                     => '1.3.6.1.4.1.9.9.166.1.1.1.1.5',
      'cbQosAtmVPI'                     => '1.3.6.1.4.1.9.9.166.1.1.1.1.6',
      'cbQosAtmVCI'                     => '1.3.6.1.4.1.9.9.166.1.1.1.1.7',
-     # These two are accepted and ignored, probably will be supported later.
-     # In some older IOSes these object don't present in the table
      'cbQosEntityIndex'                => '1.3.6.1.4.1.9.9.166.1.1.1.1.8',
      'cbQosVlanIndex'                  => '1.3.6.1.4.1.9.9.166.1.1.1.1.9',
+     'cbQosEVC'                        => '1.3.6.1.4.1.9.9.166.1.1.1.1.10',
 
      'cbQosObjectsTable'               => '1.3.6.1.4.1.9.9.166.1.5.1',
      'cbQosConfigIndex'                => '1.3.6.1.4.1.9.9.166.1.5.1.1.2',
@@ -107,7 +106,9 @@ my %cbQosValueTranslation =
          'frDLCI'         => 3,
          'atmPVC'         => 4,
          'controlPlane'   => 5,
-         'vlanPort'       => 6 },
+         'vlanPort'       => 6,
+         'evc'            => 7,
+     },
 
      'cbQosPolicyDirection' => {
          'input'          => 1,
@@ -158,7 +159,10 @@ my %servicePolicyTableParams =
      'cbQosPolicyDirection'            => 'cbqos-direction',
      'cbQosFrDLCI'                     => 'cbqos-fr-dlci',
      'cbQosAtmVPI'                     => 'cbqos-atm-vpi',
-     'cbQosAtmVCI'                     => 'cbqos-atm-vci'
+     'cbQosAtmVCI'                     => 'cbqos-atm-vci',
+     'cbQosEntityIndex'                => 'cbqos-phy-ent-idx',
+     'cbQosVlanIndex'                  => 'cbqos-vlan-idx',
+     'cbQosEVC'                        => 'cbqos-evc',
      );
 
 
@@ -167,7 +171,8 @@ my %servicePolicyTableParams =
 
 my @servicePolicyTableEntries =
     ( 'cbQosIfType', 'cbQosPolicyDirection', 'cbQosIfIndex',
-      'cbQosFrDLCI', 'cbQosAtmVPI', 'cbQosAtmVCI' );
+      'cbQosFrDLCI', 'cbQosAtmVPI', 'cbQosAtmVCI',
+      'cbQosEntityIndex', 'cbQosVlanIndex', 'cbQosEVC' );
 
 
 my %objTypeAttributes =

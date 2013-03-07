@@ -53,6 +53,7 @@ our %oiddef =
      'cbQosAtmVCI'                     => '1.3.6.1.4.1.9.9.166.1.1.1.1.7',
      'cbQosEntityIndex'                => '1.3.6.1.4.1.9.9.166.1.1.1.1.8',
      'cbQosVlanIndex'                  => '1.3.6.1.4.1.9.9.166.1.1.1.1.9',
+     'cbQosEVC'                        => '1.3.6.1.4.1.9.9.166.1.1.1.1.10',
 
      'cbQosObjectsTable'               => '1.3.6.1.4.1.9.9.166.1.5.1',
      'cbQosObjectsIndex'               => '1.3.6.1.4.1.9.9.166.1.5.1.1.1',
@@ -193,7 +194,7 @@ sub discover
     foreach my $entryName
         ('cbQosIfType', 'cbQosPolicyDirection', 'cbQosIfIndex',
          'cbQosFrDLCI', 'cbQosAtmVPI', 'cbQosAtmVCI',
-         'cbQosEntityIndex', 'cbQosVlanIndex')
+         'cbQosEntityIndex', 'cbQosVlanIndex', 'cbQosEVC')
     {
         my $table = $dd->walkSnmpTable($entryName);
         while( my($policyIndex, $value) = each %{$table} )
@@ -594,17 +595,25 @@ sub buildChildrenConfigs
                     }
                     elsif( $ifType eq 'controlPlane' )
                     {
-                        Warn('controlPlane interface type is not yet ' .
-                             'fully supported. Please contact the Torrus ' .
-                             'mailing list if your statistics do not ' .
-                             'look right.');
+                        my $ent = $policyRef->{'cbQosEntityIndex'};
+                        $policyNick .= '_' . $ent;                        
+                        $param->{'cbqos-phy-ent-idx'} = $ent;
                     }
                     elsif( $ifType eq 'vlanPort' )
                     {
-                        Warn('vlanPort interface type is not yet ' .
-                             'fully supported. Please contact the Torrus ' .
-                             'mailing list if your statistics do not ' .
-                             'look right.');                        
+                        my $vlan = $policyRef->{'cbQosVlanIndex'};
+                        
+                        $subtreeName .= ' VLAN' . $vlan;
+                        $subtreeComment .= ' VLAN ' . $vlan;
+                        $policyNick .= '_' . $vlan;
+                        
+                        $param->{'cbqos-vlan-idx'} = $vlan;
+                    }
+                    elsif( $ifType eq 'evc' )
+                    {
+                        my $evc = $policyRef->{'cbQosEVC'};
+                        $policyNick .= '_' . $evc;
+                        $param->{'cbqos-evc'} = $evc;
                     }
                     
                     my $direction = $policyRef->{'cbQosPolicyDirection'};
@@ -951,7 +960,8 @@ my %cbQosValueTranslation =
          3 => 'frDLCI',
          4 => 'atmPVC',
          5 => 'controlPlane',
-         6 => 'vlanPort' },
+         6 => 'vlanPort',
+         7 => 'evc' },
 
      'cbQosPolicyDirection' => {
          1 => 'input',

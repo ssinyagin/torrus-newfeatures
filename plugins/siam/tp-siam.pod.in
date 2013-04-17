@@ -158,11 +158,11 @@ SIAM::Device object from SIAM.
 Must return a true value in order for the device to be included in
 further processing.
 
-=item * snmp.host, snmp-version, snmp-community, snmp-timeout, snmp-retries
+=item * snmp.host, snmp.version, snmp.community, snmp.timeout, snmp.retries
 
 Optional attributes that may override the default values.
 
-=item * torrus.subtree-path
+=item * torrus.subtree_path
 
 Optional attribute, identifies the subtree name where the device node is
 placed.

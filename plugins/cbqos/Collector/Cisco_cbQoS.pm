@@ -336,7 +336,11 @@ sub initTargetAttributes
         Error("Cannot find ifDescr mapping for $ifDescr at $hosthash");
         return undef;
     }
-    
+
+    # Net::SNMP does not allow blocking sessions while non-blocking sessions
+    # still exist. We flush them here
+    Torrus::Collector::SNMP::start_snmp_dispatcher();
+        
     my $session = Torrus::Collector::SNMP::openBlockingSession
         ( $collector, $token, $hosthash );
     if( not defined($session) )

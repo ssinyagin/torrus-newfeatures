@@ -589,9 +589,7 @@ sub lookupMap
             (scalar(@mappingSessions) >=
              $Torrus::Collector::SNMP::maxSessionsPerDispatcher) )
         {
-            snmp_dispatcher();
-            @mappingSessions = ();
-            %mapLookupScheduled = ();
+            start_snmp_dispatcher();
         }
 
         # Retrieve map from host
@@ -1039,19 +1037,26 @@ sub runCollector
         }
         
         &Torrus::DB::checkInterrupted();
-        
-        snmp_dispatcher();
-
-        # Check if there were pending map lookup sessions
-        
-        if( scalar( @mappingSessions ) > 0 )
-        {
-            @mappingSessions = ();
-            %mapLookupScheduled = ();
-        }
+        start_snmp_dispatcher();
     }
     return;
 }
+
+
+
+sub start_snmp_dispatcher
+{
+    snmp_dispatcher();
+    
+    # Check if there were pending map lookup sessions
+    
+    if( scalar( @mappingSessions ) > 0 )
+    {
+        @mappingSessions = ();
+        %mapLookupScheduled = ();
+    }
+}
+
 
 
 sub callback

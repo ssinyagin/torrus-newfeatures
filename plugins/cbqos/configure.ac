@@ -18,7 +18,7 @@
 #
 
 
-AC_INIT(tp-cisco-cbqos, 2.06.02dev, ssinyagin@users.sourceforge.net)
+AC_INIT(tp-cisco-cbqos, 2.07.01dev, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)

@@ -1,3 +1,7 @@
+2013-04-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: 29-APR-2013: Release 2.07.01
+
 2013-03-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Added support for interface types: controlPlane, vlanPort, evc

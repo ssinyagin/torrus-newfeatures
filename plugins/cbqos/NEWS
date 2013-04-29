@@ -1,3 +1,8 @@
+29-APR-2013: Release 2.07.01
+
+Bugfix: sometimes QoS statistics stop collecting with the log message
+"Cannot create blocking objects when non-blocking objects exist"
+
 15-FEB-2013: Release 2.06.01
 
 Bugfix: unreachable devices could block the QoS collector from

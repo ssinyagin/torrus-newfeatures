@@ -98,7 +98,10 @@ sub discover
         {
             my $oid = $oidContainedIn . '.' . $phyIndex;
             my $result = $session->get_request( -varbindlist => [ $oid ] );
-            if( $session->error_status() == 0 and $result->{$oid} == 0 )
+            if( $session->error_status() == 0 and
+                defined($result->{$oid}) and
+                length($result->{$oid}) > 0 and
+                $result->{$oid} == 0 )
             {
                 $chassisIndex = $phyIndex;
             }

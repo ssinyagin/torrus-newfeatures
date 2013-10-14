@@ -171,7 +171,7 @@ placed.
 
 
 
-SIAM::ServiceComponent object attributes used by the discovery module:
+SIAM::DeviceComponent object attributes used by the discovery module:
 
 =over 4
 
@@ -180,17 +180,17 @@ SIAM::ServiceComponent object attributes used by the discovery module:
 Only complete service component objects are processed. The incomplete
 ones are ignored.
 
-=item * siam.svcc.type
+=item * siam.devc.type
 
-Type of service component. Supported value: C<IFMIB.Port>
+Type of device component. Supported values: C<IFMIB.Port>
 
-=item * torrus.port.name, torrus.port.shortname
+=item * siam.devc.name, torrus.port.shortname
 
 These attributes are matched against the IF-MIB interface names in order
 to find the corresponding ifIndex. This list can be modified in
 I<siam-siteconfig.pl>.
 
-=item * torrus.port.nodeid
+=item * torrus.nodeid
 
 Unique value of C<nodeid> which will be assigned to the matched interface.
 
@@ -244,10 +244,6 @@ SIAM::ServiceComponent attributes used in traffic aggregates:
 
 Only C<IFMIB.Port> is supported.
 
-=item * torrus.port.nodeid
-
-Port NodeID values are used to compose the aggregate graphs.
-
 =item * siam.svcc.name
 
 The value is used to build the legend text for the aggregate.
@@ -264,11 +260,6 @@ SIAM::ServiceComponent attributes used by siam_rrdfetch:
 
 siam_rrdfetch processes only service components where this attribute is
 set to 1.
-
-=item * torrus.fetch.nodeid
-
-NodeID prefix -- all leaf nodes which match this prefix are collected
-for this service component object.
 
 =item * torrus.fetch.max_intervals
 

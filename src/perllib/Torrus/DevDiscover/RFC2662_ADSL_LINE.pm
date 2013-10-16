@@ -168,7 +168,7 @@ sub buildConfig
         $ifParam->{'node-display-name'} =
             $interface->{$data->{'nameref'}{'ifReferenceName'}};
 
-        $interface->{'param'}{'nodeid-interface'} =
+        $ifParam->{'nodeid-interface'} =
             'adsl-' .
             $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} .
             $interface->{$data->{'nameref'}{'ifNodeid'}};

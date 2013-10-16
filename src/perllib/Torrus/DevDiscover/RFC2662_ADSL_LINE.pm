@@ -40,15 +40,26 @@ $Torrus::DevDiscover::registry{'RFC2662_ADSL_LINE'} = {
 our %oiddef =
     (
      # ADSL-LINE-MIB
-     'adslAtucCurrSnrMgn' => '1.3.6.1.2.1.10.94.1.1.2.1.4',
-     'adslAtucCurrAtn' => '1.3.6.1.2.1.10.94.1.1.2.1.5',
+     'adslAtucCurrSnrMgn'         => '1.3.6.1.2.1.10.94.1.1.2.1.4',
+     'adslAtucCurrAtn'            => '1.3.6.1.2.1.10.94.1.1.2.1.5',
      'adslAtucCurrAttainableRate' => '1.3.6.1.2.1.10.94.1.1.2.1.8',
-     'adslAtucChanCurrTxRate' => '1.3.6.1.2.1.10.94.1.1.4.1.2',
+     'adslAtucChanCurrTxRate'     => '1.3.6.1.2.1.10.94.1.1.4.1.2',
      
-     'adslAturCurrSnrMgn' => '1.3.6.1.2.1.10.94.1.1.3.1.4',
-     'adslAturCurrAtn' => '1.3.6.1.2.1.10.94.1.1.3.1.5',
+     'adslAturCurrSnrMgn'         => '1.3.6.1.2.1.10.94.1.1.3.1.4',
+     'adslAturCurrAtn'            => '1.3.6.1.2.1.10.94.1.1.3.1.5',
      'adslAturCurrAttainableRate' => '1.3.6.1.2.1.10.94.1.1.3.1.8',
-     'adslAturChanCurrTxRate' => '1.3.6.1.2.1.10.94.1.1.5.1.2',
+     'adslAturChanCurrTxRate'     => '1.3.6.1.2.1.10.94.1.1.5.1.2',
+
+     'adslAtucPerfCurr1DayLofs'   => '1.3.6.1.2.1.10.94.1.1.6.1.17',
+     'adslAtucPerfCurr1DayLoss'   => '1.3.6.1.2.1.10.94.1.1.6.1.18',
+     'adslAtucPerfCurr1DayLprs'   => '1.3.6.1.2.1.10.94.1.1.6.1.20',
+     'adslAtucPerfCurr1DayESs'    => '1.3.6.1.2.1.10.94.1.1.6.1.21',
+     'adslAtucPerfCurr1DayInits'  => '1.3.6.1.2.1.10.94.1.1.6.1.22',
+
+     'adslAturPerfCurr1DayLofs'   => '1.3.6.1.2.1.10.94.1.1.7.1.13',
+     'adslAturPerfCurr1DayLoss'   => '1.3.6.1.2.1.10.94.1.1.7.1.14',
+     'adslAturPerfCurr1DayLprs'   => '1.3.6.1.2.1.10.94.1.1.7.1.15',
+     'adslAturPerfCurr1DayESs'    => '1.3.6.1.2.1.10.94.1.1.7.1.16',
      );
 
 
@@ -87,7 +98,17 @@ sub discover
           'adslAturCurrSnrMgn',
           'adslAturCurrAtn',
           'adslAturCurrAttainableRate',
-          'adslAturChanCurrTxRate' )
+          'adslAturChanCurrTxRate',
+          'adslAtucPerfCurr1DayLofs',
+          'adslAtucPerfCurr1DayLoss',
+          'adslAtucPerfCurr1DayLprs',
+          'adslAtucPerfCurr1DayESs',
+          'adslAtucPerfCurr1DayInits',
+          'adslAturPerfCurr1DayLofs',
+          'adslAturPerfCurr1DayLoss',
+          'adslAturPerfCurr1DayLprs',
+          'adslAturPerfCurr1DayESs',
+          )
     {
         my $base = $dd->oiddef($oidname);
         my $table = $session->get_table( -baseoid => $base );
@@ -135,7 +156,6 @@ sub buildConfig
         my $ifSubtreeName = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
 
         my $ifParam = {
-            'data-file' => '%system-id%_%interface-nick%_adsl-stats.rrd',
             'collector-timeoffset-hashstring' =>'%system-id%:%interface-nick%',
             'precedence'     => $precedence,
         };
@@ -146,6 +166,11 @@ sub buildConfig
             $interface->{$data->{'nameref'}{'ifNick'}};
         $ifParam->{'node-display-name'} =
             $interface->{$data->{'nameref'}{'ifReferenceName'}};
+
+        $interface->{'param'}{'nodeid-interface'} =
+            'adsl-' .
+            $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} .
+            $interface->{$data->{'nameref'}{'ifNodeid'}};
 
         if( defined($data->{'nameref'}{'ifComment'}) and
             defined($interface->{$data->{'nameref'}{'ifComment'}}) )
@@ -180,6 +205,35 @@ sub buildConfig
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-channel-txrate');
         }
 
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayLofs'} and
+            $data->{'AdslLine'}{$ifIndex}{'adslAturPerfCurr1DayLofs'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-lofs');
+        }
+
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayLoss'} and
+            $data->{'AdslLine'}{$ifIndex}{'adslAturPerfCurr1DayLoss'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-loss');
+        }
+
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayLprs'} and
+            $data->{'AdslLine'}{$ifIndex}{'adslAturPerfCurr1DayLprs'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-lprs');
+        }
+
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayESs'} and
+            $data->{'AdslLine'}{$ifIndex}{'adslAturPerfCurr1DayESs'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-ess');
+        }
+
+        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayInits'} )
+        {
+            push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-inits');
+        }
+        
         if( scalar(@{$templates}) > 0 )
         {
             $cb->addSubtree( $subtreeNode, $ifSubtreeName,

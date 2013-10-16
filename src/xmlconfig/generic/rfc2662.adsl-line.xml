@@ -40,6 +40,18 @@
   <def name="adslAturCurrAtn"            value="1.3.6.1.2.1.10.94.1.1.3.1.5" />
   <def name="adslAturCurrAttainableRate" value="1.3.6.1.2.1.10.94.1.1.3.1.8" />
   <def name="adslAturChanCurrTxRate"     value="1.3.6.1.2.1.10.94.1.1.5.1.2" />
+  
+  <def name="adslAtucPerfCurr1DayLofs"   value="1.3.6.1.2.1.10.94.1.1.6.1.17"/>
+  <def name="adslAtucPerfCurr1DayLoss"   value="1.3.6.1.2.1.10.94.1.1.6.1.18"/>
+  <def name="adslAtucPerfCurr1DayLprs"   value="1.3.6.1.2.1.10.94.1.1.6.1.20"/>
+  <def name="adslAtucPerfCurr1DayESs"    value="1.3.6.1.2.1.10.94.1.1.6.1.21"/>
+  <def name="adslAtucPerfCurr1DayInits"  value="1.3.6.1.2.1.10.94.1.1.6.1.22"/>
+
+  <def name="adslAturPerfCurr1DayLofs"   value="1.3.6.1.2.1.10.94.1.1.7.1.13"/>
+  <def name="adslAturPerfCurr1DayLoss"   value="1.3.6.1.2.1.10.94.1.1.7.1.14"/>
+  <def name="adslAturPerfCurr1DayLprs"   value="1.3.6.1.2.1.10.94.1.1.7.1.15"/>
+  <def name="adslAturPerfCurr1DayESs"    value="1.3.6.1.2.1.10.94.1.1.7.1.16"/>
+
 </definitions>
 
 <datasources>
@@ -52,7 +64,10 @@
       <param name="snmp-object"  value="$adslAtucCurrSnrMgn.%ifindex-map%" />
       <param name="collector-scale"    value="10,/" />
       <param name="rrd-ds"             value="AtucSnrMgn" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-stats.rrd" />
       <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"            value="%nodeid-interface%//atuc//snr"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -61,7 +76,10 @@
       <param name="snmp-object"  value="$adslAturCurrSnrMgn.%ifindex-map%" />
       <param name="collector-scale"    value="10,/" />
       <param name="rrd-ds"             value="AturSnrMgn" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-stats.rrd" />
       <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"            value="%nodeid-interface%//atur//snr"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -85,6 +103,7 @@
 
       <param name="vertical-label"      value="dB" />
       <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid"            value="%nodeid-interface%//both//snr"/>
     </leaf>
   </template>
     
@@ -97,7 +116,10 @@
       <param name="snmp-object"   value="$adslAtucCurrAtn.%ifindex-map%" />
       <param name="collector-scale"    value="10,/" />
       <param name="rrd-ds"             value="AtucAtn" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-stats.rrd" />
       <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"            value="%nodeid-interface%//atuc//atn"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -106,7 +128,10 @@
       <param name="snmp-object"   value="$adslAturCurrAtn.%ifindex-map%" />
       <param name="collector-scale"    value="10,/" />
       <param name="rrd-ds"             value="AturAtn" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-stats.rrd" />
       <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"            value="%nodeid-interface%//atur//atn"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -129,6 +154,7 @@
 
       <param name="vertical-label"      value="dB" />
       <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid"            value="%nodeid-interface%//both//atn"/>
     </leaf>
   </template>
   
@@ -141,8 +167,11 @@
       <param name="snmp-object"
              value="$adslAtucCurrAttainableRate.%ifindex-map%" />
       <param name="rrd-ds"             value="AtucAttainableRate" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-stats.rrd" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="graph-legend"       value="ATUC Attainable Rate" />
+      <param name="nodeid"        value="%nodeid-interface%//atuc//attrate"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -151,8 +180,11 @@
       <param name="snmp-object"
              value="$adslAturCurrAttainableRate.%ifindex-map%" />
       <param name="rrd-ds"             value="AturAttainableRate" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-stats.rrd" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="graph-legend"       value="ATUR Attainable Rate" />
+      <param name="nodeid"        value="%nodeid-interface%//atur//attrate"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -175,6 +207,7 @@
 
       <param name="vertical-label"      value="bps" />
       <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid"        value="%nodeid-interface%//both//attrate"/>
     </leaf>
   </template>
 
@@ -186,8 +219,11 @@
       <param name="snmp-object"
              value="$adslAtucChanCurrTxRate.%ifindex-map%" />
       <param name="rrd-ds"             value="AtucCurrTxRate" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-stats.rrd" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="graph-legend"       value="ATUC Curr TX Rate" />
+      <param name="nodeid"        value="%nodeid-interface%//atuc//txrate"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -196,8 +232,11 @@
       <param name="snmp-object"
              value="$adslAturChanCurrTxRate.%ifindex-map%" />
       <param name="rrd-ds"             value="AturCurrTxRate" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-stats.rrd" />
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="graph-legend"       value="ATUR Current TX Rate" />
+      <param name="nodeid"        value="%nodeid-interface%//atur//txrate"/>
       <param name="hidden"             value="yes" />
     </leaf>
     
@@ -220,9 +259,240 @@
 
       <param name="vertical-label"      value="bps" />
       <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid"        value="%nodeid-interface%//both//txrate"/>
     </leaf>
   </template>
 
+  <!-- ******* ATUC and ATUR LOFS ******* -->
+  
+  <template name="adsl-perf-lofs">  
+    <leaf name="Atuc_Lofs">
+      <param name="comment"            value="ATUC Loss of Framing seconds" />
+      <param name="snmp-object"
+             value="$adslAtucPerfCurr1DayLofs.%ifindex-map%" />
+      <param name="rrd-ds"             value="AtucLofs" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="1.5"/>
+      <param name="nodeid"        value="%nodeid-interface%//atuc//lofs"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="Atur_Lofs">
+      <param name="comment"            value="ATUR Loss of Framing seconds" />
+      <param name="snmp-object"
+             value="$adslAturPerfCurr1DayLofs.%ifindex-map%" />
+      <param name="rrd-ds"             value="AturLofs" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="1.5"/>
+      <param name="nodeid"        value="%nodeid-interface%//atur//lofs"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="LOFS">          <!-- Multiple line graph -->
+      <param name="comment"
+             value="ATUC and ATUR Loss of Framing seconds" />
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="atuc,atur" />
+
+      <param name="ds-expr-atuc"       value="{Atuc_Lofs}" />
+      <param name="graph-legend-atuc"  value="ATUC Loss of Framing" />
+      <param name="line-style-atuc"    value="##nearend" />
+      <param name="line-color-atuc"    value="##nearend" />
+      <param name="line-order-atuc"    value="1" />
+
+      <param name="ds-expr-atur"       value="{Atur_Lofs}" />
+      <param name="graph-legend-atur"  value="ATUR Loss of Framing" />
+      <param name="line-style-atur"    value="##farend" />
+      <param name="line-color-atur"    value="##farend" />
+      <param name="line-order-atur"    value="2" />
+
+      <param name="vertical-label"      value="1/sec" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid"        value="%nodeid-interface%//both//lofs"/>
+    </leaf>
+  </template>
+
+  <!-- ******* ATUC and ATUR LOSS ******* -->
+  
+  <template name="adsl-perf-loss">  
+    <leaf name="Atuc_Loss">
+      <param name="comment"            value="ATUC Loss of Signal seconds" />
+      <param name="snmp-object"
+             value="$adslAtucPerfCurr1DayLoss.%ifindex-map%" />
+      <param name="rrd-ds"             value="AtucLoss" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="1.5"/>
+      <param name="nodeid"        value="%nodeid-interface%//atuc//loss"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="Atur_Loss">
+      <param name="comment"            value="ATUR Loss of Signal seconds" />
+      <param name="snmp-object"
+             value="$adslAturPerfCurr1DayLoss.%ifindex-map%" />
+      <param name="rrd-ds"             value="AturLoss" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="1.5"/>
+      <param name="nodeid"        value="%nodeid-interface%//atur//loss"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="LOSS">          <!-- Multiple line graph -->
+      <param name="comment"
+             value="ATUC and ATUR Loss of Signal seconds" />
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="atuc,atur" />
+
+      <param name="ds-expr-atuc"       value="{Atuc_Loss}" />
+      <param name="graph-legend-atuc"  value="ATUC Loss of Signal" />
+      <param name="line-style-atuc"    value="##nearend" />
+      <param name="line-color-atuc"    value="##nearend" />
+      <param name="line-order-atuc"    value="1" />
+
+      <param name="ds-expr-atur"       value="{Atur_Loss}" />
+      <param name="graph-legend-atur"  value="ATUR Loss of Signal" />
+      <param name="line-style-atur"    value="##farend" />
+      <param name="line-color-atur"    value="##farend" />
+      <param name="line-order-atur"    value="2" />
+
+      <param name="vertical-label"      value="1/sec" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid"        value="%nodeid-interface%//both//loss"/>
+    </leaf>
+  </template>
+
+  
+  <!-- ******* ATUC and ATUR LPRS ******* -->
+  
+  <template name="adsl-perf-lprs">  
+    <leaf name="Atuc_Lprs">
+      <param name="comment"            value="ATUC Loss of Power seconds" />
+      <param name="snmp-object"
+             value="$adslAtucPerfCurr1DayLprs.%ifindex-map%" />
+      <param name="rrd-ds"             value="AtucLprs" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="1.5"/>
+      <param name="nodeid"        value="%nodeid-interface%//atuc//lprs"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="Atur_Lprs">
+      <param name="comment"            value="ATUR Loss of Power seconds" />
+      <param name="snmp-object"
+             value="$adslAturPerfCurr1DayLprs.%ifindex-map%" />
+      <param name="rrd-ds"             value="AturLprs" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="1.5"/>
+      <param name="nodeid"        value="%nodeid-interface%//atur//lprs"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="LPRS">          <!-- Multiple line graph -->
+      <param name="comment"
+             value="ATUC and ATUR Loss of Power seconds" />
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="atuc,atur" />
+
+      <param name="ds-expr-atuc"       value="{Atuc_Lprs}" />
+      <param name="graph-legend-atuc"  value="ATUC Loss of Power" />
+      <param name="line-style-atuc"    value="##nearend" />
+      <param name="line-color-atuc"    value="##nearend" />
+      <param name="line-order-atuc"    value="1" />
+
+      <param name="ds-expr-atur"       value="{Atur_Lprs}" />
+      <param name="graph-legend-atur"  value="ATUR Loss of Power" />
+      <param name="line-style-atur"    value="##farend" />
+      <param name="line-color-atur"    value="##farend" />
+      <param name="line-order-atur"    value="2" />
+
+      <param name="vertical-label"      value="1/sec" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid"        value="%nodeid-interface%//both//lprs"/>
+    </leaf>
+  </template>
+
+  <!-- ******* ATUC and ATUR ESS ******* -->
+  
+  <template name="adsl-perf-ess">  
+    <leaf name="Atuc_ESs">
+      <param name="comment"            value="ATUC Errored seconds" />
+      <param name="snmp-object"
+             value="$adslAtucPerfCurr1DayESs.%ifindex-map%" />
+      <param name="rrd-ds"             value="AtucESs" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="1.5"/>
+      <param name="nodeid"        value="%nodeid-interface%//atuc//ess"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="Atur_ESs">
+      <param name="comment"            value="ATUR Errored seconds" />
+      <param name="snmp-object"
+             value="$adslAturPerfCurr1DayESs.%ifindex-map%" />
+      <param name="rrd-ds"             value="AturESs" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="1.5"/>
+      <param name="nodeid"        value="%nodeid-interface%//atur//ess"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="ESS">          <!-- Multiple line graph -->
+      <param name="comment"
+             value="ATUC and ATUR Errored seconds" />
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="atuc,atur" />
+
+      <param name="ds-expr-atuc"       value="{Atuc_ESs}" />
+      <param name="graph-legend-atuc"  value="ATUC Errored seconds" />
+      <param name="line-style-atuc"    value="##nearend" />
+      <param name="line-color-atuc"    value="##nearend" />
+      <param name="line-order-atuc"    value="1" />
+
+      <param name="ds-expr-atur"       value="{Atur_ESs}" />
+      <param name="graph-legend-atur"  value="ATUR Errored seconds" />
+      <param name="line-style-atur"    value="##farend" />
+      <param name="line-color-atur"    value="##farend" />
+      <param name="line-order-atur"    value="2" />
+
+      <param name="vertical-label"      value="1/sec" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid"        value="%nodeid-interface%//both//ess"/>
+    </leaf>
+  </template>
+
+  <!-- ******* ATUC Inits ******* -->
+  
+  <template name="adsl-perf-inits">  
+    <leaf name="Atuc_Inits">
+      <param name="comment"            value="ATUC Init attepmts" />
+      <param name="snmp-object"
+             value="$adslAtucPerfCurr1DayInits.%ifindex-map%" />
+      <param name="rrd-ds"             value="AtucInits" />
+      <param name="data-file"
+             value="%system-id%_%interface-nick%_adsl-perf.rrd" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="rrd-create-max"    value="100"/>
+      <param name="nodeid"        value="%nodeid-interface%//atuc//inits"/>
+      <param name="graph-lower-limit"   value="0" />
+    </leaf>
+  </template>
+        
 </datasources>
 
 </configuration>

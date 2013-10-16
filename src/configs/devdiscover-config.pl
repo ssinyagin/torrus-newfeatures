@@ -283,6 +283,26 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'adsl-channel-txrate',
          'source' => 'generic/rfc2662.adsl-line.xml'
          },
+     'RFC2662_ADSL_LINE::adsl-perf-lofs' => {
+         'name'   => 'adsl-perf-lofs',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-perf-loss' => {
+         'name'   => 'adsl-perf-loss',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-perf-lprs' => {
+         'name'   => 'adsl-perf-lprs',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-perf-ess' => {
+         'name'   => 'adsl-perf-ess',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-perf-inits' => {
+         'name'   => 'adsl-perf-inits',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
      
      #### HDSL2-SHDSL-LINE-MIB
      'RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-subtree' => {

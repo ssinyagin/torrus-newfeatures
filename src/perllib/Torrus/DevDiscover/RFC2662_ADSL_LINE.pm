@@ -140,7 +140,8 @@ sub buildConfig
 
     my $subtreeParam = {
         'precedence'          => '-600',
-        'node-display-name'   => 'ADSL line statistics'
+        'node-display-name'   => 'ADSL line statistics',
+        'comment'             => 'ADSL line signal quality and performance',
         };
     
     my $subtreeNode = $cb->addSubtree( $devNode, $subtreeName, $subtreeParam );

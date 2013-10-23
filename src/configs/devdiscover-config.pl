@@ -45,6 +45,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
      'Torrus::DevDiscover::RFC4319_HDSL2_SHDSL_LINE_MIB',     
      'Torrus::DevDiscover::Actelis',
+     'Torrus::DevDiscover::Albis_ULAF',
      'Torrus::DevDiscover::Alteon',
      'Torrus::DevDiscover::ALU_Timetra',
      'Torrus::DevDiscover::AlliedTelesyn_PBC18',
@@ -316,6 +317,12 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-endpoint' => {
          'name'   => 'hdsl-endpoint',
          'source' => 'generic/rfc4319_hdsl2_shdsl_line.xml'
+         },
+     
+     #### Albis technologies ULAF
+     'Albis_ULAF::albis-soam-lm' => {
+         'name'   => 'albis-soam-lm',
+         'source' => 'vendor/albis-ulaf.xml'
          },
      
      #### Alteon application switches

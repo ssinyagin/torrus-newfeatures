@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2013  Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+-->
+
+
+<!--
+   Albis Technologies ULAF
+   MEF SOAM measurement statistics
+-->
+
+<configuration>
+
+<definitions>
+  <def name="acceedSoamLmCurrentAvailStatsForwardAvailable"
+       value="1.3.6.1.4.1.1887.1.3.1.4.13.1.9"/>
+  <def name="acceedSoamLmCurrentAvailStatsBackwardAvailable"
+       value="1.3.6.1.4.1.1887.1.3.1.4.13.1.10"/>
+  <def name="acceedSoamLmCurrentAvailStatsForwardUnavailable"
+       value="1.3.6.1.4.1.1887.1.3.1.4.13.1.11"/>
+  <def name="acceedSoamLmCurrentAvailStatsBackwardUnavailable"
+       value="1.3.6.1.4.1.1887.1.3.1.4.13.1.12"/>
+</definitions>
+
+<datasources>
+
+  <template name="albis-soam-lm">
+     <param name="data-file"
+            value="%system-id%_%acceed-soam-cfg-index%_lm.rrd" />
+            
+     <leaf name="FwdAvail">
+      <param name="comment"
+             value="available indicators in the forward direction" />
+      <param name="snmp-object"
+      value="$acceedSoamLmCurrentAvailStatsForwardAvailable.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="FwdAvail" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//lm//fwdavail"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+     <leaf name="BckAvail">
+      <param name="comment"
+             value="available indicators in the backward direction" />
+      <param name="snmp-object"
+      value="$acceedSoamLmCurrentAvailStatsBackwardAvailable.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="BckAvail" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//lm//bckavail"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+     <leaf name="FwdUnavail">
+      <param name="comment"
+             value="available indicators in the forward direction" />
+      <param name="snmp-object"
+      value="$acceedSoamLmCurrentAvailStatsForwardUnavailable.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="FwdUnavail" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//lm//fwdunavail"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+     <leaf name="BckUnavail">
+      <param name="comment"
+             value="available indicators in the backward direction" />
+      <param name="snmp-object"
+      value="$acceedSoamLmCurrentAvailStatsBackwardUnavailable.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="BckUnavail" />
+      <param name="rrd-create-dstype"  value="COUNTER" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//lm//bckunavail"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="Availability">
+      <param name="comment"            value="LM Availability statistics" />
+      <param name="precedence"         value="100" />
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="fwd,bck" />
+
+      <param name="ds-expr-fwd"
+             value="100,100,{FwdUnavail},*,{FwdAvail},/,-"/>
+      <param name="graph-legend-fwd"  value="Forward Availability" />
+      <param name="line-style-fwd"    value="##nearend" />
+      <param name="line-color-fwd"    value="##nearend" />
+      <param name="line-order-fwd"    value="1" />
+
+      <param name="ds-expr-bck"
+             value="100,100,{BckUnavail},*,{BckAvail},/,-"/>
+      <param name="graph-legend-bck"  value="Backward Availability" />
+      <param name="line-style-bck"    value="##farend" />
+      <param name="line-color-bck"    value="##farend" />
+      <param name="line-order-bck"    value="2" />
+
+      <param name="vertical-label"      value="Percent" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid" value="%accees-soam-nodeid%//lm//availability"/>
+    </leaf>
+
+    
+  </template>  
+    
+</datasources>
+
+</configuration>

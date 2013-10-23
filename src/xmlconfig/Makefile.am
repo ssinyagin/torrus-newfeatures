@@ -26,6 +26,7 @@ dist_xml_DATA  = defaults.xml snmp-defs.xml cdef-collector-defs.xml
 
 vendordir      = $(distxmldir)/vendor
 dist_vendor_DATA = \
+	vendor/albis-ulaf.xml \
 	vendor/alteon.xml \
 	vendor/alu-timetra.xml \
 	vendor/apc.powernet.xml \

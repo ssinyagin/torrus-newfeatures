@@ -34,9 +34,30 @@
        value="1.3.6.1.4.1.1887.1.3.1.4.13.1.11"/>
   <def name="acceedSoamLmCurrentAvailStatsBackwardUnavailable"
        value="1.3.6.1.4.1.1887.1.3.1.4.13.1.12"/>
+  <def name="acceedSoamDmCurrentStatsFrameDelayTwoWayMin"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.5"/>
+  <def name="acceedSoamDmCurrentStatsFrameDelayTwoWayMax"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.6"/>
+  <def name="acceedSoamDmCurrentStatsFrameDelayTwoWayAvg"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.7"/>
+  <def name="acceedSoamDmCurrentStatsIfdvForwardMin"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.14"/>
+  <def name="acceedSoamDmCurrentStatsIfdvForwardMax"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.15"/>
+  <def name="acceedSoamDmCurrentStatsIfdvForwardAvg"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.16"/>
+  <def name="acceedSoamDmCurrentStatsIfdvBackwardMin"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.17"/>
+  <def name="acceedSoamDmCurrentStatsIfdvBackwardMax"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.18"/>
+  <def name="acceedSoamDmCurrentStatsIfdvBackwardAvg"
+       value="1.3.6.1.4.1.1887.1.3.1.4.24.1.19"/>
 </definitions>
 
 <datasources>
+
+  <template name="albis-soam-lm-subtree">
+  </template>
 
   <template name="albis-soam-lm">
      <param name="data-file"
@@ -109,11 +130,207 @@
       <param name="vertical-label"      value="Percent" />
       <param name="graph-lower-limit"   value="0" />
       <param name="nodeid" value="%accees-soam-nodeid%//lm//availability"/>
+    </leaf>    
+  </template>  
+
+  <template name="albis-soam-dm-subtree">
+  </template>
+
+  <template name="albis-soam-dm">
+     <param name="data-file"
+            value="%system-id%_%acceed-soam-cfg-index%_dm.rrd" />
+            
+     <leaf name="TwoWayMin">
+      <param name="comment"
+             value="two-way minimum delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsFrameDelayTwoWayMin.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="TwoWayMin" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//twoway-min"/>
+      <param name="hidden"             value="yes" />
     </leaf>
 
+     <leaf name="TwoWayMax">
+      <param name="comment"
+             value="two-way maximum delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsFrameDelayTwoWayMax.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="TwoWayMax" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//twoway-max"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+     <leaf name="TwoWayAvg">
+      <param name="comment"
+             value="two-way average delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsFrameDelayTwoWayAvg.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="TwoWayAvg" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//twoway-avg"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="TwoWay">
+      <param name="comment"       value="DM two-way measurement statistics" />
+      <param name="precedence"         value="100" />
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="min,max,avg" />
+
+      <param name="ds-expr-min"       value="{TwoWayMin}"/>
+      <param name="graph-legend-min"  value="Minimum" />
+      <param name="line-style-min"    value="##SingleGraph" />
+      <param name="line-color-min"    value="##clr1" />
+      <param name="line-order-min"    value="1" />
+
+      <param name="ds-expr-max"       value="{TwoWayMax}"/>
+      <param name="graph-legend-max"  value="Maximum" />
+      <param name="line-style-max"    value="##SingleGraph" />
+      <param name="line-color-max"    value="##clr2" />
+      <param name="line-order-max"    value="2" />
+
+      <param name="ds-expr-avg"       value="{TwoWayAvg}"/>
+      <param name="graph-legend-avg"  value="Average" />
+      <param name="line-style-avg"    value="##SingleGraph" />
+      <param name="line-color-avg"    value="##clr3" />
+      <param name="line-order-avg"    value="3" />
+      
+      <param name="vertical-label"      value="Microseconds" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid" value="%accees-soam-nodeid%//dm//twoway"/>
+    </leaf>    
+
+
+    <leaf name="ForwardMin">
+      <param name="comment"
+             value="Forward minimum delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsIfdvForwardMin.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="ForwardMin" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//forward-min"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+     <leaf name="ForwardMax">
+      <param name="comment"
+             value="Forward maximum delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsIfdvForwardMax.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="ForwardMax" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//forward-max"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+     <leaf name="ForwardAvg">
+      <param name="comment"
+             value="Forward average delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsIfdvForwardAvg.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="ForwardAvg" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//forward-avg"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="Forward">
+      <param name="comment"       value="DM forward measurement statistics" />
+      <param name="precedence"         value="90" />
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="min,max,avg" />
+
+      <param name="ds-expr-min"       value="{ForwardMin}"/>
+      <param name="graph-legend-min"  value="Minimum" />
+      <param name="line-style-min"    value="##SingleGraph" />
+      <param name="line-color-min"    value="##clr1" />
+      <param name="line-order-min"    value="1" />
+
+      <param name="ds-expr-max"       value="{ForwardMax}"/>
+      <param name="graph-legend-max"  value="Maximum" />
+      <param name="line-style-max"    value="##SingleGraph" />
+      <param name="line-color-max"    value="##clr2" />
+      <param name="line-order-max"    value="2" />
+
+      <param name="ds-expr-avg"       value="{ForwardAvg}"/>
+      <param name="graph-legend-avg"  value="Average" />
+      <param name="line-style-avg"    value="##SingleGraph" />
+      <param name="line-color-avg"    value="##clr3" />
+      <param name="line-order-avg"    value="3" />
+      
+      <param name="vertical-label"      value="Microseconds" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid" value="%accees-soam-nodeid%//dm//forward"/>
+    </leaf>    
     
+
+    <leaf name="BackwardMin">
+      <param name="comment"
+             value="Backward minimum delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsIfdvBackwardMin.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="BackwardMin" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//backward-min"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+     <leaf name="BackwardMax">
+      <param name="comment"
+             value="Backward maximum delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsIfdvBackwardMax.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="BackwardMax" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//backward-max"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+     <leaf name="BackwardAvg">
+      <param name="comment"
+             value="Backward average delay" />
+      <param name="snmp-object"
+      value="$acceedSoamDmCurrentStatsIfdvBackwardAvg.%acceed-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="BackwardAvg" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%accees-soam-nodeid%//dm//backward-avg"/>
+      <param name="hidden"             value="yes" />
+    </leaf>
+
+    <leaf name="Backward">
+      <param name="comment"       value="DM backward measurement statistics" />
+      <param name="precedence"         value="80" />
+      <param name="ds-type"            value="rrd-multigraph" />
+      <param name="ds-names"           value="min,max,avg" />
+
+      <param name="ds-expr-min"       value="{BackwardMin}"/>
+      <param name="graph-legend-min"  value="Minimum" />
+      <param name="line-style-min"    value="##SingleGraph" />
+      <param name="line-color-min"    value="##clr1" />
+      <param name="line-order-min"    value="1" />
+
+      <param name="ds-expr-max"       value="{BackwardMax}"/>
+      <param name="graph-legend-max"  value="Maximum" />
+      <param name="line-style-max"    value="##SingleGraph" />
+      <param name="line-color-max"    value="##clr2" />
+      <param name="line-order-max"    value="2" />
+
+      <param name="ds-expr-avg"       value="{BackwardAvg}"/>
+      <param name="graph-legend-avg"  value="Average" />
+      <param name="line-style-avg"    value="##SingleGraph" />
+      <param name="line-color-avg"    value="##clr3" />
+      <param name="line-order-avg"    value="3" />
+      
+      <param name="vertical-label"      value="Microseconds" />
+      <param name="graph-lower-limit"   value="0" />
+      <param name="nodeid" value="%accees-soam-nodeid%//dm//backward"/>
+    </leaf>    
+            
   </template>  
-    
+
+      
 </datasources>
 
 </configuration>

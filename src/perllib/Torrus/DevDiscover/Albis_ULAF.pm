@@ -39,7 +39,7 @@ our %oiddef =
      'acceedInvDeviceUserDescr' => '1.3.6.1.4.1.1887.1.3.1.1.1.1.9',
      'acceedSoamMpDescr'        => '1.3.6.1.4.1.1887.1.3.1.4.1.1.3',
 
-     # LM test configuration
+     # LM measurement configuration
      'acceedSoamLmCfgType' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.2',
      'acceedSoamLmCfgEnabled' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.4',
      'acceedSoamLmCfgMessagePeriod' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.6',
@@ -49,6 +49,14 @@ our %oiddef =
      '1.3.6.1.4.1.1887.1.3.1.4.11.1.26',
      'acceedSoamLmCfgMpDomain' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.101',
      'acceedSoamLmCfgMpPoint' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.102',
+
+     # DM measurement configuration
+     'acceedSoamDmCfgEnabled' => '1.3.6.1.4.1.1887.1.3.1.4.21.1.4',
+     'acceedSoamDmCfgMessagePeriod' => '1.3.6.1.4.1.1887.1.3.1.4.21.1.6',
+     'acceedSoamDmCfgMeasurementInterval' =>
+     '1.3.6.1.4.1.1887.1.3.1.4.21.1.12',
+     'acceedSoamDmCfgMpDomain' => '1.3.6.1.4.1.1887.1.3.1.4.21.1.101',
+     'acceedSoamDmCfgMpPoint' => '1.3.6.1.4.1.1887.1.3.1.4.21.1.102',     
      );
 
 
@@ -84,7 +92,7 @@ sub discover
 
     my $data = $devdetails->data();
     my $session = $dd->session();
-                
+    
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
 
     # device descriptions
@@ -100,7 +108,7 @@ sub discover
             $devDescr->{$idx} = $idx;
         }
     }
-        
+    
     # maintenance point descriptions
     # INDEX { devicePortIndex,
     #         deviceLinkIndex,
@@ -109,64 +117,123 @@ sub discover
     #         acceedSoamMpPointIndex }
     
     my $acceedSoamMpDescr = $dd->walkSnmpTable('acceedSoamMpDescr');
-    
+
+    {
     # LM test configurations
     # INDEX { devicePortIndex,
     #         deviceLinkIndex,
     #         entPhysicalIndex,
     #         acceedSoamLmCfgIndex }
 
-    my $lmcfg = {};
-    foreach my $oidname
-        (
-         'acceedSoamLmCfgType',
-         'acceedSoamLmCfgEnabled',
-         'acceedSoamLmCfgMessagePeriod',
-         'acceedSoamLmCfgMeasurementInterval',
-         'acceedSoamLmCfgAvailabilityMeasurementInterval',
-         'acceedSoamLmCfgMpDomain',
-         'acceedSoamLmCfgMpPoint',
-         )
-    {
-        $lmcfg->{$oidname} = $dd->walkSnmpTable($oidname);
-    }
-
-    foreach my $idx (keys %{$lmcfg->{'acceedSoamLmCfgEnabled'}})
-    {
-        if( $lmcfg->{'acceedSoamLmCfgEnabled'}{$idx} == 1 )
+        my $lmcfg = {};
+        foreach my $oidname
+            (
+             'acceedSoamLmCfgType',
+             'acceedSoamLmCfgEnabled',
+             'acceedSoamLmCfgMessagePeriod',
+             'acceedSoamLmCfgMeasurementInterval',
+             'acceedSoamLmCfgAvailabilityMeasurementInterval',
+             'acceedSoamLmCfgMpDomain',
+             'acceedSoamLmCfgMpPoint',
+             )
         {
-            my $ref = {};
-            $data->{'acceedSoamLm'}{$idx} = $ref;
+            $lmcfg->{$oidname} = $dd->walkSnmpTable($oidname);
+        }
 
-            my @x = split(/\./, $idx);
-            my $devIdx = join('.', $x[0], $x[1], $x[2]);
-            my $cfgIdx = $x[3];
-            
-            $ref->{'devDescr'} = $devDescr->{$devIdx};
-            $ref->{'lmType'} = $lmTypeDef->{
-                $lmcfg->{'acceedSoamLmCfgType'}{$idx}};
-            
-            $ref->{'period'} = $lmcfg->{'acceedSoamLmCfgMessagePeriod'}{$idx};
-            $ref->{'interval'} =
-                $lmcfg->{'acceedSoamLmCfgMeasurementInterval'}{$idx};
-            $ref->{'availInterval'} =
-                $lmcfg->{'acceedSoamLmCfgAvailabilityMeasurementInterval'}{
-                    $idx};
+        foreach my $idx (keys %{$lmcfg->{'acceedSoamLmCfgEnabled'}})
+        {
+            if( $lmcfg->{'acceedSoamLmCfgEnabled'}{$idx} == 1 )
+            {
+                my $ref = {};
+                $data->{'acceedSoamLm'}{$idx} = $ref;
 
-            my $domain = $lmcfg->{'acceedSoamLmCfgMpDomain'}{$idx};
-            my $point = $lmcfg->{'acceedSoamLmCfgMpPoint'}{$idx};
+                my @x = split(/\./, $idx);
+                my $devIdx = join('.', $x[0], $x[1], $x[2]);
+                my $cfgIdx = $x[3];
+                
+                $ref->{'devDescr'} = $devDescr->{$devIdx};
+                $ref->{'lmType'} = $lmTypeDef->{
+                    $lmcfg->{'acceedSoamLmCfgType'}{$idx}};
+                
+                $ref->{'period'} =
+                    $lmcfg->{'acceedSoamLmCfgMessagePeriod'}{$idx};
+                $ref->{'interval'} =
+                    $lmcfg->{'acceedSoamLmCfgMeasurementInterval'}{$idx};
+                $ref->{'availInterval'} =
+                    $lmcfg->{'acceedSoamLmCfgAvailabilityMeasurementInterval'}{
+                        $idx};
 
-            $ref->{'mpDescr'} =
-                $acceedSoamMpDescr->{$devIdx . '.' . $domain . '.' . $point};
+                my $domain = $lmcfg->{'acceedSoamLmCfgMpDomain'}{$idx};
+                my $point = $lmcfg->{'acceedSoamLmCfgMpPoint'}{$idx};
+
+                $ref->{'mpDescr'} =
+                    $acceedSoamMpDescr->{$devIdx . '.' . $domain .
+                                             '.' . $point};
+            }
+        }
+
+        my $nLMmeasurements = scalar(keys %{$data->{'acceedSoamLm'}});
+        Debug('Found ' . $nLMmeasurements . ' SOAM LM measurements');
+        if( $nLMmeasurements > 0 )
+        {
+            $devdetails->setCap('acceedSoamLm');
         }
     }
 
-    my $nLMmeasurements = scalar(keys %{$data->{'acceedSoamLm'}});
-    Debug('Found ' . $nLMmeasurements . ' SOAM LM measurements');
-    if( $nLMmeasurements > 0 )
     {
-        $devdetails->setCap('acceedSoamLm');
-    }
+        # DM test configurations
+        # INDEX { devicePortIndex,
+        #         deviceLinkIndex,
+        #         entPhysicalIndex,
+        #         acceedSoamDmCfgIndex }
+
+        my $dmcfg = {};
+        foreach my $oidname
+            (
+             'acceedSoamDmCfgEnabled',
+             'acceedSoamDmCfgMessagePeriod',
+             'acceedSoamDmCfgMeasurementInterval',
+             'acceedSoamDmCfgMpDomain',
+             'acceedSoamDmCfgMpPoint',
+             )
+        {
+            $dmcfg->{$oidname} = $dd->walkSnmpTable($oidname);
+        }
+
+        foreach my $idx (keys %{$dmcfg->{'acceedSoamDmCfgEnabled'}})
+        {
+            if( $dmcfg->{'acceedSoamDmCfgEnabled'}{$idx} == 1 )
+            {
+                my $ref = {};
+                $data->{'acceedSoamDm'}{$idx} = $ref;
+
+                my @x = split(/\./, $idx);
+                my $devIdx = join('.', $x[0], $x[1], $x[2]);
+                my $cfgIdx = $x[3];
+                
+                $ref->{'devDescr'} = $devDescr->{$devIdx};
+
+                $ref->{'period'} =
+                    $dmcfg->{'acceedSoamDmCfgMessagePeriod'}{$idx};
+                $ref->{'interval'} =
+                    $dmcfg->{'acceedSoamDmCfgMeasurementInterval'}{$idx};
+
+                my $domain = $dmcfg->{'acceedSoamDmCfgMpDomain'}{$idx};
+                my $point = $dmcfg->{'acceedSoamDmCfgMpPoint'}{$idx};
+                
+                $ref->{'mpDescr'} =
+                    $acceedSoamMpDescr->{$devIdx . '.' . $domain .
+                                             '.' . $point};
+            }
+        }
+        
+        my $nDMmeasurements = scalar(keys %{$data->{'acceedSoamDm'}});
+        Debug('Found ' . $nDMmeasurements . ' SOAM DM measurements');
+        if( $nDMmeasurements > 0 )
+        {
+            $devdetails->setCap('acceedSoamDm');
+        }        
+    }    
     
     return 1;
 }
@@ -180,7 +247,8 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
-    if( not $devdetails->hasCap('acceedSoamLm') )
+    if( not $devdetails->hasCap('acceedSoamLm') or
+        not $devdetails->hasCap('acceedSoamDm') )
     {
         return;
     }
@@ -193,7 +261,8 @@ sub buildConfig
         };
         
         my $lmNode =
-            $cb->addSubtree( $devNode, 'SOAM-LM', $lmNodeParam );
+            $cb->addSubtree( $devNode, 'SOAM-LM', $lmNodeParam,
+                             ['Albis_ULAF::albis-soam-lm-subtree'] );
         
         foreach my $idx (sort keys %{$data->{'acceedSoamLm'}})
         {
@@ -222,7 +291,42 @@ sub buildConfig
                              ['Albis_ULAF::albis-soam-lm']);
         }
     }
-    
+
+
+    if( $devdetails->hasCap('acceedSoamDm') )
+    {
+        my $dmNodeParam = {
+            'comment' => 'SOAM Frame Delay Measurement statistics',
+            'node-display-name' => 'SOAM DM',
+        };
+        
+        my $dmNode =
+            $cb->addSubtree( $devNode, 'SOAM-DM', $dmNodeParam,
+                             ['Albis_ULAF::albis-soam-dm-subtree']);
+        
+        foreach my $idx (sort keys %{$data->{'acceedSoamDm'}})
+        {
+            my $ref = $data->{'acceedSoamDm'}{$idx};
+            my $legend =
+                'Measurement interval:' .
+                $ref->{'interval'} . ' minutes;' .
+                'Period:' . $ref->{'period'} . ' ms;' .
+                'Device: ' . $ref->{'devDescr'};
+
+            my $param = {
+                'acceed-soam-cfg-index' => $idx,
+                'node-display-name' => $ref->{'mpDescr'},
+                'accees-soam-nodeid' => 'soam//%nodeid-device%//' . $idx,
+                'legend' => $legend,                
+            };
+
+            my $subtreeName = $idx;
+            
+            $cb->addSubtree( $dmNode, $subtreeName, $param,
+                             ['Albis_ULAF::albis-soam-dm']);
+        }
+    }
+
     return;
 }
 

@@ -320,8 +320,20 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
      
      #### Albis technologies ULAF
+     'Albis_ULAF::albis-soam-lm-subtree' => {
+         'name'   => 'albis-soam-lm-subtree',
+         'source' => 'vendor/albis-ulaf.xml'
+         },
      'Albis_ULAF::albis-soam-lm' => {
          'name'   => 'albis-soam-lm',
+         'source' => 'vendor/albis-ulaf.xml'
+         },
+     'Albis_ULAF::albis-soam-dm-subtree' => {
+         'name'   => 'albis-soam-dm-subtree',
+         'source' => 'vendor/albis-ulaf.xml'
+         },
+     'Albis_ULAF::albis-soam-dm' => {
+         'name'   => 'albis-soam-dm',
          'source' => 'vendor/albis-ulaf.xml'
          },
      

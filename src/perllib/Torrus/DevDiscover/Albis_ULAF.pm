@@ -95,6 +95,15 @@ sub discover
     
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
 
+    # work around missing entPhysicalContainedIn
+    if( not defined($data->{'param'}{'comment'}) and
+        defined($data->{'entityPhysical'}{'1'}) and
+        defined($data->{'entityPhysical'}{'1'}{'descr'}) )
+    {
+        $data->{'param'}{'comment'} =
+            $data->{'entityPhysical'}{'1'}{'descr'};
+    }
+
     # device descriptions
     # INDEX { devicePortIndex,
     #         deviceLinkIndex,

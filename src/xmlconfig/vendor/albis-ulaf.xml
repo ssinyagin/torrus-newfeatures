@@ -57,6 +57,16 @@
 <datasources>
 
   <template name="albis-soam-lm-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="avail"/>
+    
+    <param name="overview-subleave-name-avail" value="Availability"/>
+    <param name="overview-shortcut-text-avail"
+           value="All availability"/>
+    <param name="overview-shortcut-title-avail"
+           value="Show availability for all LM measurements"/>
+    <param name="overview-page-title-avail"
+           value="LM Availability Graphs"/>
   </template>
 
   <template name="albis-soam-lm">
@@ -134,6 +144,32 @@
   </template>  
 
   <template name="albis-soam-dm-subtree">
+    <param name="has-overview-shortcuts" value="yes"/>
+    <param name="overview-shortcuts" value="twoway,forward,backward"/>
+    
+    <param name="overview-subleave-name-twoway" value="TwoWay"/>
+    <param name="overview-shortcut-text-twoway"
+           value="All Two-way DM"/>
+    <param name="overview-shortcut-title-twoway"
+           value="Show two-way DM measurements"/>
+    <param name="overview-page-title-twoway"
+           value="Two-way DM Graphs"/>
+
+    <param name="overview-subleave-name-forward" value="Forward"/>
+    <param name="overview-shortcut-text-forward"
+           value="All Forward DM"/>
+    <param name="overview-shortcut-title-forward"
+           value="Show forward DM measurements"/>
+    <param name="overview-page-title-forward"
+           value="Forward DM Graphs"/>
+
+    <param name="overview-subleave-name-backward" value="Backward"/>
+    <param name="overview-shortcut-text-backward"
+           value="All Backward DM"/>
+    <param name="overview-shortcut-title-backward"
+           value="Show backward DM measurements"/>
+    <param name="overview-page-title-backward"
+           value="Backward DM Graphs"/>
   </template>
 
   <template name="albis-soam-dm">
@@ -177,26 +213,26 @@
       <param name="comment"       value="DM two-way measurement statistics" />
       <param name="precedence"         value="100" />
       <param name="ds-type"            value="rrd-multigraph" />
-      <param name="ds-names"           value="min,max,avg" />
-
-      <param name="ds-expr-min"       value="{TwoWayMin}"/>
-      <param name="graph-legend-min"  value="Minimum" />
-      <param name="line-style-min"    value="##SingleGraph" />
-      <param name="line-color-min"    value="##clr1" />
-      <param name="line-order-min"    value="1" />
+      <param name="ds-names"           value="max,avg,min" />
 
       <param name="ds-expr-max"       value="{TwoWayMax}"/>
-      <param name="graph-legend-max"  value="Maximum" />
+      <param name="graph-legend-max"  value="Maximum two-way delay" />
       <param name="line-style-max"    value="##SingleGraph" />
-      <param name="line-color-max"    value="##clr2" />
-      <param name="line-order-max"    value="2" />
+      <param name="line-color-max"    value="##clr1" />
+      <param name="line-order-max"    value="1" />
 
       <param name="ds-expr-avg"       value="{TwoWayAvg}"/>
-      <param name="graph-legend-avg"  value="Average" />
+      <param name="graph-legend-avg"  value="Average two-way delay" />
       <param name="line-style-avg"    value="##SingleGraph" />
-      <param name="line-color-avg"    value="##clr3" />
-      <param name="line-order-avg"    value="3" />
-      
+      <param name="line-color-avg"    value="##clr2" />
+      <param name="line-order-avg"    value="2" />
+
+      <param name="ds-expr-min"       value="{TwoWayMin}"/>
+      <param name="graph-legend-min"  value="Minimum two-way delay" />
+      <param name="line-style-min"    value="##SingleGraph" />
+      <param name="line-color-min"    value="##clr3" />
+      <param name="line-order-min"    value="3" />
+            
       <param name="vertical-label"      value="Microseconds" />
       <param name="graph-lower-limit"   value="0" />
       <param name="nodeid" value="%accees-soam-nodeid%//dm//twoway"/>
@@ -240,26 +276,26 @@
       <param name="comment"       value="DM forward measurement statistics" />
       <param name="precedence"         value="90" />
       <param name="ds-type"            value="rrd-multigraph" />
-      <param name="ds-names"           value="min,max,avg" />
-
-      <param name="ds-expr-min"       value="{ForwardMin}"/>
-      <param name="graph-legend-min"  value="Minimum" />
-      <param name="line-style-min"    value="##SingleGraph" />
-      <param name="line-color-min"    value="##clr1" />
-      <param name="line-order-min"    value="1" />
+      <param name="ds-names"           value="max,avg,min" />
 
       <param name="ds-expr-max"       value="{ForwardMax}"/>
-      <param name="graph-legend-max"  value="Maximum" />
+      <param name="graph-legend-max"  value="Maximum forward delay" />
       <param name="line-style-max"    value="##SingleGraph" />
-      <param name="line-color-max"    value="##clr2" />
-      <param name="line-order-max"    value="2" />
+      <param name="line-color-max"    value="##clr1" />
+      <param name="line-order-max"    value="1" />
 
       <param name="ds-expr-avg"       value="{ForwardAvg}"/>
-      <param name="graph-legend-avg"  value="Average" />
+      <param name="graph-legend-avg"  value="Average forward delay" />
       <param name="line-style-avg"    value="##SingleGraph" />
-      <param name="line-color-avg"    value="##clr3" />
-      <param name="line-order-avg"    value="3" />
+      <param name="line-color-avg"    value="##clr2" />
+      <param name="line-order-avg"    value="2" />
       
+      <param name="ds-expr-min"       value="{ForwardMin}"/>
+      <param name="graph-legend-min"  value="Minimum forward delay" />
+      <param name="line-style-min"    value="##SingleGraph" />
+      <param name="line-color-min"    value="##clr3" />
+      <param name="line-order-min"    value="3" />
+
       <param name="vertical-label"      value="Microseconds" />
       <param name="graph-lower-limit"   value="0" />
       <param name="nodeid" value="%accees-soam-nodeid%//dm//forward"/>
@@ -303,26 +339,26 @@
       <param name="comment"       value="DM backward measurement statistics" />
       <param name="precedence"         value="80" />
       <param name="ds-type"            value="rrd-multigraph" />
-      <param name="ds-names"           value="min,max,avg" />
-
-      <param name="ds-expr-min"       value="{BackwardMin}"/>
-      <param name="graph-legend-min"  value="Minimum" />
-      <param name="line-style-min"    value="##SingleGraph" />
-      <param name="line-color-min"    value="##clr1" />
-      <param name="line-order-min"    value="1" />
+      <param name="ds-names"           value="max,avg,min" />
 
       <param name="ds-expr-max"       value="{BackwardMax}"/>
-      <param name="graph-legend-max"  value="Maximum" />
+      <param name="graph-legend-max"  value="Maximum backward delay" />
       <param name="line-style-max"    value="##SingleGraph" />
-      <param name="line-color-max"    value="##clr2" />
-      <param name="line-order-max"    value="2" />
+      <param name="line-color-max"    value="##clr1" />
+      <param name="line-order-max"    value="1" />
 
       <param name="ds-expr-avg"       value="{BackwardAvg}"/>
-      <param name="graph-legend-avg"  value="Average" />
+      <param name="graph-legend-avg"  value="Average backward delay" />
       <param name="line-style-avg"    value="##SingleGraph" />
-      <param name="line-color-avg"    value="##clr3" />
-      <param name="line-order-avg"    value="3" />
-      
+      <param name="line-color-avg"    value="##clr2" />
+      <param name="line-order-avg"    value="2" />
+
+      <param name="ds-expr-min"       value="{BackwardMin}"/>
+      <param name="graph-legend-min"  value="Minimum backward delay" />
+      <param name="line-style-min"    value="##SingleGraph" />
+      <param name="line-color-min"    value="##clr3" />
+      <param name="line-order-min"    value="3" />
+            
       <param name="vertical-label"      value="Microseconds" />
       <param name="graph-lower-limit"   value="0" />
       <param name="nodeid" value="%accees-soam-nodeid%//dm//backward"/>

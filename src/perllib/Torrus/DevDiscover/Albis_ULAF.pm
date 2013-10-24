@@ -268,6 +268,7 @@ sub buildConfig
         {
             my $ref = $data->{'acceedSoamLm'}{$idx};
             my $legend =
+                'Maintenance Point:' . $ref->{'mpDescr'} . ';' .
                 'Measurement interval:' .
                 $ref->{'interval'} . ' minutes;' .
                 'Availability measurement interval: ' .
@@ -277,12 +278,15 @@ sub buildConfig
                 $ref->{'lmType'} . ';' .
                 'Device: ' . $ref->{'devDescr'};
 
+            my $gtitle = $ref->{'devDescr'} . ', ' . $ref->{'mpDescr'};
+                
             my $param = {
                 'acceed-soam-cfg-index' => $idx,
                 'rrd-create-max' => ($ref->{'period'} * 1.5 / 1000),
                 'node-display-name' => $ref->{'mpDescr'},
                 'accees-soam-nodeid' => 'soam//%nodeid-device%//' . $idx,
-                'legend' => $legend,                
+                'legend' => $legend,
+                'graph-title' => $gtitle,
             };
 
             my $subtreeName = $idx;
@@ -308,16 +312,20 @@ sub buildConfig
         {
             my $ref = $data->{'acceedSoamDm'}{$idx};
             my $legend =
+                'Maintenance Point:' . $ref->{'mpDescr'} . ';' .
                 'Measurement interval:' .
                 $ref->{'interval'} . ' minutes;' .
                 'Period:' . $ref->{'period'} . ' ms;' .
                 'Device: ' . $ref->{'devDescr'};
+
+            my $gtitle = $ref->{'devDescr'} . ', ' . $ref->{'mpDescr'};
 
             my $param = {
                 'acceed-soam-cfg-index' => $idx,
                 'node-display-name' => $ref->{'mpDescr'},
                 'accees-soam-nodeid' => 'soam//%nodeid-device%//' . $idx,
                 'legend' => $legend,                
+                'graph-title' => $gtitle,
             };
 
             my $subtreeName = $idx;

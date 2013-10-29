@@ -45,6 +45,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
      'Torrus::DevDiscover::RFC4319_HDSL2_SHDSL_LINE_MIB',     
      'Torrus::DevDiscover::Actelis',
+     'Torrus::DevDiscover::Albis_ULAF',
      'Torrus::DevDiscover::Alteon',
      'Torrus::DevDiscover::ALU_Timetra',
      'Torrus::DevDiscover::AlliedTelesyn_PBC18',
@@ -283,6 +284,26 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'adsl-channel-txrate',
          'source' => 'generic/rfc2662.adsl-line.xml'
          },
+     'RFC2662_ADSL_LINE::adsl-perf-lofs' => {
+         'name'   => 'adsl-perf-lofs',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-perf-loss' => {
+         'name'   => 'adsl-perf-loss',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-perf-lprs' => {
+         'name'   => 'adsl-perf-lprs',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-perf-ess' => {
+         'name'   => 'adsl-perf-ess',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
+     'RFC2662_ADSL_LINE::adsl-perf-inits' => {
+         'name'   => 'adsl-perf-inits',
+         'source' => 'generic/rfc2662.adsl-line.xml'
+         },
      
      #### HDSL2-SHDSL-LINE-MIB
      'RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-subtree' => {
@@ -296,6 +317,24 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-endpoint' => {
          'name'   => 'hdsl-endpoint',
          'source' => 'generic/rfc4319_hdsl2_shdsl_line.xml'
+         },
+     
+     #### Albis technologies ULAF
+     'Albis_ULAF::albis-soam-lm-subtree' => {
+         'name'   => 'albis-soam-lm-subtree',
+         'source' => 'vendor/albis-ulaf.xml'
+         },
+     'Albis_ULAF::albis-soam-lm' => {
+         'name'   => 'albis-soam-lm',
+         'source' => 'vendor/albis-ulaf.xml'
+         },
+     'Albis_ULAF::albis-soam-dm-subtree' => {
+         'name'   => 'albis-soam-dm-subtree',
+         'source' => 'vendor/albis-ulaf.xml'
+         },
+     'Albis_ULAF::albis-soam-dm' => {
+         'name'   => 'albis-soam-dm',
+         'source' => 'vendor/albis-ulaf.xml'
          },
      
      #### Alteon application switches

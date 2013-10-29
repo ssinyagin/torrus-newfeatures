@@ -198,7 +198,7 @@ Remember some styles are mandatory.
 
 =over 4
 
-=item * Applying your Schema
+=item 1. Applying your Schema
 
 In the F<torrus-siteconfig.pl> file, add the variable
 

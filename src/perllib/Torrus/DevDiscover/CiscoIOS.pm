@@ -36,8 +36,6 @@ $Torrus::DevDiscover::registry{'CiscoIOS'} = {
 
 our %oiddef =
     (
-     # CISCO-SMI
-     'ciscoProducts'                     => '1.3.6.1.4.1.9.1',
      # CISCO-PRODUCTS-MIB
      'ciscoLS1010'                       => '1.3.6.1.4.1.9.1.107',
      # CISCO-IMAGE-MIB
@@ -162,9 +160,7 @@ sub checkdevtype
     my $dd = shift;
     my $devdetails = shift;
 
-    if( not $dd->oidBaseMatch
-        ( 'ciscoProducts',
-          $devdetails->snmpVar( $dd->oiddef('sysObjectID') ) ) )
+    if( not $devdetails->isDevType('CiscoGeneric') )
     {
         return 0;
     }

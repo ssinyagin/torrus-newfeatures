@@ -1,4 +1,4 @@
-#  Copyright (C) 2002-2011  Stanislav Sinyagin
+#  Copyright (C) 2002-2013  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #
 
 
-AC_INIT([torrus],[2.06dev],[ssinyagin@users.sourceforge.net])
+AC_INIT([torrus],[2.08dev],[ssinyagin@users.sourceforge.net])
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST

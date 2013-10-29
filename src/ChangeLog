@@ -1,3 +1,14 @@
+2013-04-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 2.07
+
+2013-02-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Release 2.06
+
+	* perllib/Torrus/Collector/SNMP.pm (isMapReady): new function:
+	isMapReady(), removed function: activeMappingSessions()
+
 2012-10-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/action_snmpv1trap.in, bin/action_snmptrap.in:

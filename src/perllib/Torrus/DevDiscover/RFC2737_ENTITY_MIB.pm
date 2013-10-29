@@ -54,23 +54,8 @@ sub checkdevtype
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    my $descrTable =
-        $session->get_table( -baseoid =>
-                             $dd->oiddef('entPhysicalDescr') );
-    if( defined $descrTable )
-    {
-        $devdetails->storeSnmpVars( $descrTable );
-    }
-
-    my $nameTable =
-        $session->get_table( -baseoid =>
-                             $dd->oiddef('entPhysicalName') );
-    if( defined $nameTable )
-    {
-        $devdetails->storeSnmpVars( $nameTable );
-    }
-
-    return( defined($descrTable) or defined($nameTable) );
+    return( $dd->checkSnmpTable('entPhysicalDescr') or
+            $dd->checkSnmpTable('entPhysicalName') );
 }
 
 
@@ -85,10 +70,13 @@ sub discover
     $data->{'entityPhysical'} = {};
 
     my $chassisIndex = 0;
-    my $oidContainedIn = $dd->oiddef('entPhysicalContainedIn');
 
+    my $entPhysicalDescr = $dd->walkSnmpTable('entPhysicalDescr');
+    my $entPhysicalContainedIn = $dd->walkSnmpTable('entPhysicalContainedIn');
+    my $entPhysicalName = $dd->walkSnmpTable('entPhysicalName');
+    
     foreach my $phyIndex
-        ( $devdetails->getSnmpIndices($dd->oiddef('entPhysicalDescr')) )
+        ( sort {$a <=> $b} keys %{$entPhysicalDescr} )
     {
         my $ref = {};
         $data->{'entityPhysical'}{$phyIndex} = $ref;
@@ -96,30 +84,27 @@ sub discover
         # Find the chassis. It is not contained in anything.
         if( not $chassisIndex )
         {
-            my $oid = $oidContainedIn . '.' . $phyIndex;
-            my $result = $session->get_request( -varbindlist => [ $oid ] );
-            if( $session->error_status() == 0 and $result->{$oid} == 0 )
+            if( defined($entPhysicalContainedIn->{$phyIndex}) and
+                $entPhysicalContainedIn->{$phyIndex} == 0 )
             {
                 $chassisIndex = $phyIndex;
             }
         }
 
-        my $descr = $devdetails->snmpVar( $dd->oiddef('entPhysicalDescr') .
-                                          '.' . $phyIndex );
-        if( $descr )
+        my $descr = $entPhysicalDescr->{$phyIndex};
+        if( defined($descr) and $descr ne '' )
         {
             $ref->{'descr'} = $descr;
         }
 
-        my $name = $devdetails->snmpVar( $dd->oiddef('entPhysicalName') .
-                                         '.' . $phyIndex );
-        if( $name )
+        my $name = $entPhysicalName->{$phyIndex};
+        if( defined($name) and $name ne '' )
         {
             $ref->{'name'} = $name;
         }
     }
-
-    if( $chassisIndex )
+    
+    if( $chassisIndex > 0 )
     {
         $data->{'entityChassisPhyIndex'} = $chassisIndex;
         my $chassisDescr = $data->{'entityPhysical'}{$chassisIndex}{'descr'};

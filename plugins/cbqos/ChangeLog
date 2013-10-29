@@ -1,3 +1,18 @@
+2013-04-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: 29-APR-2013: Release 2.07.01
+
+2013-03-07  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Added support for interface types: controlPlane, vlanPort, evc
+
+2013-02-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: 15-FEB-2013: Release 2.06.01
+
+	* Collector/Cisco_cbQoS.pm: Bugfix: unreachable devices could
+	block the QoS collector from initialization.
+
 2012-06-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Collector/Cisco_cbQoS.pm (deleteTarget): reduced the number of

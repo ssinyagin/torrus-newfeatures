@@ -55,7 +55,7 @@ $Torrus::SIAM::aggr_tree_location = '/Aggregates';
 ####  SNMP discovery matching
 
 @Torrus::SIAMDD::match_port_name_attributes =
-    ('torrus.port.name',
+    ('siam.devc.name',
      'torrus.port.shortname');
 
 @Torrus::SIAMDD::match_port_properties =

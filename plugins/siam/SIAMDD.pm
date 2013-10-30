@@ -200,24 +200,24 @@ sub discover
         }                        
     }
 
-    # Find the matches of service units against device interfaces
-    my $svcunits = $devobj->get_all_service_units();
-    foreach my $unit ( @{$svcunits} )
+    # Find the matches of device components against device interfaces
+    my $components = $devobj->get_components();
+    foreach my $devc ( @{$components} )
     {
-        next unless $unit->is_complete();
+        next unless $devc->is_complete();
         
-        my $unit_type = $unit->attr('siam.svcunit.type');
+        my $devc_type = $devc->attr('siam.devc.type');
 
-        if( $unit_type eq 'IFMIB.Port' )
+        if( $devc_type eq 'IFMIB.Port' )
         {
-            Debug('Processing ServiceUnit: ' . $unit->id);
+            Debug('Processing DeviceComponent: ' . $devc->id);
             my $interface;
         
             foreach my $attr (@Torrus::SIAMDD::match_port_name_attributes)
             {
                 last if defined($interface);
                 
-                my $val = $unit->attr($attr);                
+                my $val = $devc->attr($attr);                
                 if( defined($val) )
                 {
                     Debug('Trying to match interface name: ' . $val);
@@ -252,13 +252,13 @@ sub discover
             
             if( defined($interface) )
             {
-                my $nodeid = $unit->attr('torrus.port.nodeid');
+                my $nodeid = $devc->attr('torrus.nodeid');
                 if( not defined($nodeid) )
                 {
-                    Error('SIAM::ServiceUnit, id="' . $unit->id .
-                          '" does not define torrus.port.nodeid');
-                    $unit->set_condition('torrus.imported',
-                                         '0;Undefined torrus.port.nodeid');
+                    Error('SIAM::ServiceUnit, id="' . $devc->id .
+                          '" does not define torrus.nodeid');
+                    $devc->set_condition('torrus.imported',
+                                         '0;Undefined torrus.nodeid');
                 }
                 else
                 {
@@ -266,7 +266,7 @@ sub discover
                     $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
                     $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
                     # Apply the service access bandwidth
-                    my $bw = $unit->attr('torrus.port.bandwidth');
+                    my $bw = $devc->attr('torrus.port.bandwidth');
                     if( not defined($bw) or $bw == 0 )
                     {
                         if( defined( $interface->{'ifSpeed'} ) )
@@ -291,11 +291,11 @@ sub discover
                             sprintf('bw=%g', $bw);
                     }        
                     
-                    $unit->set_condition('torrus.imported', 1);
+                    $devc->set_condition('torrus.imported', 1);
                     
                     if( $interface->{'ifAdminStatus'} != 1 )
                     {
-                        $unit->set_condition
+                        $devc->set_condition
                             ('torrus.warning',
                              'Port is administratively down on the device');
                     }
@@ -303,7 +303,7 @@ sub discover
             }
             else
             {
-                $unit->set_condition('torrus.imported',
+                $devc->set_condition('torrus.imported',
                                      '0;Could not match interface name');
             }
         }

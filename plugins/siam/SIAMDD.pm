@@ -26,7 +26,7 @@ use warnings;
 
 use Torrus::SIAM;
 use Torrus::Log;
-
+use JSON;
 
 my $siam;
 
@@ -63,9 +63,9 @@ $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
         if( defined($siam) )
         {
             my $hostParams = shift;
-            if( defined($hostParams->{'siam-managed'})
+            if( defined($hostParams->{'SIAM::managed'})
                 and
-                $hostParams->{'siam-managed'} eq 'yes'
+                $hostParams->{'SIAM::managed'} eq 'yes'
                 and
                 defined($hostParams->{'SIAM::device-inventory-id'}) )
             {
@@ -148,6 +148,31 @@ sub discover
         return 0;
     }
 
+    if( $devobj->attr('torrus.create_device_components') )
+    {
+        # create SIAM::DeviceComponent objects from discovery results
+
+        my $devc_objects = [];
+        
+        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+        {
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            next if $interface->{'excluded'};
+
+            my $attr = {};
+            $attr->{'siam.object.complete'} = 1;
+            $attr->{'siam.devc.type'} = 'IFMIB.Port';
+            $attr->{'siam.devc.name'} =
+                $interface->{$data->{'nameref'}{'ifReferenceName'}};
+
+            push(@{$devc_objects}, $attr);
+        }
+
+        Debug('Syncing ' . scalar(@{$devc_objects}) . ' device components');
+        $devobj->set_condition('siam.device.set_components',
+                               encode_json($devc_objects));
+    }
+    
     # index the interfaces by ifReferenceName
     # also populate our nodeid references
     my $orig_nameref_ifNodeidPrefix =

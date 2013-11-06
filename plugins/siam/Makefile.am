@@ -33,6 +33,11 @@ dist_myperlmod_DATA = SIAM.pm SIAMLogger.pm
 myperlmoddiscdir = $(perllibdir)/Torrus/DevDiscover
 dist_myperlmoddisc_DATA = SIAMDD.pm
 
+myperlmodsiamdddir = $(perllibdir)/Torrus/DevDiscover/SIAMDD
+dist_myperlmodsiamdd_DATA = \
+	SIAMDD/IFMIB.pm
+
+
 #####   CLI wrapper  #####
 wrapperdir = $(plugwrapperdir)
 dist_wrapper_DATA = siam-wrapper.sh

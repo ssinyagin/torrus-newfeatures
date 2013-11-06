@@ -24,6 +24,18 @@ package Torrus::DevDiscover::SIAMDD;
 use strict;
 use warnings;
 
+BEGIN
+{
+    foreach my $mod ( @Torrus::SIAMDD::loadModules )
+    {
+        if( not eval('require ' . $mod) or $@ )
+        {
+            die($@);
+        }
+    }
+}
+
+
 use Torrus::SIAM;
 use Torrus::Log;
 use JSON;
@@ -82,6 +94,7 @@ $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
 
 
 
+our %registry;
 
 
 $Torrus::DevDiscover::registry{'SIAMDD'} = {
@@ -125,8 +138,6 @@ sub discover
     my $dd = shift;
     my $devdetails = shift;
 
-    my $data = $devdetails->data();
-
     my $invid = $devdetails->param('SIAM::device-inventory-id');
     if( not defined($invid) )
     {
@@ -148,81 +159,42 @@ sub discover
         return 0;
     }
 
+    Debug('SIAMDD: ' . scalar(keys %registry) . ' registry entries');
+
+    foreach my $entry
+        ( sort {$registry{$a}{'sequence'} <=> $registry{$b}{'sequence'}}
+          keys %registry )
+    {
+        if( defined($registry{$entry}{'prepare'}) )
+        {
+            &{$registry{$entry}{'prepare'}}($dd, $devdetails);
+        }
+    }
+
+    
     if( $devobj->attr('torrus.create_device_components') )
     {
         # create SIAM::DeviceComponent objects from discovery results
 
         my $devc_objects = [];
-        
-        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+
+        foreach my $entry
+            ( sort {$registry{$a}{'sequence'} <=> $registry{$b}{'sequence'}}
+              keys %registry )
         {
-            my $interface = $data->{'interfaces'}{$ifIndex};
-            next if $interface->{'excluded'};
-
-            my $attr = {};
-            $attr->{'siam.object.complete'} = 1;
-            $attr->{'siam.devc.type'} = 'IFMIB.Port';
-            $attr->{'siam.devc.name'} =
-                $interface->{$data->{'nameref'}{'ifReferenceName'}};
-
-            push(@{$devc_objects}, $attr);
+            if( defined($registry{$entry}{'list_dev_components'}) )
+            {
+                my $r =
+                    &{$registry{$entry}{'list_dev_components'}}($dd,
+                                                               $devdetails);
+                push(@{$devc_objects}, @{$r});
+            }
         }
-
-        Debug('Syncing ' . scalar(@{$devc_objects}) . ' device components');
+                
+        Debug('SIAMDD: Syncing ' . scalar(@{$devc_objects}) .
+              ' device components');
         $devobj->set_condition('siam.device.set_components',
                                encode_json($devc_objects));
-    }
-    
-    # index the interfaces by ifReferenceName
-    # also populate our nodeid references
-    my $orig_nameref_ifNodeidPrefix =
-        $data->{'nameref'}{'ifNodeidPrefix'};
-
-    my $orig_nameref_ifNodeid =
-        $data->{'nameref'}{'ifNodeid'};
-
-    $data->{'nameref'}{'ifNodeidPrefix'} = 'SIAM_ifNodeidPrefix';
-    $data->{'nameref'}{'ifNodeid'} = 'SIAM_ifNodeid';
-
-    my %ifRef;
-    my %ifRefDuplicates;
-
-    foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
-    {
-        my $interface = $data->{'interfaces'}{$ifIndex};
-        next if $interface->{'excluded'};
-        
-        $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
-            $interface->{$orig_nameref_ifNodeidPrefix};
-        
-        $interface->{$data->{'nameref'}{'ifNodeid'}} =
-            $interface->{$orig_nameref_ifNodeid};
-
-        # first, respect the chosen reference as discovered by other modules
-        my $refkey = $interface->{$data->{'nameref'}{'ifReferenceName'}};
-        $ifRef{'default'}{$refkey} = $interface;
-
-        # then, try everything else
-        foreach my $prop (@Torrus::SIAMDD::match_port_properties)
-        {
-            if( $prop ne $data->{'nameref'}{'ifReferenceName'} )
-            {
-                my $val = $interface->{$prop};
-                if( defined($val) and length($val) > 0 )
-                {
-                    if( defined($ifRef{$prop}{$val}) )
-                    {
-                        # value already seen before,
-                        # this property has duplicates
-                        $ifRefDuplicates{$prop}{$val} = 1;
-                    }
-                    else
-                    {
-                        $ifRef{$prop}{$val} = $interface;
-                    }
-                }
-            }
-        }                        
     }
 
     # Find the matches of device components against device interfaces
@@ -230,128 +202,43 @@ sub discover
     foreach my $devc ( @{$components} )
     {
         next unless $devc->is_complete();
-        
-        my $devc_type = $devc->attr('siam.devc.type');
 
-        if( $devc_type eq 'IFMIB.Port' )
+        my $matched = 0;
+        
+        foreach my $entry
+            ( sort {$registry{$a}{'sequence'} <=> $registry{$b}{'sequence'}}
+              keys %registry )
         {
-            Debug('Processing DeviceComponent: ' . $devc->id);
-            my $interface;
-        
-            foreach my $attr (@Torrus::SIAMDD::match_port_name_attributes)
-            {
-                last if defined($interface);
-                
-                my $val = $devc->attr($attr);                
-                if( defined($val) )
-                {
-                    Debug('Trying to match interface name: ' . $val);
-                    if( defined($ifRef{'default'}{$val}) )
-                    {
-                        $interface = $ifRef{'default'}{$val};
-                    }
-                    else
-                    {
-                        foreach my $prop
-                            (@Torrus::SIAMDD::match_port_properties)
-                        {
-                            if( (not $ifRefDuplicates{$prop}{$val})
-                                and
-                                defined($ifRef{$prop}{$val}) )
-                            {
-                                $interface = $ifRef{$prop}{$val};
-                            }
-                        }
-                    }
-                        
-                    if( defined($interface) )
-                    {
-                        Debug('Matched interface name: ' . $val);
-                    }
-                    else
-                    {
-                        Debug('Did not match interface name: ' . $val);
-                    }
-                }
-            }
+            last if $matched;
             
-            if( defined($interface) )
+            if( defined($registry{$entry}{'match_devc'}) )
             {
-                my $nodeid = $devc->attr('torrus.nodeid');
-                if( not defined($nodeid) )
-                {
-                    Error('SIAM::ServiceUnit, id="' . $devc->id .
-                          '" does not define torrus.nodeid');
-                    $devc->set_condition('torrus.imported',
-                                         '0;Undefined torrus.nodeid');
-                }
-                else
-                {
-                    $interface->{'SIAM::matched'} = 1;
-                    $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
-                    $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
-                    # Apply the service access bandwidth
-                    my $bw = $devc->attr('torrus.port.bandwidth');
-                    if( not defined($bw) or $bw == 0 )
-                    {
-                        if( defined( $interface->{'ifSpeed'} ) )
-                        {
-                            $bw = $interface->{'ifSpeed'};
-                        }
-                    }
+                $matched =
+                    &{$registry{$entry}{'match_devc'}}($dd, $devdetails,
+                                                      $devc);
+            }
+        }
 
-                    if( defined($bw) and $bw > 0 )
-                    {
-                        $interface->{'param'}{'bandwidth-limit-in'} =
-                            $bw / 1e6;
-                        $interface->{'param'}{'bandwidth-limit-out'} =
-                            $bw / 1e6;
-                        $interface->{'childCustomizations'}->{'InOut_bps'}->{
-                            'upper-limit'} = $bw;
-                        $interface->{'childCustomizations'}->{'Bytes_In'} ->{
-                            'upper-limit'} = $bw / 8;
-                        $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
-                            'upper-limit'} = $bw / 8;
-                        $interface->{'param'}{'monitor-vars'} =
-                            sprintf('bw=%g', $bw);
-                    }        
-                    
-                    $devc->set_condition('torrus.imported', 1);
-                    
-                    if( $interface->{'ifAdminStatus'} != 1 )
-                    {
-                        $devc->set_condition
-                            ('torrus.warning',
-                             'Port is administratively down on the device');
-                    }
-                }
-            }
-            else
-            {
-                $devc->set_condition('torrus.imported',
-                                     '0;Could not match interface name');
-            }
+        if( $matched )
+        {
+            $devc->set_condition('torrus.imported', 1);
+        }
+        else
+        {
+            $devc->set_condition('torrus.imported',
+                                 '0;Could not match the component name');
         }
     }
-
-    # Admin-down interfaces which were not matched against SIAM have no
-    # further interest, and we exclude them
     
-    if( $devdetails->paramEnabled
-        ('SIAM::exclude-unmatched-admindown-interfaces') )
+    foreach my $entry
+        ( sort {$registry{$a}{'sequence'} <=> $registry{$b}{'sequence'}}
+          keys %registry )
     {
-        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+        if( defined($registry{$entry}{'postprocess'}) )
         {
-            my $interface = $data->{'interfaces'}{$ifIndex};
-            next if $interface->{'excluded'};
-
-            if( $interface->{'ifAdminStatus'} != 1 and
-                (not $interface->{'SIAM::matched'}) )
-            {
-                $interface->{'excluded'} = 1;
-            }
+            &{$registry{$entry}{'postprocess'}}($dd, $devdetails);
         }
-    }            
+    }
     
     $devobj->set_condition('torrus.imported', 1);
     

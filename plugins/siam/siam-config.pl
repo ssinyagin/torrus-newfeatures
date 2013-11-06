@@ -52,7 +52,11 @@ $Torrus::SIAM::aggr_descr_attr = 'torrus.aggregate.description';
 $Torrus::SIAM::aggr_tree_location = '/Aggregates';
 
 
-####  SNMP discovery matching
+####  SNMP discovery integration
+
+@Torrus::SIAMDD::loadModules =
+    ('Torrus::DevDiscover::SIAMDD::IFMIB');
+    
 
 @Torrus::SIAMDD::match_port_name_attributes =
     ('siam.devc.name',

@@ -398,6 +398,12 @@ sub discover
         }
     }
 
+    if( $devdetails->hasCap('apc_rPDU2') or
+        $devdetails->hasCap('apc_rPDU') )
+    {
+        $data->{'param'}{'nodeid-pdu'} = 'pdu//%nodeid-device%';
+    }
+
     # Modular Environmental Manager (MEM)
     
     my $mod_names = $dd->walkSnmpTable('memModulesStatusModuleName');
@@ -459,6 +465,7 @@ sub discover
 
         $data->{'apc_MEM'} = $modules;
         $data->{'param'}{'comment'} = 'APC ' . $mod_models->{0};
+        $data->{'param'}{'nodeid-sensor'} = 'sensor//%nodeid-device%';
     }    
     
     return 1;

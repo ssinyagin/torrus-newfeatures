@@ -84,7 +84,7 @@
         <param name="normal-level"      value="%rpdu2-warn-pwr%" />
         <param name="graph-upper-limit" value="%rpdu2-crit-pwr%" />
         <param name="nodeid"
-               value="pdu//%nodeid-device%//device//power"/>
+               value="%nodeid-pdu%//device//power"/>
       </leaf>      
     </subtree>
    </template>
@@ -110,7 +110,7 @@
         <param name="normal-level"      value="%rpdu2-warn-currnt%" />
         <param name="graph-upper-limit" value="%rpdu2-crit-currnt%" />
         <param name="nodeid"
-               value="pdu//%nodeid-device%//phase%rpdu2-phasenum%//current"/>
+               value="%nodeid-pdu%//phase%rpdu2-phasenum%//current"/>
       </leaf>
 
       <leaf name="Voltage">
@@ -120,7 +120,7 @@
         <param name="rrd-ds"            value="Voltage"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="nodeid"
-               value="pdu//%nodeid-device%//phase%rpdu2-phasenum%//voltage"/>
+               value="%nodeid-pdu%//phase%rpdu2-phasenum%//voltage"/>
         <param name="graph-lower-limit" value="0" />
         <param name="graph-legend"      value="phase voltage"/>
         <param name="vertical-label"    value="Volt" />
@@ -135,7 +135,7 @@
         <param name="rrd-ds"            value="Power"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="nodeid"
-               value="pdu//%nodeid-device%//phase%rpdu2-phasenum%//power"/>
+               value="%nodeid-pdu%//phase%rpdu2-phasenum%//power"/>
         <param name="graph-lower-limit" value="0" />
         <param name="graph-legend"      value="phase power consumption"/>
         <param name="vertical-label"    value="Kilowatt" />
@@ -163,7 +163,7 @@
         <param name="normal-level"      value="%rpdu2-warn-currnt%" />
         <param name="graph-upper-limit" value="%rpdu2-crit-currnt%" />
         <param name="nodeid"
-               value="pdu//%nodeid-device%//bank%rpdu2-banknum%//current"/>
+               value="%nodeid-pdu%//bank%rpdu2-banknum%//current"/>
       </leaf>
    </template>
 
@@ -198,7 +198,7 @@
         <param name="graph-legend"      value="total power"/>
         <param name="vertical-label"    value="Kilowatts" />
         <param name="nodeid"
-               value="pdu//%nodeid-device%//device//power"/>
+               value="%nodeid-pdu%//device//power"/>
       </leaf>
     </subtree>
    </template>
@@ -219,7 +219,7 @@
         <param name="vertical-label"    value="Amperes" />
         
         <param name="nodeid"
-               value="pdu//%nodeid-device%//%nodeid-rpdu-ref%//current"/>
+               value="%nodeid-pdu%//%nodeid-rpdu-ref%//current"/>
       </leaf>
    </template>
 
@@ -255,7 +255,7 @@
      <param name="graph-upper-limit" value="100" />
      <param name="graph-title" value="%system-id%:%sensor-name%"/>
      <param name="nodeid"
-            value="sensor//%nodeid-device%//%sensor-index%"/>
+            value="%nodeid-sensor%//%sensor-index%"/>
 
      <leaf name="Temperature">
        <param name="rrd-ds"            value="Temperature"/>
@@ -267,7 +267,7 @@
        <param name="graph-legend"   value="Temperature"/>
 
        <param name="nodeid"
-              value="sensor//%nodeid-device%//%sensor-index%//temperature"/>
+              value="%nodeid-sensor%//%sensor-index%//temperature"/>
      </leaf>
      
      <leaf name="Humidity">
@@ -280,7 +280,7 @@
        <param name="graph-legend"   value="Humidity"/>
 
        <param name="nodeid"
-              value="sensor//%nodeid-device%//%sensor-index%//humidity"/>
+              value="%nodeid-sensor%//%sensor-index%//humidity"/>
      </leaf>
    </template>
    

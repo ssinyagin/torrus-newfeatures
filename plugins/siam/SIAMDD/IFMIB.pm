@@ -196,53 +196,44 @@ sub match_devc
     
     if( defined($interface) )
     {
-        my $nodeid = $devc->attr('torrus.nodeid');
-        if( not defined($nodeid) )
+        $interface->{'SIAM::matched'} = 1;
+        $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
+        $interface->{$data->{'nameref'}{'ifNodeid'}} =
+            $devc->attr('torrus.nodeid');
+        
+        # Apply the service access bandwidth
+        my $bw = $devc->attr('torrus.port.bandwidth');
+        if( not defined($bw) or $bw == 0 )
         {
-            Error('SIAM::DeviceComponent, id="' . $devc->id .
-                  '" does not define torrus.nodeid');
-            $devc->set_condition('torrus.warning',
-                                 'Undefined torrus.nodeid');
-        }
-        else
-        {
-            $interface->{'SIAM::matched'} = 1;
-            $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
-            $interface->{$data->{'nameref'}{'ifNodeid'}} = $nodeid;
-
-            # Apply the service access bandwidth
-            my $bw = $devc->attr('torrus.port.bandwidth');
-            if( not defined($bw) or $bw == 0 )
+            if( defined( $interface->{'ifSpeed'} ) )
             {
-                if( defined( $interface->{'ifSpeed'} ) )
-                {
-                    $bw = $interface->{'ifSpeed'};
-                }
-            }
-            
-            if( defined($bw) and $bw > 0 )
-            {
-                $interface->{'param'}{'bandwidth-limit-in'} =
-                    $bw / 1e6;
-                $interface->{'param'}{'bandwidth-limit-out'} =
-                    $bw / 1e6;
-                $interface->{'childCustomizations'}->{'InOut_bps'}->{
-                    'upper-limit'} = $bw;
-                $interface->{'childCustomizations'}->{'Bytes_In'} ->{
-                    'upper-limit'} = $bw / 8;
-                $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
-                    'upper-limit'} = $bw / 8;
-                $interface->{'param'}{'monitor-vars'} =
-                    sprintf('bw=%g', $bw);
-            }        
-            
-            if( $interface->{'ifAdminStatus'} != 1 )
-            {
-                $devc->set_condition
-                    ('torrus.warning',
-                     'Port is administratively down on the device');
+                $bw = $interface->{'ifSpeed'};
             }
         }
+        
+        if( defined($bw) and $bw > 0 )
+        {
+            $interface->{'param'}{'bandwidth-limit-in'} =
+                $bw / 1e6;
+            $interface->{'param'}{'bandwidth-limit-out'} =
+                $bw / 1e6;
+            $interface->{'childCustomizations'}->{'InOut_bps'}->{
+                'upper-limit'} = $bw;
+            $interface->{'childCustomizations'}->{'Bytes_In'} ->{
+                'upper-limit'} = $bw / 8;
+            $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
+                'upper-limit'} = $bw / 8;
+            $interface->{'param'}{'monitor-vars'} =
+                sprintf('bw=%g', $bw);
+        }        
+        
+        if( $interface->{'ifAdminStatus'} != 1 )
+        {
+            $devc->set_condition
+                ('torrus.warning',
+                 'Port is administratively down on the device');
+        }
+        
     }
     
     return( defined($interface) );

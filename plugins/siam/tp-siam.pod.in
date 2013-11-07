@@ -173,7 +173,7 @@ If true, then SIAMDD will create SIAM::DeviceComponent objects for the
 devices according to the discovery results. If an interface is removed
 from an SNMP device, the corresponding devic component object will also
 be removed. SIAMDD assumes that C<torrus.nodeid> attribute is
-automatically calculated by th eunderlying inventory database when
+automatically calculated by the underlying inventory database when
 device component objects are created.
 
 =back

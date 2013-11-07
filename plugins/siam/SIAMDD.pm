@@ -203,6 +203,15 @@ sub discover
     {
         next unless $devc->is_complete();
 
+        if( not defined($devc->attr('torrus.nodeid')) )
+        {
+            Error('SIAM::DeviceComponent, id="' . $devc->id .
+                  '" does not define torrus.nodeid');
+            $devc->set_condition('torrus.warning',
+                                 'Undefined torrus.nodeid');
+            next;
+        }
+        
         my $matched = 0;
         
         foreach my $entry

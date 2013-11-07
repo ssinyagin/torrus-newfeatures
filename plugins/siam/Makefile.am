@@ -35,7 +35,8 @@ dist_myperlmoddisc_DATA = SIAMDD.pm
 
 myperlmodsiamdddir = $(perllibdir)/Torrus/DevDiscover/SIAMDD
 dist_myperlmodsiamdd_DATA = \
-	SIAMDD/IFMIB.pm
+	SIAMDD/IFMIB.pm \
+	SIAMDD/APC_PowerNet.pm
 
 
 #####   CLI wrapper  #####

@@ -180,7 +180,8 @@ foreach my $tree ( sort keys %bundles )
                         @{$bundles{$tree}})
     {
         my $name = $device->attr('siam.device.name');
-
+        $name =~ s/\s/-/go;
+            
         my $params = {
             'output-file' => $nodes_path . '/' . $name . '.xml',
             'system-id' => $name,

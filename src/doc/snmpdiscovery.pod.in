@@ -927,7 +927,8 @@ selector name, C<A> as attribute name, and C<T> as action name.
 =item * C<S-selector-type>
 
 Type of objects to be selected. Supported values are: C<RFC2863_IF_MIB>,
-C<CiscoCPU>, C<CiscoSensor>.
+C<CiscoCPU>, C<CiscoSensor>, C<ALU_SAP>, C<NetBotzSensor>,
+C<RFC2662_ADSL_LINE>
 
 =item * C<S-selector-expr>
 
@@ -1139,6 +1140,19 @@ C<EnclosureID>. Arguments are matched as regular expressions.
 Actions supported: C<Monitor>, C<TokensetMember>.
 
 
+=head3 RFC2662_ADSL_LINE selector
+
+This type of selector applies to ADSL line statistics.
+
+Attributes supported: C<ifSubtreeName>.
+
+Actions supported: C<AtucSnrMonitor>, C<AturSnrMonitor>,
+C<AtucAtnMonitor>, C<AturAtnMonitor>, C<AtucAttRateMonitor>,
+C<AturAttRateMonitor>, C<AtucTxRateMonitor>, C<AturTxRateMonitor>,
+C<AtucLofsMonitor>, C<AturLofsMonitor>, C<AtucLossMonitor>,
+C<AturLossMonitor>, C<AtucLprsMonitor>, C<AturLprsMonitor>,
+C<AtucESsMonitor>, C<AturESsMonitor>, C<AtucInitsMonitor>.
+
 
 =head3 Examples
 
@@ -1235,6 +1249,18 @@ This example excludes all non-Gigabit ports from discovery results:
     <param  name="NotGigE-ifSubtreeName"    value="^Gigabit" />
     <param  name="NotGigE-selector-actions" value="RemoveInterface" />
   </host>
+
+The following example sets the SNR monitoring on ADSL line statistics:
+
+  <param name="selectors" value="AdslMon" />
+  <param  name="AdslMon-selector-type"    value="RFC2662_ADSL_LINE"/>
+  <param  name="AdslMon-selector-actions">
+     AtucSnrMonitor,
+     AturSnrMonitor
+  </param>
+  <param name="AdslMon-AtucSnrMonitor-arg" value="adsl-snr-6db"/>
+  <param name="AdslMon-AturSnrMonitor-arg" value="adsl-snr-6db"/>
+
 
 
 =head1 Author

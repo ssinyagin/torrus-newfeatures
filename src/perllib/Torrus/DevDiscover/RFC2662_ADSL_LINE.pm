@@ -181,69 +181,227 @@ sub buildConfig
         }
         
         my $templates = [];
+        my $childParams = {};
+        my $adslIntf = $data->{'AdslLine'}{$ifIndex};
 
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucCurrSnrMgn'} and
-            $data->{'AdslLine'}{$ifIndex}{'adslAturCurrSnrMgn'} )
+        my $applySelectors = sub
+        {
+            my $selectorSuffix = shift;
+            my $leafSuffix = shift;
+            
+            foreach my $end ('Atuc', 'Atur')
+            {
+                my $arg = $adslIntf->{'selectorActions'}{
+                    $end . $selectorSuffix};
+                if( defined($arg) )
+                {
+                    $childParams->{$end . '_' . $leafSuffix}{'monitor'} = $arg;
+                }
+            }
+        };
+
+                
+        if( $adslIntf->{'adslAtucCurrSnrMgn'} and
+            $adslIntf->{'adslAturCurrSnrMgn'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-line-snr');
+            &{$applySelectors}('SnrMonitor', 'SnrMgn');
         }
         
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucCurrAtn'} and
-            $data->{'AdslLine'}{$ifIndex}{'adslAturCurrAtn'} )
+        if( $adslIntf->{'adslAtucCurrAtn'} and
+            $adslIntf->{'adslAturCurrAtn'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-line-atn');
+            &{$applySelectors}('AtnMonitor', 'Atn');
         }
 
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucCurrAttainableRate'} and
-            $data->{'AdslLine'}{$ifIndex}{'adslAturCurrAttainableRate'} )
+        if( $adslIntf->{'adslAtucCurrAttainableRate'} and
+            $adslIntf->{'adslAturCurrAttainableRate'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-line-attrate');
+            &{$applySelectors}('AttRateMonitor', 'AttainableRate');
         }
         
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucChanCurrTxRate'} and
-            $data->{'AdslLine'}{$ifIndex}{'adslAturChanCurrTxRate'} )
+        if( $adslIntf->{'adslAtucChanCurrTxRate'} and
+            $adslIntf->{'adslAturChanCurrTxRate'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-channel-txrate');
+            &{$applySelectors}('TxRateMonitor', 'CurrTxRate');
         }
 
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayLofs'} and
-            $data->{'AdslLine'}{$ifIndex}{'adslAturPerfCurr1DayLofs'} )
+        if( $adslIntf->{'adslAtucPerfCurr1DayLofs'} and
+            $adslIntf->{'adslAturPerfCurr1DayLofs'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-lofs');
+            &{$applySelectors}('LofsMonitor', 'Lofs');
         }
 
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayLoss'} and
-            $data->{'AdslLine'}{$ifIndex}{'adslAturPerfCurr1DayLoss'} )
+        if( $adslIntf->{'adslAtucPerfCurr1DayLoss'} and
+            $adslIntf->{'adslAturPerfCurr1DayLoss'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-loss');
+            &{$applySelectors}('LossMonitor', 'Loss');
         }
 
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayLprs'} and
-            $data->{'AdslLine'}{$ifIndex}{'adslAturPerfCurr1DayLprs'} )
+        if( $adslIntf->{'adslAtucPerfCurr1DayLprs'} and
+            $adslIntf->{'adslAturPerfCurr1DayLprs'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-lprs');
+            &{$applySelectors}('LprsMonitor', 'Lprs');
         }
 
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayESs'} and
-            $data->{'AdslLine'}{$ifIndex}{'adslAturPerfCurr1DayESs'} )
+        if( $adslIntf->{'adslAtucPerfCurr1DayESs'} and
+            $adslIntf->{'adslAturPerfCurr1DayESs'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-ess');
+            &{$applySelectors}('ESsMonitor', 'ESs');
         }
 
-        if( $data->{'AdslLine'}{$ifIndex}{'adslAtucPerfCurr1DayInits'} )
+        if( $adslIntf->{'adslAtucPerfCurr1DayInits'} )
         {
             push( @{$templates}, 'RFC2662_ADSL_LINE::adsl-perf-inits');
+            my $arg = $adslIntf->{'selectorActions'}{'AtucInitsMonitor'};
+            if( defined($arg) )
+            {
+                $childParams->{'Atuc_Inits'}{'monitor'} = $arg;
+            }
         }
         
         if( scalar(@{$templates}) > 0 )
         {
-            $cb->addSubtree( $subtreeNode, $ifSubtreeName,
-                             $ifParam, $templates );
+            my $lineNode = $cb->addSubtree( $subtreeNode, $ifSubtreeName,
+                                            $ifParam, $templates );
+
+            if( scalar(keys %{$childParams}) > 0 )
+            {
+                foreach my $childName ( sort keys %{$childParams} )
+                {
+                    $cb->addLeaf
+                        ( $lineNode, $childName,
+                          $childParams->{$childName} );
+                }
+            }
         }
     }
 
     return;
 }
+
+
+#######################################
+# Selectors interface
+#
+
+$Torrus::DevDiscover::selectorsRegistry{'RFC2662_ADSL_LINE'} = {
+    'getObjects'      => \&getSelectorObjects,
+    'getObjectName'   => \&getSelectorObjectName,
+    'checkAttribute'  => \&checkSelectorAttribute,
+    'applyAction'     => \&applySelectorAction,
+};
+
+
+## Objects are interface indexes
+
+sub getSelectorObjects
+{
+    my $devdetails = shift;
+    my $objType = shift;
+    return( sort {$a<=>$b} keys (%{$devdetails->data()->{'AdslLine'}}) );
+}
+
+
+sub checkSelectorAttribute
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $attr = shift;
+    my $checkval = shift;
+
+    my $data = $devdetails->data();
+    my $interface = $data->{'interfaces'}{$object};
+    
+    if( $attr =~ /^ifSubtreeName\d*$/ )
+    {
+        my $value = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+        my $match = 0;
+        foreach my $chkexpr ( split( /\s+/, $checkval ) )
+        {
+            if( $value =~ $chkexpr )
+            {
+                $match = 1;
+                last;
+            }
+        }
+        return $match;        
+    }
+}
+
+
+sub getSelectorObjectName
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    
+    my $data = $devdetails->data();
+    my $interface = $data->{'interfaces'}{$object};
+    return $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+}
+
+
+# Other discovery modules can add their interface actions here
+our %knownSelectorActions =
+    ( 'AtucSnrMonitor'     => 'RFC2662_ADSL_LINE',
+      'AturSnrMonitor'     => 'RFC2662_ADSL_LINE',
+      'AtucAtnMonitor'     => 'RFC2662_ADSL_LINE',
+      'AturAtnMonitor'     => 'RFC2662_ADSL_LINE',
+      'AtucAttRateMonitor' => 'RFC2662_ADSL_LINE',
+      'AturAttRateMonitor' => 'RFC2662_ADSL_LINE',
+      'AtucTxRateMonitor'  => 'RFC2662_ADSL_LINE',
+      'AturTxRateMonitor'  => 'RFC2662_ADSL_LINE',
+      'AtucLofsMonitor'    => 'RFC2662_ADSL_LINE',
+      'AturLofsMonitor'    => 'RFC2662_ADSL_LINE',
+      'AtucLossMonitor'    => 'RFC2662_ADSL_LINE',
+      'AturLossMonitor'    => 'RFC2662_ADSL_LINE',
+      'AtucLprsMonitor'    => 'RFC2662_ADSL_LINE',
+      'AturLprsMonitor'    => 'RFC2662_ADSL_LINE',
+      'AtucESsMonitor'     => 'RFC2662_ADSL_LINE',
+      'AturESsMonitor'     => 'RFC2662_ADSL_LINE',
+      'AtucInitsMonitor'   => 'RFC2662_ADSL_LINE',
+    );
+
+                            
+sub applySelectorAction
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $action = shift;
+    my $arg = shift;
+
+    my $data = $devdetails->data();
+    my $adslIntf = $data->{'AdslLine'}{$object};
+
+    if( defined( $knownSelectorActions{$action} ) )
+    {
+        if( not $devdetails->isDevType( $knownSelectorActions{$action} ) )
+        {
+            Error('Action ' . $action . ' is applied to a device that is ' .
+                  'not of type ' . $knownSelectorActions{$action} .
+                  ': ' . $devdetails->param('system-id'));
+        }
+        $adslIntf->{'selectorActions'}{$action} = $arg;
+    }
+    else
+    {
+        Error('Unknown RFC2863_IF_MIB selector action: ' . $action);
+    }
+
+    return;
+}
+
+
 
 
 1;

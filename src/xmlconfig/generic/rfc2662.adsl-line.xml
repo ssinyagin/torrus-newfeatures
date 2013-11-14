@@ -69,6 +69,7 @@
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="nodeid"            value="%nodeid-interface%//atuc//snr"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="SNR_Margin"/>
     </leaf>
 
     <leaf name="Atur_SnrMgn">
@@ -81,6 +82,7 @@
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="nodeid"            value="%nodeid-interface%//atur//snr"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="SNR_Margin"/>
     </leaf>
 
     <leaf name="SNR_Margin">               <!-- Multiple line graph -->
@@ -121,6 +123,7 @@
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="nodeid"            value="%nodeid-interface%//atuc//atn"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="Attenuation"/>
     </leaf>
 
     <leaf name="Atur_Atn">
@@ -133,6 +136,7 @@
       <param name="rrd-create-dstype"  value="GAUGE" />
       <param name="nodeid"            value="%nodeid-interface%//atur//atn"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="Attenuation"/>
     </leaf>
 
     <leaf name="Attenuation">          <!-- Multiple line graph -->
@@ -173,6 +177,7 @@
       <param name="graph-legend"       value="ATUC Attainable Rate" />
       <param name="nodeid"        value="%nodeid-interface%//atuc//attrate"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="AttainableRate"/>
     </leaf>
 
     <leaf name="Atur_AttainableRate">
@@ -186,6 +191,7 @@
       <param name="graph-legend"       value="ATUR Attainable Rate" />
       <param name="nodeid"        value="%nodeid-interface%//atur//attrate"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="AttainableRate"/>
     </leaf>
 
     <leaf name="AttainableRate">          <!-- Multiple line graph -->
@@ -225,6 +231,7 @@
       <param name="graph-legend"       value="ATUC Curr TX Rate" />
       <param name="nodeid"        value="%nodeid-interface%//atuc//txrate"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="ChannelTXRate"/>
     </leaf>
 
     <leaf name="Atur_CurrTxRate">
@@ -238,6 +245,7 @@
       <param name="graph-legend"       value="ATUR Current TX Rate" />
       <param name="nodeid"        value="%nodeid-interface%//atur//txrate"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="ChannelTXRate"/>
     </leaf>
     
     <leaf name="ChannelTXRate">          <!-- Multiple line graph -->
@@ -277,6 +285,7 @@
       <param name="rrd-create-max"    value="1.5"/>
       <param name="nodeid"        value="%nodeid-interface%//atuc//lofs"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="LOFS"/>
     </leaf>
 
     <leaf name="Atur_Lofs">
@@ -290,6 +299,7 @@
       <param name="rrd-create-max"    value="1.5"/>
       <param name="nodeid"        value="%nodeid-interface%//atur//lofs"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="LOFS"/>
     </leaf>
 
     <leaf name="LOFS">          <!-- Multiple line graph -->
@@ -330,6 +340,7 @@
       <param name="rrd-create-max"    value="1.5"/>
       <param name="nodeid"        value="%nodeid-interface%//atuc//loss"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="LOSS"/>
     </leaf>
 
     <leaf name="Atur_Loss">
@@ -343,6 +354,7 @@
       <param name="rrd-create-max"    value="1.5"/>
       <param name="nodeid"        value="%nodeid-interface%//atur//loss"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="LOSS"/>
     </leaf>
 
     <leaf name="LOSS">          <!-- Multiple line graph -->
@@ -384,6 +396,7 @@
       <param name="rrd-create-max"    value="1.5"/>
       <param name="nodeid"        value="%nodeid-interface%//atuc//lprs"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="LPRS"/>
     </leaf>
 
     <leaf name="Atur_Lprs">
@@ -397,6 +410,7 @@
       <param name="rrd-create-max"    value="1.5"/>
       <param name="nodeid"        value="%nodeid-interface%//atur//lprs"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="LPRS"/>
     </leaf>
 
     <leaf name="LPRS">          <!-- Multiple line graph -->
@@ -437,6 +451,7 @@
       <param name="rrd-create-max"    value="1.5"/>
       <param name="nodeid"        value="%nodeid-interface%//atuc//ess"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="ESS"/>
     </leaf>
 
     <leaf name="Atur_ESs">
@@ -450,6 +465,7 @@
       <param name="rrd-create-max"    value="1.5"/>
       <param name="nodeid"        value="%nodeid-interface%//atur//ess"/>
       <param name="hidden"             value="yes" />
+      <param name="monitor-action-target"  value="ESS"/>
     </leaf>
 
     <leaf name="ESS">          <!-- Multiple line graph -->

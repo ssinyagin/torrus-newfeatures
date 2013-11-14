@@ -312,7 +312,7 @@ sub setAlarm
         }
         else
         {
-            if( defined($t_expires) and time() > $t_expires )
+            if( $t_expires > 0 and time() > $t_expires )
             {
                 $self->{'db_alarms'}->del( $key );
                 $event = 'forget';
@@ -449,10 +449,12 @@ sub run_event_tset
         
         if( $add )
         {
+            Debug("Adding $token to tokenset $tset");
             $config_tree->tsetAddMember($tset, $token, 'monitor');
         }
         if( $remove )
         {
+            Debug("Removing $token from tokenset $tset");
             $config_tree->tsetDelMember($tset, $token);
         }
     }

@@ -738,7 +738,8 @@ sub validateMonitors
                 foreach my $when ( split(',', $launch_when) )
                 {
                     my $matched = 0;
-                    foreach my $event ('set', 'repeat', 'clear', 'forget')
+                    foreach my $event ('set', 'repeat', 'escalate',
+                                       'clear', 'forget')
                     {
                         if( $when eq $event )
                         {

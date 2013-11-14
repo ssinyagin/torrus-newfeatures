@@ -1704,7 +1704,7 @@ is passed with this variable.
 
 Optional for action type C<exec>. The comma-separated list of event
 types when the given action should be launched. If not defined,
-the event type C<set> is used by default.
+the event types C<set,escalate> are used by default.
 
 =item * C<setenv-params>
 

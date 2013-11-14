@@ -803,6 +803,7 @@ sub validateMonitors
     {
         $ok = validateInstanceParams($config_tree, $monitor,
                                      'monitor', \%monitor_params) ? $ok:0;
+        
         my $alist = $config_tree->getParam( $monitor, 'action' );
         foreach my $action ( split(',', $alist ) )
         {
@@ -812,7 +813,29 @@ sub validateMonitors
                 $ok = 0;
             }
         }
+
+        my $esc = $config_tree->getParam($monitor, 'escalations');
+        if( defined($esc) )
+        {
+            my @escalation_times = split(',', $esc);
+            if( scalar(@escalation_times) == 0 )
+            {
+                Error("\"escalations\" is empty in $monitor");
+                $ok = 0;
+            }
+            
+            foreach my $esc_time (@escalation_times)
+            {
+                if( $esc_time !~ /^\d+$/ or $esc_time == 0 )
+                {
+                    Error("$esc_time is not a positive integer in " .
+                          "\"escalations\" in $monitor");
+                    $ok = 0;
+                }
+            }
+        }
     }
+    
     return $ok;
 }
 

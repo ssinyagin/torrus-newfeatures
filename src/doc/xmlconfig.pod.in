@@ -1498,6 +1498,12 @@ This event type occurs the first time the alarm condition is met.
 This event type means that the alarm condition still persists
 after the previous run of Monitor.
 
+=item * C<escalate>
+
+If escalation times are defined with C<escalations> parameter, this
+event is fired if the alarm condition persists for a specified
+time. Each escalation event is fired only once.
+
 =item * C<clear>
 
 Event of this type happens when the alarm condition stops.
@@ -1534,6 +1540,12 @@ This monitor type implies that the RPN expression is specified in
 C<rpn-expr> parameter. The current leaf value is prepended to the given RPN.
 
 =back
+
+=item * C<escalations>
+
+Optional parameter with comma-separated escalation times. Each
+escalation time is a period in seconds. As soon as the alarm condition
+persists for the specified period, an C<escalate> event is fired.
 
 =item * C<rpn-expr>
 
@@ -1606,6 +1618,12 @@ determinate its behaviour: mandatory C<command> and optional C<launch-when>.
 
 Mandatory for action type C<tset>. Defines the tokenset name
 where the leaf is added when the monitor condition is met.
+
+=item * C<on-escalations>
+
+Optional parameter for action type C<tset>. It specifies a
+comma-separated list of escalation times at which the leaf would be
+added to the tokenset.
 
 =item * C<command>
 

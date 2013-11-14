@@ -279,14 +279,16 @@ from previous runs of Monitor, with the keys and values as follows:
 
 =item * E<lt>mnameE<gt>:E<lt>pathE<gt> --
 E<lt>t_setE<gt>:E<lt>t_expiresE<gt>:E<lt>statusE<gt>:
-E<lt>t_last_changeE<gt>
+E<lt>t_last_changeE<gt>[:E<lt>escalationE<gt>[:E<lt>escalationE<gt>...]]
 
 Key consists of the monitor name and leaf path. In the value, B<t_set>
 is the time when the alarm was raised. If two subsequent runs of Monitor
 raise the same alarm, B<t_set> does not change. B<t_expires> is the
-timestamp that shows when it's still important to keep the entry after the
-alarm is cleared. B<status> is 1 if the alarm is active, and 0 otherwise.
-B<t_last_change> is the timestamp of last status change.
+timestamp that shows when it's still important to keep the entry after
+the alarm is cleared. B<status> is 1 if the alarm is active, and 0
+otherwise.  B<t_last_change> is the timestamp of last status
+change. Following values are optional escalation times when escalation
+events were fired.
 
 When B<status> is 1, the record is kept regardless of timestamps.
 When B<status> is 0, and the current time is more than B<t_expires>,

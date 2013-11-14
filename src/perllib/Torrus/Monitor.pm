@@ -250,18 +250,34 @@ sub setAlarm
     my $key = $mname . ':' . $config_tree->path($token);
     
     my $prev_values = $self->{'db_alarms'}->get( $key );
+    
     my ($t_set, $t_expires, $prev_status, $t_last_change);
     $t_expires = 0;    
+    my %escalation_state; # true value if escalation was fired
+    
     if( defined($prev_values) )
     {
+        my @fired_escalations;
         Debug("Previous state found, Alarm: $alarm, ".
               "Token: $token, Monitor: $mname");
-        ($t_set, $t_expires, $prev_status, $t_last_change) =
-            split(':', $prev_values);
+        ($t_set, $t_expires, $prev_status,
+         $t_last_change, @fired_escalations) =
+             split(':', $prev_values);
+        foreach my $esc_time (@fired_escalations)
+        {
+            $escalation_state{$esc_time} = 1;
+        }
     }
 
-    my $event;
+    my @escalation_times;
+    my $esc = $config_tree->getParam($mname, 'escalations');
+    if( defined($esc) )
+    {
+        @escalation_times = split(',', $esc);
+    }
 
+    my @fire_escalations;   
+    my $event;
     $t_last_change = time();
     
     if( $alarm )
@@ -275,6 +291,16 @@ sub setAlarm
         {
             $event = 'repeat';
         }
+
+        foreach my $esc_time (@escalation_times)
+        {
+            if( ($t_last_change >= $t_set + $esc_time) and
+                not $escalation_state{$esc_time} )
+            {
+                push(@fire_escalations, $esc_time);
+                $escalation_state{$esc_time} = 1;
+            }
+        }                
     }
     else
     {
@@ -296,9 +322,7 @@ sub setAlarm
 
     if( $event )
     {
-        Debug("Event: $event, Monitor: $mname, Token: $token");
-        $obj->{'event'} = $event;
-        
+        Debug("Event: $event, Monitor: $mname, Token: $token");        
         my $action_token = $token;
         
         my $action_target =
@@ -311,15 +335,22 @@ sub setAlarm
         }
         $obj->{'action_token'} = $action_token;
 
-        foreach my $aname (split(',',
-                                 $config_tree->getParam($mname, 'action')))
+        foreach my $esc_time (0, @fire_escalations)
         {
-            &Torrus::DB::checkInterrupted();
+            Debug("Escalation: $esc_time");
+            $obj->{'escalation'} = $esc_time;
+            $obj->{'event'} = ($esc_time > 0) ? 'escalate' : $event;
+                        
+            foreach my $aname
+                (split(',', $config_tree->getParam($mname, 'action')))
+            {
+                &Torrus::DB::checkInterrupted();
             
-            Debug("Running action: $aname");
-            my $method = 'run_event_' .
-                $config_tree->getParam($aname, 'action-type');
-            $self->$method( $config_tree, $aname, $obj );
+                Debug("Running action: $aname");
+                my $method = 'run_event_' .
+                    $config_tree->getParam($aname, 'action-type');
+                $self->$method( $config_tree, $aname, $obj );
+            }
         }
 
         if( $event ne 'forget' )
@@ -328,7 +359,8 @@ sub setAlarm
                                        join(':', ($t_set,
                                                   $t_expires,
                                                   ($alarm ? 1:0),
-                                                  $t_last_change)) );
+                                                  $t_last_change,
+                                                  keys %escalation_state)) );
         }
     }
     return;
@@ -380,20 +412,51 @@ sub run_event_tset
 
     my $token = $obj->{'action_token'};
     my $event = $obj->{'event'};
-    
-    if( $event eq 'set' or $event eq 'forget' )
+
+    my $add;
+    my $remove;
+
+    if( $event eq 'forget' )
+    {
+        $remove = 1;
+    }
+    else
+    {
+        my $esc = $config_tree->getParam($aname, 'on-escalations');
+        if( defined($esc) )
+        {
+            if( $event eq 'escalate' )
+            {
+                foreach my $esc_time (split(',', $esc))
+                {
+                    if( $obj->{'escalation'} == $esc_time )
+                    {
+                        $add = 1;
+                        last;
+                    }
+                }
+            }
+        }
+        elsif( $event eq 'set' )
+        {
+            $add = 1;
+        }
+    }
+
+    if( $add or $remove )
     {
         my $tset = 'S'.$config_tree->getParam($aname, 'tset-name');
-
-        if( $event eq 'set' )
+        
+        if( $add )
         {
             $config_tree->tsetAddMember($tset, $token, 'monitor');
         }
-        else
+        if( $remove )
         {
             $config_tree->tsetDelMember($tset, $token);
         }
     }
+    
     return;
 }
 
@@ -412,7 +475,7 @@ sub run_event_exec
     my $launch_when = $config_tree->getParam($aname, 'launch-when');
     if( not defined $launch_when )
     {
-        $launch_when = 'set';
+        $launch_when = 'set,escalate';
     }
 
     if( grep {$event eq $_} split(',', $launch_when) )
@@ -449,6 +512,7 @@ sub run_event_exec
             $config_tree->getNodeParam( $config_tree->getParent( $token ),
                                         'comment', 1 );
         $ENV{'TORRUS_EVENT'}     = $event;
+        $ENV{'TORRUS_ESCALATION'} = $obj->{'escalation'};
         $ENV{'TORRUS_MONITOR'}   = $mname;
         $ENV{'TORRUS_MCOMMENT'}  = $config_tree->getParam($mname, 'comment');
         $ENV{'TORRUS_TSTAMP'}    = $obj->{'timestamp'};

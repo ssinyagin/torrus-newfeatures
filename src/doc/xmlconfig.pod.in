@@ -1671,6 +1671,10 @@ Empty if the parameter is not defined for the given leaf.
 
 Event type.
 
+=item * C<$TORRUS_ESCALATION>
+
+Escalation time. It is set to zero when the "set" event is fired.
+
 =item * C<$TORRUS_MONITOR>
 
 Monitor name

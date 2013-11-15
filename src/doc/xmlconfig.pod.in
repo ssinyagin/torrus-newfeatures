@@ -1555,6 +1555,14 @@ The expresion may reference leaf-dependent variables: the
 constructs of the form C<#varname> are replaced with the variable
 value specified in the leaf's C<monitor-vars> parameter.
 
+=item * C<time-span>
+
+Optional parameter, a positive integer specifying the time span in
+seconds. If defined, the data source value is calculated across the
+defined period with the aggregation function that is defined in
+C<rrd-cf> parameter. If not specified, the last available value is
+taken.
+
 =item * C<action>
 
 Mandatory parameter, comma-separated list of action names (spaces

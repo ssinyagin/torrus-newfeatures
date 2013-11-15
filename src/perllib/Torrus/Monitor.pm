@@ -151,7 +151,17 @@ sub check_expression
     my $token = $obj->{'token'};
     my $mname = $obj->{'mname'};
 
-    my ($value, $timestamp) = $obj->{'da'}->read( $config_tree, $token );
+    my $t_end = undef;
+    my $t_start = undef;
+    my $timespan = $config_tree->getParam($mname,'time-span');
+    if( defined($timespan) and $timespan > 0 )
+    {
+        $t_end = 'LAST';
+        $t_start = 'LAST-' . $timespan;
+    }
+    
+    my ($value, $timestamp) =
+        $obj->{'da'}->read($config_tree, $token, $t_end, $t_start);
     $value = 'UNKN' unless defined($value);
     
     my $expr = $value . ',' . $config_tree->getParam($mname,'rpn-expr');

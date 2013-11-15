@@ -58,6 +58,7 @@ my $vars =
     'ncomment'   => $ENV{'TORRUS_NCOMMENT'},
     'npcomment'  => $ENV{'TORRUS_NPCOMMENT'},
     'event'      => $ENV{'TORRUS_EVENT'},
+    'escalation' => $ENV{'TORRUS_ESCALATION'},
     'monitor'    => $ENV{'TORRUS_MONITOR'},
     'mcomment'   => $ENV{'TORRUS_MCOMMENT'},
     'severity'   => $ENV{'TORRUS_SEVERITY'},

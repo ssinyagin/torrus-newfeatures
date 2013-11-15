@@ -11,6 +11,7 @@ Monitor name:        [% monitor %]
 Monitor description: [% mcomment %]
 
 Event type:          [% event %]
+[% IF event=='escalate' %]Escalation time: [% escalation %] seconds [% END %]
 
 You can browse the node up-to-date graphs at this URL:
   [% url %]
@@ -20,6 +21,7 @@ You can browse the node up-to-date graphs at this URL:
 Event types description:
   set       Alarm condition is met first time
   repeat    Alarm condition repeats
+  escalate  Alarm is persistent for the escalation period
   clear     Alarm condition is no longer met
   forget    Information about this alarm has expired
 

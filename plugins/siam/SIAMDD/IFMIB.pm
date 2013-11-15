@@ -146,7 +146,9 @@ sub list_dev_components
 
             if( $sort_by_ifindex )
             {
-                $attr->{'display.sort.string'} = sprintf('%.15d', $ifIndex);
+                $attr->{'display.sort.string'} =
+                    sprintf('%s%.15d',
+                            $data->{'param'}{'system-id'}, $ifIndex);
             }            
 
             push(@{$ret}, $attr);

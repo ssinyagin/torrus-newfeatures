@@ -74,6 +74,7 @@ sub list_dev_components
             $attr->{'siam.object.complete'} = 1;
             $attr->{'siam.devc.type'} = 'Power.PDU';
             $attr->{'siam.devc.name'} = 'PDU';
+            $attr->{'siam.devc.description'} = 'Power distribution unit';
             
             push(@{$ret}, $attr);
         }        

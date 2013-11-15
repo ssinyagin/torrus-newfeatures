@@ -56,6 +56,20 @@
       Signal/Noise-Ratio lower than 6dB
     </param>
   </monitor>
+
+  <monitor name="adsl-es-10percent">
+    <param name="monitor-type"  value="expression"/>
+    <param name="rpn-expr"      value="0.1,GT"/>
+    <param name="time-span"     value="3600"/>
+    <param name="action"        value="adsl-bad-lines-tset, notify"/>
+    <param name="escalations"   value="1200,7200,86400"/>
+    <param name="expires"       value="86400"/>
+    <param name="severity"      value="5"/>
+    <param name="comment">
+      Errored Seconds is higher than 10% in the past hour
+    </param>
+  </monitor>
+  
 </monitors>
 
 </configuration>  

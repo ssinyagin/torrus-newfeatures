@@ -130,7 +130,16 @@ sub list_dev_components
             $attr->{'siam.devc.type'} = 'IFMIB.Port';
             $attr->{'siam.devc.name'} =
                 $interface->{$data->{'nameref'}{'ifReferenceName'}};
-            
+
+            my $descr = '-';
+            if( defined($data->{'nameref'}{'ifComment'}) and
+                defined($interface->{$data->{'nameref'}{'ifComment'}}) and
+                $interface->{$data->{'nameref'}{'ifComment'}} ne '' )
+            {
+                $descr = $interface->{$data->{'nameref'}{'ifComment'}};
+            }
+            $attr->{'siam.devc.description'} = $descr;
+
             push(@{$ret}, $attr);
         }
     }

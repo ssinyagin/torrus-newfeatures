@@ -159,6 +159,7 @@ sub buildConfig
         my $ifParam = {
             'collector-timeoffset-hashstring' =>'%system-id%:%interface-nick%',
             'precedence'     => $precedence,
+            'graph-title'    => '%system-id%:%interface-name%',
         };
 
         $ifParam->{'interface-name'} =

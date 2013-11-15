@@ -120,6 +120,10 @@ sub list_dev_components
 
     if( $data->{'siam'}{'assets'}{'IFMIB'} )
     {
+        my $sort_by_ifindex =
+            $devdetails->paramDisabled('RFC2863_IF_MIB::sort-by-name');
+            
+
         foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
@@ -139,6 +143,11 @@ sub list_dev_components
                 $descr = $interface->{$data->{'nameref'}{'ifComment'}};
             }
             $attr->{'siam.devc.description'} = $descr;
+
+            if( $sort_by_ifindex )
+            {
+                $attr->{'display.sort.string'} = sprintf('%.15d', $ifIndex);
+            }            
 
             push(@{$ret}, $attr);
         }

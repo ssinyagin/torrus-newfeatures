@@ -63,6 +63,7 @@
       <param name="comment"            value="ATUC SNR Margin" />
       <param name="snmp-object"  value="$adslAtucCurrSnrMgn.%ifindex-map%" />
       <param name="collector-scale"    value="10,/" />
+      <param name="rrd-create-max"     value="50"/>
       <param name="rrd-ds"             value="AtucSnrMgn" />
       <param name="data-file"
              value="%system-id%_%interface-nick%_adsl-stats.rrd" />
@@ -76,6 +77,7 @@
       <param name="comment"            value="ATUR SNR Margin" />
       <param name="snmp-object"  value="$adslAturCurrSnrMgn.%ifindex-map%" />
       <param name="collector-scale"    value="10,/" />
+      <param name="rrd-create-max"     value="50"/>
       <param name="rrd-ds"             value="AturSnrMgn" />
       <param name="data-file"
              value="%system-id%_%interface-nick%_adsl-stats.rrd" />
@@ -117,6 +119,7 @@
       <param name="comment"            value="ATUC Attenuation" />
       <param name="snmp-object"   value="$adslAtucCurrAtn.%ifindex-map%" />
       <param name="collector-scale"    value="10,/" />
+      <param name="rrd-create-max"     value="100"/>
       <param name="rrd-ds"             value="AtucAtn" />
       <param name="data-file"
              value="%system-id%_%interface-nick%_adsl-stats.rrd" />
@@ -130,6 +133,7 @@
       <param name="comment"            value="ATUR Attenuation" />
       <param name="snmp-object"   value="$adslAturCurrAtn.%ifindex-map%" />
       <param name="collector-scale"    value="10,/" />
+      <param name="rrd-create-max"     value="100"/>
       <param name="rrd-ds"             value="AturAtn" />
       <param name="data-file"
              value="%system-id%_%interface-nick%_adsl-stats.rrd" />

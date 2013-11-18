@@ -23,7 +23,7 @@
      comment=nodeParam(parent(node),'comment',1); %]   
   <DIV CLASS="ShortGraph">
       <DIV CLASS="NodeName">
-        <A HREF="[%url(token,urlview)%]">[% nodename %]</A>
+        <A HREF="[%url(node)%]">[% nodename %]</A>
       </DIV>
       [%IF comment%]<DIV CLASS="NodeDescr">[%xmlnorm(comment)%]</DIV>[%END%]
       [%

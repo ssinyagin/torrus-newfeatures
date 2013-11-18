@@ -407,6 +407,11 @@ If C<only-devtypes> parameter is specified, the SNMP reachability
 statistics are disabled by default. If C<enable-reachability-stats> is
 set to C<yes>, the reachability statistics are actvated in any case.
 
+=item * C<reachability-monitor>
+
+This parameter defines the monitor name which will be applied to device
+reachability statistics.
+
 =item * C<rrd-create-rra>
 
 This parameter overrides the default round-robin array definition for

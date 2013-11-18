@@ -530,6 +530,8 @@ sub buildConfig
             # we should call this anyway, in order to flush the overlays
             # set by previous host
             $cb->setRegistryOverlays( @registryOverlays );            
+
+            my $reachabilityStatsEnabled = 0;
             
             if( $devdetails->paramEnabled('disable-snmpcollector' ) )
             {
@@ -548,6 +550,7 @@ sub buildConfig
                     ) )
                 {
                     push( @{$data->{'templates'}}, '::snmp-reachability' );
+                    $reachabilityStatsEnabled = 1;
                 }
             }
 
@@ -570,6 +573,17 @@ sub buildConfig
                                            $data->{'param'},
                                            $data->{'templates'} );
 
+            if( $reachabilityStatsEnabled )
+            {
+                my $reachabilityMonitor =
+                    $devdetails->param('reachability-monitor');
+                if( defined($reachabilityMonitor) )
+                {
+                    $cb->addLeaf( $devNode, 'Device_Reachability',
+                                  {'monitor' => $reachabilityMonitor} );
+                }
+            }
+                    
             foreach my $alias
                 ( split( '\s*,\s*',
                          $devdetails->paramString('host-aliases') ) )

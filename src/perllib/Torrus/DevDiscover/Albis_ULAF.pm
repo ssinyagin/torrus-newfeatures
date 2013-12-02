@@ -311,6 +311,7 @@ sub buildConfig
                 'acceed-soam-cfg-index' => $idx,
                 'rrd-create-max' => ($ref->{'period'} * 1.5 / 1000),
                 'node-display-name' => $ref->{'mpDescr'},
+                'acceed-mp-description' => $ref->{'mpDescr'},
                 'accees-soam-nodeid' => 'soam//%nodeid-device%//' . $idx,
                 'legend' => $legend,
                 'graph-title' => $gtitle,
@@ -350,6 +351,7 @@ sub buildConfig
             my $param = {
                 'acceed-soam-cfg-index' => $idx,
                 'node-display-name' => $ref->{'mpDescr'},
+                'acceed-mp-description' => $ref->{'mpDescr'},
                 'accees-soam-nodeid' => 'soam//%nodeid-device%//' . $idx,
                 'legend' => $legend,                
                 'graph-title' => $gtitle,

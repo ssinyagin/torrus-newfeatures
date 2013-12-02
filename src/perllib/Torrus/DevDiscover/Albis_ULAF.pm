@@ -38,7 +38,9 @@ our %oiddef =
      # ACCEED-MIB
      'acceedInvDeviceUserDescr' => '1.3.6.1.4.1.1887.1.3.1.1.1.1.9',
      'acceedSoamMpDescr'        => '1.3.6.1.4.1.1887.1.3.1.4.1.1.3',
-
+     'acceedSoamMpMaintenanceDomainName' => '1.3.6.1.4.1.1887.1.3.1.4.1.1.5',
+     'acceedSoamMpShortMaName'  => '1.3.6.1.4.1.1887.1.3.1.4.1.1.7',
+     
      # LM measurement configuration
      'acceedSoamLmCfgType' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.2',
      'acceedSoamLmCfgEnabled' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.4',
@@ -126,7 +128,25 @@ sub discover
     #         acceedSoamMpPointIndex }
     
     my $acceedSoamMpDescr = $dd->walkSnmpTable('acceedSoamMpDescr');
+    my $acceedSoamMpShortMaName =
+        $dd->walkSnmpTable('acceedSoamMpShortMaName');
 
+    my $getMPDescr = sub
+    {
+        my $index = shift;
+        my $descr = $acceedSoamMpShortMaName->{$index};
+        if( not defined($descr) or $descr eq '' )
+        {
+            $descr = $acceedSoamMpDescr->{$index};
+        }
+        
+        if( not defined($descr) or $descr eq '' )
+        {
+            $descr = $index;
+        }
+        return($descr);
+    };
+        
     {
     # LM test configurations
     # INDEX { devicePortIndex,
@@ -176,8 +196,7 @@ sub discover
                 my $point = $lmcfg->{'acceedSoamLmCfgMpPoint'}{$idx};
 
                 $ref->{'mpDescr'} =
-                    $acceedSoamMpDescr->{$devIdx . '.' . $domain .
-                                             '.' . $point};
+                    &{$getMPDescr}($devIdx . '.' . $domain . '.' . $point);
             }
         }
 
@@ -229,10 +248,9 @@ sub discover
 
                 my $domain = $dmcfg->{'acceedSoamDmCfgMpDomain'}{$idx};
                 my $point = $dmcfg->{'acceedSoamDmCfgMpPoint'}{$idx};
-                
+
                 $ref->{'mpDescr'} =
-                    $acceedSoamMpDescr->{$devIdx . '.' . $domain .
-                                             '.' . $point};
+                    &{$getMPDescr}($devIdx . '.' . $domain . '.' . $point);
             }
         }
         

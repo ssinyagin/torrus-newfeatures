@@ -335,6 +335,11 @@ statistics for SIAM objects that have this attribute set to 1.
 This attribute contains the NodeID prefix that external programs can use
 for retrieving Torrus data for a given object.
 
+=item torrus.tree-url
+
+This attribute in SIAM::Device presents the HTTP or HTTPS URL that is
+used to access the torrus server and the given Torrus tree.
+
 =back
 
 

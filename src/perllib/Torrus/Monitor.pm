@@ -151,6 +151,19 @@ sub check_expression
     my $token = $obj->{'token'};
     my $mname = $obj->{'mname'};
 
+    # Timezone manipulation that would affect TOD function in RPN
+    my $tz = $config_tree->getParam($mname,'time-zone');
+    if( not defined($tz) )
+    {
+        $tz = $ENV{'TZ'};
+    }
+    
+    local $ENV{'TZ'};
+    if( defined($tz) )
+    {
+        $ENV{'TZ'} = $tz;
+    }
+    
     my $t_end = undef;
     my $t_start = undef;
     my $timespan = $config_tree->getParam($mname,'time-span');

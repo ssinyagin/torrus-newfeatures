@@ -1563,6 +1563,12 @@ defined period with the aggregation function that is defined in
 C<rrd-cf> parameter. If not specified, the last available value is
 taken.
 
+=item * C<time-zone>
+
+Optional parameter. If defined, it should contain a valid time zone name
+that is resolvable on the local server. This affects the TOD function in
+RPN expressions. If undefined, the local time zone is used.
+
 =item * C<action>
 
 Mandatory parameter, comma-separated list of action names (spaces

@@ -31,6 +31,14 @@ use warnings;
 use Torrus::Log;
 use Math::BigFloat;
 
+
+# returns the number of seconds from 00:00 (midnight) in the current time zone
+my $get_tod = sub {
+    my ($sec, $min, $hour) = localtime(time());
+    return($sec + $min*60 + $hour*3600);
+};
+
+
 # Each RPN operator is defined by an array reference with the
 # following  elements: <number of args>, <subroutine>, <accepts undef>
 
@@ -64,6 +72,7 @@ my $operators = {
     'NOT' => [ 1, sub{ (not $_[0]) ? 1:0; } ],
     'ABS' => [ 1, sub{ abs($_[0]); } ],
     'NOW' => [ 0, sub{ time(); } ],
+    'TOD' => [ 0, $get_tod ],
     'DUP' => [ 1, sub{ ($_[0], $_[0]);}, 1 ],
     'EXC' => [ 2, sub{ ($_[1], $_[0]); }, 1 ],
     'NUM' => [ 1, sub{ defined($_[0]) ? $_[0] : 0; }, 1 ],

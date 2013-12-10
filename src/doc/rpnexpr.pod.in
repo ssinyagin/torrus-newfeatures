@@ -52,6 +52,11 @@ Pops one value from stack and pushes the absolute value of it.
 
 Pushes the current time, in seconds since Epoch.
 
+=item * TOD
+
+Pushes the time-of-day value: the number of seconds since midnight in th
+ecurrent time zone.
+
 =item * MOD
 
 Equivalent of C<%>, the modulo operator. In Torrus parameter value,

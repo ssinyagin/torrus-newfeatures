@@ -57,6 +57,14 @@ Pushes the current time, in seconds since Epoch.
 Pushes the time-of-day value: the number of seconds since midnight in th
 ecurrent time zone.
 
+=item * WDAY
+
+Pushes the day of the week number (0=Sunday).
+
+=item * MOFRI
+
+Pushes 1 if today is Monday to Friday, or 0 otherwise.
+
 =item * MOD
 
 Equivalent of C<%>, the modulo operator. In Torrus parameter value,

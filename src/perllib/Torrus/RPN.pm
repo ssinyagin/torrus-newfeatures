@@ -38,6 +38,12 @@ my $get_tod = sub {
     return($sec + $min*60 + $hour*3600);
 };
 
+# returns day of week, 0=Sunday
+my $get_wday = sub {
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday) = localtime(time());
+    return($wday);
+}
+
 
 # Each RPN operator is defined by an array reference with the
 # following  elements: <number of args>, <subroutine>, <accepts undef>
@@ -73,6 +79,9 @@ my $operators = {
     'ABS' => [ 1, sub{ abs($_[0]); } ],
     'NOW' => [ 0, sub{ time(); } ],
     'TOD' => [ 0, $get_tod ],
+    'WDAY' => [ 0, $get_wday ],
+    'MOFRI' => [ 0, sub {my $d = &{$get_wday}();
+                         return(($d >=1 && $d <=5) ? 1:0);}],
     'DUP' => [ 1, sub{ ($_[0], $_[0]);}, 1 ],
     'EXC' => [ 2, sub{ ($_[1], $_[0]); }, 1 ],
     'NUM' => [ 1, sub{ defined($_[0]) ? $_[0] : 0; }, 1 ],

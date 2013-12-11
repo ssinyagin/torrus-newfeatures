@@ -3,7 +3,7 @@
      title="Non-empty tokensets"
      contentClass="SingleColumnContent" %]
 
-<H1>Non-empty tokensets</H1>
+<H1>Tokensets</H1>
 
 [% INCLUDE treename %]
 
@@ -13,9 +13,8 @@
 
      FOREACH tset = tsetList().sort;
        sz = tsetMembers(tset).size;
+       IF sz.length == 0; sz=0; END;
 
-       IF sz.length > 0 AND sz > 0;
-       
          counter = counter + 1;
 
          IF counter % 2 == 0;
@@ -30,7 +29,6 @@
       ([% sz %])
     </SPAN>
   </DIV>
-       [% END %]
      [% END %]
 </DIV>
 

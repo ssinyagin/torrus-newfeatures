@@ -1508,6 +1508,11 @@ time. Each escalation event is fired only once.
 
 Event of this type happens when the alarm condition stops.
 
+=item * C<clear_escalation>
+
+After the C<clear> event is fired, C<clear_escalation> is also fired for
+every escalation that was raised before it.
+
 =item * C<forget>
 
 Once the alarm is cleared, this event happens after the expiration

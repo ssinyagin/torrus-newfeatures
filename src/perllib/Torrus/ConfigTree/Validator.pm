@@ -739,7 +739,7 @@ sub validateMonitors
                 {
                     my $matched = 0;
                     foreach my $event ('set', 'repeat', 'escalate',
-                                       'clear', 'forget')
+                                       'clear', 'clear_escalation', 'forget')
                     {
                         if( $when eq $event )
                         {
@@ -748,16 +748,8 @@ sub validateMonitors
                     }
                     if( not $matched )
                     {
-                        if( $when eq 'throw' )
-                        {
-                            Error('Event type "throw" is no longer ' .
-                                  'supported. Replace with "set".');
-                        }
-                        else
-                        {
-                            Error("Invalid value in parameter launch-when " .
-                                  "in action $action: $when");
-                        }
+                        Error("Invalid value in parameter launch-when " .
+                              "in action $action: $when");
                         $ok = 0;
                     }
                 }

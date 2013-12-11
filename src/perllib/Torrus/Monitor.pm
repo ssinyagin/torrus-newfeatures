@@ -358,21 +358,28 @@ sub setAlarm
         }
         $obj->{'action_token'} = $action_token;
 
-        foreach my $esc_time (0, @fire_escalations)
+        $obj->{'event'} = $event;
+        $obj->{'escalation'} = 0;
+        $self->run_actions($config_tree, $obj );
+
+        if( $event eq 'repeat' )
         {
-            Debug("Escalation: $esc_time");
-            $obj->{'escalation'} = $esc_time;
-            $obj->{'event'} = ($esc_time > 0) ? 'escalate' : $event;
-                        
-            foreach my $aname
-                (split(',', $config_tree->getParam($mname, 'action')))
+            $obj->{'event'} = 'escalate';
+            foreach my $esc_time (@fire_escalations)
             {
-                &Torrus::DB::checkInterrupted();
-            
-                Debug("Running action: $aname");
-                my $method = 'run_event_' .
-                    $config_tree->getParam($aname, 'action-type');
-                $self->$method( $config_tree, $aname, $obj );
+                Debug("Escalation: $esc_time");
+                $obj->{'escalation'} = $esc_time;
+                $self->run_actions($config_tree, $obj );
+            }
+        }
+        elsif( $event eq 'clear' )
+        {
+            $obj->{'event'} = 'clear_escalation';
+            foreach my $esc_time (keys %escalation_state)
+            {
+                Debug("Clear escalation: $esc_time");
+                $obj->{'escalation'} = $esc_time;
+                $self->run_actions($config_tree, $obj );
             }
         }
 
@@ -387,6 +394,27 @@ sub setAlarm
         }
     }
     return;
+}
+
+
+sub run_actions
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $obj = shift;
+
+    my $mname = $obj->{'mname'};
+
+    foreach my $aname
+        (split(',', $config_tree->getParam($mname, 'action')))
+    {
+        &Torrus::DB::checkInterrupted();
+        
+        Debug("Running action: $aname");
+        my $method = 'run_event_' .
+            $config_tree->getParam($aname, 'action-type');
+        $self->$method( $config_tree, $aname, $obj );
+    }
 }
 
 

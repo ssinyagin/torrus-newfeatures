@@ -42,7 +42,7 @@ my $get_tod = sub {
 my $get_wday = sub {
     my ($sec,$min,$hour,$mday,$mon,$year,$wday) = localtime(time());
     return($wday);
-}
+};
 
 
 # Each RPN operator is defined by an array reference with the

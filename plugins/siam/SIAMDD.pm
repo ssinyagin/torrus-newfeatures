@@ -39,19 +39,33 @@ BEGIN
 use Torrus::SIAM;
 use Torrus::Log;
 use JSON;
+use threads;
+use Thread::Semaphore;
 
 my $siam;
+my $siamSemaphore = new Thread::Semaphore;
+
+if( not $Torrus::Global::threadsEnabled )
+{
+    Error('Torrus::DevDiscover::SIAMDD requires threads to be enabled');
+    exit(1);
+}
+
 
 $Torrus::DevDiscover::thread_start_callbacks{'SIAMDD'} =
     sub {
         if( defined($Torrus::SIAM::siam_config) and
             -f $Torrus::SIAM::siam_config )
         {
-            $siam = Torrus::SIAM->open();
-            if( not defined($siam) )
+            $siamSemaphore->down();
+            eval { $siam = Torrus::SIAM->open(); };
+
+            if( $@ or not defined($siam) )
             {
-                Error('Cannot initialize SIAM connection');
+                Error('Cannot initialize SIAM connection: ' . $@);
             }
+            
+            $siamSemaphore->up();
         }
         else
         {
@@ -64,7 +78,10 @@ $Torrus::DevDiscover::thread_end_callbacks{'SIAMDD'} =
     sub {
         if( defined($siam) )
         {
-            $siam->disconnect();
+            $siamSemaphore->down();
+            eval { $siam->disconnect(); };
+            $siamSemaphore->up();
+
             undef $siam;
         }
     };
@@ -81,13 +98,26 @@ $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
                 and
                 defined($hostParams->{'SIAM::device-inventory-id'}) )
             {
-                my $devobj = $siam->get_device
-                    ($hostParams->{'SIAM::device-inventory-id'});
-                if( defined($devobj) )
+                $siamSemaphore->down();
+
+                eval { 
+                    my $devobj = $siam->get_device
+                        ($hostParams->{'SIAM::device-inventory-id'});
+                    if( defined($devobj) )
+                    {
+                        $devobj->set_condition('torrus.imported',
+                                               '0;SNMP discovery failed');
+                    }
+                };                
+
+                if( $@ )
                 {
-                    $devobj->set_condition('torrus.imported',
-                                           '0;SNMP discovery failed');
+                    Error('Error updating SIAM: ' . $@);
                 }
+                
+                $siamSemaphore->up();
+
+                
             }
         }
     };
@@ -112,15 +142,22 @@ sub checkdevtype
 
     my $data = $devdetails->data();
     
-    if( defined($siam) and $devdetails->paramEnabled('SIAM::managed') )
+    if( $devdetails->paramEnabled('SIAM::managed') )
     {
+        if( not defined($siam) )
+        {
+            Error('Device has SIAM::managed enabled, ' .
+                  'but SIAM is not connected');
+            exit(1);
+        }
+        
         if( $devdetails->hasCap('nodeidReferenceManaged') )
         {
             Error('SIAMDD conflicts with ' .
                   $data->{'nodeidManagedBy'} . ' in nodeid management. ' .
                   'Modify the discovery instructions to enable only one ' .
                   'of the modules to manage nodeid.');
-            return 0;
+            exit(1);
         }
             
         $devdetails->setCap('nodeidReferenceManaged');
@@ -151,11 +188,20 @@ sub discover
         return 0;
     }
 
-    my $devobj = $siam->get_device($invid);
+    $siamSemaphore->down();
+
+    my $devobj = eval { $siam->get_device($invid) };
+    if( $@ )
+    {
+        Error('SIAM failure: ' . $@);
+        exit(1);
+    }
+    
     if( not defined($devobj) )
     {
         Error('Cannot find a device with siam.device.inventory_id="' .
               $invid . '" in SIAM database');
+        $siamSemaphore->up();
         return 0;
     }
 
@@ -193,12 +239,24 @@ sub discover
                 
         Debug('SIAMDD: Syncing ' . scalar(@{$devc_objects}) .
               ' device components');
-        $devobj->set_condition('siam.device.set_components',
-                               encode_json($devc_objects));
+        eval {
+            $devobj->set_condition('siam.device.set_components',
+                                   encode_json($devc_objects)) };
+        if( $@ )
+        {
+            Error('SIAM failure: ' . $@);
+            exit(1);
+        }
     }
 
     # Find the matches of device components against device interfaces
-    my $components = $devobj->get_components();
+    my $components = eval { $devobj->get_components() };
+    if( $@ )
+    {
+        Error('SIAM failure: ' . $@);
+        exit(1);
+    }
+
     foreach my $devc ( @{$components} )
     {
         next unless $devc->is_complete();
@@ -207,8 +265,14 @@ sub discover
         {
             Error('SIAM::DeviceComponent, id="' . $devc->id .
                   '" does not define torrus.nodeid');
-            $devc->set_condition('torrus.warning',
-                                 'Undefined torrus.nodeid');
+            eval { $devc->set_condition('torrus.warning',
+                                        'Undefined torrus.nodeid') };
+            if( $@ )
+            {
+                Error('SIAM failure: ' . $@);
+                exit(1);
+            }
+
             next;
         }
         
@@ -222,20 +286,36 @@ sub discover
             
             if( defined($registry{$entry}{'match_devc'}) )
             {
-                $matched =
-                    &{$registry{$entry}{'match_devc'}}($dd, $devdetails,
-                                                      $devc);
+                eval {
+                    $matched =
+                        &{$registry{$entry}{'match_devc'}}($dd, $devdetails,
+                                                           $devc)
+                };
+
+                if( $@ )
+                {
+                    Error('SIAM failure: ' . $@);
+                    exit(1);
+                }                
             }
         }
 
-        if( $matched )
+        eval {
+            if( $matched )
+            {
+                $devc->set_condition('torrus.imported', 1);
+            }
+            else
+            {
+                $devc->set_condition('torrus.imported',
+                                     '0;Could not match the component name');
+            }
+        };
+            
+        if( $@ )
         {
-            $devc->set_condition('torrus.imported', 1);
-        }
-        else
-        {
-            $devc->set_condition('torrus.imported',
-                                 '0;Could not match the component name');
+            Error('SIAM failure: ' . $@);
+            exit(1);
         }
     }
     
@@ -249,7 +329,14 @@ sub discover
         }
     }
     
-    $devobj->set_condition('torrus.imported', 1);
+    eval { $devobj->set_condition('torrus.imported', 1) };
+    if( $@ )
+    {
+        Error('SIAM failure: ' . $@);
+        exit(1);
+    }
+    
+    $siamSemaphore->up();
     
     return 1;
 }

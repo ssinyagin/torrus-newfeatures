@@ -54,7 +54,8 @@
 
    <template name="apc-pdu2-subtree">
     <param name="comment" value="Power, current, and voltage statistics" />
-
+    <param name="nodeid"  value="%nodeid-pdu%"/>
+                                 
     <param name="has-overview-shortcuts" value="yes"/>
     <param name="overview-shortcuts" value="all"/>
     <param name="overview-subleave-name-all" value="Power,Current"/>     

@@ -466,10 +466,12 @@ sub rrd_make_multigraph
                 my $max_dname = $dname . '_Max';
                 
                 my $p_maxlinestyle =
-                    $config_tree->getNodeParam($token, 'maxline-style-'.$dname);
+                    $config_tree->getNodeParam($token,
+                                               'maxline-style-'.$dname);
                 
                 my $p_maxlinecolor =
-                    $config_tree->getNodeParam($token, 'maxline-color-'.$dname);
+                    $config_tree->getNodeParam($token,
+                                               'maxline-color-'.$dname);
 
                 my $step =
                     $self->rrd_maxline_step( $config_tree, $view );

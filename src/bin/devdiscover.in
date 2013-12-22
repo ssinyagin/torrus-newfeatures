@@ -216,7 +216,7 @@ if( $workerThreads > 1 )
     require Thread::Queue;
     require Thread::Semaphore;
 
-    threads::shared::share( $everythingsOk );
+    threads::shared::share( \$everythingsOk );
 
     foreach my $callback
         (values %Torrus::DevDiscover::threading_init_callbacks)

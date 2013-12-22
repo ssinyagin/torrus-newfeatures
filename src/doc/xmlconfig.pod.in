@@ -595,6 +595,12 @@ See I<RPN expressions in Torrus> manual for more details.
 
 =back
 
+=item * C<graph-step>
+
+Optional. If defined, it specifies the minimum step in seconds that is
+used to draw the graph. This can be useful, for eample, if an average
+number of events per hour needs to be displayed.
+
 =item * C<rrd-hwpredict>
 
 Optional. If equals to C<enabled>, then this RRD datasource

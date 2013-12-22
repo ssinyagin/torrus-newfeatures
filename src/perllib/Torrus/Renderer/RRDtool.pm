@@ -1052,9 +1052,16 @@ sub rrd_make_def
     }
 
     my $def_options = '';
+    my $step = $config_tree->getNodeParam($token, 'graph-step');
+    
     if( defined($opts) and defined($opts->{'step'}) )
     {
-        $def_options .= ':step=' . $opts->{'step'};
+        $step = $opts->{'step'};
+    }
+
+    if( defined($step) )
+    {
+        $def_options .= ':step=' . $step;
     }
     
     return sprintf( 'DEF:%s=%s:%s:%s%s',
@@ -1081,6 +1088,12 @@ sub rrd_make_cdef
 
     my @args = ();
     my $ok = 1;
+
+    my $step = $config_tree->getNodeParam($token, 'graph-step');
+    if( defined($opts) and defined($opts->{'step'}) )
+    {
+        $step = $opts->{'step'};
+    }
     
     # We will name the DEFs as $dname.sprintf('%.2d', $ds_couter++);
     my $ds_couter = 1;
@@ -1120,9 +1133,9 @@ sub rrd_make_cdef
         }
         else
         {
-            if( defined($opts) and defined($opts->{'step'}) )
+            if( defined($step) )
             {
-                $defstring .= ':step=' . $opts->{'step'};
+                $defstring .= ':step=' . $step;
             }
             push( @args, $defstring );
         }

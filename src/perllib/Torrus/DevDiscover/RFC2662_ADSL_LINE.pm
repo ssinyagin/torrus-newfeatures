@@ -264,7 +264,7 @@ sub buildConfig
             my $arg = $adslIntf->{'selectorActions'}{'AtucInitsMonitor'};
             if( defined($arg) )
             {
-                $childParams->{'Atuc_Inits'}{'monitor'} = $arg;
+                $childParams->{'Atuc_Inits_Raw'}{'monitor'} = $arg;
             }
         }
         

@@ -499,8 +499,9 @@
   <!-- ******* ATUC Inits ******* -->
   
   <template name="adsl-perf-inits">  
-    <leaf name="Atuc_Inits">
+    <leaf name="Atuc_Inits_Raw">
       <param name="comment"            value="ATUC Init attepmts" />
+      <param name="hidden"             value="yes" />
       <param name="snmp-object"
              value="$adslAtucPerfCurr1DayInits.%ifindex-map%" />
       <param name="rrd-ds"             value="AtucInits" />
@@ -508,8 +509,22 @@
              value="%system-id%_%interface-nick%_adsl-perf.rrd" />
       <param name="rrd-create-dstype"  value="COUNTER" />
       <param name="rrd-create-max"    value="100"/>
+      <param name="monitor-action-target"  value="Atuc_Inits"/>
+      <param name="nodeid"        value="%nodeid-interface%//atuc//inits_raw"/>
+      <param name="graph-lower-limit"   value="0" />
+    </leaf>
+    
+    <leaf name="Atuc_Inits">
+      <param name="comment"            value="ATUC Init attepmts" />
+      <param name="ds-type"            value="rrd-file" />
+      <param name="leaf-type"          value="rrd-cdef" />
+      <param name="graph-step"         value="3600" />
+      <param name="vertical-label"      value="1/hour" />
+      <param name="graph-legend"  value="ATUC Init attepmts" />
+      <param name="rpn-expr"           value="{Atuc_Inits_Raw},3600,*" />
       <param name="nodeid"        value="%nodeid-interface%//atuc//inits"/>
       <param name="graph-lower-limit"   value="0" />
+      <param name="graph-upper-limit"   value="10" />
     </leaf>
   </template>
         

@@ -39,11 +39,9 @@ BEGIN
 use Torrus::SIAM;
 use Torrus::Log;
 use JSON;
-use threads;
-use Thread::Semaphore;
 
 my $siam;
-my $siamSemaphore = new Thread::Semaphore;
+my $siamSemaphore;
 
 if( not $Torrus::Global::threadsEnabled )
 {
@@ -52,14 +50,20 @@ if( not $Torrus::Global::threadsEnabled )
 }
 
 
+$Torrus::DevDiscover::threading_init_callbacks{'SIAMDD'} =
+    sub {
+        require Thread::Semaphore;
+        $siamSemaphore = new Thread::Semaphore;
+};
+
 $Torrus::DevDiscover::thread_start_callbacks{'SIAMDD'} =
     sub {
         if( defined($Torrus::SIAM::siam_config) and
             -f $Torrus::SIAM::siam_config )
-        {
+        {            
             $siamSemaphore->down();
             eval { $siam = Torrus::SIAM->open(); };
-
+            
             if( $@ or not defined($siam) )
             {
                 Error('Cannot initialize SIAM connection: ' . $@);
@@ -71,7 +75,7 @@ $Torrus::DevDiscover::thread_start_callbacks{'SIAMDD'} =
         {
             Error('Missing or invalid SIAM configuration file');
         }
-    };
+};
 
 
 $Torrus::DevDiscover::thread_end_callbacks{'SIAMDD'} =
@@ -84,7 +88,7 @@ $Torrus::DevDiscover::thread_end_callbacks{'SIAMDD'} =
 
             undef $siam;
         }
-    };
+};
 
 
 $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
@@ -120,7 +124,7 @@ $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
                 
             }
         }
-    };
+};
 
 
 
@@ -132,7 +136,7 @@ $Torrus::DevDiscover::registry{'SIAMDD'} = {
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig
-    };
+};
 
 
 sub checkdevtype
@@ -159,7 +163,7 @@ sub checkdevtype
                   'of the modules to manage nodeid.');
             exit(1);
         }
-            
+        
         $devdetails->setCap('nodeidReferenceManaged');
         $data->{'nodeidManagedBy'} = 'SIAMDD';
         
@@ -181,7 +185,7 @@ sub discover
         Error('Undefined parameter: SIAM::device-inventory-id');
         return 0;
     }
-       
+    
     if( not defined($siam) )
     {
         Error('SIAM is not connected');
@@ -232,11 +236,11 @@ sub discover
             {
                 my $r =
                     &{$registry{$entry}{'list_dev_components'}}($dd,
-                                                               $devdetails);
+                                                                $devdetails);
                 push(@{$devc_objects}, @{$r});
             }
         }
-                
+        
         Debug('SIAMDD: Syncing ' . scalar(@{$devc_objects}) .
               ' device components');
         eval {
@@ -311,7 +315,7 @@ sub discover
                                      '0;Could not match the component name');
             }
         };
-            
+        
         if( $@ )
         {
             Error('SIAM failure: ' . $@);

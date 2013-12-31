@@ -167,6 +167,7 @@ our %osTranslate =
      29 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, }, # nt52X64  Windows 2003 x64 (AMD64 or EMT64)
      30 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
      31 => { 'name' => 'linuxIntel',   'ident' => 'unix', 'template' => 1, }, # nt52IA64 Windows 2003 Itanium
+     33 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, }, # nt50Intel Windows 2008 32bit
      35 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
      );
 
@@ -260,20 +261,23 @@ sub checkdevtype
 
     if( $session->error_status() == 0 )
     {
+        my $sysType = $empireOsType->{$dd->oiddef('empireSystemType')};
 
-        $devdetails->setCap('EmpireSystemedge::' . $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{ident} );
-        $devdetails->{'os_ident'} = $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{ident};
+        if( not defined($osTranslate{$sysType}) )
+        {
+            Warn('Unknown value in empireSystemType: ' . $sysType);
+            return 0;
+        }
 
-        $devdetails->setCap('EmpireSystemedge::' . $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{name} );
-        $devdetails->{'os_name'} = $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{name};
+        my $tr = $osTranslate{$sysType};
+        
+        $devdetails->setCap('EmpireSystemedge::' . $tr->{ident} );
+        $devdetails->{'os_ident'} = $tr->{ident};
 
-        $devdetails->{'os_name_template'} = $osTranslate{
-            $empireOsType->{$dd->oiddef('empireSystemType')} }{template};
+        $devdetails->setCap('EmpireSystemedge::' . $tr->{name} );
+        $devdetails->{'os_name'} = $tr->{name};
 
+        $devdetails->{'os_name_template'} = $tr->{template};
     }
 
     # Exclude Virtual Interfaces on Solaris
@@ -524,7 +528,7 @@ sub discover
             my $svcType = 3;
             my $svcTotRespTime = 12;
 
-            $devdetails->setCap('EmpireSystemedge::ServiceResponse');
+            my $found = 0;
             $data->{'empireSvcStats'} = {};
             $data->{'empireSvcStats'}{'indices'} = [];
 
@@ -533,6 +537,8 @@ sub discover
                 push(@{$data->{'empireSvcStats'}{'indices'}}, $index);
 
                 if($table->{$svcType . '.' . $index} eq "4") {
+                    $found = 1;
+                   
                     $data->{'empireSvcStats'}{$index}{'param'}{'INDEX'} = $index;
                     $data->{'empireSvcStats'}{$index}{'param'}{'id'} = 'Responder_' . $index;
                     $data->{'empireSvcStats'}{$index}{'param'}{'descr'} = $table->{$svcDescr . '.' . $index};
@@ -548,7 +554,11 @@ sub discover
                         $data->{'empireSvcStats'}{$index}{'param'}{'name'} = $data->{'param'}->{'snmp-host'};
                     }
                 }
-            } 
+            }
+
+            if( $found ) {
+                $devdetails->setCap('EmpireSystemedge::ServiceResponse');
+            }                
         }
     }
 

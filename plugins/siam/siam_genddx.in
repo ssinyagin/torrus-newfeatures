@@ -198,7 +198,7 @@ foreach my $tree ( sort keys %bundles )
 
         $params->{'snmp-host'} = $host;
 
-        foreach my $p ('version', 'community', 'timeout', 'retries')
+        foreach my $p ('port', 'version', 'community', 'timeout', 'retries')
         {
             my $v = $device->attr('snmp.' . $p);
             if( defined($v) )

@@ -61,7 +61,7 @@ $Torrus::DevDiscover::thread_start_callbacks{'SIAMDD'} =
         if( defined($Torrus::SIAM::siam_config) and
             -f $Torrus::SIAM::siam_config )
         {            
-            $siamSemaphore->down();
+            defined($siamSemaphore) and $siamSemaphore->down();
             eval { $siam = Torrus::SIAM->open(); };
             
             if( $@ or not defined($siam) )
@@ -69,7 +69,7 @@ $Torrus::DevDiscover::thread_start_callbacks{'SIAMDD'} =
                 Error('Cannot initialize SIAM connection: ' . $@);
             }
             
-            $siamSemaphore->up();
+            defined($siamSemaphore) and $siamSemaphore->up();
         }
         else
         {
@@ -82,9 +82,9 @@ $Torrus::DevDiscover::thread_end_callbacks{'SIAMDD'} =
     sub {
         if( defined($siam) )
         {
-            $siamSemaphore->down();
+            defined($siamSemaphore) and $siamSemaphore->down();
             eval { $siam->disconnect(); };
-            $siamSemaphore->up();
+            defined($siamSemaphore) and $siamSemaphore->up();
 
             undef $siam;
         }
@@ -102,7 +102,7 @@ $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
                 and
                 defined($hostParams->{'SIAM::device-inventory-id'}) )
             {
-                $siamSemaphore->down();
+                defined($siamSemaphore) and $siamSemaphore->down();
 
                 eval { 
                     my $devobj = $siam->get_device
@@ -119,7 +119,7 @@ $Torrus::DevDiscover::discovery_failed_callbacks{'SIAMDD'} =
                     Error('Error updating SIAM: ' . $@);
                 }
                 
-                $siamSemaphore->up();
+                defined($siamSemaphore) and $siamSemaphore->up();
 
                 
             }
@@ -192,7 +192,7 @@ sub discover
         return 0;
     }
 
-    $siamSemaphore->down();
+    defined($siamSemaphore) and $siamSemaphore->down();
 
     my $devobj = eval { $siam->get_device($invid) };
     if( $@ )
@@ -205,7 +205,7 @@ sub discover
     {
         Error('Cannot find a device with siam.device.inventory_id="' .
               $invid . '" in SIAM database');
-        $siamSemaphore->up();
+        defined($siamSemaphore) and $siamSemaphore->up();
         return 0;
     }
 
@@ -340,7 +340,7 @@ sub discover
         exit(1);
     }
     
-    $siamSemaphore->up();
+    defined($siamSemaphore) and $siamSemaphore->up();
     
     return 1;
 }

@@ -96,6 +96,7 @@ our @copyParams =
       'snmp-community',
       'snmp-version',
       'snmp-username',
+      'snmp-contextname',
       'snmp-authkey',
       'snmp-authpassword',
       'snmp-authprotocol',
@@ -223,8 +224,9 @@ sub discover
     }
     elsif( $version eq '3' )        
     {
-        foreach my $arg ( qw(-username -authkey -authpassword -authprotocol
-                             -privkey -privpassword -privprotocol) )
+        foreach my $arg ( qw(-username -contextname -authkey -authpassword
+                             -authprotocol -privkey
+                             -privpassword -privprotocol) )
         {
             if( defined $devdetails->param( 'snmp' . $arg ) )
             {

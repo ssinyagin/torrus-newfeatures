@@ -37,6 +37,7 @@ my %validatorLeafParams =
                                '2c' => { 'snmp-community'     => undef },
                                '3'  => {
                                    'snmp-username' => undef,
+                                   '+snmp-contextname' => undef,
                                    '+snmp-authkey' => undef,
                                    '+snmp-authpassword' => undef,
                                    '+snmp-authprotocol' => {

@@ -786,6 +786,10 @@ C<1> or C<2c>. Specifies the SNMP community for the given device.
 
 Mandatory when C<collector-type=snmp> and SNMP version is C<3>.
 
+=item * C<snmp-contextname>
+
+Optional SNMP context name for SNMPv3.
+
 =item * C<snmp-authkey>
 
 Optional authentication key for SNMPv3. If not defined, the authentication

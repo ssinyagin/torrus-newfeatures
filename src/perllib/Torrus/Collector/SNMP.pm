@@ -50,6 +50,7 @@ $Torrus::Collector::params{'snmp'} = {
     'snmp-port'         => undef,
     'snmp-community'    => undef,
     'snmp-username'     => undef,
+    'snmp-contextname'  => undef,
     'snmp-authkey'      => undef,
     'snmp-authpassword' => undef,
     'snmp-authprotocol' => 'md5',
@@ -347,7 +348,7 @@ sub snmpSessionArgs
     {
         push( @{$ret}, -username, $community);
 
-        foreach my $arg ( qw(-authkey -authpassword -authprotocol
+        foreach my $arg ( qw(-contextname -authkey -authpassword -authprotocol
                              -privkey -privpassword -privprotocol) )
         {
             my $val = $collector->param($token, 'snmp' . $arg);            

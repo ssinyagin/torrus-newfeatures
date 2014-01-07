@@ -280,7 +280,8 @@ corresponding C<output-file>.
 
 =item * C<snmp-ipversion>, C<snmp-transport>, C<snmp-port>,
         C<snmp-community>,  C<snmp-version>, C<snmp-timeout>,
-        C<snmp-retries>, C<snmp-host>, C<snmp-username>, C<snmp-authkey>,
+        C<snmp-retries>, C<snmp-host>, C<snmp-username>, C<snmp-contextname>,
+        C<snmp-authkey>,
         C<snmp-authpassword>, C<snmp-authprotocol>, C<snmp-privkey>,
         C<snmp-privpassword>, C<snmp-privprotocol>
 

@@ -493,6 +493,8 @@ sub buildConfig
                 $param->{'precedence'} =
                     sprintf("%d", 1000 -
                             $pool->{'phyIndex'} * 100 - $pool->{'poolIndex'});
+
+                $param->{'entity-phy-name'} = $pool->{'phyName'};
                 
                 $cb->addSubtree( $subtreeNode, $poolSubtreeName, $param,
                                  [ 'CiscoGeneric::cisco-enh-mempool' ]);
@@ -551,11 +553,14 @@ sub buildConfig
             {
                 $param->{'cisco-cpu-indexmap'} = $INDEX;
                 $param->{'cisco-cpu-ref'} = $INDEX;
+                $param->{'entity-phy-name'} =
+                    $cpu->{'phy-name'} . ' (' . $INDEX . ')';
             }
             else
             {
                 $param->{'entity-phy-index'} = $cpu->{'phy-index'};
                 $param->{'cisco-cpu-ref'} = '%entity-phy-index%';
+                $param->{'entity-phy-name'} = $cpu->{'phy-name'};
             }
             
             my @templates;

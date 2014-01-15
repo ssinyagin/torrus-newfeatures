@@ -207,7 +207,7 @@ foreach my $tree ( sort keys %bundles )
             }
         }
 
-        my $subtree = $device->attr('torrus.subtree-path');
+        my $subtree = $device->attr('torrus.subtree_path');
         if( defined($subtree) )
         {
             $params->{'host-subtree'} = $subtree;

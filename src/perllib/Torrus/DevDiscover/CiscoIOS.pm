@@ -165,20 +165,39 @@ sub checkdevtype
         return 0;
     }
 
-    my $session = $dd->session();
-    if( not $dd->checkSnmpTable('ciscoImageTable') )
+    # first, try to find IOS or IOS XR in sysDescr
+    my $sysDescr = $devdetails->snmpVar($dd->oiddef('sysDescr'));
+    my $found = 0;
+    if( defined($sysDescr) and
+        index( $sysDescr, 'Cisco IOS Software' ) >= 0 )
     {
-        if( $dd->checkSnmpTable('ceImageTable') )
+        $found = 1;
+    }
+    elsif( defined($sysDescr) and
+           index( $sysDescr, 'Cisco IOS XR Software' ) >= 0 )
+    {
+        $found = 1;
+        $devdetails->setCap('CiscoIOSXR');
+    }
+    else
+    {
+        # fall back to software image table
+        if( $dd->checkSnmpTable('ciscoImageTable') )
         {
-            # IOS XR has a new MIB for software image management
-            $devdetails->setCap('CiscoIOSXR');            
+            $found = 1;
         }
-        else
+        elsif( $dd->checkSnmpTable('ceImageTable') )
         {
-            return 0;
+            $found = 1;
+            $devdetails->setCap('CiscoIOSXR');
         }
     }
 
+    if( not $found )
+    {
+        return 0;
+    }
+    
     # On some Layer3 switching devices, VlanXXX interfaces give some
     # useful stats, while on others the stats are not relevant at all
     

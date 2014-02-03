@@ -554,7 +554,7 @@ sub buildConfig
 
         
         foreach my $opIndex
-            ( sort {$a <=> $b} keys %{$data->{'jnxOperating'}} )
+            ( sort {$a cmp $b} keys %{$data->{'jnxOperating'}} )
         {
             my $operating = $data->{'jnxOperating'}{$opIndex};
             my $jnxCPU    = $operating->{'cpu'};

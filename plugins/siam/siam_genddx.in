@@ -213,6 +213,24 @@ foreach my $tree ( sort keys %bundles )
             $params->{'host-subtree'} = $subtree;
         }
 
+        my $template = $device->attr('torrus.device_template');
+        if( defined($template) )
+        {
+            my $t = $Torrus::SIAM::ddx_device_templates{$template};
+            if( not defined($t) )
+            {
+                Error("Device $name specifies the template $template in " .
+                      "torrus.device_template attribute, but this " .
+                      "template is undefined");
+                exit(1);
+            }
+
+            foreach my $p (keys %{$t})
+            {
+                $params->{$p} = $t->{$p};
+            }
+        }
+            
         my $hostNode = $doc->createElement('host');
         $root->appendChild( $hostNode );
 

@@ -34,6 +34,10 @@ $Torrus::SIAM::ddx_defaults = {
 };
 
 
+# sets of device parameters triggered by torrus.device_template
+# device attribute. The templates should be defined in siam-siteconfig.pl
+%Torrus::SIAM::ddx_device_templates = ();
+
 ####   Traffic aggregation graphs
 
 # Default location for aggregation XML files

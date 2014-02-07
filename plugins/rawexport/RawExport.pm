@@ -216,6 +216,9 @@ sub storeData
                         next;
                     }
 
+                    # make sure we always work with BigInt objects
+                    $value = Math::BigInt->new($value);
+                    
                     my $increment;
                     my $prevTimestamp;
                     

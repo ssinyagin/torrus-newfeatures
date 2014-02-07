@@ -168,7 +168,7 @@ our %osTranslate =
      30 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
      31 => { 'name' => 'linuxIntel',   'ident' => 'unix', 'template' => 1, }, # nt52IA64 Windows 2003 Itanium
      33 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, }, # nt50Intel Windows 2008 32bit
-     35 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, },
+     35 => { 'name' => 'nt50Intel',    'ident' => 'nt',   'template' => 1, }, # nt50Intel Windows 2008 R2 64bit or Windows 2012 
      );
 
 # Solaris Virtual Interface Filtering

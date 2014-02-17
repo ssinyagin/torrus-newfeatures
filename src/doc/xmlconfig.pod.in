@@ -329,6 +329,11 @@ which are defined with the property "expand".
 
 =over 4
 
+=item * C<tree-name>
+
+This parameter is automatically added to the root element of the tree
+and defines the tree name.
+
 =item * C<ds-type>
 
 Mandatory parameter for every datasource leaf. Currently, the following values

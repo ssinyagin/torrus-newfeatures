@@ -1,3 +1,8 @@
+2014-02-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/ConfigTree/Writer.pm (initRoot): new parameter:
+	tree-name automatically inserted to the top of the tree
+
 2013-04-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Release 2.07

@@ -156,6 +156,7 @@ sub initRoot
         $self->{'db_dsconfig'}->put( 'tp:'.$token, '/' );
         $self->{'db_dsconfig'}->put( 'n:'.$token, 0 );
         $self->{'nodetype_cache'}{$token} = 0;
+        $self->setNodeParam($token, 'tree-name', $self->treeName());
     }
     return;
 }

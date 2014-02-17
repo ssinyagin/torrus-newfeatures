@@ -355,7 +355,8 @@ sub discover
                         $interface->{'ifType'} == $filter->{'ifType'} )
                     {
                         if( not defined( $filter->{'ifDescr'} ) or
-                            $interface->{'ifDescr'} =~ $filter->{'ifDescr'} )
+                            (defined($interface->{'ifDescr'}) and 
+                             $interface->{'ifDescr'} =~ $filter->{'ifDescr'}) )
                         {
                             $match = 1;
                         }

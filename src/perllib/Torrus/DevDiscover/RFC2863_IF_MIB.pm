@@ -524,6 +524,21 @@ sub buildConfig
     {
         my $interface = $data->{'interfaces'}{$ifIndex};
 
+        # an interface may be excluded from IF-MIB statistics, but
+        # still use nodeid for other stats
+        
+        if( not defined( $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} ) )
+        {
+            $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
+                'if//%nodeid-device%//';
+        }
+        
+        if( not defined( $interface->{$data->{'nameref'}{'ifNodeid'}} ) )
+        {
+            $interface->{$data->{'nameref'}{'ifNodeid'}} =
+                $interface->{$data->{'nameref'}{'ifReferenceName'}};
+        }
+
         next if $interface->{'excluded'};
         $nInterfaces++;
 
@@ -545,18 +560,6 @@ sub buildConfig
         {
             $interface->{'param'}{'interface-vendor-specific'} =
                 $interface->{$data->{'nameref'}{'ifVendorSpecific'}};
-        }
-
-        if( not defined( $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} ) )
-        {
-            $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} =
-                'if//%nodeid-device%//';
-        }
-        
-        if( not defined( $interface->{$data->{'nameref'}{'ifNodeid'}} ) )
-        {
-            $interface->{$data->{'nameref'}{'ifNodeid'}} =
-                $interface->{$data->{'nameref'}{'ifReferenceName'}};
         }
 
         # A per-interface value which is used by leafs in IF-MIB templates

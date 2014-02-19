@@ -28,6 +28,14 @@ use IO::File;
 
 use Torrus::Log;
 
+
+# TMPLNAME => {name => NAME, source => XMLFILE}
+our %templateRegistry;
+
+# SEQUENCE => {TMPLNAME => {name => NAME, source => XMLFILE}}
+our %pluginTemplateRegistry;
+
+
 sub new
 {
     my $self = {};
@@ -80,16 +88,28 @@ sub lookupRegistry
             $ret = $regOverlay->{$template};
         }
     }
-    
-    if( not defined( $ret ) and
-        defined( $Torrus::ConfigBuilder::templateRegistry{$template} ) )
+
+    if( not defined($ret) )
     {
-        $ret = $Torrus::ConfigBuilder::templateRegistry{$template};
+        foreach my $sequence (sort {$a <=> $b} keys %pluginTemplateRegistry)
+        {
+            if( defined( $pluginTemplateRegistry{$sequence}{$template} ) )
+            {
+                $ret = $pluginTemplateRegistry{$sequence}{$template};
+                last;
+            }
+        }
+    }
+        
+    if( not defined($ret) and
+        defined( $templateRegistry{$template} ) )
+    {
+        $ret = $templateRegistry{$template};
     }
     
-    if( not defined( $ret ) )
+    if( not defined($ret) )
     {
-        if( scalar(keys %Torrus::ConfigBuilder::templateRegistry) > 0 )
+        if( scalar(keys %templateRegistry) > 0 )
         {
             Warn('Template ' . $template .
                  ' is not listed in ConfigBuilder template registry');

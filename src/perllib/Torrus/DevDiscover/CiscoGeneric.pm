@@ -48,6 +48,7 @@ our %oiddef =
 
      # CISCO-ENHANCED-MEMPOOL-MIB
      'cempMemPoolName'                   => '1.3.6.1.4.1.9.9.221.1.1.1.1.3',
+     'cempMemPoolHCUsed'                 => '1.3.6.1.4.1.9.9.221.1.1.1.1.18',
      
      # CISCO-MEMORY-POOL-MIB
      'ciscoMemoryPoolName'               => '1.3.6.1.4.1.9.9.48.1.1.1.2',
@@ -152,26 +153,21 @@ sub discover
     
     if( $devdetails->paramDisabled('CiscoGeneric::disable-memory-pools') )
     {
-        my $eMemPool =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('cempMemPoolName') );
-        
-        if( defined($eMemPool) and scalar(keys %{$eMemPool}) > 0 and
+        my $eMemPool = $dd->walkSnmpTable('cempMemPoolName');
+        my $eMemHC = $dd->walkSnmpTable('cempMemPoolHCUsed');
+               
+        if( scalar(keys %{$eMemPool}) > 0 and
             $devdetails->isDevType('RFC2737_ENTITY_MIB') )
         {
-            $devdetails->storeSnmpVars( $eMemPool );
             $devdetails->setCap('cempMemPool');
             $data->{'cempMemPool'} = {};
 
-            foreach my $INDEX
-                ( $devdetails->
-                  getSnmpIndices($dd->oiddef('cempMemPoolName') ) )
+            foreach my $INDEX (keys %{$eMemPool})
             {
                 # $INDEX is a pair entPhysicalIndex . cempMemPoolIndex
                 my ( $phyIndex, $poolIndex ) = split('\.', $INDEX);
 
-                my $poolName = $devdetails->
-                    snmpVar($dd->oiddef('cempMemPoolName') . '.' . $INDEX );
+                my $poolName = $eMemPool->{$INDEX};
 
                 $poolName = 'Processor' unless $poolName;
                 
@@ -189,6 +185,11 @@ sub discover
                     'phyDescr' => $phyDescr,
                     'phyName'  => $phyName
                     };
+
+                if( defined($eMemHC->{$INDEX}) )
+                {
+                    $data->{'cempMemPool'}{$INDEX}{'hc'} = 1;
+                }
             }
         }
         else
@@ -495,9 +496,15 @@ sub buildConfig
                             $pool->{'phyIndex'} * 100 - $pool->{'poolIndex'});
 
                 $param->{'entity-phy-name'} = $pool->{'phyName'};
+
+                my $template = 'CiscoGeneric::cisco-enh-mempool';
+                if( $pool->{'hc'} )
+                {
+                    $template = 'CiscoGeneric::cisco-enh-mempool-hc';
+                }
                 
                 $cb->addSubtree( $subtreeNode, $poolSubtreeName, $param,
-                                 [ 'CiscoGeneric::cisco-enh-mempool' ]);
+                                 [ $template ]);
             }
         }
         else

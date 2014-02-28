@@ -45,6 +45,9 @@
   <def name="cempMemPoolUsed"        value="1.3.6.1.4.1.9.9.221.1.1.1.1.7" />
   <def name="cempMemPoolFree"        value="1.3.6.1.4.1.9.9.221.1.1.1.1.8" />
   <def name="cempMemPoolLargestFree" value="1.3.6.1.4.1.9.9.221.1.1.1.1.9" />
+  <def name="cempMemPoolHCUsed"      value="1.3.6.1.4.1.9.9.221.1.1.1.1.18" />
+  <def name="cempMemPoolHCFree"      value="1.3.6.1.4.1.9.9.221.1.1.1.1.20" />
+  <def name="cempMemPoolHCLargestFree" value="1.3.6.1.4.1.9.9.221.1.1.1.1.22"/>
   
   <!-- CISCO-MEMORY-POOL-MIB:ciscoMemoryPoolTable -->
   <def name="ciscoMemoryPoolUsed"        value="1.3.6.1.4.1.9.9.48.1.1.1.5" />
@@ -123,6 +126,49 @@
     <leaf name="LargestFree">
       <param name="snmp-object"
              value="$cempMemPoolLargestFree.%mempool-index%"/>
+      <param name="rrd-ds"       value="Pool%mempool-poolindex%LargestFree"/>
+      <param name="graph-legend" value="%mempool-name% largest free block" />
+      <param name="comment" value="Largest free block in %mempool-name% pool"/>
+    </leaf>
+  </template>
+
+  <template name="cisco-enh-mempool-hc">
+    <param name="data-file"
+             value="%system-id%_memusage_%mempool-phyindex%.rrd"/>
+    <leaf name="Usage">
+      <param name="precedence" value="1000"/>
+      <param name="comment" value="Total vs. Used Memory"/>
+      <param name="title"   value="%mempool-name% Memory Usage"/>
+      <param name="ds-type" value="rrd-multigraph"/>
+      <param name="ds-names" value="total,used"/>
+      <!-- total -->
+      <param name="ds-expr-total" value="{Free},{Used},+"/>
+      <param name="graph-legend-total" value="Total"/>
+      <param name="line-style-total" value="##totalresource"/>
+      <param name="line-color-total" value="##totalresource"/>
+      <param name="line-order-total" value="1"/>
+      <!-- used -->
+      <param name="ds-expr-used" value="{Used}"/>
+      <param name="graph-legend-used" value="Used"/>
+      <param name="line-style-used" value="##resourceusage"/>
+      <param name="line-color-used" value="##resourceusage"/>
+      <param name="line-order-used" value="2"/>
+    </leaf>
+    <leaf name="Free">
+      <param name="snmp-object"  value="$cempMemPoolHCFree.%mempool-index%"/>
+      <param name="rrd-ds"       value="Pool%mempool-poolindex%Free"/>
+      <param name="graph-legend" value="%mempool-name% memory free" />
+      <param name="comment"      value="Bytes Free in %mempool-name% pool"/>
+    </leaf>
+    <leaf name="Used">
+      <param name="snmp-object"  value="$cempMemPoolHCUsed.%mempool-index%"/>
+      <param name="rrd-ds"       value="Pool%mempool-poolindex%Used"/>
+      <param name="graph-legend" value="%mempool-name% memory free" />
+      <param name="comment"      value="Bytes Used in %mempool-name%"/>
+    </leaf>
+    <leaf name="LargestFree">
+      <param name="snmp-object"
+             value="$cempMemPoolHCLargestFree.%mempool-index%"/>
       <param name="rrd-ds"       value="Pool%mempool-poolindex%LargestFree"/>
       <param name="graph-legend" value="%mempool-name% largest free block" />
       <param name="comment" value="Largest free block in %mempool-name% pool"/>

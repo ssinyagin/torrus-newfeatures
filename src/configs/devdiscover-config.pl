@@ -660,6 +660,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-enh-mempool',
          'source' => 'vendor/cisco.generic.xml'
          },
+     'CiscoGeneric::cisco-enh-mempool-hc' => {
+         'name'   => 'cisco-enh-mempool-hc',
+         'source' => 'vendor/cisco.generic.xml'
+         },
      'CiscoGeneric::cisco-memusage-subtree' => {
          'name'   => 'cisco-memusage-subtree',
          'source' => 'vendor/cisco.generic.xml'

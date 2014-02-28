@@ -54,10 +54,8 @@ our %oiddef =
      'ciscoMemoryPoolName'               => '1.3.6.1.4.1.9.9.48.1.1.1.2',
 
      # CISCO-PROCESS-MIB
-     'cpmCPUTotalTable'                  => '1.3.6.1.4.1.9.9.109.1.1.1.1',
      'cpmCPUTotalPhysicalIndex'          => '1.3.6.1.4.1.9.9.109.1.1.1.1.2',
      'cpmCPUTotal1minRev'                => '1.3.6.1.4.1.9.9.109.1.1.1.1.7',
-     'cpmCPUTotal1min'                   => '1.3.6.1.4.1.9.9.109.1.1.1.1.4',
 
      # OLD-CISCO-CPU-MIB
      'avgBusy1'                          => '1.3.6.1.4.1.9.2.1.57.0'
@@ -194,32 +192,23 @@ sub discover
         }
         else
         {
-            my $MemoryPool =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('ciscoMemoryPoolName') );
+            my $MemoryPool = $dd->walkSnmpTable('ciscoMemoryPoolName');
 
-            if( defined($MemoryPool) and scalar(keys %{$MemoryPool}) > 0 )
+            if( scalar(keys %{$MemoryPool}) > 0 )
             {
-                $devdetails->storeSnmpVars( $MemoryPool );
                 $devdetails->setCap('ciscoMemoryPool');
                 
                 $data->{'ciscoMemoryPool'} = {};
                 
-                foreach my $memType
-                    ( $devdetails->
-                      getSnmpIndices($dd->oiddef('ciscoMemoryPoolName')) )
+                foreach my $memType (keys %{$MemoryPool})
                 {
                     # According to CISCO-MEMORY-POOL-MIB, only types 1 to 5
                     # are static, and the rest are dynamic
                     # (of which none ever seen)
                     if( $memType <= 5 )
                     {
-                        my $name =
-                            $devdetails->
-                            snmpVar($dd->oiddef('ciscoMemoryPoolName') .
-                                    '.' . $memType );
-
-                        $data->{'ciscoMemoryPool'}{$memType} = $name;
+                        $data->{'ciscoMemoryPool'}{$memType} =
+                            $MemoryPool->{$memType};
                     }
                 }
             }
@@ -228,37 +217,30 @@ sub discover
 
     if( $devdetails->paramDisabled('CiscoGeneric::disable-cpu-stats') )
     {
-        my $ciscoCpuStats =
-            $session->get_table( -baseoid => $dd->oiddef('cpmCPUTotalTable') );
-
-        if( defined $ciscoCpuStats )
+        my $cpmCPUTotalPhysicalIndex =
+            $dd->walkSnmpTable('cpmCPUTotalPhysicalIndex');
+        my $cpmCPUTotal1minRev =
+            $dd->walkSnmpTable('cpmCPUTotal1minRev');
+        
+        if( scalar(keys %{$cpmCPUTotalPhysicalIndex}) > 0 )
         {
             $devdetails->setCap('ciscoCpuStats');
-            $devdetails->storeSnmpVars( $ciscoCpuStats );
 
             $data->{'ciscoCpuStats'} = {};
 
             # Find multiple CPU entries pointing to the same Phy index
             my %phyReferers = ();            
-            foreach my $INDEX
-                ( $devdetails->
-                  getSnmpIndices($dd->oiddef('cpmCPUTotalPhysicalIndex') ) )
+            foreach my $INDEX (keys %{$cpmCPUTotalPhysicalIndex})
             {
-                my $phyIndex = $devdetails->
-                    snmpVar($dd->oiddef('cpmCPUTotalPhysicalIndex') .
-                            '.' . $INDEX );
+                my $phyIndex = $cpmCPUTotalPhysicalIndex->{$INDEX};
                 $phyReferers{$phyIndex}++;
             }
                 
-            foreach my $INDEX
-                ( $devdetails->
-                  getSnmpIndices($dd->oiddef('cpmCPUTotalPhysicalIndex') ) )
+            foreach my $INDEX (keys %{$cpmCPUTotalPhysicalIndex})
             {
                 $data->{'ciscoCpuStats'}{$INDEX} = {};
 
-                my $phyIndex = $devdetails->
-                    snmpVar($dd->oiddef('cpmCPUTotalPhysicalIndex') .
-                            '.' . $INDEX );
+                my $phyIndex = $cpmCPUTotalPhysicalIndex->{$INDEX};
                 
                 my $phyDescr;
                 my $phyName;
@@ -291,8 +273,7 @@ sub discover
                     'phy-referers' => $phyReferers{$phyIndex},
                     'cpu-nick'   => $cpuNick };
                 
-                if( $devdetails->hasOID( $dd->oiddef('cpmCPUTotal1minRev') .
-                                         '.' .  $INDEX ) )
+                if( defined($cpmCPUTotal1minRev->{$INDEX}) )
                 {
                     $data->{'ciscoCpuStats'}{$INDEX}{'stats-type'} = 'revised';
                 }

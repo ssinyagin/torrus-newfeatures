@@ -88,7 +88,7 @@ Mandatory, the directory where the raw export files are stored.
 Mandatory, the export file name. It can contain any strftime(3) conversion
 characters, but the percent sign (C<%>) should be replaced with hash
 sign (C<#>). Also C<^X^> defines a period of X seconds, and this string is
-replaced with the number of seconds from today's start of the day in GMT time
+replaced with the number of seconds from today's start of the day in local time
 zone, rounded to the specified period. For examnple, C<^600^> defines a period
 of 10 minutes, and this will cause a new file to be created every 10 minutes.
 

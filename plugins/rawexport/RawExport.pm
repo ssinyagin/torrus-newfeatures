@@ -27,7 +27,7 @@ use Thread::Queue;
 use Date::Format;
 use Math::BigInt;
 use Math::BigFloat;
-
+use IO::File;
 
 use Torrus::Log;
 
@@ -310,7 +310,19 @@ sub rawUpdateThread
 
         my $fname = time2str( $filejob->{'filename'}, time() );
 
-        if( not open(RAWOUT, '>> ' . $fname) )
+        while( $fname =~ /\^(\d+)\^/ )
+        {
+            my $stepsize = $1;
+            my $curr_seconds = time() % 86400;
+            my $curr_step =
+                sprintf('%.5d',
+                        $curr_seconds - ($curr_seconds % $stepsize));
+            $fname =~ s/\^(\d+)\^/$curr_step/;
+        }
+        
+        my $rawout = IO::File->new('>> ' . $fname);
+
+        if( not $rawout )
         {
             Error('Cannot open ' . $fname . ' for writing: ' . $!);
             next;
@@ -321,16 +333,16 @@ sub rawUpdateThread
 
         foreach my $rowentry ( @{$filejob->{'values'}} )
         {
-            print RAWOUT ( join( $separator,
-                                 time2str( $ts_format, $rowentry->{'time'} ),
-                                 $rowentry->{'rowid'},
-                                 $rowentry->{'value'} ),
-                           "\n");
-
+            $rawout->print( join( $separator,
+                                  time2str( $ts_format, $rowentry->{'time'} ),
+                                  $rowentry->{'rowid'},
+                                  $rowentry->{'value'} ),
+                            "\n");
+            
             &Torrus::DB::checkInterrupted();
         }
 
-        close(RAWOUT);
+        $rawout->close();
         
         Debug('RawExport: wrote ' . $fname);
     }

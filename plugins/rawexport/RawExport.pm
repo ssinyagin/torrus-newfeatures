@@ -313,7 +313,8 @@ sub rawUpdateThread
         while( $fname =~ /\^(\d+)\^/ )
         {
             my $stepsize = $1;
-            my $curr_seconds = time() % 86400;
+            my ($sec, $min, $hour) = localtime(time());
+            my $curr_seconds = $sec + $min*60 + $hour*3600;
             my $curr_step =
                 sprintf('%.5d',
                         $curr_seconds - ($curr_seconds % $stepsize));

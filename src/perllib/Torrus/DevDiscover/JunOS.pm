@@ -564,6 +564,8 @@ sub buildConfig
             my $jnxTag = $jnxDesc;
             $jnxTag =~ s/\W+/_/go;
             $jnxTag =~ s/_$//go;
+            $jnxTag = 'main' if length($jnxTag) == 0;
+            
             # Fix the .'s into _'s for the RRD-DS and name of leaf
             my $opIndexFix = $opIndex;
             $opIndexFix =~ s/\./_/g;

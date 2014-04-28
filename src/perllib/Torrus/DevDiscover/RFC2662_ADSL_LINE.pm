@@ -336,6 +336,8 @@ sub checkSelectorAttribute
         }
         return $match;        
     }
+
+    return 0;
 }
 
 

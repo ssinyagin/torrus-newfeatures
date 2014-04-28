@@ -16,10 +16,12 @@
 
 # Stanislav Sinyagin <ssinyagin@yahoo.com>
 
-# Discovery module for IP-MIB (RFC 2011)
-# This module does not generate any XML, but provides information
-# for other discovery modules. For the sake of discovery time and traffic,
-# it is not implicitly executed during the normal discovery process.
+# Discovery module for IP-MIB (RFC 2011) This module does not generate
+# any XML, but provides information for other discovery modules. For the
+# sake of discovery time and traffic, it is not implicitly executed
+# during the normal discovery process. The module queries
+# ipNetToMediaTable which is deprecated, but still supported in newer
+# RFC4293. Some Cisco routers still use the old table anyway.
 
 package Torrus::DevDiscover::RFC2011_IP_MIB;
 
@@ -47,19 +49,14 @@ sub discover
     my $data = $devdetails->data();
     my $session = $dd->session();
 
-    my $table = $session->get_table( -baseoid =>
-                                     $dd->oiddef('ipNetToMediaPhysAddress'));
-    
-    if( not defined($table) or scalar(keys %{$table}) == 0 )
+    my $map = $dd->walkSnmpTable('ipNetToMediaPhysAddress');
+        
+    if( not defined($map) or scalar(keys %{$map}) == 0 )
     {
         return 0;
     }
     
-    $devdetails->storeSnmpVars( $table );
-
-    foreach my $INDEX
-        ( $devdetails->
-          getSnmpIndices( $dd->oiddef('ipNetToMediaPhysAddress') ) )
+    foreach my $INDEX (keys %{$map})
     {
         my( $ifIndex, @ipAddrOctets ) = split( '\.', $INDEX );
         my $ipAddr = join('.', @ipAddrOctets);
@@ -67,9 +64,7 @@ sub discover
         my $interface = $data->{'interfaces'}{$ifIndex};
         next if not defined( $interface );
 
-        my $phyAddr =
-            $devdetails->snmpVar($dd->oiddef('ipNetToMediaPhysAddress') .
-                                 '.' . $INDEX);
+        my $phyAddr = $map->{$INDEX};
 
         $interface->{'ipNetToMedia'}{$ipAddr} = $phyAddr;
         $interface->{'mediaToIpNet'}{$phyAddr} = $ipAddr;

@@ -92,6 +92,10 @@ sub discover
             my $ifStats = $dd->walkSnmpTable('ipIfStatsHCInOctets_' . $ipver);
             foreach my $ifIndex (keys %{$ifStats})
             {
+                my $interface = $data->{'interfaces'}{$ifIndex};
+                next if not defined($interface);
+                next if $interface->{'excluded'};
+                
                 $data->{'ipIfStats'}{$ipver}{$ifIndex} = 1;
             }
         }
@@ -171,6 +175,35 @@ sub buildConfig
             my $templates = ['RFC4293_IP_MIB::ipifstats-hcoctets'];
             my $childParams = {};
 
+            my $actionsRef =
+                $data->{'ipIfStats_SelectorActions'}{$ipver}{$ifIndex};
+            if( defined($actionsRef) )
+            {
+                foreach my $dir ( 'In', 'Out' )
+                {
+                    if( defined( $actionsRef->{$dir . 'BytesMonitor'} ) )
+                    {
+                        $childParams->{
+                            'Bytes_' . $dir}->{'monitor'} =
+                                $actionsRef->{$dir . 'BytesMonitor'};
+                    }
+
+                    if( defined( $actionsRef->{$dir . 'BytesParameters'} ) )
+                    {
+                        my @pairs =
+                            split('\s*;\s*',
+                                  $actionsRef->{$dir . 'BytesParameters'});
+                        
+                        foreach my $pair( @pairs )
+                        {
+                            my ($param, $val) = split('\s*=\s*', $pair);
+                            $childParams->{
+                                'Bytes_' . $dir}->{$param} = $val;
+                        }
+                    }
+                }
+            }
+                        
             if( scalar(@{$templates}) > 0 )
             {
                 my $intfNode = $cb->addSubtree( $subtreeNode, $ifSubtreeName,
@@ -191,6 +224,137 @@ sub buildConfig
         
     return;
 }
+
+
+
+#######################################
+# Selectors interface
+#
+
+$Torrus::DevDiscover::selectorsRegistry{'RFC4293_IP_MIB_v4'} = {
+    'getObjects'      => \&v4_getSelectorObjects,
+    'getObjectName'   => \&v4_getSelectorObjectName,
+    'checkAttribute'  => \&v4_checkSelectorAttribute,
+    'applyAction'     => \&v4_applySelectorAction,
+};
+
+$Torrus::DevDiscover::selectorsRegistry{'RFC4293_IP_MIB_v6'} = {
+    'getObjects'      => \&v6_getSelectorObjects,
+    'getObjectName'   => \&v6_getSelectorObjectName,
+    'checkAttribute'  => \&v6_checkSelectorAttribute,
+    'applyAction'     => \&v6_applySelectorAction,
+};
+
+
+sub v4_getSelectorObjects {getSelectorObjects('ipv4', @_)};
+sub v4_getSelectorObjectName {getSelectorObjectName('ipv4', @_)};
+sub v4_checkSelectorAttribute {checkSelectorAttribute('ipv4', @_)};
+sub v4_applySelectorAction {applySelectorAction('ipv4', @_)};
+
+sub v6_getSelectorObjects {getSelectorObjects('ipv6', @_)};
+sub v6_getSelectorObjectName {getSelectorObjectName('ipv6', @_)};
+sub v6_checkSelectorAttribute {checkSelectorAttribute('ipv6', @_)};
+sub v6_applySelectorAction {applySelectorAction('ipv6', @_)};
+
+
+## Objects are interface indexes
+
+sub getSelectorObjects
+{
+    my $ipver = shift;
+    my $devdetails = shift;
+    my $objType = shift;
+    return( sort {$a<=>$b} keys
+            (%{$devdetails->data()->{'ipIfStats'}{$ipver}}) );
+}
+
+
+sub checkSelectorAttribute
+{
+    my $ipver = shift;
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $attr = shift;
+    my $checkval = shift;
+
+    my $data = $devdetails->data();
+    my $interface = $data->{'interfaces'}{$object};
+    if( not defined($interface) or $interface->{'excluded'} )
+    {
+        return 0;
+    }
+    
+    if( $attr =~ /^ifSubtreeName\d*$/ )
+    {
+        my $value = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+        my $match = 0;
+        foreach my $chkexpr ( split( /\s+/, $checkval ) )
+        {
+            if( $value =~ $chkexpr )
+            {
+                $match = 1;
+                last;
+            }
+        }
+        return $match;        
+    }
+
+    return 0;
+}
+
+
+sub getSelectorObjectName
+{
+    my $ipver = shift;
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    
+    my $data = $devdetails->data();
+    my $interface = $data->{'interfaces'}{$object};
+    return $interface->{$data->{'nameref'}{'ifSubtreeName'}};
+}
+
+
+our %knownSelectorActions =
+    (
+     'InBytesMonitor'    => 'RFC4293_IP_MIB',
+     'OutBytesMonitor'   => 'RFC4293_IP_MIB',
+     'InBytesParameters' => 'RFC4293_IP_MIB',
+     'OutBytesParameters' => 'RFC4293_IP_MIB',
+    );
+
+                            
+sub applySelectorAction
+{
+    my $ipver = shift;
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $action = shift;
+    my $arg = shift;
+
+    my $data = $devdetails->data();
+
+    if( defined( $knownSelectorActions{$action} ) )
+    {
+        if( not $devdetails->isDevType( $knownSelectorActions{$action} ) )
+        {
+            Error('Action ' . $action . ' is applied to a device that is ' .
+                  'not of type ' . $knownSelectorActions{$action} .
+                  ': ' . $devdetails->param('system-id'));
+        }
+        $data->{'ipIfStats_SelectorActions'}{$ipver}{$object}{$action} = $arg;
+    }
+    else
+    {
+        Error('Unknown RFC4293_IP_MIB selector action: ' . $action);
+    }
+
+    return;
+}
+
 
 
 

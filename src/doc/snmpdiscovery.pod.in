@@ -712,6 +712,11 @@ downstream and MAC layer stats are skipped.
 If set to C<yes>, all DOCSIS interfaces are excluded from any cable or
 interface statistics.
 
+=item * C<RFC4293_IP_MIB::ipv4-stats>, C<RFC4293_IP_MIB::ipv6-stats>
+
+If set to C<yes>, IP-MIB statistics for the corresponding IP protocol
+version are included in discovery.
+
 =back
 
 =head3 Vendor parameters
@@ -1158,6 +1163,19 @@ C<AturAttRateMonitor>, C<AtucTxRateMonitor>, C<AturTxRateMonitor>,
 C<AtucLofsMonitor>, C<AturLofsMonitor>, C<AtucLossMonitor>,
 C<AturLossMonitor>, C<AtucLprsMonitor>, C<AturLprsMonitor>,
 C<AtucESsMonitor>, C<AturESsMonitor>, C<AtucInitsMonitor>.
+
+
+=head3 RFC4293_IP_MIB_v4 and RFC4293_IP_MIB_v6 selectors
+
+These selectors apply to the IP-MIB statistics if they are present on
+the device and their discovery is activated by
+C<RFC4293_IP_MIB::ipv4-stats> or C<RFC4293_IP_MIB::ipv6-stats>
+parameters.
+
+Attributes supported: C<ifSubtreeName>.
+
+Actions supported: C<InBytesMonitor>, C<OutBytesMonitor>,
+C<InBytesParameters>, C<OutBytesParameters>
 
 
 =head3 Examples

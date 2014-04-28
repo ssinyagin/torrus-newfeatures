@@ -76,6 +76,7 @@ dist_generic_DATA = \
 	generic/rfc2670.docsis-if.xml \
 	generic/rfc2790.host-resources.xml \
 	generic/rfc2863.if-mib.xml \
+	generic/rfc4293.ip-mib.xml \
 	generic/rfc4319_hdsl2_shdsl_line.xml
 
 examplesdir   =  $(distxmldir)/examples

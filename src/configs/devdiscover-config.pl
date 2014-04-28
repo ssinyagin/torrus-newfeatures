@@ -43,6 +43,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::RFC2670_DOCS_IF',
      'Torrus::DevDiscover::RFC2737_ENTITY_MIB',
      'Torrus::DevDiscover::RFC2790_HOST_RESOURCES',
+     'Torrus::DevDiscover::RFC4293_IP_MIB',     
      'Torrus::DevDiscover::RFC4319_HDSL2_SHDSL_LINE_MIB',     
      'Torrus::DevDiscover::Actelis',
      'Torrus::DevDiscover::Albis_ULAF',
@@ -305,6 +306,16 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source' => 'generic/rfc2662.adsl-line.xml'
          },
      
+     #### IP-MIB traffic stats
+     'RFC4293_IP_MIB::rfc4293-ipmib-subtree' => {
+         'name'   => 'rfc4293-ipmib-subtree',
+         'source' => 'generic/rfc4293.ip-mib.xml'
+         },
+     'RFC4293_IP_MIB::ipifstats-hcoctets' => {
+         'name'   => 'ipifstats-hcoctets',
+         'source' => 'generic/rfc4293.ip-mib.xml'
+         },
+
      #### HDSL2-SHDSL-LINE-MIB
      'RFC4319_HDSL2_SHDSL_LINE_MIB::hdsl-subtree' => {
          'name'   => 'hdsl-subtree',

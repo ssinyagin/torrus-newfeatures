@@ -109,19 +109,19 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 150,                   # mplsTunnel
          'ifDescr' => '^lsi$'
      },
-     
+
      'other' => {
          'ifType'  => 1,                     # other
      },
-     
+
      'loopback' => {
          'ifType'  => 24,                    # softwareLoopback
      },
-     
+
      'propVirtual' => {
          'ifType'  => 53,                    # propVirtual
      },
-     
+
      'gre_ipip_pime_pimd_mtun'  => {
          'ifType'  => 131,                     # tunnel
          'ifDescr' => '^(gre)|(ipip)|(pime)|(pimd)|(mtun)$'
@@ -131,7 +131,7 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 131,                     # tunnel
          'ifDescr' => '^(pd)|(pe)|(gr)|(ip)|(mt)|(lt)-\d+\/\d+\/\d+$'
      },
-     
+
      'ls' => {
          'ifType'  => 108,                     # pppMultilinkBundle
          'ifDescr' => '^ls-\d+\/\d+\/\d+$'
@@ -155,7 +155,7 @@ sub checkdevtype
 
     &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
         ($devdetails, $interfaceFilter);
-    
+
     if( defined( $interfaceFilterOverlay ) )
     {
         &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
@@ -197,44 +197,21 @@ sub discover
     if( $devdetails->paramDisabled('JunOS::disable-cos') )
     {
         # Poll table to translate the CoS Index to a Name
-        my $cosQueueNumTable =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('jnxCosFcIdToFcName') );
-        $devdetails->storeSnmpVars( $cosQueueNumTable );
-
-        if( $cosQueueNumTable )
+        my $jnxCosFcIdToFcName = $dd->walkSnmpTable('jnxCosFcIdToFcName');
+        
+        if( scalar(keys %{$jnxCosFcIdToFcName}) )
         {
             $devdetails->setCap('jnxCoS');
-
-            # Find the index of the CoS queue name    
-            foreach my $cosFcIndex ( $devdetails->getSnmpIndices
-                                     ($dd->oiddef('jnxCosFcIdToFcName')) )
-            {
-                my $cosFcNameOid = $dd->oiddef('jnxCosFcIdToFcName') . "." .
-                    $cosFcIndex;
-                my $cosFcName    = $cosQueueNumTable->{$cosFcNameOid};
-
-                Debug("JunOS::CoS  FC index: $cosFcIndex  name: $cosFcName");
-
-                # Construct the data ...
-                $data->{'jnxCos'}{'queue'}{$cosFcIndex} = $cosFcName;
-            }
+            $data->{'jnxCos'}{'queue'} = $jnxCosFcIdToFcName;
 
             # We need to find out all the interfaces that have CoS enabled
             # on them. We will use jnxCosQstatQedPkts as our reference point.
-            my $cosIfIndex =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('jnxCosQstatQedPkts') );
-            $devdetails->storeSnmpVars( $cosIfIndex );
-
-	    if( $cosIfIndex )            
+            my $jnxCosQstatQedPkts = $dd->walkSnmpTable('jnxCosQstatQedPkts');
+            
+            foreach my $INDEX ( keys %{$jnxCosQstatQedPkts} )
             {
-		foreach my $INDEX ( $devdetails->getSnmpIndices
-                                ($dd->oiddef('jnxCosQstatQedPkts')) )
-            	{
-                	my( $ifIndex, $cosQueueIndex ) = split( '\.', $INDEX );
-			$data->{'jnxCos'}{'ifIndex'}{$ifIndex} = 1;
-               	} 
+                my( $ifIndex, $cosQueueIndex ) = split( '\.', $INDEX );
+                $data->{'jnxCos'}{'ifIndex'}{$ifIndex} = 1;
             }
         }
     } # END JunOS::disable-cos
@@ -244,63 +221,35 @@ sub discover
     #
     if( $devdetails->paramDisabled('JunOS::disable-operating') )
     {
-        my $tableDesc = $session->get_table( -baseoid =>
-                                             $dd->oiddef('jnxOperatingDescr'));
-        $devdetails->storeSnmpVars( $tableDesc );
+        my $jnxOperatingDescr = $dd->walkSnmpTable('jnxOperatingDescr');        
 
-        if ( $tableDesc )
+        if ( scalar(keys %{$jnxOperatingDescr}) )
         {
             # PROG: Set Capability flag
             $devdetails->setCap('jnxOperating');
 
             # PROG: Poll tables for more info to match and index on
-            my $tableCPU =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('jnxOperatingCPU'));
-            $devdetails->storeSnmpVars( $tableCPU );
-
-            my $tableISR =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('jnxOperatingISR'));
-            $devdetails->storeSnmpVars( $tableISR );
-
-            my $tableMEM =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('jnxOperatingMemory'));
-            $devdetails->storeSnmpVars( $tableMEM );
-
-            my $tableTemp =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('jnxOperatingTemp'));
-            $devdetails->storeSnmpVars( $tableTemp );
+            my $jnxOperatingCPU = $dd->walkSnmpTable('jnxOperatingCPU');
+            my $jnxOperatingISR = $dd->walkSnmpTable('jnxOperatingISR');
+            my $jnxOperatingMemory = $dd->walkSnmpTable('jnxOperatingMemory');
+            my $jnxOperatingTemp = $dd->walkSnmpTable('jnxOperatingTemp');
 
             # PROG: Build tables for all the oids
             #       We are using the Descr oid base for matching. (cheap hack)
-            foreach my $opIndex ( $devdetails->getSnmpIndices
-                                  ($dd->oiddef('jnxOperatingDescr')) )
+            foreach my $opIndex ( keys %{$jnxOperatingDescr} )
             {
-                my $opCPU  = $devdetails->snmpVar
-                    ($dd->oiddef('jnxOperatingCPU') . '.' . $opIndex);
-                my $opDesc = $devdetails->snmpVar
-                    ($dd->oiddef('jnxOperatingDescr') . '.' . $opIndex);
-                my $opMem  = $devdetails->snmpVar
-                    ($dd->oiddef('jnxOperatingMemory') . '.' . $opIndex);
-                my $opISR  = $devdetails->snmpVar
-                    ($dd->oiddef('jnxOperatingISR') . '.' . $opIndex);
-                my $opTemp = $devdetails->snmpVar
-                    ($dd->oiddef('jnxOperatingTemp')  . '.' . $opIndex);
-
-                Debug("JunOS:: opIdx: $opIndex  Desc: $opDesc");
-                Debug("JunOS::   CPU: $opCPU, CPU: $opISR, MEM: $opMem");
-                Debug("JunOS::   Temp: $opTemp");
-
                 # Construct the data
                 $data->{'jnxOperating'}{$opIndex}{'index'} = $opIndex;
-                $data->{'jnxOperating'}{$opIndex}{'cpu'}   = $opCPU;
-                $data->{'jnxOperating'}{$opIndex}{'desc'}  = $opDesc;
-                $data->{'jnxOperating'}{$opIndex}{'isr'}   = $opISR;
-                $data->{'jnxOperating'}{$opIndex}{'mem'}   = $opMem;
-                $data->{'jnxOperating'}{$opIndex}{'temp'}  = $opTemp;
+                $data->{'jnxOperating'}{$opIndex}{'cpu'}   =
+                    $jnxOperatingCPU->{$opIndex};
+                $data->{'jnxOperating'}{$opIndex}{'desc'}  =
+                    $jnxOperatingDescr->{$opIndex};
+                $data->{'jnxOperating'}{$opIndex}{'isr'}   =
+                    $jnxOperatingISR->{$opIndex};
+                $data->{'jnxOperating'}{$opIndex}{'mem'}   =
+                    $jnxOperatingMemory->{$opIndex};
+                $data->{'jnxOperating'}{$opIndex}{'temp'}  =
+                    $jnxOperatingTemp->{$opIndex};
             }
         } # END: if $tableDesc
     } # END: JunOS::disable-operating
@@ -309,45 +258,29 @@ sub discover
     # PROG: Firewall statistics
     if( $devdetails->paramDisabled('JunOS::disable-firewall') )
     {
-        my $tableFWFilter =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('jnxFWCounterDisplayFilterName'));
-        $devdetails->storeSnmpVars( $tableFWFilter );
-
-        if( $tableFWFilter )
+        my $jnxFWCounterDisplayFilterName =
+            $dd->walkSnmpTable('jnxFWCounterDisplayFilterName');
+        
+        if( scalar(keys %{$jnxFWCounterDisplayFilterName}) )
         {
             # PROG: Set Capability flag
             $devdetails->setCap('jnxFirewall');
 
             # PROG: Poll tables for more info to match and index on
-            my $tableFWCounter =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('jnxFWCounterDisplayName') );
-            $devdetails->storeSnmpVars( $tableFWCounter );
-
+            my $jnxFWCounterDisplayName =
+                $dd->walkSnmpTable('jnxFWCounterDisplayName');
+            
             # Firewall Type (counter = 2, policer = 3)
-            my $tableFWType  =
-                $session->get_table( -baseoid =>
-                                     $dd->oiddef('jnxFWCounterDisplayType') );
-            $devdetails->storeSnmpVars( $tableFWType );
-
+            my $jnxFWCounterDisplayType =
+                $dd->walkSnmpTable('jnxFWCounterDisplayType');
+            
             # PROG: Build tables for all the oids
             #       We are using the FW Filter name as the Indexing
-            foreach my $fwIndex ( $devdetails->getSnmpIndices
-                                  ($dd->oiddef('jnxFWCounterDisplayName')) )
+            foreach my $fwIndex ( keys %{$jnxFWCounterDisplayName} )
             {
-                my $fwFilter = $devdetails->snmpVar
-                    ($dd->oiddef('jnxFWCounterDisplayFilterName') .
-                     '.' . $fwIndex);
-                my $fwCounter  = $devdetails->snmpVar
-                    ($dd->oiddef('jnxFWCounterDisplayName') .
-                     '.' . $fwIndex);
-                my $fwType = $devdetails->snmpVar
-                    ($dd->oiddef('jnxFWCounterDisplayType') .
-                     '.' . $fwIndex);
-                Debug("JunOS::fw Filter: $fwFilter");
-                Debug("JunOS::fw         Counter: $fwCounter");
-                Debug("JunOS::fw            Type: $fwType");
+                my $fwFilter = $jnxFWCounterDisplayFilterName->{$fwIndex};
+                my $fwCounter  = $jnxFWCounterDisplayName->{$fwIndex};
+                my $fwType = $jnxFWCounterDisplayType->{$fwIndex};
 
                 # Construct the data
                 $data->{'jnxFirewall'}{$fwFilter}{$fwCounter}{'oid'} =
@@ -362,31 +295,29 @@ sub discover
     # PROG: Check for RPF availability
     if( $devdetails->paramDisabled('JunOS::disable-rpf') )
     {
-        my $tableRPF =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('jnxRpfStatsPackets') );
-        $devdetails->storeSnmpVars( $tableRPF );
-
-        if( $tableRPF )
+        my $jnxRpfStatsPackets = $dd->walkSnmpTable('jnxRpfStatsPackets');
+        
+        if( scalar(keys %{$jnxRpfStatsPackets}) )
         {
             # PROG: Set capability flag
             $devdetails->setCap('jnxRPF');
 
             # PROG: Find all the relevent interfaces
-            foreach my $rpfIndex ( $devdetails->getSnmpIndices
-                                   ($dd->oiddef('jnxRpfStatsPackets')) )
+            foreach my $rpfIndex ( keys %{$jnxRpfStatsPackets} )
             {
                 my ($ifIndex,$addrFamily) = split('\.',$rpfIndex);
-                if( defined( $data->{'interfaces'}{$ifIndex} ) )
+                my $interface = $data->{'interfaces'}{$ifIndex};
+                
+                if( defined($interface) and not $interface->{'excluded'} )
                 {
                     my $ifAddrFam = $addrFamily == 1 ? 'ipv4' : 'ipv6';
-                    my $intName   = $data->{'interfaces'}{$ifIndex}{'ifName'};
-                    my $intNameT  = $data->{'interfaces'}{$ifIndex}{'ifNameT'};
+                    my $intName   = $interface->{'ifName'};
+                    my $intNameT  = $interface->{'ifNameT'};
                     
                     # Construct data
                     $data->{'jnxRPF'}{$ifIndex}{'ifName'}  = $intName;
                     $data->{'jnxRPF'}{$ifIndex}{'ifNameT'} = $intNameT;
-                    
+
                     if( $addrFamily == 1 )
                     {
                         $data->{'jnxRPF'}{$ifIndex}{'ipv4'} = 1;
@@ -394,7 +325,7 @@ sub discover
                     if( $addrFamily == 2 )
                     {
                         $data->{'jnxRPF'}{$ifIndex}{'ipv6'} = 2;
-                    }                    
+                    }
                 }
             }
         }
@@ -419,7 +350,7 @@ sub buildConfig
     {
 	# PROG: Add CoS information if it exists.
 	my $nodeTop = $cb->addSubtree( $devNode, 'CoS', undef,
-                                  [ 'JunOS::junos-cos-subtree']);
+                                       [ 'JunOS::junos-cos-subtree']);
 
         foreach my $ifIndex ( sort {$a <=> $b} keys
                               %{$data->{'jnxCos'}{'ifIndex'}} )
@@ -444,7 +375,7 @@ sub buildConfig
             foreach my $cosIndex ( sort keys %{$data->{'jnxCos'}{'queue'}} )
             {
                 my $cosName  = $data->{'jnxCos'}{'queue'}{$cosIndex};
-                
+
                 # Add Leaf for each one
                 Debug("JunOS::CoS  ifIndex: $ifIndex ($ifName -> $cosName)");
                 my $nodeIFCOS =
@@ -472,7 +403,7 @@ sub buildConfig
                           { 'comment'  => 'Random Early Detection' },
                           [ 'JunOS::junos-cos-red' ]);
                 }
-                
+
             } # end foreach (INDEX of queue's [Q-ID])
         } # end foreach (INDEX of port)
     } # end if HasCap->{CoS}
@@ -496,7 +427,7 @@ sub buildConfig
                 $cb->addSubtree( $nodeFW, $fwFilter,
                                  { 'comment' => 'Filter: ' . $fwFilter },
                                  [ 'JunOS::junos-firewall-filter-subtree' ]);
-            
+
             # Loop through and find all the counter names within the filter
             foreach my $fwCounter ( sort keys %{$firewall} )
             {
@@ -552,7 +483,7 @@ sub buildConfig
             $cb->addSubtree( $devNode, 'Temperature_Sensors', undef,
                              [ 'JunOS::junos-temperature-subtree' ]);
 
-        
+
         foreach my $opIndex
             ( sort {$a cmp $b} keys %{$data->{'jnxOperating'}} )
         {
@@ -565,7 +496,7 @@ sub buildConfig
             $jnxTag =~ s/\W+/_/go;
             $jnxTag =~ s/_$//go;
             $jnxTag = 'main' if length($jnxTag) == 0;
-            
+
             # Fix the .'s into _'s for the RRD-DS and name of leaf
             my $opIndexFix = $opIndex;
             $opIndexFix =~ s/\./_/g;
@@ -597,7 +528,7 @@ sub buildConfig
                     $jnxTag =~ s/_temp(erature|)_sensor//g;
                     $cb->addLeaf( $nodeTemp, $jnxTag,
                                   { 'comment'         => $jnxDesc,
-                                    'sensor-desc'     => $jnxDesc, 
+                                    'sensor-desc'     => $jnxDesc,
                                     'sensor-index'    => $opIndex,
                                     'sensor-indexFix' => $opIndexFix },
                                   [ 'JunOS::junos-temperature-sensor' ]);
@@ -626,7 +557,7 @@ sub buildConfig
 
             Debug("JunOS:: RPF  int: $ifName  IPv4: $hasIPv4  IPv6: $hasIPv6");
 
-            # PROG: Process IPv4 first ... 
+            # PROG: Process IPv4 first ...
             if( $hasIPv4 )
             {
                 $cb->addSubtree( $nodeRPF, 'IPv4_' . $ifNameT,

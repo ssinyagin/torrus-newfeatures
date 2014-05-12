@@ -377,7 +377,6 @@ sub buildConfig
                 my $cosName  = $data->{'jnxCos'}{'queue'}{$cosIndex};
 
                 # Add Leaf for each one
-                Debug("JunOS::CoS  ifIndex: $ifIndex ($ifName -> $cosName)");
                 my $nodeIFCOS =
                     $cb->addSubtree( $nodePort, $cosName,
                                      { 'comment'    => "Class: " . $cosName,
@@ -506,7 +505,8 @@ sub buildConfig
             {
                 $cb->addSubtree( $nodeCPU, $jnxTag,
                                  { 'comment'   => $jnxDesc,
-                                   'cpu-index' => $opIndex },
+                                   'cpu-index' => $opIndex,
+                                   'cpu-desc' => $jnxDesc },
                                  [ 'JunOS::junos-cpu' ]);
             }
 
@@ -516,7 +516,8 @@ sub buildConfig
                 $cb->addSubtree( $nodeMem, $jnxTag,
                                  { 'comment'      => $jnxDesc,
                                    'mem-index'    => $opIndex,
-                                   'mem-indexFix' => $opIndexFix },
+                                   'mem-indexFix' => $opIndexFix,
+                                   'mem-desc'    => $jnxDesc },
                                  [ 'JunOS::junos-memory' ]);
             }
 
@@ -554,8 +555,6 @@ sub buildConfig
             my $ifNameT = $data->{'interfaces'}{$ifIndex}{'ifNameT'};
             my $hasIPv4 = $data->{'jnxRPF'}{$ifIndex}{'ipv4'};
             my $hasIPv6 = $data->{'jnxRPF'}{$ifIndex}{'ipv6'};
-
-            Debug("JunOS:: RPF  int: $ifName  IPv4: $hasIPv4  IPv6: $hasIPv6");
 
             # PROG: Process IPv4 first ...
             if( $hasIPv4 )

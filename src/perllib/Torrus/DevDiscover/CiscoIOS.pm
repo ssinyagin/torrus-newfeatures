@@ -243,6 +243,11 @@ sub checkdevtype
 
     $devdetails->setCap('interfaceIndexingManaged');
 
+    if( $devdetails->paramEnabled('CiscoIOS::ifindex-persist') )
+    {
+        $devdetails->setCap('interfaceIndexingPersistent');
+    }
+
     return 1;
 }
 

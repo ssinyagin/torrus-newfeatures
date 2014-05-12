@@ -1,3 +1,8 @@
+2014-05-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS.pm: new discovery parameter:
+	CiscoIOS::ifindex-persist
+
 2014-04-28  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC4293_IP_MIB.pm: new discovery

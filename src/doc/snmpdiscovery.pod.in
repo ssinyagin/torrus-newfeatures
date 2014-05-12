@@ -751,6 +751,15 @@ bundle instead of by the ID of the bundle.
 
 When set to C<yes>, wireless client machines are not tracked.
 
+=item * C<CiscoIOS::ifindex-persist>
+
+Set this to C<yes> if the router is configured with C<snmp-server
+ifindex persist> command. There is no way to verify via SNMP if this
+option is configured on the router, so it should be used with care. When
+enabled, this option enables ifIndex-based indexing of router
+interfaces, and the collector does not have to retrieve interface names
+from the device.
+
 =item * C<CiscoGeneric::disable-cpu-stats>
 
 When set to C<yes>, Cisco CPU usage statistics are excluded from discovery.

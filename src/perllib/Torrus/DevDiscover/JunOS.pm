@@ -487,7 +487,7 @@ sub buildConfig
 
         # Loop through and find all the filter names
         foreach my $fwFilter
-            ( sort {$a <=> $b} keys %{$data->{'jnxFirewall'}} )
+            ( sort keys %{$data->{'jnxFirewall'}} )
         {
             my $firewall  = $data->{'jnxFirewall'}{$fwFilter};
 
@@ -498,7 +498,7 @@ sub buildConfig
                                  [ 'JunOS::junos-firewall-filter-subtree' ]);
             
             # Loop through and find all the counter names within the filter
-            foreach my $fwCounter ( sort {$a <=> $b} keys %{$firewall} )
+            foreach my $fwCounter ( sort keys %{$firewall} )
             {
                 my $fwOid     = $firewall->{$fwCounter}{'oid'};
                 my $fwType    = $firewall->{$fwCounter}{'type'};

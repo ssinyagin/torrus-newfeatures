@@ -348,7 +348,7 @@ sub snmpSessionArgs
     {
         push( @{$ret}, -username, $community);
 
-        foreach my $arg ( qw(-contextname -authkey -authpassword -authprotocol
+        foreach my $arg ( qw(-authkey -authpassword -authprotocol
                              -privkey -privpassword -privprotocol) )
         {
             my $val = $collector->param($token, 'snmp' . $arg);            
@@ -386,6 +386,13 @@ sub openBlockingSession
         if( defined( $maxmsgsize ) and $maxmsgsize > 0 )
         {
             $session->max_msg_size( $maxmsgsize );
+        }
+
+        my $contextname = $collector->param($token, 'snmp-contextname');
+        if( defined($contextname) and $contextname ne '' )
+        {
+            # dirty hack: this is a private method in Net::SNMP
+            $session->_context_name($contextname);
         }
     }
     
@@ -439,8 +446,14 @@ sub openNonblockingSession
     my $maxmsgsize = $collector->param($token, 'snmp-max-msg-size');
     if( defined( $maxmsgsize ) and $maxmsgsize > 0 )
     {
-        $session->max_msg_size( $maxmsgsize );
-        
+        $session->max_msg_size( $maxmsgsize );        
+    }
+
+    my $contextname = $collector->param($token, 'snmp-contextname');
+    if( defined($contextname) and $contextname ne '' )
+    {
+        # dirty hack: this is a private method in Net::SNMP
+        $session->_context_name($contextname);
     }
     
     return $session;

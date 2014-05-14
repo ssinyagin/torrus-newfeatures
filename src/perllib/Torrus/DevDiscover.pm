@@ -224,7 +224,7 @@ sub discover
     }
     elsif( $version eq '3' )        
     {
-        foreach my $arg ( qw(-username -contextname -authkey -authpassword
+        foreach my $arg ( qw(-username -authkey -authpassword
                              -authprotocol -privkey
                              -privpassword -privprotocol) )
         {
@@ -268,6 +268,13 @@ sub discover
     {
         Error('Cannot create SNMP session: ' . $error);
         return undef;
+    }
+
+    my $contextname = $devdetails->param('snmp-contextname');
+    if( defined($contextname) and $contextname ne '' )
+    {
+        # dirty hack: this is a private method in Net::SNMP
+        $session->_context_name($contextname);
     }
     
     my @oids = ();

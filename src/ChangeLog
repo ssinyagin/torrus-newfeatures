@@ -1,3 +1,10 @@
+2014-05-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm: Improved interface
+	indexing for unknown devices. New parameters:
+	RFC2863_IF_MIB::name-hint
+	RFC2863_IF_MIB::comment-hint
+
 2014-05-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm: new discovery parameter:

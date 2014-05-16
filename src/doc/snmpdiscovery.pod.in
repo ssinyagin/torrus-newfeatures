@@ -604,10 +604,23 @@ This discovery parameter, if set to C<yes>, restores the old behavior.
 
 =item * C<RFC2863_IF_MIB::subtree-name-hint>
 
-Optional. By default, per-interface subtrees are named after the values of
-C<ifDescr> SNMP variables. If this option is set to C<ifName>, this
-SNMP variable would be used for subtree naming. This option is ignored if
-the device is supported by a vendor specific discovery module.
+Optional. By default, per-interface subtrees are named after the values
+of C<ifDescr> SNMP variables. If this option is set to C<ifName>, this
+SNMP variable would be used for subtree naming. This option is ignored
+if the device is supported by a vendor specific discovery module. If
+C<ifDescr> entries are non-unique on the device, but you still want to
+use them for subtree names, you need to specify this parameter
+explicitly with C<ifDescr> as a value.
+
+=item * C<RFC2863_IF_MIB::name-hint>
+
+Optional. By default, human-readable interface names are taken from 
+C<ifDescr> SNMP values. It can be changed with this parameter.
+
+=item * C<RFC2863_IF_MIB::comment-hint>
+
+Optional. By default, interface descriptions are taken from 
+C<ifAlias> SNMP values. It can be changed with this parameter.
 
 =item * C<RFC2863_IF_MIB::nodeid-hint>
 

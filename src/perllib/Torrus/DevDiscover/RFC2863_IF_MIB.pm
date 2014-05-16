@@ -205,6 +205,8 @@ sub discover
         }
     }
 
+    my $could_not_find_interface_indexing = 0;
+    
     if( not $devdetails->hasCap('interfaceNamingProprietary') )
     {
         ## Set default interface index mapping
@@ -242,7 +244,7 @@ sub discover
         }
         else
         {
-            $devdetails->setCap('interfaceIndexingPersistent');
+            $could_not_find_interface_indexing = 1;
             $data->{'nameref'}{'ifSubtreeName'} = 'ifIndex';
             $data->{'nameref'}{'ifReferenceName'} = 'ifIndex';
             $data->{'nameref'}{'ifNick'} = 'ifIndex';
@@ -294,6 +296,10 @@ sub discover
                       $hint);
             }
         }
+        elsif( $could_not_find_interface_indexing )
+        {
+            $devdetails->setCap('interfaceIndexingPersistent');
+        }
             
         $hint =
             $devdetails->param('RFC2863_IF_MIB::subtree-name-hint');
@@ -302,6 +308,12 @@ sub discover
             if( $hint eq 'ifName' )
             {
                 $data->{'nameref'}{'ifSubtreeName'} = 'ifNameT';
+                $data->{'nameref'}{'ifReferenceName'} = 'ifName';
+            }
+            elsif( $hint eq 'ifDescr' )
+            {
+                $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
+                $data->{'nameref'}{'ifReferenceName'} = 'ifDescr';
             }
             else
             {
@@ -309,7 +321,21 @@ sub discover
                       $hint);
             }
         }
-        
+
+        $hint =
+            $devdetails->param('RFC2863_IF_MIB::name-hint');
+        if( defined( $hint ) )
+        {
+            $data->{'nameref'}{'ifReferenceName'} = $hint;
+        }
+
+        $hint =
+            $devdetails->param('RFC2863_IF_MIB::comment-hint');
+        if( defined( $hint ) )
+        {
+            $data->{'nameref'}{'ifComment'} = $hint;
+        }
+
         $hint =
             $devdetails->param('RFC2863_IF_MIB::nodeid-hint');
         if( defined( $hint ) )

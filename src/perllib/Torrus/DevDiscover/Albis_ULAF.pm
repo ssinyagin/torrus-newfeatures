@@ -273,12 +273,6 @@ sub buildConfig
     my $devNode = shift;
 
     my $data = $devdetails->data();
-
-    if( not $devdetails->hasCap('acceedSoamLm') or
-        not $devdetails->hasCap('acceedSoamDm') )
-    {
-        return;
-    }
     
     if( $devdetails->hasCap('acceedSoamLm') )
     {

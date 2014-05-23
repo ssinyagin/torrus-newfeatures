@@ -51,7 +51,9 @@ our %oiddef =
      '1.3.6.1.4.1.1887.1.3.1.4.11.1.26',
      'acceedSoamLmCfgMpDomain' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.101',
      'acceedSoamLmCfgMpPoint' => '1.3.6.1.4.1.1887.1.3.1.4.11.1.102',
-
+     'acceedSoamLmCurrentAvailStatsForwardAvailable',
+     '1.3.6.1.4.1.1887.1.3.1.4.13.1.9'
+     
      # DM measurement configuration
      'acceedSoamDmCfgEnabled' => '1.3.6.1.4.1.1887.1.3.1.4.21.1.4',
      'acceedSoamDmCfgMessagePeriod' => '1.3.6.1.4.1.1887.1.3.1.4.21.1.6',
@@ -164,6 +166,7 @@ sub discover
              'acceedSoamLmCfgAvailabilityMeasurementInterval',
              'acceedSoamLmCfgMpDomain',
              'acceedSoamLmCfgMpPoint',
+             'acceedSoamLmCurrentAvailStatsForwardAvailable'
              )
         {
             $lmcfg->{$oidname} = $dd->walkSnmpTable($oidname);
@@ -173,6 +176,15 @@ sub discover
         {
             if( $lmcfg->{'acceedSoamLmCfgEnabled'}{$idx} == 1 )
             {
+                if( not defined
+                    $lmcfg->{'acceedSoamLmCurrentAvailStatsForwardAvailable'}{
+                        $idx} )
+                {
+                    Warn('LM measurement ' . $idx .
+                         ' does not have availability data');
+                    next;
+                }
+
                 my $ref = {};
                 $data->{'acceedSoamLm'}{$idx} = $ref;
 

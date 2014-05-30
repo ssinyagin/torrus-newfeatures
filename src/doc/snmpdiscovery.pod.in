@@ -1,4 +1,4 @@
-#  Copyright (C) 2002-2009  Stanislav Sinyagin
+#  Copyright (C) 2002-2014  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -730,6 +730,13 @@ interface statistics.
 If set to C<yes>, IP-MIB statistics for the corresponding IP protocol
 version are included in discovery.
 
+=item * C<RFC4293_IP_MIB::tokenset-members>,
+ C<RFC4293_IP_MIB::ipv4-external-serviceid>,
+ C<RFC4293_IP_MIB::ipv6-external-serviceid>
+
+These parameters work for IP-MIB statistics the same way as
+corresponding parameters in RFC2863_IF_MIB.
+
 =back
 
 =head3 Vendor parameters
@@ -1197,7 +1204,7 @@ parameters.
 Attributes supported: C<ifSubtreeName>.
 
 Actions supported: C<InBytesMonitor>, C<OutBytesMonitor>,
-C<InBytesParameters>, C<OutBytesParameters>
+C<InBytesParameters>, C<OutBytesParameters>, C<TokensetMember>
 
 
 =head3 Examples

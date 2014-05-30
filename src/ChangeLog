@@ -1,3 +1,11 @@
+2014-05-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC4293_IP_MIB.pm: New params:
+	RFC4293_IP_MIB::tokenset-members,
+	RFC4293_IP_MIB::ipv4-external-serviceid,
+	RFC4293_IP_MIB::ipv6-external-serviceid,
+	New selector action: TokensetMember
+
 2014-05-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm: Improved interface

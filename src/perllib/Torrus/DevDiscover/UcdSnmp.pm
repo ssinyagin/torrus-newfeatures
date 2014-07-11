@@ -63,6 +63,32 @@ our %oiddef =
      'ucd_laTable'              => '1.3.6.1.4.1.2021.10'
      );
 
+# Not all interfaces are normally needed to monitor.
+# You may override the interface filtering in devdiscover-siteconfig.pl:
+# redefine $Torrus::DevDiscover::UcdSnmp::interfaceFilter
+# or define $Torrus::DevDiscover::UcdSnmp::interfaceFilterOverlay
+
+our $interfaceFilter;
+our $interfaceFilterOverlay;
+my %ucdInterfaceFilter;
+
+if( not defined( $interfaceFilter ) )
+{
+    $interfaceFilter = \%ucdInterfaceFilter;
+}
+
+
+# Key is some unique symbolic name, does not mean anything
+# ifType is the number to match the interface type
+# ifDescr is the regexp to match the interface description
+%ucdInterfaceFilter =
+    (
+     'Loopback'  => {
+         'ifType'  => 24,                     # softwareLoopback
+     },
+    );
+
+
 sub checkdevtype
 {
     my $dd = shift;
@@ -77,6 +103,15 @@ sub checkdevtype
         return 0;
     }
 
+    &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+        ($devdetails, $interfaceFilter);
+
+    if( defined( $interfaceFilterOverlay ) )
+    {
+        &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+            ($devdetails, $interfaceFilterOverlay);
+    }
+    
     return 1;
 }
 

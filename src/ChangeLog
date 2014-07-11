@@ -1,3 +1,8 @@
+2014-07-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/UcdSnmp.pm: Loopback interfaces
+	filtered out
+
 2014-05-16  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm: Improved interface

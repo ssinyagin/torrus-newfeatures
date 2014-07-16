@@ -1,0 +1,17 @@
+    --- CiscoIOS_cbQoS.207.pm       Fri May  2 14:28:21 2014
+    +++ CiscoIOS_cbQoS.207_patched.pm       Fri May  2 14:28:21 2014
+    @@ -758,9 +758,12 @@
+             }
+             elsif( $objType eq 'randomDetect')
+             {
+    +            my $exponweight = $configRef->{'cbQosREDCfgExponWeight'};
+                 $subtreeName = 'WRED';
+    -            $objectName = 'WRED';
+    +            $objectName = $exponweight;
+                 $subtreeComment = 'Weighted Random Early Detect Statistics';
+    +            $objectNick = 'red_'.$exponweight;
+    +            $param->{'cbqos-red-exponential-weight'} = $exponweight;
+                 $param->{'legend'} =
+                     sprintf('Exponential Weight: %d;',
+                             $configRef->{'cbQosREDCfgExponWeight'});
+

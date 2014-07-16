@@ -1,0 +1,13 @@
+    --- RFC2863_IF_MIB.207.pm       Fri May  2 14:28:22 2014
+    +++ RFC2863_IF_MIB.207_patched.pm       Fri May  2 14:28:22 2014
+    @@ -1157,6 +1159,11 @@
+                                                   $summary, $intfNode );
+                     }
+                 }
+    +        } else {
+    +            Debug('Excluding interface: ' .
+    +                  $interface->{$data->{'nameref'}{'ifReferenceName'}});
+    +            delete $data->{'interfaces'}{$ifIndex};
+    +
+             }
+         }

@@ -95,6 +95,21 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 6,                        # ethernetCsmacd
          'ifDescr' => 'WFP\s+LightWeight\s+Filter'
          },
+
+     'LightWeight Filter MAC Native' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => 'WFP\s+Native\s+MAC\s+Layer\s+LightWeight\s+Filter'
+         },
+
+     'LightWeight Filter MAC 802.3' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => 'WFP\s+802.3\s+MAC\s+Layer\s+LightWeight\s+Filter'
+         },
+
+     'Microsoft Kernel Debug Network Adapter' => {
+         'ifType'  => 6,                        # ethernetCsmacd
+         'ifDescr' => 'Microsoft\s+Kernel\s+Debug\s+Network\s+Adapter'
+         },
      );
 
 sub checkdevtype

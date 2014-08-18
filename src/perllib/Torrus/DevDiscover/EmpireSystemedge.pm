@@ -330,7 +330,16 @@ sub discover
     # shameless rip-off from MicrsoftWindows.pm
     if( ( $devdetails->{'os_name'} =~ /nt40Intel/i ) or ( $devdetails->{'os_name'} =~ /nt50Intel/i )) {
 
-        $data->{'nameref'}{'ifComment'} = ''; # suggest?
+        # to keep backward compatibility we set the interface
+        # comment explicitly to '' if there is no ifAlias table
+        # which _may_ be the case with very old versions of 
+        # Microsoft Windows
+        if ( not $devdetails->hasCap( 'ifAlias' ) ) 
+        {
+            Debug("No ifAlias present to setting ifComment to ''");
+            $data->{'nameref'}{'ifComment'} = '';
+        }
+
         $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
         Torrus::DevDiscover::RFC2863_IF_MIB::retrieveMacAddresses( $dd, $devdetails );
         $data->{'nameref'}{'ifNick'} = 'MAC';

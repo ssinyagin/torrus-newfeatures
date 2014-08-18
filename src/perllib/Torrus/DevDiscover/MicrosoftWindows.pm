@@ -149,10 +149,18 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
+    # to keep backward compatibility we set the interface
+    # comment explicitly to '' if there is no ifAlias table
+    # which _may_ be the case with very old versions of 
+    # Microsoft Windows
+    if ( not $devdetails->hasCap( 'ifAlias' ) ) 
+    {
+        Debug("No ifAlias present to setting ifComment to ''");
+        $data->{'nameref'}{'ifComment'} = '';
+    }
+
     # In Windows SNMP agent, ifDescr is not unique per interface.
     # We use MAC address as a unique interface identifier.
-
-    $data->{'nameref'}{'ifComment'} = ''; # suggest?
 
     $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
     Torrus::DevDiscover::RFC2863_IF_MIB::retrieveMacAddresses( $dd,

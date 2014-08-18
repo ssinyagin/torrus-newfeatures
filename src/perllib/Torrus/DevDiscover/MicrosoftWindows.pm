@@ -95,21 +95,6 @@ if( not defined( $interfaceFilter ) )
          'ifType'  => 6,                        # ethernetCsmacd
          'ifDescr' => 'WFP\s+LightWeight\s+Filter'
          },
-
-     'LightWeight Filter MAC Native' => {
-         'ifType'  => 6,                        # ethernetCsmacd
-         'ifDescr' => 'WFP\s+Native\s+MAC\s+Layer\s+LightWeight\s+Filter'
-         },
-
-     'LightWeight Filter MAC 802.3' => {
-         'ifType'  => 6,                        # ethernetCsmacd
-         'ifDescr' => 'WFP\s+802.3\s+MAC\s+Layer\s+LightWeight\s+Filter'
-         },
-
-     'Microsoft Kernel Debug Network Adapter' => {
-         'ifType'  => 6,                        # ethernetCsmacd
-         'ifDescr' => 'Microsoft\s+Kernel\s+Debug\s+Network\s+Adapter'
-         },
      );
 
 sub checkdevtype
@@ -149,18 +134,10 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
-    # to keep backward compatibility we set the interface
-    # comment explicitly to '' if there is no ifAlias table
-    # which _may_ be the case with very old versions of
-    # Microsoft Windows
-    if ( not $devdetails->hasCap( 'ifAlias' ) )
-    {
-        Debug("No ifAlias present to setting ifComment to ''");
-        $data->{'nameref'}{'ifComment'} = '';
-    }
-
     # In Windows SNMP agent, ifDescr is not unique per interface.
     # We use MAC address as a unique interface identifier.
+
+    $data->{'nameref'}{'ifComment'} = ''; # suggest?
 
     $data->{'param'}{'ifindex-map'} = '$IFIDX_MAC';
     Torrus::DevDiscover::RFC2863_IF_MIB::retrieveMacAddresses( $dd,

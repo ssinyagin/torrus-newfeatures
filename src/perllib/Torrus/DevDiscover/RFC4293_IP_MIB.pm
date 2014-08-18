@@ -58,14 +58,14 @@ sub checkdevtype
 
     my $data = $devdetails->data();
     my $matched = 0;
-    
+
     if( $devdetails->paramEnabled('RFC4293_IP_MIB::ipv4-stats') and
         $dd->checkSnmpTable('ipIfStatsHCInOctets_ipv4') )
     {
         $matched = 1;
         $devdetails->setCap('ipIfStatsHCInOctets_ipv4');
     }
-    
+
     if( $devdetails->paramEnabled('RFC4293_IP_MIB::ipv6-stats') and
         $dd->checkSnmpTable('ipIfStatsHCInOctets_ipv6') )
     {
@@ -95,12 +95,12 @@ sub discover
                 my $interface = $data->{'interfaces'}{$ifIndex};
                 next if not defined($interface);
                 next if $interface->{'excluded'};
-                
+
                 $data->{'ipIfStats'}{$ipver}{$ifIndex} = 1;
             }
         }
     }
-    
+
     return 1;
 }
 
@@ -118,9 +118,91 @@ sub buildConfig
     {
         my $ipver = lc($ipverUC);
         next unless $devdetails->hasCap('ipIfStatsHCInOctets_' . $ipver);
+
+        # tokenset member interfaces of the form
+        # Format: tset:intf,intf; tokenset:intf,intf;
+        # Format for global parameter:
+        #     tset:host/intf,host/intf; tokenset:host/intf,host/intf;
+        my %tsetMember;
+        my %tsetMemberApplied;
+        foreach my $memList
+            ( split( /\s*;\s*/,
+                     $devdetails->paramString
+                     ('RFC4293_IP_MIB::tokenset-members') ) )
+        {
+            my ($tset, $list) = split( /\s*:\s*/, $memList );
+            foreach my $intfName ( split( /\s*,\s*/, $list ) )
+            {
+                if( $intfName =~ /\// )
+                {
+                    my( $host, $intf ) = split( '/', $intfName );
+                    if( $host eq $devdetails->param('snmp-host') )
+                    {
+                        $tsetMember{$intf}{$tset} = 1;
+                    }
+                }
+                else
+                {
+                    $tsetMember{$intfName}{$tset} = 1;
+                }
+            }
+        }
+
+        # External storage serviceid assignment
+        # Params: RFC4293_IP_MIB::ipv4-external-serviceid,
+        #         RFC4293_IP_MIB::ipv6-external-serviceid,
+        my %extStorage;
+        my %extStorageTrees;
+        
+        foreach my $srvDef
+            ( split( /\s*,\s*/,
+                     $devdetails->paramString
+                     ('RFC4293_IP_MIB::' . $ipver . '-external-serviceid') ) )
+        {
+            my ( $serviceid, $intfName, $direction, $trees ) =
+                split( /\s*:\s*/, $srvDef );
+            
+            if( $intfName =~ /\// )
+            {
+                my( $host, $intf ) = split( '/', $intfName );
+                if( $host eq $devdetails->param('snmp-host') )
+                {
+                    $intfName = $intf;
+                }
+                else
+                {
+                    $intfName = undef;
+                }
+            }
+            
+            if( defined($intfName) and $intfName ne '' )
+            {
+                if( defined( $trees ) )
+                {
+                    # Trees are listed with '|' as separator,
+                    # whereas compiler expects commas
+                    
+                    $trees =~ s/\s*\|\s*/,/g;
+                }
+                
+                if( $direction eq 'Both' )
+                {
+                    $extStorage{$intfName}{'In'} = $serviceid . '_IN';
+                    $extStorageTrees{$serviceid . '_IN'} = $trees;
+                    
+                    $extStorage{$intfName}{'Out'} = $serviceid . '_OUT';
+                    $extStorageTrees{$serviceid . '_OUT'} = $trees;
+                }
+                else
+                {
+                    $extStorage{$intfName}{$direction} = $serviceid;
+                    $extStorageTrees{$serviceid} = $trees;
+                }
+            }
+        }
         
         my $subtreeName = $ipverUC . '_Stats';
-        
+
         my $subtreeParam = {
             'precedence'          => '-600',
             'node-display-name'   => $ipverUC . ' traffic statistics',
@@ -129,12 +211,12 @@ sub buildConfig
             'ipmib-ipver-name' => $ipver,
             'ipmib-ipver-nameuc' => $ipverUC,
         };
-        
+
         my $subtreeNode =
             $cb->addSubtree( $devNode, $subtreeName, $subtreeParam,
                              ['RFC4293_IP_MIB::rfc4293-ipmib-subtree']);
-        
-        my $precedence = 1000;        
+
+        my $precedence = 1000;
         foreach my $ifIndex ( sort {$a<=>$b} %{$data->{'ipIfStats'}{$ipver}} )
         {
             my $interface = $data->{'interfaces'}{$ifIndex};
@@ -145,26 +227,26 @@ sub buildConfig
                 $interface->{$data->{'nameref'}{'ifSubtreeName'}};
 
             my $ifParam = {};
-            
+
             $ifParam->{'collector-timeoffset-hashstring'} =
                 '%system-id%:%interface-nick%';
             $ifParam->{'precedence'} = $precedence;
-            
+
             $ifParam->{'graph-title'} =
                 '%system-id%:%interface-name% ' . $ipverUC;
-            
+
             $ifParam->{'interface-name'} =
                 $interface->{$data->{'nameref'}{'ifReferenceName'}};
             $ifParam->{'interface-nick'} =
                 $interface->{$data->{'nameref'}{'ifNick'}};
             $ifParam->{'node-display-name'} =
                 $interface->{$data->{'nameref'}{'ifReferenceName'}};
-            
+
             $ifParam->{'nodeid-interface'} =
                 $ipver . '-' .
                 $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} .
                 $interface->{$data->{'nameref'}{'ifNodeid'}};
-            
+
             if( defined($data->{'nameref'}{'ifComment'}) and
                 defined($interface->{$data->{'nameref'}{'ifComment'}}) )
             {
@@ -193,7 +275,7 @@ sub buildConfig
                         my @pairs =
                             split('\s*;\s*',
                                   $actionsRef->{$dir . 'BytesParameters'});
-                        
+
                         foreach my $pair( @pairs )
                         {
                             my ($param, $val) = split('\s*=\s*', $pair);
@@ -202,13 +284,61 @@ sub buildConfig
                         }
                     }
                 }
+
+                if( defined( $actionsRef->{'TokensetMember'} ) )
+                {
+                    foreach my $tset
+                        ( split('\s*,\s*', $actionsRef->{'TokensetMember'}) )
+                    {
+                        $tsetMember{$ifSubtreeName}{$tset} = 1;
+                    }
+                }
             }
+
+            if( defined( $extStorage{$ifSubtreeName} ) )
+            {
+                foreach my $dir ( 'In', 'Out' )
+                {
+                    if( defined( $extStorage{$ifSubtreeName}{$dir} ) )
+                    {
+                        my $serviceid = $extStorage{$ifSubtreeName}{$dir};
+
+                        my $params = {
+                            'storage-type'      => 'rrd,ext',
+                            'ext-service-id'    => $serviceid,
+                            'ext-service-units' => 'bytes' };
                         
+                        if( defined( $extStorageTrees{$serviceid} )
+                            and $extStorageTrees{$serviceid} ne '' )
+                        {
+                            $params->{'ext-service-trees'} =
+                                $extStorageTrees{$serviceid};
+                        }
+
+                        foreach my $param ( keys %{$params} )
+                        {
+                            $childParams->{
+                                'Bytes_' . $dir}{$param} = $params->{$param};
+                        }
+                    }
+                }
+            }
+
             if( scalar(@{$templates}) > 0 )
             {
                 my $intfNode = $cb->addSubtree( $subtreeNode, $ifSubtreeName,
                                                 $ifParam, $templates );
-                
+
+                if( defined( $tsetMember{$ifSubtreeName} ) )
+                {
+                    my $tsetList =
+                        join( ',', sort keys %{$tsetMember{$ifSubtreeName}} );
+
+                    $childParams->{'InOut_bps'}->{'tokenset-member'} =
+                        $tsetList;
+                    $tsetMemberApplied{$ifSubtreeName} = 1;
+                }
+
                 if( scalar(keys %{$childParams}) > 0 )
                 {
                     foreach my $childName ( sort keys %{$childParams} )
@@ -220,8 +350,29 @@ sub buildConfig
                 }
             }
         }
+
+        if( scalar(keys %tsetMember) > 0 )
+        {
+            my @failedIntf;
+            foreach my $intfName ( keys %tsetMember )
+            {
+                if( not $tsetMemberApplied{$intfName} )
+                {
+                    push( @failedIntf, $intfName );
+                }
+            }
+
+            if( scalar( @failedIntf ) > 0 )
+            {
+                Warn('RFC4293_IP_MIB statistics for the following ' .
+                     'interfaces were not added to tokensets, ' .
+                     'probably because they do not exist or are explicitly ' .
+                     'excluded: ' .
+                     join(' ', sort @failedIntf));
+            }
+        }
     }
-        
+
     return;
 }
 
@@ -284,7 +435,7 @@ sub checkSelectorAttribute
     {
         return 0;
     }
-    
+
     if( $attr =~ /^ifSubtreeName\d*$/ )
     {
         my $value = $interface->{$data->{'nameref'}{'ifSubtreeName'}};
@@ -297,7 +448,7 @@ sub checkSelectorAttribute
                 last;
             }
         }
-        return $match;        
+        return $match;
     }
 
     return 0;
@@ -310,7 +461,7 @@ sub getSelectorObjectName
     my $devdetails = shift;
     my $object = shift;
     my $objType = shift;
-    
+
     my $data = $devdetails->data();
     my $interface = $data->{'interfaces'}{$object};
     return $interface->{$data->{'nameref'}{'ifSubtreeName'}};
@@ -323,9 +474,10 @@ our %knownSelectorActions =
      'OutBytesMonitor'   => 'RFC4293_IP_MIB',
      'InBytesParameters' => 'RFC4293_IP_MIB',
      'OutBytesParameters' => 'RFC4293_IP_MIB',
+     'TokensetMember' => 'RFC4293_IP_MIB',
     );
 
-                            
+
 sub applySelectorAction
 {
     my $ipver = shift;

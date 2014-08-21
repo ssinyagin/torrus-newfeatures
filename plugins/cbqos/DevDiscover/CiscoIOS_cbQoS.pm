@@ -552,6 +552,11 @@ sub buildChildrenConfigs
                 }
                 
                 my $ifIndex    = $policyRef->{'cbQosIfIndex'};
+                if( not defined($ifIndex) )
+                {
+                    next;
+                }
+                
                 my $interface  = $data->{'interfaces'}{$ifIndex};
 
                 if( defined( $interface ) and not $interface->{'excluded'} )

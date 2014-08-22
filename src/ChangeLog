@@ -1,3 +1,7 @@
+2014-08-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/RPC.pm: new RPC method: TIMESERIES
+
 2014-07-11  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/UcdSnmp.pm: Loopback interfaces

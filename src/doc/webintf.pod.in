@@ -362,6 +362,15 @@ data samples.
 
 =back
 
+=item * TIMESERIES
+
+This RPC call retrieves the numerical data for a leaf, and returns it in
+tabular form. In addition to standard URL parameters, C<Gstep> and
+C<Gmaxrows> are supported as described in I<rrdxport> manual page. The
+returned data contains also "rrgraph_args" map element, which presents
+the arguments for RRD Tool rrgraph command.
+
+
 =item * SEARCH_NODEID
 
 This RPC call performs a prefix search for I<nodeid> values among all

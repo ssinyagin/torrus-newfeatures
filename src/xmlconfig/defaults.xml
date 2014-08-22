@@ -340,6 +340,11 @@
   <view name="rpc">
     <param name="view-type"     value="rpc" />
     <param name="expires"       value="300" />
+    <!-- TIMESERIES needs line styles -->
+    <param name="line-style"    value="##SingleGraph" />
+    <param name="line-color"    value="##SingleGraph" />
+    <param name="maxline-style" value="##SingleGraphMax" />
+    <param name="maxline-color" value="##SingleGraphMax" />
   </view>    
 </views>
 

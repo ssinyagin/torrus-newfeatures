@@ -48,19 +48,12 @@ my %mime_type =
 my @arg_arrays = qw(opts defs bg hwtick hrule hwline line fg);
 
 
-sub render_rrgraph
+sub prepare_rrgraph_args
 {
     my $self = shift;
     my $config_tree = shift;
     my $token = shift;
     my $view = shift;
-    my $outfile = shift;
-
-    if( not $config_tree->isLeaf($token) )
-    {
-        Error("Token $token is not a leaf");
-        return undef;
-    }
 
     my $obj = {'args' => {}, 'dname' => 'A'};
 
@@ -167,14 +160,35 @@ sub render_rrgraph
 
     # We're all set
 
-
-    my @args;
+    my $args = [];
     foreach my $arrayName ( @arg_arrays )
     {
-        push( @args, @{$obj->{'args'}{$arrayName}} );
+        push( @{$args}, @{$obj->{'args'}{$arrayName}} );
     }
-    Debug("RRDs::graph arguments: " . join(' ', @args));
 
+    return ($args, $obj);
+}
+
+
+
+sub render_rrgraph
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $token = shift;
+    my $view = shift;
+    my $outfile = shift;
+
+    if( not $config_tree->isLeaf($token) )
+    {
+        Error("Token $token is not a leaf");
+        return undef;
+    }
+
+    my ($args, $obj) =
+        $self->prepare_rrgraph_args($config_tree, $token, $view);
+    Debug("RRDs::graph arguments: " . join(' ', @{$args}));
+    
     # localize the TZ enviromennt for the child process
     {
         my $tz = $self->{'options'}->{'variables'}->{'TZ'};
@@ -189,7 +203,7 @@ sub render_rrgraph
             $ENV{'TZ'} = $tz;
         }
         
-        &RRDs::graph( $outfile, @args );
+        &RRDs::graph( $outfile, @{$args} );
     }
 
     my $ERR=RRDs::error;

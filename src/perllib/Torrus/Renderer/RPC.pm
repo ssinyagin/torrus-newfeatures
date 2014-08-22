@@ -51,6 +51,10 @@ my %rpc_methods =
          'call' => \&rpc_aggregate_ds,
      },
      
+     'TIMESERIES'   => {
+         'call' => \&rpc_timeseries,
+     },
+     
      'SEARCH_NODEID' => {
          'call' => \&rpc_search_nodeid,
          'needs_params' => 1,
@@ -312,6 +316,93 @@ sub rpc_aggregate_ds
     $result->{'data'}{$token} = $data;
     return;
 }
+
+
+
+
+sub rpc_timeseries
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $opts = shift;
+
+    my $token = $opts->{'token'};
+    my $view = $opts->{'view'};
+    my $params = $opts->{'params'};
+    my $result = $opts->{'result'};
+    
+    if( not $config_tree->isLeaf($token) )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'TIMESERIES supports only leaf nodes';
+        return;
+    }
+
+    my @args;
+    foreach my $opt ('step', 'maxrows')
+    {
+        my $value = $self->{'options'}->{'variables'}->{'G' . $opt};
+        if( defined($value) )
+        {
+            push(@args, '--' . $opt, $value);
+        }
+    }
+        
+    my ($rrgraph_args, $obj) =
+        $self->prepare_rrgraph_args($config_tree, $token, $view);
+
+    Debug('rrgraph_args: ' . join(' ', @{$rrgraph_args}));
+
+    my @xport_names;
+        
+    for(my $i=0; $i < scalar(@{$rrgraph_args}); $i++)
+    {
+        my $val = $rrgraph_args->[$i];
+        if( ($val eq '--start') or ($val eq '--end') )
+        {
+            $i++;
+            push(@args, $val, $rrgraph_args->[$i]);
+        }
+        elsif( $val =~ /^C?DEF/o )
+        {
+            push(@args, $val);
+        }
+        elsif( $val =~ /^LINE\d*:([a-zA-Z0-9_]+)/o or
+               $val =~ /^AREA:([a-zA-Z0-9_]+)/o )
+        {
+            push(@xport_names, $1);
+        }
+    }
+
+    foreach my $name ( @xport_names )
+    {
+        push(@args, 'XPORT:' . $name . ':' . $name);
+    }
+    
+    Debug('RRDs::xport arguments: ' . join(' ', @args));
+
+    my @xport_ret = RRDs::xport(@args);
+    
+    my $ERR=RRDs::error;
+    if( $ERR )
+    {
+        $result->{'success'} = 0;
+        $result->{'error'} = 'RRD::xport returned error: ' . $ERR;
+        return undef;
+    }
+
+    my $r = $result->{'data'};
+    $r->{'rrgraph_args'} = $rrgraph_args;
+
+    foreach my $ret_name
+        ('start', 'end', 'step', 'cols', 'names', 'data')
+    {
+        $r->{$ret_name} = shift @xport_ret;
+    }    
+    
+    return;
+}
+
 
 
 

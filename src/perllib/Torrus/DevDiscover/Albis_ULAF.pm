@@ -209,6 +209,8 @@ sub discover
 
                 $ref->{'mpDescr'} =
                     &{$getMPDescr}($devIdx . '.' . $domain . '.' . $point);
+                
+                $ref->{'nodeid-prefix'} = 'soam//%nodeid-device%//';
             }
         }
 
@@ -263,6 +265,8 @@ sub discover
 
                 $ref->{'mpDescr'} =
                     &{$getMPDescr}($devIdx . '.' . $domain . '.' . $point);
+
+                $ref->{'nodeid-prefix'} = 'soam//%nodeid-device%//';
             }
         }
         
@@ -318,7 +322,7 @@ sub buildConfig
                 'rrd-create-max' => ($ref->{'period'} * 1.5 / 1000),
                 'node-display-name' => $ref->{'mpDescr'},
                 'acceed-mp-description' => $ref->{'mpDescr'},
-                'accees-soam-nodeid' => 'soam//%nodeid-device%//' . $idx,
+                'accees-soam-nodeid' => $ref->{'nodeid-prefix'} . $idx,
                 'legend' => $legend,
                 'graph-title' => $gtitle,
             };
@@ -358,7 +362,7 @@ sub buildConfig
                 'acceed-soam-cfg-index' => $idx,
                 'node-display-name' => $ref->{'mpDescr'},
                 'acceed-mp-description' => $ref->{'mpDescr'},
-                'accees-soam-nodeid' => 'soam//%nodeid-device%//' . $idx,
+                'accees-soam-nodeid' => $ref->{'nodeid-prefix'} . $idx,
                 'legend' => $legend,                
                 'graph-title' => $gtitle,
             };

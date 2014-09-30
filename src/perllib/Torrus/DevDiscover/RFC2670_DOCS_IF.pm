@@ -240,11 +240,17 @@ sub buildConfig
                 # Copy some parameters from IF-MIB discovery results
                 
                 foreach my $p ('interface-name', 'interface-nick',
-                               'node-display-name', 'comment')
+                               'node-display-name')
                 {
                     $ifParam->{$p} = $interface->{'param'}{$p};
                 }
-                
+
+                my $comment = $interface->{'param'}{'comment'};
+                if( defined($comment) and $comment ne '' )
+                {
+                    $ifParam->{'comment'} = $comment;
+                }
+                    
                 $ifParam->{'nodeid-docsif'} =
                     $data->{'docsConfig'}{$category}{'nodeidCategory'} .
                     '//%nodeid-device%//' .

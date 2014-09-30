@@ -30,7 +30,7 @@ use Torrus::Log;
 
 
 $Torrus::DevDiscover::registry{'CiscoCatOS'} = {
-    'sequence'     => 500,
+    'sequence'     => 510,
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig

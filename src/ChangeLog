@@ -1,3 +1,9 @@
+2014-09-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoIOS.pm: Bugfix in discovery
+	sequence. This bug was invisible up to perl v5.18.0. Now Perl
+	randomizes hash keys on every loop.
+
 2014-08-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RPC.pm: new RPC method: TIMESERIES

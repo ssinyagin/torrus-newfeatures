@@ -26,7 +26,7 @@ use Torrus::Log;
 
 
 $Torrus::DevDiscover::registry{'CiscoIOS_MacAccounting'} = {
-    'sequence'     => 510,
+    'sequence'     => 600,
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig

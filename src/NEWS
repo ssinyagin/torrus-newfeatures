@@ -1,3 +1,28 @@
+02-OCT-2014: Torrus release 2.08
+
+In this release:
+
+-- Fix for a long time hidden bug in Cisco IOS discovery modules. It
+   popped up first under Perl 5.18
+
+-- IPv6 traffic statistics via RFC4293_IP_MIB
+
+-- Cisco IOS: support for persistent interface indexes; 64-bit memory
+   statistics; IOS and IOS XR detection from sysDescr string
+
+-- Improvements for unknown devices (port name and comment hints)
+
+-- RPC interface allows retrieving of time series.
+
+-- Support for Albis Technologies ULAF devices
+
+-- Support for context name in SNMPv3
+
+-- Event escalation for threshold monitors
+
+-- Various improvements in RFC2662_ADSL_LINE discovery module
+
+
 29-APR-2013: Torrus release 2.07
 
 This is a bugfix release that fixes some problems in tp-cbqos plugin

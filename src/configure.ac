@@ -18,7 +18,7 @@
 #
 
 
-AC_INIT([torrus],[2.08dev],[ssinyagin@users.sourceforge.net])
+AC_INIT([torrus],[2.08],[ssinyagin@users.sourceforge.net])
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST

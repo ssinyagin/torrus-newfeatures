@@ -1,4 +1,4 @@
-#  Copyright (C) 2002-2013 Stanislav Sinyagin
+#  Copyright (C) 2002-2014 Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #
 
 
-AC_INIT(tp-cisco-cbqos, 2.08.01dev, ssinyagin@users.sourceforge.net)
+AC_INIT(tp-cisco-cbqos, 2.08.01, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)

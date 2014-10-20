@@ -1,3 +1,8 @@
+2014-10-20  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/Fortinet.pm: new discovery module for
+	Fortinet products
+
 2014-10-02  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: Torrus release 2.08

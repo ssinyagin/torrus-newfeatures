@@ -50,6 +50,7 @@ dist_vendor_DATA = \
 	vendor/empire.systemedge.xml \
 	vendor/empire.systemedge.ntregperf.xml \
 	vendor/f5.bigip.xml \
+	vendor/fortinet.xml \
 	vendor/foundry.xml \
 	vendor/ftos.xml \
 	vendor/jacarta.xml \

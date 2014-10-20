@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (C) 2014 Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+   Fortinet products
+-->
+
+
+<configuration>
+  <definitions>
+    <!-- FORTINET-FORTIGATE-MIB -->
+    <def name="fgSysCpuUsage"
+         value="1.3.6.1.4.1.12356.101.4.1.3.0"/>
+    <def name="fgSysMemUsage"
+         value="1.3.6.1.4.1.12356.101.4.1.4.0"/>
+    <def name="fgSysDiskUsage"
+         value="1.3.6.1.4.1.12356.101.4.1.6.0"/>
+    <def name="fgSysSesCount"
+         value="1.3.6.1.4.1.12356.101.4.1.8.0"/>
+    <def name="fgSysLowMemUsage"
+         value="1.3.6.1.4.1.12356.101.4.1.9.0"/>
+    <def name="fgSysSesRate10"
+         value="1.3.6.1.4.1.12356.101.4.1.12.0"/>
+    <def name="fgSysSes6Count"
+         value="1.3.6.1.4.1.12356.101.4.1.15.0"/>
+    <def name="fgSysSes6Rate10"
+         value="1.3.6.1.4.1.12356.101.4.1.17.0"/>
+    <def name="fgProcessorUsage"
+         value="1.3.6.1.4.1.12356.101.4.4.2.1.2"/>
+
+    <!-- FORTINET-FORTIMANAGER-FORTIANALYZER-MIB -->
+    <def name="fmSysCpuUsage"
+         value="1.3.6.1.4.1.12356.103.2.1.1.0"/>
+    <def name="fmSysMemUsed"
+         value="1.3.6.1.4.1.12356.103.2.1.2.0"/>
+    <def name="fmSysDiskUsage"
+         value="1.3.6.1.4.1.12356.103.2.1.4.0"/>
+    <def name="fmSysCpuUsageExcludedNice"
+         value="1.3.6.1.4.1.12356.103.2.1.6.0"/>
+    
+  </definitions>
+
+  <datasources>
+
+    <template name="fortigate-system-stats">
+      <param name="data-file"  value="%system-id%_fg_system.rrd"/>
+      <param name="rrd-cf"            value="AVERAGE"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      
+      <leaf name="CPU_Usage">
+        <param name="node-display-name"  value="CPU Usage"/>
+        <param name="comment"            value="Current CPU utilization"/>
+        <param name="graph-legend"       value="CPU Usage"/>
+        <param name="snmp-object"        value="$fgSysCpuUsage"/>
+        <param name="rrd-ds"             value="CpuUsage"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="990"/>
+      </leaf>
+      <leaf name="Memory_Usage">
+        <param name="node-display-name"  value="Memory Usage"/>
+        <param name="comment"            value="Current memory utilization"/>
+        <param name="graph-legend"       value="Memory Usage"/>
+        <param name="snmp-object"        value="$fgSysMemUsage"/>
+        <param name="rrd-ds"             value="MemUsage"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="980"/>
+      </leaf>
+      <leaf name="Disk_Usage">
+        <param name="node-display-name"  value="Disk Usage"/>
+        <param name="comment"            value="Hard disk utilization"/>
+        <param name="graph-legend"       value="Disk Usage"/>
+        <param name="snmp-object"        value="$fgSysDiskUsage"/>
+        <param name="rrd-ds"             value="DiskUsage"/>
+        <param name="collector-scale"
+               value="%fortigate-disk-capacity%,/,100,*"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="970"/>
+      </leaf>
+      <leaf name="Session_Count">
+        <param name="node-display-name"  value="Session Count"/>
+        <param name="comment"      value="Current count of active sessions"/>
+        <param name="graph-legend"       value="Session Count"/>
+        <param name="snmp-object"        value="$fgSysSesCount"/>
+        <param name="rrd-ds"             value="SesCount"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="vertical-label"     value="Sessions"/>
+        <param name="precedence"         value="960"/>
+      </leaf>
+      <leaf name="LowMem_Usage">
+        <param name="node-display-name"  value="LowMem Usage"/>
+        <param name="comment"            value="Kernel memory utilization"/>
+        <param name="graph-legend"       value="LowMem Usage"/>
+        <param name="snmp-object"        value="$fgSysLowMemUsage"/>
+        <param name="rrd-ds"             value="LowMemUsage"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="950"/>
+      </leaf>
+      <leaf name="Session_Rate">
+        <param name="node-display-name"  value="Session Rate"/>
+        <param name="comment"            value="Average session setup rate"/>
+        <param name="graph-legend"       value="Session rate"/>
+        <param name="snmp-object"        value="$fgSysSesRate10"/>
+        <param name="rrd-ds"             value="SesRate10"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="vertical-label"     value="1/s"/>
+        <param name="precedence"         value="940"/>
+      </leaf>
+      <leaf name="Session6_Count">
+        <param name="node-display-name"  value="IPv6 Session Count"/>
+        <param name="comment"   value="Current count of active IPv6 sessions"/>
+        <param name="graph-legend"       value="IPv6 Session Count"/>
+        <param name="snmp-object"        value="$fgSysSes6Count"/>
+        <param name="rrd-ds"             value="Ses6Count"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="vertical-label"     value="Sessions"/>
+        <param name="precedence"         value="930"/>
+      </leaf>
+      <leaf name="Session6_Rate">
+        <param name="node-display-name"  value="IPv6 Session Rate"/>
+        <param name="comment"        value="Average IPv6 session setup rate"/>
+        <param name="graph-legend"       value="IPv6 Session rate"/>
+        <param name="snmp-object"        value="$fgSysSes6Rate10"/>
+        <param name="rrd-ds"             value="Ses6Rate10"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="vertical-label"     value="1/s"/>
+        <param name="precedence"         value="920"/>
+      </leaf>
+    </template>     
+
+
+    <template name="fortigate-cpu">
+      <param name="data-file"  value="%system-id%_fg_per_cpu.rrd"/>
+      <param name="rrd-cf"            value="AVERAGE"/>      
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      <param name="comment"            value="Current CPU utilization"/>
+      <param name="snmp-object"
+             value="$fgProcessorUsage.%fortigate-cpu-index%"/>
+      <param name="rrd-ds"             value="Cpu%fortigate-cpu-index%"/>
+      <param name="graph-lower-limit"  value="0"/>
+      <param name="graph-upper-limit"  value="100"/>
+      <param name="vertical-label"     value="Percent"/>
+      <param name="line-style"         value="##resourceusage"/>        
+    </template>     
+
+
+    <template name="fortimanager-system-stats">
+      <param name="data-file"  value="%system-id%_fm_system.rrd"/>
+      <param name="rrd-cf"            value="AVERAGE"/>
+      <param name="rrd-create-dstype" value="GAUGE"/>
+      
+      <leaf name="CPU_Usage">
+        <param name="node-display-name"  value="CPU Usage"/>
+        <param name="comment"            value="Current CPU utilization"/>
+        <param name="graph-legend"       value="CPU Usage"/>
+        <param name="snmp-object"        value="$fmSysCpuUsage"/>
+        <param name="rrd-ds"             value="CpuUsage"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="990"/>
+      </leaf>
+
+      <leaf name="CPU_Usage_ExclNice">
+        <param name="node-display-name"  value="CPU Usage excl. nice"/>
+        <param name="comment"
+               value="CPU utilization excluding low-priority processes"/>
+        <param name="graph-legend"       value="Non-nice CPU Usage"/>
+        <param name="snmp-object"        value="$fmSysCpuUsageExcludedNice"/>
+        <param name="rrd-ds"             value="CpuUsageEN"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="980"/>
+      </leaf>
+      <leaf name="Memory_Usage">
+        <param name="node-display-name"  value="Memory Usage"/>
+        <param name="comment"            value="Current memory utilization"/>
+        <param name="graph-legend"       value="Memory Usage"/>
+        <param name="snmp-object"        value="$fmSysMemUsed"/>
+        <param name="collector-scale"
+               value="%fortimanager-mem-capacity%,/,100,*"/>
+        <param name="rrd-ds"             value="MemUsage"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="970"/>
+      </leaf>
+      <leaf name="Disk_Usage">
+        <param name="node-display-name"  value="Disk Usage"/>
+        <param name="comment"            value="Hard disk utilization"/>
+        <param name="graph-legend"       value="Disk Usage"/>
+        <param name="snmp-object"        value="$fmSysDiskUsage"/>
+        <param name="rrd-ds"             value="DiskUsage"/>
+        <param name="collector-scale"
+               value="%fortimanager-disk-capacity%,/,100,*"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="960"/>
+      </leaf>
+    </template>     
+      
+  </datasources>
+</configuration>

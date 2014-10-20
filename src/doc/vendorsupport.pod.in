@@ -175,6 +175,12 @@ may provide about the server health and performance.
 
 CPU, Temperature and Power supply statistics.
 
+=item * Fortinet
+
+CPU, memory and disk usage for Fortigate and Fortimanager. Also the
+current nyumber of sessions and session establishment rate for
+Fortigate.
+
 =item * Jacarta iMeter
 
 Humidity, Temperature, Electric current meters.

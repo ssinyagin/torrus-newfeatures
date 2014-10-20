@@ -74,6 +74,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::ComtechEFData',
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
+     'Torrus::DevDiscover::Fortinet',
      'Torrus::DevDiscover::Foundry',
      'Torrus::DevDiscover::FTOS',
      'Torrus::DevDiscover::Jacarta',
@@ -1138,6 +1139,21 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source'    => 'vendor/f5.bigip.xml',
      },
      
+     #### Fortinet
+     'Fortinet::fortigate-system-stats' => {
+         'name'      => 'fortigate-system-stats',
+         'source'    => 'vendor/fortinet.xml',
+     },
+     'Fortinet::fortigate-cpu' => {
+         'name'      => 'fortigate-cpu',
+         'source'    => 'vendor/fortinet.xml',
+     },
+     'Fortinet::fortimanager-system-stats' => {
+         'name'      => 'fortimanager-system-stats',
+         'source'    => 'vendor/fortinet.xml',
+     },
+     
+
      #### MicrosoftWindows
      'MicrosoftWindows::microsoft-iis-ftp-stats' => {
          'name'     => 'microsoft-iis-ftp-stats',

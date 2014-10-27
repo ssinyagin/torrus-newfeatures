@@ -33,7 +33,7 @@ use Torrus::Log;
 
 
 $Torrus::DevDiscover::registry{'CiscoIOS_cbQoS'} = {
-    'sequence'     => 510,
+    'sequence'     => 520,
     'checkdevtype' => \&checkdevtype,
     'discover'     => \&discover,
     'buildConfig'  => \&buildConfig

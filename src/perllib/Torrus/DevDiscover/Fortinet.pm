@@ -51,6 +51,30 @@ our %oiddef =
     );
 
 
+our $fortigateInterfaceFilter;
+our $fortigateInterfaceFilterOverlay;
+
+if( not defined( $fortigateInterfaceFilter ) )
+{
+    $fortigateInterfaceFilter = {
+        'SSLRoot' => {
+            'ifType'  => 131,                  # tunnel
+            'ifDescr' => '^ssl.root',
+        },
+        'MGMT' => {
+            'ifType'  => 6,                    # ethernetCsmacd
+            'ifDescr' => '^mgmt',
+        },
+        'Modem' => {
+            'ifType'  => 6,                    # ethernetCsmacd
+            'ifDescr' => '^modem',
+        },
+    };
+}
+
+
+
+
 sub checkdevtype
 {
     my $dd = shift;
@@ -61,6 +85,16 @@ sub checkdevtype
     if( $dd->oidBaseMatch('fgModel', $objID) )
     {
         $devdetails->setCap('Fortinet_FG');
+        
+        &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+            ($devdetails, $fortigateInterfaceFilter);
+        
+        if( defined( $fortigateInterfaceFilterOverlay ) )
+        {
+            &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
+                ($devdetails, $fortigateInterfaceFilterOverlay);
+        }
+        
         return 1;
     }
     elsif( $dd->oidBaseMatch('fmModel', $objID) )

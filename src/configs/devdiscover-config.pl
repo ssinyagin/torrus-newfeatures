@@ -1114,6 +1114,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      },
 
      #### F5 BigIP
+     'F5BigIp::f5-global-host' => {
+         'name'      => 'f5-global-host',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
      'F5BigIp::f5-object-statistics' => {
          'name'      => 'f5-object-statistics',
          'source'    => 'vendor/f5.bigip.xml',

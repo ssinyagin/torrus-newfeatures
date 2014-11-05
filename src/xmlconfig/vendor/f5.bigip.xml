@@ -23,11 +23,55 @@
 
 <configuration>
   <definitions>
+    <!-- F5-BIGIP-SYSTEM-MIB -->
+    <def name="sysGlobalHostMemUsed"
+         value="1.3.6.1.4.1.3375.2.1.1.2.20.3.0"/>
+    <def name="sysGlobalHostCpuUsageRatio5m"
+         value="1.3.6.1.4.1.3375.2.1.1.2.20.37.0"/>
   </definitions>
 
   
   <datasources>
     
+    <template name="f5-global-host">
+      <subtree name="GlobalHostStats">
+        <param name="node-display-name"  value="Global Host Statistics"/>
+        <param name="comment"            value="F5 system utilization"/>
+        <param name="data-file"  value="%system-id%_f5_global_host.rrd"/>
+        <param name="rrd-cf"            value="AVERAGE"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
+
+      <leaf name="Memory_Utilization">
+        <param name="node-display-name"  value="Memory Utilization"/>
+        <param name="comment"            value="Current memory usage"/>
+        <param name="graph-legend"       value="Memory Usage"/>
+        <param name="snmp-object"        value="$sysGlobalHostMemUsed"/>
+        <param name="rrd-ds"             value="MemUsage"/>
+        <param name="collector-scale"
+               value="%f5-global-host-memtotal%,/,100,*"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="990"/>
+      </leaf>
+        
+      <leaf name="CPU_Utilization">
+        <param name="node-display-name"  value="CPU Utilization"/>
+        <param name="comment"            value="Current CPU usage"/>
+        <param name="graph-legend"       value="CPU Usage"/>
+        <param name="snmp-object"        value="$sysGlobalHostCpuUsageRatio5m"/>
+        <param name="rrd-ds"             value="CpuUsage"/>
+        <param name="graph-lower-limit"  value="0"/>
+        <param name="graph-upper-limit"  value="100"/>
+        <param name="vertical-label"     value="Percent"/>
+        <param name="line-style"         value="##resourceusage"/>        
+        <param name="precedence"         value="980"/>
+      </leaf>
+      </subtree>
+    </template>
+      
+
     <template name="ltm-node-statistics">
       <!-- F5-BIGIP-LOCAL-MIB::ltmNodeAddrStatTable -->
       <param name="f5-oid-pktsin"   value="1.3.6.1.4.1.3375.2.2.4.2.3.1.3"/>

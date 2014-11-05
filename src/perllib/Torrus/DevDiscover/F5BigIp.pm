@@ -43,6 +43,7 @@ our %oiddef =
      'f5_sysPlatformInfoMarketingName' => '1.3.6.1.4.1.3375.2.1.3.5.2.0',
      'f5_sysProductVersion'            => '1.3.6.1.4.1.3375.2.1.4.2.0',
      'f5_sysProductBuild'              => '1.3.6.1.4.1.3375.2.1.4.3.0',
+     'sysGlobalHostMemTotal'           => '1.3.6.1.4.1.3375.2.1.1.2.20.2.0',
 
      # F5-BIGIP-LOCAL-MIB -- LTM stats
      'ltmNodeAddrNumber'         => '1.3.6.1.4.1.3375.2.2.4.1.1.0',
@@ -124,35 +125,39 @@ sub discover
     
     # Common system information
     {
-        my @oids;
-        foreach my $oidname ( @f5_sys_oidlist )
+        my $result = $dd->retrieveSnmpOIDs(@f5_sys_oidlist);
+        if( defined($result) )
         {
-            push( @oids, $dd->oiddef($oidname) );
+        
+            my $sysref = {};
+            foreach my $oidname ( @f5_sys_oidlist )
+            {
+                my $val = $result->{$oidname};
+                if( defined($val) and length($val) > 0 )
+                {
+                    $sysref->{$oidname} = $val;
+                }
+                else
+                {
+                    $sysref->{$oidname} = 'N/A';
+                }
+            }
+            
+            $data->{'param'}{'comment'} =
+                $sysref->{'f5_sysPlatformInfoMarketingName'} .
+                ', Version ' .
+                $sysref->{'f5_sysProductVersion'} .
+                ', Build ' .
+                $sysref->{'f5_sysProductBuild'};
         }
-        
-        my $result = $session->get_request( -varbindlist => \@oids );
-        
-        my $sysref = {};
-        foreach my $oidname ( @f5_sys_oidlist )
+
+        $result = $dd->retrieveSnmpOIDs('sysGlobalHostMemTotal');
+        if( defined($result) and $result->{'sysGlobalHostMemTotal'} > 0 )
         {
-            my $oid = $dd->oiddef($oidname);
-            my $val = $result->{$oid};
-            if( defined($val) and length($val) > 0 )
-            {
-                $sysref->{$oidname} = $val;
-            }
-            else
-            {
-                $sysref->{$oidname} = 'N/A';
-            }
+            $data->{'param'}{'f5-global-host-memtotal'} =
+                $result->{'sysGlobalHostMemTotal'};
+            push( @{$data->{'templates'}}, 'F5BigIp::f5-global-host' );
         }
-        
-        $data->{'param'}{'comment'} =
-            $sysref->{'f5_sysPlatformInfoMarketingName'} .
-            ', Version ' .
-            $sysref->{'f5_sysProductVersion'} .
-            ', Build ' .
-            $sysref->{'f5_sysProductBuild'};
     }
 
     # Check LTM capabilities

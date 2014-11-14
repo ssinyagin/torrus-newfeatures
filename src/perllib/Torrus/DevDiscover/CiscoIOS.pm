@@ -179,6 +179,14 @@ sub checkdevtype
         $found = 1;
         $devdetails->setCap('CiscoIOSXR');
     }
+    elsif( defined($sysDescr) and
+           index( $sysDescr, 'Cisco NX-OS' ) >= 0 )
+    {
+        # nexus implements the class-based qoS MIB, so we treat it as
+        # an IOS device
+        $found = 1;
+        $devdetails->setCap('CiscoNXOS');
+    }
     else
     {
         # fall back to software image table
@@ -243,7 +251,8 @@ sub checkdevtype
 
     $devdetails->setCap('interfaceIndexingManaged');
 
-    if( $devdetails->paramEnabled('CiscoIOS::ifindex-persist') )
+    if( $devdetails->hasCap('CiscoNXOS') or
+        $devdetails->paramEnabled('CiscoIOS::ifindex-persist') )
     {
         $devdetails->setCap('interfaceIndexingPersistent');
     }

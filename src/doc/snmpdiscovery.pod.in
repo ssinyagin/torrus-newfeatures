@@ -743,6 +743,11 @@ corresponding parameters in RFC2863_IF_MIB.
 
 =over 4
 
+=item * C<Albis_ULAF::mp-name-filter>
+
+If defined, the parameter shoudl specify a regular expression for SOAM
+MP names which should be excluded from discovery results.
+
 =item * C<Arbor_E::disable-bundle-offer>,
     C<Arbor_E::disable-bundle-offer-deny>,
     C<Arbor_E::disable-bundle-offer-pktsize>,

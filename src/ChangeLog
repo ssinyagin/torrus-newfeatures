@@ -1,5 +1,8 @@
 2014-11-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/DevDiscover/Albis_ULAF.pm (discover):
+	new discovery parameter: Albis_ULAF::mp-name-filter
+
 	* perllib/Torrus/DevDiscover/CiscoIOS.pm: support for Cisco Nexus;
 	persistent ifIndex for Nexus
 

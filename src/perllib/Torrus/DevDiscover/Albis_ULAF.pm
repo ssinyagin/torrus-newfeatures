@@ -156,7 +156,10 @@ sub discover
         }
         return($descr);
     };
-        
+
+    # filter by MP name
+    my $mp_name_filter = $devdetails->param('Albis_ULAF::mp-name-filter');
+    
     {
     # LM test configurations
     # INDEX { devicePortIndex,
@@ -194,7 +197,6 @@ sub discover
                 }
 
                 my $ref = {};
-                $data->{'acceedSoamLm'}{$idx} = $ref;
 
                 my @x = split(/\./, $idx);
                 my $devIdx = join('.', $x[0], $x[1], $x[2]);
@@ -219,6 +221,14 @@ sub discover
                     &{$getMPDescr}($devIdx . '.' . $domain . '.' . $point);
                 
                 $ref->{'nodeid-prefix'} = 'soam//%nodeid-device%//';
+
+                if( defined($mp_name_filter) and
+                    $ref->{'mpDescr'} =~ $mp_name_filter )
+                {
+                    next;
+                }
+
+                $data->{'acceedSoamLm'}{$idx} = $ref;
             }
         }
 
@@ -255,7 +265,6 @@ sub discover
             if( $dmcfg->{'acceedSoamDmCfgEnabled'}{$idx} == 1 )
             {
                 my $ref = {};
-                $data->{'acceedSoamDm'}{$idx} = $ref;
 
                 my @x = split(/\./, $idx);
                 my $devIdx = join('.', $x[0], $x[1], $x[2]);
@@ -275,6 +284,14 @@ sub discover
                     &{$getMPDescr}($devIdx . '.' . $domain . '.' . $point);
 
                 $ref->{'nodeid-prefix'} = 'soam//%nodeid-device%//';
+
+                if( defined($mp_name_filter) and
+                    $ref->{'mpDescr'} =~ $mp_name_filter )
+                {
+                    next;
+                }
+                
+                $data->{'acceedSoamDm'}{$idx} = $ref;
             }
         }
         

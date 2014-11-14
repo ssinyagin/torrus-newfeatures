@@ -96,8 +96,16 @@ sub discover
 
     my $data = $devdetails->data();
     my $session = $dd->session();
+
+    # Versions 2.00 and 2.10 do not support more then one OID on some requests
+    my $oids_per_pdu = 10;
+    my $sysdescr = $devdetails->snmpVar($dd->oiddef('sysDescr'));
+    if( $sysdescr =~ / V2.(1|0)0,/o )
+    {
+        $oids_per_pdu = 1;
+    }
     
-    $data->{'param'}{'snmp-oids-per-pdu'} = 10;
+    $data->{'param'}{'snmp-oids-per-pdu'} = $oids_per_pdu;
 
     # work around missing entPhysicalContainedIn
     if( not defined($data->{'param'}{'comment'}) and

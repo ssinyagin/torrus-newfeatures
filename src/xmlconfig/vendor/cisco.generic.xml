@@ -65,6 +65,10 @@
                           value="1.3.6.1.4.1.9.9.13.1.3.1.6" />
   <def name="ciscoEnvMonSupplyState"
                           value="1.3.6.1.4.1.9.9.13.1.5.1.3" />
+
+  <!-- CISCO-SYSTEM-EXT-MIB -->
+  <def name="cseSysCPUUtilization"    value="1.3.6.1.4.1.9.9.305.1.1.1.0" />
+  <def name="cseSysMemoryUtilization" value="1.3.6.1.4.1.9.9.305.1.1.2.0" />
 </definitions>
 
 <datasources>
@@ -376,7 +380,35 @@
     <param name="rrd-hwpredict"      value="disabled" />
   </template>
   
-  
+
+  <template name="cisco-system-ext-mib">
+    <subtree name="System_Utilization">
+      <param name="comment"         value="System CPU and memory statistics"/>
+      <param name="node-display-name"  value="System_Utilization"/>
+      <param name="precedence"      value="-800"/>
+      <param name="data-file"       value="%system-id%_sys-ext-mib.rrd"/>
+      <param name="rrd-create-dstype"  value="GAUGE"/>
+      <param name="graph-lower-limit"  value="0" />
+      <param name="graph-upper-limit"  value="100" />
+      <param name="upper-limit"        value="80" />
+      <param name="vertical-label"     value="Percent"/>
+      <param name="graph-title"        value="%system-id%" />
+      <leaf name="CPU">
+        <param name="comment"     value="CPU usage"/>
+        <param name="rrd-ds"      value="cpu"/>
+        <param name="snmp-object" value="$cseSysCPUUtilization"/>
+        <param name="graph-legend" value="CPU usage"/>
+      </leaf>
+      <leaf name="Memory">
+        <param name="comment"     value="Memory usage"/>
+        <param name="rrd-ds"      value="mem"/>
+        <param name="snmp-object" value="$cseSysMemoryUtilization"/>
+        <param name="graph-legend" value="Memory usage"/>
+      </leaf>
+    </subtree>
+ </template>
+
+    
 </datasources>
 
 </configuration>

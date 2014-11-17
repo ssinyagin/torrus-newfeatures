@@ -814,6 +814,11 @@ like Cisco GSR.
 
 if set to C<yes>, Cisco power supply statistics are not collected.
 
+=item * C<CiscoGeneric::disable-system-ext-mib>
+
+if set to C<yes>, CPU and memory statistics from CISCO-SYSTEM-EXT-MIB
+are not used.
+
 =item * C<CiscoGeneric::power-monitor>
 
 Name of the power supply monitor for Cisco devices.

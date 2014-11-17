@@ -58,7 +58,11 @@ our %oiddef =
      'cpmCPUTotal1minRev'                => '1.3.6.1.4.1.9.9.109.1.1.1.1.7',
 
      # OLD-CISCO-CPU-MIB
-     'avgBusy1'                          => '1.3.6.1.4.1.9.2.1.57.0'
+     'avgBusy1'                          => '1.3.6.1.4.1.9.2.1.57.0',
+
+     # CISCO-SYSTEM-EXT-MIB
+     'cseSysCPUUtilization'              => '1.3.6.1.4.1.9.9.305.1.1.1.0',
+     'cseSysMemoryUtilization'           => '1.3.6.1.4.1.9.9.305.1.1.2.0',
      );
 
 sub checkdevtype
@@ -292,6 +296,22 @@ sub discover
         }
     }
 
+    if( $devdetails->paramDisabled('CiscoGeneric::disable-system-ext-mib') )
+    {
+        my $result =
+            $dd->retrieveSnmpOIDs('cseSysCPUUtilization',
+                                  'cseSysMemoryUtilization');
+        
+        if( defined $result and
+            defined($result->{'cseSysCPUUtilization'}) and
+            defined($result->{'cseSysMemoryUtilization'}) )
+        {
+            $devdetails->setCap('ciscoSysExtMib');
+            push( @{$data->{'templates'}},
+                  'CiscoGeneric::cisco-system-ext-mib' );
+        }
+    }
+    
     return 1;
 }
 

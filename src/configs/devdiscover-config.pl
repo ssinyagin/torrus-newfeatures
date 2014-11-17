@@ -696,6 +696,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-power-supply',
          'source' => 'vendor/cisco.generic.xml'
          },
+     'CiscoGeneric::cisco-system-ext-mib' => {
+         'name'   => 'cisco-system-ext-mib',
+         'source' => 'vendor/cisco.generic.xml'
+         },
      'CiscoIOS::cisco-interface-counters' => {
          'name'   => 'cisco-interface-counters',
          'source' => 'vendor/cisco.ios.xml'

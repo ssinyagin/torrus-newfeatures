@@ -1,3 +1,8 @@
+2014-11-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/CiscoGeneric.pm: added support for
+	CISCO-SYSTEM-EXT-MIB (mainly needed for Cisco Nexus)
+
 2014-11-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/Albis_ULAF.pm (discover):

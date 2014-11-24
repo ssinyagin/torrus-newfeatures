@@ -808,6 +808,8 @@ sub checkSnmpOID
 
 ##
 # retrieve the given OIDs by names and return hash with values
+# if the agent returns noSuchObject, the corresponding hash values
+# are empty strings
 
 sub retrieveSnmpOIDs
 {

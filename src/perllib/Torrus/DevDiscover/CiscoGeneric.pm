@@ -303,8 +303,8 @@ sub discover
                                   'cseSysMemoryUtilization');
         
         if( defined $result and
-            defined($result->{'cseSysCPUUtilization'}) and
-            defined($result->{'cseSysMemoryUtilization'}) )
+            $result->{'cseSysCPUUtilization'} ne '' and
+            $result->{'cseSysMemoryUtilization'} ne '' )
         {
             $devdetails->setCap('ciscoSysExtMib');
             push( @{$data->{'templates'}},

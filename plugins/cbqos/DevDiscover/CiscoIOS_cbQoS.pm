@@ -109,6 +109,7 @@ our %oiddef =
      'cbQosPoliceCfgExceedSetValue'    => '1.3.6.1.4.1.9.9.166.1.12.1.1.7',
      'cbQosPoliceCfgViolateAction'     => '1.3.6.1.4.1.9.9.166.1.12.1.1.8',
      'cbQosPoliceCfgViolateSetValue'   => '1.3.6.1.4.1.9.9.166.1.12.1.1.9',
+     'cbQosPoliceCfgRateType'          => '1.3.6.1.4.1.9.9.166.1.12.1.1.12',
 
      'cbQosTSCfgTable'                 => '1.3.6.1.4.1.9.9.166.1.13.1',
      'cbQosTSCfgRate'                  => '1.3.6.1.4.1.9.9.166.1.13.1.1.1',
@@ -333,13 +334,15 @@ sub discover
 
     # Process cbQosxxxCfgTable
     $data->{'cbqos_objcfg'} = {};
-
+    $data->{'cbqos_invalid_cfg'} = {};
+    
     while( my( $policyObjectIndex, $objectRef ) =
            each %{$data->{'cbqos_objects'}} )
     {
         my $objConfIndex = $objectRef->{'cbQosConfigIndex'};
 
         next if exists( $data->{'cbqos_objcfg'}{$objConfIndex} );
+        next if $data->{'cbqos_invalid_cfg'}{$objConfIndex};
 
         my $objType = $objectRef->{'cbQosObjectsType'};
         my $object = {};
@@ -401,6 +404,19 @@ sub discover
         }
         elsif( $objType eq 'police' )
         {
+            # if cbQosPoliceCfgRateType specifies other than bps, the
+            # collector cannot use cbQosPoliceCfgRate as a name index, and
+            # that complicates things. Probably someday someone sponsors a fix
+            my $val = $cfgData->{$dd->oiddef('cbQosPoliceCfgRateType') .'.'.
+                                     $objConfIndex};
+            if( defined($val) and $val != 1 )
+            {
+                Warn('cbQosPoliceCfgRateType for ' . $objConfIndex .
+                     ' has unsupported value(' . $val . ')');
+                $data->{'cbqos_invalid_cfg'}{$objConfIndex} = 1;
+                next;
+            }
+            
             push( @rows,
                   'cbQosPoliceCfgRate',
                   'cbQosPoliceCfgBurstSize',
@@ -428,11 +444,9 @@ sub discover
             }
             elsif( $mandatory{$row} )
             {
-                Warn('Object with missing mandatory configuration: ' .
-                     'cbQosPolicyIndex=' . $objectRef->{'cbQosPolicyIndex'} .
-                     ', cbQosObjectsIndex=' . $policyObjectIndex .
-                     ', row=' . $row);
-                delete $data->{'cbqos_objects'}{$policyObjectIndex};
+                Warn('Missing required configuration in: ' .
+                     'cbQosConfigIndex=' . $objConfIndex . ', row=' . $row);
+                $data->{'cbqos_invalid_cfg'}{$objConfIndex} = 1;
                 $objType = 'DELETED';
             }
         }
@@ -512,11 +526,13 @@ sub buildChildrenConfigs
     
     foreach my $policyObjectIndex
         ( sort { $a <=> $b } @{$data->{'cbqos_children'}{$parentObjIndex}} )
-    {
+    {      
         my $objectRef     = $data->{'cbqos_objects'}{$policyObjectIndex};
-        
+               
         my $objConfIndex  = $objectRef->{'cbQosConfigIndex'};
         next unless defined($objConfIndex);
+
+        next if $data->{'cbqos_invalid_cfg'}{$objConfIndex};
         
         my $objType       = $objectRef->{'cbQosObjectsType'};
         my $configRef     = $data->{'cbqos_objcfg'}{$objConfIndex};
@@ -718,48 +734,56 @@ sub buildChildrenConfigs
             push( @templates,
                   'CiscoIOS_cbQoS::cisco-cbqos-queueing-meters' );
 
-            $param->{'legend'} =
-                sprintf('Guaranteed Bandwidth: %d %s;' .
-                        'Flow: %s;' .
-                        'Priority: %s;',                        
-                        $bandwidth, $units,                        
-                        $configRef->{'cbQosQueueingCfgFlowEnabled'},
-                        $configRef->{'cbQosQueueingCfgPriorityEnabled'});
+            my $legend = sprintf('Guaranteed Bandwidth: %d %s;',
+                                 $bandwidth, $units);
 
-            if( defined( $configRef->{'cbQosQueueingCfgAggregateQLimit'} ) )
+            my $val = $configRef->{'cbQosQueueingCfgFlowEnabled'};
+            if( defined($val) )
             {
-                $param->{'legend'} .=
+                $legend .= 'Flow: ' . $val . ';';
+            }
+
+            $val = $configRef->{'cbQosQueueingCfgPriorityEnabled'};
+            if( defined($val) )
+            {
+                $legend .= 'Priority: ' . $val . ';';
+            }
+            
+            $val = $configRef->{'cbQosQueueingCfgAggregateQLimit'};
+            if( defined($val) )
+            {
+                $legend .=
                     sprintf('Max Queue Size: %d %s;',
-                            $configRef->{'cbQosQueueingCfgAggregateQLimit'},
+                            $val,
                             $configRef->{'cbQosQueueingCfgQLimitUnits'});
             }
             elsif( defined( $configRef->{'cbQosQueueingCfgAggregateQSize'} ) )
             {
-                $param->{'legend'} .=
+                $legend .=
                     sprintf('Max Queue Size: %d packets;',
                             $configRef->{'cbQosQueueingCfgAggregateQSize'});
             }
 
-            if( $configRef->{'cbQosQueueingCfgIndividualQSize'} > 0 )
+            $val = $configRef->{'cbQosQueueingCfgIndividualQSize'};
+            if( defined($val) and $val > 0 )
             {
-                $param->{'legend'} .=
-                    sprintf('Individual Flow Queue Size: %d packets;',
-                            $configRef->{'cbQosQueueingCfgIndividualQSize'});
+                $legend .=
+                    sprintf('Individual Flow Queue Size: %d packets;', $val);
             }
 
-            if( $configRef->{'cbQosQueueingCfgDynamicQNumber'} > 0 )
+            $val = $configRef->{'cbQosQueueingCfgDynamicQNumber'};
+            if( defined($val) and $val > 0 )
             {
-                $param->{'legend'} .=
-                    sprintf('Max Dynamic Queues: %d;',
-                            $configRef->{'cbQosQueueingCfgDynamicQNumber'});
+                $legend .= sprintf('Max Dynamic Queues: %d;', $val);
             }
 
-            if( $configRef->{'cbQosQueueingCfgPrioBurstSize'} > 0 )
+            $val = $configRef->{'cbQosQueueingCfgPrioBurstSize'};
+            if( defined($val) and $val > 0 )
             {
-                $param->{'legend'} .=
-                    sprintf('Priority Burst Size: %d bytes;',
-                            $configRef->{'cbQosQueueingCfgPrioBurstSize'});
+                $legend .= sprintf('Priority Burst Size: %d bytes;', $val);
             }
+
+            $param->{'legend'} = $legend;
         }
         elsif( $objType eq 'randomDetect')
         {
@@ -787,20 +811,34 @@ sub buildChildrenConfigs
             $param->{'cbqos-shaping-rate'} = $rate;
             push( @templates,
                   'CiscoIOS_cbQoS::cisco-cbqos-shaping-meters' );
+
+            my $legend = sprintf('Committed Rate: %d bits/second;', $rate);
             
-            $param->{'legend'} =
-                sprintf('Committed Rate: %d bits/second;' .
-                        'Burst Size: %d bits;' .
-                        'Ext Burst Size: %d bits;' .
-                        'Limit: %s;',
-                        $rate,
-                        $configRef->{'cbQosTSCfgBurstSize'},
-                        $configRef->{'cbQosTSCfgExtBurstSize'},
-                        $configRef->{'cbQosTSCfgLimitType'});
-            if( $configRef->{'cbQosTSCfgAdaptiveEnabled'} == 1 )
+            my $val = $configRef->{'cbQosTSCfgBurstSize'};
+            if( defined($val) )
             {
-                $param->{'legend'} .= 'Adaptive: yes;';
-            }                        
+                $legend .= sprintf('Burst Size: %d bits;', $val);
+            }
+
+            $val = $configRef->{'cbQosTSCfgExtBurstSize'};
+            if( defined($val) )
+            {
+                $legend .= sprintf('Ext Burst Size: %d bits;', $val);
+            }
+
+            $val = $configRef->{'cbQosTSCfgLimitType'};
+            if( defined($val) )
+            {
+                $legend .= sprintf('Limit: %s;', $val);
+            }
+
+            $val = $configRef->{'cbQosTSCfgAdaptiveEnabled'};
+            if( defined($val) and $val == 1 )
+            {
+                $legend .= 'Adaptive: yes;';
+            }
+            
+            $param->{'legend'} = $legend;
         }
         elsif( $objType eq 'police' )
         {
@@ -953,7 +991,9 @@ my $truthValueTranslation = {
 my $queueUnitTranslation = {
     1 => 'packets',
     2 => 'cells',
-    3 => 'bytes'
+    3 => 'bytes',
+    4 => 'ms',
+    5 => 'us'
     };
 
 

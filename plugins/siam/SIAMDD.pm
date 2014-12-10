@@ -209,6 +209,9 @@ sub discover
         return 0;
     }
 
+    my $data = $devdetails->data();
+    $data->{'param'}{'siam-device'} = $devobj->id();
+
     Debug('SIAMDD: ' . scalar(keys %registry) . ' registry entries');
 
     foreach my $entry

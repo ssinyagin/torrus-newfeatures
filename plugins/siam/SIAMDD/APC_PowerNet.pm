@@ -103,6 +103,7 @@ sub match_devc
         $devdetails->hasCap('apc_rPDU') )
     {
         $data->{'param'}{'nodeid-pdu'} = $devc->attr('torrus.nodeid');
+        $data->{'param'}{'siam-devicecomponent'} = $devc->id();
         return 1;
     }
         

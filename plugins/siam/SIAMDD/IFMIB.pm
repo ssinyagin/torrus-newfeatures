@@ -220,7 +220,8 @@ sub match_devc
         $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} = '';
         $interface->{$data->{'nameref'}{'ifNodeid'}} =
             $devc->attr('torrus.nodeid');
-        
+        $interface->{'param'}{'siam-devicecomponent'} = $devc->id();
+
         # Apply the service access bandwidth
         my $bw = $devc->attr('torrus.port.bandwidth');
         if( not defined($bw) or $bw == 0 )
@@ -246,6 +247,30 @@ sub match_devc
             $interface->{'param'}{'monitor-vars'} =
                 sprintf('bw=%g', $bw);
         }        
+
+        my $monitor_names = $devc->attr('torrus.port.monitors');
+        if( defined($monitor_names) and $monitor_names =~ /\w/ )
+        {
+            $interface->{'childCustomizations'}->{'Bytes_In'} ->{
+                'monitor'} = $monitor_names;
+            $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
+                'monitor'} = $monitor_names;
+
+            my $new_vars = $devc->attr('torrus.port.monitor_vars');
+            if( defined($new_vars) )
+            {
+                my $vars = $interface->{'param'}{'monitor-vars'};
+                if( defined($vars) )
+                {
+                    $vars .= ';' . $new_vars;
+                }
+                else
+                {
+                    $vars = $new_vars;
+                }
+                $interface->{'param'}{'monitor-vars'} = $vars;
+            }
+        }
         
         if( $interface->{'ifAdminStatus'} != 1 )
         {

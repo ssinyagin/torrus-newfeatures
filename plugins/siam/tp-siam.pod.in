@@ -191,7 +191,7 @@ ones are ignored.
 
 =item * siam.devc.type
 
-Type of device component. Supported values: C<IFMIB.Port>
+Type of device component. Supported values: C<IFMIB.Port>, C<Power.PDU>
 
 =item * siam.devc.name, torrus.port.shortname
 
@@ -208,6 +208,16 @@ Unique value of C<nodeid> which will be assigned to the matched interface.
 Optional service bandwidth in bit per second. If defined, the
 corresponding bandwidth limit parameters are applied to the interface
 configuration.
+
+=item * torrus.port.monitors
+
+Optional comma-separated list of monitor names as defined in C<monitor>
+XML configuration parameter.
+
+=item * torrus.port.monitor_vars
+
+Optional key=value pairs separated by semicolumns. These pairs are added
+to the C<monitor-vars> parameter in XML configuration.
 
 =back
 

@@ -105,6 +105,10 @@
 
   <param name="collector-instance-hashstring" value="%system-id%" />
 
+  <!-- Default schedule for the monitor -->
+  <param name="monitor-period"     value="300" />
+  <param name="monitor-timeoffset" value="75" />
+  
 </datasources>
 
 <token-sets>

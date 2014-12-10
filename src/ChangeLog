@@ -1,5 +1,8 @@
 2014-12-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* xmlconfig/defaults.xml: moved monitor-period and
+	monitor-timeoffset from snmp-defs.xml
+
 	* bin/monitor.in: new CLI option: --runalways
 
 	* configs/torrus-config.pl: new configuration parameters:

@@ -131,10 +131,6 @@
 
     <param name="leaf-type" value="rrd-def" />
     <param name="rrd-cf"    value="AVERAGE" />
-
-    <!-- Default schedule for the monitor -->
-    <param name="monitor-period"     value="300" />
-    <param name="monitor-timeoffset" value="75" />
     
     <param name="searchable" value="yes" />
   </template>

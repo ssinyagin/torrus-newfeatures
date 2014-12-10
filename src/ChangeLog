@@ -1,3 +1,11 @@
+2014-12-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/monitor.in: new CLI option: --runalways
+
+	* configs/torrus-config.pl: new configuration parameters:
+	$Torrus::Collector::runAlways = 0;
+	$Torrus::Monitor::runAlways = 0;
+
 2014-11-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/CiscoGeneric.pm: added support for

@@ -189,7 +189,7 @@ if( $runonce )
 {
     $options{'-RunOnce'} = 1;
 }
-if( $runalways )
+if( $runalways or $Torrus::Collector::runAlways )
 {
     $options{'-RunAlways'} = 1;
 }

@@ -71,6 +71,11 @@ $Torrus::Monitor::useSyslog = 1;
 # Syslog socket on the local host is used
 # $Torrus::Log::syslogSockOpt = ['unix', '/home/jsmith/tmp/syslog.sock'];
 
+# If true, daemons will continue running even if there are no relevant
+# datasource leaves
+$Torrus::Collector::runAlways = 0;
+$Torrus::Monitor::runAlways = 0;
+
 # By default, there's an exclusive lock that allows only one collector
 # process to initialize at a time. This reduces the concurrency and
 # usually optimizes the initialization of multiple collector processes.

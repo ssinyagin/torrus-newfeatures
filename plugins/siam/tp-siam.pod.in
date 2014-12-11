@@ -176,6 +176,15 @@ be removed. SIAMDD assumes that C<torrus.nodeid> attribute is
 automatically calculated by the underlying inventory database when
 device component objects are created.
 
+=item * torrus.if.adminup_only
+
+If true, all admin-down interfaces are excluded from discovery results.
+
+=item * torrus.if.siam_known_only
+
+If true, all interfaces which were not matched against SIAM objects are
+excluded from discovery results.
+
 =back
 
 

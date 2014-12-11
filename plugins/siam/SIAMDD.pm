@@ -220,7 +220,7 @@ sub discover
     {
         if( defined($registry{$entry}{'prepare'}) )
         {
-            &{$registry{$entry}{'prepare'}}($dd, $devdetails);
+            &{$registry{$entry}{'prepare'}}($dd, $devdetails, $devobj);
         }
     }
 

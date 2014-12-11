@@ -41,7 +41,8 @@ sub prepare
 {
     my $dd = shift;
     my $devdetails = shift;
-
+    my $devobj = shift;
+    
     my $data = $devdetails->data();
 
     if( not $devdetails->isDevType('RFC2863_IF_MIB') or
@@ -103,6 +104,14 @@ sub prepare
                 }
             }
         }                        
+    }
+
+    foreach my $attr ('torrus.if.adminup_only', 'torrus.if.siam_known_only')
+    {
+        if( $devobj->attr($attr) )
+        {
+            $data->{'siam'}{$attr} = 1;
+        }
     }
 
     return;
@@ -311,6 +320,34 @@ sub postprocess
 
             if( $interface->{'ifAdminStatus'} != 1 and
                 (not $interface->{'SIAM::matched'}) )
+            {
+                $interface->{'excluded'} = 1;
+            }
+        }
+    }
+
+    if( $data->{'siam'}{'torrus.if.adminup_only'} )
+    {
+        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+        {
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            next if $interface->{'excluded'};
+
+            if( $interface->{'ifAdminStatus'} != 1 )
+            {
+                $interface->{'excluded'} = 1;
+            }
+        }
+    }
+
+    if( $data->{'siam'}{'torrus.if.siam_known_only'} )
+    {
+        foreach my $ifIndex ( keys %{$data->{'interfaces'}} )
+        {
+            my $interface = $data->{'interfaces'}{$ifIndex};
+            next if $interface->{'excluded'};
+            
+            if( not $interface->{'SIAM::matched'} )
             {
                 $interface->{'excluded'} = 1;
             }

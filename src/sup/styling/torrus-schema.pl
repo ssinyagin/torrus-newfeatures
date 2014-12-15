@@ -32,6 +32,12 @@
      'HruleMax'       => {
          'color' => '##darkmagenta'
          },
+     'HruleWarn'       => {
+         'color' => '##darkorange'
+         },
+     'HruleCrit'       => {
+         'color' => '##crimson'
+         },
      'BpsIn'          => {
          'color' => '#01ca00',
          'line'  => 'AREA'

@@ -1086,6 +1086,7 @@ sub buildConfig
         {
             push( @templates,
                   'RFC2863_IF_MIB::interface-bandwidth-usage' );
+            $interface->{'hasChild'}{'Bandwidth_Usage'} = 1;
         }
 
         if( ref( $interface->{'templates'} ) )

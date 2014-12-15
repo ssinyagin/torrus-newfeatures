@@ -1,3 +1,8 @@
+2014-12-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* xmlconfig/defaults.xml: two new horizontal rules: warn-level,
+	crit-level
+
 2014-12-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* xmlconfig/defaults.xml: moved monitor-period and

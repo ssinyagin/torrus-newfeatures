@@ -137,13 +137,17 @@
     <param name="hw-bndr-color" value="##HWBoundary" />
     <param name="hw-fail-color" value="##HWFailure" />
 
-    <param name="hrules"            value="min,norm,max"/>
+    <param name="hrules"            value="min,norm,max,warn,crit"/>
     <param name="hrule-color-min"   value="##HruleMin"/>
     <param name="hrule-value-min"   value="lower-limit"/>
     <param name="hrule-color-norm"  value="##HruleNormal"/>
     <param name="hrule-value-norm"  value="normal-level"/>
     <param name="hrule-color-max"   value="##HruleMax"/>
     <param name="hrule-value-max"   value="upper-limit"/>
+    <param name="hrule-color-warn"   value="##HruleWarn"/>
+    <param name="hrule-value-warn"   value="warn-level"/>
+    <param name="hrule-color-crit"   value="##HruleCrit"/>
+    <param name="hrule-value-crit"   value="crit-level"/>
 
     <param name="decorations"       value="busday,evening,night"/>
 

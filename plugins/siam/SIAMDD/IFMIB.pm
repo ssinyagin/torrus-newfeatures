@@ -280,7 +280,29 @@ sub match_devc
                 $interface->{'param'}{'monitor-vars'} = $vars;
             }
         }
-        
+
+        foreach my $level ('warn', 'crit')
+        {
+            my $val = $devc->attr('torrus.port.' . $level);
+            next unless ( defined($val) and $val > 0 );
+            
+            $interface->{'childCustomizations'}->{'InOut_bps'}->{
+                $level . '-level'} = $val;
+            $interface->{'childCustomizations'}->{'Bytes_In'} ->{
+                $level . '-level'} = $val / 8;
+            $interface->{'childCustomizations'}->{'Bytes_Out'} ->{
+                $level . '-level'} = $val / 8;
+
+            # RFC2863_IF_MIB::bandwidth-usage parameter is checked in
+            # RFC2863_IF_MIB and customizations are ignored if the
+            # bandwidth usage is not displayed
+            if( defined($bw) and $bw > 0 )
+            {
+                $interface->{'childCustomizations'}->{'Bandwidth_Usage'} ->{
+                    $level . '-level'} = 100.0 * $val / $bw;
+            }
+        }
+
         if( $interface->{'ifAdminStatus'} != 1 )
         {
             $devc->set_condition

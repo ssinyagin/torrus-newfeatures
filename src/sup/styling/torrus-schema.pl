@@ -24,19 +24,29 @@
          'color' => '##moccasin'
          },
      'HruleMin'       => {
-         'color' => '##darkmagenta'
+         'color' => '##darkmagenta',
+         'alpha' => 'A0',
+         'line'  => 'LINE1'
          },
      'HruleNormal'    => {
-         'color' => '##seagreen'
+         'color' => '##seagreen',
+         'alpha' => 'A0',
+         'line'  => 'LINE1'
          },
      'HruleMax'       => {
-         'color' => '##darkmagenta'
+         'color' => '##darkmagenta',
+         'alpha' => 'A0',
+         'line'  => 'LINE1'
          },
      'HruleWarn'       => {
-         'color' => '##darkorange'
+         'color' => '##darkorange',
+         'alpha' => 'A0',
+         'line'  => 'LINE1'
          },
      'HruleCrit'       => {
-         'color' => '##crimson'
+         'color' => '##crimson',
+         'alpha' => 'A0',
+         'line'  => 'LINE1'
          },
      'BpsIn'          => {
          'color' => '#01ca00',

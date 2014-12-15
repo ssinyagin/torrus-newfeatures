@@ -1,5 +1,8 @@
 2014-12-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
+	* perllib/Torrus/Renderer/RRDtool.pm: now hrules are drawn with
+	semi-transparent LINE1
+
 	* xmlconfig/defaults.xml: two new horizontal rules: warn-level,
 	crit-level
 

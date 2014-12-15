@@ -45,7 +45,7 @@ my %mime_type =
      'EPS' => 'application/postscript',
      'PDF' => 'application/pdf');
 
-my @arg_arrays = qw(opts defs bg hwtick hrule hwline line fg);
+my @arg_arrays = qw(opts defs bg hwtick hwline line hrule fg);
 
 
 sub prepare_rrgraph_args
@@ -768,15 +768,17 @@ sub rrd_make_hrules
 
             if( defined( $value ) )
             {
-                my $color =
+                my $style =
                     $config_tree->getParam($view, 'hrule-color-'.$hruleName);
-                $color = $self->mkcolor( $color );
 
+                my $color = $self->mkcolor( $style );
+                my $line = $self->mkline( $style );
+                
                 my $legend =
                     $config_tree->getNodeParam($token,
                                                'hrule-legend-'.$hruleName);
 
-                my $arg = sprintf( 'HRULE:%e%s', $value, $color );
+                my $arg = sprintf( '%s:%e%s', $line, $value, $color );
                 if( defined( $legend ) and $legend =~ /\S/ )
                 {
                     $arg .= ':' . $legend . '\l';
@@ -1288,7 +1290,8 @@ sub mkcolor
     my $self = shift;
     my $color = shift;
 
-    my $recursionLimit = 100;
+    my $alpha;    
+    my $recursionLimit = 10;
 
     while( $color =~ /^\#\#(\S+)$/ )
     {
@@ -1306,9 +1309,19 @@ sub mkcolor
                 Error('No color is defined for ' . $colorName);
                 $color = '#000000';
             }
+
+            my $new_alpha =
+                $Torrus::Renderer::graphStyles{$colorName}{'alpha'};
+            if( defined($new_alpha) )
+            {
+                $alpha = $new_alpha;
+            }
         }
     }
-    return $color;
+
+    $alpha = '' unless defined($alpha);
+    
+    return ($color . $alpha);
 }
 
 sub mkline

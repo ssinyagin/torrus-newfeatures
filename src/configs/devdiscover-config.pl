@@ -1122,6 +1122,18 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'      => 'f5-global-host',
          'source'    => 'vendor/f5.bigip.xml',
      },
+     'F5BigIp::f5-multihost-host' => {
+         'name'      => 'f5-multihost-host',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
+     'F5BigIp::f5-multihost-cpu-subtree' => {
+         'name'      => 'f5-multihost-cpu-subtree',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
+     'F5BigIp::f5-multihost-cpu' => {
+         'name'      => 'f5-multihost-cpu',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
      'F5BigIp::f5-object-statistics' => {
          'name'      => 'f5-object-statistics',
          'source'    => 'vendor/f5.bigip.xml',

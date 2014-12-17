@@ -43,7 +43,10 @@ our %oiddef =
      'f5_sysPlatformInfoMarketingName' => '1.3.6.1.4.1.3375.2.1.3.5.2.0',
      'f5_sysProductVersion'            => '1.3.6.1.4.1.3375.2.1.4.2.0',
      'f5_sysProductBuild'              => '1.3.6.1.4.1.3375.2.1.4.3.0',
-     'sysGlobalHostMemTotal'           => '1.3.6.1.4.1.3375.2.1.1.2.20.2.0',
+     'f5_sysGlobalHostMemTotal'        => '1.3.6.1.4.1.3375.2.1.1.2.20.2.0',
+     'f5_sysMultiHostHostId'           => '1.3.6.1.4.1.3375.2.1.7.4.2.1.1',
+     'f5_sysMultiHostTotal'            => '1.3.6.1.4.1.3375.2.1.7.4.2.1.2',
+     'f5_sysMultiHostCpuId'            => '1.3.6.1.4.1.3375.2.1.7.5.2.1.3',
 
      # F5-BIGIP-LOCAL-MIB -- LTM stats
      'ltmNodeAddrNumber'         => '1.3.6.1.4.1.3375.2.2.4.1.1.0',
@@ -151,35 +154,55 @@ sub discover
                 $sysref->{'f5_sysProductBuild'};
         }
 
-        $result = $dd->retrieveSnmpOIDs('sysGlobalHostMemTotal');
-        if( defined($result) and $result->{'sysGlobalHostMemTotal'} > 0 )
+        $result = $dd->retrieveSnmpOIDs('f5_sysGlobalHostMemTotal');
+        if( defined($result) and $result->{'f5_sysGlobalHostMemTotal'} > 0 )
         {
             $data->{'param'}{'f5-global-host-memtotal'} =
-                $result->{'sysGlobalHostMemTotal'};
+                $result->{'f5_sysGlobalHostMemTotal'};
             push( @{$data->{'templates'}}, 'F5BigIp::f5-global-host' );
+        }
+
+        if( $devdetails->paramEnabled('F5BigIp::multi-host-stats') )
+        {
+            my $hostID = $dd->walkSnmpTable('f5_sysMultiHostHostId');
+            my $hostMem = $dd->walkSnmpTable('f5_sysMultiHostTotal');
+            while( my( $hINDEX, $memsize ) = each %{$hostMem} )
+            {
+                $data->{'f5_host'}{$hINDEX}{'memtotal'} = $memsize;
+                $data->{'f5_host'}{$hINDEX}{'hostid'} = $hostID->{$hINDEX};
+            }
+            
+            foreach my $hINDEX (keys %{$data->{'f5_host'}})
+            {
+                my $cpus = $dd->walkSnmpTable('f5_sysMultiHostCpuId');
+                while( my( $cINDEX, $id ) = each %{$cpus} )
+                {
+                    $cINDEX = substr($cINDEX, length($hINDEX)+1);
+                    $data->{'f5_host'}{$hINDEX}{'cpu'}{$cINDEX} = $id;
+                }
+            }
         }
     }
 
     # Check LTM capabilities
     {
-        my $oid_nodes = $dd->oiddef('ltmNodeAddrNumber');
-        my $oid_pools = $dd->oiddef('ltmPoolNumber');
-        my $oid_vservers = $dd->oiddef('ltmVirtualServNumber');
-        
-        my $result = $session->get_request
-            ( -varbindlist => [$oid_nodes, $oid_pools, $oid_vservers] );
-        
-        if( defined($result->{$oid_nodes}) and $result->{$oid_nodes} > 0 )
+        my $result = $dd->retrieveSnmpOIDs(
+            'ltmNodeAddrNumber', 'ltmPoolNumber', 'ltmVirtualServNumber');
+                
+        if( defined($result->{'ltmNodeAddrNumber'}) and
+            $result->{'ltmNodeAddrNumber'} > 0 )
         {
             $devdetails->setCap('F5_LTM_Nodes');
         }
         
-        if( defined($result->{$oid_pools}) and $result->{$oid_pools} > 0 )
+        if( defined($result->{'ltmPoolNumber'}) and
+            $result->{'ltmPoolNumber'} > 0 )
         {
             $devdetails->setCap('F5_LTM_Pools');
         }
         
-        if( defined($result->{$oid_vservers}) and $result->{$oid_vservers} > 0 )
+        if( defined($result->{'ltmVirtualServNumber'}) and
+            $result->{'ltmVirtualServNumber'} > 0 )
         {
             $devdetails->setCap('F5_LTM_VServers');
         }
@@ -313,6 +336,43 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
+    if( defined($data->{'f5_host'}) )
+    {
+        foreach my $hINDEX (keys %{$data->{'f5_host'}})
+        {
+            my $hostSubtree = 'Host ' . $data->{'f5_host'}{$hINDEX}{'hostid'};
+            
+            my $params = {
+                'node-display-name' =>$hostSubtree,
+                'comment' => 'BigIP host',
+                'f5-host-index' => $hINDEX,
+                'f5-host-memtotal' => $data->{'f5_host'}{$hINDEX}{'memtotal'},
+            };
+                
+            $hostSubtree =~ s/\W/_/g;
+            my $hostNode = $cb->addSubtree
+                ( $devNode, $hostSubtree, $params,
+                  ['F5BigIp::f5-multihost-host']);
+            
+            my $cpusNode = $cb->addSubtree
+                ( $hostNode, 'CPU', {}, ['F5BigIp::f5-multihost-cpu-subtree']);
+
+            foreach my $cINDEX (sort {$a<=>$b} keys
+                                %{$data->{'f5_host'}{$hINDEX}{'cpu'}})
+            {
+                my $id = $data->{'f5_host'}{$hINDEX}{'cpu'}{$cINDEX};
+                my $params = {
+                    'f5-cpu-index' => $cINDEX,
+                    'f5-cpu-id' => $id,
+                };
+
+                $cb->addSubtree
+                    ( $cpusNode, $id, $params, ['F5BigIp::f5-multihost-cpu']);
+                
+            }
+        }
+    }
+    
     my $p_precedence = 10000;
     
     foreach my $partition (sort keys %{$data->{'ltm'}})

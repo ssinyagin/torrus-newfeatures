@@ -28,6 +28,30 @@
          value="1.3.6.1.4.1.3375.2.1.1.2.20.3.0"/>
     <def name="sysGlobalHostCpuUsageRatio5m"
          value="1.3.6.1.4.1.3375.2.1.1.2.20.37.0"/>
+    <def name="sysMultiHostUsed"
+         value="1.3.6.1.4.1.3375.2.1.7.4.2.1.3"/>
+    <def name="sysMultiHostCpuUsageRatio5m"
+         value="1.3.6.1.4.1.3375.2.1.7.5.2.1.35"/>
+    <def name="sysTcpStatOpen"
+         value="1.3.6.1.4.1.3375.2.1.1.2.12.2.0"/>
+    <def name="sysTcpStatAccepts"
+         value="1.3.6.1.4.1.3375.2.1.1.2.12.6.0"/>
+    <def name="sysTcpStatAcceptfails"
+         value="1.3.6.1.4.1.3375.2.1.1.2.12.7.0"/>
+    <def name="sysTcpStatConnects"
+         value="1.3.6.1.4.1.3375.2.1.1.2.12.8.0"/>
+    <def name="sysTcpStatConnfails"
+         value="1.3.6.1.4.1.3375.2.1.1.2.12.9.0"/>
+    <def name="sysUdpStatOpen"
+         value="1.3.6.1.4.1.3375.2.1.1.2.13.2.0"/>
+    <def name="sysUdpStatAccepts"
+         value="1.3.6.1.4.1.3375.2.1.1.2.13.3.0"/>
+    <def name="sysUdpStatAcceptfails"
+         value="1.3.6.1.4.1.3375.2.1.1.2.13.4.0"/>
+    <def name="sysUdpStatConnects"
+         value="1.3.6.1.4.1.3375.2.1.1.2.13.5.0"/>
+    <def name="sysUdpStatConnfails"
+         value="1.3.6.1.4.1.3375.2.1.1.2.13.6.0"/>
   </definitions>
 
   
@@ -39,38 +63,228 @@
         <param name="comment"            value="F5 system utilization"/>
         <param name="data-file"  value="%system-id%_f5_global_host.rrd"/>
         <param name="rrd-cf"            value="AVERAGE"/>
-        <param name="rrd-create-dstype" value="GAUGE"/>
 
+        <leaf name="Memory_Utilization">
+          <param name="node-display-name"  value="Memory Utilization"/>
+          <param name="comment"            value="Current memory usage"/>
+          <param name="graph-legend"       value="Memory Usage"/>
+          <param name="snmp-object"        value="$sysGlobalHostMemUsed"/>
+          <param name="rrd-ds"             value="MemUsage"/>
+          <param name="rrd-create-dstype"  value="GAUGE"/>
+          <param name="collector-scale"
+                 value="%f5-global-host-memtotal%,/,100,*"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="graph-upper-limit"  value="100"/>
+          <param name="vertical-label"     value="Percent"/>
+          <param name="line-style"         value="##resourceusage"/>        
+          <param name="precedence"         value="990"/>
+        </leaf>
+        
+        <leaf name="CPU_Utilization">
+          <param name="node-display-name"  value="CPU Utilization"/>
+          <param name="comment"            value="Current CPU usage"/>
+          <param name="graph-legend"       value="CPU Usage"/>
+          <param name="snmp-object"
+                 value="$sysGlobalHostCpuUsageRatio5m"/>
+          <param name="rrd-ds"             value="CpuUsage"/>
+          <param name="rrd-create-dstype"  value="GAUGE"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="graph-upper-limit"  value="100"/>
+          <param name="vertical-label"     value="Percent"/>
+          <param name="line-style"         value="##resourceusage"/>        
+          <param name="precedence"         value="980"/>
+        </leaf>
+
+        <leaf name="TCP_Open">
+          <param name="node-display-name"  value="TCP - Open Connections"/>
+          <param name="comment"  value="Number of current open connections"/>
+          <param name="graph-legend"       value="Open TCP Connections"/>
+          <param name="snmp-object"        value="$sysTcpStatOpen"/>
+          <param name="rrd-ds"             value="TcpOpen"/>
+          <param name="rrd-create-dstype"  value="GAUGE"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections"/>
+          <param name="precedence"         value="970"/>
+        </leaf>
+        
+        <leaf name="TCP_Accepts">
+          <param name="node-display-name"  value="TCP - Accepted Connections"/>
+          <param name="comment"  value="Rate of connections accepted"/>
+          <param name="graph-legend"       value="Accepted TCP Connections"/>
+          <param name="snmp-object"        value="$sysTcpStatAccepts"/>
+          <param name="snmp-object-type"   value="COUNTER64"/>
+          <param name="rrd-ds"             value="TcpAccepts"/>
+          <param name="rrd-create-dstype"  value="COUNTER"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections/s"/>
+          <param name="precedence"         value="960"/>
+        </leaf>
+        
+        <leaf name="TCP_Acceptfails">
+          <param name="node-display-name"
+                 value="TCP - Non-accepted Connections"/>
+          <param name="comment"  value="Rate of connections not accepted"/>
+          <param name="graph-legend"    value="Non-accepted TCP Connections"/>
+          <param name="snmp-object"        value="$sysTcpStatAcceptfails"/>
+          <param name="snmp-object-type"   value="COUNTER64"/>
+          <param name="rrd-ds"             value="TcpAccfails"/>
+          <param name="rrd-create-dstype"  value="COUNTER"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections/s"/>
+          <param name="precedence"         value="950"/>
+        </leaf>
+
+        <leaf name="TCP_Connects">
+          <param name="node-display-name"
+                 value="TCP - Established Connections"/>
+          <param name="comment"  value="Rate of connections established"/>
+          <param name="graph-legend"       value="Established TCP Connections"/>
+          <param name="snmp-object"        value="$sysTcpStatConnects"/>
+          <param name="snmp-object-type"   value="COUNTER64"/>
+          <param name="rrd-ds"             value="TcpConnects"/>
+          <param name="rrd-create-dstype"  value="COUNTER"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections/s"/>
+          <param name="precedence"         value="940"/>
+        </leaf>
+
+        <leaf name="TCP_Connfails">
+          <param name="node-display-name"
+                 value="TCP - Failed Connections"/>
+          <param name="comment"  value="Rate of connection failures"/>
+          <param name="graph-legend"       value="Failed TCP Connections"/>
+          <param name="snmp-object"        value="$sysTcpStatConnfails"/>
+          <param name="snmp-object-type"   value="COUNTER64"/>
+          <param name="rrd-ds"             value="TcpConnfails"/>
+          <param name="rrd-create-dstype"  value="COUNTER"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections/s"/>
+          <param name="precedence"         value="930"/>
+        </leaf>
+
+        <leaf name="UDP_Open">
+          <param name="node-display-name"  value="UDP - Open Connections"/>
+          <param name="comment"  value="Number of current open connections"/>
+          <param name="graph-legend"       value="Open UDP Connections"/>
+          <param name="snmp-object"        value="$sysUdpStatOpen"/>
+          <param name="rrd-ds"             value="UdpOpen"/>
+          <param name="rrd-create-dstype"  value="GAUGE"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections"/>
+          <param name="precedence"         value="970"/>
+        </leaf>
+        
+        <leaf name="UDP_Accepts">
+          <param name="node-display-name"  value="UDP - Accepted Connections"/>
+          <param name="comment"  value="Rate of connections accepted"/>
+          <param name="graph-legend"       value="Accepted UDP Connections"/>
+          <param name="snmp-object"        value="$sysUdpStatAccepts"/>
+          <param name="snmp-object-type"   value="COUNTER64"/>
+          <param name="rrd-ds"             value="UdpAccepts"/>
+          <param name="rrd-create-dstype"  value="COUNTER"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections/s"/>
+          <param name="precedence"         value="960"/>
+        </leaf>
+        
+        <leaf name="UDP_Acceptfails">
+          <param name="node-display-name"
+                 value="UDP - Non-accepted Connections"/>
+          <param name="comment"  value="Rate of connections not accepted"/>
+          <param name="graph-legend"    value="Non-accepted UDP Connections"/>
+          <param name="snmp-object"        value="$sysUdpStatAcceptfails"/>
+          <param name="snmp-object-type"   value="COUNTER64"/>
+          <param name="rrd-ds"             value="UdpAccfails"/>
+          <param name="rrd-create-dstype"  value="COUNTER"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections/s"/>
+          <param name="precedence"         value="950"/>
+        </leaf>
+
+        <leaf name="UDP_Connects">
+          <param name="node-display-name"
+                 value="UDP - Established Connections"/>
+          <param name="comment"  value="Rate of connections established"/>
+          <param name="graph-legend"       value="Established UDP Connections"/>
+          <param name="snmp-object"        value="$sysUdpStatConnects"/>
+          <param name="snmp-object-type"   value="COUNTER64"/>
+          <param name="rrd-ds"             value="UdpConnects"/>
+          <param name="rrd-create-dstype"  value="COUNTER"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections/s"/>
+          <param name="precedence"         value="940"/>
+        </leaf>
+
+        <leaf name="UDP_Connfails">
+          <param name="node-display-name"
+                 value="UDP - Failed Connections"/>
+          <param name="comment"  value="Rate of connection failures"/>
+          <param name="graph-legend"       value="Failed UDP Connections"/>
+          <param name="snmp-object"        value="$sysUdpStatConnfails"/>
+          <param name="snmp-object-type"   value="COUNTER64"/>
+          <param name="rrd-ds"             value="UdpConnfails"/>
+          <param name="rrd-create-dstype"  value="COUNTER"/>
+          <param name="graph-lower-limit"  value="0"/>
+          <param name="vertical-label"     value="Connections/s"/>
+          <param name="precedence"         value="930"/>
+        </leaf>
+        
+      </subtree>
+    </template>
+
+    <template name="f5-multihost-host">
       <leaf name="Memory_Utilization">
         <param name="node-display-name"  value="Memory Utilization"/>
         <param name="comment"            value="Current memory usage"/>
         <param name="graph-legend"       value="Memory Usage"/>
-        <param name="snmp-object"        value="$sysGlobalHostMemUsed"/>
+        <param name="snmp-object"
+               value="$sysMultiHostUsed.%f5-host-index%"/>
         <param name="rrd-ds"             value="MemUsage"/>
         <param name="collector-scale"
-               value="%f5-global-host-memtotal%,/,100,*"/>
+               value="%f5-host-memtotal%,/,100,*"/>
+        <param name="data-file"
+               value="%system-id%_f5_host_%f5-host-index%.rrd"/>
+        <param name="rrd-cf"            value="AVERAGE"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="graph-lower-limit"  value="0"/>
         <param name="graph-upper-limit"  value="100"/>
         <param name="vertical-label"     value="Percent"/>
         <param name="line-style"         value="##resourceusage"/>        
-        <param name="precedence"         value="990"/>
-      </leaf>
-        
+      </leaf>        
+    </template>
+
+    <template name="f5-multihost-cpu-subtree">
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="util"/>
+      
+      <param name="overview-subleave-name-util" value="CPU_Utilization"/>
+      <param name="overview-shortcut-text-util"
+             value="All CPU Utilization"/>
+      <param name="overview-shortcut-title-util"
+             value="Show utilization for all processors"/>
+      <param name="overview-page-title-traffic"
+             value="CPU Utilization"/>
+    </template>
+    
+    <template name="f5-multihost-cpu">
       <leaf name="CPU_Utilization">
         <param name="node-display-name"  value="CPU Utilization"/>
         <param name="comment"            value="Current CPU usage"/>
+        <param name="graph-title"        value="CPU %f5-cpu-id%" />
         <param name="graph-legend"       value="CPU Usage"/>
-        <param name="snmp-object"        value="$sysGlobalHostCpuUsageRatio5m"/>
+        <param name="snmp-object"
+         value="$sysMultiHostCpuUsageRatio5m.%f5-host-index%.%f5-cpu-index%"/>
         <param name="rrd-ds"             value="CpuUsage"/>
+        <param name="data-file"
+               value="%system-id%_f5_cpu_%f5-host-index%_%f5-cpu-index%.rrd"/>
+        <param name="rrd-cf"            value="AVERAGE"/>
+        <param name="rrd-create-dstype" value="GAUGE"/>
         <param name="graph-lower-limit"  value="0"/>
         <param name="graph-upper-limit"  value="100"/>
         <param name="vertical-label"     value="Percent"/>
         <param name="line-style"         value="##resourceusage"/>        
-        <param name="precedence"         value="980"/>
       </leaf>
-      </subtree>
     </template>
-      
 
     <template name="ltm-node-statistics">
       <!-- F5-BIGIP-LOCAL-MIB::ltmNodeAddrStatTable -->

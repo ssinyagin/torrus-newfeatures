@@ -704,6 +704,10 @@ C<host/intf, host/intf, ...>. Example:
   </host>
 
 
+=item * C<RFC2863_IF_MIB::disable-all>
+
+if set to C<yes>, disables processing of IF-MIB completely.
+
 =back
 
 =head3 Other generic MIB parameters

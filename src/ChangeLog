@@ -1,3 +1,8 @@
+2014-12-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:
+	new discovery parameter: RFC2863_IF_MIB::disable-all
+
 2014-12-15  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm: now hrules are drawn with

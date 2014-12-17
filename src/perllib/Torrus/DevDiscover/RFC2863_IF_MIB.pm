@@ -78,6 +78,11 @@ sub discover
 {
     my $dd = shift;
     my $devdetails = shift;
+
+    if( $devdetails->paramEnabled('RFC2863_IF_MIB::disable-all') )
+    {
+        return 1;
+    }
     
     my $session = $dd->session();
     
@@ -509,6 +514,11 @@ sub buildConfig
     my $devNode = shift;
     my $globalData = shift;
 
+    if( $devdetails->paramEnabled('RFC2863_IF_MIB::disable-all') )
+    {
+        return;
+    }
+    
     my $data = $devdetails->data();
 
     if( scalar( keys %{$data->{'interfaces'}} ) == 0 )

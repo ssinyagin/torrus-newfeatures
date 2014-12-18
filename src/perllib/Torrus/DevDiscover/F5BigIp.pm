@@ -47,6 +47,9 @@ our %oiddef =
      'f5_sysMultiHostHostId'           => '1.3.6.1.4.1.3375.2.1.7.4.2.1.1',
      'f5_sysMultiHostTotal'            => '1.3.6.1.4.1.3375.2.1.7.4.2.1.2',
      'f5_sysMultiHostCpuId'            => '1.3.6.1.4.1.3375.2.1.7.5.2.1.3',
+     'f5_sysInterfaceName'             => '1.3.6.1.4.1.3375.2.1.2.4.1.2.1.1',
+     'f5_sysInterfaceEnabled'          => '1.3.6.1.4.1.3375.2.1.2.4.1.2.1.8',
+     'f5_sysInterfaceStatus'           => '1.3.6.1.4.1.3375.2.1.2.4.1.2.1.17',
 
      # F5-BIGIP-LOCAL-MIB -- LTM stats
      'ltmNodeAddrNumber'         => '1.3.6.1.4.1.3375.2.2.4.1.1.0',
@@ -92,6 +95,8 @@ my %ltm_category_comment =
      'VServers' => 'Virtual server statistics',
     );
 
+
+
 sub checkdevtype
 {
     my $dd = shift;
@@ -104,10 +109,7 @@ sub checkdevtype
         return 0;
     }
     
-    $devdetails->setCap('interfaceIndexingPersistent');
-
-    &Torrus::DevDiscover::RFC2863_IF_MIB::addInterfaceFilter
-        ($devdetails, $f5InterfaceFilter);
+    $devdetails->setParam('RFC2863_IF_MIB::disable-all', 'yes');
     
     return 1;
 }
@@ -180,6 +182,51 @@ sub discover
                     $cINDEX = substr($cINDEX, length($hINDEX)+1);
                     $data->{'f5_host'}{$hINDEX}{'cpu'}{$cINDEX} = $id;
                 }
+            }
+        }
+    }
+
+    # 64bit traffic counters for interfaces
+    {
+        $data->{'f5_ports'} = {};
+        
+        my $ifNames = $dd->walkSnmpTable('f5_sysInterfaceName');
+
+        # sysInterfaceEnabled:
+        #  false(0),
+        #  true(1)
+        # sysInterfaceStatus:
+        #  up(0),
+        #  down(1),
+        #  uninitialized(3),
+        #  unpopulated(5)
+        
+        my $ifEnabled = $dd->walkSnmpTable('f5_sysInterfaceEnabled');
+        my $ifStatus = $dd->walkSnmpTable('f5_sysInterfaceStatus');
+
+        foreach my $INDEX (keys %{$ifNames})
+        {
+            if( $ifEnabled->{$INDEX} == 1 and $ifStatus->{$INDEX} <= 1 )
+            {
+                my $name = $ifNames->{$INDEX};
+                my $sortIndex = 0;
+                my $scale = 1;
+                foreach my $part (reverse split(/\W/, $name))
+                {
+                    my $x = 0;
+                    if( $part =~ /^\d+$/ )
+                    {
+                        $x = $part;
+                    }
+
+                    $sortIndex += $x * $scale;
+                    $scale *= 1000;
+                }
+                
+                $data->{'f5_ports'}{$INDEX} = {
+                    'name' => $name,
+                    'order' => $sortIndex,
+                };
             }
         }
     }
@@ -343,7 +390,7 @@ sub buildConfig
             my $hostSubtree = 'Host ' . $data->{'f5_host'}{$hINDEX}{'hostid'};
             
             my $params = {
-                'node-display-name' =>$hostSubtree,
+                'node-display-name' => $hostSubtree,
                 'comment' => 'BigIP host',
                 'f5-host-index' => $hINDEX,
                 'f5-host-memtotal' => $data->{'f5_host'}{$hINDEX}{'memtotal'},
@@ -372,6 +419,39 @@ sub buildConfig
             }
         }
     }
+
+
+    if( defined($data->{'f5_ports'}) )
+    {
+        my $statsNode = $cb->addSubtree
+            ( $devNode, 'Interface_Counters', {},
+              ['F5BigIp::f5-interface-counters-subtree']);
+        
+        foreach my $INDEX ( sort {$data->{'f5_ports'}{$a}{'order'} <=>
+                                      $data->{'f5_ports'}{$b}{'order'}}
+                            keys %{$data->{'f5_ports'}} )
+        {
+            my $name = $data->{'f5_ports'}{$INDEX}{'name'};
+            my $ifSubtree = $name;
+            $ifSubtree =~ s/\W/_/g;
+            my $order = $data->{'f5_ports'}{$INDEX}{'order'};
+            my $nodeid = 'f5-if//%nodeid-device%//' . $name;
+            
+            my $params = {
+                'node-display-name' => $name,
+                'f5-interface-index' => $INDEX,
+                'f5-interface-name' => $name,
+                'nodeid-interface' => $nodeid,
+                'nodeid' => $nodeid,
+                'precedence' => (0 - $order),
+                
+            };
+
+            $cb->addSubtree($statsNode, $ifSubtree, $params,
+                            ['F5BigIp::f5-interface']);
+        }
+    }
+    
     
     my $p_precedence = 10000;
     

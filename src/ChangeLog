@@ -1,3 +1,8 @@
+2014-12-18  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/DevDiscover/F5BigIp.pm: added system performance
+	statistics and 64-bit interface counters
+
 2014-12-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2863_IF_MIB.pm:

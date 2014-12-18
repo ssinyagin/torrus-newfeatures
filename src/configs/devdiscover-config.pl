@@ -1134,6 +1134,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'      => 'f5-multihost-cpu',
          'source'    => 'vendor/f5.bigip.xml',
      },
+     'F5BigIp::f5-interface-counters-subtree' => {
+         'name'      => 'f5-interface-counters-subtree',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
+     'F5BigIp::f5-interface' => {
+         'name'      => 'f5-interface',
+         'source'    => 'vendor/f5.bigip.xml',
+     },
      'F5BigIp::f5-object-statistics' => {
          'name'      => 'f5-object-statistics',
          'source'    => 'vendor/f5.bigip.xml',

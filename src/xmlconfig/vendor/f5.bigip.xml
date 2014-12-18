@@ -52,6 +52,22 @@
          value="1.3.6.1.4.1.3375.2.1.1.2.13.5.0"/>
     <def name="sysUdpStatConnfails"
          value="1.3.6.1.4.1.3375.2.1.1.2.13.6.0"/>
+    <def name="sysInterfaceStatPktsIn"
+         value="1.3.6.1.4.1.3375.2.1.2.4.4.3.1.2"/>
+    <def name="sysInterfaceStatBytesIn"
+         value="1.3.6.1.4.1.3375.2.1.2.4.4.3.1.3"/>
+    <def name="sysInterfaceStatPktsOut"
+         value="1.3.6.1.4.1.3375.2.1.2.4.4.3.1.4"/>
+    <def name="sysInterfaceStatBytesOut"
+         value="1.3.6.1.4.1.3375.2.1.2.4.4.3.1.5"/>
+    <def name="sysInterfaceStatErrorsIn"
+         value="1.3.6.1.4.1.3375.2.1.2.4.4.3.1.8"/>
+    <def name="sysInterfaceStatErrorsOut"
+         value="1.3.6.1.4.1.3375.2.1.2.4.4.3.1.9"/>
+    <def name="sysInterfaceStatDropsIn"
+         value="1.3.6.1.4.1.3375.2.1.2.4.4.3.1.10"/>
+    <def name="sysInterfaceStatDropsOut"
+         value="1.3.6.1.4.1.3375.2.1.2.4.4.3.1.11"/>
   </definitions>
 
   
@@ -233,6 +249,9 @@
     </template>
 
     <template name="f5-multihost-host">
+      <param name="collector-timeoffset-hashstring"
+             value="%system-id%:%f5-host-index%" />
+      
       <leaf name="Memory_Utilization">
         <param name="node-display-name"  value="Memory Utilization"/>
         <param name="comment"            value="Current memory usage"/>
@@ -279,6 +298,8 @@
                value="%system-id%_f5_cpu_%f5-host-index%_%f5-cpu-index%.rrd"/>
         <param name="rrd-cf"            value="AVERAGE"/>
         <param name="rrd-create-dstype" value="GAUGE"/>
+        <param name="collector-timeoffset-hashstring"
+               value="%system-id%:%f5-host-index%:%f5-cpu-index%" />
         <param name="graph-lower-limit"  value="0"/>
         <param name="graph-upper-limit"  value="100"/>
         <param name="vertical-label"     value="Percent"/>
@@ -286,6 +307,215 @@
       </leaf>
     </template>
 
+    <template name="f5-interface-counters-subtree">
+      <param name="node-display-name"  value="Interfaces"/>
+      <param name="comment" value="Interface traffic and error counters"/>
+      
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="traffic,errors"/>
+      
+      <param name="overview-subleave-name-traffic" value="InOut_bps"/>
+      <param name="overview-shortcut-text-traffic"
+             value="All traffic"/>
+      <param name="overview-shortcut-title-traffic"
+             value="Show traffic for all interfaces on one page"/>
+      <param name="overview-page-title-traffic"
+             value="Input/Output Graphs"/>
+
+      <param name="overview-subleave-name-errors"
+             value="Drops_In,Drops_Out,Errors_In,Errors_Out"/>
+      <param name="overview-shortcut-text-errors"
+             value="All errors"/>
+      <param name="overview-shortcut-title-errors"
+             value="Show all interface errors on one page"/>
+      <param name="overview-page-title-errors"
+             value="Interface errors"/>
+      
+      <param name="descriptive-nickname"
+             value="%system-id%:%f5-interface-name%"/>
+      <param name="data-file"
+             value="%system-id%_f5_if_%f5-interface-index%.rrd" />
+      <param name="graph-title" value="%descriptive-nickname%" />
+      <param name="collector-timeoffset-hashstring"
+             value="%system-id%:%f5-interface-index%" />
+    </template>
+
+    <template name="f5-interface">
+      <leaf name="Bytes_In">
+        <param name="snmp-object"
+               value="$sysInterfaceStatBytesIn.%f5-interface-index%" />
+        <param name="snmp-object-type"  value="COUNTER64" />
+        <param name="rrd-ds"            value="BytesIn" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="ext-dstype"        value="COUNTER64" />
+        <param name="rrd-create-max"    value="1e15"/>
+        <param name="ext-counter-max"   value="1e15"/>
+        <param name="comment"  value="Input byte counter for the interface" />
+        <param name="graph-legend"      value="Bytes in" />
+        <param name="vertical-label"    value="Bps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="990" />
+        <param name="monitor-action-target"  value="InOut_bps"/>
+        <param name="nodeid"            value="%nodeid-interface%//inbytes"/>
+      </leaf>
+
+      <leaf name="Bytes_Out">
+        <param name="snmp-object"
+               value="$sysInterfaceStatBytesOut.%f5-interface-index%" />
+        <param name="snmp-object-type"  value="COUNTER64" />
+        <param name="rrd-ds"            value="BytesOut" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="ext-dstype"        value="COUNTER64" />
+        <param name="rrd-create-max"    value="1e15"/>
+        <param name="ext-counter-max"   value="1e15"/>
+        <param name="comment" value="Output byte counter for the interface" />
+        <param name="graph-legend"      value="Bytes out" />
+        <param name="vertical-label"    value="Bps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="980" />
+        <param name="monitor-action-target"  value="InOut_bps"/>
+        <param name="nodeid"            value="%nodeid-interface%//outbytes"/>
+      </leaf>
+
+      <leaf name="InOut_bps">
+        <param name="comment" value="Input and Output bits per second graphs" />
+        <param name="vertical-label"   value="bps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="rrd-hwpredict"    value="disabled" />
+        <param name="precedence"       value="1000" />
+        <param name="nodeid"           value="%nodeid-interface%//inoutbit"/>
+        <param name="ds-type"          value="rrd-multigraph" />
+        <param name="ds-names"         value="in,out" />
+
+        <param name="ds-expr-in"       value="{Bytes_In},8,*" />
+        <param name="graph-legend-in"  value="Bits per second in" />
+        <param name="line-style-in"    value="##BpsIn" />
+        <param name="line-color-in"    value="##BpsIn" />
+        <param name="line-order-in"    value="1" />
+        <param name="maxline-style-in" value="##BpsInMax" />
+        <param name="maxline-color-in" value="##BpsInMax" />
+
+        <param name="ds-expr-out"      value="{Bytes_Out},8,*" />
+        <param name="graph-legend-out" value="Bits per second out" />
+        <param name="line-style-out"   value="##BpsOut" />
+        <param name="line-color-out"   value="##BpsOut" />
+        <param name="line-order-out"   value="2" />
+        <param name="maxline-style-out" value="##BpsOutMax" />
+        <param name="maxline-color-out" value="##BpsOutMax" />
+      </leaf>
+
+      <leaf name="Packets_In">
+        <param name="snmp-object"
+               value="$sysInterfaceStatPktsIn.%f5-interface-index%" />
+        <param name="snmp-object-type"  value="COUNTER64" />
+        <param name="rrd-ds"            value="PktsIn" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="rrd-create-max"    value="1e15"/>
+        <param name="comment" value="Input packet counter for the interface" />
+        <param name="graph-legend"      value="Packets in" />
+        <param name="vertical-label"    value="pps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="890" />
+        <param name="nodeid"            value="%nodeid-interface%//inpackets"/>
+      </leaf>
+
+      <leaf name="Packets_Out">
+        <param name="snmp-object"
+               value="$sysInterfaceStatPktsOut.%f5-interface-index%" />
+        <param name="snmp-object-type"  value="COUNTER64" />
+        <param name="rrd-ds"            value="PktsOut" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="rrd-create-max"    value="1e15"/>
+        <param name="comment" value="Output packet counter for the interface" />
+        <param name="graph-legend"      value="Packets out" />
+        <param name="vertical-label"    value="pps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="880" />
+        <param name="nodeid"            value="%nodeid-interface%//outpackets"/>
+      </leaf>
+      
+      <leaf name="Errors_In">
+        <param name="snmp-object"
+               value="$sysInterfaceStatErrorsIn.%f5-interface-index%" />
+        <param name="snmp-object-type"  value="COUNTER64" />
+        <param name="rrd-ds"            value="ErrorsIn" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="rrd-hwpredict"     value="disabled" />
+        <param name="comment" value="Input errors for the interface" />
+        <param name="graph-legend"      value="Errors in" />
+        <param name="vertical-label"    value="pps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="690" />
+        <param name="nodeid"            value="%nodeid-interface%//inerr"/>
+        <param name="help-text">
+          Input errors usually mean that the interface receives broken packets
+          from the media. This migh be caused by problems with the physical
+          condition of the transmission media, or elecrical interference.
+        </param>
+      </leaf>
+
+      <leaf name="Errors_Out">
+        <param name="snmp-object"
+               value="$sysInterfaceStatErrorsOut.%f5-interface-index%" />
+        <param name="snmp-object-type"  value="COUNTER64" />
+        <param name="rrd-ds"            value="ErrorsOut" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="rrd-hwpredict"     value="disabled" />
+        <param name="comment" value="Output errors for the interface" />
+        <param name="graph-legend"      value="Errors out" />
+        <param name="vertical-label"    value="pps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="680" />
+        <param name="nodeid"            value="%nodeid-interface%//outerr"/>
+        <param name="help-text">
+          Output errors occur when the interface is not able to send packets
+          to the media for some reasons.
+        </param>
+      </leaf>
+
+      <leaf name="Drops_In">
+        <param name="snmp-object"
+               value="$sysInterfaceStatDropsIn.%f5-interface-index%" />
+        <param name="snmp-object-type"  value="COUNTER64" />
+        <param name="rrd-ds"            value="DropsIn" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="rrd-hwpredict"     value="disabled" />
+        <param name="comment" value="Input discards for the interface" />
+        <param name="graph-legend"      value="Drops in" />
+        <param name="vertical-label"    value="pps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="790" />
+        <param name="nodeid"            value="%nodeid-interface%//indrops"/>
+        <param name="help-text">
+          Input discards may occur when the packets arrive from the interface
+          media, and the router is not able to process them. This can possibly
+          occur because of performance problems.
+        </param>
+      </leaf>
+
+      <leaf name="Drops_Out">
+        <param name="snmp-object"
+               value="$sysInterfaceStatDropsOut.%f5-interface-index%" />
+        <param name="snmp-object-type"  value="COUNTER64" />
+        <param name="rrd-ds"            value="DropsOut" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="rrd-hwpredict"     value="disabled" />
+        <param name="comment" value="Output discards for the interface" />
+        <param name="graph-legend"      value="Drops out" />
+        <param name="vertical-label"    value="pps" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="780" />
+        <param name="nodeid"            value="%nodeid-interface%//outdrops"/>
+        <param name="help-text">
+          Output discards may occur when the router has prepared packets for
+          transmission, but the interface is not able to send them. This
+          may happen because of not enough available bandwidth on
+          the output interface.
+        </param>
+      </leaf>
+    </template>
+
+    
     <template name="ltm-node-statistics">
       <!-- F5-BIGIP-LOCAL-MIB::ltmNodeAddrStatTable -->
       <param name="f5-oid-pktsin"   value="1.3.6.1.4.1.3375.2.2.4.2.3.1.3"/>
@@ -341,6 +571,9 @@
 
     
     <template name="f5-object-statistics">
+      <param name="collector-timeoffset-hashstring"
+             value="%system-id%:%f5-object-nameidx%" />
+      
       <leaf name="InOut_bps">
         <param name="comment" value="Input and Output bit per second graphs" />
         <param name="vertical-label"   value="bps" />

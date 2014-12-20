@@ -41,6 +41,10 @@
          value="1.3.6.1.4.1.12356.101.4.1.17.0"/>
     <def name="fgProcessorUsage"
          value="1.3.6.1.4.1.12356.101.4.4.2.1.2"/>
+    <def name="fgIpSessNumber"
+         value="1.3.6.1.4.1.12356.101.11.2.2.1.1"/>
+    <def name="fgIp6SessNumber"
+         value="1.3.6.1.4.1.12356.101.11.2.3.1.1"/>
 
     <!-- FORTINET-FORTIMANAGER-FORTIANALYZER-MIB -->
     <def name="fmSysCpuUsage"
@@ -169,6 +173,66 @@
     </template>     
 
 
+    <template name="fortigate-vdoms-subtree">
+      <param name="has-overview-shortcuts" value="yes"/>
+      <param name="overview-shortcuts" value="ip4s,ip6s"/>
+      
+      <param name="overview-subleave-name-ip4s" value="IPv4_Sessions"/>
+      <param name="overview-shortcut-text-ip4s"
+             value="All IPv4 Sessions"/>
+      <param name="overview-shortcut-title-ip4s"
+             value="Show session counters for all VDOMs"/>
+      <param name="overview-page-title-ip4s"
+             value="IPv4 Sessions"/>
+
+      <param name="overview-subleave-name-ip6s" value="IPv6_Sessions"/>
+      <param name="overview-shortcut-text-ip6s"
+             value="All IPv6 Sessions"/>
+      <param name="overview-shortcut-title-ip6s"
+             value="Show session counters for all VDOMs"/>
+      <param name="overview-page-title-ip6s"
+             value="IPv6 Sessions"/>
+    </template>
+
+    <template name="fortigate-vdom">
+      <param name="data-file"  value="%system-id%_fg_vdom.rrd"/>
+      <param name="fortigate-vdom-nodeid"
+             value="fg-vdom//%nodeid-device%//%fortigate-vdom-name%"/>
+      <param name="nodeid"    value="%fortigate-vdom-nodeid%"/>
+      <param name="collector-timeoffset-hashstring"
+             value="%system-id%:%fortigate-vdom-index%"/>
+                                                 
+      <leaf name="IPv4_Sessions">
+        <param name="snmp-object"
+               value="$fgIpSessNumber.%fortigate-vdom-index%" />
+        <param name="rrd-ds"            value="ip4s" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="rrd-create-max"    value="1e15"/>
+        <param name="ext-counter-max"   value="1e15"/>
+        <param name="comment"  value="IPv4 sessions rate" />
+        <param name="graph-legend"      value="IPv4 Sessions" />
+        <param name="vertical-label"    value="1/s" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="990" />
+        <param name="nodeid"    value="%fortigate-vdom-nodeid%//ipv4sess"/>
+      </leaf>
+
+      <leaf name="IPv6_Sessions">
+        <param name="snmp-object"
+               value="$fgIp6SessNumber.%fortigate-vdom-index%" />
+        <param name="rrd-ds"            value="ip6s" />
+        <param name="rrd-create-dstype" value="COUNTER" />
+        <param name="rrd-create-max"    value="1e15"/>
+        <param name="ext-counter-max"   value="1e15"/>
+        <param name="comment"  value="IPv6 sessions rate" />
+        <param name="graph-legend"      value="IPv6 Sessions" />
+        <param name="vertical-label"    value="1/s" />
+        <param name="graph-lower-limit" value="0" />
+        <param name="precedence"        value="980" />
+        <param name="nodeid"    value="%fortigate-vdom-nodeid%//ipv6sess"/>
+      </leaf>      
+    </template>
+    
     <template name="fortimanager-system-stats">
       <param name="data-file"  value="%system-id%_fm_system.rrd"/>
       <param name="rrd-cf"            value="AVERAGE"/>

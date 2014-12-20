@@ -36,6 +36,7 @@ our %oiddef =
     (
      # FORTINET-FORTIGATE-MIB
      'fgModel'     => '1.3.6.1.4.1.12356.101.1',
+     'fgVdEntName' => '1.3.6.1.4.1.12356.101.3.2.1.1.2',
 
      # FORTINET-FORTIMANAGER-FORTIANALYZER-MIB
      'fmModel'     => '1.3.6.1.4.1.12356.103.1',
@@ -136,6 +137,12 @@ sub discover
                     $result->{'fgProcessorCount'};
             }
         }
+
+        my $vdNames = $dd->walkSnmpTable('fgVdEntName');
+        if( defined($vdNames) and scalar(keys %{$vdNames}) > 0 )
+        {
+            $data->{'Fortigate'}{'vdom'} = $vdNames;
+        }
     }
     elsif( $devdetails->hasCap('Fortinet_FM') )
     {
@@ -188,6 +195,32 @@ sub buildConfig
                 
                 $cb->addLeaf( $node, 'CPU_' . $i, $param,
                               [ 'Fortinet::fortigate-cpu' ] );
+            }
+        }
+
+        if( defined($data->{'Fortigate'}{'vdom'}) )
+        {
+            my $vdNode = 
+                $cb->addSubtree( $devNode, 'Virtual_Domains',
+                                 {
+                                     'node-display-name' => 'Virtual Domains'
+                                 },
+                                 [ 'Fortinet::fortigate-vdoms-subtree' ] );
+            
+            foreach my $INDEX (sort {$a <=> $b}
+                               keys %{$data->{'Fortigate'}{'vdom'}})
+            {
+                my $name = $data->{'Fortigate'}{'vdom'}{$INDEX};
+                my $vdSubtree = $name;
+                $vdSubtree =~ s/\W/_/g;
+                my $vdParams = {                    
+                    'node-display-name' => $name,
+                    'fortigate-vdom-index' => $INDEX,
+                    'fortigate-vdom-name' => $name,
+                };
+                
+                $cb->addSubtree( $vdNode, $vdSubtree, $vdParams,
+                                 [ 'Fortinet::fortigate-vdom' ] );
             }
         }
     }

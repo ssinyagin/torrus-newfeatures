@@ -1176,6 +1176,14 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'      => 'fortigate-cpu',
          'source'    => 'vendor/fortinet.xml',
      },
+     'Fortinet::fortigate-vdoms-subtree' => {
+         'name'      => 'fortigate-vdoms-subtree',
+         'source'    => 'vendor/fortinet.xml',
+     },
+     'Fortinet::fortigate-vdom' => {
+         'name'      => 'fortigate-vdom',
+         'source'    => 'vendor/fortinet.xml',
+     },
      'Fortinet::fortimanager-system-stats' => {
          'name'      => 'fortimanager-system-stats',
          'source'    => 'vendor/fortinet.xml',

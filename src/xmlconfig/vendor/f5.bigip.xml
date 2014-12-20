@@ -311,7 +311,7 @@
              value="All CPU Utilization"/>
       <param name="overview-shortcut-title-util"
              value="Show utilization for all processors"/>
-      <param name="overview-page-title-traffic"
+      <param name="overview-page-title-util"
              value="CPU Utilization"/>
     </template>
     

@@ -349,7 +349,7 @@ sub rpc_timeseries
     }
         
     my ($rrgraph_args, $obj) =
-        $self->prepare_rrgraph_args($config_tree, $token, $view);
+        $self->prepare_rrgraph_args($config_tree, $token, 'embedded');
 
     Debug('rrgraph_args: ' . join(' ', @{$rrgraph_args}));
 
@@ -367,8 +367,8 @@ sub rpc_timeseries
         {
             push(@args, $val);
         }
-        elsif( $val =~ /^LINE\d*:([a-zA-Z0-9_]+)/o or
-               $val =~ /^AREA:([a-zA-Z0-9_]+)/o )
+        elsif( $val =~ /^LINE\d*:([a-zA-Z_][a-zA-Z0-9_]+)/o or
+               $val =~ /^AREA:([a-zA-Z_][a-zA-Z0-9_]+)/o )
         {
             push(@xport_names, $1);
         }
@@ -392,14 +392,30 @@ sub rpc_timeseries
     }
 
     my $r = $result->{'data'};
-    $r->{'rrgraph_args'} = $rrgraph_args;
 
     foreach my $ret_name
         ('start', 'end', 'step', 'cols', 'names', 'data')
     {
         $r->{$ret_name} = shift @xport_ret;
     }    
+
+    # remove --start and --end from rrgraph_args
+    my $i = 0;
+    while( $i < scalar(@{$rrgraph_args}) )
+    {
+        my $val = $rrgraph_args->[$i];
+        if( ($val eq '--start') or ($val eq '--end') )
+        {
+            splice(@{$rrgraph_args}, $i, 2);
+        }
+        else
+        {
+            $i++;
+        }
+    }
     
+    $r->{'rrgraph_args'} = $rrgraph_args;
+
     return;
 }
 

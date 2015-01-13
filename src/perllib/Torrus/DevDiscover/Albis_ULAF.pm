@@ -220,7 +220,8 @@ sub discover
                 $ref->{'mpDescr'} =
                     &{$getMPDescr}($devIdx . '.' . $domain . '.' . $point);
                 
-                $ref->{'nodeid-prefix'} = 'soam//%nodeid-device%//';
+                $ref->{'nodeid-prefix'} =
+                    'soam//%nodeid-device%' . '//' . $idx;
 
                 if( defined($mp_name_filter) and
                     $ref->{'mpDescr'} =~ $mp_name_filter )
@@ -283,7 +284,8 @@ sub discover
                 $ref->{'mpDescr'} =
                     &{$getMPDescr}($devIdx . '.' . $domain . '.' . $point);
 
-                $ref->{'nodeid-prefix'} = 'soam//%nodeid-device%//';
+                $ref->{'nodeid-prefix'} =
+                    'soam//%nodeid-device%' . '//' . $idx;
 
                 if( defined($mp_name_filter) and
                     $ref->{'mpDescr'} =~ $mp_name_filter )
@@ -341,13 +343,16 @@ sub buildConfig
                 'Device: ' . $ref->{'devDescr'};
 
             my $gtitle = $ref->{'devDescr'} . ', ' . $ref->{'mpDescr'};
-                
+
+            my $nodeid = $ref->{'nodeid-prefix'} . '//lm';
+            
             my $param = {
                 'acceed-soam-cfg-index' => $idx,
                 'rrd-create-max' => ($ref->{'period'} * 1.5 / 1000),
                 'node-display-name' => $ref->{'mpDescr'},
                 'acceed-mp-description' => $ref->{'mpDescr'},
-                'accees-soam-nodeid' => $ref->{'nodeid-prefix'} . $idx,
+                'accees-soam-nodeid' => $nodeid,
+                'nodeid' => $nodeid,
                 'legend' => $legend,
                 'graph-title' => $gtitle,
             };
@@ -383,11 +388,14 @@ sub buildConfig
 
             my $gtitle = $ref->{'devDescr'} . ', ' . $ref->{'mpDescr'};
 
+            my $nodeid = $ref->{'nodeid-prefix'} . '//dm';
+            
             my $param = {
                 'acceed-soam-cfg-index' => $idx,
                 'node-display-name' => $ref->{'mpDescr'},
                 'acceed-mp-description' => $ref->{'mpDescr'},
-                'accees-soam-nodeid' => $ref->{'nodeid-prefix'} . $idx,
+                'accees-soam-nodeid' => $nodeid,
+                'nodeid' => $nodeid,
                 'legend' => $legend,                
                 'graph-title' => $gtitle,
             };

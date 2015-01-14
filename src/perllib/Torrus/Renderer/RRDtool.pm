@@ -778,7 +778,8 @@ sub rrd_make_hrules
                     $config_tree->getNodeParam($token,
                                                'hrule-legend-'.$hruleName);
 
-                my $arg = sprintf( '%s:%e%s', $line, $value, $color );
+                my $arg = sprintf( '%s:%e%s::skipscale',
+                                   $line, $value, $color );
                 if( defined( $legend ) and $legend =~ /\S/ )
                 {
                     $arg .= ':' . $legend . '\l';

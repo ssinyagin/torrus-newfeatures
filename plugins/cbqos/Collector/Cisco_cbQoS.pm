@@ -280,8 +280,11 @@ sub make_full_name
 
     if( defined($objNameOid) )
     {
-        $objectID .= $CfgTable{$hosthash}{
-            $objCfgIndex}{$objNameOid};
+        my $name = $CfgTable{$hosthash}{$objCfgIndex}{$objNameOid};
+        if( defined($name) )
+        {
+            $objectID .= $name;
+        }
     }
     
     $objectID .= ':' . $objType;
@@ -298,7 +301,21 @@ sub initTargetAttributes
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'cisco-cbqos' );
     my $hosthash = $tref->{'hosthash'};
+
+    if( $collector->param( $token, 'cbqos-persistent-indexing' ) eq 'yes' )
+    {
+        # Prepare the object for snmp collector
+        my $oid = $collector->param( $token, 'snmp-object' );
+        my $policyIndex = $collector->param( $token, 'cbqos-policy-index' );
+        my $objectIndex = $collector->param( $token, 'cbqos-object-index' );
+        $oid =~ s/POL/$policyIndex/;
+        $oid =~ s/OBJ/$objectIndex/;
+        $collector->setParam( $token, 'snmp-object', $oid );
         
+        return Torrus::Collector::SNMP::initTargetAttributes
+            ( $collector, $token );
+    }
+    
     if( not Torrus::Collector::SNMP::isMapReady($hosthash,
                                                 $oiddef{'ifDescr'}) )
     {
@@ -388,11 +405,7 @@ sub initTargetAttributes
             my $policyIndex = substr( $oid, $prefixlen + 1 );
 
             my $entryName = $oidrev{$prefixOid};
-            if( not defined $entryName )
-            {
-                Warn("Unknown OID: $prefixOid");
-            }
-            else
+            if( defined($entryName) )
             {
                 $ref->{$policyIndex}{$entryName} = $val;
             }
@@ -406,8 +419,9 @@ sub initTargetAttributes
             my $mapString = '';
             foreach my $entryName ( @servicePolicyTableEntries )
             {
-                $mapString .=
-                    sprintf( '%d:', $ref->{$policyIndex}{$entryName} );
+                my $value = $ref->{$policyIndex}{$entryName};
+                $value = 0 unless defined($value);
+                $mapString .= sprintf( '%d:', $value );
             }
             $mapRef->{$mapString} = $policyIndex;
         }

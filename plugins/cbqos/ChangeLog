@@ -1,3 +1,8 @@
+2015-01-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* added support for CBQoS MIB persistent indexing
+	(snmp mib persist cbqos)
+
 2014-10-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* NEWS: 27-OCT-2014: Release 2.08.02

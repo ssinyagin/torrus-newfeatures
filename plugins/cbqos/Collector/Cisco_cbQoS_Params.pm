@@ -25,46 +25,67 @@ use strict;
 
 our %requiredLeafParams =
     (
-     'cbqos-direction'              => {
-         'input'          => undef,
-         'output'         => undef },
-     
-     'cbqos-interface-name'         => undef,
-     
-     'cbqos-interface-type'         =>  {
-         'mainInterface'  => undef,
-         'subInterface'   => undef,
-         'frDLCI'         => {
-             'cbqos-fr-dlci' => undef },
-         'atmPVC'         => {
-             'cbqos-atm-vpi' => undef,
-             'cbqos-atm-vci' => undef },
-         'controlPlane'   => {
-             'cbqos-phy-ent-idx' => undef },
-         'vlanPort'       => {
-             'cbqos-vlan-idx' => undef },
-         'evc'            => {
-             'cbqos-evc' => undef },
+     'cbqos-persistent-indexing' => {
+         'yes' => {
+             'cbqos-policy-index' => undef,
+             'cbqos-object-index' => undef,
+         },
+         
+         'no'  => {
+             'cbqos-direction'              => {
+                 'input'          => undef,
+                 'output'         => undef,
+             },
+             
+             'cbqos-interface-name'         => undef,
+             
+             'cbqos-interface-type'         =>  {
+                 'mainInterface'  => undef,
+                 'subInterface'   => undef,
+                 'frDLCI'         => {
+                     'cbqos-fr-dlci' => undef,
+                 },
+                 'atmPVC'         => {
+                     'cbqos-atm-vpi' => undef,
+                     'cbqos-atm-vci' => undef,
+                 },
+                 'controlPlane'   => {
+                     'cbqos-phy-ent-idx' => undef,
+                 },
+                 'vlanPort'       => {
+                     'cbqos-vlan-idx' => undef,
+                 },
+                 'evc'            => {
+                     'cbqos-evc' => undef,
+                 },
+             },
+             
+             'cbqos-object-type'            => {
+                 'policymap'      => undef,
+                 'classmap'       => {
+                     'cbqos-class-map-name' => undef,
+                 },
+                 'matchStatement' => {
+                     'cbqos-match-statement-name' => undef,
+                 },
+                 'queueing'       => {
+                     'cbqos-queueing-bandwidth' => undef,
+                 },
+                 'randomDetect'   => undef,
+                 'trafficShaping' => {
+                     'cbqos-shaping-rate' => undef,
+                 },
+                 'police'         => {
+                     'cbqos-police-rate' => undef,
+                 },
+                 'set'            => undef,
+             },
+             
+             'cbqos-parent-name' => undef,
+             'cbqos-full-name' => undef,
+         },
      },
-     
-     'cbqos-object-type'            => {
-         'policymap'      => undef,
-         'classmap'       => {
-             'cbqos-class-map-name' => undef },
-         'matchStatement' => {
-             'cbqos-match-statement-name' => undef },
-         'queueing'       => {
-             'cbqos-queueing-bandwidth' => undef },
-         'randomDetect'   => undef,
-         'trafficShaping' => {
-             'cbqos-shaping-rate' => undef },
-         'police'         => {
-             'cbqos-police-rate' => undef },
-         'set'            => undef },
-     
-     'cbqos-parent-name' => undef,
-     'cbqos-full-name' => undef
-     );
+    );
 
 
 sub initValidatorLeafParams

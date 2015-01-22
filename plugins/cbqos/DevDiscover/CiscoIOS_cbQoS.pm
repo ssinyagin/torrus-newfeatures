@@ -84,6 +84,7 @@ our %oiddef =
      'cbQosQueueingCfgPrioBurstSize'   => '1.3.6.1.4.1.9.9.166.1.9.1.1.8',
      'cbQosQueueingCfgQLimitUnits'     => '1.3.6.1.4.1.9.9.166.1.9.1.1.9',
      'cbQosQueueingCfgAggregateQLimit' => '1.3.6.1.4.1.9.9.166.1.9.1.1.10',
+     'cbQosQueueingCfgBandwidth64'     => '1.3.6.1.4.1.9.9.166.1.9.1.1.13',
 
      'cbQosREDCfgTable'                => '1.3.6.1.4.1.9.9.166.1.10.1',
      'cbQosREDCfgExponWeight'          => '1.3.6.1.4.1.9.9.166.1.10.1.1.1',
@@ -109,7 +110,10 @@ our %oiddef =
      'cbQosPoliceCfgExceedSetValue'    => '1.3.6.1.4.1.9.9.166.1.12.1.1.7',
      'cbQosPoliceCfgViolateAction'     => '1.3.6.1.4.1.9.9.166.1.12.1.1.8',
      'cbQosPoliceCfgViolateSetValue'   => '1.3.6.1.4.1.9.9.166.1.12.1.1.9',
+     'cbQosPoliceCfgRate64'            => '1.3.6.1.4.1.9.9.166.1.12.1.1.11',
      'cbQosPoliceCfgRateType'          => '1.3.6.1.4.1.9.9.166.1.12.1.1.12',
+     'cbQosPoliceCfgPercentRateValue'  => '1.3.6.1.4.1.9.9.166.1.12.1.1.13',
+     'cbQosPoliceCfgCellRate'          => '1.3.6.1.4.1.9.9.166.1.12.1.1.15',
 
      'cbQosTSCfgTable'                 => '1.3.6.1.4.1.9.9.166.1.13.1',
      'cbQosTSCfgRate'                  => '1.3.6.1.4.1.9.9.166.1.13.1.1.1',
@@ -117,6 +121,9 @@ our %oiddef =
      'cbQosTSCfgExtBurstSize'          => '1.3.6.1.4.1.9.9.166.1.13.1.1.3',
      'cbQosTSCfgAdaptiveEnabled'       => '1.3.6.1.4.1.9.9.166.1.13.1.1.4',
      'cbQosTSCfgLimitType'             => '1.3.6.1.4.1.9.9.166.1.13.1.1.6',
+     'cbQosTSCfgRateType'              => '1.3.6.1.4.1.9.9.166.1.13.1.1.7',
+     'cbQosTSCfgPercentRateValue'      => '1.3.6.1.4.1.9.9.166.1.13.1.1.8',
+     'cbQosTSCfgRate64'                => '1.3.6.1.4.1.9.9.166.1.13.1.1.11'
      );
 
 # Object types "policymap", "set" are not used for statistics.
@@ -188,6 +195,19 @@ sub discover
     my $session = $dd->session();
     my $data = $devdetails->data();
 
+    $data->{'param'}{'snmp-oids-per-pdu'} = '20';
+
+    if( $devdetails->paramEnabled('CiscoIOS_cbQoS::persistent-indexing') )
+    {
+        $data->{'param'}{'cbqos-persistent-indexing'} = 'yes';
+        $data->{'cbqos_persistent_indexing'} = 1;
+        $devdetails->setCap('cbQoS_PersistentIndexing');
+    }
+    else
+    {
+        $data->{'param'}{'cbqos-persistent-indexing'} = 'no';
+    }
+    
     # Process cbQosServicePolicyTable
     
     $data->{'cbqos_policies'} = {};
@@ -217,86 +237,72 @@ sub discover
     {
         return 1;
     }
+
+    my $cbQosConfigIndex = $dd->walkSnmpTable('cbQosConfigIndex');
+    my $cbQosParentObjectsIndex = $dd->walkSnmpTable('cbQosParentObjectsIndex');
+
+    my $needTables = {};
     
     while( my($INDEX, $value) = each %{$cbQosObjectsType} )
-    {
-        $data->{'cbqos_objects'}{$INDEX}{'cbQosObjectsType'} =
-            translateCbQoSValue( $value, 'cbQosObjectsType' );
-    }
-
-    my $cbQosConfigIndex =
-        $dd->walkSnmpTable('cbQosConfigIndex');
-    my $cbQosParentObjectsIndex =
-        $dd->walkSnmpTable('cbQosParentObjectsIndex');
-    
-    my $needTables = {};
-
-    foreach my $INDEX (keys %{$data->{'cbqos_objects'}})
     {
         my ($policyIndex, $objectIndex) = split(/\./o, $INDEX);
 
         if( not exists( $data->{'cbqos_policies'}{$policyIndex} ) )
         {
-            delete $data->{'cbqos_objects'}{$INDEX};
+            next;
+        }
+        
+        my $objType = translateCbQoSValue( $value, 'cbQosObjectsType' );
+
+        # Store only objects of supported types
+        if( not $supportedObjectTypes{$objType} )
+        {
             next;
         }
 
-        my $object = $data->{'cbqos_objects'}{$INDEX};
-        $object->{'cbQosPolicyIndex'} = $policyIndex;
-        $object->{'cbQosConfigIndex'} = $cbQosConfigIndex->{$INDEX};
-
-        my $objType = $object->{'cbQosObjectsType'};
-
-        # Store only objects of supported types
-        my $takeit = $supportedObjectTypes{$objType};
-
         # Suppress unneeded objects
-        if( $takeit and
-            $devdetails->paramEnabled('CiscoIOS_cbQoS::classmaps-only')
-            and
+        if( $devdetails->paramEnabled('CiscoIOS_cbQoS::classmaps-only') and
             $objType ne 'policymap' and
             $objType ne 'classmap' )
         {
-            $takeit = 0;
+            next;
         }
         
-        if( $takeit and
-            $devdetails->paramEnabled
-            ('CiscoIOS_cbQoS::suppress-match-statements')
-            and
-            $objType eq 'matchStatement' )
+        if( $objType eq 'matchStatement' and
+            $devdetails->paramEnabled(
+                'CiscoIOS_cbQoS::suppress-match-statements') )
         {
-            $takeit = 0;
+            next;
         }
 
-        if( $takeit )
+        my $object = {};
+        $object->{'cbQosObjectsType'} = $objType;
+        $object->{'cbQosPolicyIndex'} = $policyIndex;
+        $object->{'cbQosObjectsIndex'} = $objectIndex;
+        $object->{'cbQosConfigIndex'} = $cbQosConfigIndex->{$INDEX};
+
+        $data->{'cbqos_objects'}{$INDEX} = $object;
+            
+        # Store the hierarchy information
+        my $parent = $cbQosParentObjectsIndex->{$INDEX};
+        if( $parent ne '0' )
         {
-            # Store the hierarchy information
-            my $parent = $cbQosParentObjectsIndex->{$INDEX};
-            if( $parent ne '0' )
-            {
-                $parent = $policyIndex .'.'. $parent;
-            }
+            $parent = $policyIndex .'.'. $parent;
+        }
                 
-            if( not exists( $data->{'cbqos_children'}{$parent} ) )
-            {
-                $data->{'cbqos_children'}{$parent} = [];
-            }
-            push( @{$data->{'cbqos_children'}{$parent}},
-                  $policyIndex .'.'. $objectIndex );
-
-            foreach my $tableName
-                ( @{$cfgTablesForType{$object->{'cbQosObjectsType'}}} )
-            {
-                $needTables->{$tableName} = 1;
-            }
-        }
-        else
+        if( not exists( $data->{'cbqos_children'}{$parent} ) )
         {
-            delete $data->{'cbqos_objects'}{$INDEX};
+            $data->{'cbqos_children'}{$parent} = [];
+        }
+        push( @{$data->{'cbqos_children'}{$parent}},
+              $policyIndex .'.'. $objectIndex );
+
+        foreach my $tableName
+            ( @{$cfgTablesForType{$object->{'cbQosObjectsType'}}} )
+        {
+            $needTables->{$tableName} = 1;
         }
     }
-
 
     # Prepare the list of DSCP values for RED
     my @dscpValues =
@@ -379,7 +385,8 @@ sub discover
                   'cbQosQueueingCfgDynamicQNumber',
                   'cbQosQueueingCfgPrioBurstSize',
                   'cbQosQueueingCfgQLimitUnits',
-                  'cbQosQueueingCfgAggregateQLimit' );
+                  'cbQosQueueingCfgAggregateQLimit',
+                  'cbQosQueueingCfgBandwidth64' );
             $mandatory{'cbQosQueueingCfgBandwidth'} = 1;
             $mandatory{'cbQosQueueingCfgBandwidthUnits'} = 1;
         }
@@ -394,25 +401,41 @@ sub discover
         }
         elsif( $objType eq 'trafficShaping' )
         {
+            my $val = $cfgData->{$dd->oiddef('cbQosTSCfgRate') .'.'.
+                                     $objConfIndex};
+            if( not defined($val) and
+                not $data->{'cbqos_persistent_indexing'} )
+            {
+                Warn('cbQosTSCfgRateType for ' . $objConfIndex .
+                     ' has unsupported value. It is ' .
+                     'recommended to use cbQoS MIB persistency if possible');
+                $data->{'cbqos_invalid_cfg'}{$objConfIndex} = 1;
+                next;
+            }
+
             push( @rows,
                   'cbQosTSCfgRate',
                   'cbQosTSCfgBurstSize',
                   'cbQosTSCfgExtBurstSize',
                   'cbQosTSCfgAdaptiveEnabled',
-                  'cbQosTSCfgLimitType' );
+                  'cbQosTSCfgLimitType',
+                  'cbQosTSCfgRateType',
+                  'cbQosTSCfgPercentRateValue',
+                  'cbQosTSCfgRate64' );
             $mandatory{'cbQosTSCfgRate'} = 1;
         }
         elsif( $objType eq 'police' )
         {
             # if cbQosPoliceCfgRateType specifies other than bps, the
-            # collector cannot use cbQosPoliceCfgRate as a name index, and
-            # that complicates things. Probably someday someone sponsors a fix
-            my $val = $cfgData->{$dd->oiddef('cbQosPoliceCfgRateType') .'.'.
+            # collector cannot use cbQosPoliceCfgRate as a name index
+            my $val = $cfgData->{$dd->oiddef('cbQosPoliceCfgRate') .'.'.
                                      $objConfIndex};
-            if( defined($val) and $val != 1 )
+            if( not defined($val) and
+                not $data->{'cbqos_persistent_indexing'} )
             {
                 Warn('cbQosPoliceCfgRateType for ' . $objConfIndex .
-                     ' has unsupported value(' . $val . ')');
+                     ' has unsupported value. It is ' .
+                     'recommended to use cbQoS MIB persistency if possible');
                 $data->{'cbqos_invalid_cfg'}{$objConfIndex} = 1;
                 next;
             }
@@ -426,7 +449,11 @@ sub discover
                   'cbQosPoliceCfgExceedAction',
                   'cbQosPoliceCfgExceedSetValue',
                   'cbQosPoliceCfgViolateAction',
-                  'cbQosPoliceCfgViolateSetValue' );
+                  'cbQosPoliceCfgViolateSetValue',
+                  'cbQosPoliceCfgRate64',
+                  'cbQosPoliceCfgRateType',
+                  'cbQosPoliceCfgPercentRateValue',
+                  'cbQosPoliceCfgCellRate' );
             $mandatory{'cbQosPoliceCfgRate'} = 1;
         }
         else
@@ -442,10 +469,13 @@ sub discover
                 $value = translateCbQoSValue( $value, $row );
                 $data->{'cbqos_objcfg'}{$objConfIndex}{$row} = $value;
             }
-            elsif( $mandatory{$row} )
+            elsif( $mandatory{$row} and
+                   not $data->{'cbqos_persistent_indexing'})
             {
                 Warn('Missing required configuration in: ' .
-                     'cbQosConfigIndex=' . $objConfIndex . ', row=' . $row);
+                     'cbQosConfigIndex=' . $objConfIndex . ', row=' . $row .
+                     '. It is recommended to use cbQoS MIB persistency ' .
+                     ' if possible');
                 $data->{'cbqos_invalid_cfg'}{$objConfIndex} = 1;
                 $objType = 'DELETED';
             }
@@ -549,6 +579,12 @@ sub buildChildrenConfigs
 
         $param->{'cbqos-parent-type'} = $parentObjType;
         $param->{'cbqos-parent-name'} = $parentObjName;
+
+        if( $data->{'cbqos_persistent_indexing'} )
+        {
+            $param->{'cbqos-policy-index'} = $objectRef->{'cbQosPolicyIndex'};
+            $param->{'cbqos-object-index'} = $objectRef->{'cbQosObjectsIndex'};
+        }
         
         my $buildSubtree = 1;
         
@@ -722,32 +758,50 @@ sub buildChildrenConfigs
         }
         elsif( $objType eq 'queueing' )
         {
+            my $val = $configRef->{'cbQosQueueingCfgPriorityEnabled'};
+            my $priorityQ = (defined($val) and $val eq 'enabled');
+
+            $val = $configRef->{'cbQosQueueingCfgFlowEnabled'};
+            my $flowQ = (defined($val) and $val eq 'enabled');
+
             my $bandwidth = $configRef->{'cbQosQueueingCfgBandwidth'};
+            if( not defined($bandwidth) )
+            {
+                $bandwidth = $configRef->{'cbQosQueueingCfgBandwidth64'};
+            }
+            
+            if( not defined($bandwidth) )
+            {
+                # a queue without bandwidth does not have any statistics,
+                # so we skip it
+                next;
+            }                
+
+            if( $priorityQ )
+            {
+                $subtreeName = 'Priority queue';
+            }
+            elsif( $flowQ )
+            {
+                $subtreeName = 'Flow queue';
+            }
+            else
+            {
+                $subtreeName = 'Queue';
+            }
+            
             $objectName = $bandwidth;
-
             my $units = $configRef->{'cbQosQueueingCfgBandwidthUnits'};
-
-            $subtreeName = 'Bandwidth ' . $bandwidth . ' ' . $units;
-            $subtreeComment = 'Queueing statistics';
+            $subtreeName .= ' ' . $bandwidth . ' ' . $units;
             $objectNick = 'qu_' . $bandwidth;
             $param->{'cbqos-queueing-bandwidth'} = $bandwidth;
+            my $legend = sprintf('Guaranteed Bandwidth: %d %s;',
+                               $bandwidth, $units);
+
+
             push( @templates,
                   'CiscoIOS_cbQoS::cisco-cbqos-queueing-meters' );
-
-            my $legend = sprintf('Guaranteed Bandwidth: %d %s;',
-                                 $bandwidth, $units);
-
-            my $val = $configRef->{'cbQosQueueingCfgFlowEnabled'};
-            if( defined($val) )
-            {
-                $legend .= 'Flow: ' . $val . ';';
-            }
-
-            $val = $configRef->{'cbQosQueueingCfgPriorityEnabled'};
-            if( defined($val) )
-            {
-                $legend .= 'Priority: ' . $val . ';';
-            }
+            $subtreeComment = 'Queueing statistics';
             
             $val = $configRef->{'cbQosQueueingCfgAggregateQLimit'};
             if( defined($val) )
@@ -790,11 +844,14 @@ sub buildChildrenConfigs
             $subtreeName = 'WRED';
             $objectName = 'WRED';
             $subtreeComment = 'Weighted Random Early Detect Statistics';
-            $param->{'legend'} =
-                sprintf('Exponential Weight: %d;',
-                        $configRef->{'cbQosREDCfgExponWeight'});
-            push( @templates,
-                  'CiscoIOS_cbQoS::cisco-cbqos-red-subtree' );
+            my $val = $configRef->{'cbQosREDCfgExponWeight'};
+
+            if( defined($val) )
+            {
+                $param->{'legend'} = sprintf('Exponential Weight: %d;', $val);
+            }
+
+            push( @templates, 'CiscoIOS_cbQoS::cisco-cbqos-red-subtree' );
 
             if( $configRef->{'cbQosREDCfgDscpPrec'} == 1 )
             {
@@ -803,16 +860,35 @@ sub buildChildrenConfigs
         }
         elsif( $objType eq 'trafficShaping' )
         {
-            my $rate = $configRef->{'cbQosTSCfgRate'};
-            $objectName = $rate;
-            $subtreeName = sprintf('Shape %d bps', $rate );
+            my $legend = 'Committed Rate: ';
+            my $rateType = $configRef->{'cbQosTSCfgRateType'};
+            
+            if( defined($rateType) and $rateType eq 'percentage' )
+            {
+                my $pc = $configRef->{'cbQosTSCfgPercentRateValue'};
+                $objectName = $pc;
+                $subtreeName = sprintf('Shape %d%%', $pc );
+                $objectNick = 'ts_' . $pc . '_pc';                
+                $legend .= sprintf('%d%%;', $pc);
+            }
+            else
+            {
+                my $rate = $configRef->{'cbQosTSCfgRate'};
+                if( not defined($rate) )
+                {
+                    $rate = $configRef->{'cbQosTSCfgRate64'};
+                }
+                $objectName = $rate;
+                $subtreeName = sprintf('Shape %d bps', $rate );
+                $objectNick = 'ts_' . $rate;
+                $param->{'cbqos-shaping-rate'} = $rate;
+                $legend .= sprintf('%d bps;', $rate);
+            }
+
             $subtreeComment = 'Traffic shaping statistics';
-            $objectNick = 'ts_' . $rate;
-            $param->{'cbqos-shaping-rate'} = $rate;
+            
             push( @templates,
                   'CiscoIOS_cbQoS::cisco-cbqos-shaping-meters' );
-
-            my $legend = sprintf('Committed Rate: %d bits/second;', $rate);
             
             my $val = $configRef->{'cbQosTSCfgBurstSize'};
             if( defined($val) )
@@ -842,35 +918,66 @@ sub buildChildrenConfigs
         }
         elsif( $objType eq 'police' )
         {
-            my $rate = $configRef->{'cbQosPoliceCfgRate'};
-            $objectName = $rate;
+            my $rateType = $configRef->{'cbQosPoliceCfgRateType'};
+            my $legend = 'Committed Rate: ';
 
-            $subtreeName = sprintf('Police %d bps', $rate );
+            if( defined($rateType) and $rateType eq 'percentage' )
+            {
+                my $pc = $configRef->{'cbQosPoliceCfgPercentRateValue'};
+                $objectName = $pc;
+                $subtreeName = sprintf('Police %d%%', $pc );
+                $objectNick = 'p_' . $pc . '_pc';
+                $legend .= sprintf('%d%%;', $pc );
+            }
+            elsif( defined($rateType) and $rateType eq 'cps' )
+            {
+                my $cps = $configRef->{'cbQosPoliceCfgCellRate'};
+                $objectName = $cps;
+                $subtreeName = sprintf('Police %d cps', $cps );
+                $objectNick = 'p_' . $cps . '_cps';
+                $legend .= sprintf('%d cps;', $cps );
+            }
+            else
+            {
+                my $rate = $configRef->{'cbQosPoliceCfgRate'};
+                if( not defined($rate) )
+                {
+                    $rate = $configRef->{'cbQosPoliceCfgRate64'};
+                }
+                $objectName = $rate;
+                $subtreeName = sprintf('Police %d bps', $rate );
+                $objectNick = 'p_' . $rate;
+                $legend .= sprintf('%d bps;', $rate );
+                $param->{'cbqos-police-rate'} = $rate;
+            }
+
+            my @labels =
+                (
+                 'Burst Size: %d Octets',     'cbQosPoliceCfgBurstSize',
+                 'Ext Burst Size: %d Octets', 'cbQosPoliceCfgExtBurstSize',
+                 'Conform Action: %s',        'cbQosPoliceCfgConformAction',
+                 'Conform Set Value: %d',     'cbQosPoliceCfgConformSetValue',
+                 'Exceed Action: %s',         'cbQosPoliceCfgExceedAction',
+                 'Exceed Set Value: %d',      'cbQosPoliceCfgExceedSetValue',
+                 'Violate Action: %s',        'cbQosPoliceCfgViolateAction',
+                 'Violate Set Value: %d',     'cbQosPoliceCfgViolateSetValue',
+                );
+
+            while( scalar(@labels) )
+            {
+                my $format = shift @labels;
+                my $var = shift @labels;
+
+                my $value = $configRef->{$var};
+                if( defined($value) )
+                {
+                    $legend .= sprintf($format, $value) . ';';
+                }
+            }
+            
+            $param->{'legend'} = $legend;
             $subtreeComment = 'Rate policing statistics';
-            $objectNick = 'p_' . $rate;
-            $param->{'cbqos-police-rate'} = $rate;
-            push( @templates,
-                  'CiscoIOS_cbQoS::cisco-cbqos-police-meters' );
-
-            $param->{'legend'} =
-                sprintf('Committed Rate: %d bits/second;' .
-                        'Burst Size: %d Octets;' .
-                        'Ext Burst Size: %d Octets;' .
-                        'Conform Action: %s;' .
-                        'Conform Set Value: %d;' .
-                        'Exceed Action: %s;' .
-                        'Exceed Set Value: %d;' .
-                        'Violate Action: %s;' .
-                        'Violate Set Value: %d',
-                        $rate,
-                        $configRef->{'cbQosPoliceCfgBurstSize'},
-                        $configRef->{'cbQosPoliceCfgExtBurstSize'},
-                        $configRef->{'cbQosPoliceCfgConformAction'},
-                        $configRef->{'cbQosPoliceCfgConformSetValue'},
-                        $configRef->{'cbQosPoliceCfgExceedAction'},
-                        $configRef->{'cbQosPoliceCfgExceedSetValue'},
-                        $configRef->{'cbQosPoliceCfgViolateAction'},
-                        $configRef->{'cbQosPoliceCfgViolateSetValue'});
+            push( @templates, 'CiscoIOS_cbQoS::cisco-cbqos-police-meters' );
         }
         else
         {
@@ -902,7 +1009,11 @@ sub buildChildrenConfigs
 
             $fullName .= $objectName . ':' . $objTypeMap{$objType};
 
-            $param->{'cbqos-full-name'} = $fullName;
+            if( not $data->{'cbqos_persistent_indexing'} )
+            {
+                $param->{'cbqos-full-name'} = $fullName;
+            }
+            
             $param->{'comment'} = $subtreeComment;
             $param->{'cbqos-object-descr'} = $subtreeComment;
             
@@ -940,7 +1051,8 @@ sub buildChildrenConfigs
                                     $cfg->{'cbQosREDClassCfgMaxThreshold'},
                                     $cfg->{'cbQosREDClassCfgThresholdUnit'});
                     }
-                    else
+                    elsif( defined($cfg->{'cbQosREDCfgMinThreshold'}) and
+                           defined($cfg->{'cbQosREDCfgMaxThreshold'}) )
                     {
                         $redParam->{'legend'} =
                             sprintf('Min Threshold: %d packets;' .
@@ -996,6 +1108,13 @@ my $queueUnitTranslation = {
     5 => 'us'
     };
 
+my $qosRateType = {
+    1 => 'bps',
+    2 => 'percentage',
+    3 => 'cps',
+    4 => 'per_thousand',
+    5 => 'per_million',
+};
 
 my %cbQosValueTranslation =
     (
@@ -1033,8 +1152,10 @@ my %cbQosValueTranslation =
          1 => 'kbps',
          2 => 'percent',
          3 => 'percent_remaining',
-         4 => 'ratio_remaining'
-         },
+         4 => 'ratio_remaining',
+         5 => 'per_thousand',
+         6 => 'per_million',
+     },
      
      'cbQosREDClassCfgThresholdUnit'    => $queueUnitTranslation,
      
@@ -1047,11 +1168,14 @@ my %cbQosValueTranslation =
          1 => 'average',
          2 => 'peak'
          },
+
+     'cbQosTSCfgRateType' => $qosRateType,
      
      'cbQosPoliceCfgConformAction'  => $policyActionTranslation,
      'cbQosPoliceCfgExceedAction'   => $policyActionTranslation,
-     'cbQosPoliceCfgViolateAction'  => $policyActionTranslation
-     );
+     'cbQosPoliceCfgViolateAction'  => $policyActionTranslation,
+     'cbQosPoliceCfgRateType'  => $qosRateType,
+    );
 
 sub translateCbQoSValue
 {

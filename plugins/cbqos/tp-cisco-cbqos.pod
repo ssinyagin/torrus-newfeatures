@@ -82,6 +82,13 @@ The following parameters may be specified in C<devdiscover> input XML:
 
 =over 4
 
+=item * C<CiscoIOS_cbQoS::persistent-indexing>
+
+Set this to C<yes> if the router is configured with C<snmp mib persist
+cbqos>.  This will reduce the CPU load during the polling cycles, and
+also will allow polling some types of objects that were unavailable with
+dynamic indexing.
+
 =item * C<CiscoIOS_cbQoS::red-dscp-values>
 
 Optional. Comma-separated list of DSCP values to be used for WRED
@@ -183,6 +190,25 @@ substitutes C<POL> and C<OBJ> strings in C<snmp-object> parameter with
 the current values of policy and object index correspondingly.
 
 Development of this plugin was sponsored by Cablecom GmbH.
+
+=head2 Recommendations for Cisco ASR 9000
+
+The following configuration commands are recommended for Cisco ASR9K in
+order to optimize the polling:
+
+    snmp-server ifindex persist
+    snmp mib persist cbqos
+
+The following discovery parameters are recommended for corresponding DDX files:
+
+    <param name="CiscoIOS::ifindex-persist" value="yes"/>
+    <param name="CiscoIOS_cbQoS::persistent-indexing" value="yes"/>
+    <param name="CiscoIOS_cbQoS::suppress-dropnobuf" value="yes"/>
+    <param name="CiscoIOS_cbQoS::suppress-match-statements" value="yes"/>
+
+cbQosCMNoBufDropPkt and match statement statistics are not supported in
+ASR9k, so it's better to disable them, otherwise the collector will
+issue warnings.
 
 =head1 Author
 

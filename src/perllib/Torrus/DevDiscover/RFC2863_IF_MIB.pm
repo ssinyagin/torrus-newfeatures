@@ -1557,24 +1557,30 @@ sub getSelectorObjectName
 
 
 # Other discovery modules can add their interface actions here
-our %knownSelectorActions =
-    ( 'InBytesMonitor'    => 'RFC2863_IF_MIB',
-      'OutBytesMonitor'   => 'RFC2863_IF_MIB',
-      'InDiscardsMonitor'  => 'RFC2863_IF_MIB',
-      'OutDiscardsMonitor' => 'RFC2863_IF_MIB',
-      'InErrorsMonitor'   => 'RFC2863_IF_MIB',
-      'OutErrorsMonitor'  => 'RFC2863_IF_MIB',
-      'NotifyPolicy'      => 'RFC2863_IF_MIB',
-      'HoltWinters'       => 'RFC2863_IF_MIB',
-      'NoPacketCounters'  => 'RFC2863_IF_MIB',
-      'NoDiscardCounters' => 'RFC2863_IF_MIB',
-      'NoErrorCounters'   => 'RFC2863_IF_MIB',
-      'RemoveInterface'   => 'RFC2863_IF_MIB',
-      'TokensetMember'    => 'RFC2863_IF_MIB',
-      'Parameters'        => 'RFC2863_IF_MIB',
-      'InBytesParameters' => 'RFC2863_IF_MIB',
-      'OutBytesParameters' => 'RFC2863_IF_MIB',
-      'AddTemplates'       => 'RFC2863_IF_MIB' );
+our %knownSelectorActions;
+{
+    foreach my $name (
+        'InBytesMonitor',
+        'OutBytesMonitor',
+        'InDiscardsMonitor',
+        'OutDiscardsMonitor',
+        'InErrorsMonitor',
+        'OutErrorsMonitor',
+        'NotifyPolicy',
+        'HoltWinters',
+        'NoPacketCounters',
+        'NoDiscardCounters',
+        'NoErrorCounters',
+        'RemoveInterface',
+        'TokensetMember',
+        'Parameters',
+        'InBytesParameters',
+        'OutBytesParameters',
+        'AddTemplates')
+    {
+        $knownSelectorActions{$name} = 'RFC2863_IF_MIB';
+    }
+}
 
                             
 sub applySelectorAction

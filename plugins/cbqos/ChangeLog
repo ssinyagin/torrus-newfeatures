@@ -1,3 +1,7 @@
+2015-01-26  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* DevDiscover/CiscoIOS_cbQoS.pm: selector actions NoQoSStats, QoSStats
+
 2015-01-22  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* added support for CBQoS MIB persistent indexing

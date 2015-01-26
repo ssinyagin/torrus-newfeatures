@@ -29,7 +29,7 @@ these days, and the choice of management systems able to monitor QoS
 parameters is too narrow.
 
 Cisco IOS provides QoS statistics in its CISCO-CLASS-BASED-QOS-MIB.
-This MIB is far too complex for a regular SNMP collector. 
+This MIB is far too complex for a regular SNMP collector.
 
 The C<cbqos> Torrus plugin provides a complete solution for automated
 SNMP discovery and collection for QoS objects on Cisco routers.
@@ -115,7 +115,35 @@ for: 12.2(15)T7, ...).
 
 Optional. When set to C<yes>, disables classmap Dropped No Buffer statistics.
 
+=item * C<CiscoIOS_cbQoS::default-skip-qos-stats>
+
+If this parameter is set to C<yes>, all QoS statistics are disabled for
+all interfaces, except those that match a selector with C<QoSStats>
+action.
+
 =back
+
+
+
+=head2 Selectors
+
+The QoS discovery module extends the standard C<RFC2863_IF_MIB>
+selectors by adding two new actions:
+
+=over 4
+
+=item * C<NoQoSStats>
+
+This action disables the QoS statistiics for an interface that matched
+the selector.
+
+=item * C<QoSStats>
+
+If C<CiscoIOS_cbQoS::default-skip-qos-stats> iis set to C<yes>, this
+action enables QoS statistics for those interfaces which match the
+selector.
+
+
 
 =head2 Implementation details
 
@@ -212,4 +240,4 @@ issue warnings.
 
 =head1 Author
 
-Copyright (c) 2004 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2004-2015 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

@@ -207,7 +207,10 @@ sub discover
     {
         $data->{'param'}{'cbqos-persistent-indexing'} = 'no';
     }
-    
+
+    $data->{'cbqos_default_skip'} =
+        $devdetails->paramEnabled('CiscoIOS_cbQoS::default-skip-qos-stats');
+
     # Process cbQosServicePolicyTable
     
     $data->{'cbqos_policies'} = {};
@@ -519,7 +522,8 @@ sub buildConfig
     my $devNode = shift;
 
     my $data = $devdetails->data();
-
+    $data->{'cbqos_toplevel_policymaps_total'} = 0;
+    
     my $topNode =
         $cb->addSubtree( $devNode, 'QoS_Stats', undef,
                          ['CiscoIOS_cbQoS::cisco-cbqos-subtree']);
@@ -530,8 +534,13 @@ sub buildConfig
     }
     
     # Recursively build a subtree for every policy
-
     buildChildrenConfigs( $data, $cb, $topNode, '0', '', '', '', '' );
+
+    if( $data->{'cbqos_toplevel_policymaps_total'} == 0 )
+    {
+        $devNode->removeChild($topNode);
+    }
+    
     return;
 }
 
@@ -610,99 +619,109 @@ sub buildChildrenConfigs
                 }
                 
                 my $interface  = $data->{'interfaces'}{$ifIndex};
-
-                if( defined( $interface ) and not $interface->{'excluded'} )
+                if( not defined( $interface ) or $interface->{'excluded'} )
                 {
-                    my $interfaceName = $interface->{'ifDescr'};
-                    $param->{'cbqos-interface-name'} = $interfaceName;
-                    $param->{'searchable'} = 'yes';
-                    
-                    my $policyNick =
-                        $interface->{$data->{'nameref'}{'ifNick'}};
-
-                    $subtreeName =
-                        $interface->{$data->{'nameref'}{'ifReferenceName'}};
-                                        
-                    $subtreeComment = $interfaceName;
-                    
-                    my $ifType = $policyRef->{'cbQosIfType'};
-                    $param->{'cbqos-interface-type'} = $ifType;
-
-                    if( $ifType eq 'frDLCI' )
-                    {
-                        my $dlci = $policyRef->{'cbQosFrDLCI'};
-                        
-                        $subtreeName .= ' ' . $dlci;
-                        $subtreeComment .= ' DLCI ' . $dlci;
-                        $policyNick .= '_' . $dlci;
-                        
-                        $param->{'cbqos-fr-dlci'} = $dlci;
-                    }
-                    elsif( $ifType eq 'atmPVC' )
-                    {
-                        my $vpi = $policyRef->{'cbQosAtmVPI'};
-                        my $vci = $policyRef->{'cbQosAtmVCI'};
-                        
-                        $subtreeName .= ' ' . $vpi . '/' . $vci;
-                        $subtreeComment .= ' PVC ' . $vpi . '/' . $vci;
-                        $policyNick .= '_' . $vpi . '_' . $vci;
-                        
-                        $param->{'cbqos-atm-vpi'} = $vpi;
-                        $param->{'cbqos-atm-vci'} = $vci;
-                    }
-                    elsif( $ifType eq 'controlPlane' )
-                    {
-                        my $ent = $policyRef->{'cbQosEntityIndex'};
-                        $policyNick .= '_' . $ent;                        
-                        $param->{'cbqos-phy-ent-idx'} = $ent;
-                    }
-                    elsif( $ifType eq 'vlanPort' )
-                    {
-                        my $vlan = $policyRef->{'cbQosVlanIndex'};
-                        
-                        $subtreeName .= ' VLAN' . $vlan;
-                        $subtreeComment .= ' VLAN ' . $vlan;
-                        $policyNick .= '_' . $vlan;
-                        
-                        $param->{'cbqos-vlan-idx'} = $vlan;
-                    }
-                    elsif( $ifType eq 'evc' )
-                    {
-                        my $evc = $policyRef->{'cbQosEVC'};
-                        $policyNick .= '_' . $evc;
-                        $param->{'cbqos-evc'} = $evc;
-                    }
-                    
-                    my $direction = $policyRef->{'cbQosPolicyDirection'};
-                    
-                    # input -> in, output -> out
-                    my $dir = $direction;
-                    $dir =~ s/put$//;
-                    
-                    $subtreeName .= ' ' . $dir;
-                    $subtreeComment .= ' ' . $direction . ' policy';
-                    $param->{'cbqos-direction'} = $direction;
-                    $policyNick .=  '_' . $dir;
-                    
-                    $param->{'cbqos-policy-nick'} = $policyNick;
-                                  
-                    my $ifComment =
-                        $interface->{$data->{'nameref'}{'ifComment'}};
-                    if( defined($ifComment) and $ifComment ne '' )
-                    {
-                        $subtreeComment .= ' (' . $ifComment . ')';
-                    }
-
-                    $param->{'nodeid-cbqos-policy'} =
-                        'qos//' .
-                        $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} .
-                        $interface->{$data->{'nameref'}{'ifNodeid'}} .
-                        '//' . $dir;
+                    next;
                 }
-                else
+
+                if( $interface->{'selectorActions'}{'NoQoSStats'} )
                 {
-                    $buildSubtree = 0;
+                    next;
                 }
+
+                if( $data->{'cbqos_default_skip'} and
+                    not $interface->{'selectorActions'}{'QoSStats'} )
+                {
+                    next;
+                }
+
+                my $interfaceName = $interface->{'ifDescr'};
+                $param->{'cbqos-interface-name'} = $interfaceName;
+                $param->{'searchable'} = 'yes';
+                
+                my $policyNick =
+                    $interface->{$data->{'nameref'}{'ifNick'}};
+
+                $subtreeName =
+                    $interface->{$data->{'nameref'}{'ifReferenceName'}};
+                
+                $subtreeComment = $interfaceName;
+                
+                my $ifType = $policyRef->{'cbQosIfType'};
+                $param->{'cbqos-interface-type'} = $ifType;
+
+                if( $ifType eq 'frDLCI' )
+                {
+                    my $dlci = $policyRef->{'cbQosFrDLCI'};
+                    
+                    $subtreeName .= ' ' . $dlci;
+                    $subtreeComment .= ' DLCI ' . $dlci;
+                    $policyNick .= '_' . $dlci;
+                    
+                    $param->{'cbqos-fr-dlci'} = $dlci;
+                }
+                elsif( $ifType eq 'atmPVC' )
+                {
+                    my $vpi = $policyRef->{'cbQosAtmVPI'};
+                    my $vci = $policyRef->{'cbQosAtmVCI'};
+                    
+                    $subtreeName .= ' ' . $vpi . '/' . $vci;
+                    $subtreeComment .= ' PVC ' . $vpi . '/' . $vci;
+                    $policyNick .= '_' . $vpi . '_' . $vci;
+                    
+                    $param->{'cbqos-atm-vpi'} = $vpi;
+                    $param->{'cbqos-atm-vci'} = $vci;
+                }
+                elsif( $ifType eq 'controlPlane' )
+                {
+                    my $ent = $policyRef->{'cbQosEntityIndex'};
+                    $policyNick .= '_' . $ent;                        
+                    $param->{'cbqos-phy-ent-idx'} = $ent;
+                }
+                elsif( $ifType eq 'vlanPort' )
+                {
+                    my $vlan = $policyRef->{'cbQosVlanIndex'};
+                    
+                    $subtreeName .= ' VLAN' . $vlan;
+                    $subtreeComment .= ' VLAN ' . $vlan;
+                    $policyNick .= '_' . $vlan;
+                    
+                    $param->{'cbqos-vlan-idx'} = $vlan;
+                }
+                elsif( $ifType eq 'evc' )
+                {
+                    my $evc = $policyRef->{'cbQosEVC'};
+                    $policyNick .= '_' . $evc;
+                    $param->{'cbqos-evc'} = $evc;
+                }
+                
+                my $direction = $policyRef->{'cbQosPolicyDirection'};
+                
+                # input -> in, output -> out
+                my $dir = $direction;
+                $dir =~ s/put$//;
+                
+                $subtreeName .= ' ' . $dir;
+                $subtreeComment .= ' ' . $direction . ' policy';
+                $param->{'cbqos-direction'} = $direction;
+                $policyNick .=  '_' . $dir;
+                
+                $param->{'cbqos-policy-nick'} = $policyNick;
+                
+                my $ifComment =
+                    $interface->{$data->{'nameref'}{'ifComment'}};
+                if( defined($ifComment) and $ifComment ne '' )
+                {
+                    $subtreeComment .= ' (' . $ifComment . ')';
+                }
+
+                $param->{'nodeid-cbqos-policy'} =
+                    'qos//' .
+                    $interface->{$data->{'nameref'}{'ifNodeidPrefix'}} .
+                    $interface->{$data->{'nameref'}{'ifNodeid'}} .
+                    '//' . $dir;
+
+                $data->{'cbqos_toplevel_policymaps_total'}++;
             }
             else
             {
@@ -1246,6 +1265,18 @@ sub translateDscpValue
     return $value;
 }
 
+
+#######################################
+# Selectors interface: we're using RFC2863_IF_MIB actions
+#
+
+{
+    foreach my $name ('QoSStats', 'NoQoSStats')
+    {
+        $Torrus::DevDiscover::RFC2863_IF_MIB::knownSelectorActions{$name} =
+            'CiscoIOS_cbQoS';
+    }
+}
 
 1;
 

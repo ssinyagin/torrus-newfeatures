@@ -143,7 +143,7 @@ If C<CiscoIOS_cbQoS::default-skip-qos-stats> iis set to C<yes>, this
 action enables QoS statistics for those interfaces which match the
 selector.
 
-
+=back
 
 =head2 Implementation details
 

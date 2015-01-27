@@ -347,9 +347,13 @@ sub rpc_timeseries
             push(@args, '--' . $opt, $value);
         }
     }
-        
+
+    my $dataonly =
+        $self->{'options'}{'variables'}{'DATAONLY'} ? 1:0;
+    
     my ($rrgraph_args, $obj) =
-        $self->prepare_rrgraph_args($config_tree, $token, 'embedded');
+        $self->prepare_rrgraph_args($config_tree, $token, 'embedded',
+                                    {'data_only' => $dataonly});
 
     Debug('rrgraph_args: ' . join(' ', @{$rrgraph_args}));
 
@@ -399,22 +403,25 @@ sub rpc_timeseries
         $r->{$ret_name} = shift @xport_ret;
     }    
 
-    # remove --start and --end from rrgraph_args
-    my $i = 0;
-    while( $i < scalar(@{$rrgraph_args}) )
+    if( not $dataonly )
     {
-        my $val = $rrgraph_args->[$i];
-        if( ($val eq '--start') or ($val eq '--end') )
+        # remove --start and --end from rrgraph_args
+        my $i = 0;
+        while( $i < scalar(@{$rrgraph_args}) )
         {
-            splice(@{$rrgraph_args}, $i, 2);
+            my $val = $rrgraph_args->[$i];
+            if( ($val eq '--start') or ($val eq '--end') )
+            {
+                splice(@{$rrgraph_args}, $i, 2);
+            }
+            else
+            {
+                $i++;
+            }
         }
-        else
-        {
-            $i++;
-        }
+        
+        $r->{'rrgraph_args'} = $rrgraph_args;
     }
-    
-    $r->{'rrgraph_args'} = $rrgraph_args;
 
     return;
 }

@@ -322,6 +322,12 @@ security concern.
 Optional. If set to 1, the resulting JSON data is sorted and formatted
 for human reading.
 
+=item * DATAONLY
+
+Optional parameter in TIMESERIES RPC call. If it's set to a true value,
+the call would return only the data rows, without decorations and
+RRDgraph command arguments.
+
 =back
 
 

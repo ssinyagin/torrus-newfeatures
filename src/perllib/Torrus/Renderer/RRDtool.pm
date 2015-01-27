@@ -54,7 +54,10 @@ sub prepare_rrgraph_args
     my $config_tree = shift;
     my $token = shift;
     my $view = shift;
-
+    my $opt = shift;
+    
+    $opt = {} unless defined($opt);
+    
     my $obj = {'args' => {}, 'dname' => 'A'};
 
     foreach my $arrayName ( @arg_arrays )
@@ -151,11 +154,14 @@ sub prepare_rrgraph_args
     }
 
     return(undef) if $obj->{'error'};
-    
-    $self->rrd_make_hrules( $config_tree, $token, $view, $obj );
-    if( not $Torrus::Renderer::ignoreDecorations )
+
+    if( not $opt->{'data_only'} )
     {
-        $self->rrd_make_decorations( $config_tree, $token, $view, $obj );
+        $self->rrd_make_hrules( $config_tree, $token, $view, $obj );
+        if( not $Torrus::Renderer::ignoreDecorations )
+        {
+            $self->rrd_make_decorations( $config_tree, $token, $view, $obj );
+        }
     }
 
     # We're all set

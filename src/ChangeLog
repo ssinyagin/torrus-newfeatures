@@ -1,3 +1,8 @@
+2015-01-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/RPC.pm (rpc_timeseries): added DATAONLY
+	parameter for TIMESERIES RPC call
+
 2015-01-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_hrules): using

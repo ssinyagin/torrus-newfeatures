@@ -217,18 +217,22 @@ my @rpc_print_statements =
                     'PRINT:D1:%le'],
      },
      {
-         'name' => 'MAX',
-         'args' => ['VDEF:E1=Amax,MAXIMUM',
-                    'PRINT:E1:%le'],
-     },
-     {
          'name' => 'AVAIL',
          'args' => ['CDEF:F1=Aavg,UN,0,100,IF',
                     'VDEF:F2=F1,AVERAGE',
                     'PRINT:F2:%.2lf'],
      },
      );
-     
+
+my @rpc_print_max_statements =
+    (
+     {
+         'name' => 'MAX',
+         'args' => ['VDEF:E1=Amax,MAXIMUM',
+                    'PRINT:E1:%le'],
+     },
+     );
+
 my %rrd_print_opts =
     (
      'start'  => '--start',
@@ -270,20 +274,34 @@ sub rpc_aggregate_ds
         return;
     }
 
+    my $rra = $config_tree->getNodeParam($token, 'rrd-create-rra');
+    my $has_max = ($rra =~ /RRA:MAX:/s);
+        
     my @args;    
     
     push( @args, $self->rrd_make_opts( $config_tree, $token, $view,
                                        \%rrd_print_opts, ) );
     
     push( @args,
-          $self->rrd_make_def($config_tree, $token, 'Aavg', 'AVERAGE'),
-          $self->rrd_make_def($config_tree, $token, 'Amax', 'MAX') );
-          
-    foreach my $entry ( @rpc_print_statements )
+          $self->rrd_make_def($config_tree, $token, 'Aavg', 'AVERAGE') );
+    if( $has_max )
+    {
+        push( @args,
+              $self->rrd_make_def($config_tree, $token, 'Amax', 'MAX') );
+    }
+
+    my @prints;
+    push( @prints, @rpc_print_statements );
+    if( $has_max )
+    {
+        push( @prints, @rpc_print_max_statements );
+    }
+    
+    foreach my $entry ( @prints )
     {
         push( @args, @{$entry->{'args'}} );
     }
-
+    
     Debug('RRDs::graphv arguments: ' . join(' ', @args));
 
     my $r = RRDs::graphv('-', @args);
@@ -299,7 +317,7 @@ sub rpc_aggregate_ds
     my $data = {};
     my $i = 0;
 
-    foreach my $entry ( @rpc_print_statements )
+    foreach my $entry ( @prints )
     {
         my $key = 'print[' . $i . ']';
         my $val = $r->{$key};

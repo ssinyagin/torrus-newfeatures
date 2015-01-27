@@ -3,6 +3,9 @@
 	* perllib/Torrus/Renderer/RPC.pm (rpc_timeseries): added DATAONLY
 	parameter for TIMESERIES RPC call
 
+	* perllib/Torrus/Renderer/RPC.pm: AGGREGATE_DS RPC call now works
+	for leaves without MAX RRA
+
 2015-01-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RRDtool.pm (rrd_make_hrules): using

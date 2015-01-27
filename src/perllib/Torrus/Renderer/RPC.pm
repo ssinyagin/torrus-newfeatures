@@ -367,8 +367,8 @@ sub rpc_timeseries
         {
             push(@args, $val);
         }
-        elsif( $val =~ /^LINE\d*:([a-zA-Z_][a-zA-Z0-9_]+)/o or
-               $val =~ /^AREA:([a-zA-Z_][a-zA-Z0-9_]+)/o )
+        elsif( $val =~ /^LINE\d*:([a-zA-Z_][a-zA-Z0-9_]*)/o or
+               $val =~ /^AREA:([a-zA-Z_][a-zA-Z0-9_]*)/o )
         {
             push(@xport_names, $1);
         }

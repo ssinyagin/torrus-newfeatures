@@ -33,7 +33,7 @@ use Torrus::SiteConfig;
 use Torrus::ServiceID;
     
 use Digest::MD5 qw(md5); # needed as hash function
-
+use POSIX; # we use ceil() from here
 
 our %multigraph_remove_space =
     ('ds-expr-' => 1,
@@ -579,20 +579,20 @@ sub postProcessNodes
                             my $hashString =
                                 $p{'collector-timeoffset-hashstring'};
                             
-                            my $bucketSize = int( ($max - $min) / $step );
+                            my $bucketSize = ceil(($max-$min)/$step);
                             $newOffset =
                                 $min
                                 +
-                                $step * ( unpack( 'N', md5( $hashString ) ) %
+                                $step * ( unpack('N', md5($hashString)) %
                                           $bucketSize )
                                 +
-                                $instance * int( $step / $nInstances );
+                                $instance * ceil($step/$nInstances);
                         }
                     }
                 }
                 else
                 {
-                    $newOffset += $instance * int( $period / $nInstances ); 
+                    $newOffset += $instance * ceil($period/$nInstances); 
                 } 
 
                 $newOffset %= $period;

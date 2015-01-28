@@ -72,7 +72,9 @@
   <template name="albis-soam-lm">
      <param name="data-file"
             value="%system-id%_%acceed-soam-cfg-index%_lm.rrd" />
-            
+     <param name="collector-timeoffset-hashstring"
+            value="%system-id%:%acceed-soam-cfg-index%"/>
+ 
      <leaf name="FwdAvail">
       <param name="comment"
              value="available indicators in the forward direction" />
@@ -175,6 +177,8 @@
   <template name="albis-soam-dm">
      <param name="data-file"
             value="%system-id%_%acceed-soam-cfg-index%_dm.rrd" />
+     <param name="collector-timeoffset-hashstring"
+            value="%system-id%:%acceed-soam-cfg-index%"/>
             
      <leaf name="TwoWayMin">
       <param name="comment"

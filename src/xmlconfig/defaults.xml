@@ -98,12 +98,12 @@
 
   <!-- Minimum set of parameters if we use
        collector-dispersed-timeoffset=yes -->
-  <param name="collector-timeoffset-hashstring" value="%system-id%" />
+  <param name="collector-timeoffset-hashstring" value="%system-id%zz" />
   <param name="collector-timeoffset-min" value="0" />
   <param name="collector-timeoffset-max" value="300" />
   <param name="collector-timeoffset-step" value="60" />
 
-  <param name="collector-instance-hashstring" value="%system-id%" />
+  <param name="collector-instance-hashstring" value="%system-id%xx" />
 
   <!-- Default schedule for the monitor -->
   <param name="monitor-period"     value="300" />

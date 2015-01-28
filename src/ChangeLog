@@ -1,3 +1,8 @@
+2015-01-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP.pm: DNS errors treated as host
+	unreachable; reachability statistics more accurate
+
 2015-01-27  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RPC.pm (rpc_timeseries): added DATAONLY

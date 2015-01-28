@@ -115,6 +115,8 @@ my %hostUnreachableRetry;
 # Hosts that were deleted because of unreachability for too long
 my %unreachableHostDeleted;
 
+# Hosts were we sent at least one request
+my %hostCommunicationTried;
 
 our $db_failures;
 
@@ -145,6 +147,7 @@ sub initCollectorGlobals
     %hostUnreachableSeen = ();
     %hostUnreachableRetry = ();
     %unreachableHostDeleted = ();
+    %hostCommunicationTried = ();
     
     # Configuration re-compile was probably caused by new object instances
     # appearing on the monitored devices. Here we force the maps to refresh
@@ -379,6 +382,8 @@ sub openBlockingSession
     if( not defined($session) )
     {
         Error('Cannot create SNMP session for ' . $hosthash . ': ' . $error);
+        # this is most probably DNS failure
+        probablyDead( $collector, $hosthash );
     }
     else
     {
@@ -414,6 +419,8 @@ sub openNonblockingSession
     if( not defined($session) )
     {
         Error('Cannot create SNMP session for ' . $hosthash . ': ' . $error);
+        # this is most probably DNS failure
+        probablyDead( $collector, $hosthash );
         return undef;
     }
     
@@ -698,6 +705,8 @@ sub mapLookupCallback
     my $result = $session->var_bind_list();
     if( defined $result )
     {
+        hostReachableAgain( $collector, $hosthash );
+        
         my $preflen = length($map) + 1;
         
         while( my( $oid, $key ) = each %{$result} )
@@ -745,6 +754,8 @@ sub probablyDead
 
     my $cref = $collector->collectorData( 'snmp' );
 
+    $hostCommunicationTried{$hosthash} = 1;
+    
     # Stop all collection for this host, until next initTargetAttributes
     # is successful
     delete $cref->{'activehosts'}{$hosthash};
@@ -861,6 +872,8 @@ sub hostReachableAgain
 {
     my $collector = shift;
     my $hosthash = shift;
+    
+    $hostCommunicationTried{$hosthash} = 1;
     
     if( exists( $hostUnreachableSeen{$hosthash} ) )
     {
@@ -1369,10 +1382,13 @@ sub reachable_runCollector
 
     while(my ($hosthash, $r) = each %{$cref->{'targets'}} )
     {
-        foreach my $token (keys %{$r})
+        if( $hostCommunicationTried{$hosthash} )
         {
             my $val = $db_failures->is_host_available($hosthash) ? 100:0;
-            $collector->setValue( $token, $val, $timestamp, 0 );
+            foreach my $token (keys %{$r})
+            {
+                $collector->setValue( $token, $val, $timestamp, 0 );
+            }
         }
     }
     return;

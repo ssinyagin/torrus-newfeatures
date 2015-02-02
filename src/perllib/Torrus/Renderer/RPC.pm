@@ -26,6 +26,7 @@ use Torrus::Log;
 use RRDs;
 use JSON ();
 use IO::File;
+use Math::BigFloat;
 
 # Set to true if you want JSON to be pretty and canonical
 our $pretty_json;
@@ -441,6 +442,43 @@ sub rpc_timeseries
         $r->{'rrgraph_args'} = $rrgraph_args;
     }
 
+    # convert numbers to strings, undefs to NaN, andinfinities to
+    # Infinity and -Infinity
+
+    for( my $i=0; $i < scalar(@{$r->{'data'}}); $i++ )
+    {
+        for( my $j=0; $j < scalar(@{$r->{'data'}[$i]}); $j++ )
+        {
+            my $val = $r->{'data'}[$i][$j];
+            if( not defined($val) )
+            {
+                $val = 'NaN';
+            }
+            else
+            {
+                $val = Math::BigFloat->new($val);
+                if( $val->is_nan() )
+                {
+                    $val = 'NaN';
+                }
+                elsif( $val->is_inf('+') )
+                {
+                    $val = 'Infinity';
+                }
+                elsif( $val->is_inf('-') )
+                {
+                    $val = '-Infinity';
+                }
+                else
+                {
+                    $val = $val->bstr();
+                }
+            }
+            
+            $r->{'data'}[$i][$j] = $val;
+        }
+    }
+    
     return;
 }
 

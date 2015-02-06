@@ -332,7 +332,14 @@ sub applySelectors
                 my $callback = sub
                 {
                     my $attr = shift;
-                    my $checkval = $self->param( $sel . '-' . $attr );
+                    my $param = $sel . '-' . $attr;
+                    my $checkval = $self->param($param);
+                    if( not defined($checkval) )
+                    {
+                        Error("Parameter $param is not defined for " .
+                              $self->param('snmp-host'));
+                        return 0;
+                    }
                     
                     Debug('Checking attribute: ' . $attr .
                           ' and value: ' . $checkval);

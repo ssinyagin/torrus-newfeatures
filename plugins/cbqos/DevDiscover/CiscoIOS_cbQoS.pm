@@ -242,7 +242,8 @@ sub discover
     }
 
     my $cbQosConfigIndex = $dd->walkSnmpTable('cbQosConfigIndex');
-    my $cbQosParentObjectsIndex = $dd->walkSnmpTable('cbQosParentObjectsIndex');
+    my $cbQosParentObjectsIndex =
+        $dd->walkSnmpTable('cbQosParentObjectsIndex');
 
     my $needTables = {};
     
@@ -567,7 +568,9 @@ sub buildChildrenConfigs
         ( sort { $a <=> $b } @{$data->{'cbqos_children'}{$parentObjIndex}} )
     {      
         my $objectRef     = $data->{'cbqos_objects'}{$policyObjectIndex};
-               
+        
+        next if $objectRef->{'selectorActions'}{'SkipObect'};
+
         my $objConfIndex  = $objectRef->{'cbQosConfigIndex'};
         next unless defined($objConfIndex);
 
@@ -624,13 +627,15 @@ sub buildChildrenConfigs
                     next;
                 }
 
-                if( $interface->{'selectorActions'}{'NoQoSStats'} )
+                if( $interface->{'selectorActions'}{'NoQoSStats'} or
+                    $objectRef->{'selectorActions'}{'NoQoSStats'} )
                 {
                     next;
-                }
+                }                
 
                 if( $data->{'cbqos_default_skip'} and
-                    not $interface->{'selectorActions'}{'QoSStats'} )
+                    not $interface->{'selectorActions'}{'QoSStats'} and
+                    not $objectRef->{'selectorActions'}{'QoSStats'} )
                 {
                     next;
                 }
@@ -1034,6 +1039,7 @@ sub buildChildrenConfigs
             }
             
             $param->{'comment'} = $subtreeComment;
+            $param->{'cbqos-object-name'} = $objectName;
             $param->{'cbqos-object-descr'} = $subtreeComment;
             
             if( ($parentObjType ne '') and ($parentObjName ne '') )
@@ -1267,7 +1273,7 @@ sub translateDscpValue
 
 
 #######################################
-# Selectors interface: we're using RFC2863_IF_MIB actions
+# Selectors interface: we're re-using RFC2863_IF_MIB actions
 #
 
 {
@@ -1277,6 +1283,135 @@ sub translateDscpValue
             'CiscoIOS_cbQoS';
     }
 }
+
+#######################################
+# Selectors interface: cbQoS
+#
+
+$Torrus::DevDiscover::selectorsRegistry{'cbQoS'} = {
+    'getObjects'      => \&getSelectorObjects,
+    'getObjectName'   => \&getSelectorObjectName,
+    'checkAttribute'  => \&checkSelectorAttribute,
+    'applyAction'     => \&applySelectorAction,
+};
+
+
+my %selObjectNameAttr =
+    (
+     'policymap' => 'cbQosPolicyMapName',
+     'classmap'  => 'cbQosCMName'
+     );
+
+
+
+sub getSelectorObjects
+{
+    my $devdetails = shift;
+    my $objType = shift;
+
+    my $data = $devdetails->data();
+    my @ret;
+
+    foreach my $INDEX (sort keys %{$data->{'cbqos_objects'}})
+    {
+        my $type = $data->{'cbqos_objects'}{$INDEX}{'cbQosObjectsType'};
+        if( defined($selObjectNameAttr{$type}) )
+        {
+            push(@ret, $INDEX);
+        }
+    }
+
+    return @ret;
+}
+
+
+sub checkSelectorAttribute
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $attr = shift;
+    my $checkval = shift;
+
+    my $data = $devdetails->data();
+    my $objectRef = $data->{'cbqos_objects'}{$object};
+    my $objConfIndex  = $objectRef->{'cbQosConfigIndex'};
+    my $configRef     = $data->{'cbqos_objcfg'}{$objConfIndex};
+
+    my $type = $objectRef->{'cbQosObjectsType'};
+    my $value = $configRef->{$selObjectNameAttr{$type}};    
+    
+    if( ($type eq 'policymap') and ($attr =~ /^PMName\d*$/) )
+    {
+        return( ($value =~ $checkval) ? 1:0 );
+    }
+    elsif( ($type eq 'classmap') and ($attr =~ /^CMName\d*$/) )
+    {
+        return( ($value =~ $checkval) ? 1:0 );
+    }
+
+    return 0;
+}
+
+
+sub getSelectorObjectName
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    
+    my $data = $devdetails->data();
+    my $objectRef = $data->{'cbqos_objects'}{$object};
+    my $objConfIndex  = $objectRef->{'cbQosConfigIndex'};
+    my $configRef     = $data->{'cbqos_objcfg'}{$objConfIndex};
+
+    my $type = $objectRef->{'cbQosObjectsType'};
+    my $value = $configRef->{$selObjectNameAttr{$type}};    
+
+    return $type . '::' . $value;
+}
+
+
+# Other discovery modules can add their interface actions here
+our %knownSelectorActions;
+{
+    foreach my $name
+        (
+         'NoQoSStats',
+         'QoSStats',
+         'SkipObect',
+         )
+    {
+        $knownSelectorActions{$name} = 'cbQoS';
+    }
+}
+
+                            
+sub applySelectorAction
+{
+    my $devdetails = shift;
+    my $object = shift;
+    my $objType = shift;
+    my $action = shift;
+    my $arg = shift;
+
+    my $data = $devdetails->data();
+    my $objectRef = $data->{'cbqos_objects'}{$object};
+    
+    if( defined( $knownSelectorActions{$action} ) )
+    {
+        $objectRef->{'selectorActions'}{$action} = $arg;
+    }
+    else
+    {
+        Error('Unknown cbQoS selector action: ' . $action);
+    }
+
+    return;
+}
+
+
+
 
 1;
 

@@ -20,8 +20,6 @@
 
 =head1 Cisco Class-based QoS discovery and collection plugin
 
-Status: Released; Last modified: 03-MAY-2004
-
 =head2 Introduction
 
 DiffServ-based quality of service is being deployed in many networks
@@ -125,7 +123,7 @@ action.
 
 
 
-=head2 Selectors
+=head2 RFC2863_IF_MIB selector
 
 The QoS discovery module extends the standard C<RFC2863_IF_MIB>
 selectors by adding two new actions:
@@ -139,11 +137,64 @@ the selector.
 
 =item * C<QoSStats>
 
-If C<CiscoIOS_cbQoS::default-skip-qos-stats> iis set to C<yes>, this
+If C<CiscoIOS_cbQoS::default-skip-qos-stats> is set to C<yes>, this
 action enables QoS statistics for those interfaces which match the
 selector.
 
 =back
+
+
+
+=head2 cbQoS selector
+
+The selector type C<cbQoS> can be used to select individual QoS objects
+(policy maps, class maps) and apply actions to them, such as dropping
+from configuration, or explicitly including them.
+
+The following selector attributes are supported:
+
+=over 4
+
+=item * PMName
+
+Policy map name
+
+=item * CMName
+
+Class map name
+
+=back
+
+Actions supported:
+
+=over 4
+
+=item * C<NoQoSStats>
+
+This action disables the QoS statistics for interfaces where the matched
+policy map is attached.
+
+=item * C<QoSStats>
+
+If C<CiscoIOS_cbQoS::default-skip-qos-stats> is set to C<yes>, this
+action enables QoS statistics for those interfaces where matched policy
+maps are attached.
+
+=item * C<SkipObect>
+
+A matched class-map or policy-map is excluded from Torrus configuration.
+
+=back
+
+The following example excludes class-default class maps from the configuration:
+
+    <param name="selectors" value="qos"/>
+    <param name="qos-selector-type" value="cbQoS"/>
+    <param name="qos-selector-expr"  value="{CMName}"/>
+    <param name="qos-CMName" value="^class-default"/>
+    <param name="qos-selector-actions"  value="SkipObect"/>
+
+
 
 =head2 Implementation details
 

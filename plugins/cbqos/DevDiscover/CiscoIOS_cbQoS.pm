@@ -758,9 +758,12 @@ sub buildChildrenConfigs
         }
         elsif( $objType eq 'randomDetect')
         {
+            my $exponweight = $configRef->{'cbQosREDCfgExponWeight'};
             $subtreeName = 'WRED';
-            $objectName = 'WRED';
+            $objectName = $exponweight;
             $subtreeComment = 'Weighted Random Early Detect Statistics';
+            $objectNick = 'red_'.$exponweight;
+            $param->{'cbqos-red-exponential-weight'} = $exponweight;
             $param->{'legend'} =
                 sprintf('Exponential Weight: %d;',
                         $configRef->{'cbQosREDCfgExponWeight'});

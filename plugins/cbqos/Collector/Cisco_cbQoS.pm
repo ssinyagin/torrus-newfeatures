@@ -74,6 +74,7 @@ my %oiddef =
      'cbQosCMName'                     => '1.3.6.1.4.1.9.9.166.1.7.1.1.1',
      'cbQosMatchStmtName'              => '1.3.6.1.4.1.9.9.166.1.8.1.1.1',
      'cbQosQueueingCfgBandwidth'       => '1.3.6.1.4.1.9.9.166.1.9.1.1.1',
+     'cbQosREDCfgExponWeight'          => '1.3.6.1.4.1.9.9.166.1.10.1.1.1',
      'cbQosPoliceCfgRate'              => '1.3.6.1.4.1.9.9.166.1.12.1.1.1',
      'cbQosTSCfgRate'                  => '1.3.6.1.4.1.9.9.166.1.13.1.1.1',
      );
@@ -197,7 +198,9 @@ my %objTypeAttributes =
          'name-oid'   => 'cbQosQueueingCfgBandwidth' },
 
      # 'randomDetect'     
-     5 => {},
+     5 => {
+         'name-param' => 'cbqos-red-exponential-weight',
+         'name-oid'   => 'cbQosREDCfgExponWeight'},
      
      # 'trafficShaping'
      6 => {
@@ -422,6 +425,7 @@ sub initTargetAttributes
 
         foreach my $table ( 'cbQosPolicyMapName', 'cbQosCMName',
                             'cbQosMatchStmtName', 'cbQosQueueingCfgBandwidth',
+                            'cbQosREDCfgExponWeight',
                             'cbQosTSCfgRate', 'cbQosPoliceCfgRate' )
         {
             my $result =

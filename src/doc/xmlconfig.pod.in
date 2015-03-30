@@ -825,7 +825,7 @@ C<snmp-authpassword> must be defined too.
 
 =item * C<snmp-privprotocol>
 
-Optional privacy protocol for SNMPv3. Valid values: C<des>, C<aes128cfb>,
+Optional privacy protocol for SNMPv3. Valid values: C<des>, C<aes>,
 or C<3desede>. Default is C<des>.
 
 =item * C<snmp-timeout>

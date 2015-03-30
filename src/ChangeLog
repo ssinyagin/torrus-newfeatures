@@ -1,3 +1,8 @@
+2015-03-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Collector/SNMP_Params.pm: "aes128cfb" is invalid
+	value for snmp-privprotocol, should be "aes"
+
 2015-01-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Collector/SNMP.pm: DNS errors treated as host

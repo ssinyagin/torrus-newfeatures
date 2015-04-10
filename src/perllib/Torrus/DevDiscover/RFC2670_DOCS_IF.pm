@@ -185,7 +185,13 @@ sub discover
         $data->{'docsCableDownstream'} = [];
     }
 
-    if( $devdetails->hasCap('docsDownstreamUtil') )
+    if( $devdetails->paramEnabled('RFC2670_DOCS_IF::disable-downstreams') )
+    {
+        $data->{'docsCableDownstream'} = [];
+    }
+    
+    if( $devdetails->hasCap('docsDownstreamUtil') and
+        scalar(@{$data->{'docsCableDownstream'}}) > 0 )
     {
         push( @{$data->{'docsConfig'}{'docsCableDownstream'}{'templates'}},
               'RFC2670_DOCS_IF::docsis-downstream-subtree' );        

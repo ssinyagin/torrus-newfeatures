@@ -410,7 +410,7 @@ sub run_actions
     {
         &Torrus::DB::checkInterrupted();
         
-        Info(sprintf('Running action %s for event % in monitor %s',
+        Info(sprintf('Running action %s for event %s in monitor %s',
                      $aname, $obj->{'event'}, $obj->{'mname'}));
         my $method = 'run_event_' .
             $config_tree->getParam($aname, 'action-type');

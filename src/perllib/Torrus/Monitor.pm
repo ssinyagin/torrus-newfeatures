@@ -410,7 +410,8 @@ sub run_actions
     {
         &Torrus::DB::checkInterrupted();
         
-        Debug("Running action: $aname");
+        Info(sprintf('Running action %s for event % in monitor %s',
+                     $aname, $obj->{'event'}, $obj->{'mname'}));
         my $method = 'run_event_' .
             $config_tree->getParam($aname, 'action-type');
         $self->$method( $config_tree, $aname, $obj );
@@ -497,15 +498,16 @@ sub run_event_tset
     if( $add or $remove )
     {
         my $tset = 'S'.$config_tree->getParam($aname, 'tset-name');
+        my $path = $config_tree->path($token);
         
         if( $add )
         {
-            Debug("Adding $token to tokenset $tset");
+            Info("Adding $path to tokenset $tset");
             $config_tree->tsetAddMember($tset, $token, 'monitor');
         }
         if( $remove )
         {
-            Debug("Removing $token from tokenset $tset");
+            Info("Removing $path from tokenset $tset");
             $config_tree->tsetDelMember($tset, $token);
         }
     }
@@ -634,7 +636,7 @@ sub run_event_exec
             }
         }
 
-        Debug("Going to run command: $cmd");
+        Info("Executing command: $cmd");
         my $status = system($cmd);
         if( $status != 0 )
         {

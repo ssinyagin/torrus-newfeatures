@@ -10,7 +10,7 @@ IMPORTS
         FROM RRDTOOL-SMI;
 
 torrus MODULE-IDENTITY
-    LAST-UPDATED "200506210000Z"
+    LAST-UPDATED "201504140000Z"
     ORGANIZATION "Round Robin Database Framework project"
     CONTACT-INFO
         "Round Robin Database Framework project
@@ -22,7 +22,7 @@ torrus MODULE-IDENTITY
 
          Stanislav Sinyagin
          Tel. +41 79 407 02 24
-         E-mail: ssinyagin@yahoo.com"
+         E-mail: ssinyagin@k-open.com"
     DESCRIPTION
         "The MIB module for SNMP variables specific to Torrus project"
         ::= { rrdtool 1 }
@@ -170,6 +170,14 @@ torrusMonitorDesc OBJECT-TYPE
     DESCRIPTION
         "Human readable monitor comment"
     ::= { torrusMonitorEventsEntry 9 }
+
+torrusParentDesc OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Human readable comment on the parent subtree"
+    ::= { torrusMonitorEventsEntry 10 }
     
 torrusAlarm NOTIFICATION-TYPE
     OBJECTS  { torrusToken, torrusMonitorName, torrusEventType,

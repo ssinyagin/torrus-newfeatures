@@ -1,3 +1,8 @@
+2015-04-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* bin/action_snmptrap.in: TORRUS_NPCOMMENT is deliverd in .10 in
+	SNMP traps
+
 2015-04-10  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/DevDiscover/RFC2670_DOCS_IF.pm: new discovery

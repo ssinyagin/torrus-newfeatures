@@ -89,7 +89,10 @@ my @varbindlist = ( $oid_prefix . '.1',
                     INTEGER32, $severity,
 
                     $oid_prefix . '.9',
-                    OCTET_STRING, $ENV{'TORRUS_MCOMMENT'}
+                    OCTET_STRING, $ENV{'TORRUS_MCOMMENT'},
+
+                    $oid_prefix . '.10',
+                    OCTET_STRING, $ENV{'TORRUS_NPCOMMENT'},
                     );
           
 

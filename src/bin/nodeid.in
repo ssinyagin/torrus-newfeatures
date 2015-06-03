@@ -35,9 +35,9 @@ exit(1) unless Torrus::SiteConfig::verify();
 
 
 my %commands =
-    ('info'   => \&do_info,
-     'search' => \&do_search,
-     'render' => \&do_render);
+    ('info'   => 1,
+     'search' => 1,
+     'render' => 1);
 
 
 

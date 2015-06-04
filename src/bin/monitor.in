@@ -150,6 +150,11 @@ Info(sprintf("Torrus version %s", '@VERSION@'));
 Info(sprintf("%s started for tree %s", $0, $tree));
 Info(sprintf("Process ID %d", $$));
 
+$SIG{'HUP'} = sub {
+    Warn('Received SIGHUP. Stopping the process.');
+    exit(1);
+};
+
 if( $delay > 0 )
 {
     Info(sprintf('Delaying for %d minutes', $delay));

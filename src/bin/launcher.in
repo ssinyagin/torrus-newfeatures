@@ -1,0 +1,408 @@
+#!@PERL@ -w
+#  Copyright (C) 2015  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+
+use strict;
+use warnings;
+BEGIN { require '@torrus_config_pl@'; }
+
+
+use Getopt::Long;
+use POSIX qw(setuid setgid getuid getgid);
+
+use Torrus::SiteConfig;
+use Torrus::Log;
+
+exit(1) unless Torrus::SiteConfig::verify();
+
+
+my %commands =
+    ('start'   => \&do_start,
+     'stop'    => \&do_stop,
+     'status'  => \&do_status);
+
+
+
+my $cmd;
+my $user = '@torrus_user@';
+my $collector_opts = '';
+my $monitor_opts = '';
+my $force;
+my $timeout = 30;
+my $verbose;
+my $help_needed;
+
+
+my $ok = GetOptions('cmd=s'       => \$cmd,
+                    'user=s'      => \$user,
+                    'copts=s'     => \$collector_opts,
+                    'mopts=s'     => \$monitor_opts,
+                    'timeout=i'   => \$timeout,
+                    'force'       => \$force,
+                    'verbose'     => \$verbose,
+                    'help'        => \$help_needed);
+
+if( not $ok or
+    not $cmd or not $commands{$cmd} or
+    $help_needed or scalar(@ARGV) > 0 )
+{
+    print STDERR "Usage: $0 --cmd=CMD [options...]\n",
+    "Options:\n",
+    "  --cmd=CMD        Command (start|stop|status)\n",
+    "  --user=NAME      \[$user\] User that will run the daemons\n",
+    "  --copts=STRING   Collector command options\n",
+    "  --mopts=STRING   Monitor command options\n",
+    "  --timeout=N      \[$timeout\] time waiting for daemons to stop\n",
+    "  --force          Kill daemons if they cannot be stopped\n",
+    "  --verbose        Print extra information\n",
+    "  --help           This help message\n";
+    exit 1;
+}
+
+if( $verbose )
+{
+    Torrus::Log::setLevel('verbose');
+}
+
+&{$commands{$cmd}}();
+
+exit($ok?0:1);
+
+
+sub do_start
+{
+    switch_uid();
+
+    my $pidfiles = pidfiles();
+    if( scalar(@{$pidfiles}) > 0 )
+    {
+        Error("$Torrus::Global::pidDir contains PID files from some " .
+              "older Torrus processes. Aborting");
+        exit(1);
+    }
+
+    foreach my $tree (sort keys %Torrus::Global::treeConfig)
+    {
+        my $daemons = get_daemons($tree);
+                
+        for( my $inst = 0; $inst < $daemons->{'collectors'}; $inst++ )
+        {
+            Info("starting Torrus collector instance $inst for tree $tree");
+            my $status =
+                system($Torrus::Global::pkgbindir .
+                       "/collector --tree=$tree --instance=$inst " .
+                       $collector_opts);
+            if( $status != 0 )
+            {
+                Error("Collector failed to start");
+                exit(1);
+            }
+        }
+
+        if( $daemons->{'monitor'} )
+        {
+            Info("starting Torrus monitor for tree $tree");
+            my $status =
+                system($Torrus::Global::pkgbindir .
+                       "/monitor --tree=$tree " .
+                       $monitor_opts);
+            if( $status != 0 )
+            {
+                Error("Monitor failed to start");
+                exit(1);
+            }
+        }
+    }
+    
+    return;
+}
+
+
+sub do_stop
+{
+    switch_uid();
+
+    my $time_limit = time() + $timeout;
+    
+    my %lostpid;
+
+    # send SIGHUP 
+    {
+        my $pidfiles = pidfiles();
+        if( scalar(@{$pidfiles}) == 0 )
+        {
+            Info("Torrus daemons are not running");
+            $ok = 0;
+            return;
+        }
+        
+        foreach my $pidfile (@{$pidfiles})
+        {
+            my $pid = read_pidfile($pidfile);
+            my $pname = pidname($pidfile);
+            Info("Sending SIGHUP to $pid ($pname)");
+            if( kill('HUP', $pid) == 0 )
+            {
+                Error("Cannot stop process $pid ($pname): $!");
+                $lostpid{$pidfile} = 1;
+                $ok = 0;
+            }
+        }
+    }
+
+    # check if everyone has finished
+    my $done = 0;
+    while( not $done and time() < $time_limit )
+    {
+        my $still_running = 0;
+        my $pidfiles = pidfiles();
+        foreach my $pidfile (@{$pidfiles})
+        {
+            if( not $lostpid{$pidfile} )
+            {
+                if( -e $pidfile )
+                {
+                    $still_running = 1;
+                    last;
+                }
+            }
+        }
+
+        if( not $still_running )
+        {
+            $done = 1;
+        }
+        else
+        {
+            sleep(2);
+        }
+    }
+
+    if( not $done )
+    {
+        Error("Failed to stop some processes gracefully");
+
+        if( $force )
+        {
+            # send SIGKILL
+            
+            my $pidfiles = pidfiles();
+            foreach my $pidfile (@{$pidfiles})
+            {
+                if( not $lostpid{$pidfile} )
+                {                    
+                    my $pid = read_pidfile($pidfile);
+                    my $pname = pidname($pidfile);
+                    
+                    Info("Sending SIGKILL to $pid ($pname)");
+                    if( kill('KILL', $pid) == 0 )
+                    {
+                        Error("Cannot kill process $pid ($pname): $!");
+                        $lostpid{$pidfile} = 1;
+                        $ok = 0;
+                    }
+                    else
+                    {
+                        if( not unlink($pidfile) )
+                        {
+                            Error("Cannot delete $pidfile: $!");
+                            $ok = 0;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            $ok = 0;
+        }
+    }
+
+    if( scalar(keys %lostpid) > 0 )
+    {
+        Error("Lost PID files that need to be deleted manually: " .
+              join(' ', sort keys %lostpid));
+        $ok = 0;
+    }
+    
+    if( $ok )
+    {
+        Info("Stopped Torrus daemons successfully");
+    }
+
+    return;
+}
+
+
+sub do_status
+{
+    switch_uid();
+
+    my %lostpid;
+
+    # send zero signal to see if the process exists
+    my $pidfiles = pidfiles();
+    if( scalar(@{$pidfiles}) == 0 )
+    {
+        Info("Torrus daemons are not running");
+        $ok = 0;
+        return;
+    }
+        
+    foreach my $pidfile (@{$pidfiles})
+    {
+        my $pid = read_pidfile($pidfile);
+        my $pname = pidname($pidfile);
+        if( kill(0, $pid) == 0 )
+        {
+            Error("Error checking status for process $pid ($pname): $!");
+            $lostpid{$pidfile} = $pid;
+            $ok = 0;
+        }
+        else
+        {
+            Info("$pid ($pname): running");
+        }
+    }
+
+    if( scalar(keys %lostpid) > 0 )
+    {
+        Error("Lost PID files that need to be deleted manually: " .
+              join(' ', sort keys %lostpid));
+        $ok = 0;
+    }
+    
+    return;
+}
+
+
+
+sub switch_uid
+{
+    my ($pwName, $pwCode, $pwUid, $pwGid, $pwQuota, $pwComment,
+        $pwGcos, $pwHome, $pwLogprog) = getpwnam($user);
+    
+    if( not defined($pwUid) )
+    {
+        Error("User $user does not exist");
+        exit(1);
+    }
+
+    if( not setgid($pwGid) )
+    {
+        Error("Cannot switch to group $pwGid: $!");
+        exit(1);
+    }
+
+    if( not setuid($pwUid) )
+    {
+        Error("Cannot switch to user $user: $!");
+        exit(1);
+    }
+
+    Verbose("Switched user to " .
+            scalar(getpwuid(getuid())) . ':' . scalar(getgrgid(getgid())));
+}
+
+
+
+sub pidfiles
+{
+    if( not opendir(PIDDIR, $Torrus::Global::pidDir) )
+    {
+        Error("Cannot open directory $Torrus::Global::pidDir: $!");
+        exit(1);
+    }
+    
+    my @files = grep { !/^\./ } readdir(PIDDIR);
+    closedir( PIDDIR );
+
+    my $ret = [];
+
+    foreach my $file ( @files )
+    {
+        if( $file =~ /\.pid$/ )
+        {
+            push(@{$ret}, $Torrus::Global::pidDir . '/' . $file);
+        }
+    }
+
+    return $ret;
+}
+
+
+sub read_pidfile
+{
+    my $file = shift;
+    
+    if( not open(PID, $file) )
+    {
+        Error("Cannot open $file: $!");
+        exit(1);
+    }
+            
+    my $pid = <PID>;
+    close PID;
+    $pid =~ s/\s+//sg;
+    return $pid;
+}
+
+
+sub pidname
+{
+    my $pidfile = shift;
+
+    my $pname = $pidfile;
+    if( $pidfile =~ /\/([^\/]+)\.pid$/ )
+    {
+        $pname = $1;
+    }
+
+    return $pname;
+}
+
+
+
+sub get_daemons
+{
+    my $tree = shift;
+
+    my $cfg = $Torrus::Global::treeConfig{$tree};
+
+    my $n_collectors = $cfg->{'run'}{'collector'};
+    if( not defined($n_collectors) )
+    {
+        $n_collectors = 0;
+    }
+    
+    my $monitor = $cfg->{'run'}{'monitor'} ? 1:0;
+    
+    Verbose(sprintf("Tree %s: %d collector instances, %s monitor",
+                    $tree, $n_collectors,
+                    $monitor ? 'run':'no'));
+    
+    return {'collectors' => $n_collectors, 'monitor' => $monitor};
+}
+    
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:

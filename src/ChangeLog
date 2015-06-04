@@ -1,3 +1,9 @@
+2015-06-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* init.d/torrus.in: utilize the new launcher in init script
+
+	* bin/launcher.in: new utility for starting-stopping daemons
+
 2015-04-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* bin/action_snmptrap.in: TORRUS_NPCOMMENT is deliverd in .10 in

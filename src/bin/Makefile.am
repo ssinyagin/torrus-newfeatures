@@ -41,6 +41,7 @@ pkgbin_SCRIPTS = \
 	genlist			\
 	genreport		\
 	install_plugin		\
+	launcher		\
 	monitor      		\
 	nodeid			\
 	rrddir2xml		\
@@ -76,6 +77,7 @@ EXTRA_DIST = \
 	genlist.in		\
 	genreport.in		\
 	install_plugin.in	\
+	launcher.in		\
 	monitor.in      	\
 	nodeid.in		\
 	rrddir2xml.in		\
@@ -147,6 +149,9 @@ genreport: genreport.in
 
 install_plugin: install_plugin.in
 	$(SUBST) install_plugin.in > install_plugin
+
+launcher: launcher.in
+	$(SUBST) launcher.in > launcher
 
 monitor: monitor.in
 	$(SUBST) monitor.in > monitor

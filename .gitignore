@@ -214,6 +214,7 @@
 /src/bin/genlist
 /src/bin/genreport
 /src/bin/install_plugin
+/src/bin/launcher
 /src/bin/mkroutercfg
 /src/bin/monitor
 /src/bin/nodeid

@@ -1,0 +1,103 @@
+#  Copyright (C) 2015  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# Stanislav Sinyagin <ssinyagin@yahoo.com>
+#
+#
+
+=head1 NAME
+
+launcher - Torrus utility
+
+=head1 SYNOPSIS
+
+B<launcher> --cmd=CMD I<options...>
+
+=head1 DESCRIPTION
+
+This command is starting or stopping all needed Torrus daemons, and is
+designed to be used in the system startup/shutdown scripts.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--cmd=CMD>
+
+[Mandatory] Defines the action command. The following commands are supported:
+
+=over 8
+
+=item * start
+
+Starts all required collectors and monitors
+
+=item * stop
+
+Stops runnig collectors and monitors andn waits for them to finish
+within certain timeout.
+
+=item * status
+
+Prints the current status of collector and monitor daemons.
+
+=back
+
+
+=item B<--user=NAME>
+
+Changes the default user name that is used to run the daemons.
+
+=item B<--copts=STRING>
+
+Additional command-line arguments for collector daemon.
+
+=item B<--mopts=STRING>
+
+Additional command-line arguments for monitor daemon.
+
+=item B<--timeout=N>
+
+Changes the default time to wait for daemons to stop.
+
+=item B<--force>
+
+Causes the daemons to be killed with SIGKILL if they cannot be stopped
+within the normal timeout. As a result, the Torrus database would most
+probably be corrupted and require recovery.
+
+=item B<--verbose>
+
+print extra information to STDERR
+
+=item B<--help>
+
+Displays a help message.
+
+=back
+
+
+=head1 SEE ALSO
+
+L<torrus(@mansec_usercmd@)>
+
+=head1 NOTES
+
+See more documentation at Torrus home page: http://torrus.org
+
+=head1 AUTHOR
+
+Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>

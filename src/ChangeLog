@@ -1,3 +1,8 @@
+2015-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* perllib/Torrus/Renderer/RPC.pm (rpc_timeseries): TIMESERIES RPC
+	call now returns title, labels, and vertical_label
+
 2015-06-04  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* init.d/torrus.in: utilize the new launcher in init script

@@ -15,7 +15,7 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 
 # This module is an interface to SIAM API
 

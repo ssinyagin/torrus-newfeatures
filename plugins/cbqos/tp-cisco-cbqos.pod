@@ -14,7 +14,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 #
 #
 
@@ -291,4 +291,4 @@ issue warnings.
 
 =head1 Author
 
-Copyright (c) 2004-2015 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2004-2015 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>

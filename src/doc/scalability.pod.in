@@ -15,7 +15,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 #
 #
 
@@ -268,6 +268,6 @@ it is preferred that at least 50% of average CPU time is idle.
 
 =head1 Authors
 
-Copyright (c) 2004-2005 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2004-2005 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
 
 Copyright (c) 2004 Christian Schnidrig E<lt>christian.schnidrig@bluewin.chE<gt>

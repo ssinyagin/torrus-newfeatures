@@ -14,7 +14,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 #
 #
 
@@ -158,4 +158,4 @@ from human intervention.
 
 =head1 Author
 
-Copyright (c) 2003 Stanislav Sinyagin E<lt>ssinyagin@yahoo.comE<gt>
+Copyright (c) 2003 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>

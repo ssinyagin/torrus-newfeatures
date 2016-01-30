@@ -3,7 +3,7 @@
 # with $Torrus::Renderer::stylingProfile in your torrus-siteconfig.pl
 # or better define your amendments in Torrus::Renderer::stylingProfileOverlay
 
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
 
 %Torrus::Renderer::graphStyles =

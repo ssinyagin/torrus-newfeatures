@@ -4,7 +4,7 @@
 # and email the warning message.
 # *.old.rrd files are ignored
 
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 #
 
 # Where the RRD files are located. Separate multiple paths with space

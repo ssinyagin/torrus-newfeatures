@@ -22,7 +22,7 @@ torrus MODULE-IDENTITY
 
          Stanislav Sinyagin
          Tel. +41 79 407 02 24
-         E-mail: ssinyagin@yahoo.com"
+         E-mail: ssinyagin@k-open.com"
     DESCRIPTION
         "The MIB module for SNMP variables specific to Torrus project"
         ::= { rrdtool 1 }

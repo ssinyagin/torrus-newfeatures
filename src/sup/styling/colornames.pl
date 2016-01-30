@@ -1,6 +1,6 @@
 # Symbolic Color names
 
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
 
 my %colorNames =

@@ -17,7 +17,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
   $Id$
-  Stanislav Sinyagin <ssinyagin@yahoo.com>
+  Stanislav Sinyagin <ssinyagin@k-open.com>
 
   XSLT Template to transform Torrus configuration into a skeleton of
   subtrees and leaves only.

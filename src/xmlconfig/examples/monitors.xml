@@ -17,7 +17,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
   $Id$
-  Stanislav Sinyagin <ssinyagin@yahoo.com>
+  Stanislav Sinyagin <ssinyagin@k-open.com>
 
 -->
 
@@ -85,7 +85,7 @@
   <action name="report-email">
     <param name="action-type" value="exec" />
     <param name="command">
-      $TORRUS_HOME/bin/action_printemail | mail ssinyagin@yahoo.com
+      $TORRUS_HOME/bin/action_printemail | mail ssinyagin@k-open.com
     </param>
     <param name="launch-when" value="set, clear" />
   </action>

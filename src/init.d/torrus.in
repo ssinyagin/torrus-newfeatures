@@ -4,7 +4,7 @@
 # Install it as /etc/init.d/torrus (most UNIXes),
 # or as /usr/local/etc/rc.d/torrus.sh (FreeBSD), or probably somewhere else.
 #
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 #
 #
 ### chkconfig info

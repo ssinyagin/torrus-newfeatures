@@ -14,7 +14,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 
 package Torrus::Renderer::RPC;
 use strict;
@@ -377,6 +377,9 @@ sub rpc_timeseries
     Debug('rrgraph_args: ' . join(' ', @{$rrgraph_args}));
 
     my @xport_names;
+    my $labels = [];
+    my $title = '';
+    my $vertical_label = '';        
         
     for(my $i=0; $i < scalar(@{$rrgraph_args}); $i++)
     {
@@ -394,6 +397,24 @@ sub rpc_timeseries
                $val =~ /^AREA:([a-zA-Z_][a-zA-Z0-9_]*)/o )
         {
             push(@xport_names, $1);
+            if( $val =~ /:([^:\\]+)\\l/o )
+            {
+                push(@{$labels}, $1);
+            }
+            else
+            {
+                push(@{$labels}, '');
+            }
+        }
+        elsif( $val eq '--title' )
+        {
+            $i++;
+            $title = $rrgraph_args->[$i];
+        }
+        elsif( $val eq '--vertical-label' )
+        {
+            $i++;
+            $vertical_label = $rrgraph_args->[$i];
         }
     }
 
@@ -442,6 +463,10 @@ sub rpc_timeseries
         $r->{'rrgraph_args'} = $rrgraph_args;
     }
 
+    $r->{'title'} = $title;
+    $r->{'vertical_label'} = $vertical_label;
+    $r->{'labels'} = $labels;
+    
     # convert numbers to strings, undefs to NaN, andinfinities to
     # Infinity and -Infinity
 

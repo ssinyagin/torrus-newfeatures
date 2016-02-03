@@ -16,7 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # Shawn Ferry <sferry at sevenspace dot com> <lalartu at obscure dot org>
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 #
 
 =head1 Torrus SNMP Device Discovery Developer's Guide

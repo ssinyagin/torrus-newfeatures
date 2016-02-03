@@ -1,7 +1,7 @@
 #
 # Generate HTML files out of POD
 #
-# Stanislav Sinyagin <ssinyagin@yahoo.com>
+# Stanislav Sinyagin <ssinyagin@k-open.com>
 #
 
 gen_html () {

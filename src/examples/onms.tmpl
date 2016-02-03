@@ -34,7 +34,7 @@
   <!-- IP address: [% interface.addr %] -->
 
   <subtree name="[% interface.addr %]">
-    <param name="data-dir" value="[% responcedir _ "/" _ interface.addr %]"/>
+    <param name="data-dir" value="[% responsedir _ "/" _ interface.addr %]"/>
     <apply-template name="onms-response"/>
     [% FOREACH svc = interface.services; 
          IF svc.name == 'icmp' %]

@@ -281,11 +281,11 @@
     <param name="overview-shortcuts"        value="rt"/>
     <param name="overview-subleave-name-rt"    value="LatestCompletionTime"/>
     <param name="overview-shortcut-text-rt"
-           value="All responce times"/>
+           value="All response times"/>
     <param name="overview-shortcut-title-rt"
-           value="Show all responce time graphs in one page"/>
+           value="Show all response time graphs in one page"/>
     <param name="overview-page-title-rt"
-           value="Responce Time Graphs"/>
+           value="Response Time Graphs"/>
            
     <param name="rrd-hwpredict"     value="disabled" />
   </template>

@@ -24,26 +24,26 @@
 # and builds the data file which you can use with onms.tmpl to generate
 # Torrus XML configuration.
 
-# Usage (RESPONCEDIR setting may be skipped if it's in the default path)
+# Usage (RESPONSEDIR setting may be skipped if it's in the default path)
 #
-# RESPONCEDIR=/var/opennms/rrd/response
-# export RESPONCEDIR
+# RESPONSEDIR=/var/opennms/rrd/response
+# export RESPONSEDIR
 # cd /usr/local/torrus-0.1/share/torrus/
 # ./examples/onmsInterfaces.sh > onms.data
 # tpage --define data=onms.data examples/onms.tmpl > xmlconfig/onms.xml
 
 
-if test x"$RESPONCEDIR" = x""; then
-  RESPONCEDIR=/var/opennms/rrd/response
+if test x"$RESPONSEDIR" = x""; then
+  RESPONSEDIR=/var/opennms/rrd/response
 fi
 
-echo '[% responcedir = "'$RESPONCEDIR'" %]'
+echo '[% responsedir = "'$RESPONSEDIR'" %]'
 echo '[% ifs = ['
 
-for ipaddr in `ls ${RESPONCEDIR}`; do
+for ipaddr in `ls ${RESPONSEDIR}`; do
   echo "  { addr => '$i',";
   echo "    services => [";
-  for service in `ls ${RESPONCEDIR}/$i | awk -F. '{print $1}'`; do
+  for service in `ls ${RESPONSEDIR}/$i | awk -F. '{print $1}'`; do
     echo -n "      {name => '${service}', "
     legend=`echo $j | awk '{print toupper($1)}'`
     echo "legend => '${legend}'}"

@@ -1,3 +1,7 @@
+2016-02-17  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Torrus Release 2.09
+
 2015-09-29  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/Renderer/RPC.pm (rpc_timeseries): TIMESERIES RPC

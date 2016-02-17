@@ -1,3 +1,34 @@
+17-FEB-2016: Torrus release 2.09
+
+In this release:
+
+-- RRDtool 1.4.8 or newer is required
+
+-- New and improved SNMP discovery modules (Fortinet, Cisco Nexus, Albis
+   ULAF, F5 BigIP)
+
+-- Configuration parameters that prevent Collector and Monitor from
+   exiting when there's no work to do: $Torrus::Collector::runAlways,
+   $Torrus::Monitor::runAlways, and CLI option: --runalways.
+
+-- Two new horizontal rules: warn-level, crit-level
+
+-- Horizontal rules are drawn semi-transparent
+
+-- New discovery parameter: RFC2863_IF_MIB::disable-all to disable all
+   interface stats
+
+-- Improvements and new options in the RPC interface
+
+-- DNS errors are treated as host unreachable
+
+-- New sysvinit startup script, more reliable and providing better
+   control over processes
+
+-- other minor bugfixes and improvements
+   
+
+
 02-OCT-2014: Torrus release 2.08
 
 In this release:

@@ -35,8 +35,11 @@
            END;
          END;
 %]
-  <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
+<DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
     <SPAN CLASS="NodeName">
+      [% IF displayHealth and nodeParam(child,'has-health-status',1) == 'yes' %]
+             <IMG CLASS="Health" SRC="[%url(child,healthView)%]">
+      [% END %]
       [% thisIsAlias ? '<EM CLASS="Alias">':'';
          hidden ? '<EM CLASS="ShowHidden">':'' %]
       <A HREF="[%url(child)%]"[%urlTitle%]>[% nodeName(child) %]</A>

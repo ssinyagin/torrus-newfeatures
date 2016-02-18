@@ -29,7 +29,10 @@ styldir = $(supdir)/styling
 dist_styl_DATA = \
 	styling/colornames.pl  \
 	styling/rainbow-schema.pl \
-	styling/torrus-schema.pl
+	styling/torrus-schema.pl \
+	styling/critical.png \
+	styling/good.png \
+	styling/warning.png
 
 
 webplaindir = @webplaindir@

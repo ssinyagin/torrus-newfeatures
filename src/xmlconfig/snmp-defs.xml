@@ -171,6 +171,8 @@
 
   <!-- Device reachability statistics -->
   <template name="snmp-reachability">
+    <param name="has-health-status"    value="yes"/>
+    <param name="health-status-nodeid" value="reachable//%nodeid-device%"/>
     <leaf name="Device_Reachability">
       <param name="node-display-name"  value="Device Reachability"/>
       <param name="comment"  value="Device availability statistics" />

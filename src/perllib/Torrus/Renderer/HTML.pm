@@ -114,7 +114,9 @@ sub render_html
         'verifyDate'  => sub { return verifyDate($_[0]); },
         'markup'     => sub{ return $self->translateMarkup( @_ ); },
         'searchEnabled' => $Torrus::Renderer::searchEnabled,
-        'searchResults' => sub { return $self->doSearch($config_tree, $_[0]); }
+        'searchResults' => sub { return $self->doSearch($config_tree, $_[0]); },
+        'displayHealth' => $Torrus::Renderer::displayHealthIcons,
+        'healthView' => $Torrus::Renderer::healthView,
     };
     
     

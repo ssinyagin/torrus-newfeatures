@@ -501,3 +501,11 @@ SPAN.LoginInput INPUT.Remember {
   color : red;
   height : 15px;
 }
+
+IMG.Health {
+  display : inline;
+  height : 16px;
+  width : 16px;
+  padding-left: 5px;
+  padding-right: 5px;
+}

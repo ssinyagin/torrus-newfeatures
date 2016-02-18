@@ -130,8 +130,12 @@ my %view_params =
                                    'print-cf' => undef},
                      'html' => {'html-template' => undef},
                      'adminfo' => undef,
-                     'rpc' => undef}
-     );
+                     'rpc' => undef,
+                     'health' => {'good-img' => undef,
+                                  'warning-img' => undef,
+                                  'critical-img' => undef,
+                                  'mime-type' => undef}}
+    );
 
 
 # Load additional validation, configurable from

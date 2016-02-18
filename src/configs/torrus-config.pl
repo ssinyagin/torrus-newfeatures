@@ -38,6 +38,7 @@ $Torrus::Global::reportsDir     = '@reportsdir@';
 $Torrus::Global::sesStoreDir    = '@sesstordir@';
 $Torrus::Global::sesLockDir     = '@seslockdir@';
 $Torrus::Global::webPlainDir    = '@webplaindir@';
+$Torrus::Global::healthIconsDir = $Torrus::Global::stylingDir;
 
 @Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
 
@@ -303,6 +304,13 @@ $Torrus::Renderer::RPC::pretty_json = 0;
 @Torrus::Renderer::loadAdmInfo =
     ( 'Torrus::Collector::SNMP_Params',
       'Torrus::Collector::CDef_Params' );
+
+# Display health icons in directory listings
+$Torrus::Renderer::displayHealthIcons = 1;
+
+# View definition for health icons
+$Torrus::Renderer::healthView = 'health';
+
 
 # Parameters that are comma-separated values
 @Torrus::ConfigTree::XMLCompiler::listparams = ();

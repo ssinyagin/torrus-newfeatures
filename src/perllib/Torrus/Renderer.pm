@@ -34,13 +34,15 @@ use Torrus::Renderer::RRDtool;
 use Torrus::Renderer::Frontpage;
 use Torrus::Renderer::AdmInfo;
 use Torrus::Renderer::RPC;
+use Torrus::Renderer::Health;
 
 # Inherit methods from these modules
 use base qw(Torrus::Renderer::HTML
             Torrus::Renderer::RRDtool
             Torrus::Renderer::Frontpage
             Torrus::Renderer::AdmInfo
-            Torrus::Renderer::RPC);
+            Torrus::Renderer::RPC
+            Torrus::Renderer::Health);
 
 sub new
 {

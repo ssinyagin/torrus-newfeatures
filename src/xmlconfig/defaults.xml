@@ -52,6 +52,7 @@
   <prop param="storage-type"       prop="remspace" value="1"/>
   <prop param="tokenset-member"    prop="remspace" value="1"/>
   <prop param="value-map"          prop="remspace" value="1"/>
+  <prop param="health-status-nodeid"  prop="remspace" value="1"/>
 
   <!-- Parameters which need to be expanded accorrding
        to $defs and %paramrefs% -->
@@ -80,6 +81,7 @@
   <prop param="system-id"             prop="expand" value="1"/>
   <prop param="transform-value"       prop="expand" value="1"/>
   <prop param="upper-limit"           prop="expand" value="1"/>
+  <prop param="health-status-nodeid"  prop="expand" value="1"/>
 
   <!-- Parameters which are included in search DB -->
   <prop param="comment"               prop="search" value="1"/>
@@ -108,6 +110,22 @@
   <!-- Default schedule for the monitor -->
   <param name="monitor-period"     value="300" />
   <param name="monitor-timeoffset" value="75" />
+
+  <!-- Length of the time period over which the average health
+       status is calculated-->
+  <param name="health-lookup-period"  value="1800" />
+
+  <!-- Default values for health status levels
+       if health status is higher or equal the good level => green
+       if health status is higher or equal the warning level => yellow
+       if health status is below the warning level => red
+       
+       More than 25 minutes downtime in last 30 minutes => red,
+       otherwise yellow.
+  -->
+  <param name="health-level-good"     value="100" />
+  <param name="health-level-warning"  value="15" />
+
   
 </datasources>
 
@@ -354,6 +372,17 @@
     <param name="maxline-style" value="##SingleGraphMax" />
     <param name="maxline-color" value="##SingleGraphMax" />
   </view>    
+
+  <!-- health icon image -->
+  <view name="health">
+    <param name="view-type"     value="health" />
+    <param name="expires"       value="60" />
+    <param name="good-img"      value="good.png" />
+    <param name="warning-img"   value="warning.png" />
+    <param name="critical-img"  value="critical.png" />
+    <param name="mime-type"     value="image/png" />
+  </view>
+
 </views>
 
 </configuration>

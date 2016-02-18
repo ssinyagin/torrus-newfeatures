@@ -104,7 +104,7 @@ sub render_health
 
     push( @args, 'VDEF:D1=Aavg,AVERAGE', 'PRINT:D1:%le' );
     
-    Info('RRDs::graphv arguments: ' . join(' ', @args));
+    # Info('RRDs::graphv arguments: ' . join(' ', @args));
 
     my $r = RRDs::graphv('-', @args);
 
@@ -117,7 +117,7 @@ sub render_health
 
     my $value = $r->{'print[0]'};
     
-    Info("health value: " . $value);
+    # Info("health value: " . $value);
     
     my $status = 'good';
     if( $value < $config_tree->getNodeParam($token, 'health-level-good') )

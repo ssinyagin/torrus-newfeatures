@@ -339,7 +339,27 @@ sub match_devc
                                 $svcc_match;
                         }
 
-                        $devc->set_condition('siam.devc.link_svcc', $svcc_match);
+                        eval {
+                            $devc->set_condition
+                                ('siam.devc.link_svcc', $svcc_match);
+                        };
+
+                        if( $@ )
+                        {
+                            Error('Error setting siam.devc.link_svcc on  ' .
+                                  $devc->id() . ': ' . $@);
+                        }
+                        else
+                        {
+                            my $name =
+                                $interface->{$data->{'nameref'}{
+                                    'ifReferenceName'}};
+                            
+                            Verbose('Linked SIAM::ServiceComponent with ' .
+                                    'siam.svcc.inventory_id=' . $svcc_match .
+                                    ' to ' . $devdetails->param('system-id') .
+                                    ' port ' . $name);
+                        }
                     }
                 }
             }

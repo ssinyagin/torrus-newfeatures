@@ -73,25 +73,6 @@ F<siam-siteconfig.pl>.
 
 
 
-=head2 siam_genxml utility
-
-C<siam_genxml> reads the SIAM data, and looks for C<torrus.aggregate.*>
-attributes in SIAM::ServiceUnit objects. Then it produces Torrus XML
-configuration with aggregate graphs of corresponding types.
-
-Command-line arguments:
-
-  torrus siam_genxml [options...]
-  Options:
-    --server=HOSTNAME       Torrus server to match in SIAM
-    --paggr=PATH            Path to store aggregates XML
-    --verbose               print extra information
-    --debug                 print debugging information
-
-The traffic aggregate XML files are stored by default in
-I<xmlconfig/bundles/>.
-
-
 
 
 =head2 Torrus::DevDiscover::SIAMDD module
@@ -227,54 +208,6 @@ XML configuration parameter.
 
 Optional key=value pairs separated by semicolumns. These pairs are added
 to the C<monitor-vars> parameter in XML configuration.
-
-=back
-
-
-
-SIAM::ServiceUnit attributes used for traffic aggregate graphs:
-
-=over 4
-
-=item * siam.object.complete
-
-Only complete service objects are processed. The incomplete ones are ignored.
-
-=item * torrus.aggregate.traffic
-
-Only service unit objects with this attribute set to 1 are processed for
-traffic aggregates. The resulting aggregates take the service components
-of type C<IFMIB.Port>.
-
-=item * torrus.aggregate.name
-
-Human-readable name for the aggregate. It is used as a subtree name in
-Torrus tree.
-
-=item * torrus.aggregate.nodeid
-
-The value of this parameter is used as the base for NodeID for the
-aggregate leafs.
-
-=item * torrus.aggregate.description
-
-[Optional] human-readable description of the aggregate.
-
-=back
-
-
-
-SIAM::ServiceComponent attributes used in traffic aggregates:
-
-=over 4
-
-=item * siam.svcc.type
-
-Only C<IFMIB.Port> is supported.
-
-=item * siam.svcc.name
-
-The value is used to build the legend text for the aggregate.
 
 =back
 

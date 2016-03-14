@@ -170,7 +170,6 @@
 /plugins/siam/config.status.lineno
 /plugins/siam/siam_rrdfetch
 /plugins/siam/siam_genddx
-/plugins/siam/siam_genxml
 /plugins/siam/substvars.sh
 /plugins/siam/tp-*.tar.gz
 /plugins/siam/*.txt

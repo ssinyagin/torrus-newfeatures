@@ -1,3 +1,7 @@
+2016-03-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* Removed siam_genxml as incompatible with SIAM v1.x data model
+
 2014-05-30  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Merged branch SIAM_v1.x into master

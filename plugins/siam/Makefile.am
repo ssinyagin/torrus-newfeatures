@@ -46,16 +46,13 @@ dist_wrapper_DATA = siam-wrapper.sh
 
 #####   Executable scripts  #####
 pkgbindir = @pkgbindir@
-pkgbin_SCRIPTS = siam_rrdfetch siam_genddx siam_genxml
+pkgbin_SCRIPTS = siam_rrdfetch siam_genddx
 
 siam_rrdfetch: siam_rrdfetch.in
 	$(SUBST) siam_rrdfetch.in > siam_rrdfetch
 
 siam_genddx: siam_genddx.in
 	$(SUBST) siam_genddx.in > siam_genddx
-
-siam_genxml: siam_genxml.in
-	$(SUBST) siam_genxml.in > siam_genxml
 
 #####   Documentation files   #####
 pkgdocdir  = @pkgdocdir@

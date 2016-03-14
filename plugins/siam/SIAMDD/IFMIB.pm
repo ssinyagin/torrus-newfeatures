@@ -27,7 +27,6 @@ use warnings;
 use Torrus::Log;
 
 
-
 $Torrus::DevDiscover::SIAMDD::registry{'IFMIB'} = {
     'sequence'            => 1000,
     'prepare'             => \&prepare,
@@ -309,7 +308,42 @@ sub match_devc
                 ('torrus.warning',
                  'Port is administratively down on the device');
         }
-        
+
+        if( $Torrus::SIAMDD::ifmib_search_svcc_in_description and
+            defined($data->{'nameref'}{'ifComment'}) )
+        {
+            if( not defined ($Torrus::SIAMDD::ifmib_search_svcc_pattern) )
+            {
+                Error('$Torrus::SIAMDD::ifmib_search_svcc_in_description ' .
+                      'is true, but ' .
+                      '$Torrus::SIAMDD::ifmib_search_svcc_pattern ' .
+                      ' is not defined');
+            }
+            else
+            {
+                my $comment =
+                    $interface->{$data->{'nameref'}{'ifComment'}};
+                
+                if( defined($comment) and
+                    $comment =~ $Torrus::SIAMDD::ifmib_search_svcc_pattern )
+                {
+                    my $svcc_match = $1;
+                    if( defined($svcc_match) and length($svcc_match) > 0 )
+                    {
+                        Debug('Found SVCC identifier ' . $svcc_match .
+                              ' in IFMIB port description');
+                        if( defined($Torrus::SIAMDD::ifmib_search_svcc_prefix) )
+                        {
+                            $svcc_match =
+                                $Torrus::SIAMDD::ifmib_search_svcc_prefix .
+                                $svcc_match;
+                        }
+
+                        $devc->set_condition('siam.devc.link_svcc', $svcc_match);
+                    }
+                }
+            }
+        }
     }
     
     return( defined($interface) );

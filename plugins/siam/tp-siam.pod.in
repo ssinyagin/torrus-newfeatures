@@ -78,7 +78,7 @@ F<siam-siteconfig.pl>.
 =head2 Torrus::DevDiscover::SIAMDD module
 
 The discovery module C<Torrus::DevDiscover::SIAMDD> tries to match the
-IF-MIB interface names in SIAM against those on the network devices. The
+device component names in SIAM against those on the network devices. The
 resulting configuration contains I<nodeid> values imported from SIAM and
 assigned to corresponding device interfaces. As a result, external
 programs can fetch Torrus data by using the enterprise-specific service
@@ -266,6 +266,13 @@ message.
 This condition is set by siam_rrdfetch on SIAM::ServiceDataElement objects.
 It contains a hashref with the retrieved data:
 timestamp->counter->CF->value
+
+=item siam.devc.link_svcc
+
+This condition is set by SIAMDD on DeviceComponent objects which have
+corresponding ServiceComponent identifiers in their descriptions. This
+instruct the SIAM back-end to create a pointer from the Service
+Component to the DeviceComponent object.
 
 =back
 

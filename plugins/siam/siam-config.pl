@@ -55,6 +55,18 @@ push(@Torrus::SIAMDD::loadModules,
      'ifDescr',
      'ifAlias');
 
+# parameters for automatic linking of SIAM::DeviceComponents
+# to SIAM::ServiceComponents
+
+# activiate automatic linking
+$Torrus::SIAMDD::ifmib_search_svcc_in_description = 0;
+
+# pattern to search for
+$Torrus::SIAMDD::ifmib_search_svcc_pattern = '\{(\d+)\}';
+
+# SIAM::ServiceComponent prefix (if needed)
+$Torrus::SIAMDD::ifmib_search_svcc_prefix = 'SC';
+
 
 require '@siam_siteconfig_pl@';
 

@@ -734,8 +734,7 @@ sub checkSnmpTable
     {
         # check if the returned oid shares the base of the query
         my $firstOid = (keys %{$result})[0];
-        if( Net::SNMP::oid_base_match( $oid, $firstOid ) and
-            $result->{$firstOid} ne '' )
+        if( Net::SNMP::oid_base_match( $oid, $firstOid ) )
         {
             return 1;
         }

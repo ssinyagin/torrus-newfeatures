@@ -1,4 +1,4 @@
-#  Copyright (C) 2002  Stanislav Sinyagin
+#  Copyright (C) 2002-2016  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -62,6 +62,9 @@ our %oiddef =
      'rttMonEchoAdminNumPackets'          => '1.3.6.1.4.1.9.9.42.1.2.2.1.18'
      );
 
+
+our %appltemplates =
+    ('jitterAppl' => ['CiscoIOS_SAA::cisco-rtt-jitter-subtree']);
 
 
 our %adminInterpret =
@@ -175,12 +178,8 @@ sub checkdevtype
 
     if( $devdetails->isDevType('CiscoIOS') )
     {
-        my $rttAdminTable =
-            $session->get_table( -baseoid =>
-                                 $dd->oiddef('rttMonCtrlAdminTable') );
-        if( defined($rttAdminTable) and scalar(keys %{$rttAdminTable}) > 0 )
+        if( $dd->checkSnmpTable('rttMonCtrlAdminTable') )
         {
-            $devdetails->storeSnmpVars( $rttAdminTable );
             return 1;
         }
     }
@@ -208,12 +207,25 @@ sub discover
 
     $data->{'rtt_entries'} = {};
 
-    foreach my $rttIndex
-        ( $devdetails->getSnmpIndices( $dd->oiddef('rttMonCtrlAdminOwner') ) )
+    my $adminValues = {};
+    foreach my $adminField
+        ( sort {$adminInterpret{$a}{'order'} <=>
+                    $adminInterpret{$b}{'order'}}
+          keys %adminInterpret )
+    {
+        my $table = $dd->walkSnmpTable($adminField);
+        if( scalar(keys %{$table}) > 0 )
+        {
+            $adminValues->{$adminField} = $table;
+        }
+    }
+            
+    my $rttStatus = $dd->walkSnmpTable('rttMonCtrlAdminStatus');
+
+    foreach my $rttIndex (keys %{$rttStatus})
     {
         # we're interested in Active agents only
-        if( $devdetails->snmpVar($dd->oiddef('rttMonCtrlAdminStatus') .
-                                 '.' . $rttIndex) != 1 )
+        if( $rttStatus->{$rttIndex} != 1 )
         {
             next;
         }
@@ -228,10 +240,10 @@ sub discover
         foreach my $adminField
             ( sort {$adminInterpret{$a}{'order'} <=>
                         $adminInterpret{$b}{'order'}}
-              keys %adminInterpret )
+              keys %{$adminValues} )
         {
-            my $value = $devdetails->snmpVar( $dd->oiddef( $adminField ) .
-                                              '.' . $rttIndex );
+            my $value = $adminValues->{$adminField}{$rttIndex};
+            
             if( defined( $value ) and length( $value ) > 0 )
             {
                 my $intrp = $adminInterpret{$adminField};
@@ -283,6 +295,11 @@ sub buildConfig
 
     my $data = $devdetails->data();
 
+    if( scalar(keys %{$data->{'rtt_entries'}}) == 0 )
+    {
+        return;
+    }
+    
     my $subtreeNode =
         $cb->addSubtree( $devNode, 'SAA', undef,
                          ['CiscoIOS_SAA::cisco-saa-subtree']);
@@ -293,10 +310,19 @@ sub buildConfig
         my $param = $data->{'rtt_entries'}{$rttIndex}{'param'};
         $param->{'precedence'} = sprintf('%d', 10000 - $rttIndex);
 
-        # TODO: should really consider rtt-type and rtt-echo-protocol
+        my $templates = [];
+        my $proto = $param->{'rtt-echo-protocol'};        
+        if( defined($proto) and defined($appltemplates{$proto}) )
+        {
+            push(@{$templates}, @{$appltemplates{$proto}});
+        }
 
-        $cb->addSubtree( $subtreeNode, $subtreeName, $param,
-                         ['CiscoIOS_SAA::cisco-rtt-echo-subtree']);
+        if( scalar(@{$templates}) == 0 )
+        {
+            push(@{$templates}, 'CiscoIOS_SAA::cisco-rtt-echo-subtree');
+        }
+        
+        $cb->addSubtree( $subtreeNode, $subtreeName, $param, $templates );
     }
 
     return;

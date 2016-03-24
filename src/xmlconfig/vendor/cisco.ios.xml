@@ -34,8 +34,10 @@
 
   <!-- CISCO-RTTMON-MIB -->
   <def name="rttMonLatestRttOperCompletionTime"
-                          value="1.3.6.1.4.1.9.9.42.1.2.10.1.1" />
-
+       value="1.3.6.1.4.1.9.9.42.1.2.10.1.1" />
+  <def name="rttMonLatestJitterOperAvgJitter"
+       value="1.3.6.1.4.1.9.9.42.1.5.2.1.46" />
+  
   <!-- OLD-CISCO-MEMORY-MIB -->
   <def name="bufferElFree"      value="1.3.6.1.4.1.9.2.1.9.0"/>
   <def name="bufferElMax"       value="1.3.6.1.4.1.9.2.1.10.0"/>
@@ -279,7 +281,7 @@
     
     <param name="has-overview-shortcuts"    value="yes"/>
     <param name="overview-shortcuts"        value="rt"/>
-    <param name="overview-subleave-name-rt"    value="LatestCompletionTime"/>
+    <param name="overview-subleave-name-rt"    value="Results"/>
     <param name="overview-shortcut-text-rt"
            value="All response times"/>
     <param name="overview-shortcut-title-rt"
@@ -292,20 +294,40 @@
 
   <!-- RTT Echo statitsics -->
   <template name="cisco-rtt-echo-subtree">
-    <leaf name="LatestCompletionTime">
+    <leaf name="Results">
       <param name="snmp-object"
              value="$rttMonLatestRttOperCompletionTime.%rtt-index%" />
       <param name="rrd-ds"            value="complTime" />
       <param name="rrd-create-dstype" value="GAUGE" />
       <param name="data-file"
              value="%system-id%_rtt_%rtt-index%.rrd" />
+      <param name="graph-title" value="%system-id% SAA RTT" />
       <param name="graph-legend"      value="rtr %rtt-index%" />
       <param name="vertical-label"    value="milliseconds" />
       <param name="graph-lower-limit" value="0"/>
       <param name="nodeid"   value="sla//%nodeid-device%//%rtt-index%//rtt"/>
     </leaf>
   </template>
+  
+  <!-- Jitter statitsics -->
+  <template name="cisco-rtt-jitter-subtree">
+    <leaf name="Results">
+      <param name="snmp-object"
+             value="$rttMonLatestJitterOperAvgJitter.%rtt-index%" />
+      <param name="rrd-ds"            value="avgJitter" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="data-file"
+             value="%system-id%_jitter_%rtt-index%.rrd" />
+      <param name="graph-title" value="%system-id% SAA Jitter" />
+      <param name="graph-legend"      value="rtr %rtt-index%" />
+      <param name="vertical-label"    value="milliseconds" />
+      <param name="graph-lower-limit" value="0"/>
+      <param name="nodeid"   value="sla//%nodeid-device%//%rtt-index%//jitter"/>
+    </leaf>
+  </template>
 
+
+  
   <!-- OLD-CISCO-MEMORY-MIB templates -->
 
   <template name="old-cisco-memory-buffers">

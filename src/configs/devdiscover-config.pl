@@ -768,6 +768,10 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'cisco-rtt-echo-subtree',
          'source' => 'vendor/cisco.ios.xml'
          },
+     'CiscoIOS_SAA::cisco-rtt-jitter-subtree' => {
+         'name'   => 'cisco-rtt-jitter-subtree',
+         'source' => 'vendor/cisco.ios.xml'
+         },
      'CiscoFirewall::cisco-firewall-subtree' => {
          'name'   => 'cisco-firewall-subtree',
          'source' => 'vendor/cisco.firewall.xml',

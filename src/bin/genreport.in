@@ -155,7 +155,7 @@ if( $genhtml )
 
             my $options = {'Tree' => $tree};
 
-            if( length( $all2tree ) > 0 )
+            if( $all2tree > 0 )
             {
                 $options->{'All_Service_IDs'} = 1;
             }

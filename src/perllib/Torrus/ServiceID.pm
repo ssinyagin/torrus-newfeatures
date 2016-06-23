@@ -109,12 +109,14 @@ sub getParams
 
     my $ret = {};
     my $plist = $self->{'db_params'}->get( 'P:'.$serviceid );
-    foreach my $param ( split(',', $plist ) )
+    if( defined($plist) )
     {
-        $ret->{$param} =
-            $self->{'db_params'}->get( 'p:'.$serviceid.':'.$param );
-    }
-
+        foreach my $param ( split(',', $plist ) )
+        {
+            $ret->{$param} =
+                $self->{'db_params'}->get( 'p:'.$serviceid.':'.$param );
+        }
+    }    
     return $ret;
 }    
 

@@ -28,12 +28,14 @@ use Getopt::Long;
 
 use Torrus::Log;
 use Torrus::ReportOutput::HTML;
+use Torrus::ReportOutput::XLSX;
 use Torrus::SiteConfig;
 
 my $report;
 my $date;
 my $time = '00:00';
 my $genhtml;
+my $genxlsx;
 my @trees;
 my $all2tree;
 
@@ -45,6 +47,7 @@ my $ok = GetOptions(
                     'date=s'      => \$date,
                     'time=s'      => \$time,
                     'genhtml'     => \$genhtml,
+                    'genxlsx'     => \$genxlsx,
                     'tree=s'      => \@trees,
                     'all2tree=s'  => \$all2tree,
                     'verbose'     => \$verbose,
@@ -57,9 +60,9 @@ if( $report and not defined($Torrus::ReportGenerator::modules{$report}) )
     $ok = 0;
 }
                                             
-if( not $ok or (not $report and not $genhtml) or
+if( not $ok or (not $report and not $genhtml and not $genxlsx) or
     ($report and not $date) or
-    ($genhtml and scalar(@trees) > 0 and $all2tree) or
+    (($genhtml or $genxlsx) and scalar(@trees) > 0 and $all2tree) or
     scalar( @ARGV ) > 0 )
 {
     print STDERR
@@ -122,7 +125,7 @@ if( $report )
     }
 }
 
-if( $genhtml )
+if( $genhtml or $genxlsx )
 {
     if( $all2tree )
     {
@@ -151,28 +154,48 @@ if( $genhtml )
         {
             &Torrus::DB::checkInterrupted();
             
-            Verbose('Generating HTML report for tree ' . $tree);
-
             my $options = {'Tree' => $tree};
 
-            if( $all2tree > 0 )
+            if( $all2tree )
             {
                 $options->{'All_Service_IDs'} = 1;
             }
-            
-            my $out = new Torrus::ReportOutput::HTML( $options );
-            
-            if( $out->init() )
+
+            if( $genhtml )
             {
-                $ok = $out->generate() ? $ok:0;
+                Verbose('Generating HTML report for tree ' . $tree);
+                my $out = new Torrus::ReportOutput::HTML( $options );
+                if( $out->init() )
+                {
+                    $ok = $out->generate() ? $ok:0;
+                }
+                else
+                {
+                    $ok = 0;
+                }
             }
-            else
+
+            if( $genxlsx )
             {
-                $ok = 0;
+                Verbose('Generating XLSX report for tree ' . $tree);
+                my $out = new Torrus::ReportOutput::XLSX( $options );
+                if( $out->init() )
+                {
+                    $ok = $out->generate() ? $ok:0;
+                }
+                else
+                {
+                    $ok = 0;
+                }
             }
+            
         }
     }
 }
+
+
+    
+
 
 exit($ok ? 0:1);
 

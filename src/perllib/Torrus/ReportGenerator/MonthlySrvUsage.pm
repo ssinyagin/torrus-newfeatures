@@ -142,17 +142,11 @@ sub generate
 
         # Calculate the total volume if it's a counter
         my $volume = Math::BigFloat->new(0);
-        my $volumeDefined = 0;
-        if( not defined( $params->{'dstype'} ) or
-            $params->{'dstype'} =~ /^COUNTER/o )
+        foreach my $row ( @{$data} )
         {
-            $volumeDefined = 1;
-            foreach my $row ( @{$data} )
-            {
-                $volume += $row->{'value'} * $row->{'intvl'};
-            }
+            $volume += $row->{'value'} * $row->{'intvl'};
         }
-
+        
         # Adjust units and scale
 
         my $usageUnits = '';
@@ -195,14 +189,11 @@ sub generate
             'value'     => ($unavailCount*100)/$nDatapoints,
             'units'     => '%' });
 
-        if( $volumeDefined )
-        {
-            $self->{'backend'}->addField( $self->{'reportId'}, {
-                'name'      => 'VOLUME',
-                'serviceid' => $serviceid,
-                'value'     => $volume,
-                'units'     => $volumeUnits });
-        }
+        $self->{'backend'}->addField( $self->{'reportId'}, {
+            'name'      => 'VOLUME',
+            'serviceid' => $serviceid,
+            'value'     => $volume,
+            'units'     => $volumeUnits });
     }
 
     &Torrus::DB::checkInterrupted();

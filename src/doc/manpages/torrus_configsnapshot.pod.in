@@ -73,7 +73,7 @@ Create a new tree with only the snapshot file in it. Compile the tree.
 
 =item *
 
-At this stage, it is up to the user to decide wether to continue running the
+At this stage, it is up to the user to decide whether to continue running the
 collector and monitor daemons for this new tree. The old data may be preserved
 for historical reference, and collector may be run with the newest tree
 structure and definitions.

@@ -40,7 +40,7 @@ hostnames. Hostnames may have the form C<host:devname> where C<devname> is
 a symbolic device name.
 
 This utility is designed to be used only once, in order to generate
-the discovery XML canvas, for futher manual editing. It generates only
+the discovery XML canvas, for further manual editing. It generates only
 basic set of parameters, and there are much more of those that you may
 use to customize the discovery process.
 

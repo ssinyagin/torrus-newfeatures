@@ -47,7 +47,7 @@ Starts all required collectors and monitors
 
 =item * stop
 
-Stops runnig collectors and monitors andn waits for them to finish
+Stops running collectors and monitors andn waits for them to finish
 within certain timeout.
 
 =item * status

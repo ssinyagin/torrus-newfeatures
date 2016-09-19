@@ -106,7 +106,7 @@ delaying).
 
 =item Min, Max, Average, Exp Average
 
-The time values are displayed in four columns: Mimimum, Maximum and Average
+The time values are displayed in four columns: Minimum, Maximum and Average
 values since last reset, and Exponential decay value, which may be interpreted
 as the average for last several values. With defaults defined in
 F<torrus-config.pl>, 95% of the average is calculated from last 3 values.
@@ -125,7 +125,7 @@ How much time the too long run took.
 
 =item RRD Queue
 
-In a multithreaded environment, the RRD files are writen in a background
+In a multithreaded environment, the RRD files are written in a background
 thread. This value shows the length of the RRD update queue at the beginning
 of each update cycle.
 

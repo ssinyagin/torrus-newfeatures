@@ -46,7 +46,7 @@ AC_ARG_ENABLE(pkgonly,
         [AC_HELP_STRING([--enable-pkgonly],
                         [Skip all checking])])
 AC_SUBST(enable_pkgonly)
-        
+
 perllibdirs="\'\${perllibdir}\'"
 
 PERLOPTS=
@@ -111,16 +111,16 @@ if test "$enable_pkgonly" != yes; then
 #  Check if Perl threads can be used.
 #  Requirements are: perl 5.8.8 with threads compiled,
 #  threads ver. 1.41 or higher, threads::shared ver. 1.03 or higher
-   
+
    perlithreads=1
-   
+
    AC_MSG_CHECKING([if Perl version is 5.8.8 or higher])
    if ${PERL} ${PERLOPTS} -e 'use 5.8.8' 2>/dev/null; then
      AC_MSG_RESULT([Ok])
    else
      perlithreads=0
      AC_MSG_RESULT([no])
-   fi       
+   fi
 
    if test ${perlithreads} -eq 1; then
      AC_MSG_CHECKING([threading support in Perl])
@@ -132,7 +132,7 @@ if test "$enable_pkgonly" != yes; then
      fi
    fi
 
-   if test ${perlithreads} -eq 1; then     
+   if test ${perlithreads} -eq 1; then
      AC_MSG_CHECKING([if threads module version is 1.41 or higher])
      if ${PERL} ${PERLOPTS} -e \
        'use threads; exit($threads::VERSION >= 1.41 ? 0:1)'; then
@@ -143,19 +143,19 @@ if test "$enable_pkgonly" != yes; then
      fi
    fi
 
-   if test ${perlithreads} -eq 1; then  
+   if test ${perlithreads} -eq 1; then
      AC_MSG_CHECKING([if threads::shared module version is 1.03 or higher])
      if ${PERL} ${PERLOPTS} -e \
        'use threads; use threads::shared;
         exit($threads::shared::VERSION >= 1.03 ? 0:1)'; then
          AC_MSG_RESULT([Ok])
-     else         
+     else
        perlithreads=0
        AC_MSG_RESULT([no])
      fi
    fi
-     
-   if test ${perlithreads} -eq 0; then  
+
+   if test ${perlithreads} -eq 0; then
      AC_MSG_ERROR([Perl multithreading is disabled or modules are too old])
    fi
 fi
@@ -180,7 +180,7 @@ if test "$enable_pkgonly" != yes; then
         AC_MSG_RESULT([Ok])
     fi
 fi
-   
+
 
 # Set the var/db and var/cache ownership
 
@@ -234,7 +234,7 @@ if test -z "$plugdevdisccfgdir"; then
 AC_ARG_VAR(plugwrapperdir, [[PLUGINSDIR/wrapper]])
 if test -z "$plugwrapperdir"; then
    plugwrapperdir='${pluginsdir}/wrapper'; fi
-      
+
 AC_ARG_VAR(scriptsdir, [[PKGHOME/scripts] Script files])
 if test -z "$scriptsdir"; then
    scriptsdir='${pkghome}/scripts'; fi
@@ -316,12 +316,12 @@ AC_ARG_VAR(defrrddir, [[/srv/torrus/collector_rrd] Default RRD storage path])
 if test -z "$defrrddir"; then
    defrrddir='/srv/torrus/collector_rrd'; fi
 
-   
+
 AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
 AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])
 AC_CONFIG_FILES([examples/Makefile perllib/Makefile])
 AC_CONFIG_FILES([sup/Makefile xmlconfig/Makefile])
-                                    
+
 AC_CONFIG_FILES([setup_tools/substvars.sh],[chmod +x setup_tools/substvars.sh])
 AC_CONFIG_FILES([setup_tools/mkvardir.sh], [chmod +x setup_tools/mkvardir.sh])
 AC_CONFIG_FILES([init.d/torrus], [chmod +x init.d/torrus])

@@ -288,6 +288,14 @@ AC_ARG_VAR(varprefix, [[/var/torrus] Common prefix for runtime data])
 if test -z "$varprefix"; then
    varprefix='/var/torrus'; fi
 
+AC_ARG_VAR(compilerwd, [[VARPREFIX/gitwd/compiler] Compiler working dir])
+if test -z "$compilerwd"; then
+   compilerwd='${varprefix}/gitwd/compiler'; fi
+
+AC_ARG_VAR(readerwd, [[VARPREFIX/gitwd/reader] Reader working dir])
+if test -z "$readerwd"; then
+   readerwd='${varprefix}/gitwd/reader'; fi
+
 AC_ARG_VAR(reportsdir, [[VARPREFIX/reports] Reports output])
 if test -z "$reportsdir"; then
    reportsdir='${varprefix}/reports'; fi

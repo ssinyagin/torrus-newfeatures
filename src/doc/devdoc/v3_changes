@@ -17,7 +17,10 @@ Removed variables:
   cachedir
   dbhome
 
-
+New variables:
+  compilerwd
+  readerwd
+  
 
 
 
@@ -38,3 +41,6 @@ Changed defaults:
   $Torrus::Renderer::globalSearchEnabled = 0;
 
 
+New config:
+  $Torrus::Global::compilerWD
+  $Torrus::Global::readerWD

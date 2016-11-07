@@ -36,9 +36,12 @@ $Torrus::Global::reportsDir     = '@reportsdir@';
 $Torrus::Global::sesStoreDir    = '@sesstordir@';
 $Torrus::Global::sesLockDir     = '@seslockdir@';
 $Torrus::Global::webPlainDir    = '@webplaindir@';
+$Torrus::Global::compilerWD     = '@compilerwd@';
+$Torrus::Global::readerWD       = '@readerwd@';
+@Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
+
 $Torrus::Global::healthIconsDir = $Torrus::Global::stylingDir;
 
-@Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
 
 # How long we can wait till the configuration is ready, in seconds
 $Torrus::Global::ConfigReadyTimeout = 1800;

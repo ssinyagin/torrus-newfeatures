@@ -1,0 +1,112 @@
+##################################
+digitalocean SSD:
+
+root@do01:~# time perl write.pl 200000
+
+real    1m36.161s
+user    0m28.252s
+sys     0m25.768s
+
+root@do01:~# time perl read.pl        
+
+real    1m28.023s
+user    0m28.696s
+sys     0m23.756s
+
+
+##################################
+tor01 ext4 in the lab (3.5" disks with software mirror and LVM)
+
+root@tor01:/opt/t3/t# time perl write.pl 200000
+
+real    8m7.494s
+user    0m16.688s
+sys     0m12.808s
+root@tor01:/opt/t3/t# time perl read.pl 
+
+real    9m56.452s
+user    0m14.528s
+sys     0m9.392s
+
+
+##################################
+tor01 BTRFS:
+
+root@tor01:/opt/t3/t# time perl write.pl 200000
+
+real    1m29.186s
+user    0m18.544s
+sys     0m20.388s
+root@tor01:/opt/t3/t# time perl read.pl 
+
+real    2m24.438s
+user    0m15.948s
+sys     0m9.704s
+
+
+##################################
+tor01 BTRFS on top of ext4
+
+apt-get install btrfs-tools
+dd if=/dev/zero of=/opt/t3/t/dataimg bs=64M count=100
+mkfs.btrfs /opt/t3/t/dataimg
+mkdir /opt/t3/t/data/
+mount /opt/t3/t/dataimg /opt/t3/t/data/
+
+
+root@tor01:/opt/t3/t# time perl write.pl 200000
+
+real    4m42.214s
+user    0m18.312s
+sys     0m22.456s
+
+root@tor01:/opt/t3/t# time perl read.pl 
+
+real    8m50.374s
+user    0m17.828s
+sys     0m14.360s
+
+
+##################################
+tor01 BTRFS:
+
+time perl src/examples/v3_perf/write.pl 50000
+
+real    0m13.011s
+user    0m6.136s
+sys     0m5.204s
+
+cd /opt/t3/t/data/
+git init
+time git add --all
+
+real    0m36.877s
+user    0m31.472s
+sys     0m3.656s
+
+time git commit -m 'xx'
+
+real    0m19.054s
+user    0m3.172s
+sys     0m7.812s
+
+time git status
+On branch master
+nothing to commit, working directory clean
+
+real    0m1.940s
+user    0m0.636s
+sys     0m1.400s
+
+
+# ext4
+cd /var/tmp/
+time git clone /opt/t3/t/data
+Cloning into 'data'...
+done.
+Checking out files: 100% (50001/50001), done.
+
+real    0m15.816s
+user    0m2.968s
+sys     0m7.820s
+

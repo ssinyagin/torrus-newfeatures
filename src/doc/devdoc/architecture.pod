@@ -374,11 +374,11 @@ C<tree>, C<token>, C<dstype>. Optional: C<units>.
 List of parameter names for a service ID.
 
 =back
-    
+
 
 
 =head3 C<snmp_failures> contents
-    
+
 =over 4
 
 =item * C<c:I<counter>> => C<I<number>>

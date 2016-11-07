@@ -46,10 +46,6 @@ AC_ARG_ENABLE(pkgonly,
         [AC_HELP_STRING([--enable-pkgonly],
                         [Skip all checking])])
 AC_SUBST(enable_pkgonly)
-
-AC_ARG_ENABLE(threads,
-        [AC_HELP_STRING([--disable-threads],
-                        [Disable Perl threads usage])])
         
 perllibdirs="\'\${perllibdir}\'"
 
@@ -100,7 +96,7 @@ AC_SUBST(perllibdirs, [${perllibdirs}])
 
 if test "$enable_pkgonly" != yes; then
 
-   for module in 'BerkeleyDB' 'XML::LibXML' 'Template' \
+   for module in 'Redis' 'Cache::Memcached::Fast' 'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \
                  'Date::Parse' 'JSON'
    do
@@ -117,53 +113,51 @@ if test "$enable_pkgonly" != yes; then
 #  threads ver. 1.41 or higher, threads::shared ver. 1.03 or higher
    
    perlithreads=1
-   if test x"$enable_threads" = xno; then
-     perlithreads=0     
-   else
    
-     AC_MSG_CHECKING([if Perl version is 5.8.8 or higher])
-     if ${PERL} ${PERLOPTS} -e 'use 5.8.8' 2>/dev/null; then
+   AC_MSG_CHECKING([if Perl version is 5.8.8 or higher])
+   if ${PERL} ${PERLOPTS} -e 'use 5.8.8' 2>/dev/null; then
+     AC_MSG_RESULT([Ok])
+   else
+     perlithreads=0
+     AC_MSG_RESULT([no])
+   fi       
+
+   if test ${perlithreads} -eq 1; then
+     AC_MSG_CHECKING([threading support in Perl])
+     if ${PERL} ${PERLOPTS} -e 'use threads' 2>/dev/null; then
        AC_MSG_RESULT([Ok])
      else
        perlithreads=0
-     fi       
-
-     if test ${perlithreads} -eq 1; then
-       AC_MSG_CHECKING([threading support in Perl])
-       if ${PERL} ${PERLOPTS} -e 'use threads' 2>/dev/null; then
-         AC_MSG_RESULT([Ok])
-       else
-         perlithreads=0
-       fi
+       AC_MSG_RESULT([no])
      fi
-
-     if test ${perlithreads} -eq 1; then     
-       AC_MSG_CHECKING([if threads module version is 1.41 or higher])
-       if ${PERL} ${PERLOPTS} -e \
-         'use threads; exit($threads::VERSION >= 1.41 ? 0:1)'; then
-           AC_MSG_RESULT([Ok])
-       else
-           perlithreads=0
-       fi
-     fi
-
-     if test ${perlithreads} -eq 1; then  
-       AC_MSG_CHECKING([if threads::shared module version is 1.03 or higher])
-       if ${PERL} ${PERLOPTS} -e \
-         'use threads; use threads::shared;
-          exit($threads::shared::VERSION >= 1.03 ? 0:1)'; then
-           AC_MSG_RESULT([Ok])
-       else         
-           perlithreads=0
-       fi
-     fi
-     
-     if test ${perlithreads} -eq 0; then  
-       AC_MSG_RESULT([No. Multithreading will not be used.])
-     fi
-          
    fi
-   AC_SUBST(perlithreads, [${perlithreads}])   
+
+   if test ${perlithreads} -eq 1; then     
+     AC_MSG_CHECKING([if threads module version is 1.41 or higher])
+     if ${PERL} ${PERLOPTS} -e \
+       'use threads; exit($threads::VERSION >= 1.41 ? 0:1)'; then
+         AC_MSG_RESULT([Ok])
+     else
+       perlithreads=0
+       AC_MSG_RESULT([no])
+     fi
+   fi
+
+   if test ${perlithreads} -eq 1; then  
+     AC_MSG_CHECKING([if threads::shared module version is 1.03 or higher])
+     if ${PERL} ${PERLOPTS} -e \
+       'use threads; use threads::shared;
+        exit($threads::shared::VERSION >= 1.03 ? 0:1)'; then
+         AC_MSG_RESULT([Ok])
+     else         
+       perlithreads=0
+       AC_MSG_RESULT([no])
+     fi
+   fi
+     
+   if test ${perlithreads} -eq 0; then  
+     AC_MSG_ERROR([Perl multithreading is disabled or modules are too old])
+   fi
 fi
 
 AC_ARG_VAR(torrus_user,  [[torrus] UID to run the daemons])
@@ -190,13 +184,13 @@ fi
 
 # Set the var/db and var/cache ownership
 
-AC_ARG_VAR(var_user,  [[TORRUS_USER] Owner of db and cache directories])
-AC_ARG_VAR(var_group, [[torrus] Group of db and cache directories])
-AC_ARG_VAR(var_mode,  [[775] Mode of db and cache directories])
+AC_ARG_VAR(var_user,  [[TORRUS_USER] Owner of writable directories])
+AC_ARG_VAR(var_group, [[torrus] Group of writable directories])
+AC_ARG_VAR(var_mode,  [[775] Mode of writable directories])
 
 AC_ARG_ENABLE(varperm,
         [AC_HELP_STRING(--disable-varperm,
-        Disable db and cache access rights tuning)],
+        Disable directory access rights tuning)],
         [],
         [enable_varperm="yes"])
 AC_SUBST(enable_varperm)
@@ -223,7 +217,7 @@ if test -z "$exmpdir"; then
 
 AC_ARG_VAR(perllibdir,  [[PKGHOME/perllib] Torrus Perl libraries])
 if test -z "$perllibdir"; then
-   perllibdir='${pkghome}/perllib'; fi
+   perllibdir='${pkghome}/lib'; fi
 
 AC_ARG_VAR(pluginsdir,   [[PKGHOME/plugins] Plugin configurations])
 if test -z "$pluginsdir"; then
@@ -240,7 +234,6 @@ if test -z "$plugdevdisccfgdir"; then
 AC_ARG_VAR(plugwrapperdir, [[PLUGINSDIR/wrapper]])
 if test -z "$plugwrapperdir"; then
    plugwrapperdir='${pluginsdir}/wrapper'; fi
-
       
 AC_ARG_VAR(scriptsdir, [[PKGHOME/scripts] Script files])
 if test -z "$scriptsdir"; then
@@ -294,14 +287,6 @@ if test -z "$piddir"; then
 AC_ARG_VAR(varprefix, [[/var/torrus] Common prefix for runtime data])
 if test -z "$varprefix"; then
    varprefix='/var/torrus'; fi
-   
-AC_ARG_VAR(cachedir, [[VARPREFIX/cache] Renderer cache])
-if test -z "$cachedir"; then
-   cachedir='${varprefix}/cache'; fi
-
-AC_ARG_VAR(dbhome, [[VARPREFIX/db] Berkeley DB files])
-if test -z "$dbhome"; then
-   dbhome='${varprefix}/db'; fi
 
 AC_ARG_VAR(reportsdir, [[VARPREFIX/reports] Reports output])
 if test -z "$reportsdir"; then

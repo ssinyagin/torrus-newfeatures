@@ -1,0 +1,21 @@
+configure.ac
+============
+
+Perl threads are required (they were optional for v2).
+
+Renamed "perllib" to "lib".
+
+New perl modules required:
+  Redis
+  Cache::Memcached::Fast
+
+Perl modules not needed:
+  BerkeleyDB
+
+Removed variables:
+  perlithreads
+  cachedir
+  dbhome
+
+
+

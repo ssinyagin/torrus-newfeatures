@@ -17,7 +17,7 @@
 # Stanislav Sinyagin <ssinyagin@k-open.com>
 #
 
-SUBDIRS = . bin configs doc examples perllib sup xmlconfig
+SUBDIRS = . bin configs doc examples lib sup xmlconfig
 
 EXTRA_DIST = \
 	setup_tools/Bundle/Torrus.pm \
@@ -115,7 +115,7 @@ PERLCRITIC_CMD = ${PERLCRITIC} --profile=critic.profile
 critic:
 	@if test ${PERLCRITIC} != no; then \
 	  ${PERLCRITIC_CMD} `egrep -l '^\#..PERL' bin/*.in`; \
-	  ${PERLCRITIC_CMD} perllib/Torrus/; \
+	  ${PERLCRITIC_CMD} lib/Torrus/; \
 	else \
 	  echo 'perlcritic command not found'; \
 	fi

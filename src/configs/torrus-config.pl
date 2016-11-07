@@ -28,10 +28,8 @@ $Torrus::Global::version        = '@VERSION@';
 $Torrus::Global::cfgDefsDir     = '@cfgdefdir@';
 $Torrus::Global::cfgSiteDir     = '@siteconfdir@';
 $Torrus::Global::pkgbindir      = '@pkgbindir@';
-$Torrus::Global::dbHome         = '@dbhome@';
 $Torrus::Global::templateDirs   = ['@tmpldir@', '@tmpluserdir@'];
 $Torrus::Global::stylingDir     = '@styldir@';
-$Torrus::Global::cacheDir       = '@cachedir@';
 $Torrus::Global::pidDir         = '@piddir@';
 $Torrus::Global::logDir         = '@logdir@';
 $Torrus::Global::reportsDir     = '@reportsdir@';
@@ -41,10 +39,6 @@ $Torrus::Global::webPlainDir    = '@webplaindir@';
 $Torrus::Global::healthIconsDir = $Torrus::Global::stylingDir;
 
 @Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
-
-$Torrus::Global::threadsEnabled  = '@perlithreads@';
-
-$Torrus::DB::dbSub              = 'sub';
 
 # How long we can wait till the configuration is ready, in seconds
 $Torrus::Global::ConfigReadyTimeout = 1800;
@@ -135,10 +129,6 @@ $Torrus::Collector::SNMP::mapsExpireCheckPeriod = 600;
 # There is a strange bug that with more than 400 sessions per SNMP
 # dispatcher some requests are not sent at all
 $Torrus::Collector::SNMP::maxSessionsPerDispatcher = 100;
-
-# When enabled, the collector starts a background thread that
-# writes to RRD files
-$Torrus::Collector::RRDStorage::useThreads = $Torrus::Global::threadsEnabled;
 
 # How many unwritten updates are allowed to stay in the queue
 $Torrus::Collector::RRDStorage::thrQueueLimit = 1000000;
@@ -247,9 +237,6 @@ $Torrus::Renderer::Chooser::expires = '300';
 $Torrus::Renderer::Chooser::template = 'default-chooser.html';
 $Torrus::Renderer::Chooser::searchTemplate = 'globalsearch.html';
 
-# We clean the renderer cache at least once a day
-$Torrus::Renderer::cacheMaxAge = 86400;
-
 # Some RRDtool versions may report errors on decorations
 $Torrus::Renderer::ignoreDecorations = 0;
 
@@ -263,12 +250,12 @@ $Torrus::Renderer::hwGraphLegend = 0;
 # When true, users may view service usage reports (requires SQL connection)
 $Torrus::Renderer::displayReports = 0;
 
-# Allow tree searching. The search DB should be built with buildsearchdb
-$Torrus::Renderer::searchEnabled = 1;
+# Allow tree searching. 
+$Torrus::Renderer::searchEnabled = 0;
 
 # Allow global searching across the trees. If the user authentication
 # is enabled, the user should have rights DisplayTree and GlobalSearch for '*'
-$Torrus::Renderer::globalSearchEnabled = 1;
+$Torrus::Renderer::globalSearchEnabled = 0;
 
 # Set to true if you want JSON to be pretty and canonical (needs extra
 # CPU cycles)

@@ -19,3 +19,22 @@ Removed variables:
 
 
 
+
+
+torrus-config.pl
+================
+
+Removed config:
+  $Torrus::Global::threadsEnabled
+  $Torrus::Collector::RRDStorage::useThreads
+  $Torrus::Global::cacheDir
+  $Torrus::Renderer::cacheMaxAge
+  $Torrus::Global::dbHome
+  $Torrus::DB::dbSub
+
+
+Changed defaults:
+  $Torrus::Renderer::searchEnabled = 0; # until search service is built
+  $Torrus::Renderer::globalSearchEnabled = 0;
+
+

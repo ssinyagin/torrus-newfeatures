@@ -47,9 +47,7 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
     -e "s,\@SHELL\@,@SHELL@,g" \
     -e "s,\@VERSION\@,@VERSION@,g" \
     -e "s,\@bindir\@,@bindir@,g" \
-    -e "s,\@cachedir\@,@cachedir@,g" \
     -e "s,\@cfgdefdir\@,@cfgdefdir@,g" \
-    -e "s,\@dbhome\@,@dbhome@,g" \
     -e "s,\@defrrddir\@,@defrrddir@,g" \
     -e "s,\@devdiscover_config_pl\@,$devdiscover_config_pl,g" \
     -e "s,\@devdiscover_siteconfig_pl\@,$devdiscover_siteconfig_pl,g" \
@@ -62,7 +60,6 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
     -e "s,\@mansec_misc\@,@mansec_misc@,g" \
     -e "s,\@mansec_usercmd\@,@mansec_usercmd@,g" \
     -e "s,\@notify_siteconfig_pl\@,$notify_siteconfig_pl,g" \
-    -e "s,\@perlithreads\@,@perlithreads@,g" \
     -e "s,\@perllibdir\@,@perllibdir@,g" \
     -e "s,\@perllibdirs\@,@perllibdirs@,g" \
     -e "s,\@piddir\@,@piddir@,g" \

@@ -88,8 +88,7 @@ C<ConfigTree> Perl module provides an API for accessing the
 configuration trees, as well as other types of data. Each data element
 is referred to by a token, as follows:
 
-Tree node token starts with letter I<T>. The rest is the 40-character
-SHA-1 checksum of a node as described above.
+Tree node token is a 40-character SHA-1 checksum of a node as described above.
 
 Tokenset name starts with letter I<S>. The rest is an arbitrary sequence of
 word characters.
@@ -441,17 +440,16 @@ consisting of two parts:
 
 =over 4
 
-=item 1 the daemon that subscribes to C<treecommits:*> channels and
+=item 1. the daemon that subscribes to C<treecommits:*> channels and
   updates its database after every commit;
 
-=item 2 a RESTful API service for retrieving the search results
+=item 2. a RESTful API service for retrieving the search results
 
 =back
 
 
 
 
-=back
 
 =head1 Author
 

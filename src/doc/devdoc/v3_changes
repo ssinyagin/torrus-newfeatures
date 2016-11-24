@@ -7,7 +7,9 @@ Renamed "perllib" to "lib".
 
 New perl modules required:
   Redis
+  Redis::DistLock
   Cache::Memcached::Fast
+  Git::Raw
 
 Perl modules not needed:
   BerkeleyDB
@@ -18,9 +20,12 @@ Removed variables:
   dbhome
 
 New variables:
-  compilerwd
+  writerwd
   readerwd
   
+New software daemons required:
+  redis
+  memcached
 
 
 
@@ -34,7 +39,9 @@ Removed config:
   $Torrus::Renderer::cacheMaxAge
   $Torrus::Global::dbHome
   $Torrus::DB::dbSub
-
+  $Torrus::Global::ConfigReadyTimeout
+  $Torrus::Global::ConfigReadyRetryPeriod
+  $Torrus::Global::ConfigReadersWaitPeriod
 
 Changed defaults:
   $Torrus::Renderer::searchEnabled = 0; # until search service is built
@@ -42,5 +49,7 @@ Changed defaults:
 
 
 New config:
-  $Torrus::Global::compilerWD
+  $Torrus::Global::writerWD
   $Torrus::Global::readerWD
+  $Torrus::Global::redisServer
+  $Torrus::Global::redisPrefix

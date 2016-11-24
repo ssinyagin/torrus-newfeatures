@@ -36,24 +36,37 @@ $Torrus::Global::reportsDir     = '@reportsdir@';
 $Torrus::Global::sesStoreDir    = '@sesstordir@';
 $Torrus::Global::sesLockDir     = '@seslockdir@';
 $Torrus::Global::webPlainDir    = '@webplaindir@';
-$Torrus::Global::compilerWD     = '@compilerwd@';
+$Torrus::Global::writerWD       = '@writerwd@';
 $Torrus::Global::readerWD       = '@readerwd@';
 @Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
 
 $Torrus::Global::healthIconsDir = $Torrus::Global::stylingDir;
 
 
-# How long we can wait till the configuration is ready, in seconds
-$Torrus::Global::ConfigReadyTimeout = 1800;
+# By default, local Redis server is used
+$Torrus::Global::redisServer = '127.0.0.1:6379';
 
-# How often we check if the configuration is ready, in seconds
-$Torrus::Global::ConfigReadyRetryPeriod = 30;
+# All keys and channel names in redis are prepended with this prefix.
+# It should be unique per Torrus instance within the same Redis
+# database.
+$Torrus::Global::redisPrefix = 'torrus_';
 
-# How long the compiler waits till readers finish, in seconds
-$Torrus::Global::ConfigReadersWaitTimeout = 180;
+# the branch name used in writer WD
+$Torrus::ConfigTree::writerLocalBranch = 'master';
 
-# How often compiler checks for readers to finish
-$Torrus::Global::ConfigReadersWaitPeriod = 5;
+# If defined, the writer will push here, with tree name as branch name
+$Torrus::ConfigTree::writerRemoteRepo = undef;
+
+$Torrus::ConfigTree::writerAuthorName = 'Torrus Compiler';
+$Torrus::ConfigTree::writerAuthorEmail = 'torrus@localhost';
+
+
+# If undefined, the reader will fetch from writer WD.
+# If defined, thereader will fetch from remote repo with tree name as
+# branch name
+$Torrus::ConfigTree::readerRemoteRepo = undef;
+
+
 
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;

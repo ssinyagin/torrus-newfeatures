@@ -142,7 +142,7 @@ is stored at C<b7/ba/> path.
 =item * C<children/>: tor each subtree node, there is a JSON file
   defining an array of child tokens.
 
-=item * C<agents/I<DAEMON>/I<TREE>/I<INSTANCE>/>: each daemon that needs
+=item * C<agents/I<DAEMON>/I<INSTANCE>/>: each daemon that needs
   a quick access to a subset of leaf nodes (primarily, I<collector>, and
   also I<monitor>) can retrieve the node configurations from this
   structure. The instance number is 4-digit lower-case hexademical
@@ -156,6 +156,9 @@ is stored at C<b7/ba/> path.
   has zero-length files, each file named after a node token, that
   represent the topmost nodes that are defined by the corresponding XML
   file.
+
+=item * C<srcrev>: A file containing a JSON scalar referring to the
+  commit in XML sources.
 
 =item * C<nodeid/>: two-level 256-way directory structure. Each file is a
   SHA-1 digest of the tree name, followed by semicolon, and the
@@ -227,7 +230,7 @@ reading.
 =item * C<wdlock:I<WDPATH>> -- this key is used for the mutex that
   protects the consumer working directory during the Git pull
   operation. Each consumer process that intends to make the pull, should
-  ackquire this mutex, then check the actual HEAD of the working
+  acquire this mutex, then check the actual HEAD of the working
   directory, and pull if it's not the latest one.
 
 =item * C<treehead:I<TREE>> -- the value is the Git commit number of the

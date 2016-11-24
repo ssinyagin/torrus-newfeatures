@@ -22,9 +22,14 @@ package Torrus::ConfigTree;
 use strict;
 use warnings;
 
-use Torrus::DB;
+use Redis;
+use Redis::DistLock;
+use Cache::Memcached::Fast;
+use Git::Raw;
+use JSON;
+use File::Path qw(make_path);
+
 use Torrus::Log;
-use Torrus::TimeStamp;
 
 
 
@@ -35,380 +40,193 @@ sub new
     my %options = @_;
     bless $self, $class;
 
-    $self->{'treename'} = $options{'-TreeName'};
-    die('ERROR: TreeName is mandatory') if not $self->{'treename'};
+    my $treename = $options{'-TreeName'};
+    die('ERROR: TreeName is mandatory') if not $treename;
+    $self->{'treename'} = $treename;
 
-    $self->{'db_config_instances'} =
-        new Torrus::DB( 'config_instances', -WriteAccess => 1 );
-    defined( $self->{'db_config_instances'} ) or return( undef );
+    $self->{'iamwriter'} = $options{'-WriteAccess'} ? 1:0;
+    
+    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis_prefix'} = $Torrus::Global::redisPrefix;
 
-    my $i = $self->{'db_config_instances'}->get('ds:' . $self->{'treename'});
-    if( not defined($i) )
+    my $wd;
+    
+    if( $self->{'iamwriter'} )
     {
-        $i = 0;
-        $self->{'first_time_created'} = 1;
+        $wd = $Torrus::Global::writerWD . '/' . $treename;
+        if( defined($Torrus::ConfigTree::writerRemoteRepo) )
+        {
+            $self->{'remote'} = $Torrus::ConfigTree::writerRemoteRepo;
+            $self->{'remote_branch'} = $treename;
+        }
+    }
+    else
+    {
+        $wd = $Torrus::Global::readerWD . '/' . $treename;
+        if( defined($Torrus::ConfigTree::readerRemoteRepo) )
+        {
+            $self->{'remote'} = $Torrus::ConfigTree::readerRemoteRepo;
+            $self->{'remote_branch'} = $treename;
+        }
+        else
+        {
+            $self->{'remote'} = $Torrus::Global::writerWD . '/' . $treename;
+            $self->{'remote_branch'} = $Torrus::ConfigTree::writerLocalBranch;
+        }
     }
 
-    my $dsConfInstance = sprintf( '%d', $i );
-
-    $i = $self->{'db_config_instances'}->get('other:' . $self->{'treename'});
-    $i = 0 unless defined( $i );
-
-    my $otherConfInstance = sprintf( '%d', $i );
-
-    if( $options{'-WriteAccess'} )
+    $self-{'wd'} = $wd;
+    
+    if( not -d $wd )
     {
-        $self->{'is_writing'} = 1;
-        
-        # Acquire exlusive lock on the database and set the compiling flag
+        $self->_lock_wd();
+        if( not -d $wd )
         {
-            my $ok = 1;
-            my $key = 'compiling:' . $self->{'treename'};
-            my $cursor = $self->{'db_config_instances'}->cursor( -Write => 1 );
-            my $compilingFlag =
-                $self->{'db_config_instances'}->c_get( $cursor, $key );
-            if( $compilingFlag )
+            $self->{'fresh_wd'} = 1;
+            if( $self->{'iamwriter'} )
             {
-                if( $options{'-ForceWriter'} )
+                $self->_init_new_writer_wd();
+            }
+            else
+            {
+                if( defined($self->_treehead()) )
                 {
-                    Warn('Another compiler process is probably still ' .
-                         'running. This may lead to an unusable ' .
-                         'database state');
+                    $self->_init_new_reader_wd();
                 }
                 else
                 {
-                    Error('Another compiler is running for the tree ' .
-                          $self->{'treename'});
-                    $ok = 0;
+                    # the writer has not yet initialized the tree
+                    $self->{'config_not_ready'} = 1;
                 }
             }
-            else
-            {
-                $self->{'db_config_instances'}->c_put( $cursor, $key, 1 );
-            }
-            $self->{'db_config_instances'}->c_close($cursor);
-            if( not $ok )
-            {
-                return undef;
-            }
-            $self->{'iam_writer'} = 1;
         }
-
-        if( not $options{'-NoDSRebuild'} )
-        {
-            $dsConfInstance = sprintf( '%d', ( $dsConfInstance + 1 ) % 2 );
-        }
-        $otherConfInstance = sprintf( '%d', ( $otherConfInstance + 1 ) % 2 );
+        $self->_unlock_wd();
     }
 
-    $self->{'ds_config_instance'} = $dsConfInstance;
-    $self->{'other_config_instance'} = $otherConfInstance;
-
-    $self->{'db_readers'} = new Torrus::DB('config_readers',
-                                           -Subdir => $self->{'treename'},
-                                           -WriteAccess => 1 );
-    defined( $self->{'db_readers'} ) or return( undef );
-
-    $self->{'db_dsconfig'} =
-        new Torrus::DB('ds_config_' . $dsConfInstance,
-                       -Subdir => $self->{'treename'},  -Btree => 1,
-                       -WriteAccess => $options{'-WriteAccess'});
-    defined( $self->{'db_dsconfig'} ) or return( undef );
-    
-    $self->{'db_otherconfig'} =
-        new Torrus::DB('other_config_' . $otherConfInstance,
-                       -Subdir => $self->{'treename'}, -Btree => 1,
-                       -WriteAccess => $options{'-WriteAccess'});
-    defined( $self->{'db_otherconfig'} ) or return( undef );
-    
-    $self->{'db_aliases'} =
-        new Torrus::DB('aliases_' . $dsConfInstance,
-                       -Subdir => $self->{'treename'},  -Btree => 1,
-                       -WriteAccess => $options{'-WriteAccess'});
-    defined( $self->{'db_aliases'} ) or return( undef );
-
-    if( $options{'-WriteAccess'} )
+    if( $self->{'config_not_ready'} )
     {
-        $self->setReady(0);
-        $self->waitReaders();
-
-        if( $options{'-Rebuild'} )
-        {
-            $self->{'db_otherconfig'}->trunc();
-            if( not $options{'-NoDSRebuild'} )
-            {
-                $self->{'db_dsconfig'}->trunc();
-                $self->{'db_aliases'}->trunc();
-            }
-        }
+        return undef;
     }
-    else
+
+    if( not defined($self->{'repo'}) )
     {
-        $self->setReader();
-
-        if( not $self->isReady() )
-        {
-            if( $options{'-Wait'} )
-            {
-                Warn('Configuration is not ready');
-
-                my $waitingTimeout =
-                    time() + $Torrus::Global::ConfigReadyTimeout;
-                my $success = 0;
-
-                while( not $success and time() < $waitingTimeout )
-                {
-                    $self->clearReader();
-
-                    Info('Sleeping ' .
-                         $Torrus::Global::ConfigReadyRetryPeriod .
-                         ' seconds');
-                    sleep $Torrus::Global::ConfigReadyRetryPeriod;
-
-                    $self->setReader();
-
-                    if( $self->isReady() )
-                    {
-                        $success = 1;
-                        Info('Now configuration is ready');
-                    }
-                    else
-                    {
-                        Info('Configuration is still not ready');
-                    }
-                }
-                if( not $success )
-                {
-                    Error('Configuration wait timed out');
-                    $self->clearReader();
-                    return undef;
-                }
-            }
-            else
-            {
-                Error('Configuration is not ready');
-                $self->clearReader();
-                return undef;
-            }
-        }
+        $self->{'repo'} = Git::Raw::Repository->open($wd);
     }
-
-    # Read the parameter properties into memory
-    $self->{'db_paramprops'} =
-        new Torrus::DB('paramprops_' . $dsConfInstance,
-                       -Subdir => $self->{'treename'},  -Btree => 1,
-                       -WriteAccess => $options{'-WriteAccess'});
-    defined( $self->{'db_paramprops'} ) or return( undef );
     
-    if( $options{'-Rebuild'} )
-    {
-        $self->{'db_paramprops'}->trunc();
-    }
-    else
-    {
-        my $cursor = $self->{'db_paramprops'}->cursor();
-        while( my ($key, $val) =
-               $self->{'db_paramprops'}->next( $cursor ) )
-        {
-            my( $param, $prop ) = split( /:/o, $key );
-            $self->{'paramprop'}{$prop}{$param} = $val;
-        }
-        $self->{'db_paramprops'}->c_close($cursor);
-        undef $cursor;
-        $self->{'db_paramprops'}->closeNow();
-        delete $self->{'db_paramprops'};
-    }
-
-    
-    $self->{'db_sets'} =
-        new Torrus::DB('tokensets_' . $dsConfInstance,
-                       -Subdir => $self->{'treename'}, -Btree => 0,
-                       -WriteAccess => 1, -Truncate => $options{'-Rebuild'});
-    defined( $self->{'db_sets'} ) or return( undef );
-
-
-    $self->{'db_nodepcache'} =
-        new Torrus::DB('nodepcache_' . $dsConfInstance,
-                       -Subdir => $self->{'treename'}, -Btree => 1,
-                       -WriteAccess => 1,
-                       -Truncate => ($options{'-Rebuild'} and
-                                     not $options{'-NoDSRebuild'}));
-    defined( $self->{'db_nodepcache'} ) or return( undef );
-
-
-    $self->{'db_nodeid'} =
-        new Torrus::DB('nodeid_' . $dsConfInstance,
-                       -Subdir => $self->{'treename'}, -Btree => 1,
-                       -WriteAccess => 1,
-                       -Truncate => ($options{'-Rebuild'} and
-                                     not $options{'-NoDSRebuild'}));
-    defined( $self->{'db_nodeid'} ) or return( undef );
-
     return $self;
 }
 
 
-sub DESTROY
+sub _init_new_writer_wd
+{
+    my $self = shift;
+    
+    my $dir = $self-{'wd'};
+    Debug("Initializing a writer working directory in $dir");
+    make_path($dir) or die("Cannot create $dir: $!");
+    my $repo = Git::Raw::Repository->init($dir);
+    
+    if( defined($self->{'remote'}) )
+    {
+        Debug('Adding a remote for pushing: ' . $self->{'remote'}); 
+        my $remote =
+            Git::Raw::Remote->create($repo, 'origin', $self->{'remote'});
+    }
+
+    my $index = $repo->index;
+    $index->write;
+    my $tree = $index->write_tree;
+    my $me = Git::Raw::Signature->now($Torrus::ConfigTree::writerAuthorName,
+                                      $Torrus::ConfigTree::writerAuthorEmail);
+    
+    $repo->commit('Initial empty commit', $me, $me, [], $tree);
+
+    if( $Torrus::ConfigTree::writerLocalBranch ne 'master' )
+    {
+        my $branch = Git::Raw::Branch->lookup($repo, 'master', 1);
+        $branch->move($Torrus::ConfigTree::writerLocalBranch, 1);
+    }
+
+    $self->{'repo'} = $repo;
+    
+    return;
+}
+
+
+
+sub _init_new_reader_wd
 {
     my $self = shift;
 
-    Debug('Destroying ConfigTree object');
+    my $dir = $self-{'wd'};
+    Debug("Initializing a reader working directory in $dir");
 
-    if( $self->{'iam_writer'} )
+    my $url;
+    my $branch;
+    if( defined($Torrus::ConfigTree::readerRemoteRepo) )
     {
-        # Acquire exlusive lock on the database and clear the compiling flag
-        my $cursor = $self->{'db_config_instances'}->cursor( -Write => 1 );
-        $self->{'db_config_instances'}->c_put
-            ( $cursor, 'compiling:' . $self->{'treename'}, 0 );
-        $self->{'db_config_instances'}->c_close($cursor);
+        $url = $Torrus::ConfigTree::readerRemoteRepo;
+        $branch = $self->treeName();
     }
     else
     {
-        $self->clearReader();
+        $url = $Torrus::Global::writerWD . '/' . $self->treeName();
+        $branch = $Torrus::ConfigTree::writerLocalBranch;
     }
-
-    delete $self->{'db_dsconfig'};
-    delete $self->{'db_otherconfig'};
-    delete $self->{'db_aliases'};
-    delete $self->{'db_sets'};
-    delete $self->{'db_nodepcache'};
-    delete $self->{'db_readers'};
-    return;
+            
+    my $repo = Git::Raw::Repository->clone($url, $dir,
+                                           {'checkout_branch' => $branch});
+    $self->{'repo'} = $repo;
 }
 
-# Manage the readinness flag
 
-sub setReady
-{
-    my $self = shift;
-    my $ready = shift;
-    $self->{'db_otherconfig'}->put( 'ConfigurationReady', $ready ? 1:0 );
-    return;
-}
-
-sub isReady
-{
-    my $self = shift;
-    return $self->{'db_otherconfig'}->get( 'ConfigurationReady' );
-}
-
-# Manage the readers database
-
-sub setReader
+sub _treehead
 {
     my $self = shift;
 
-    my $readerId = 'pid=' . $$ . ',rand=' . sprintf('%.10d', rand(1e9));
-    Debug('Setting up reader: ' . $readerId);
-    $self->{'reader_id'} = $readerId;
-    $self->{'db_readers'}->put( $readerId,
-                                sprintf('%d:%d:%d',
-                                        time(),
-                                        $self->{'ds_config_instance'},
-                                        $self->{'other_config_instance'}) );
-    return;
+    return $self->{'redis'}->get
+        ($self->{'redis_prefix'} . 'treehead:' . $self->treeName());
 }
 
-sub clearReader
+
+sub _lock_wd
 {
     my $self = shift;
 
-    if( defined( $self->{'reader_id'} ) )
+    my $rd = Redis::DistLock->new
+        ( servers => [$Torrus::Global::redisServer] );
+    Debug('Acquiring a lock for ' . $self-{'wd'});
+    my $lock =
+        $rd->lock($self->{'redis_prefix'} . 'wdlock:' . $self-{'wd'},
+                  7200);
+    if( not defined($lock) )
     {
-        Debug('Clearing reader: ' . $self->{'reader_id'});
-        $self->{'db_readers'}->del( $self->{'reader_id'} );
-        delete $self->{'reader_id'};
+        die('Failed to acquire a lock for ' . $self-{'wd'});
     }
+    
+    $self->{'wd_rd'} = $rd;
+    $self->{'wd_mutex'} = $lock;
     return;
 }
 
 
-sub waitReaders
+sub _unlock_wd
 {
     my $self = shift;
-
-    # Let the active readers finish their job
-    my $noReaders = 0;
-    while( not $noReaders )
-    {
-        my @readers = ();
-        
-        {
-            my $cursor = $self->{'db_readers'}->cursor();
-            while( my ($key, $val) = $self->{'db_readers'}->next( $cursor ) )
-            {
-                my( $timestamp, $dsInst, $otherInst ) = split( /:/o, $val );
-                if( $dsInst == $self->{'ds_config_instance'} or
-                    $otherInst == $self->{'other_config_instance'} )
-                {
-                    push( @readers, {
-                        'reader' => $key,
-                        'timestamp' => $timestamp } );
-                }
-            }
-            $self->{'db_readers'}->c_close($cursor);
-        }
-        
-        if( @readers > 0 )
-        {
-            Info('Waiting for ' . scalar(@readers) . ' readers:');
-            my $recentTS = 0;
-            foreach my $reader ( @readers )
-            {
-                Info($reader->{'reader'} . ', timestamp: ' .
-                     localtime( $reader->{'timestamp'} ));
-                if( $reader->{'timestamp'} > $recentTS )
-                {
-                    $recentTS = $reader->{'timestamp'};
-                }
-            }
-            if( $recentTS + $Torrus::Global::ConfigReadersWaitTimeout >=
-                time() )
-            {
-                Info('Sleeping ' . $Torrus::Global::ConfigReadersWaitPeriod  .
-                     ' seconds');
-                sleep( $Torrus::Global::ConfigReadersWaitPeriod );
-            }
-            else
-            {
-                # the readers are too long active. we ignore them now
-                Warn('Readers wait timed out. Flushing the readers list for ' .
-                     'DS config instance ' . $self->{'ds_config_instance'} .
-                     ' and Other config instance ' .
-                     $self->{'other_config_instance'});
-
-                my $cursor = $self->{'db_readers'}->cursor( -Write => 1 );
-                while( my ($key, $val) =
-                       $self->{'db_readers'}->next( $cursor ) )
-                {
-                    my( $timestamp, $dsInst, $otherInst ) =
-                        split( /:/o, $val );
-                    if( $dsInst == $self->{'ds_config_instance'} or
-                        $otherInst == $self->{'other_config_instance'} )
-                    {
-                        $self->{'db_readers'}->c_del( $cursor );
-                    }
-                }
-                $self->{'db_readers'}->c_close($cursor);
-                $noReaders = 1;
-            }
-        }
-        else
-        {
-            $noReaders = 1;
-        }
-    }
+    $self->{'wd_rd'}->release($self->{'wd_mutex'});
+    delete $self->{'wd_mutex'};        
+    delete $self->{'wd_rd'};
     return;
 }
-
+            
+                             
 
 
 # This should be called after Torrus::TimeStamp::init();
 
 sub getTimestamp
 {
-    my $self = shift;
-    return Torrus::TimeStamp::get($self->{'treename'} . ':configuration');
+    die('getTimestamp is deprecated');
 }
 
 sub treeName

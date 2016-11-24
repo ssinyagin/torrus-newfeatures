@@ -96,7 +96,9 @@ AC_SUBST(perllibdirs, [${perllibdirs}])
 
 if test "$enable_pkgonly" != yes; then
 
-   for module in 'Redis' 'Cache::Memcached::Fast' 'XML::LibXML' 'Template' \
+   for module in 'Redis' 'Redis::DistLock' \
+                 'Cache::Memcached::Fast' 'Git::Raw' \
+                 'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \
                  'Date::Parse' 'JSON'
    do
@@ -288,9 +290,9 @@ AC_ARG_VAR(varprefix, [[/var/torrus] Common prefix for runtime data])
 if test -z "$varprefix"; then
    varprefix='/var/torrus'; fi
 
-AC_ARG_VAR(compilerwd, [[VARPREFIX/gitwd/compiler] Compiler working dir])
-if test -z "$compilerwd"; then
-   compilerwd='${varprefix}/gitwd/compiler'; fi
+AC_ARG_VAR(writerwd, [[VARPREFIX/gitwd/compiler] Compiler working dir])
+if test -z "$writerwd"; then
+   writerwd='${varprefix}/gitwd/compiler'; fi
 
 AC_ARG_VAR(readerwd, [[VARPREFIX/gitwd/reader] Reader working dir])
 if test -z "$readerwd"; then

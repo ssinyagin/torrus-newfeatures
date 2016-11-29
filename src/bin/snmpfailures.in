@@ -65,7 +65,7 @@ my $out = {};
 
 &Torrus::DB::setSafeSignalHandlers();
 
-my $nInstances = Torrus::SiteConfig::collectorInstances( $tree );
+my $nInstances = Torrus::SiteConfig::agentInstances( $tree, 'collector' );
 for( my $instance = 0; $instance < $nInstances; $instance++ )
 {
     my $db_failures = new Torrus::SNMP_Failures( -Tree => $tree,

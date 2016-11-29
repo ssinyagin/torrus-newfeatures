@@ -82,7 +82,7 @@ if( not Torrus::SiteConfig::mayRunCollector( $tree ) )
     exit 1;
 }
 
-my $nInstances = Torrus::SiteConfig::collectorInstances( $tree );
+my $nInstances = Torrus::SiteConfig::agentInstances( $tree, 'collector' );
 
 if( $nInstances > 1 and not defined( $instance ) )
 {

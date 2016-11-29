@@ -284,11 +284,13 @@ sub mayRunCollector
     return( defined($run) and $run > 0 );   
 }
 
-sub collectorInstances
+sub agentInstances
 {
     my $tree = shift;
-    my $run = $Torrus::Global::treeConfig{$tree}{'run'}{'collector'};
-    return( (defined($run) and $run > 1) ? int($run) : 1 ); 
+    my $agent = shift;
+        
+    my $run = $Torrus::Global::treeConfig{$tree}{'run'}{$agent};
+    return( (defined($run) and $run > 1) ? int($run) : 0 ); 
 }
 
 sub mayRunMonitor

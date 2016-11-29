@@ -66,7 +66,7 @@ sub new
         Torrus::SiteConfig::mayRunCollector( $self->treeName() );
 
     $self->{'collectorInstances'} =
-        Torrus::SiteConfig::collectorInstances( $self->treeName() );
+        Torrus::SiteConfig::agentInstances( $self->treeName(), 'agent' );
 
     $self->{'db_collectortokens'} = [];
     foreach my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )

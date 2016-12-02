@@ -219,7 +219,11 @@ number. The JSON files are hashes defining all parameter values needed
 by the daemon. These files are populated by the XML compiler after the
 tree is processed.
 
-
+Git branch names are fixed as follows: the C<configtree> directory is in
+branch C<I<TREE>_configtree>, and agent working directories are in
+branches C<I<TREE>_II<DAEMON>_I<INSTANCE>>. This naming allows all
+branches to be pushed into a single remote repository in case if
+distributed setup is required.
 
 
 =head2 Redis database

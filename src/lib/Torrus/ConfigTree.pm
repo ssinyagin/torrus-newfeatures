@@ -49,29 +49,24 @@ sub new
     $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_prefix'} = $Torrus::Global::redisPrefix;
 
-    my $wd;
+    my $wd = $self->_configtree_wd_path();
     
     if( $self->{'iamwriter'} )
     {
-        $wd = $Torrus::Global::writerWD . '/' . $treename;
         if( defined($Torrus::ConfigTree::writerRemoteRepo) )
         {
             $self->{'remote'} = $Torrus::ConfigTree::writerRemoteRepo;
-            $self->{'remote_branch'} = $treename;
         }
     }
     else
     {
-        $wd = $Torrus::Global::readerWD . '/' . $treename;
         if( defined($Torrus::ConfigTree::readerRemoteRepo) )
         {
             $self->{'remote'} = $Torrus::ConfigTree::readerRemoteRepo;
-            $self->{'remote_branch'} = $treename;
         }
         else
         {
-            $self->{'remote'} = $Torrus::Global::writerWD . '/' . $treename;
-            $self->{'remote_branch'} = $Torrus::ConfigTree::writerLocalBranch;
+            $self->{'remote'} = $self->_configtree_wd_path(1);
         }
     }
 
@@ -85,13 +80,15 @@ sub new
             $self->{'fresh_wd'} = 1;
             if( $self->{'iamwriter'} )
             {
-                $self->_init_new_writer_wd();
+                $self->_init_new_writer_wd
+                    ($wd, $self->_configtree_branch_name());
             }
             else
             {
                 if( defined($self->_treehead()) )
                 {
-                    $self->_init_new_reader_wd();
+                    $self->_init_new_reader_wd
+                        ($wd, $self->_configtree_branch_name());
                 }
                 else
                 {
@@ -103,51 +100,174 @@ sub new
         $self->_unlock_wd();
     }
 
+    # prepare the agent WD for writer
+    if( $self->{'iamwriter'} )
+    {
+        foreach my $agent ('collector', 'monitor')
+        {
+            my $nInstances =
+                Torrus::SiteConfig::agentInstances( $treename, $agent );
+            for( my $instance = 0; $instance < $nInstances; $instance++ )
+            {
+                my $awd = $self->_agent_wd_path($agent, $instance);
+                if( not -d $awd )
+                {
+                    $self->_init_new_writer_wd
+                        ($awd, $self->_agent_branch_name($agent, $instance));
+                }
+            }
+        }
+    }
+    
     if( $self->{'config_not_ready'} )
     {
         return undef;
-    }
-
-    if( not defined($self->{'repo'}) )
-    {
-        $self->{'repo'} = Git::Raw::Repository->open($wd);
     }
     
     return $self;
 }
 
 
+sub _configtree_wd_path
+{
+    my $self = shift;
+    my $iswriter = shift;
+
+    $iswriter = $self->{'iamwriter'} unless defined($iswriter);
+
+    if( $iswriter )
+    {
+        return $Torrus::Global::writerWD . '/' .
+            $self->{'treename'} . '/' .
+            $Torrus::ConfigTree::writerConfigtreeWDsubdir;
+            
+    }
+    else
+    {
+        return $Torrus::Global::readerWD . '/' .
+            $self->{'treename'} . '/' .
+            $Torrus::ConfigTree::readerConfigtreeWDsubdir;
+    }
+}
+
+
+sub _agent_instance_name
+{
+    my $self = shift;
+    my $agent = shift;
+    my $instance = shift;
+
+    return sprintf('%s_%.4x', $agent, $instance);
+}
+
+
+sub _agent_wd_path
+{
+    my $self = shift;
+    my $agent = shift;
+    my $instance = shift;
+    my $iswriter = shift;
+
+    $iswriter = $self->{'iamwriter'} unless defined($iswriter);
+    
+    if( $iswriter )
+    {
+        return $Torrus::Global::writerWD . '/' .
+            $self->{'treename'} . '/' .
+            $Torrus::ConfigTree::writerAgentsWDsubdir . '/' .
+            $self->_agent_instance_name($agent, $instance);
+    }
+    else
+    {
+        return $Torrus::Global::readerWD . '/' .
+            $self->{'treename'} . '/' .
+            $Torrus::ConfigTree::readerAgentsWDsubdir . '/' .
+            $self->_agent_instance_name($agent, $instance);
+    }
+}
+
+
+sub _configtree_branch_name
+{
+    my $self = shift;
+    return $self->{'treename'} . '_configtree';
+}
+
+
+sub _agent_branch_name
+{
+    my $self = shift;
+    my $agent = shift;
+    my $instance = shift;
+    
+    return $self->{'treename'} . '_' .
+        $self->_agent_instance_name($agent, $instance);
+}
+    
+
+sub _signature
+{
+    return Git::Raw::Signature->now
+        ($Torrus::ConfigTree::writerAuthorName,
+         $Torrus::ConfigTree::writerAuthorEmail);
+}
+
+
+
 sub _init_new_writer_wd
 {
     my $self = shift;
+    my $dir = shift;
+    my $branchname = shift;
     
-    my $dir = $self-{'wd'};
     Debug("Initializing a writer working directory in $dir");
     make_path($dir) or die("Cannot create $dir: $!");
+    
+    if( defined($self->{'remote'}) )
+    {
+        # first, try to check out an existing branch
+        Debug('Trying to clone branch ' . $branchname .
+              ' from ' . $self->{'remote'});
+        eval {
+            Git::Raw::Repository->clone
+                ($self->{'remote'}, $dir,
+                 {'checkout_branch' => $self->{'remote_branch'}});
+            Debug('OK');
+        };
+        
+        if( not $@ )
+        {
+            return;
+        }
+        Debug('Could not clone: ' . $@);
+    }
+            
+    Debug("Creating an empty repo in $dir");
     my $repo = Git::Raw::Repository->init($dir);
     
+    my $index = $repo->index;
+    $index->write;
+    my $tree = $index->write_tree;
+    my $me = $self->_signature();
+    
+    $repo->commit('Initial empty commit', $me, $me, [], $tree);
+
+    my $branch = Git::Raw::Branch->lookup($repo, 'master', 1);
+    $branch->move($branchname, 1);
+    
+
     if( defined($self->{'remote'}) )
     {
         Debug('Adding a remote for pushing: ' . $self->{'remote'}); 
         my $remote =
             Git::Raw::Remote->create($repo, 'origin', $self->{'remote'});
-    }
 
-    my $index = $repo->index;
-    $index->write;
-    my $tree = $index->write_tree;
-    my $me = Git::Raw::Signature->now($Torrus::ConfigTree::writerAuthorName,
-                                      $Torrus::ConfigTree::writerAuthorEmail);
-    
-    $repo->commit('Initial empty commit', $me, $me, [], $tree);
-
-    if( $Torrus::ConfigTree::writerLocalBranch ne 'master' )
-    {
-        my $branch = Git::Raw::Branch->lookup($repo, 'master', 1);
-        $branch->move($Torrus::ConfigTree::writerLocalBranch, 1);
-    }
-
-    $self->{'repo'} = $repo;
+        $remote->push(['refs/heads/master:refs/heads/' . $branchname]);
+        my $br = Git::Raw::Branch->lookup( $repo, 'master', 1 );
+        my $ref = Git::Raw::Reference->lookup
+            ('refs/remotes/origin/' $branchname, $repo);
+        $br->upstream($ref);
+    }                
     
     return;
 }
@@ -157,26 +277,16 @@ sub _init_new_writer_wd
 sub _init_new_reader_wd
 {
     my $self = shift;
+    my $dir = shift;
+    my $branchname = shift;
 
-    my $dir = $self-{'wd'};
-    Debug("Initializing a reader working directory in $dir");
+    Debug("Setting up a reader working directory in $dir");
+    Debug('Cloning branch ' . $branchname . 'from ' . $self->{'remote'});
+    
+    Git::Raw::Repository->clone
+        ($self->{'remote'}, $dir, {'checkout_branch' => $branchname});
 
-    my $url;
-    my $branch;
-    if( defined($Torrus::ConfigTree::readerRemoteRepo) )
-    {
-        $url = $Torrus::ConfigTree::readerRemoteRepo;
-        $branch = $self->treeName();
-    }
-    else
-    {
-        $url = $Torrus::Global::writerWD . '/' . $self->treeName();
-        $branch = $Torrus::ConfigTree::writerLocalBranch;
-    }
-            
-    my $repo = Git::Raw::Repository->clone($url, $dir,
-                                           {'checkout_branch' => $branch});
-    $self->{'repo'} = $repo;
+    return;
 }
 
 
@@ -189,22 +299,27 @@ sub _treehead
 }
 
 
+
 sub _lock_wd
 {
     my $self = shift;
+    my $dir = shift;
 
-    my $rd = Redis::DistLock->new
-        ( servers => [$Torrus::Global::redisServer] );
-    Debug('Acquiring a lock for ' . $self-{'wd'});
-    my $lock =
-        $rd->lock($self->{'redis_prefix'} . 'wdlock:' . $self-{'wd'},
-                  7200);
-    if( not defined($lock) )
+    if( not defined($self->{'wd_rd'}) )
     {
-        die('Failed to acquire a lock for ' . $self-{'wd'});
+        $self->{'wd_rd'} = Redis::DistLock->new
+            ( servers => [$Torrus::Global::redisServer] );
     }
     
-    $self->{'wd_rd'} = $rd;
+    Debug('Acquiring a lock for ' . $dir);
+    my $lock =
+        $self->{'wd_rd'}->lock($self->{'redis_prefix'} . 'wdlock:' . $dir,
+                               7200);
+    if( not defined($lock) )
+    {
+        die('Failed to acquire a lock for ' . $dir);
+    }
+    
     $self->{'wd_mutex'} = $lock;
     return;
 }
@@ -215,7 +330,6 @@ sub _unlock_wd
     my $self = shift;
     $self->{'wd_rd'}->release($self->{'wd_mutex'});
     delete $self->{'wd_mutex'};        
-    delete $self->{'wd_rd'};
     return;
 }
             

@@ -51,10 +51,14 @@ $Torrus::Global::redisServer = '127.0.0.1:6379';
 # database.
 $Torrus::Global::redisPrefix = 'torrus_';
 
-# the branch name used in writer WD
-$Torrus::ConfigTree::writerLocalBranch = 'master';
+# Git working directories for configtree and agents
+$Torrus::ConfigTree::writerConfigtreeWDsubdir = 'configtree';
+$Torrus::ConfigTree::writerAgentsWDsubdir = 'agents';
+$Torrus::ConfigTree::readerConfigtreeWDsubdir = 'configtree';
+$Torrus::ConfigTree::readerAgentsWDsubdir = 'agents';
 
-# If defined, the writer will push here, with tree name as branch name
+
+# If defined, the writer will push here
 $Torrus::ConfigTree::writerRemoteRepo = undef;
 
 $Torrus::ConfigTree::writerAuthorName = 'Torrus Compiler';
@@ -62,8 +66,7 @@ $Torrus::ConfigTree::writerAuthorEmail = 'torrus@localhost';
 
 
 # If undefined, the reader will fetch from writer WD.
-# If defined, thereader will fetch from remote repo with tree name as
-# branch name
+# If defined, thereader will fetch from remote repo with bramch names as above
 $Torrus::ConfigTree::readerRemoteRepo = undef;
 
 

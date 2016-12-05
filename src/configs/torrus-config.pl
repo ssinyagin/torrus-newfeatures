@@ -49,7 +49,17 @@ $Torrus::Global::redisServer = '127.0.0.1:6379';
 # All keys and channel names in redis are prepended with this prefix.
 # It should be unique per Torrus instance within the same Redis
 # database.
-$Torrus::Global::redisPrefix = 'torrus_';
+$Torrus::Global::redisPrefix = 'torrus:';
+
+
+# By default, local memcached server is used
+$Torrus::Global::memcachedServer = '127.0.0.1:11211';
+
+# All keys in memcached are prepended with this prefix.  It should be
+# unique per Torrus instance within the same memcached server.
+$Torrus::Global::memcachedPrefix = 'torrus:';
+
+
 
 # Git working directories for configtree and agents
 $Torrus::ConfigTree::writerConfigtreeWDsubdir = 'configtree';

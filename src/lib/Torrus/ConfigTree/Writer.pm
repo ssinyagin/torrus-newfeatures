@@ -210,66 +210,6 @@ sub addChild
     return $ctoken;
 }
 
-sub setAlias
-{
-    my $self = shift;
-    my $token = shift;
-    my $apath = shift;
-
-    my $ok = 1;
-
-    my $iamLeaf = $self->isLeaf($token);
-
-    # TODO: Add more verification here
-    if( not defined($apath) or $apath !~ /^\//o or
-        ( not $iamLeaf and $apath !~ /\/$/o ) or
-        ( $iamLeaf and $apath =~ /\/$/o ) )
-    {
-        my $path = $self->path($token);
-        Error("Incorrect alias at $path: $apath"); $ok = 0;
-    }
-    elsif( $self->token( $apath ) )
-    {
-        my $path = $self->path($token);
-        Error("Alias already exists: $apath at $path"); $ok = 0;
-    }
-    else
-    {
-        # Go through the alias and create subtrees if neccessary
-
-        my @pathelements = $self->splitPath($apath);
-        my $aliasChildName = pop @pathelements;
-
-        my $nodepath = '';
-        my $parent_token = $self->token('/');
-
-        foreach my $nodename ( @pathelements )
-        {
-            $nodepath .= $nodename;
-            my $child_token = $self->token( $nodepath );
-            if( not defined( $child_token ) )
-            {
-                $child_token = $self->addChild( $parent_token, $nodename );
-                if( not defined( $child_token ) )
-                {
-                    return 0;
-                }
-            }
-            $parent_token = $child_token;
-        }
-
-        my $alias_token = $self->addChild( $parent_token, $aliasChildName, 1 );
-        if( not defined( $alias_token ) )
-        {
-            return 0;
-        }
-
-        $self->{'db_dsconfig'}->put( 'a:'.$alias_token, $token );
-        $self->{'db_dsconfig'}->addToList( 'ar:'.$token, $alias_token );
-        $self->{'db_aliases'}->put( $apath, $token );
-    }
-    return $ok;
-}
 
 sub addView
 {

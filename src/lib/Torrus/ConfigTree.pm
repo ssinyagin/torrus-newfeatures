@@ -28,7 +28,8 @@ use Cache::Memcached::Fast;
 use Git::Raw;
 use JSON;
 use File::Path qw(make_path);
-
+use Digest::SHA qw(sha1_hex);
+    
 use Torrus::Log;
 
 
@@ -87,7 +88,7 @@ sub new
             {
                 if( defined($self->_treehead()) )
                 {
-                    $self->_init_new_reader_wd
+                    $self->{'head'} = $self->_init_new_reader_wd
                         ($wd, $self->_configtree_branch_name());
                 }
                 else
@@ -118,12 +119,34 @@ sub new
             }
         }
     }
+
+    # Reader needs to know the current HEAD
+    if( not $self->{'iamwriter'} )
+    {
+        if( not $self->{'fresh_wd'} )
+        {
+            my $repo = Git::Raw::Repository->open($wd);
+            my $branch = Git::Raw::Branch->lookup
+                ($repo, $self->_configtree_branch_name(), 1);
+            my $usref = $branch->upstream();
+            die('Expected a valid upstream') unless defined($usref);
+            
+
+             and $options{'-Pull'} )
+        }
+    }
     
     if( $self->{'config_not_ready'} )
     {
         return undef;
     }
     
+    $self->{'cache'} =
+        new Cache::Memcached::Fast({
+            servers => [{ 'address' => $Torrus::Global::memcachedServer,
+                          'noreply' => 1 }],
+            namespace => $Torrus::Global::memcachedPrefix});
+        
     return $self;
 }
 
@@ -283,10 +306,10 @@ sub _init_new_reader_wd
     Debug("Setting up a reader working directory in $dir");
     Debug('Cloning branch ' . $branchname . 'from ' . $self->{'remote'});
     
-    Git::Raw::Repository->clone
+    my $repo = Git::Raw::Repository->clone
         ($self->{'remote'}, $dir, {'checkout_branch' => $branchname});
 
-    return;
+    return $repo->head->target->id;
 }
 
 
@@ -332,11 +355,17 @@ sub _unlock_wd
     delete $self->{'wd_mutex'};        
     return;
 }
-            
-                             
 
 
-# This should be called after Torrus::TimeStamp::init();
+sub _node_file
+{
+    my $self = shift;
+    my $token = shift;
+
+    return join('/', $self-{'wd'}, 'nodes', substr($token, 0, 2), 
+                substr($token, 2, 2), $token);
+}
+
 
 sub getTimestamp
 {
@@ -350,29 +379,6 @@ sub treeName
 }
 
 
-# Returns array with path components
-
-sub splitPath
-{
-    my $self = shift;
-    my $path = shift;
-    my @ret = ();
-    while( length($path) > 0 )
-    {
-        my $node;
-        $path =~ s/^([^\/]*\/?)//o;
-        if( defined($1) )
-        {
-            $node = $1;
-            push(@ret, $node);
-        }
-        else
-        {
-            last;
-        }
-    }
-    return @ret;
-}
 
 sub nodeName
 {
@@ -382,34 +388,21 @@ sub nodeName
     return $path;
 }
 
+
 sub token
 {
     my $self = shift;
     my $path = shift;
 
-    my $token = $self->{'db_dsconfig'}->get( 'pt:'.$path );
-    if( not defined( $token ) )
+    my $token = sha1_hex($self->{'treename'} . ':' . $path);
+    if( -f $self->_node_file($token) )
     {
-        my $prefixLen = 1; # the leading slash is anyway there
-        my $pathLen = length( $path );
-        while( not defined( $token ) and $prefixLen < $pathLen )
-        {
-            my $result = $self->{'db_aliases'}->getBestMatch( $path );
-            if( not defined( $result ) )
-            {
-                $prefixLen = $pathLen; # exit the loop
-            }
-            else
-            {
-                # Found a partial match
-                $prefixLen = length( $result->{'key'} );
-                my $aliasTarget = $self->path( $result->{'value'} );
-                $path = $aliasTarget . substr( $path, $prefixLen );
-                $token = $self->{'db_dsconfig'}->get( 'pt:'.$path );
-            }
-        }
+        return $token;
     }
-    return $token;
+    else
+    {
+        return undef;
+    }    
 }
 
 sub path
@@ -464,24 +457,6 @@ sub isSubtree
     return( $self->nodeType($token) == 0 );
 }
 
-# Returns the real token or undef
-sub isAlias
-{
-    my $self = shift;
-    my $token = shift;
-
-    return( ( $self->nodeType($token) == 2 ) ?
-            $self->{'db_dsconfig'}->get( 'a:'.$token ) : undef );
-}
-
-# Returns the list of tokens pointing to this one as an alias
-sub getAliases
-{
-    my $self = shift;
-    my $token = shift;
-
-    return $self->{'db_dsconfig'}->getListItems('ar:'.$token);
-}
 
 
 sub getParam

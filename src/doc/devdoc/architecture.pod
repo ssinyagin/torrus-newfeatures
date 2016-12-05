@@ -434,6 +434,7 @@ ID of the configuration tree, separated by colons.
 
 =over 4
 
+=item * C<
 =item * C<np:I<NAME>:I<PNAME>> -- stores a calculated value of a
   parameter for a given node token or view. The value a concatenation of
   status character and the parameter value. The status character is C<U>

@@ -10,6 +10,7 @@ New perl modules required:
   Redis::DistLock
   Cache::Memcached::Fast
   Git::Raw
+  Digest::SHA
 
 Perl modules not needed:
   BerkeleyDB
@@ -25,7 +26,7 @@ New variables:
   
 New software daemons required:
   redis
-  memcached
+  memcached version 1.2.5 or higher
 
 
 
@@ -53,3 +54,13 @@ New config:
   $Torrus::Global::readerWD
   $Torrus::Global::redisServer
   $Torrus::Global::redisPrefix
+
+
+Torrus::ConfigTree
+==================
+
+TODO: remove ConfigTree->getTimestamp
+
+Aliases are no longer supported
+
+

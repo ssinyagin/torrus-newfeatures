@@ -104,42 +104,32 @@ start with a lower case letter.
 
 =head2 Git storage
 
-A Torrus instance uses a number of working directories for each tree
-configuration:
+A Torrus instance uses a number of Git branches for each tree
+configuration. The XML compiler is the only writer, and consumers are
+only reading from the Git repositories. Both writing and reading is done
+directly on local Git repositories, so working directories are not
+needed. If the writer and reader are on the same host, they use the same
+Git repository. Otherwise, the writer pushes its commits to a remote
+repository, and the reader pulls from it. The reader sets an exclusive
+lock on the repository for the time of fetching and merging, so that
+other readers don't try to pull at the same time.
 
-=over
+Each tree has its own set of branches. The C<I<TREE>_configtree> branch
+contains a full hierarchy of objects, so all parameters that are defined
+in the input XML are retrievable. Typically the Web UI renderer is
+consuming this data.
 
-=item * The XML compiler's working directories are used exclusively by
-  the compiler. Once the compiler finishes its work, it commits the
-  changes and (optionally) pushes them to the repositories. Then it
-  sends a notfication to Redis, so that the consumer processes can
-  update their data.
+Also there's a number of agent branches, one per agent instance
+(collectors and monitors are typical agents):
+C<I<TREE>_I<DAEMON>_I<INSTANCE>>. Each such branch contains only the
+information and parameters needed by the agent, so that the agent
+process can start and update its data as fast as possible.
 
-=item * The working directory of consumer processes on a given host
-  (there might be multiple hosts sharing the same configuration). The
-  consumer can check the update status in Redis and pull the new commits
-  if necessary. Before pulling, it sets an exclusive lock on the working
-  directlry via Redis, and pulls the changes from the repository. If
-  both compiler and the consumer are sharing the same host, the
-  compiler's working directory can act as a Git remote, thus saving on
-  network communication.
-
-=back
-
-Each tree has its own set of working directories. The C<configtree>
-working directory contains a full hierarchy of objects, so all
-parameters that are defined in the input XML are retrievable. Typically
-the Web UI renderer is consuming this data. Also there's a number of
-agent working directories, one per agent instance (collectors and
-monitors are typical agents). These working directories contain only the
-information and parameters needed by the agents, so that they can start
-and update their data as fast as possible.
-
-The C<configtree> working directory has subdirectories as follows. The
+The C<I<TREE>_configtree> branch has subdirectories as follows. The
 directories C<nodes> and C<children> contain JSON files named after the
 node tokens, arranged into two-level 256-way tree structure. For
 example, the file for token C<b7ba0d88a0b14a4e6c3c61f5446aa619a537098f>
-is stored at C<b7/ba/> path.
+is stored as C<b7/ba/0d88a0b14a4e6c3c61f5446aa619a537098f>.
 
 =over
 
@@ -179,12 +169,6 @@ is stored at C<b7/ba/> path.
 The C<srcdef> structure is mainly required for recursive deletion of
 nodes if a corresponding XML file is changed or deleted.
 
-In large installations, the number of files can exceed 1 million, and
-filesystem optimization might be needed. Ext4 is fixed to the maximum
-number of inodes at creation time. Btrfs is thought to be a better
-match, and it looks to be better optimized for large numbers of small
-files.
-
 Each Git commit refers to a complete and consistent tree structure. If
 the compiler finds an error, it does not create a new commit, and rolls
 back to the latest HEAD.
@@ -209,8 +193,7 @@ leaf names should end with alphanumeric characters.
 =back
 
 
-The agent working directories are stored at
-C<agents/I<DAEMON>_I<INSTANCE>/> path and contain JSON files named after
+The agent branches contain JSON files named after
 the node tokens, arranged into two-level 256-way tree structure. Each
 daemon that needs a quick access to a subset of leaf nodes (primarily,
 I<collector>, and also I<monitor>) retrieve the node configurations from
@@ -219,11 +202,6 @@ number. The JSON files are hashes defining all parameter values needed
 by the daemon. These files are populated by the XML compiler after the
 tree is processed.
 
-Git branch names are fixed as follows: the C<configtree> directory is in
-branch C<I<TREE>_configtree>, and agent working directories are in
-branches C<I<TREE>_II<DAEMON>_I<INSTANCE>>. This naming allows all
-branches to be pushed into a single remote repository in case if
-distributed setup is required.
 
 
 =head2 Redis database
@@ -240,19 +218,17 @@ reading.
 
 =over 4
 
-=item * C<wdlock:I<WDPATH>> -- this key is used for the mutex that
-  protects a working directory during updates (compiler uses this for
-  guaranteeing that only one process is working at a time, and consumers
-  use this during Git pull operation). Each consumer process that
-  intends to make the pull, should acquire this mutex, then check the
-  actual HEAD of the working directory, and pull if it's not the latest
-  one.
+=item * C<gitlock:I<REPOPATH>> -- this key is used for the mutex that
+  protects a local Git repository during pulls. Each consumer process
+  that intends to make the pull, should acquire this mutex, then check
+  again the latest coommit in its branch, and pull if it's not the
+  latest one.
 
-=item * C<githeads:I<TREE>> -- this is a hash containing the commit
-  numbers written by the compiler. The keys are C<configtree> and
-  C<agents/I<DAEMON>_I<INSTANCE>/>, and the values are the Git commit
-  numbers of corresponding repositories. The consumer process compares
-  this with the current known commit and pulls the updates if needed.
+=item * C<githeads> -- this is a hash containing commit numbers written
+  by the compiler. The keys are branch names, and the values are the Git
+  commit numbers of corresponding tops of the branches. The consumer
+  process compares this with the current known commit and pulls the
+  updates if needed.
 
 =item * C<tsets:I<TREE>> -- list of tokenset names.
 
@@ -291,7 +267,7 @@ PubSub channels:
 =over 4
 
 =item * C<treecommits:I<TREE>> -- the value of every new Git commit in
-  C<configtree> repository is published to this channel.
+  C<I<TREE>_configtree> branch is published to this channel.
 
 =back
 

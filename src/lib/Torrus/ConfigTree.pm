@@ -723,68 +723,6 @@ sub getParamProperties
     return $self->{'paramprop'};
 }
 
-# Recognize the regexp patterns within a path,
-# like /Netflow/Exporters/.*/.*/bps.
-# Each pattern is applied against direct child names only.
-#
-sub getNodesByPattern
-{
-    my $self = shift;
-    my $pattern = shift;
-
-    if( $pattern !~ /^\//o )
-    {
-        Error("Incorrect pattern: $pattern");
-        return undef;
-    }
-
-    my @retlist = ();
-    foreach my $nodepattern ( $self->splitPath($pattern) )
-    {
-        my @next_retlist = ();
-
-        # Cut the trailing slash, if any
-        my $patternname = $nodepattern;
-        $patternname =~ s/\/$//o;
-
-        if( $patternname =~ /\W/o )
-        {
-            foreach my $candidate ( @retlist )
-            {
-                # This is a pattern, let's get all matching children
-                foreach my $child ( $self->getChildren( $candidate ) )
-                {
-                    # Cut the trailing slash and leading path
-                    my $childname = $self->path($child);
-                    $childname =~ s/\/$//o;
-                    $childname =~ s/.*\/([^\/]+)$/$1/o;
-                    if( $childname =~ $patternname )
-                    {
-                        push( @next_retlist, $child );
-                    }
-                }
-            }
-
-        }
-        elsif( length($patternname) == 0 )
-        {
-            @next_retlist = ( $self->token('/') );
-        }
-        else
-        {
-            foreach my $candidate ( @retlist )
-            {
-                my $proposal = $self->path($candidate).$nodepattern;
-                if( defined( my $proptoken = $self->token($proposal) ) )
-                {
-                    push( @next_retlist, $proptoken );
-                }
-            }
-        }
-        @retlist = @next_retlist;
-    }
-    return @retlist;
-}
 
 #
 # Recognizes absolute or relative path, '..' as the parent subtree

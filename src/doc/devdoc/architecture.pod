@@ -119,6 +119,12 @@ contains a full hierarchy of objects, so all parameters that are defined
 in the input XML are retrievable. Typically the Web UI renderer is
 consuming this data.
 
+The C<I<TREE>_xmlsrc> branch contains XML files that are used by the XML
+compiler. While processing the XML files, it adds them into this branch,
+and performs a commit after a successful data validation. This
+branch is used for incremental compilations in order to track the
+changes in XML sources.
+    
 Also there's a number of agent branches, one per agent instance
 (collectors and monitors are typical agents):
 C<I<TREE>_I<DAEMON>_I<INSTANCE>>. Each such branch contains only the
@@ -137,7 +143,7 @@ is stored as C<b7/ba/0d88a0b14a4e6c3c61f5446aa619a537098f>.
   parent's token, and parameters.
 
 =item * C<children/>: tor each subtree node, there is a JSON file
-  defining an array of child tokens.
+  defining a hash with child tokens as keys and "1" as values.
 
 =item * C<srcref/I<XMLSHA>/I<NODESHA>>: the C<srcref> directory defines
   the dependency of tree nodes on source XML files. SHA-1 digest of each
@@ -178,15 +184,26 @@ keys and values:
 
 =over 4
 
-=item * C<tree>: the tree name
-
-=item * C<type>: "S" for subtree, "L" for a leaf.
+=item * C<is_subtree>: 1 for subtree, 0 for a leaf.
 
 =item * C<parent>: token of the parent node, or empty string if this is
 the top of the tree.
 
-=item * C<name>: the node name. Subtree names must end with slash, and
-leaf names should end with alphanumeric characters.
+=item * C<path>: the full node name. Subtree names must end with slash,
+and leaf names should end with alphanumeric characters.
+
+=item * C<params>: hash with parameter names and values.
+
+=item * C<vars>: hash with variable values (used in setvar, iftrue and
+iffalse XML statements).
+
+=back
+
+
+The JSON files within C<other> are hashes with the following keys and
+values:
+
+=over 4
 
 =item * C<params>: hash with parameter names values.
 
@@ -219,9 +236,9 @@ reading.
 =over 4
 
 =item * C<gitlock:I<REPOPATH>> -- this key is used for the mutex that
-  protects a local Git repository during pulls. Each consumer process
-  that intends to make the pull, should acquire this mutex, then check
-  again the latest coommit in its branch, and pull if it's not the
+  protects a local Git repository during pulls or init. Each consumer
+  process that intends to make the pull, should acquire this mutex, then
+  check again the latest coommit in its branch, and pull if it's not the
   latest one.
 
 =item * C<githeads> -- this is a hash containing commit numbers written
@@ -410,7 +427,6 @@ ID of the configuration tree, separated by colons.
 
 =over 4
 
-=item * C<
 =item * C<np:I<NAME>:I<PNAME>> -- stores a calculated value of a
   parameter for a given node token or view. The value a concatenation of
   status character and the parameter value. The status character is C<U>

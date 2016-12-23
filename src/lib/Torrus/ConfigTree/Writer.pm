@@ -61,45 +61,151 @@ sub new
     
     bless $self, $class;
 
+    my $repo = $self->{'repo'} =
+        Git::Raw::Repository->open($self->{'repodir'});
+    
+    my $branchname = $self->{'branch'};
+    my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
+
+    if( not defined($branch) )
+    {
+        # This is a fresh repo, create the configtree branch
+        my $builder = Git::Raw::Tree::Builder->new($repo);
+        $builder->clear();
+        my $tree = $builder->write();
+        my $me = $self->_signature();
+        my $refname = 'refs/heads/' / $branchname;
+        my $commit = $repo->commit("Initial empty commit in $branchname" ,
+                                   $me, $me, [], $tree, $refname);
+    
+        $branch = $repo->branch($branchname, $commit);
+    }
+
+    my $index = Git::Raw::Index->new();
+    $repo->index($index);
+
+    # This points to the last commit, and we're writing a new tree with the
+    # help of index
+    delete $self->{'gittree'};
+
+    my $tree = $branch->peel('tree');
+    $index->read_tree($tree);
+    $self->{'gitindex'} = $index;
+    
     $self->{'viewparent'} = {};
     $self->{'mayRunCollector'} =
         Torrus::SiteConfig::mayRunCollector( $self->treeName() );
 
     $self->{'collectorInstances'} =
-        Torrus::SiteConfig::agentInstances( $self->treeName(), 'agent' );
+        Torrus::SiteConfig::agentInstances( $self->treeName(), 'collector' );
 
-    $self->{'db_collectortokens'} = [];
-    foreach my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
-    {
-        $self->{'db_collectortokens'}->[$instance] =
-            new Torrus::DB( 'collector_tokens' . '_' .
-                            $instance . '_' . $self->{'ds_config_instance'},
-                            -Subdir => $self->treeName(),
-                            -WriteAccess => 1,
-                            -Truncate    => 1 );
-    }
-
-    # delay writing of frequently changed values
-    $self->{'db_dsconfig'}->delay();
-    $self->{'db_otherconfig'}->delay();    
+    $self->{'is_writing'} = 1;
+    
     return $self;
 }
 
 
-sub newToken
+sub DESTROY
 {
     my $self = shift;
-    my $token = $self->{'next_free_token'};
-    $token = 1 unless defined( $token );
-    $self->{'next_free_token'} = $token + 1;
-    return sprintf('T%.4d', $token);
+    
+}
+
+sub _signature
+{
+    return Git::Raw::Signature->now
+        ($Torrus::ConfigTree::writerAuthorName,
+         $Torrus::ConfigTree::writerAuthorEmail);
 }
 
 
-sub setParam
+sub _node_read
+{
+    my $self = shift;
+    my $token = shift;
+
+    my $ret;
+    if( defined($self->{'editing_node'}) and $token eq $self->{'editing_node'} )
+    {
+        $ret = $self->{'editing'};
+    }
+    else
+    {
+        $ret = $self->SUPER::_node_read($token);
+    }
+
+    if( defined($ret) )
+    {
+        foreach my $name (keys %{$ret->{'vars'}})
+        {
+            $self->{'setvar'}{$token}{$name} = $ret->{'vars'}{$name};
+        }
+    }
+
+    return $ret;
+}
+
+
+sub _agent_instance_name
+{
+    my $self = shift;
+    my $agent = shift;
+    my $instance = shift;
+
+    return sprintf('%s_%.4x', $agent, $instance);
+}
+
+
+sub _agent_branch_name
+{
+    my $self = shift;
+    my $agent = shift;
+    my $instance = shift;
+    
+    return $self->{'treename'} . '_' .
+        $self->_agent_instance_name($agent, $instance);
+}
+
+
+sub _write_json
+{
+    my $self = shift;
+    my $filename = shift;
+    my $data = shift;
+    
+    $self->{'gitindex'}->add_frombuffer
+        ($filename, $self->{'json'}->encode($data));
+    return;
+}
+
+    
+
+sub editOther
 {
     my $self  = shift;
     my $name  = shift;
+
+    if( defined($self->{'editing'}) )
+    {
+        die('another object is being edited');
+    }
+
+    my $obj = $self->_other_read($name);
+    if( not defined($obj) )
+    {
+        $obj = {'params' => {}};
+    }
+    
+    $self->{'editing'} = $obj;
+    $self->{'editing_name'} = $name;
+    
+    return;
+}
+
+
+sub setOtherParam
+{
+    my $self  = shift;
     my $param = shift;
     my $value = shift;
 
@@ -108,11 +214,99 @@ sub setParam
         $value =~ s/\s+//go;
     }
 
-    $self->{'paramcache'}{$name}{$param} = $value;
-    $self->{'db_otherconfig'}->put( 'P:'.$name.':'.$param, $value );
-    $self->{'db_otherconfig'}->addToList('Pl:'.$name, $param);
+    my $oldval = $self->{'editing'}{'params'}{$param};
+    if( not defined($oldval) or $oldval ne $value )
+    {
+        $self->{'editing'}{'params'}{$param} = $value;
+        $self->{'editing_dirty'} = 1;
+    }
+    
     return;
 }
+
+sub commitOther
+{
+    my $self  = shift;
+    
+    if( not defined($self->{'editing'}) )
+    {
+        die('setOtherParam() called before editOther()');
+    }
+    if( not defined($self->{'editing_name'}) )
+    {
+        die('a node object is being edited');
+    }
+
+    if( $self->{'editing_dirty'} )
+    {
+        $self->_write_json('other/' . $self->{'editing_name'},
+                           $self->{'editing'});
+    }
+
+    delete $self->{'editing'};
+    delete $self->{'editing_name'};
+    delete $self->{'editing_dirty'};
+}
+
+    
+sub editNode
+{
+    my $self  = shift;
+    my $path  = shift;
+
+    if( defined($self->{'editing'}) )
+    {
+        die('another object is being edited');
+    }
+
+    my $token = $self->token($path, 1);
+    my $is_subtree = ($path =~ /\/$/) ? 1:0;
+    my $parent_token;
+    
+    my $slashpos = rindex($path, '/');
+    if( $slashpos > 0 )
+    {
+        my $parent_path = substr($path, 0, $slashpos+1);
+        $parent_token = $self->token($parent_path, 1);
+        my $parent_node = $self->_node_read($parent_token);
+        
+        if( not defined($parent_node) or
+            not $parent_node->{'children'}->{$token} )
+        {
+            $self->editNode($parentpath);
+            $self->_add_child_token($token);
+            $self->commitNode();
+        }
+    }
+    else
+    {
+        $parent_token = '';
+    }
+
+    my $node = $self->_node_read($token);
+    if( not defined($node) )
+    {
+        $node = {
+            'is_subtree' => $is_subtree,
+            'parent' => $parent_node,
+            'path' => $path,
+            'params' => {},
+            'vars' => {},
+        };
+        
+        if( $is_subtree )
+        {
+            $node->{'children'} = {};
+        }
+    }
+    
+    $self->{'editing'} = $node;
+    $self->{'editing_node'} = $token;
+    
+    return $token;
+}
+
+
 
 sub setNodeParam
 {
@@ -126,131 +320,48 @@ sub setNodeParam
         $value =~ s/\s+//go;
     }
 
-    $self->{'paramcache'}{$name}{$param} = $value;
-    $self->{'db_dsconfig'}->put( 'P:'.$name.':'.$param, $value );
-    $self->{'db_dsconfig'}->addToList('Pl:'.$name, $param);
+    my $oldval = $self->{'editing'}{'params'}{$param};
+    if( not defined($oldval) or $oldval ne $value )
+    {
+        $self->{'editing'}{'params'}{$param} = $value;
+        $self->{'editing_dirty'} = 1;
+    }
+    
     return;
 }
 
 
-sub setParamProperty
-{
-    my $self = shift;
-    my $param = shift;
-    my $prop = shift;
-    my $value = shift;
-
-    $self->{'paramprop'}{$prop}{$param} = $value;
-    $self->{'db_paramprops'}->put( $param . ':' . $prop, $value );
-    return;
-}
-
-
-sub initRoot
+sub _add_child_token
 {
     my $self  = shift;
-    if( not defined( $self->token('/') ) )
+    my $ctoken  = shift;
+
+    if( not $self->{'editing'}{'is_subtree'} )
     {
-        my $token = $self->newToken();
-        $self->{'db_dsconfig'}->put( 'pt:/', $token );
-        $self->{'db_dsconfig'}->put( 'tp:'.$token, '/' );
-        $self->{'db_dsconfig'}->put( 'n:'.$token, 0 );
-        $self->{'nodetype_cache'}{$token} = 0;
-        $self->setNodeParam($token, 'tree-name', $self->treeName());
+        die($self->{'editing'}{'path'} . ' (' . $ctoken . ' is not a subtree');
+    }
+
+    if( not $self->{'editing'}{'children'}{$ctoken} )
+    {
+        $self->{'editing'}{'children'}{$ctoken} = 1;
+        $self->{'editing_dirty_children'} = 1;
     }
     return;
 }
+        
 
 sub addChild
 {
     my $self = shift;
     my $token = shift;
     my $childname = shift;
-    my $isAlias = shift;
 
-    if( not $self->isSubtree( $token ) )
-    {
-        Error('Cannot add a child to a non-subtree node: ' .
-              $self->path($token));
-        return undef;
-    }
+    my $path = $self->{'editing'}{'path'} . $childname;
+    my $ctoken = $self->token($path, 1);
 
-    my $path = $self->path($token) . $childname;
+    $self->_add_child_token($ctoken);
 
-    # If the child already exists, do nothing
-
-    my $ctoken = $self->token($path);
-    if( not defined($ctoken) )
-    {
-        $ctoken = $self->newToken();
-
-        $self->{'db_dsconfig'}->put( 'pt:'.$path, $ctoken );
-        $self->{'db_dsconfig'}->put( 'tp:'.$ctoken, $path );
-
-        $self->{'db_dsconfig'}->addToList( 'c:'.$token, $ctoken );
-        $self->{'db_dsconfig'}->put( 'p:'.$ctoken, $token );
-        $self->{'parentcache'}{$ctoken} = $token;
-
-        my $nodeType;
-        if( $isAlias )
-        {
-            $nodeType = 2; # alias
-        }
-        elsif( $childname =~ /\/$/o )
-        {
-            $nodeType = 0; # subtree
-        }
-        else
-        {
-            $nodeType = 1; # leaf
-        }
-        $self->{'db_dsconfig'}->put( 'n:'.$ctoken, $nodeType );
-        $self->{'nodetype_cache'}{$ctoken} = $nodeType;
-    }
     return $ctoken;
-}
-
-
-sub addView
-{
-    my $self = shift;
-    my $vname = shift;
-    my $parent = shift;
-    $self->{'db_otherconfig'}->addToList('V:', $vname);
-    if( defined( $parent ) )
-    {
-        $self->{'viewparent'}{$vname} = $parent;
-    }
-    return;
-}
-
-
-sub addMonitor
-{
-    my $self = shift;
-    my $mname = shift;
-    $self->{'db_otherconfig'}->addToList('M:', $mname);
-    return;
-}
-
-
-sub addAction
-{
-    my $self = shift;
-    my $aname = shift;
-    $self->{'db_otherconfig'}->addToList('A:', $aname);
-    return;
-}
-
-
-sub addDefinition
-{
-    my $self = shift;
-    my $name = shift;
-    my $value = shift;
-    $self->{'db_dsconfig'}->put( 'd:'.$name, $value );
-    $self->{'db_dsconfig'}->addToList('D:', $name);
-    return;
 }
 
 
@@ -262,8 +373,121 @@ sub setVar
     my $value = shift;
     
     $self->{'setvar'}{$token}{$name} = $value;
+
+    my $oldval = $self->{'editing'}{'vars'}{$name};
+    if( not defined($oldval) or $oldval ne $value )
+    {
+        $self->{'editing'}{'vars'}{$name} = $value;
+        $self->{'editing_dirty'} = 1;
+    }
+
     return;
 }
+
+
+sub commitNode
+{
+    my $self  = shift;
+    
+    if( not defined($self->{'editing'}) )
+    {
+        die('setOtherParam() called before editOther()');
+    }
+    if( not defined($self->{'editing_node'}) )
+    {
+        die('an object being edited is not a node');
+    }
+
+    my $sha_file = $self->_sha_file($self->{'editing_node'});
+    
+    if( $self->{'editing_dirty'} )
+    {
+        my $data = {
+            'is_subtree' => $self->{'editing'}{'is_subtree'},
+            'parent' => $self->{'editing'}{'parent'},
+            'path' => $self->{'editing'}{'path'},
+            'params' => $self->{'editing'}{'params'},
+            'vars' => $self->{'editing'}{'vars'},
+        };
+
+        $self->_write_json('nodes/' . $sha_file, $data);
+    }
+
+    if( $self->{'editing_dirty_children'} )
+    {
+        $self->_write_json('children/' . $sha_file,
+                           $self->{'editing'}{'children'});
+    }
+    
+    delete $self->{'editing'};
+    delete $self->{'editing_node'};
+    delete $self->{'editing_dirty'};
+    delete $self->{'editing_dirty_children'};
+    return;
+}
+
+
+
+
+sub setParamProperty
+{
+    my $self = shift;
+    my $param = shift;
+    my $prop = shift;
+    my $value = shift;
+
+    $self->{'paramprop'}{$prop}{$param} = $value;
+    return;
+}
+
+
+sub writeParamProps
+{
+    my $self = shift;
+    $self->_write_json('paramprops', $self->{'paramprop'});
+    return;
+}
+
+
+sub initRoot
+{
+    my $self  = shift;
+
+    my $token = $self->editNode('/');
+    $self->setNodeParam($token, 'tree-name', $self->treeName());
+    $self->commitNode();
+    return;
+}
+
+
+
+
+sub addView
+{
+    my $self = shift;
+    my $vname = shift;
+    my $parent = shift;
+
+    if( defined( $parent ) )
+    {
+        $self->{'viewparent'}{$vname} = $parent;
+    }
+    return;
+}
+
+
+
+sub addDefinition
+{
+    my $self = shift;
+    my $name = shift;
+    my $value = shift;
+
+    $self->_write_json('definitions/' . $name, $value);
+    return;
+}
+
+
 
 
 sub isTrueVar
@@ -273,17 +497,18 @@ sub isTrueVar
     my $name = shift;
 
     my $ret = 0;
-
-    while( defined( $token ) and
-           not defined( $self->{'setvar'}{$token}{$name} ) )
+    
+    while( $token ne '' and
+           not defined($self->{'setvar'}{$token}{$name}) )
     {
-        $token = $self->getParent( $token );
+        my $node = $self->_node_read($token);
+        $token = $node->{'parent'};
     }
-
-    if( defined( $token ) )
+    
+    if( $token ne '' )
     {
         my $value = $self->{'setvar'}{$token}{$name};
-        if( defined( $value ) )
+        if( defined($value) )
         {
             if( $value eq 'true' or
                 $value =~ /^\d+$/o and $value )
@@ -296,40 +521,8 @@ sub isTrueVar
     return $ret;
 }
 
-sub finalize
-{
-    my $self = shift;
-    my $status = shift;
 
-    if( $status )
-    {
-        # write delayed data
-        $self->{'db_dsconfig'}->commit();
-        $self->{'db_otherconfig'}->commit();    
-        
-        Verbose('Configuration has compiled successfully. Switching over to ' .
-             'DS config instance ' . $self->{'ds_config_instance'} .
-             ' and Other config instance ' .
-             $self->{'other_config_instance'} );
 
-        $self->setReady(1);
-        if( not $self->{'-NoDSRebuild'} )
-        {
-            $self->{'db_config_instances'}->
-                put( 'ds:' . $self->treeName(),
-                     $self->{'ds_config_instance'} );
-        }
-
-        $self->{'db_config_instances'}->
-            put( 'other:' . $self->treeName(),
-                 $self->{'other_config_instance'} );
-
-        Torrus::TimeStamp::init();
-        Torrus::TimeStamp::setNow($self->treeName() . ':configuration');
-        Torrus::TimeStamp::release();
-    }
-    return;
-}
 
 
 sub postProcess
@@ -342,8 +535,6 @@ sub postProcess
     $self->{'viewParamsProcessed'} = {};
     foreach my $vname ( $self->getViewNames() )
     {
-        &Torrus::DB::checkInterrupted();
-        
         $self->propagateViewParams( $vname );
     }
     return $ok;
@@ -355,8 +546,6 @@ sub postProcessNodes
 {
     my $self = shift;
     my $token = shift;
-
-    &Torrus::DB::checkInterrupted();
 
     my $ok = 1;
 
@@ -696,6 +885,42 @@ sub validate
 
     return $ok;
 }
+
+
+sub finalize
+{
+    my $self = shift;
+    my $status = shift;
+
+    if( $status )
+    {
+        my $branchname = $self->{'branch'};
+        my $branch = Git::Raw::Branch->lookup($self->{'repo'}, $branchname, 1);
+
+        my $me = $self->_signature();
+        my $parent = $branch->peel('commit');
+
+        my $tree = $self->{'gitindex'}->write_tree();
+        
+        my $commit = $self->{'repo'}->commit
+            (scalar(localtime(time())),
+             $me, $me, [$parent], $tree, $branch->name());
+
+        $self->{'redis'}->hset
+            ($self->{'redis_prefix'} . 'githeads',
+             $self->{'branch'},
+             $commit->id());
+
+        $self->{'redis'}->pub
+            ($self->{'redis_prefix'} . 'treecommits:' . $self->treeName(),
+             $commit->id());
+                
+        Verbose('Configuration has compiled successfully');
+    }
+    return;
+}
+
+
 
 
 1;

@@ -18,7 +18,7 @@
 #
 
 
-AC_INIT([torrus],[2.10dev],[ssinyagin@users.sourceforge.net])
+AC_INIT([torrus],[3.00dev],[ssinyagin@users.sourceforge.net])
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
@@ -34,6 +34,7 @@ AC_PATH_PROG(SED, sed, no)
 AC_PATH_PROG(FIND, find, no)
 AC_PATH_PROG(RM, rm, no)
 AC_PATH_PROG(SLEEP, sleep, no)
+AC_PATH_PROG(GIT, git, no)
 
 
 # This will generate doc pages from POD sources
@@ -96,8 +97,13 @@ AC_SUBST(perllibdirs, [${perllibdirs}])
 
 if test "$enable_pkgonly" != yes; then
 
+   if test ${GIT} -eq no; then
+     AC_MSG_ERROR([Git executable is required])
+   fi
+
    for module in 'Redis' 'Redis::DistLock' \
                  'Cache::Memcached::Fast' 'Git::Raw' \
+                 'Cache::Ref' \
                  'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \
                  'Date::Parse' 'JSON'
@@ -109,6 +115,14 @@ if test "$enable_pkgonly" != yes; then
          AC_MSG_ERROR([Perl cannot find $module]);
      fi
    done
+
+   AC_MSG_CHECKING([if Git::Raw is version 0.65 or higher])
+   if ${PERL} ${PERLOPTS} -e \
+     'use Git::Raw; exit($Git::Raw::VERSION >= 0.65 ? 0:1)'; then
+     AC_MSG_RESULT([Ok])
+   else
+     AC_MSG_ERROR([Git::Raw version 0.65 or higher is required]);
+   fi
 
 #  Check if Perl threads can be used.
 #  Requirements are: perl 5.8.8 with threads compiled,
@@ -290,13 +304,9 @@ AC_ARG_VAR(varprefix, [[/var/torrus] Common prefix for runtime data])
 if test -z "$varprefix"; then
    varprefix='/var/torrus'; fi
 
-AC_ARG_VAR(writerwd, [[VARPREFIX/gitwd/compiler] Compiler working dir])
-if test -z "$writerwd"; then
-   writerwd='${varprefix}/gitwd/compiler'; fi
-
-AC_ARG_VAR(readerwd, [[VARPREFIX/gitwd/reader] Reader working dir])
-if test -z "$readerwd"; then
-   readerwd='${varprefix}/gitwd/reader'; fi
+AC_ARG_VAR(gitrepodir, [[VARPREFIX/gitrepo] git repository dir])
+if test -z "$gitrepodir"; then
+   gitrepodir='${varprefix}/gitrepo'; fi
 
 AC_ARG_VAR(reportsdir, [[VARPREFIX/reports] Reports output])
 if test -z "$reportsdir"; then

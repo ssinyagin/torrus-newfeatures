@@ -85,8 +85,7 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
     -e "s,\@torrus_siteconfig_pl\@,$torrus_siteconfig_pl,g" \
     -e "s,\@torrus_user\@,@torrus_user@,g" \
     -e "s,\@webplaindir\@,@webplaindir@,g" \
-    -e "s,\@writerwd\@,@writerwd@,g" \
-    -e "s,\@readerwd\@,@readerwd@,g" \
+    -e "s,\@gitrepodir\@,@gitrepodir@,g" \
     $1
 
 # Local Variables:

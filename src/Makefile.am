@@ -71,8 +71,7 @@ mkvardir=@abs_top_builddir@/setup_tools/mkvardir.sh
 install-data-local:
 	@echo Testing if prefix has changed during make
 	test "$(prefix)" = "@prefix@"
-	$(mkvardir) $(DESTDIR)$(writerwd)
-	$(mkvardir) $(DESTDIR)$(readerwd)
+	$(mkvardir) $(DESTDIR)$(gitrepodir)
 	$(mkvardir) $(DESTDIR)$(piddir)
 	$(mkvardir) $(DESTDIR)$(reportsdir)
 	$(mkvardir) $(DESTDIR)$(logdir)

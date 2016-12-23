@@ -36,8 +36,7 @@ $Torrus::Global::reportsDir     = '@reportsdir@';
 $Torrus::Global::sesStoreDir    = '@sesstordir@';
 $Torrus::Global::sesLockDir     = '@seslockdir@';
 $Torrus::Global::webPlainDir    = '@webplaindir@';
-$Torrus::Global::writerWD       = '@writerwd@';
-$Torrus::Global::readerWD       = '@readerwd@';
+$Torrus::Global::gitRepoDir     = '@gitrepodir@';
 @Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
 
 $Torrus::Global::healthIconsDir = $Torrus::Global::stylingDir;
@@ -60,25 +59,21 @@ $Torrus::Global::memcachedServer = '127.0.0.1:11211';
 $Torrus::Global::memcachedPrefix = 'torrus:';
 
 
-
-# Git working directories for configtree and agents
-$Torrus::ConfigTree::writerConfigtreeWDsubdir = 'configtree';
-$Torrus::ConfigTree::writerAgentsWDsubdir = 'agents';
-$Torrus::ConfigTree::readerConfigtreeWDsubdir = 'configtree';
-$Torrus::ConfigTree::readerAgentsWDsubdir = 'agents';
-
-
-# If defined, the writer will push here
+# if true, push to the specified repo
+$Torrus::ConfigTree::writerPush = 0;
 $Torrus::ConfigTree::writerRemoteRepo = undef;
 
 $Torrus::ConfigTree::writerAuthorName = 'Torrus Compiler';
 $Torrus::ConfigTree::writerAuthorEmail = 'torrus@localhost';
 
 
-# If undefined, the reader will fetch from writer WD.
-# If defined, thereader will fetch from remote repo with bramch names as above
+# if true, push to the specified repo
+$Torrus::ConfigTree::readerPull = 0;
 $Torrus::ConfigTree::readerRemoteRepo = undef;
 
+$Torrus::ConfigTree::remoteName = 'torrus_remote';
+
+$Torrus::ConfigTree::objCacheSize = 2048;
 
 
 # How much the timestamps can differ in one RRD file, in seconds

@@ -29,7 +29,8 @@ use Git::Raw;
 use JSON;
 use File::Path qw(make_path);
 use Digest::SHA qw(sha1_hex);
-    
+use Cache::Ref::CART;
+
 use Torrus::Log;
 
 
@@ -50,327 +51,276 @@ sub new
     $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_prefix'} = $Torrus::Global::redisPrefix;
 
-    my $wd = $self->_configtree_wd_path();
-    
-    if( $self->{'iamwriter'} )
-    {
-        if( defined($Torrus::ConfigTree::writerRemoteRepo) )
-        {
-            $self->{'remote'} = $Torrus::ConfigTree::writerRemoteRepo;
-        }
-    }
-    else
-    {
-        if( defined($Torrus::ConfigTree::readerRemoteRepo) )
-        {
-            $self->{'remote'} = $Torrus::ConfigTree::readerRemoteRepo;
-        }
-        else
-        {
-            $self->{'remote'} = $self->_configtree_wd_path(1);
-        }
-    }
+    $self->{'json'} = JSON->new->canonical(1);
 
-    $self-{'wd'} = $wd;
-    
-    if( not -d $wd )
+    my $repodir = $Torrus::Global::gitRepoDir;
+    if( defined($options{'-RepoDir'}) )
     {
-        $self->_lock_wd();
-        if( not -d $wd )
+        $repodir = $options{'-RepoDir'};
+    }
+    
+    $self->{'repodir'} = $repodir;
+    $self->{'branch'} = $treename . '_configtree';
+        
+    if( not -e $repodir . '/config' )
+    {
+        $self->_lock_repodir();
+        if( not -e $repodir . '/config' )
         {
-            $self->{'fresh_wd'} = 1;
+            Debug("Initializing the Git repository in $repodir");
+            my $repo = Git::Raw::Repository->init($repodir, 1);
+            my $remote_url;
+            
             if( $self->{'iamwriter'} )
             {
-                $self->_init_new_writer_wd
-                    ($wd, $self->_configtree_branch_name());
+                if( $Torrus::ConfigTree::writerPush )
+                {
+                    $remote_url = $Torrus::ConfigTree::writerRemoteRepo;
+                }
             }
             else
             {
-                if( defined($self->_treehead()) )
+                if( $Torrus::ConfigTree::readerPull )
                 {
-                    $self->{'head'} = $self->_init_new_reader_wd
-                        ($wd, $self->_configtree_branch_name());
-                }
-                else
-                {
-                    # the writer has not yet initialized the tree
-                    $self->{'config_not_ready'} = 1;
+                    $remote_url = $Torrus::ConfigTree::readerRemoteRepo;
                 }
             }
-        }
-        $self->_unlock_wd();
-    }
 
-    # prepare the agent WD for writer
-    if( $self->{'iamwriter'} )
-    {
-        foreach my $agent ('collector', 'monitor')
-        {
-            my $nInstances =
-                Torrus::SiteConfig::agentInstances( $treename, $agent );
-            for( my $instance = 0; $instance < $nInstances; $instance++ )
+            if( defined($remote_url) )
             {
-                my $awd = $self->_agent_wd_path($agent, $instance);
-                if( not -d $awd )
-                {
-                    $self->_init_new_writer_wd
-                        ($awd, $self->_agent_branch_name($agent, $instance));
-                }
+                Git::Raw::Remote->create($repo,
+                                         $Torrus::ConfigTree::remoteName
+                                         $remote_url);
             }
         }
+        $self->_unlock_repodir();
     }
 
-    # Reader needs to know the current HEAD
     if( not $self->{'iamwriter'} )
     {
-        if( not $self->{'fresh_wd'} )
+        my $head = $self->_branchhead();
+        if( not defined($head) )
         {
-            my $repo = Git::Raw::Repository->open($wd);
-            my $branch = Git::Raw::Branch->lookup
-                ($repo, $self->_configtree_branch_name(), 1);
-            my $usref = $branch->upstream();
-            die('Expected a valid upstream') unless defined($usref);
-            
-
-             and $options{'-Pull'} )
+            # the writer has not yet write to its branch
+            return undef;
         }
+
+        if( not $self->gotoHead() )
+        {
+            # could not retrieve the head commit
+            return undef;
+        }            
     }
-    
-    if( $self->{'config_not_ready'} )
-    {
-        return undef;
-    }
-    
-    $self->{'cache'} =
+
+    $self->{'paramprop'} = $self->_read_json('paramprops');
+    $self->{'paramprop'} = {} unless defined($self->{'paramprop'});
+        
+    $self->{'extcache'} =
         new Cache::Memcached::Fast({
             servers => [{ 'address' => $Torrus::Global::memcachedServer,
                           'noreply' => 1 }],
             namespace => $Torrus::Global::memcachedPrefix});
-        
+
+    $self->{'objcache'} = Cache::Ref::CART->new
+        ( size => $Torrus::ConfigTree::objCacheSize );
+    
     return $self;
 }
 
 
-sub _configtree_wd_path
+
+
+sub _branchhead
 {
     my $self = shift;
-    my $iswriter = shift;
+    return $self->{'redis'}->hget
+        ($self->{'redis_prefix'} . 'githeads', $self->{'branch'});
+}
 
-    $iswriter = $self->{'iamwriter'} unless defined($iswriter);
 
-    if( $iswriter )
+
+sub _lock_repodir
+{
+    my $self = shift;
+
+    if( not defined($self->{'distlock'}) )
     {
-        return $Torrus::Global::writerWD . '/' .
-            $self->{'treename'} . '/' .
-            $Torrus::ConfigTree::writerConfigtreeWDsubdir;
-            
-    }
-    else
-    {
-        return $Torrus::Global::readerWD . '/' .
-            $self->{'treename'} . '/' .
-            $Torrus::ConfigTree::readerConfigtreeWDsubdir;
-    }
-}
-
-
-sub _agent_instance_name
-{
-    my $self = shift;
-    my $agent = shift;
-    my $instance = shift;
-
-    return sprintf('%s_%.4x', $agent, $instance);
-}
-
-
-sub _agent_wd_path
-{
-    my $self = shift;
-    my $agent = shift;
-    my $instance = shift;
-    my $iswriter = shift;
-
-    $iswriter = $self->{'iamwriter'} unless defined($iswriter);
-    
-    if( $iswriter )
-    {
-        return $Torrus::Global::writerWD . '/' .
-            $self->{'treename'} . '/' .
-            $Torrus::ConfigTree::writerAgentsWDsubdir . '/' .
-            $self->_agent_instance_name($agent, $instance);
-    }
-    else
-    {
-        return $Torrus::Global::readerWD . '/' .
-            $self->{'treename'} . '/' .
-            $Torrus::ConfigTree::readerAgentsWDsubdir . '/' .
-            $self->_agent_instance_name($agent, $instance);
-    }
-}
-
-
-sub _configtree_branch_name
-{
-    my $self = shift;
-    return $self->{'treename'} . '_configtree';
-}
-
-
-sub _agent_branch_name
-{
-    my $self = shift;
-    my $agent = shift;
-    my $instance = shift;
-    
-    return $self->{'treename'} . '_' .
-        $self->_agent_instance_name($agent, $instance);
-}
-    
-
-sub _signature
-{
-    return Git::Raw::Signature->now
-        ($Torrus::ConfigTree::writerAuthorName,
-         $Torrus::ConfigTree::writerAuthorEmail);
-}
-
-
-
-sub _init_new_writer_wd
-{
-    my $self = shift;
-    my $dir = shift;
-    my $branchname = shift;
-    
-    Debug("Initializing a writer working directory in $dir");
-    make_path($dir) or die("Cannot create $dir: $!");
-    
-    if( defined($self->{'remote'}) )
-    {
-        # first, try to check out an existing branch
-        Debug('Trying to clone branch ' . $branchname .
-              ' from ' . $self->{'remote'});
-        eval {
-            Git::Raw::Repository->clone
-                ($self->{'remote'}, $dir,
-                 {'checkout_branch' => $self->{'remote_branch'}});
-            Debug('OK');
-        };
-        
-        if( not $@ )
-        {
-            return;
-        }
-        Debug('Could not clone: ' . $@);
-    }
-            
-    Debug("Creating an empty repo in $dir");
-    my $repo = Git::Raw::Repository->init($dir);
-    
-    my $index = $repo->index;
-    $index->write;
-    my $tree = $index->write_tree;
-    my $me = $self->_signature();
-    
-    $repo->commit('Initial empty commit', $me, $me, [], $tree);
-
-    my $branch = Git::Raw::Branch->lookup($repo, 'master', 1);
-    $branch->move($branchname, 1);
-    
-
-    if( defined($self->{'remote'}) )
-    {
-        Debug('Adding a remote for pushing: ' . $self->{'remote'}); 
-        my $remote =
-            Git::Raw::Remote->create($repo, 'origin', $self->{'remote'});
-
-        $remote->push(['refs/heads/master:refs/heads/' . $branchname]);
-        my $br = Git::Raw::Branch->lookup( $repo, 'master', 1 );
-        my $ref = Git::Raw::Reference->lookup
-            ('refs/remotes/origin/' $branchname, $repo);
-        $br->upstream($ref);
-    }                
-    
-    return;
-}
-
-
-
-sub _init_new_reader_wd
-{
-    my $self = shift;
-    my $dir = shift;
-    my $branchname = shift;
-
-    Debug("Setting up a reader working directory in $dir");
-    Debug('Cloning branch ' . $branchname . 'from ' . $self->{'remote'});
-    
-    my $repo = Git::Raw::Repository->clone
-        ($self->{'remote'}, $dir, {'checkout_branch' => $branchname});
-
-    return $repo->head->target->id;
-}
-
-
-sub _treehead
-{
-    my $self = shift;
-
-    return $self->{'redis'}->get
-        ($self->{'redis_prefix'} . 'treehead:' . $self->treeName());
-}
-
-
-
-sub _lock_wd
-{
-    my $self = shift;
-    my $dir = shift;
-
-    if( not defined($self->{'wd_rd'}) )
-    {
-        $self->{'wd_rd'} = Redis::DistLock->new
+        $self->{'distlock'} = Redis::DistLock->new
             ( servers => [$Torrus::Global::redisServer] );
     }
     
-    Debug('Acquiring a lock for ' . $dir);
+    Debug('Acquiring a lock for ' . $self->{'repodir'});
     my $lock =
-        $self->{'wd_rd'}->lock($self->{'redis_prefix'} . 'wdlock:' . $dir,
-                               7200);
+        $self->{'distlock'}->lock($self->{'redis_prefix'} .
+                                  'gitlock:' . $self->{'repodir'},
+                                  7200);
     if( not defined($lock) )
     {
-        die('Failed to acquire a lock for ' . $dir);
+        die('Failed to acquire a lock for ' . $self->{'repodir'});
     }
     
-    $self->{'wd_mutex'} = $lock;
+    $self->{'mutex'} = $lock;
     return;
 }
 
 
-sub _unlock_wd
+sub _unlock_repodir
 {
     my $self = shift;
-    $self->{'wd_rd'}->release($self->{'wd_mutex'});
-    delete $self->{'wd_mutex'};        
+    
+    Debug('Releasing the lock for ' . $self->{'repodir'});
+    
+    $self->{'distlock'}->release($self->{'mutex'});
+    delete $self->{'mutex'};        
     return;
 }
 
 
-sub _node_file
+sub _sha_file
+{
+    my $self = shift;
+    my $sha = shift;
+    return join('/', substr($sha, 0, 2), substr($sha, 2, 2), substr($sha, 4));
+}
+
+
+my _read_file
+{
+    my $self = shift;
+    my $filename = shift;
+
+    if( defined($self->{'gitindex'}) )
+    {
+        my $entry = $self->{'gitindex'}->find($filename);
+        if( defined($entry) )
+        {
+            return $entry->blob();
+        }
+        else
+        {
+            return undef;
+        }
+    }
+    else
+    {
+        my $entry = $self->{'gittree'}->entry_bypath($filename);
+        if( defined($entry) )
+        {
+            return $entry->object()->content();
+        }
+        else
+        {
+            return undef;
+        }
+    }
+}
+
+
+my _read_json
+{
+    my $self = shift;
+    my $filename = shift;
+    
+    my $blob = $self->_read_file($filename);
+    if( defined($blob) )
+    {
+        return $self->{'json'}->decode($blob);
+    }
+    else
+    {
+        return undef;
+    }
+}
+
+
+        
+sub _node_read
 {
     my $self = shift;
     my $token = shift;
 
-    return join('/', $self-{'wd'}, 'nodes', substr($token, 0, 2), 
-                substr($token, 2, 2), $token);
+    my $ret = $self->{'objcache'}->get($token);
+    if( not defined($ret) )
+    {
+        my $sha_file = $self->_sha_file($token);
+    
+        $ret = $self->_read_json('nodes/' . $sha_file);
+        if( not defined($ret) )
+        {
+            return undef;
+        }
+
+        if( $ret->{'is_subtree'} )
+        {
+            my $children = $self->_read_json('children/' . $sha_file);
+            die('Cannot find list of children for ' . $token)
+                unless defined($children);
+            $ret->{'children'} = $children;
+        }
+
+        $self->{'objcache'}->set($token => $ret);
+    }
+    
+    return $ret;
 }
 
 
-sub getTimestamp
+sub _other_read
 {
-    die('getTimestamp is deprecated');
+    my $self = shift;
+    my $name = shift;
+
+    my $ret = $self->{'objcache'}->get($name);
+    if( not defined($ret) )
+    {
+        $ret = $self->_read_json('other/' . $name);
+        if( defined($ret) )
+        {
+            $self->{'objcache'}->set($name => $ret);
+        }
+    }
+    
+    return $ret;
 }
+
+
+sub _node_file_exists
+{
+    my $self = shift;
+    my $token = shift;
+
+    if( defined($self->{'gitindex'}) )
+    {
+        return defined($self->{'gitindex'}->find($filename));
+    }
+    else
+    {
+        return defined($self->{'gittree'}->entry_bypath($filename));
+    }
+}    
+
+
+sub gotoHead
+{
+    my $self = shift;
+
+    my $head = $self->_branchhead();
+    return 0 unless defined($head);
+
+    if( not defined($self->{'repo'}) )
+    {
+        $self->{'repo'} = Git::Raw::Repository->open($self->{'repodir'});
+    }
+
+    my $commit = Git::Raw::Commit->lookup($self->{'repo'}, $head);
+    die("Cannot lookup commit $head") unless defined($commit);
+    
+    $self->{'gittree'} = $commit->tree();
+    return 1;
+}
+
+
+
 
 sub treeName
 {
@@ -388,14 +338,16 @@ sub nodeName
     return $path;
 }
 
-
+    
+    
 sub token
 {
     my $self = shift;
     my $path = shift;
+    my $nocheck = shift;
 
     my $token = sha1_hex($self->{'treename'} . ':' . $path);
-    if( -f $self->_node_file($token) )
+    if( $nocheck or $self->_node_file_exists($token) )
     {
         return $token;
     }
@@ -409,35 +361,20 @@ sub path
 {
     my $self = shift;
     my $token = shift;
-    return $self->{'db_dsconfig'}->get( 'tp:'.$token );
+
+    my $node = $self->_node_read($token);
+    return $node->{'path'};
 }
+
 
 sub nodeExists
 {
     my $self = shift;
     my $path = shift;
 
-    return defined( $self->{'db_dsconfig'}->get( 'pt:'.$path ) );
+    return defined( $self->token($path) );
 }
 
-
-sub nodeType
-{
-    my $self = shift;
-    my $token = shift;
-
-    my $type = $self->{'nodetype_cache'}{$token};
-    if( not defined( $type ) )
-    {
-        $type = $self->{'db_dsconfig'}->get( 'n:'.$token );
-        if( not defined( $type ) )
-        {
-            $type = -1;
-        }
-        $self->{'nodetype_cache'}{$token} = $type;
-    }
-    return $type;
-}
     
 
 sub isLeaf
@@ -445,7 +382,8 @@ sub isLeaf
     my $self = shift;
     my $token = shift;
 
-    return ( $self->nodeType($token) == 1 );
+    my $node = $self->_node_read($token);
+    return( not $node->{'is_subtree'} );
 }
 
 
@@ -454,30 +392,48 @@ sub isSubtree
     my $self = shift;
     my $token = shift;
 
-    return( $self->nodeType($token) == 0 );
+    my $node = $self->_node_read($token);
+    return( not $node->{'is_subtree'} );
 }
 
 
 
-sub getParam
+sub getOtherParam
 {
     my $self = shift;
     my $name = shift;
     my $param = shift;
-    my $fromDS = shift;
 
-    if( exists( $self->{'paramcache'}{$name}{$param} ) )
+    my $obj = $self->_other_read($name);
+    
+    if( defined($obj) )
     {
-        return $self->{'paramcache'}{$name}{$param};
+        return $obj->{'params'}{$param};
     }
     else
     {
-        my $db = $fromDS ? $self->{'db_dsconfig'} : $self->{'db_otherconfig'};
-        my $val = $db->get( 'P:'.$name.':'.$param );
-        $self->{'paramcache'}{$name}{$param} = $val;
-        return $val;
+        return undef;
     }
 }
+
+
+sub _read_node_param
+{
+    my $self = shift;
+    my $token = shift;
+    my $param = shift;
+
+    my $node = $self->_node_read($token);
+    if( defined($node) )
+    {
+        return $node->{'params'}{$param};
+    }
+    else
+    {
+        return undef;
+    }
+}
+
 
 sub retrieveNodeParam
 {
@@ -494,7 +450,7 @@ sub retrieveNodeParam
     
     while( not defined($value) and defined($currtoken) )
     {
-        $value = $self->getParam( $currtoken, $param, 1 );
+        $value = $self->_read_node_param( $currtoken, $param );
         if( not defined $value )
         {
             if( $walked )
@@ -512,9 +468,13 @@ sub retrieveNodeParam
 
     foreach my $ancestor ( @ancestors )
     {
-        $self->{'paramcache'}{$ancestor}{$param} = $value;
+        my $node = $self->{'objcache'}->get($ancestor);
+        if( defined($node) )
+        {
+            $node->{'params'}{$param} = $value;
+        }
     }
-    
+
     return $self->expandNodeParam( $token, $param, $value );
 }
 
@@ -626,7 +586,7 @@ sub getNodeParam
     my $value;
     if( $noclimb )
     {
-        $value = $self->getParam( $token, $param, 1 );
+        $value = $self->_read_node_param( $token, $param );
         return $self->expandNodeParam( $token, $param, $value );
     }
 
@@ -635,8 +595,8 @@ sub getNodeParam
         return $self->retrieveNodeParam( $token, $param );
     }
 
-    my $cachekey = $token.':'.$param;
-    my $cacheval = $self->{'db_nodepcache'}->get( $cachekey );
+    my $cachekey = 'np:' . $token . ':' . $param;
+    my $cacheval = $self->{'extcache'}->get($cachekey);
     if( defined( $cacheval ) )
     {
         my $status = substr( $cacheval, 0, 1 );
@@ -654,57 +614,71 @@ sub getNodeParam
 
     if( defined( $value ) )
     {
-        $self->{'db_nodepcache'}->put( $cachekey, 'D'.$value );
+        $self->{'extcache'}->set( $cachekey, 'D'.$value );
     }
     else
     {
-        $self->{'db_nodepcache'}->put( $cachekey, 'U' );
+        $self->{'extcache'}->set( $cachekey, 'U' );
     }
 
     return $value;
 }
 
 
-sub getParamNames
+
+
+sub getOtherParams
 {
     my $self = shift;
     my $name = shift;
-    my $fromDS = shift;
 
-    my $db = $fromDS ? $self->{'db_dsconfig'} : $self->{'db_otherconfig'};
-
-    return $db->getListItems('Pl:'.$name);
-}
-
-
-sub getParams
-{
-    my $self = shift;
-    my $name = shift;
-    my $fromDS = shift;
-
-    my $ret = {};
-    foreach my $param ( $self->getParamNames( $name, $fromDS ) )
+    my $obj = $self->_other_read($name);
+    
+    if( defined($obj) )
     {
-        $ret->{$param} = $self->getParam( $name, $param, $fromDS );
+        return $obj->{'params'};
     }
-    return $ret;
+    else
+    {
+        return {};
+    }
 }
+
+
+sub getNodeParams
+{
+    my $self = shift;
+    my $token = shift;
+
+    my $obj = $self->_node_read($token);
+    
+    if( defined($obj) )
+    {
+        return $obj->{'params'};
+    }
+    else
+    {
+        return {};
+    }
+}
+
+
 
 sub getParent
 {
     my $self = shift;
     my $token = shift;
-    if( exists( $self->{'parentcache'}{$token} ) )
+
+    my $node = $self->_node_read($token);
+    my $parent = $node->{'parent'};
+    if( $parent eq '' )
     {
-        return $self->{'parentcache'}{$token};
+        return undef;
     }
     else
     {
-        my $parent = $self->{'db_dsconfig'}->get( 'p:'.$token );
-        $self->{'parentcache'}{$token} = $parent;
         return $parent;
-    }
+    }    
 }
 
 
@@ -713,15 +687,24 @@ sub getChildren
     my $self = shift;
     my $token = shift;
 
-    if( (my $alias = $self->isAlias($token)) )
+    my $node = $self->_node_read($token);
+    if( not $node->{'is_subtree'} )
     {
-        return $self->getChildren($alias);
+        return;
     }
-    else
+    
+    my @ret;
+    while( my ($key, $val) = each %{$node->{'children'}} )
     {
-        return $self->{'db_dsconfig'}->getListItems( 'c:'.$token );
+        if($val)
+        {
+            push(@ret, $key);
+        }
     }
+
+    return @ret;
 }
+
 
 sub getParamProperty
 {

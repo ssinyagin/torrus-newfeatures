@@ -9,8 +9,9 @@ New perl modules required:
   Redis
   Redis::DistLock
   Cache::Memcached::Fast
-  Git::Raw
+  Git::Raw (version 0.65 or higher)
   Digest::SHA
+  Cache::Ref
 
 Perl modules not needed:
   BerkeleyDB

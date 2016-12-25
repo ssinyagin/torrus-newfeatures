@@ -155,10 +155,16 @@ is stored as C<b7/ba/0d88a0b14a4e6c3c61f5446aa619a537098f>.
 =item * C<srcrev>: A file containing a JSON scalar referring to the
   commit in XML sources.
 
-=item * C<nodeid/>: two-level 256-way directory structure. Each file is a
-  SHA-1 digest of the tree name, followed by semicolon, and the
-  I<nodeid> value. The content of the file is a JSON scalar indicating
-  the node token.
+=item * C<nodeid/>: two-level 256-way directory structure. Each file is
+  a SHA-1 digest of I<nodeid> value. The content of the file is a JSON
+  array of the nodeid value and node token.
+
+=item * C<nodeidpx/>: I<nodeid> prefix searching database. Each
+  I<nodeid> value is split by standard delimiters (two consecutive
+  slashes), and each resulting prefix is used to build a key in this
+  hierarchy. Two-level 256-way directory structure is built from SHA-1
+  digests of these keys. The directories contain zero-length files
+  representing the SHA-1 digests of I<nodeid> values.
 
 =item * C<definitions/>: each file is a definition name, and the content
   is a JSON scalar returning the definition value.

@@ -51,7 +51,7 @@ sub new
     $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_prefix'} = $Torrus::Global::redisPrefix;
 
-    $self->{'json'} = JSON->new->canonical(1);
+    $self->{'json'} = JSON->new->canonical(1)->allow_nonref(1);
 
     my $repodir = $Torrus::Global::gitRepoDir;
     if( defined($options{'-RepoDir'}) )
@@ -396,6 +396,15 @@ sub isSubtree
     return( not $node->{'is_subtree'} );
 }
 
+
+sub isRoot
+{
+    my $self = shift;
+    my $token = shift;
+    
+    my $node = $self->_node_read($token);
+    return( $node->{'parent'} eq '');
+}
 
 
 sub getOtherParam
@@ -756,7 +765,7 @@ sub getRelative
             if( $relPath =~ /^\.\.\//o )
             {
                 $relPath =~ s/^\.\.\///o;
-                if( $token ne $self->token('/') )
+                if( not $self->isRoot($token) )
                 {
                     $token = $self->getParent( $token );
                 }
@@ -786,12 +795,37 @@ sub getRelative
 }
 
 
+sub _nodeid_sha_file
+{
+    my $self = shift;
+    my $nodeid = shift;
+
+    return ('nodeid/' . $self->_sha_file(sha1_hex($nodeid)));
+}
+
+sub _nodeidpx_sha_dir
+{
+    my $self = shift;
+    my $prefix = shift;
+
+    return ('nodeidpx/' . $self->_sha_file(sha1_hex($prefix)) . '/');
+}
+
+
 sub getNodeByNodeid
 {
     my $self = shift;
     my $nodeid = shift;
 
-    return $self->{'db_nodeid'}->get( $nodeid );
+    my $result = $self->_read_json( $self->_nodeid_sha_file($nodeid) );
+    if( defined($result) )
+    {
+        return $result->[1];
+    }
+    else
+    {
+        return undef;
+    }
 }
 
 # Returns arrayref or undef.
@@ -801,7 +835,24 @@ sub searchNodeidPrefix
     my $self = shift;
     my $prefix = shift;
 
-    return $self->{'db_nodeid'}->searchPrefix( $prefix );
+    $prefix =~ s/\/\/$//; # remove trailing separator if any
+    my $dir = $self->_nodeidpx_sha_dir($prefix);
+
+    my $tree_entry = $self->{'gittree'}->entry_bypath($dir);
+    return undef unless defined($tree_entry);
+
+    my $dir_tree = $tree_entry->onject();
+    die('Expected a tree object') unless $dir_tree->is_tree();
+
+    my @ret;
+    foreach my $entry ($dir_tree->entries())
+    {
+        push(@ret,
+             $self->{'json'}->decode(
+                 $entry->object()->content()));
+    }
+    
+    return @ret;
 }
 
 

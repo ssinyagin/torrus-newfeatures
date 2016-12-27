@@ -828,7 +828,7 @@ sub getNodeByNodeid
     }
 }
 
-# Returns arrayref or undef.
+# Returns arrayref.
 # Each element is an arrayref to [nodeid, token] pair
 sub searchNodeidPrefix
 {
@@ -841,29 +841,61 @@ sub searchNodeidPrefix
     my $tree_entry = $self->{'gittree'}->entry_bypath($dir);
     return undef unless defined($tree_entry);
 
-    my $dir_tree = $tree_entry->onject();
+    my $dir_tree = $tree_entry->object();
     die('Expected a tree object') unless $dir_tree->is_tree();
 
-    my @ret;
+    my $ret = [];
     foreach my $entry ($dir_tree->entries())
     {
-        push(@ret,
+        push(@{$ret},
              $self->{'json'}->decode(
                  $entry->object()->content()));
     }
     
-    return @ret;
+    return $ret;
 }
 
 
-# Returns arrayref or undef.
+# Returns arrayref.
 # Each element is an arrayref to [nodeid, token] pair
 sub searchNodeidSubstring
 {
     my $self = shift;
     my $substring = shift;
 
-    return $self->{'db_nodeid'}->searchSubstring( $substring );
+    my $top_entry = $self->{'gittree'}->entry_bypath('nodeid');
+    die('Cannot find nodeid/ tree entry') unless defined($top_entry);
+
+    my $top_tree = $top_entry->object();
+    die('Expected a tree object') unless $top_tree->is_tree();
+
+    my $ret = [];
+    foreach my $l1entry ($top_tree->entries())
+    {
+        my $l1tree = $l1entry->object();
+        die('Expected a tree object') unless $l1tree->is_tree();
+        
+        foreach my $l2entry ($l1tree->entries())
+        {
+            my $l2tree = $l2entry->object();
+            die('Expected a tree object') unless $l2tree->is_tree();
+
+            foreach my $l3entry ($l2tree->entries())
+            {
+                my $l3blob = $l3entry->object();
+                die('Expected a blob object') unless $l3blob->is_blob();
+
+                my $data = $self->{'json'}->decode($l3blob->content());
+
+                if( index($data->[0], $substring) > 0 )
+                {
+                    push(@{$ret}, $data);
+                }
+            }
+        }
+    }
+    
+    return $ret;
 }
 
 
@@ -878,14 +910,14 @@ sub getDefaultView
     {
         if( $token eq 'SS' )
         {
-            $view = $self->getParam('SS', 'default-tsetlist-view');
+            $view = $self->getOtherParam('SS', 'default-tsetlist-view');
         }
         else
         {
-            $view = $self->getParam($token, 'default-tset-view');
+            $view = $self->getOtherParam($token, 'default-tset-view');
             if( not defined( $view ) )
             {
-                $view = $self->getParam('SS', 'default-tset-view');
+                $view = $self->getOtherParam('SS', 'default-tset-view');
             }
         }
     }
@@ -920,15 +952,53 @@ sub getInstanceParam
     }
     else
     {
-        return $self->getParam($name, $param);
+        return $self->getOtherParam($name, $param);
     }
+}
+
+
+sub _other_object_names
+{
+    my $self = shift;
+    my $filename = shift;
+
+    my @ret;
+    my $data = $self->_read_json('other/' . $filename);
+    if( defined($data) )
+    {
+        foreach my $name ( keys %{$data} )
+        {
+            if( $data->{$name} )
+            {
+                push(@ret, $name);
+            }
+        }
+    }
+    
+    return @ret;
+}
+
+sub _other_object_exists
+{
+    my $self = shift;
+    my $filename = shift;
+    my $objname = shift;
+    
+    my $data = $self->_read_json('other/' . $filename);
+    
+    if( defined($data) )
+    {
+        return $data->{$objname};
+    }
+    
+    return undef;
 }
 
 
 sub getViewNames
 {
     my $self = shift;
-    return $self->{'db_otherconfig'}->getListItems( 'V:' );
+    return $self->_other_object_names('__VIEWS__');
 }
 
 
@@ -936,48 +1006,40 @@ sub viewExists
 {
     my $self = shift;
     my $vname = shift;
-    return $self->searchOtherList('V:', $vname);
+    return $self->_other_object_exists('__VIEWS__', $vname);
 }
 
 
 sub getMonitorNames
 {
     my $self = shift;
-    return $self->{'db_otherconfig'}->getListItems( 'M:' );
+    return $self->_other_object_names('__MONITORS__');
 }
+
 
 sub monitorExists
 {
     my $self = shift;
     my $mname = shift;
-    return $self->searchOtherList('M:', $mname);
+    return $self->_other_object_exists('__MONITORS__', $mname);
 }
 
 
 sub getActionNames
 {
     my $self = shift;
-    return $self->{'db_otherconfig'}->getListItems( 'A:' );
+    return $self->_other_object_names('__ACTIONS__');
 }
 
 
 sub actionExists
 {
     my $self = shift;
-    my $mname = shift;
-    return $self->searchOtherList('A:', $mname);
+    my $aname = shift;
+    return $self->_other_object_exists('__ACTIONS__', $aname);
 }
 
 
-# Search for a value in comma-separated list
-sub searchOtherList
-{
-    my $self = shift;
-    my $key = shift;
-    my $name = shift;
-
-    return $self->{'db_otherconfig'}->searchList($key, $name);
-}
 
 # Token sets manipulation
 
@@ -992,22 +1054,21 @@ sub addTset
 {
     my $self = shift;
     my $tset = shift;
-    $self->{'db_sets'}->addToList('S:', $tset);
+    $self->{'redis'}->hset('tsets:' . $self->treeName(), $tset, '1');
     return;
 }
-
 
 sub tsetExists
 {
     my $self = shift;
     my $tset = shift;
-    return $self->{'db_sets'}->searchList('S:', $tset);
+    return $self->{'redis'}->hget('tsets:' . $self->treeName(), $tset) ? 1:0;
 }
 
 sub getTsets
 {
     my $self = shift;
-    return $self->{'db_sets'}->getListItems('S:');
+    return $self->{'redis'}->hkeys('tsets:' . $self->treeName());
 }
 
 sub tsetMembers
@@ -1015,7 +1076,7 @@ sub tsetMembers
     my $self = shift;
     my $tset = shift;
 
-    return $self->{'db_sets'}->getListItems('s:'.$tset);
+    return $self->{'redis'}->hkeys('tset:' . $self->treeName() . ':' . $tset);
 }
 
 sub tsetMemberOrigin
@@ -1024,7 +1085,8 @@ sub tsetMemberOrigin
     my $tset = shift;
     my $token = shift;
     
-    return $self->{'db_sets'}->get('o:'.$tset.':'.$token);
+    return $self->{'redis'}->hget('tset:' . $self->treeName() . ':' . $tset,
+                                  $token);
 }
 
 sub tsetAddMember
@@ -1034,8 +1096,9 @@ sub tsetAddMember
     my $token = shift;
     my $origin = shift;
 
-    $self->{'db_sets'}->addToList('s:'.$tset, $token);
-    $self->{'db_sets'}->put('o:'.$tset.':'.$token, $origin);
+    $self->{'redis'}->hget('tset:' . $self->treeName() . ':' . $tset,
+                           $token,
+                           $origin);
     return;
 }
 
@@ -1046,8 +1109,8 @@ sub tsetDelMember
     my $tset = shift;
     my $token = shift;
 
-    $self->{'db_sets'}->delFromList('s:'.$tset, $token);
-    $self->{'db_sets'}->del('o:'.$tset.':'.$token);
+    $self->{'redis'}->hdel('tset:' . $self->treeName() . ':' . $tset,
+                           $token);
     return;
 }
 
@@ -1057,13 +1120,28 @@ sub getDefinition
 {
     my $self = shift;
     my $name = shift;
-    return $self->{'db_dsconfig'}->get( 'd:'.$name );
+
+    return $self->_read_json('definitions/' . $name);
 }
 
 sub getDefinitionNames
 {
     my $self = shift;
-    return $self->{'db_dsconfig'}->getListItems( 'D:' );
+
+    my @ret;
+    my $tree_entry = $self->{'gittree'}->entry_bypath('definitions');
+    return undef unless defined($tree_entry);
+
+    my $dir_tree = $tree_entry->object();
+    die('Expected a tree object') unless $dir_tree->is_tree();
+
+    foreach my $entry ($dir_tree->entries())
+    {
+        push(@ret, $entry->name());
+    }
+    
+
+    return @ret;
 }
 
 

@@ -171,7 +171,10 @@ is stored as C<b7/ba/0d88a0b14a4e6c3c61f5446aa619a537098f>.
 
 =item * C<other/>: JSON objects for views, monitors, and actions
   definitions. Files are named after the view, monitor, or action name,
-  and the content is a hash with parameters defining each object.
+  and the content is a hash with parameters defining each object. The
+  following special files are JSON hashes of object names and "1" as
+  values of corresponding types: C<__VIEWS__>, C<__MONITORS__>,
+  C<__ACTIONS__>.
 
 =item * C<paramprops>: a single JSON file defining parameter properties
   in two-level hash.
@@ -253,11 +256,12 @@ reading.
   process compares this with the current known commit and pulls the
   updates if needed.
 
-=item * C<tsets:I<TREE>> -- list of tokenset names.
+=item * C<tsets:I<TREE>> -- hash of tokenset names as keys and "1" as
+  values.
 
 =item * C<tset:I<TREE>:I<TSET>> -- hash of tokenset members. Tokens are
-  the keys, and the values are "S" for static, "M" for monitor,
-  indicating their origins.
+  the keys, and the values indicate the origins. Currently known origins
+  are "static" and "monitor".
 
 =item * C<tsetparam:I<TREE>:I<TSET>> -- a hash of tokenset parameters.
 

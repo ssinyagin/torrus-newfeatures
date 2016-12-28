@@ -36,6 +36,8 @@ use Digest::MD5 qw(md5); # needed as hash function
 use POSIX; # we use ceil() from here
 use Digest::SHA qw(sha1_hex);
 
+$Carp::Verbose = 1;
+
 our %multigraph_remove_space =
     ('ds-expr-' => 1,
      'graph-legend-' => 0);
@@ -75,11 +77,12 @@ sub new
         $builder->clear();
         my $tree = $builder->write();
         my $me = $self->_signature();
-        my $refname = 'refs/heads/' / $branchname;
+        my $refname = 'refs/heads/' . $branchname;
         my $commit = $repo->commit("Initial empty commit in $branchname" ,
                                    $me, $me, [], $tree, $refname);
     
-        $branch = $repo->branch($branchname, $commit);
+        $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
+        die('expected a branch') unless defined($branch);
     }
 
     $self->{'previous_commit'} = $branch->peel('commit');
@@ -96,14 +99,14 @@ sub new
     $self->{'gitindex'} = $index;
     
     $self->{'viewparent'} = {};
-    $self->{'mayRunCollector'} =
-        Torrus::SiteConfig::mayRunCollector( $self->treeName() );
 
     $self->{'collectorInstances'} =
         Torrus::SiteConfig::agentInstances( $self->treeName(), 'collector' );
 
     $self->{'is_writing'} = 1;
-    
+
+    $self->_read_paramprops();
+
     return $self;
 }
 
@@ -212,7 +215,9 @@ sub endEditingOthers
 {
     my $self  = shift;
 
-    $self->_write_json('other/' . $filename, $self->{'others_list'});
+    $self->_write_json($self->{'others_list_file'}, $self->{'others_list'});
+    delete $self->{'others_list_file'};
+    delete $self->{'others_list'};
     return;
 }
     
@@ -312,7 +317,7 @@ sub editNode
     my $is_subtree = ($path =~ /\/$/) ? 1:0;
     my $parent_token;
     
-    my $slashpos = rindex($path, '/');
+    my $slashpos = rindex($path, '/', length($path) - ($is_subtree?2:0));
     if( $slashpos > 0 )
     {
         my $parent_path = substr($path, 0, $slashpos+1);
@@ -322,7 +327,7 @@ sub editNode
         if( not defined($parent_node) or
             not $parent_node->{'children'}->{$token} )
         {
-            $self->editNode($parentpath);
+            $self->editNode($parent_path);
             $self->_add_child_token($token);
             $self->commitNode();
         }
@@ -337,7 +342,7 @@ sub editNode
     {
         $node = {
             'is_subtree' => $is_subtree,
-            'parent' => $parent_node,
+            'parent' => $parent_token,
             'path' => $path,
             'params' => {},
             'vars' => {},
@@ -347,6 +352,9 @@ sub editNode
         {
             $node->{'children'} = {};
         }
+
+        $self->{'editing_dirty'} = 1;
+        $self->{'editing_dirty_children'} = 1;
     }
     
     $self->{'editing'} = $node;
@@ -592,6 +600,8 @@ sub commitConfig
     Debug('Wrote ' . $commit->id());
 
     delete $self->{'gitindex'};
+    $self->{'gittree'} = $tree;
+    
     # release the index memory, as it may be quite large
     my $index = Git::Raw::Index->new();
     $self->{'repo'}->index($index);
@@ -1004,7 +1014,7 @@ sub updateAgentConfigs
     my $self = shift;
 
     my $repos = {};
-    my @reponames;
+    my @branchnames;
 
     foreach my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
     {
@@ -1029,11 +1039,12 @@ sub updateAgentConfigs
             $builder->clear();
             my $tree = $builder->write();
             my $me = $self->_signature();
-            my $refname = 'refs/heads/' / $branchname;
+            my $refname = 'refs/heads/' . $branchname;
             my $commit = $repo->commit("Initial empty commit in $branchname" ,
                                        $me, $me, [], $tree, $refname);
-            
-            $branch = $repo->branch($branchname, $commit);
+
+            $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
+            die('expected a branch') unless defined($branch);
         }
         
         my $index = Git::Raw::Index->new();
@@ -1185,7 +1196,7 @@ sub _fetch_collector_params
         {
             foreach my $param ( keys %{$map} )
             {
-                my $value = $config_tree->getNodeParam( $token, $param );
+                my $value = $self->getNodeParam( $token, $param );
 
                 if( ref( $map->{$param} ) )
                 {

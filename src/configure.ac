@@ -97,7 +97,7 @@ AC_SUBST(perllibdirs, [${perllibdirs}])
 
 if test "$enable_pkgonly" != yes; then
 
-   if test ${GIT} -eq no; then
+   if test ${GIT} = no; then
      AC_MSG_ERROR([Git executable is required])
    fi
 

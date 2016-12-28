@@ -41,7 +41,7 @@ my %rrd_params =
                                    'data-file' => undef,
                                    'data-dir'  => undef},
                      'rrd-cdef' => {'rpn-expr' => undef}},
-     );
+    );
 
 my %rrdmulti_params = ( 'ds-names' => undef );
 
@@ -86,7 +86,7 @@ our %collector_params =
          'yes' => undef }
      # collector-timeoffset-min, max, step, and hashstring are validated
      # during post-processing
-     );
+    );
 
 
 # Plugins might in theory create new datasource types
@@ -106,12 +106,12 @@ my %monitor_params =
                         'failures' => undef},
      'action'       => undef,
      'expires'      => undef
-     );
+    );
 
 my %action_params =
     ('action-type' => {'tset' => {'tset-name' => undef},
                        'exec' => {'command' => undef} }
-     );
+    );
 
 my %view_params =
     ('expires' => undef,
@@ -177,8 +177,6 @@ sub validateNode
     my $config_tree = shift;
     my $token = shift;
 
-    &Torrus::DB::checkInterrupted();
-
     my $ok = 1;
 
     if( $config_tree->isLeaf($token) )
@@ -235,7 +233,8 @@ sub validateNode
                                   "rrgraph-views for $path");
                             $ok = 0;
                         }
-                        elsif( $config_tree->getParam($view, 'view-type') ne
+                        elsif( $config_tree->getOtherParam($view,
+                                                           'view-type') ne
                                'rrgraph' )
                         {
                             my $path = $config_tree->path( $token );
@@ -486,8 +485,6 @@ sub validateRPN
     my $config_tree = shift;
     my $timeoffset_supported = shift;
 
-    &Torrus::DB::checkInterrupted();
-    
     my $ok = 1;
 
     # There must be at least one DS reference
@@ -571,19 +568,19 @@ sub validateViews
 
     foreach my $view ($config_tree->getViewNames())
     {
-        &Torrus::DB::checkInterrupted();
-        
         $ok = validateInstanceParams($config_tree, $view,
                                      'view', \%view_params) ? $ok:0;
-        if( $ok and $config_tree->getParam($view, 'view-type') eq 'rrgraph' )
+        if( $ok and $config_tree->getOtherParam($view, 'view-type')
+            eq 'rrgraph' )
         {
-            my $hrulesList = $config_tree->getParam($view, 'hrules');
+            my $hrulesList = $config_tree->getOtherParam($view, 'hrules');
             if( defined( $hrulesList ) )
             {
                 foreach my $hrule ( split(',', $hrulesList ) )
                 {
                     my $valueParam =
-                        $config_tree->getParam($view, 'hrule-value-' . $hrule);
+                        $config_tree->getOtherParam($view,
+                                                    'hrule-value-' . $hrule);
                     if( not defined( $valueParam ) or $valueParam !~ /^\S+$/o )
                     {
                         Error('Mandatory parameter hrule-value-' . $hrule .
@@ -592,7 +589,8 @@ sub validateViews
                         $ok = 0;
                     }
                     my $color =
-                        $config_tree->getParam($view, 'hrule-color-'.$hrule);
+                        $config_tree->getOtherParam($view,
+                                                    'hrule-color-'.$hrule);
                     if( not defined( $color ) )
                     {
                         Error('Mandatory parameter hrule-color-' . $hrule .
@@ -606,7 +604,7 @@ sub validateViews
                 }
             }
 
-            my $decorList = $config_tree->getParam($view, 'decorations');
+            my $decorList = $config_tree->getOtherParam($view, 'decorations');
             if( defined( $decorList ) )
             {
                 foreach my $decorName ( split(',', $decorList ) )
@@ -615,7 +613,7 @@ sub validateViews
                     {
                         my $param = 'dec-' . $paramName . '-' . $decorName;
                         if( not defined( $config_tree->
-                                         getParam($view, $param) ) )
+                                         getOtherParam($view, $param) ) )
                         {
                             Error('Missing parameter: ' . $param .
                                   ' in view ' . $view);
@@ -623,30 +621,33 @@ sub validateViews
                         }
                     }
 
-                    $ok = validateLine( $config_tree->
-                                        getParam($view,
-                                                 'dec-style-' . $decorName) )
+                    $ok = validateLine
+                        ( $config_tree->getOtherParam
+                          ($view, 'dec-style-' . $decorName) )
                         ? $ok:0;
-                    $ok = validateColor( $config_tree->
-                                         getParam($view,
-                                                  'dec-color-' . $decorName) )
+                    $ok = validateColor
+                        ( $config_tree->
+                          getOtherParam($view, 'dec-color-' . $decorName) )
                         ? $ok:0;
                 }
             }
 
-            $ok = validateColor( $config_tree->getParam($view, 'line-color') )
+            $ok = validateColor(
+                $config_tree->getOtherParam($view, 'line-color') )
                 ? $ok:0;
-            $ok = validateLine( $config_tree->getParam($view, 'line-style') )
+            $ok = validateLine(
+                $config_tree->getOtherParam($view, 'line-style') )
                 ? $ok:0;
 
-            my $gprintValues = $config_tree->getParam($view, 'gprint-values');
+            my $gprintValues =
+                $config_tree->getOtherParam($view, 'gprint-values');
             if( defined( $gprintValues ) and length( $gprintValues ) > 0 )
             {
                 foreach my $gprintVal ( split(',', $gprintValues ) )
                 {
                     my $format =
-                        $config_tree->getParam($view,
-                                               'gprint-format-' . $gprintVal);
+                        $config_tree->getOtherParam
+                        ($view, 'gprint-format-' . $gprintVal);
                     if( not defined( $format ) or length( $format ) == 0 )
                     {
                         Error('GPRINT format for ' . $gprintVal .
@@ -719,10 +720,10 @@ sub validateMonitors
     {        
         $ok = validateInstanceParams($config_tree, $action,
                                      'action', \%action_params) ? $ok:0;
-        my $atype = $config_tree->getParam($action, 'action-type');
+        my $atype = $config_tree->getOtherParam($action, 'action-type');
         if( $atype eq 'tset' )
         {
-            my $tset = $config_tree->getParam($action, 'tset-name');
+            my $tset = $config_tree->getOtherParam($action, 'tset-name');
             if( defined $tset )
             {
                 $tset = 'S'.$tset;
@@ -736,7 +737,8 @@ sub validateMonitors
         }
         elsif( $atype eq 'exec' )
         {
-            my $launch_when = $config_tree->getParam($action, 'launch-when');
+            my $launch_when =
+                $config_tree->getOtherParam($action, 'launch-when');
             if( defined $launch_when )
             {
                 foreach my $when ( split(',', $launch_when) )
@@ -760,7 +762,7 @@ sub validateMonitors
             }
 
             my $setenv_dataexpr =
-                $config_tree->getParam( $action, 'setenv-dataexpr' );
+                $config_tree->getOtherParam( $action, 'setenv-dataexpr' );
 
             if( defined( $setenv_dataexpr ) )
             {
@@ -783,8 +785,8 @@ sub validateMonitors
                               ": \"" . $env . "\"");
                         $ok = 0;
                     }
-                    elsif( not defined ($config_tree->getParam( $action,
-                                                                $param ) ) )
+                    elsif( not defined ($config_tree->getOtherParam
+                                        ($action, $param) ) )
                     {
                         Error("Parameter referenced in setenv-dataexpr is " .
                               "not defined in action " .
@@ -801,7 +803,7 @@ sub validateMonitors
         $ok = validateInstanceParams($config_tree, $monitor,
                                      'monitor', \%monitor_params) ? $ok:0;
         
-        my $alist = $config_tree->getParam( $monitor, 'action' );
+        my $alist = $config_tree->getOtherParam( $monitor, 'action' );
         foreach my $action ( split(',', $alist ) )
         {
             if( not $config_tree->actionExists( $action ) )
@@ -811,7 +813,7 @@ sub validateMonitors
             }
         }
 
-        my $esc = $config_tree->getParam($monitor, 'escalations');
+        my $esc = $config_tree->getOtherParam($monitor, 'escalations');
         if( defined($esc) )
         {
             my @escalation_times = split(',', $esc);
@@ -842,7 +844,7 @@ sub validateTokensets
     my $config_tree = shift;
     my $ok = 1;
 
-    my $view = $config_tree->getParam( 'SS', 'default-tsetlist-view' );
+    my $view = $config_tree->getOtherParam( 'SS', 'default-tsetlist-view' );
     if( not defined( $view ) )
     {
         Error("View is not defined for tokensets list");
@@ -856,12 +858,10 @@ sub validateTokensets
 
     foreach my $tset ($config_tree->getTsets())
     {
-        &Torrus::DB::checkInterrupted();
-        
-        $view = $config_tree->getParam($tset, 'default-tset-view');
+        $view = $config_tree->getOtherParam($tset, 'default-tset-view');
         if( not defined( $view ) )
         {
-            $view = $config_tree->getParam('SS', 'default-tset-view');
+            $view = $config_tree->getOtherParam('SS', 'default-tset-view');
         }
 
         if( not defined( $view ) )
@@ -888,8 +888,6 @@ sub validateInstanceParams
     my $inst_type = shift;
     my $mapref = shift;
 
-    &Torrus::DB::checkInterrupted();
-    
     # Debug("Validating $inst_type $inst_name");
 
     my $ok = 1;

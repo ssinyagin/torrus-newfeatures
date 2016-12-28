@@ -33,7 +33,7 @@ use Cache::Ref::CART;
 
 use Torrus::Log;
 
-
+use Carp;
 
 sub new
 {
@@ -89,7 +89,7 @@ sub new
             if( defined($remote_url) )
             {
                 Git::Raw::Remote->create($repo,
-                                         $Torrus::ConfigTree::remoteName
+                                         $Torrus::ConfigTree::remoteName,
                                          $remote_url);
             }
         }
@@ -104,15 +104,23 @@ sub new
             # the writer has not yet written its branch
             return undef;
         }
-    }
 
-    $self->{'paramprop'} = $self->_read_json('paramprops');
-    $self->{'paramprop'} = {} unless defined($self->{'paramprop'});
+        $self->_read_paramprops();
+    }
 
     $self->{'objcache'} = Cache::Ref::CART->new
         ( size => $Torrus::ConfigTree::objCacheSize );
 
     return $self;
+}
+
+
+sub _read_paramprops
+{
+    my $self = shift;
+    $self->{'paramprop'} = $self->_read_json('paramprops');
+    $self->{'paramprop'} = {} unless defined($self->{'paramprop'});
+    return;
 }
 
 
@@ -122,7 +130,7 @@ sub _init_extcache
     my $commit = shift;
 
     my $memcached_prefix = $Torrus::Global::memcachedPrefix .
-        $treename . substr($commit, 0, 4);
+        $self->{'treename'} . substr($commit, 0, 4);
 
     if( defined($self->{'extcache'}) )
     {
@@ -137,18 +145,6 @@ sub _init_extcache
     return;
 }
 
-
-sub _branchhead
-{
-    my $self = shift;
-
-    if( not defined($self->{'current_head'}) )
-    {
-        $self->{'current_head'} =
-    }
-
-    return $self->{'current_head'};
-}
 
 
 sub _lock_repodir
@@ -196,7 +192,7 @@ sub _sha_file
 }
 
 
-my _read_file
+sub _read_file
 {
     my $self = shift;
     my $filename = shift;
@@ -206,7 +202,7 @@ my _read_file
         my $entry = $self->{'gitindex'}->find($filename);
         if( defined($entry) )
         {
-            return $entry->blob();
+            return $entry->blob()->content();
         }
         else
         {
@@ -228,7 +224,7 @@ my _read_file
 }
 
 
-my _read_json
+sub _read_json
 {
     my $self = shift;
     my $filename = shift;
@@ -300,6 +296,8 @@ sub _node_file_exists
 {
     my $self = shift;
     my $token = shift;
+
+    my $filename = 'nodes/' . $self->_sha_file($token);
 
     if( defined($self->{'gitindex'}) )
     {

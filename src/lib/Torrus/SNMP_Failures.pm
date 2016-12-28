@@ -27,7 +27,6 @@ use warnings;
 
 use Digest::MD5 qw(md5_hex);
 
-use Torrus::DB;
 use Torrus::Log;
 
 

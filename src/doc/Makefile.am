@@ -77,10 +77,7 @@ devdocdir  = $(pkgdocdir)/devdoc
 dist_devdoc_DATA = \
 		devdoc/architecture.pod \
 		devdoc/devdiscover.pod \
-		devdoc/progstyle.pod \
-		devdoc/reqs.0.0.pod \
-		devdoc/reqs.0.1.pod \
-		devdoc/torrus_roadmap.pod
+		devdoc/progstyle.pod
 
 SUFFIXES = .pod.in .pod .txt
 

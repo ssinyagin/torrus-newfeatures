@@ -175,10 +175,6 @@ sub compile_definitions
         {
             Error("Definition without value: $name"); $ok = 0;
         }
-        elsif( defined $self->getDefinition($name) )
-        {
-            Error("Duplicate definition: $name"); $ok = 0;
-        }
         else
         {
             $self->addDefinition($name, $value);
@@ -354,7 +350,7 @@ sub compile_subtrees
     }
 
     # templates might include child nodes, so we open this one again
-    my $token = $self->editNode($path);
+    $self->editNode($path);
     
     $ok = $self->compile_params($node, $token, 1);
 
@@ -403,7 +399,7 @@ sub compile_subtrees
                 if( $self->validate_nodename( $name ) )
                 {
                     $ok = $self->compile_subtrees
-                        ($subtree, $path.'/'.$name.'/') ? $ok:0;
+                        ($subtree, $path.$name.'/') ? $ok:0;
                 }
                 else
                 {
@@ -423,9 +419,8 @@ sub compile_subtrees
             {
                 if( $self->validate_nodename( $name ) )
                 {
-                    my $ltoken = $self->addChild($token, $name);
                     $ok = $self->compile_subtrees
-                        ($leaf, $path.'/'.$name, 1) ? $ok:0;
+                        ($leaf, $path.$name, 1) ? $ok:0;
                 }
                 else
                 {

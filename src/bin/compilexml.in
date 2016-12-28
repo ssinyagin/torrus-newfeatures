@@ -81,8 +81,6 @@ elsif( $verbose )
 }
 
 
-&Torrus::DB::setSafeSignalHandlers();
-
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
 our $global_ok = 1;
@@ -95,8 +93,6 @@ foreach my $tree ( @trees )
         exit(1);
     }
 
-    &Torrus::DB::checkInterrupted();
-    
     Verbose("Compiling tree: $tree");
 
     my $ok = 1;
@@ -133,8 +129,8 @@ foreach my $tree ( @trees )
         last;
     }
 
-    Verbose('Data post-processing...');
-    if( not $compiler->postProcess() )
+    Verbose('Preparing a commit...');
+    if( not $compiler->commitConfig() )
     {
         Error('Errors found during post-processing');
         $ok = 0;
@@ -153,48 +149,11 @@ foreach my $tree ( @trees )
             $ok = 0;
         }
     }
-
-    &Torrus::DB::checkInterrupted();
-    
-    # Preserve the dynamic tokenset members
-    if( not $compiler->{'first_time_created'} )
-    {
-        my $oldConfig = new Torrus::ConfigTree( -TreeName => $tree );
-        if( defined( $oldConfig ) )
-        {
-            foreach my $ts ( $oldConfig->getTsets() )
-            {
-                if( $compiler->tsetExists( $ts ) )
-                {
-                    foreach my $member ( $oldConfig->tsetMembers( $ts ) )
-                    {
-                        my $origin =
-                            $oldConfig->tsetMemberOrigin( $ts, $member );
-                        if( defined( $origin ) and $origin ne 'static' )
-                        {
-                            my $path = $oldConfig->path($member);
-                            if( $compiler->nodeExists( $path ) )
-                            {
-                                my $token = $compiler->token( $path );
-                                $compiler->tsetAddMember
-                                    ( $ts, $token, $origin );
-                                Verbose('Preserved dynamic tokenset member: ' .
-                                        $path . ' in ' . $ts);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        undef $oldConfig;
-    }
-                    
-    &Torrus::DB::checkInterrupted();
                              
     $compiler->finalize( $ok );
-    undef $compiler;
-    &Torrus::DB::cleanupEnvironment();
+
+    Verbose('Updating agent configurations');
+    $compiler->updateAgentConfigs();
 
     $global_ok = $ok ? $global_ok:0;
 }

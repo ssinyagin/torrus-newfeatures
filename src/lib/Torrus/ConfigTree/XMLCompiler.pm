@@ -28,7 +28,6 @@ use Torrus::ConfigTree;
 use Torrus::ConfigTree::Validator;
 use Torrus::SiteConfig;
 use Torrus::Log;
-use Torrus::TimeStamp;
 
 use XML::LibXML;
 
@@ -64,10 +63,8 @@ sub compile
     my $self = shift;
     my $filename = shift;
 
-    &Torrus::DB::checkInterrupted();
-    
-    $filename = Torrus::SiteConfig::findXMLFile($filename);
-    if( not defined( $filename ) )
+    my $fullname = Torrus::SiteConfig::findXMLFile($filename);
+    if( not defined( $fullname ) )
     {
         return 0;
     }
@@ -82,17 +79,23 @@ sub compile
         $self->{'files_processed'}{$filename} = 1;
     }
 
-    Verbose('Compiling ' . $filename);
+    Verbose('Compiling ' . $fullname);
 
     my $ok = 1;
     my $parser = new XML::LibXML;
     my $doc;
-    if( not eval {$doc = $parser->parse_file($filename)} or $@ )
+
+    open(my $fh, '<:raw:encoding(utf8)', $fullname) or
+        die("Cannot open $fullname: $!");
+    my $blob = do { local $/; <$fh> };    
+    
+    if( not eval {$doc = $parser->parse_string($blob)} or $@ )
     {
-        Error("Failed to parse $filename: $@");
+        Error("Failed to parse $fullname: $@");
         return 0;
     }
 
+    
     my $root = $doc->documentElement();
 
     # Initialize the '/' element
@@ -104,7 +107,7 @@ sub compile
         my $incfile = $node->getAttribute('filename');
         if( not $incfile )
         {
-            Error("No filename given in include statement in $filename");
+            Error("No filename given in include statement in $fullname");
             $ok = 0;
         }
         else
@@ -141,10 +144,14 @@ sub compile
         $ok = $self->compile_tokensets( $node ) ? $ok:0;
     }
 
+    $self->startEditingOthers('__VIEWS__');
+
     foreach my $node ( $root->getElementsByTagName('views') )
     {
         $ok = $self->compile_views( $node ) ? $ok:0;
     }
+
+    $self->endEditingOthers();
 
     return $ok;
 }
@@ -158,8 +165,6 @@ sub compile_definitions
 
     foreach my $def ( $node->getChildrenByTagName('def') )
     {
-        &Torrus::DB::checkInterrupted();
-        
         my $name = $def->getAttribute('name');
         my $value = $def->getAttribute('value');
         if( not $name )
@@ -191,8 +196,6 @@ sub compile_paramprops
 
     foreach my $def ( $node->getChildrenByTagName('prop') )
     {
-        &Torrus::DB::checkInterrupted();
-          
         my $param = $def->getAttribute('param'); 
         my $prop = $def->getAttribute('prop');
         my $value = $def->getAttribute('value');
@@ -220,8 +223,6 @@ sub compile_params
     my $name = shift;
     my $isDS = shift;
 
-    &Torrus::DB::checkInterrupted();
-          
     my $ok = 1;
     foreach my $p_node ( $node->getChildrenByTagName('param') )
     {
@@ -247,7 +248,7 @@ sub compile_params
             }
             else
             {
-                $self->setParam($name, $param, $value);
+                $self->setOtherParam($name, $param, $value);
             }
         }
     }
@@ -282,7 +283,10 @@ sub compile_ds
     }
 
     # Recursively traverse the tree
-    $ok = $self->compile_subtrees( $ds_node, $self->token('/') ) ? $ok:0;
+    $ok = $self->compile_subtrees( $ds_node, '/' ) ? $ok:0;
+
+    # last compiled node needs a commit
+    $self->commitNode();
 
     return $ok;
 }
@@ -303,9 +307,10 @@ sub compile_subtrees
 {
     my $self = shift;
     my $node = shift;
-    my $token = shift;
+    my $path = shift;
     my $iamLeaf = shift;
-    
+
+    my $token = $self->editNode($path);
     my $ok = 1;
 
     # setting of compile-time variables
@@ -316,7 +321,6 @@ sub compile_subtrees
         my $value = $setvar->getAttribute('value');
         if( not defined( $name ) or not defined( $value ) )
         {
-            my $path = $self->path($token);
             Error("Setvar statement without name or value in $path"); $ok = 0;
         }
         else
@@ -332,7 +336,6 @@ sub compile_subtrees
         my $name = $templateapp->getAttribute('name');
         if( not $name )
         {
-            my $path = $self->path($token);
             Error("Template application without a name at $path"); $ok = 0;
         }
         else
@@ -340,28 +343,20 @@ sub compile_subtrees
             my $template = $self->{'Templates'}->{$name};
             if( not defined $template )
             {
-                my $path = $self->path($token);
                 Error("Cannot find template named $name at $path"); $ok = 0;
             }
             else
             {
                 $ok = $self->compile_subtrees
-                    ($template, $token, $iamLeaf) ? $ok:0;
+                    ($template, $path, $iamLeaf) ? $ok:0;
             }
         }
     }
 
+    # templates might include child nodes, so we open this one again
+    my $token = $self->editNode($path);
+    
     $ok = $self->compile_params($node, $token, 1);
-
-    # Handle aliases -- we are still in compile_subtrees()
-
-    foreach my $alias ( $node->getChildrenByTagName('alias') )
-    {
-        my $apath = $alias->textContent();
-        $apath =~ s/\s+//mgo;
-        $ok = $self->setAlias($token, $apath) ? $ok:0;
-    }
-
 
     # applying compile-time variables
     
@@ -370,12 +365,11 @@ sub compile_subtrees
         my $var = $iftrue->getAttribute('var');
         if( not defined( $var ) )
         {
-            my $path = $self->path($token);
             Error("Iftrue statement without variable name in $path"); $ok = 0;
         }
         elsif( $self->isTrueVar( $token, $var ) )
         {
-            $ok = $self->compile_subtrees( $iftrue, $token, $iamLeaf ) ? $ok:0;
+            $ok = $self->compile_subtrees( $iftrue, $path, $iamLeaf ) ? $ok:0;
         }
     }
 
@@ -384,16 +378,14 @@ sub compile_subtrees
         my $var = $iffalse->getAttribute('var');
         if( not defined( $var ) )
         {
-            my $path = $self->path($token);
             Error("Iffalse statement without variable name in $path"); $ok = 0;
         }
         elsif( not $self->isTrueVar( $token, $var ) )
         {
             $ok = $self->compile_subtrees
-                ( $iffalse, $token, $iamLeaf ) ? $ok:0;
+                ( $iffalse, $path, $iamLeaf ) ? $ok:0;
         }
     }
-
     
     # Compile child nodes -- the last part of compile_subtrees()
 
@@ -404,19 +396,17 @@ sub compile_subtrees
             my $name = $subtree->getAttribute('name');
             if( not defined( $name ) or length( $name ) == 0 )
             {
-                my $path = $self->path($token);
                 Error("Subtree without a name at $path"); $ok = 0;
             }
             else
             {
                 if( $self->validate_nodename( $name ) )
                 {
-                    my $stoken = $self->addChild($token, $name.'/');
-                    $ok = $self->compile_subtrees( $subtree, $stoken ) ? $ok:0;
+                    $ok = $self->compile_subtrees
+                        ($subtree, $path.'/'.$name.'/') ? $ok:0;
                 }
                 else
                 {
-                    my $path = $self->path($token);
                     Error("Invalid subtree name: $name at $path"); $ok = 0;
                 }
             }
@@ -427,7 +417,6 @@ sub compile_subtrees
             my $name = $leaf->getAttribute('name');
             if( not defined( $name ) or length( $name ) == 0 )
             {
-                my $path = $self->path($token);
                 Error("Leaf without a name at $path"); $ok = 0;
             }
             else
@@ -435,16 +424,17 @@ sub compile_subtrees
                 if( $self->validate_nodename( $name ) )
                 {
                     my $ltoken = $self->addChild($token, $name);
-                    $ok = $self->compile_subtrees( $leaf, $ltoken, 1 ) ? $ok:0;
+                    $ok = $self->compile_subtrees
+                        ($leaf, $path.'/'.$name, 1) ? $ok:0;
                 }
                 else
                 {
-                    my $path = $self->path($token);
                     Error("Invalid leaf name: $name at $path"); $ok = 0;
                 }
             }
         }
     }
+    
     return $ok;
 }
 
@@ -455,6 +445,8 @@ sub compile_monitors
     my $mon_node = shift;
     my $ok = 1;
 
+    $self->startEditingOthers('__MONITORS__');
+    
     foreach my $monitor ( $mon_node->getChildrenByTagName('monitor') )
     {
         my $mname = $monitor->getAttribute('name');
@@ -464,11 +456,15 @@ sub compile_monitors
         }
         else
         {
-            $self->addMonitor( $mname );
+            $self->addOtherObject($mname);
             $ok = $self->compile_params($monitor, $mname) ? $ok:0;
+            $self->commitOther();
         }
     }
 
+    $self->endEditingOthers();
+    $self->startEditingOthers('__ACTIONS__');
+    
     foreach my $action ( $mon_node->getChildrenByTagName('action') )
     {
         my $aname = $action->getAttribute('name');
@@ -478,10 +474,14 @@ sub compile_monitors
         }
         else
         {
-            $self->addAction( $aname );
+            $self->addOtherObject($aname);
             $ok = $self->compile_params($action, $aname);
+            $self->commitOther();
         }
     }
+
+    $self->endEditingOthers();
+
     return $ok;
 }
 
@@ -492,20 +492,24 @@ sub compile_tokensets
     my $tsets_node = shift;
     my $ok = 1;
 
+    $self->editOther('SS');
     $ok = $self->compile_params($tsets_node, 'SS') ? $ok:0;
+    $self->commitOther();
 
     foreach my $tokenset ( $tsets_node->getChildrenByTagName('token-set') )
     {
         my $sname = $tokenset->getAttribute('name');
         if( not $sname )
         {
-            Error("Token-set without a name"); $ok = 0;
+            Error("Tokenset without a name"); $ok = 0;
         }
         else
         {
             $sname = 'S'. $sname;
             $self->addTset( $sname );
+            $self->editOther($sname);
             $ok = $self->compile_params($tokenset, $sname) ? $ok:0;
+            $self->commitOther();
         }
     }
     return $ok;
@@ -530,6 +534,8 @@ sub compile_views
         {
             $self->addView( $vname, $parentname );
             $ok = $self->compile_params( $view, $vname ) ? $ok:0;
+            $self->commitOther();
+            
             # Process child views
             $ok = $self->compile_views( $view, $vname ) ? $ok:0;
         }

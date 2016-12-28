@@ -1,4 +1,4 @@
-#  Copyright (C) 2002-2007  Stanislav Sinyagin
+#  Copyright (C) 2002-2017  Stanislav Sinyagin
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ sub new
     $self->{'treename'} = $treename;
 
     $self->{'iamwriter'} = $options{'-WriteAccess'} ? 1:0;
-    
+
     $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_prefix'} = $Torrus::Global::redisPrefix;
 
@@ -58,10 +58,10 @@ sub new
     {
         $repodir = $options{'-RepoDir'};
     }
-    
+
     $self->{'repodir'} = $repodir;
     $self->{'branch'} = $treename . '_configtree';
-        
+
     if( not -e $repodir . '/config' )
     {
         $self->_lock_repodir();
@@ -70,7 +70,7 @@ sub new
             Debug("Initializing the Git repository in $repodir");
             my $repo = Git::Raw::Repository->init($repodir, 1);
             my $remote_url;
-            
+
             if( $self->{'iamwriter'} )
             {
                 if( $Torrus::ConfigTree::writerPush )
@@ -98,45 +98,57 @@ sub new
 
     if( not $self->{'iamwriter'} )
     {
-        my $head = $self->_branchhead();
-        if( not defined($head) )
-        {
-            # the writer has not yet write to its branch
-            return undef;
-        }
-
         if( not $self->gotoHead() )
         {
             # could not retrieve the head commit
+            # the writer has not yet written its branch
             return undef;
-        }            
+        }
     }
 
     $self->{'paramprop'} = $self->_read_json('paramprops');
     $self->{'paramprop'} = {} unless defined($self->{'paramprop'});
-        
-    $self->{'extcache'} =
-        new Cache::Memcached::Fast({
-            servers => [{ 'address' => $Torrus::Global::memcachedServer,
-                          'noreply' => 1 }],
-            namespace => $Torrus::Global::memcachedPrefix});
 
     $self->{'objcache'} = Cache::Ref::CART->new
         ( size => $Torrus::ConfigTree::objCacheSize );
-    
+
     return $self;
 }
 
 
+sub _init_extcache
+{
+    my $self = shift;
+    my $commit = shift;
+
+    my $memcached_prefix = $Torrus::Global::memcachedPrefix .
+        $treename . substr($commit, 0, 4);
+
+    if( defined($self->{'extcache'}) )
+    {
+        $self->{'extcache'}->disconnect_all();
+    }
+    
+    $self->{'extcache'} =
+        new Cache::Memcached::Fast({
+            servers => [{ 'address' => $Torrus::Global::memcachedServer,
+                          'noreply' => 1 }],
+            namespace => $memcached_prefix});
+    return;
+}
 
 
 sub _branchhead
 {
     my $self = shift;
-    return $self->{'redis'}->hget
-        ($self->{'redis_prefix'} . 'githeads', $self->{'branch'});
-}
 
+    if( not defined($self->{'current_head'}) )
+    {
+        $self->{'current_head'} =
+    }
+
+    return $self->{'current_head'};
+}
 
 
 sub _lock_repodir
@@ -148,7 +160,7 @@ sub _lock_repodir
         $self->{'distlock'} = Redis::DistLock->new
             ( servers => [$Torrus::Global::redisServer] );
     }
-    
+
     Debug('Acquiring a lock for ' . $self->{'repodir'});
     my $lock =
         $self->{'distlock'}->lock($self->{'redis_prefix'} .
@@ -158,7 +170,7 @@ sub _lock_repodir
     {
         die('Failed to acquire a lock for ' . $self->{'repodir'});
     }
-    
+
     $self->{'mutex'} = $lock;
     return;
 }
@@ -167,11 +179,11 @@ sub _lock_repodir
 sub _unlock_repodir
 {
     my $self = shift;
-    
+
     Debug('Releasing the lock for ' . $self->{'repodir'});
-    
+
     $self->{'distlock'}->release($self->{'mutex'});
-    delete $self->{'mutex'};        
+    delete $self->{'mutex'};
     return;
 }
 
@@ -220,7 +232,7 @@ my _read_json
 {
     my $self = shift;
     my $filename = shift;
-    
+
     my $blob = $self->_read_file($filename);
     if( defined($blob) )
     {
@@ -233,7 +245,7 @@ my _read_json
 }
 
 
-        
+
 sub _node_read
 {
     my $self = shift;
@@ -243,7 +255,7 @@ sub _node_read
     if( not defined($ret) )
     {
         my $sha_file = $self->_sha_file($token);
-    
+
         $ret = $self->_read_json('nodes/' . $sha_file);
         if( not defined($ret) )
         {
@@ -260,7 +272,7 @@ sub _node_read
 
         $self->{'objcache'}->set($token => $ret);
     }
-    
+
     return $ret;
 }
 
@@ -279,7 +291,7 @@ sub _other_read
             $self->{'objcache'}->set($name => $ret);
         }
     }
-    
+
     return $ret;
 }
 
@@ -297,14 +309,16 @@ sub _node_file_exists
     {
         return defined($self->{'gittree'}->entry_bypath($filename));
     }
-}    
+}
 
 
 sub gotoHead
 {
     my $self = shift;
 
-    my $head = $self->_branchhead();
+    my $head = $self->{'redis'}->hget(
+        $self->{'redis_prefix'} . 'githeads', $self->{'branch'});
+
     return 0 unless defined($head);
 
     if( not defined($self->{'repo'}) )
@@ -314,8 +328,11 @@ sub gotoHead
 
     my $commit = Git::Raw::Commit->lookup($self->{'repo'}, $head);
     die("Cannot lookup commit $head") unless defined($commit);
-    
+
     $self->{'gittree'} = $commit->tree();
+
+    $self->_init_extcache($head);
+    
     return 1;
 }
 
@@ -338,8 +355,8 @@ sub nodeName
     return $path;
 }
 
-    
-    
+
+
 sub token
 {
     my $self = shift;
@@ -354,7 +371,7 @@ sub token
     else
     {
         return undef;
-    }    
+    }
 }
 
 sub path
@@ -375,7 +392,15 @@ sub nodeExists
     return defined( $self->token($path) );
 }
 
-    
+
+sub tokenExists
+{
+    my $self = shift;
+    my $token = shift;
+
+    return $self->_node_file_exists($token);
+}
+
 
 sub isLeaf
 {
@@ -401,7 +426,7 @@ sub isRoot
 {
     my $self = shift;
     my $token = shift;
-    
+
     my $node = $self->_node_read($token);
     return( $node->{'parent'} eq '');
 }
@@ -414,7 +439,7 @@ sub getOtherParam
     my $param = shift;
 
     my $obj = $self->_other_read($name);
-    
+
     if( defined($obj) )
     {
         return $obj->{'params'}{$param};
@@ -451,12 +476,12 @@ sub retrieveNodeParam
     my $param = shift;
 
     # walk up the tree and save the grandparent's value at parent's cache
-    
-    my $value;    
+
+    my $value;
     my $currtoken = $token;
     my @ancestors;
     my $walked = 0;
-    
+
     while( not defined($value) and defined($currtoken) )
     {
         $value = $self->_read_node_param( $currtoken, $param );
@@ -642,7 +667,7 @@ sub getOtherParams
     my $name = shift;
 
     my $obj = $self->_other_read($name);
-    
+
     if( defined($obj) )
     {
         return $obj->{'params'};
@@ -660,7 +685,7 @@ sub getNodeParams
     my $token = shift;
 
     my $obj = $self->_node_read($token);
-    
+
     if( defined($obj) )
     {
         return $obj->{'params'};
@@ -687,7 +712,7 @@ sub getParent
     else
     {
         return $parent;
-    }    
+    }
 }
 
 
@@ -701,7 +726,7 @@ sub getChildren
     {
         return;
     }
-    
+
     my @ret;
     while( my ($key, $val) = each %{$node->{'children'}} )
     {
@@ -746,9 +771,9 @@ sub getRelative
     {
         my $nodeid = $1;
         $token = $self->getNodeByNodeid( $nodeid );
-        return(undef) unless defined($token);        
+        return(undef) unless defined($token);
     }
-    
+
     if( $relPath =~ /^\//o )
     {
         return $self->token( $relPath );
@@ -851,7 +876,7 @@ sub searchNodeidPrefix
              $self->{'json'}->decode(
                  $entry->object()->content()));
     }
-    
+
     return $ret;
 }
 
@@ -874,7 +899,7 @@ sub searchNodeidSubstring
     {
         my $l1tree = $l1entry->object();
         die('Expected a tree object') unless $l1tree->is_tree();
-        
+
         foreach my $l2entry ($l1tree->entries())
         {
             my $l2tree = $l2entry->object();
@@ -894,7 +919,7 @@ sub searchNodeidSubstring
             }
         }
     }
-    
+
     return $ret;
 }
 
@@ -974,7 +999,7 @@ sub _other_object_names
             }
         }
     }
-    
+
     return @ret;
 }
 
@@ -983,14 +1008,14 @@ sub _other_object_exists
     my $self = shift;
     my $filename = shift;
     my $objname = shift;
-    
+
     my $data = $self->_read_json('other/' . $filename);
-    
+
     if( defined($data) )
     {
         return $data->{$objname};
     }
-    
+
     return undef;
 }
 
@@ -1054,7 +1079,8 @@ sub addTset
 {
     my $self = shift;
     my $tset = shift;
-    $self->{'redis'}->hset('tsets:' . $self->treeName(), $tset, '1');
+    $self->{'redis'}->hset($self->{'redis_prefix'} . 'tsets:' .
+                           $self->treeName(), $tset, '1');
     return;
 }
 
@@ -1062,13 +1088,15 @@ sub tsetExists
 {
     my $self = shift;
     my $tset = shift;
-    return $self->{'redis'}->hget('tsets:' . $self->treeName(), $tset) ? 1:0;
+    return $self->{'redis'}->hget($self->{'redis_prefix'} . 'tsets:' .
+                                  $self->treeName(), $tset) ? 1:0;
 }
 
 sub getTsets
 {
     my $self = shift;
-    return $self->{'redis'}->hkeys('tsets:' . $self->treeName());
+    return $self->{'redis'}->hkeys($self->{'redis_prefix'} . 'tsets:' .
+                                   $self->treeName());
 }
 
 sub tsetMembers
@@ -1076,7 +1104,8 @@ sub tsetMembers
     my $self = shift;
     my $tset = shift;
 
-    return $self->{'redis'}->hkeys('tset:' . $self->treeName() . ':' . $tset);
+    return $self->{'redis'}->hkeys($self->{'redis_prefix'} . 'tset:' .
+                                   $self->treeName() . ':' . $tset);
 }
 
 sub tsetMemberOrigin
@@ -1084,8 +1113,9 @@ sub tsetMemberOrigin
     my $self = shift;
     my $tset = shift;
     my $token = shift;
-    
-    return $self->{'redis'}->hget('tset:' . $self->treeName() . ':' . $tset,
+
+    return $self->{'redis'}->hget($self->{'redis_prefix'} . 'tset:' .
+                                  $self->treeName() . ':' . $tset,
                                   $token);
 }
 
@@ -1096,7 +1126,8 @@ sub tsetAddMember
     my $token = shift;
     my $origin = shift;
 
-    $self->{'redis'}->hget('tset:' . $self->treeName() . ':' . $tset,
+    $self->{'redis'}->hget($self->{'redis_prefix'} . 'tset:' .
+                           $self->treeName() . ':' . $tset,
                            $token,
                            $origin);
     return;
@@ -1109,7 +1140,8 @@ sub tsetDelMember
     my $tset = shift;
     my $token = shift;
 
-    $self->{'redis'}->hdel('tset:' . $self->treeName() . ':' . $tset,
+    $self->{'redis'}->hdel($self->{'redis_prefix'} . 'tset:' .
+                           $self->treeName() . ':' . $tset,
                            $token);
     return;
 }
@@ -1139,7 +1171,6 @@ sub getDefinitionNames
     {
         push(@ret, $entry->name());
     }
-    
 
     return @ret;
 }

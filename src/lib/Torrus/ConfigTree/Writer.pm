@@ -28,12 +28,13 @@ use warnings;
 use base 'Torrus::ConfigTree';
 
 use Torrus::Log;
-use Torrus::TimeStamp;
+use Torrus::Collector;
 use Torrus::SiteConfig;
 use Torrus::ServiceID;
     
 use Digest::MD5 qw(md5); # needed as hash function
 use POSIX; # we use ceil() from here
+use Digest::SHA qw(sha1_hex);
 
 our %multigraph_remove_space =
     ('ds-expr-' => 1,
@@ -81,6 +82,8 @@ sub new
         $branch = $repo->branch($branchname, $commit);
     }
 
+    $self->{'previous_commit'} = $branch->peel('commit');
+    
     my $index = Git::Raw::Index->new();
     $repo->index($index);
 
@@ -178,6 +181,40 @@ sub _write_json
     return;
 }
 
+
+sub startEditingOthers
+{
+    my $self  = shift;
+    my $filename  = shift;
+
+    $self->{'others_list_file'} = $filename;
+    $self->{'others_list'} = $self->_read_json('other/' . $filename);
+}
+
+
+sub addOtherObject
+{
+    my $self  = shift;
+    my $name  = shift;
+
+    if( not defined($self->{'others_list_file'}) )
+    {
+        die('startEditingOthers() was not called');
+    }
+
+    $self->{'others_list'}{$name} = 1;
+    $self->editOther($name);
+    return;
+}
+    
+
+sub endEditingOthers
+{
+    my $self  = shift;
+
+    $self->_write_json('other/' . $filename, $self->{'others_list'});
+    return;
+}
     
 
 sub editOther
@@ -248,18 +285,30 @@ sub commitOther
     delete $self->{'editing_dirty'};
 }
 
-    
+
+# editNode can be called more than once on the same node, so we do
+# nothing in this case.
+# If it's called for a different node, we commit the previous one.
+
 sub editNode
 {
     my $self  = shift;
     my $path  = shift;
 
+    my $token = $self->token($path, 1);
+    
     if( defined($self->{'editing'}) )
     {
-        die('another object is being edited');
+        if( $self->{'editing_node'} eq $token )
+        {
+            return $token;
+        }
+        else
+        {
+            $self->commitNode();
+        }
     }
 
-    my $token = $self->token($path, 1);
     my $is_subtree = ($path =~ /\/$/) ? 1:0;
     my $parent_token;
     
@@ -350,20 +399,6 @@ sub _add_child_token
 }
         
 
-sub addChild
-{
-    my $self = shift;
-    my $token = shift;
-    my $childname = shift;
-
-    my $path = $self->{'editing'}{'path'} . $childname;
-    my $ctoken = $self->token($path, 1);
-
-    $self->_add_child_token($ctoken);
-
-    return $ctoken;
-}
-
 
 sub setVar
 {
@@ -441,21 +476,18 @@ sub setParamProperty
 }
 
 
-sub writeParamProps
-{
-    my $self = shift;
-    $self->_write_json('paramprops', $self->{'paramprop'});
-    return;
-}
-
 
 sub initRoot
 {
     my $self  = shift;
 
-    my $token = $self->editNode('/');
-    $self->setNodeParam($token, 'tree-name', $self->treeName());
-    $self->commitNode();
+    if( not $self->{'init_root_done'} )
+    {
+        my $token = $self->editNode('/');
+        $self->setNodeParam($token, 'tree-name', $self->treeName());
+        $self->commitNode();
+        $self->{'init_root_done'} = 1;
+    }
     return;
 }
 
@@ -472,6 +504,8 @@ sub addView
     {
         $self->{'viewparent'}{$vname} = $parent;
     }
+
+    $self->addOtherObject($vname);
     return;
 }
 
@@ -525,24 +559,65 @@ sub isTrueVar
 
 
 
-sub postProcess
+sub commitConfig
 {
     my $self = shift;
 
-    my $ok = $self->postProcessNodes();
-
+    my $ok = $self->_post_process_nodes();
+    return($ok) unless $ok;
+    
     # Propagate view inherited parameters
     $self->{'viewParamsProcessed'} = {};
     foreach my $vname ( $self->getViewNames() )
     {
-        $self->propagateViewParams( $vname );
+        $self->_propagate_view_params( $vname );
     }
+
+    $self->_write_json('paramprops', $self->{'paramprop'});
+
+    Debug('Writing a commit in branch: ' . $self->{'branch'});
+    my $branchname = $self->{'branch'};
+    my $branch = Git::Raw::Branch->lookup($self->{'repo'}, $branchname, 1);
+    my $parent = $branch->peel('commit');
+    
+    my $me = $self->_signature();
+    
+    my $tree = $self->{'gitindex'}->write_tree();
+    
+    my $commit = $self->{'repo'}->commit
+        (scalar(localtime(time())),
+         $me, $me, [$parent], $tree, $branch->name());
+
+    $self->{'new_commit'} = $commit->id();
+    Debug('Wrote ' . $commit->id());
+
+    delete $self->{'gitindex'};
+    # release the index memory, as it may be quite large
+    my $index = Git::Raw::Index->new();
+    $self->{'repo'}->index($index);
+
+    $self->_init_extcache($commit);
+
+    $self->{'is_writing'} = undef;
+
+    # clean up tokenset members if their nodes were removed
+    foreach my $ts ( $self->getTsets() )
+    {
+        foreach my $member ( $self->tsetMembers($ts) )
+        {
+            if( not $self->tokenExists($member) )
+            {
+                $self->tsetDelMember($ts, $member);
+            }
+        }
+    }
+
     return $ok;
 }
 
 
 
-sub postProcessNodes
+sub _post_process_nodes
 {
     my $self = shift;
     my $token = shift;
@@ -554,22 +629,38 @@ sub postProcessNodes
         $token = $self->token('/');
     }
 
+    my $path = $self->path($token);
+    
     my $nodeid = $self->getNodeParam( $token, 'nodeid', 1 );
     if( defined( $nodeid ) )
     {
         # verify the uniqueness of nodeid
-        
-        my $oldToken = $self->{'db_nodeid'}->get($nodeid);
-        if( defined($oldToken) )
+
+        my $nodeid_sha = sha1_hex($nodeid);
+        my $sha_file = 'nodeid/' . $self->_sha_file($nodeid_sha);
+        my $old_entry = $self->_read_json($sha_file);
+        if( defined($old_entry) )
         {
-            Error('Non-unique nodeid ' . $nodeid .
-                  ' in ' . $self->path($token) .
-                  ' and ' . $self->path($oldToken));
-            $ok = 0;
+            if( $old_entry->[1] ne $token )
+            {
+                Error('Non-unique nodeid ' . $nodeid .
+                      ' in ' . $path .
+                      ' and ' . $self->path($old_entry->[1]));
+                $ok = 0;
+            }
         }
         else
         {
-            $self->{'db_nodeid'}->put($nodeid, $token);
+            $self->_write_json($sha_file, [$nodeid, $token]);
+
+            my $pos = 0;
+            while( ($pos = index($nodeid, '//', $pos)) >= 0 )
+            {
+                my $prefix = substr($nodeid, 0, $pos);
+                my $dir = $self->_nodeidpx_sha_dir($prefix);
+                $self->{'gitindex'}->add_frombuffer(
+                    $dir . '/' . $nodeid_sha, '');
+            }
         }
     }
 
@@ -578,16 +669,15 @@ sub postProcessNodes
     {
         # Process static tokenset members
 
-        my $tsets = $self->getNodeParam( $token, 'tokenset-member' );
+        my $tsets = $self->getNodeParam($token, 'tokenset-member');
         if( defined( $tsets ) )
         {
             foreach my $tset ( split(/,/o, $tsets) )
             {
                 my $tsetName = 'S'.$tset;
-                if( not $self->tsetExists( $tsetName ) )
+                if( not $self->tsetExists($tsetName) )
                 {
-                    my $path = $self->path( $token );
-                    Error("Referenced undefined token set $tset in $path");
+                    Error("Referenced undefined tokenset $tset in $path");
                     $ok = 0;
                 }
                 else
@@ -603,7 +693,9 @@ sub postProcessNodes
             if( $dsType eq 'rrd-multigraph' )
             {
                 # Expand parameter substitutions in multigraph leaves
-                
+
+                $self->editNode($path);
+
                 my @dsNames =
                     split(/,/o, $self->getNodeParam($token, 'ds-names') );
                 
@@ -631,9 +723,13 @@ sub postProcessNodes
                         }
                     }
                 }
+
+                $self->commitNode();
             }
-            elsif( $dsType eq 'collector' and $self->{'mayRunCollector'} )
+            elsif( $dsType eq 'collector' )
             {
+                $self->editNode($path);
+
                 # Split the collecting job between collector instances
                 my $instance = 0;
                 my $nInstances = $self->{'collectorInstances'};
@@ -733,9 +829,6 @@ sub postProcessNodes
                                          $newOffset );
                 }
 
-                $self->{'db_collectortokens'}->[$instance]->put
-                    ( $token, sprintf('%d:%d', $period, $newOffset) );
-
                 my $storagetypes =
                     $self->getNodeParam( $token, 'storage-type' );
                 foreach my $stype ( split(/,/o, $storagetypes) )
@@ -811,30 +904,29 @@ sub postProcessNodes
                         }
                     }
                 }
+                
+                $self->commitNode();
             }
         }
         else
         {
-            my $path = $self->path( $token );
             Error("Mandatory parameter 'ds-type' is not defined for $path");
             $ok = 0;
         }            
     }
     else
     {
-        foreach my $ctoken ( $self->getChildren( $token ) )
+        foreach my $ctoken ( $self->getChildren($token) )
         {
-            if( not $self->isAlias( $ctoken ) )
-            {
-                $ok = $self->postProcessNodes( $ctoken ) ? $ok:0;
-            }
+            $ok = $self->_post_process_nodes( $ctoken ) ? $ok:0;
         }
     }
+    
     return $ok;
 }
 
 
-sub propagateViewParams
+sub _propagate_view_params
 {
     my $self = shift;
     my $vname = shift;
@@ -849,14 +941,14 @@ sub propagateViewParams
     my $parent = $self->{'viewparent'}{$vname};
     if( defined( $parent ) )
     {
-        $self->propagateViewParams( $parent );
+        $self->_propagate_view_params( $parent );
 
         my $parentParams = $self->getParams( $parent );
         foreach my $param ( keys %{$parentParams} )
         {
-            if( not defined( $self->getParam( $vname, $param ) ) )
+            if( not defined( $self->getOtherParam( $vname, $param ) ) )
             {
-                $self->setParam( $vname, $param, $parentParams->{$param} );
+                $self->setOtherParam( $vname, $param, $parentParams->{$param} );
             }
         }
     }
@@ -872,8 +964,6 @@ sub validate
     my $self = shift;
 
     my $ok = 1;
-
-    $self->{'is_writing'} = undef;
 
     if( not $self->{'-NoDSRebuild'} )
     {
@@ -894,29 +984,246 @@ sub finalize
 
     if( $status )
     {
-        my $branchname = $self->{'branch'};
-        my $branch = Git::Raw::Branch->lookup($self->{'repo'}, $branchname, 1);
-
-        my $me = $self->_signature();
-        my $parent = $branch->peel('commit');
-
-        my $tree = $self->{'gitindex'}->write_tree();
-        
-        my $commit = $self->{'repo'}->commit
-            (scalar(localtime(time())),
-             $me, $me, [$parent], $tree, $branch->name());
-
         $self->{'redis'}->hset
             ($self->{'redis_prefix'} . 'githeads',
              $self->{'branch'},
-             $commit->id());
+             $self->{'new_commit'});
 
         $self->{'redis'}->pub
             ($self->{'redis_prefix'} . 'treecommits:' . $self->treeName(),
-             $commit->id());
+             $self->{'new_commit'});
                 
         Verbose('Configuration has compiled successfully');
     }
+    return;
+}
+
+
+sub updateAgentConfigs
+{
+    my $self = shift;
+
+    my $repos = {};
+    my @reponames;
+
+    foreach my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
+    {
+        push(@branchnames, $self->_agent_branch_name('collector', $instance));
+    }
+
+    push(@branchnames, $self->_agent_branch_name('monitor', 0));
+
+    # open repo objects for every agent branch, and initialize in-memory
+    # indexes for writing
+    
+    foreach my $branchname (@branchnames)
+    {
+        my $repo = Git::Raw::Repository->open($self->{'repodir'});
+
+        my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
+        if( not defined($branch) )
+        {
+            Debug("Creating a new branch $branchname");
+            # This is a fresh repo, create the agent branch
+            my $builder = Git::Raw::Tree::Builder->new($repo);
+            $builder->clear();
+            my $tree = $builder->write();
+            my $me = $self->_signature();
+            my $refname = 'refs/heads/' / $branchname;
+            my $commit = $repo->commit("Initial empty commit in $branchname" ,
+                                       $me, $me, [], $tree, $refname);
+            
+            $branch = $repo->branch($branchname, $commit);
+        }
+        
+        my $index = Git::Raw::Index->new();
+        $repo->index($index);
+        
+        my $tree = $branch->peel('tree');
+        $index->read_tree($tree);
+
+        $repos->{$branchname} = $repo;
+    }
+
+    Debug('Collecting node parameters and poulating indexes');
+    $self->_walk_nodes_for_agent_configs($repos, undef);
+
+    foreach my $branchname (@branchnames)
+    {
+        Debug("Writing a commit in $branchname");
+        
+        my $repo = $repos->{$branchname};
+        my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
+        my $parent = $branch->peel('commit');
+        my $me = $self->_signature();
+
+        my $tree = $repo->index()->write_tree();
+    
+        my $commit = $repo->commit
+            (scalar(localtime(time())),
+             $me, $me, [$parent], $tree, $branch->name());
+
+        Debug('Wrote ' . $commit->id());
+
+        $self->{'redis'}->hset
+            ($self->{'redis_prefix'} . 'githeads',
+             $branchname,
+             $commit->id());
+    }
+    
+    return;
+}
+    
+sub _write_agent_params
+{
+    my $self = shift;
+    my $repos = shift;
+    my $token = shift;
+    my $agent = shift;
+    my $instance = shift;
+    my $params = shift;
+
+    my $index =
+        $repos->{$self->_agent_branch_name($agent, $instance)}->index();
+
+    $index->add_frombuffer($self->_sha_file($token),
+                           $self->{'json'}->encode($params));
+    return;
+}
+
+    
+
+sub _walk_nodes_for_agent_configs
+{
+    my $self = shift;
+    my $repos = shift;
+    my $token = shift;
+
+    if( not defined( $token ) )
+    {
+        $token = $self->token('/');
+    }
+
+    if( $self->isLeaf($token) )
+    {
+        my $dsType = $self->getNodeParam($token, 'ds-type');
+        if( $dsType eq 'collector' )
+        {
+            my $instance = $self->getNodeParam($token, 'collector-instance');
+            
+            my $params = {};
+            foreach my $param (
+                'collector-timeoffset',
+                'collector-period',
+                'collector-type',
+                'storage-type',
+                'transform-value',
+                'collector-scale',
+                'value-map')
+            {
+                my $val = $self->getNodeParam($token, $param);
+                if( defined($val) )
+                {
+                    $params->{$param} = $val;
+                }
+            }
+
+            $self->_fetch_collector_params($token, $params);
+                
+            $self->_write_agent_params($repos, $token,
+                                       'collector', $instance, $params);
+        }
+
+        if( $dsType ne 'rrd-multigraph' )
+        {
+            # monitor
+            my $mlist = $self->getNodeParam($token, 'monitor');
+            if( defined $mlist )
+            {
+                my $params = {'monitor' => $mlist};
+                
+                foreach my $param ('monitor-period',
+                                   'monitor-timeoffset')
+                {
+                    $params->{$param} = $self->getNodeParam($token, $param);
+                }
+
+                $self->_write_agent_params($repos, $token,
+                                           'monitor', 0, $params);
+            }
+        }
+    }
+    else
+    {
+        foreach my $ctoken ( $self->getChildren($token) )
+        {
+            $self->_walk_nodes_for_agent_configs($repos, $ctoken);
+        }
+    }
+}
+
+
+sub _fetch_collector_params
+{
+    my $self = shift;
+    my $token = shift;
+    my $params = shift;
+
+    my $type = $params->{'collector-type'};
+
+    if( not defined( $Torrus::Collector::params{$type} ) )
+    {
+        die("\%Torrus::Collector::params does not have member $type");
+    }
+
+    my @maps = ( $Torrus::Collector::params{$type} );
+
+    while( scalar( @maps ) > 0 )
+    {
+        my @next_maps = ();
+        foreach my $map ( @maps )
+        {
+            foreach my $param ( keys %{$map} )
+            {
+                my $value = $config_tree->getNodeParam( $token, $param );
+
+                if( ref( $map->{$param} ) )
+                {
+                    if( defined $value )
+                    {
+                        if( exists $map->{$param}->{$value} )
+                        {
+                            if( defined $map->{$param}->{$value} )
+                            {
+                                push( @next_maps,
+                                      $map->{$param}->{$value} );
+                            }
+                        }
+                        else
+                        {
+                            Error("Parameter $param has unknown value: " .
+                                  $value . " in " . $self->path($token));
+                        }
+                    }
+                }
+                else
+                {
+                    if( not defined $value )
+                    {
+                        # We know the default value
+                        $value = $map->{$param};
+                    }
+                }
+                # Finally store the value
+                if( defined $value )
+                {
+                    $params->{$param} = $value;
+                }
+            }
+        }
+        @maps = @next_maps;
+    }
+    
     return;
 }
 

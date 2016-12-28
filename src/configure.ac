@@ -339,7 +339,7 @@ if test -z "$defrrddir"; then
 
 AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
 AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])
-AC_CONFIG_FILES([examples/Makefile perllib/Makefile])
+AC_CONFIG_FILES([examples/Makefile lib/Makefile])
 AC_CONFIG_FILES([sup/Makefile xmlconfig/Makefile])
 
 AC_CONFIG_FILES([setup_tools/substvars.sh],[chmod +x setup_tools/substvars.sh])

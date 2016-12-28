@@ -460,11 +460,7 @@ sub validateNode
 
         foreach my $ctoken ( $config_tree->getChildren($token) )
         {
-            if( not $config_tree->isAlias($ctoken) )
-            {
-                $ok = validateNode($config_tree, $ctoken)
-                    ? $ok:0;
-            }
+            $ok = validateNode($config_tree, $ctoken) ? $ok:0;
         }
     }
     return $ok;

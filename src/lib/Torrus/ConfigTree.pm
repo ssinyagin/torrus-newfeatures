@@ -831,7 +831,7 @@ sub _nodeidpx_sha_dir
     my $self = shift;
     my $prefix = shift;
 
-    return ('nodeidpx/' . $self->_sha_file(sha1_hex($prefix)) . '/');
+    return ('nodeidpx/' . $self->_sha_file(sha1_hex($prefix)));
 }
 
 

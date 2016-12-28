@@ -152,8 +152,11 @@ foreach my $tree ( @trees )
                              
     $compiler->finalize( $ok );
 
-    Verbose('Updating agent configurations');
-    $compiler->updateAgentConfigs();
+    if( $ok )
+    {
+        Verbose('Updating agent configurations');
+        $compiler->updateAgentConfigs();
+    }
 
     $global_ok = $ok ? $global_ok:0;
 }

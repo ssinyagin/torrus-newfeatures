@@ -190,8 +190,10 @@ sub startEditingOthers
     my $self  = shift;
     my $filename  = shift;
 
-    $self->{'others_list_file'} = $filename;
-    $self->{'others_list'} = $self->_read_json('other/' . $filename);
+    $self->{'others_list_file'} = 'other/' . $filename;
+    my $old_list = $self->_read_json($self->{'others_list_file'});
+    $old_list = {} unless defined($old_list);
+    $self->{'others_list'} = $old_list;
 }
 
 
@@ -318,7 +320,7 @@ sub editNode
     my $parent_token;
     
     my $slashpos = rindex($path, '/', length($path) - ($is_subtree?2:0));
-    if( $slashpos > 0 )
+    if( $slashpos >= 0 )
     {
         my $parent_path = substr($path, 0, $slashpos+1);
         $parent_token = $self->token($parent_path, 1);
@@ -351,10 +353,10 @@ sub editNode
         if( $is_subtree )
         {
             $node->{'children'} = {};
+            $self->{'editing_dirty_children'} = 1;
         }
 
         $self->{'editing_dirty'} = 1;
-        $self->{'editing_dirty_children'} = 1;
     }
     
     $self->{'editing'} = $node;
@@ -368,7 +370,6 @@ sub editNode
 sub setNodeParam
 {
     my $self  = shift;
-    my $name  = shift;
     my $param = shift;
     my $value = shift;
 
@@ -492,7 +493,7 @@ sub initRoot
     if( not $self->{'init_root_done'} )
     {
         my $token = $self->editNode('/');
-        $self->setNodeParam($token, 'tree-name', $self->treeName());
+        $self->setNodeParam('tree-name', $self->treeName());
         $self->commitNode();
         $self->{'init_root_done'} = 1;
     }
@@ -670,6 +671,7 @@ sub _post_process_nodes
                 my $dir = $self->_nodeidpx_sha_dir($prefix);
                 $self->{'gitindex'}->add_frombuffer(
                     $dir . '/' . $nodeid_sha, '');
+                $pos+=2;
             }
         }
     }
@@ -727,8 +729,7 @@ sub _post_process_nodes
                                                             $newValue );
                             if( $newValue ne $value )
                             {
-                                $self->setNodeParam( $token, $dsParam,
-                                                     $newValue );
+                                $self->setNodeParam( $dsParam, $newValue );
                             }
                         }
                     }
@@ -767,9 +768,7 @@ sub _post_process_nodes
                         unpack( 'N', md5( $hashString ) ) % $nInstances;
                 }          
 
-                $self->setNodeParam( $token,
-                                     'collector-instance',
-                                     $instance );
+                $self->setNodeParam( 'collector-instance', $instance );
                 
                 my $dispersed =
                     $self->getNodeParam($token,
@@ -834,9 +833,7 @@ sub _post_process_nodes
                 
                 if( $newOffset != $oldOffset )
                 {
-                    $self->setNodeParam( $token,
-                                         'collector-timeoffset',
-                                         $newOffset );
+                    $self->setNodeParam('collector-timeoffset', $newOffset );
                 }
 
                 my $storagetypes =
@@ -953,14 +950,18 @@ sub _propagate_view_params
     {
         $self->_propagate_view_params( $parent );
 
-        my $parentParams = $self->getParams( $parent );
+        $self->editOther($vname);
+        
+        my $parentParams = $self->getOtherParams($parent);
         foreach my $param ( keys %{$parentParams} )
         {
             if( not defined( $self->getOtherParam( $vname, $param ) ) )
             {
-                $self->setOtherParam( $vname, $param, $parentParams->{$param} );
+                $self->setOtherParam($param, $parentParams->{$param});
             }
         }
+
+        $self->commitOther();
     }
 
     # mark this view as processed
@@ -999,7 +1000,7 @@ sub finalize
              $self->{'branch'},
              $self->{'new_commit'});
 
-        $self->{'redis'}->pub
+        $self->{'redis'}->publish
             ($self->{'redis_prefix'} . 'treecommits:' . $self->treeName(),
              $self->{'new_commit'});
                 
@@ -1016,9 +1017,9 @@ sub updateAgentConfigs
     my $repos = {};
     my @branchnames;
 
-    foreach my $instance ( 0 .. ($self->{'collectorInstances'} - 1) )
+    for( my $inst = 0; $inst < $self->{'collectorInstances'}; $inst++ )
     {
-        push(@branchnames, $self->_agent_branch_name('collector', $instance));
+        push(@branchnames, $self->_agent_branch_name('collector', $inst));
     }
 
     push(@branchnames, $self->_agent_branch_name('monitor', 0));

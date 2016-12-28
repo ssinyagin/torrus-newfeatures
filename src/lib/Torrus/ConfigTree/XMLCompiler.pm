@@ -240,11 +240,11 @@ sub compile_params
 
             if( $isDS )
             {
-                $self->setNodeParam($name, $param, $value);
+                $self->setNodeParam($param, $value);
             }
             else
             {
-                $self->setOtherParam($name, $param, $value);
+                $self->setOtherParam($param, $value);
             }
         }
     }
@@ -516,6 +516,7 @@ sub compile_views
     my $self = shift;
     my $vw_node = shift;
     my $parentname = shift;
+    
     my $ok = 1;
 
     foreach my $view ( $vw_node->getChildrenByTagName('view') )

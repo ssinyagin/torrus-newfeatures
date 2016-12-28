@@ -290,7 +290,7 @@ sub agentInstances
     my $agent = shift;
         
     my $run = $Torrus::Global::treeConfig{$tree}{'run'}{$agent};
-    return( (defined($run) and $run > 1) ? int($run) : 0 ); 
+    return( (defined($run) and $run > 0) ? int($run) : 0 ); 
 }
 
 sub mayRunMonitor

@@ -216,10 +216,7 @@ sub collect_datasources
     
     my $topNode = $cb->getTopSubtree();
     my $topToken = $config_tree->token('/');
-    
-    my $params = prepare_params( $config_tree, $topToken );
-    $cb->addParams( $topNode, $params );
-
+            
     if( defined($filter_param) )
     {
         $filterTokens{$topToken} = apply_filter( $config_tree, $topToken );
@@ -266,27 +263,43 @@ sub collect_subtrees
     my $cb = shift;
     my $token = shift;
     my $parentNode = shift;
-    
-    foreach my $ctoken ( $config_tree->getChildren( $token ) )
+
+    if( defined($filter_param) and not $filterTokens{$token} )
     {
-        if( not defined($filter_param) or $filterTokens{$ctoken} )
-        {
-            my $childName =
-                $config_tree->nodeName( $config_tree->path($ctoken) );
-            my $params = prepare_params( $config_tree, $ctoken );
+        return;
+    }
+
+    my $params = prepare_params($config_tree, $token);
+    my $nodeName = $config_tree->nodeName( $config_tree->path($token) );
+    my $isSubtree = $config_tree->isSubtree($token);
+
+    my $curNode;
+    if( $isSubtree )
+    {
+        $curNode = $cb->addSubtree( $parentNode, $nodeName, $params );
+    }
+    else
+    {
+        $curNode = $cb->addLeaf( $parentNode, $nodeName, $params );
+    }
         
-            if( $config_tree->isSubtree( $ctoken ) )
-            {
-                my $subtreeNode =
-                    $cb->addSubtree( $parentNode, $childName, $params );
-                collect_subtrees( $config_tree, $cb, $ctoken, $subtreeNode );
-            }
-            elsif( $config_tree->isLeaf( $ctoken ) )
-            {
-                $cb->addLeaf( $parentNode, $childName, $params );
-            }
+    my @srcfiles = $config_tree->getSrcFiles($token);
+    if( scalar(@srcfiles) )
+    {
+        $cb->addComment($curNode, 'src: ' . join(',', @srcfiles));
+    }
+    
+    $cb->addComment($curNode, 'token: ' . $token);
+
+    
+    if( $isSubtree )
+    {
+        foreach my $ctoken ( $config_tree->getChildren( $token ) )
+        {
+            collect_subtrees( $config_tree, $cb, $ctoken, $curNode );
         }
     }
+
     return;
 }
 

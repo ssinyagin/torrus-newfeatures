@@ -81,6 +81,8 @@ sub compile
 
     Verbose('Compiling ' . $fullname);
 
+    $self->{'srcfiles'}{$filename} = 1;
+    
     my $ok = 1;
     my $parser = new XML::LibXML;
     my $doc;
@@ -94,12 +96,8 @@ sub compile
         Error("Failed to parse $fullname: $@");
         return 0;
     }
-
     
     my $root = $doc->documentElement();
-
-    # Initialize the '/' element
-    $self->initRoot();
 
     # First of all process all pre-required files
     foreach my $node ( $root->getElementsByTagName('include') )
@@ -153,6 +151,8 @@ sub compile
 
     $self->endEditingOthers();
 
+    delete $self->{'srcfiles'}{$filename};
+    
     return $ok;
 }
 

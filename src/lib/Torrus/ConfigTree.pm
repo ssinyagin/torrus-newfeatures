@@ -1181,6 +1181,25 @@ sub getDefinitionNames
 }
 
 
+sub getSrcFiles
+{
+    my $self = shift;
+    my $token = shift;
+
+    my $node = $self->_node_read($token);
+    if( defined($node->{'src'}) )
+    {
+        return sort keys %{$node->{'src'}};
+    }
+    else
+    {
+        return ();
+    }
+}
+
+
+
+
 1;
 
 

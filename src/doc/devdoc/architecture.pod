@@ -196,15 +196,19 @@ keys and values:
 =item * C<is_subtree>: 1 for subtree, 0 for a leaf.
 
 =item * C<parent>: token of the parent node, or empty string if this is
-the top of the tree.
+  the top of the tree.
 
 =item * C<path>: the full node name. Subtree names must end with slash,
-and leaf names should end with alphanumeric characters.
+  and leaf names should end with alphanumeric characters.
 
 =item * C<params>: hash with parameter names and values.
 
 =item * C<vars>: hash with variable values (used in setvar, iftrue and
-iffalse XML statements).
+  iffalse XML statements).
+
+=item * C<src>: optional hash of source XML file names as keys and "1"
+  as values. It's only defined on the topmost node that is affected by a
+  given XML.
 
 =back
 

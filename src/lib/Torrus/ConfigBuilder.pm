@@ -490,6 +490,16 @@ sub addStatistics
 }
 
 
+sub addComment
+{
+    my $self = shift;
+    my $parentNode = shift;
+    my $msg = shift;
+    
+    $parentNode->appendChild($self->{'doc'}->createComment($msg));
+    return;
+}
+
 
 sub requiredFiles
 {

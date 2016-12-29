@@ -104,6 +104,7 @@ sub new
         Torrus::SiteConfig::agentInstances( $self->treeName(), 'collector' );
 
     $self->{'is_writing'} = 1;
+    $self->{'srcfiles'} = {};
 
     $self->_read_paramprops();
 
@@ -183,6 +184,7 @@ sub _write_json
         ($filename, $self->{'json'}->encode($data));
     return;
 }
+
 
 
 sub startEditingOthers
@@ -444,25 +446,70 @@ sub commitNode
         die('an object being edited is not a node');
     }
 
-    my $sha_file = $self->_sha_file($self->{'editing_node'});
+    if( $self->{'editing_dirty'} or $self->{'editing_dirty_children'} )
+    {
+        my $sha_file = $self->_sha_file($self->{'editing_node'});
     
-    if( $self->{'editing_dirty'} )
-    {
-        my $data = {
-            'is_subtree' => $self->{'editing'}{'is_subtree'},
-            'parent' => $self->{'editing'}{'parent'},
-            'path' => $self->{'editing'}{'path'},
-            'params' => $self->{'editing'}{'params'},
-            'vars' => $self->{'editing'}{'vars'},
-        };
+        if( $self->{'editing_dirty'} )
+        {
+            my $data = {
+                'is_subtree' => $self->{'editing'}{'is_subtree'},
+                'parent' => $self->{'editing'}{'parent'},
+                'path' => $self->{'editing'}{'path'},
+                'params' => $self->{'editing'}{'params'},
+                'vars' => $self->{'editing'}{'vars'},
+            };
 
-        $self->_write_json('nodes/' . $sha_file, $data);
-    }
+            # find the topmost ancestor that is affected by each source file
 
-    if( $self->{'editing_dirty_children'} )
-    {
-        $self->_write_json('children/' . $sha_file,
-                           $self->{'editing'}{'children'});
+            if( defined($self->{'editing'}{'src'}) )
+            {
+                $data->{'src'} = $self->{'editing'}{'src'};
+            }
+
+            foreach my $srcfile (keys %{$self->{'srcfiles'}})
+            {
+                my $src_found;
+                
+                if( defined($data->{'src'}) and $data->{'src'}{$srcfile} )
+                {
+                    $src_found = 1;
+                }
+                
+                my $ancestor;
+                if( not $src_found )
+                {
+                    $ancestor = $data->{'parent'};
+                }
+                
+                while( not $src_found and $ancestor ne '' )
+                {
+                    my $node = $self->_node_read($ancestor);
+            
+                    if( defined($node->{'src'}) and $node->{'src'}{$srcfile} )
+                    {
+                        $src_found = 1;
+                    }
+                    
+                    $ancestor = $node->{'parent'};
+                }
+
+                if( not $src_found )
+                {
+                    $data->{'src'}{$srcfile} = 1;
+                    # this is for the object cache
+                    $self->{'editing'}{'src'}{$srcfile} = 1;
+                }
+            }
+            
+            $self->_write_json('nodes/' . $sha_file, $data);
+        }
+
+        if( $self->{'editing_dirty_children'} )
+        {
+            $self->_write_json('children/' . $sha_file,
+                               $self->{'editing'}{'children'});
+        }
     }
     
     delete $self->{'editing'};
@@ -485,23 +532,6 @@ sub setParamProperty
     $self->{'paramprop'}{$prop}{$param} = $value;
     return;
 }
-
-
-
-sub initRoot
-{
-    my $self  = shift;
-
-    if( not $self->{'init_root_done'} )
-    {
-        my $token = $self->editNode('/');
-        $self->setNodeParam('tree-name', $self->treeName());
-        $self->commitNode();
-        $self->{'init_root_done'} = 1;
-    }
-    return;
-}
-
 
 
 
@@ -574,6 +604,10 @@ sub commitConfig
 {
     my $self = shift;
 
+    $self->editNode('/');
+    $self->setNodeParam('tree-name', $self->treeName());
+    $self->commitNode();
+        
     my $ok = $self->_post_process_nodes();
     return($ok) unless $ok;
     

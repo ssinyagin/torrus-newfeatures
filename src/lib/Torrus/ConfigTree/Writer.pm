@@ -594,14 +594,24 @@ sub commitConfig
     my $me = $self->_signature();
     
     my $tree = $self->{'gitindex'}->write_tree();
+
+    if( $tree->id() ne $parent->tree()->id() )
+    {
+        my $commit = $self->{'repo'}->commit
+            (scalar(localtime(time())),
+             $me, $me, [$parent], $tree, $branch->name());
+        
+        $self->{'new_commit'} = $commit->id();
+        Debug('Wrote ' . $commit->id());
+        $self->_init_extcache($commit);
+    }
+    else
+    {
+        $self->{'notning_changed_in_config'} = 1;
+        Verbose('Nothing is changed in branch ' . $self->{'branch'} .
+                ', skipping the commit');
+    }
     
-    my $commit = $self->{'repo'}->commit
-        (scalar(localtime(time())),
-         $me, $me, [$parent], $tree, $branch->name());
-
-    $self->{'new_commit'} = $commit->id();
-    Debug('Wrote ' . $commit->id());
-
     delete $self->{'gitindex'};
     $self->{'gittree'} = $tree;
     
@@ -609,18 +619,19 @@ sub commitConfig
     my $index = Git::Raw::Index->new();
     $self->{'repo'}->index($index);
 
-    $self->_init_extcache($commit);
-
     $self->{'is_writing'} = undef;
 
-    # clean up tokenset members if their nodes were removed
-    foreach my $ts ( $self->getTsets() )
+    if( not $self->{'notning_changed_in_config'} )
     {
-        foreach my $member ( $self->tsetMembers($ts) )
+        # clean up tokenset members if their nodes were removed
+        foreach my $ts ( $self->getTsets() )
         {
-            if( not $self->tokenExists($member) )
+            foreach my $member ( $self->tsetMembers($ts) )
             {
-                $self->tsetDelMember($ts, $member);
+                if( not $self->tokenExists($member) )
+                {
+                    $self->tsetDelMember($ts, $member);
+                }
             }
         }
     }
@@ -976,6 +987,8 @@ sub validate
 {
     my $self = shift;
 
+    return 1 if $self->{'notning_changed_in_config'};
+
     my $ok = 1;
 
     if( not $self->{'-NoDSRebuild'} )
@@ -995,7 +1008,7 @@ sub finalize
     my $self = shift;
     my $status = shift;
 
-    if( $status )
+    if( $status and not $self->{'notning_changed_in_config'} )
     {
         $self->{'redis'}->hset
             ($self->{'redis_prefix'} . 'githeads',
@@ -1016,6 +1029,8 @@ sub updateAgentConfigs
 {
     my $self = shift;
 
+    return if $self->{'notning_changed_in_config'};
+    
     my $repos = {};
     my @branchnames;
 
@@ -1072,17 +1087,24 @@ sub updateAgentConfigs
         my $me = $self->_signature();
 
         my $tree = $repo->index()->write_tree();
-    
-        my $commit = $repo->commit
-            (scalar(localtime(time())),
-             $me, $me, [$parent], $tree, $branch->name());
 
-        Debug('Wrote ' . $commit->id());
+        if( $tree->id() ne $parent->tree()->id() )
+        {
+            my $commit = $repo->commit
+                (scalar(localtime(time())),
+                 $me, $me, [$parent], $tree, $branch->name());
+            Debug('Wrote ' . $commit->id());
 
-        $self->{'redis'}->hset
-            ($self->{'redis_prefix'} . 'githeads',
-             $branchname,
-             $commit->id());
+            $self->{'redis'}->hset
+                ($self->{'redis_prefix'} . 'githeads',
+                 $branchname,
+                 $commit->id());
+        }
+        else
+        {
+            Debug('Nothing changed in ' . $branchname .
+                  ', skipping the commit');
+        }
     }
     
     return;

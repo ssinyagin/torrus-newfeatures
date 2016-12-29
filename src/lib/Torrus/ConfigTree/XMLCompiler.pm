@@ -82,7 +82,7 @@ sub compile
     Verbose('Compiling ' . $fullname);
 
     $self->{'srcfiles'}{$filename} = 1;
-    
+        
     my $ok = 1;
     my $parser = new XML::LibXML;
     my $doc;
@@ -113,6 +113,8 @@ sub compile
             $ok = $self->compile( $incfile ) ? $ok:0;
         }
     }
+
+    $self->{'current_srcfile'} = $filename;
 
     foreach my $node ( $root->getElementsByTagName('param-properties') )
     {
@@ -274,7 +276,8 @@ sub compile_ds
         }
         else
         {
-            $self->{'Templates'}->{$name} = $template;
+            $self->{'Templates'}{$name} = $template;
+            $self->{'template_src'}{$name} = $self->{'current_srcfile'};
         }
     }
 
@@ -343,8 +346,21 @@ sub compile_subtrees
             }
             else
             {
+                my $tmpl_src = $self->{'template_src'}{$name};
+                my $src_set;
+                if( not $self->{'srcfiles'}{$tmpl_src} )
+                {
+                    $self->{'srcfiles'}{$tmpl_src} = 1;
+                    $src_set = 1;
+                }
+                
                 $ok = $self->compile_subtrees
                     ($template, $path, $iamLeaf) ? $ok:0;
+
+                if( $src_set )
+                {
+                    delete $self->{'srcfiles'}{$tmpl_src};
+                }
             }
         }
     }

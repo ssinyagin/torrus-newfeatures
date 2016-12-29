@@ -130,7 +130,7 @@ sub _init_extcache
     my $commit = shift;
 
     my $memcached_prefix = $Torrus::Global::memcachedPrefix .
-        $self->{'treename'} . substr($commit, 0, 4);
+        $self->{'treename'} . ':' . substr($commit, 0, 4) . ':';
 
     if( defined($self->{'extcache'}) )
     {
@@ -627,30 +627,37 @@ sub getNodeParam
         return $self->retrieveNodeParam( $token, $param );
     }
 
-    my $cachekey = 'np:' . $token . ':' . $param;
-    my $cacheval = $self->{'extcache'}->get($cachekey);
-    if( defined( $cacheval ) )
+    my $cachekey;
+    if( $Torrus::ConfigTree::useMemcachedForParams )
     {
-        my $status = substr( $cacheval, 0, 1 );
-        if( $status eq 'U' )
+        $cachekey = 'np:' . $token . ':' . $param;
+        my $cacheval = $self->{'extcache'}->get($cachekey);
+        if( defined( $cacheval ) )
         {
-            return undef;
-        }
-        else
-        {
-            return substr( $cacheval, 1 );
+            my $status = substr( $cacheval, 0, 1 );
+            if( $status eq 'U' )
+            {
+                return undef;
+            }
+            else
+            {
+                return substr( $cacheval, 1 );
+            }
         }
     }
 
     $value = $self->retrieveNodeParam( $token, $param );
 
-    if( defined( $value ) )
+    if( $Torrus::ConfigTree::useMemcachedForParams )
     {
-        $self->{'extcache'}->set( $cachekey, 'D'.$value );
-    }
-    else
-    {
-        $self->{'extcache'}->set( $cachekey, 'U' );
+        if( defined( $value ) )
+        {
+            $self->{'extcache'}->set( $cachekey, 'D'.$value );
+        }
+        else
+        {
+            $self->{'extcache'}->set( $cachekey, 'U' );
+        }
     }
 
     return $value;

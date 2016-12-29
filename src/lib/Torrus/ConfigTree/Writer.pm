@@ -358,6 +358,7 @@ sub editNode
         }
 
         $self->{'editing_dirty'} = 1;
+        $self->{'objcache'}->set($token => $node);
     }
     
     $self->{'editing'} = $node;

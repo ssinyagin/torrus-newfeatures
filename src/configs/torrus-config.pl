@@ -75,6 +75,10 @@ $Torrus::ConfigTree::remoteName = 'torrus_remote';
 
 $Torrus::ConfigTree::objCacheSize = 2048;
 
+# By default, we do not use Memcached to store calculated object params,
+# as it slows down the compiler because of network delays. This can be
+# useful to turn on in some occasions.
+$Torrus::ConfigTree::useMemcachedForParams = 0;
 
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;

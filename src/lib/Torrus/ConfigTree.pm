@@ -416,7 +416,7 @@ sub isSubtree
     my $token = shift;
 
     my $node = $self->_node_read($token);
-    return( not $node->{'is_subtree'} );
+    return( $node->{'is_subtree'} );
 }
 
 

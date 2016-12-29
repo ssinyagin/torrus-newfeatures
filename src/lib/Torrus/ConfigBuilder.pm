@@ -390,23 +390,6 @@ sub addParam
 }
 
 
-sub addAlias
-{
-    my $self = shift;
-    my $parentNode = shift;
-    my $aliasPath = shift;
-
-    if( not ref( $parentNode ) ) # I hope nobody would need this
-    {
-        $parentNode = $self->{'datasources'};
-    }
-
-    my $aliasNode = $self->{'doc'}->createElement( 'alias' );
-    $aliasNode->appendText( $aliasPath );
-    $parentNode->appendChild( $aliasNode );
-    return;
-}
-
 
 sub setVar
 {

@@ -316,32 +316,33 @@ sub editNode
         }
     }
 
-    my $is_subtree = ($path =~ /\/$/) ? 1:0;
-    my $parent_token;
-    
-    my $slashpos = rindex($path, '/', length($path) - ($is_subtree?2:0));
-    if( $slashpos >= 0 )
-    {
-        my $parent_path = substr($path, 0, $slashpos+1);
-        $parent_token = $self->token($parent_path, 1);
-        my $parent_node = $self->_node_read($parent_token);
-        
-        if( not defined($parent_node) or
-            not $parent_node->{'children'}->{$token} )
-        {
-            $self->editNode($parent_path);
-            $self->_add_child_token($token);
-            $self->commitNode();
-        }
-    }
-    else
-    {
-        $parent_token = '';
-    }
-
     my $node = $self->_node_read($token);
     if( not defined($node) )
     {
+        my $is_subtree = ($path =~ /\/$/) ? 1:0;
+        my $parent_token;
+
+        if( $path eq '/' )
+        {
+            $parent_token = '';
+        }
+        else
+        {
+            my $slashpos =
+                rindex($path, '/', length($path) - ($is_subtree?2:0));
+            my $parent_path = substr($path, 0, $slashpos+1);
+            $parent_token = $self->token($parent_path, 1);
+            my $parent_node = $self->_node_read($parent_token);
+            
+            if( not defined($parent_node) or
+                not $parent_node->{'children'}->{$token} )
+            {
+                $self->editNode($parent_path);
+                $self->_add_child_token($token);
+                $self->commitNode();
+            }
+        }
+        
         $node = {
             'is_subtree' => $is_subtree,
             'parent' => $parent_token,

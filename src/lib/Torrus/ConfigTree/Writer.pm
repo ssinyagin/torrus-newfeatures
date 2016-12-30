@@ -1128,6 +1128,7 @@ sub deleteSrcFile
     
     foreach my $token (sort keys %{$self->{'srcrefs'}{$filename}})
     {
+        Debug('Deleting recursively: ' . $self->path($token));
         $self->deleteNode($token);
     }
 
@@ -1155,8 +1156,6 @@ sub deleteNode
             $self->deleteNode($ctoken);
         }
     }
-
-    Debug('Deleting ' . $self->path($token));
 
     if( defined($node->{'src'}) )
     {

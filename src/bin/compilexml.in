@@ -32,7 +32,6 @@ exit(1) unless Torrus::SiteConfig::verify();
 
 our @trees;
 our $all_trees;
-our $no_ds;
 our $no_validation;
 our $force;
 
@@ -42,7 +41,6 @@ our $help_needed;
 
 my $opts_ok = GetOptions ('tree=s'   => \@trees,
                           'all'      => \$all_trees,
-                          'nods'     => \$no_ds,
                           'noval'    => \$no_validation,
                           'force'    => \$force,
                           'debug'    => \$debug,
@@ -56,7 +54,6 @@ if( not $opts_ok or not (scalar(@trees) or $all_trees) or
     "Options:\n",
     "  --tree=NAME     tree name(s) to compile\n",
     "  --all           compile all trees\n",
-    "  --nods          compile non-datasource configuration only\n",
     "  --noval         disable parameter validation\n",
     "  --force         force the compiler even if anoother " .
         "compiler process is probably running\n",
@@ -98,7 +95,6 @@ foreach my $tree ( @trees )
     my $ok = 1;
     my $compiler =
         new Torrus::ConfigTree::XMLCompiler( -TreeName => $tree,
-                                             -NoDSRebuild => $no_ds,
                                              -ForceWriter => $force );
     if( not defined( $compiler ) )
     {

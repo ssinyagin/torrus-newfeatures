@@ -47,13 +47,6 @@ sub new
 
     bless $self, $class;
 
-    if( $options{'-NoDSRebuild'} )
-    {
-        $self->{'-NoDSRebuild'} = 1;
-    }
-
-    $self->{'files_processed'} = {};
-
     return $self;
 }
 
@@ -70,18 +63,16 @@ sub compile
     }
                     
     # Make sure we process each file only once
-    if( $self->{'files_processed'}{$filename} )
+    if( $self->{'srcfiles_seen'}{$filename} )
     {
         return 1;
     }
     else
     {
-        $self->{'files_processed'}{$filename} = 1;
+        $self->{'srcfiles_seen'}{$filename} = 1;
     }
 
     Verbose('Compiling ' . $fullname);
-
-    $self->{'srcfiles'}{$filename} = 1;
         
     my $ok = 1;
     my $parser = new XML::LibXML;
@@ -91,11 +82,16 @@ sub compile
         die("Cannot open $fullname: $!");
     my $blob = do { local $/; <$fh> };    
     
-    if( not eval {$doc = $parser->parse_string($blob)} or $@ )
+    if( not eval {$doc = $parser->parse_string(\$blob)} or $@ )
     {
         Error("Failed to parse $fullname: $@");
         return 0;
     }
+
+    my $file_changed = $self->addSrcFile($filename, \$blob);
+
+    # clean up the memory
+    $blob = undef;
     
     my $root = $doc->documentElement();
 
@@ -114,47 +110,61 @@ sub compile
         }
     }
 
-    $self->{'current_srcfile'} = $filename;
-
-    foreach my $node ( $root->getElementsByTagName('param-properties') )
+    if( $file_changed and $self->{'srcglobaldeps'}{$filename} )
     {
-        $ok = $self->compile_paramprops( $node ) ? $ok:0;
+        Debug("A global dependency file has changed ($filename), " .
+              "rebuilding the whole tree");
+        $self->{'rebuild_all'} = 1;
     }
 
-    if( not $self->{'-NoDSRebuild'} )
+    if( $file_changed or $self->{'rebuild_all'} )
     {
+        # Delete all dependent objects and build them again
+        $self->deleteSrcFile($filename);
+
+        $self->{'srcfiles'}{$filename} = 1;
+        
+        $self->{'current_srcfile'} = $filename;
+
+        foreach my $node ( $root->getElementsByTagName('param-properties') )
+        {
+            $self->{'srcglobaldeps'}{$filename} = 1;
+            $ok = $self->compile_paramprops( $node ) ? $ok:0;
+        }
+        
         foreach my $node ( $root->getElementsByTagName('definitions') )
         {
+            $self->{'srcglobaldeps'}{$filename} = 1;
             $ok = $self->compile_definitions( $node ) ? $ok:0;
         }
-
+        
         foreach my $node ( $root->getElementsByTagName('datasources') )
         {
             $ok = $self->compile_ds( $node ) ? $ok:0;
         }
+        
+        foreach my $node ( $root->getElementsByTagName('monitors') )
+        {
+            $ok = $self->compile_monitors( $node ) ? $ok:0;
+        }
+        
+        foreach my $node ( $root->getElementsByTagName('token-sets') )
+        {
+            $ok = $self->compile_tokensets( $node ) ? $ok:0;
+        }
+        
+        $self->startEditingOthers('__VIEWS__');
+
+        foreach my $node ( $root->getElementsByTagName('views') )
+        {
+            $ok = $self->compile_views( $node ) ? $ok:0;
+        }
+
+        $self->endEditingOthers();
+
+        delete $self->{'srcfiles'}{$filename};
     }
 
-    foreach my $node ( $root->getElementsByTagName('monitors') )
-    {
-        $ok = $self->compile_monitors( $node ) ? $ok:0;
-    }
-
-    foreach my $node ( $root->getElementsByTagName('token-sets') )
-    {
-        $ok = $self->compile_tokensets( $node ) ? $ok:0;
-    }
-
-    $self->startEditingOthers('__VIEWS__');
-
-    foreach my $node ( $root->getElementsByTagName('views') )
-    {
-        $ok = $self->compile_views( $node ) ? $ok:0;
-    }
-
-    $self->endEditingOthers();
-
-    delete $self->{'srcfiles'}{$filename};
-    
     return $ok;
 }
 
@@ -265,6 +275,9 @@ sub compile_ds
 
     foreach my $template ( $ds_node->getChildrenByTagName('template') )
     {
+        # Whenever there's a temlate, we mark the file as global dependency
+        $self->{'srcglobaldeps'}{$self->{'current_srcfile'}} = 1;
+        
         my $name = $template->getAttribute('name');
         if( not $name )
         {
@@ -277,7 +290,6 @@ sub compile_ds
         else
         {
             $self->{'Templates'}{$name} = $template;
-            $self->{'template_src'}{$name} = $self->{'current_srcfile'};
         }
     }
 
@@ -346,21 +358,8 @@ sub compile_subtrees
             }
             else
             {
-                my $tmpl_src = $self->{'template_src'}{$name};
-                my $src_set;
-                if( not $self->{'srcfiles'}{$tmpl_src} )
-                {
-                    $self->{'srcfiles'}{$tmpl_src} = 1;
-                    $src_set = 1;
-                }
-                
                 $ok = $self->compile_subtrees
                     ($template, $path, $iamLeaf) ? $ok:0;
-
-                if( $src_set )
-                {
-                    delete $self->{'srcfiles'}{$tmpl_src};
-                }
             }
         }
     }

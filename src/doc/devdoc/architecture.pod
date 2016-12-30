@@ -119,12 +119,10 @@ contains a full hierarchy of objects, so all parameters that are defined
 in the input XML are retrievable. Typically the Web UI renderer is
 consuming this data.
 
-The C<I<TREE>_xmlsrc> branch contains XML files that are used by the XML
-compiler. While processing the XML files, it adds them into this branch,
-and performs a commit after a successful data validation. This
-branch is used for incremental compilations in order to track the
-changes in XML sources.
-    
+The C<I<TREE>_srcfiles> branch contains XML files that are used by the
+XML compiler. While processing the XML files, it adds them into this
+branch in order to track the changes in XML sources.
+
 Also there's a number of agent branches, one per agent instance
 (collectors and monitors are typical agents):
 C<I<TREE>_I<DAEMON>_I<INSTANCE>>. Each such branch contains only the
@@ -145,15 +143,20 @@ is stored as C<b7/ba/0d88a0b14a4e6c3c61f5446aa619a537098f>.
 =item * C<children/>: tor each subtree node, there is a JSON file
   defining a hash with child tokens as keys and "1" as values.
 
-=item * C<srcref/I<XMLSHA>/I<NODESHA>>: the C<srcref> directory defines
-  the dependency of tree nodes on source XML files. SHA-1 digest of each
-  XML file name defines a directory name, and each of these directories
-  has zero-length files, each file named after a node token, that
-  represent the topmost nodes that are defined by the corresponding XML
-  file.
+=item * C<srcrefs>: a JSON hash representing dependencies of nodes from
+  XML files. It's a two-level hash: the first key is the source file
+  name, the second key is the token of topmost dependent node, and the
+  value is "1".
+
+=item * C<srcglobaldeps>: a JSON hash representing the XML source files
+  which, if changed, enforce a full rebuild of the tree
+  configuration. The keys are file names, and values are "1".
 
 =item * C<srcrev>: A file containing a JSON scalar referring to the
   commit in XML sources.
+
+=item * C<srcfiles>: A file containing a JSON hash with source XML files
+  as keys and "1" as values.
 
 =item * C<nodeid/>: two-level 256-way directory structure. Each file is
   a SHA-1 digest of I<nodeid> value. The content of the file is a JSON

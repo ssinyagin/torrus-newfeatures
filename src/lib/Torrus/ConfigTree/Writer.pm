@@ -64,12 +64,69 @@ sub new
     
     bless $self, $class;
 
-    my $repo = $self->{'repo'} =
-        Git::Raw::Repository->open($self->{'repodir'});
-    
-    my $branchname = $self->{'branch'};
-    my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
+    # set up the configtree branch
+    {
+        my ($repo, $branch, $index) =
+            $self->_setup_repo_writing($self->{'branch'});
+            
+        $self->{'repo'} = $repo;
+        $self->{'previous_commit'} = $branch->peel('commit');
+        $self->{'gitindex'} = $index;
 
+        # This points to the last commit, and we're writing a new tree with the
+        # help of index
+        delete $self->{'gittree'};
+    }
+
+    # set up the srcfiles branch
+    {
+        $self->{'srcbranch'} = $self->treeName() . '_srcfiles';
+        my ($repo, $branch, $index) =
+            $self->_setup_repo_writing($self->{'srcbranch'});
+        
+        $self->{'srcrepo'} = $repo;
+        $self->{'srcindex'} = $index;
+
+        my $prev_commit = $self->_read_json('srcrev');
+        $prev_commit = '' unless defined($prev_commit);
+        $self->{'src_previous_commit'} = $prev_commit;
+    }
+    
+    $self->{'viewparent'} = {};
+
+    $self->{'collectorInstances'} =
+        Torrus::SiteConfig::agentInstances( $self->treeName(), 'collector' );
+
+    $self->{'is_writing'} = 1;
+    
+    $self->{'srcfiles'} = {};
+    $self->{'srcfiles_seen'} = {};
+
+    $self->{'srcrefs'} = $self->_read_json('srcrefs');
+    $self->{'srcrefs'} = {} unless defined $self->{'srcrefs'};
+
+    $self->{'srcglobaldeps'} = $self->_read_json('srcglobaldeps');
+    $self->{'srcglobaldeps'} = {} unless defined $self->{'srcglobaldeps'};
+
+    $self->_read_paramprops();
+
+    return $self;
+}
+
+
+sub DESTROY
+{
+    my $self = shift;
+}
+
+sub _setup_repo_writing
+{
+    my $self = shift;
+    my $branchname = shift;
+
+    my $repo = Git::Raw::Repository->open($self->{'repodir'});
+    my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
+        
     if( not defined($branch) )
     {
         # This is a fresh repo, create the configtree branch
@@ -84,39 +141,18 @@ sub new
         $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
         die('expected a branch') unless defined($branch);
     }
-
-    $self->{'previous_commit'} = $branch->peel('commit');
     
     my $index = Git::Raw::Index->new();
     $repo->index($index);
-
-    # This points to the last commit, and we're writing a new tree with the
-    # help of index
-    delete $self->{'gittree'};
-
+            
     my $tree = $branch->peel('tree');
     $index->read_tree($tree);
-    $self->{'gitindex'} = $index;
-    
-    $self->{'viewparent'} = {};
 
-    $self->{'collectorInstances'} =
-        Torrus::SiteConfig::agentInstances( $self->treeName(), 'collector' );
-
-    $self->{'is_writing'} = 1;
-    $self->{'srcfiles'} = {};
-
-    $self->_read_paramprops();
-
-    return $self;
+    return ($repo, $branch, $index);
 }
-
-
-sub DESTROY
-{
-    my $self = shift;
     
-}
+
+
 
 sub _signature
 {
@@ -499,6 +535,7 @@ sub commitNode
                     $data->{'src'}{$srcfile} = 1;
                     # this is for the object cache
                     $self->{'editing'}{'src'}{$srcfile} = 1;
+                    $self->{'srcrefs'}{$srcfile}{$self->{'editing_node'}} = 1;
                 }
             }
             
@@ -607,7 +644,26 @@ sub commitConfig
     $self->editNode('/');
     $self->setNodeParam('tree-name', $self->treeName());
     $self->commitNode();
-        
+
+    # Detect source files which were removed
+    my $old_srcfiles = $self->_read_json('srcfiles');
+    $old_srcfiles = {} unless defined($old_srcfiles);
+
+    foreach my $filename (sort keys %{$old_srcfiles})
+    {
+        if( not $self->{'srcfiles_seen'}{$filename} )
+        {
+            Verbose("$filename was removed from source configuration");
+            $self->deleteSrcFile($filename);
+            $self->{'srcindex'}->remove($filename);
+        }
+    }
+
+    $self->_write_json('srcfiles', $self->{'srcfiles_seen'});
+    $self->_write_json('srcrefs', $self->{'srcrefs'});
+    $self->_write_json('srcglobaldeps', $self->{'srcglobaldeps'});
+    $self->_write_json('paramprops', $self->{'paramprop'});
+
     my $ok = $self->_post_process_nodes();
     return($ok) unless $ok;
     
@@ -618,41 +674,84 @@ sub commitConfig
         $self->_propagate_view_params( $vname );
     }
 
-    $self->_write_json('paramprops', $self->{'paramprop'});
 
-    Debug('Writing a commit in branch: ' . $self->{'branch'});
-    my $branchname = $self->{'branch'};
-    my $branch = Git::Raw::Branch->lookup($self->{'repo'}, $branchname, 1);
-    my $parent = $branch->peel('commit');
+    my $new_src_commit = '';
     
-    my $me = $self->_signature();
-    
-    my $tree = $self->{'gitindex'}->write_tree();
-
-    if( $tree->id() ne $parent->tree()->id() )
     {
-        my $commit = $self->{'repo'}->commit
-            (scalar(localtime(time())),
-             $me, $me, [$parent], $tree, $branch->name());
+        my $branchname = $self->{'srcbranch'};
+        Debug("Writing a commit in branch: $branchname");
+
+        my $branch =
+            Git::Raw::Branch->lookup($self->{'srcrepo'}, $branchname, 1);
+        my $parent = $branch->peel('commit');
+        my $tree = $self->{'srcindex'}->write_tree();
+
+        if( $tree->id() ne $parent->tree()->id() )
+        {
+            my $me = $self->_signature();
+            my $commit = $self->{'srcrepo'}->commit
+                (scalar(localtime(time())),
+                 $me, $me, [$parent], $tree, $branch->name());
         
-        $self->{'new_commit'} = $commit->id();
-        Debug('Wrote ' . $commit->id());
-        $self->_init_extcache($commit);
+            $new_src_commit = $commit->id();
+            Debug('Wrote ' . $commit->id());
+        }
+        else
+        {
+            Verbose("Nothing is changed in branch $branchname");
+            $new_src_commit = $parent;
+        }
+    }
+
+    if( $new_src_commit ne $self->{'src_previous_commit'} )
+    {
+        Debug("Something is changed in source files");
+        
+        $self->_write_json('srcrev', $new_src_commit);
+        
+        my $branchname = $self->{'branch'};
+        Debug("Writing a commit in branch: $branchname");
+        my $branch = Git::Raw::Branch->lookup($self->{'repo'}, $branchname, 1);
+        my $parent = $branch->peel('commit');
+    
+        my $tree = $self->{'gitindex'}->write_tree();
+
+        if( $tree->id() ne $parent->tree()->id() )
+        {
+            my $me = $self->_signature();
+            my $commit = $self->{'repo'}->commit
+                (scalar(localtime(time())),
+                 $me, $me, [$parent], $tree, $branch->name());
+            
+            $self->{'new_commit'} = $commit->id();
+            Debug('Wrote ' . $commit->id());
+        }
+        else
+        {
+            $self->{'notning_changed_in_config'} = 1;
+            Verbose("Nothing is changed in branch $branchname");
+        }
     }
     else
     {
         $self->{'notning_changed_in_config'} = 1;
-        Verbose('Nothing is changed in branch ' . $self->{'branch'} .
-                ', skipping the commit');
     }
     
     delete $self->{'gitindex'};
-    $self->{'gittree'} = $tree;
     
     # release the index memory, as it may be quite large
     my $index = Git::Raw::Index->new();
     $self->{'repo'}->index($index);
 
+    # get the latest commit tree
+    {
+        my $branch =
+            Git::Raw::Branch->lookup($self->{'repo'}, $self->{'branch'}, 1);
+        my $commit = $branch->peel('commit');
+        $self->{'gittree'} = $commit->tree();
+        $self->_init_extcache($commit);
+    }
+    
     $self->{'is_writing'} = undef;
 
     if( not $self->{'notning_changed_in_config'} )
@@ -1016,6 +1115,64 @@ sub _propagate_view_params
     return;
 }
 
+
+sub addSrcFile
+{
+    my $self = shift;
+    my $filename = shift;
+    my $blobref = shift;
+
+    my $prev_blob_id = '';
+    if( my $entry = $self->{'srcindex'}->find($filename) )
+    {
+        $prev_blob_id = $entry->blob()->id();
+    }
+    
+    my $entry = $self->{'srcindex'}->add_frombuffer($filename, $blobref);
+    my $new_blob_id = $entry->blob()->id();
+
+    return( $new_blob_id ne $prev_blob_id );
+}
+
+
+sub deleteSrcFile
+{
+    my $self = shift;
+    my $filename = shift;
+
+    return unless defined($self->{'srcrefs'}{$filename});
+    Debug("Deleting source file: $filename");
+    
+    foreach my $token (sort keys %{$self->{'srcrefs'}{$filename}})
+    {
+        $self->deleteNode($token);
+    }
+
+    delete $self->{'srcrefs'}{$filename};
+    delete $self->{'srcglobaldeps'}{$filename};
+
+    return;
+}
+
+
+sub deleteNode
+{
+    my $self = shift;
+    my $token = shift;
+    
+    if( $self->isSubtree($token) )
+    {
+        foreach my $ctoken ( $self->getChildren($token) )
+        {
+            $self->deleteNode($ctoken);
+        }
+    }
+    
+    my $sha_file = $self->_sha_file($token);
+    $self->{'gitindex'}->remove('nodes/' . $sha_file);
+    $self->{'gitindex'}->remove('children/' . $sha_file);
+    $self->{'objcache'}->remove($token);
+}
 
 sub validate
 {

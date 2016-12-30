@@ -9,7 +9,7 @@ New perl modules required:
   Redis
   Redis::DistLock
   Cache::Memcached::Fast
-  Git::Raw (version 0.65 or higher)
+  Git::Raw (version 0.69 or higher)
   Digest::SHA
   Cache::Ref
 

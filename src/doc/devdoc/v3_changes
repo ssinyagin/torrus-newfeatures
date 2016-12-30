@@ -5,6 +5,8 @@ Perl threads are required (they were optional for v2).
 
 Renamed "perllib" to "lib".
 
+Perl version 5.8.9 or higher.
+
 New perl modules required:
   Redis
   Redis::DistLock

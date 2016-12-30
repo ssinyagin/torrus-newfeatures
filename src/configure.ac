@@ -125,13 +125,13 @@ if test "$enable_pkgonly" != yes; then
    fi
 
 #  Check if Perl threads can be used.
-#  Requirements are: perl 5.8.8 with threads compiled,
+#  Requirements are: perl 5.8.9 with threads compiled,
 #  threads ver. 1.41 or higher, threads::shared ver. 1.03 or higher
 
    perlithreads=1
 
-   AC_MSG_CHECKING([if Perl version is 5.8.8 or higher])
-   if ${PERL} ${PERLOPTS} -e 'use 5.8.8' 2>/dev/null; then
+   AC_MSG_CHECKING([if Perl version is 5.8.9 or higher])
+   if ${PERL} ${PERLOPTS} -e 'use 5.8.9' 2>/dev/null; then
      AC_MSG_RESULT([Ok])
    else
      perlithreads=0

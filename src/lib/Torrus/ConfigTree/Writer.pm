@@ -375,8 +375,10 @@ sub editNode
             if( not defined($parent_node) or
                 not $parent_node->{'children'}->{$token} )
             {
+                # add a child token
                 $self->editNode($parent_path);
-                $self->_add_child_token($token);
+                $self->{'editing'}{'children'}{$token} = 1;
+                $self->{'editing_dirty_children'} = 1;
                 $self->commitNode();
             }
         }
@@ -429,24 +431,6 @@ sub setNodeParam
 }
 
 
-sub _add_child_token
-{
-    my $self  = shift;
-    my $ctoken  = shift;
-
-    if( not $self->{'editing'}{'is_subtree'} )
-    {
-        die($self->{'editing'}{'path'} . ' (' . $ctoken . ' is not a subtree');
-    }
-
-    if( not $self->{'editing'}{'children'}{$ctoken} )
-    {
-        $self->{'editing'}{'children'}{$ctoken} = 1;
-        $self->{'editing_dirty_children'} = 1;
-    }
-    return;
-}
-        
 
 
 sub setVar
@@ -673,7 +657,6 @@ sub commitConfig
     {
         $self->_propagate_view_params( $vname );
     }
-
 
     my $new_src_commit = '';
     
@@ -1141,7 +1124,7 @@ sub deleteSrcFile
     my $filename = shift;
 
     return unless defined($self->{'srcrefs'}{$filename});
-    Debug("Deleting source file: $filename");
+    Debug("Deleting dependencies of $filename");
     
     foreach my $token (sort keys %{$self->{'srcrefs'}{$filename}})
     {
@@ -1159,20 +1142,51 @@ sub deleteNode
 {
     my $self = shift;
     my $token = shift;
+
+    my $node = $self->_node_read($token);
     
-    if( $self->isSubtree($token) )
+    my $parent = $node->{'parent'};
+    my $iamsubtree = $node->{'is_subtree'};
+    
+    if( $iamsubtree )
     {
         foreach my $ctoken ( $self->getChildren($token) )
         {
             $self->deleteNode($ctoken);
         }
     }
+
+    Debug('Deleting ' . $self->path($token));
+
+    if( defined($node->{'src'}) )
+    {
+        foreach my $srcfile (keys %{$node->{'src'}})
+        {
+            delete $self->{'srcrefs'}{$srcfile}{$token};
+        }
+    }
     
     my $sha_file = $self->_sha_file($token);
     $self->{'gitindex'}->remove('nodes/' . $sha_file);
-    $self->{'gitindex'}->remove('children/' . $sha_file);
     $self->{'objcache'}->remove($token);
+
+    if( $iamsubtree )
+    {
+        $self->{'gitindex'}->remove('children/' . $sha_file);
+    }
+
+    # remove ourselves from parent's list of children
+    if( $parent ne '' )
+    {
+        $self->editNode($self->path($parent));
+        delete $self->{'editing'}{'children'}{$token};
+        $self->{'editing_dirty_children'} = 1;
+        $self->commitNode();
+    }
+    
+    return;
 }
+
 
 sub validate
 {

@@ -117,7 +117,8 @@ sub compile
         $self->{'rebuild_all'} = 1;
     }
 
-    if( $file_changed or $self->{'rebuild_all'} )
+    if( $file_changed or $self->{'rebuild_all'} or
+        $self->{'srcglobaldeps'}{$filename} )
     {
         # Delete all dependent objects and build them again
         $self->deleteSrcFile($filename);
@@ -367,7 +368,7 @@ sub compile_subtrees
     # templates might include child nodes, so we open this one again
     $self->editNode($path);
     
-    $ok = $self->compile_params($node, $token, 1);
+    $ok = $self->compile_params($node, $token, 1) ? $ok:0;
 
     # applying compile-time variables
     

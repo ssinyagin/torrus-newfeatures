@@ -24,22 +24,26 @@
   These are the default settings for the root node of a datasource tree.
 
   WARNING: This file is overwritten by "make install"
-  
+
   It is recommended to place all site customizations in site-global.xml,
   as it would not be overwritten by the installer.
 -->
 
 <configuration>
   <datasources>
-    
+
     <!-- Default views must be defined -->
     <param name="default-subtree-view" value="default-dir-html" />
     <param name="default-leaf-view" value="default-rrd-html" />
     <param name="rrgraph-views">
-      short,last24h,lastweek,lastmonth,lastyear
+      last24h-small,last24h,lastweek,lastmonth,lastyear
     </param>
 
-    <!-- Minimum set of parameters if we use
+    <!-- Disperse the collector timeoffsets. This will split the
+         collector job in multiple smaller jobs -->
+    <param name="collector-dispersed-timeoffset" value="yes"/>
+
+    <!-- Minimum set of parameters in case of
          collector-dispersed-timeoffset=yes -->
     <param name="collector-timeoffset-hashstring" value="%system-id%zz" />
     <param name="collector-timeoffset-min" value="0" />
@@ -60,7 +64,7 @@
          if health status is higher or equal the good level => green
          if health status is higher or equal the warning level => yellow
          if health status is below the warning level => red
-         
+
          More than 25 minutes downtime in last 30 minutes => red,
          otherwise yellow.
     -->

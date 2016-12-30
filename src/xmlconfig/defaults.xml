@@ -26,14 +26,14 @@
   and default view definitions.
 
   WARNING: This file is overwritten by "make install"
-  
+
   It is recommended to place all site customizations in site-global.xml,
   as it would not be overwritten by the installer.
 -->
 
 <configuration>
   <include filename="default-root.xml"/>
-  
+
   <param-properties>
     <!-- Parameters where space is removed from values -->
     <prop param="action"             prop="remspace" value="1"/>
@@ -164,7 +164,7 @@
       <param name="gprint-format-average" value="AVERAGE:%8.2lf%s"/>
       <param name="gprint-format-max"     value="MAX:%8.2lf%s"/>
       <param name="gprint-format-min"     value="MIN:%8.2lf%s"/>
-      
+
       <!-- Last day graph, inherits parameters from the above -->
       <view name="last24h">
         <param name="start"         value="-24hours" />
@@ -208,7 +208,7 @@
         <param name="gprint-header" value=""/>
         <param name="gprint-format-current" value="LAST:Current\: %7.2lf%s"/>
         <param name="description"   value="Last 6 hours graph" />
-        
+
         <view name="last24h-small">
           <param name="start"         value="-24hours" />
           <param name="description"   value="Last 24 hours graph" />
@@ -268,7 +268,7 @@
       <param name="expires"       value="3600" />
       <param name="html-template" value="default-recursivedir.html" />
     </view>
-    
+
     <view name="rrd-print-daily">
       <param name="view-type"     value="rrprint" />
       <param name="expires"       value="300" />
@@ -304,7 +304,7 @@
       <param name="expires"       value="3600" />
       <param name="html-template" value="default-helptext.html" />
     </view>
-    
+
     <view name="adminfo">
       <param name="view-type"     value="adminfo" />
       <param name="expires"       value="3600" />
@@ -323,7 +323,7 @@
       <param name="expires"       value="300" />
       <param name="html-template" value="iframe-rrd.html" />
     </view>
-    
+
     <!-- RPC calls -->
     <view name="rpc">
       <param name="view-type"     value="rpc" />
@@ -333,7 +333,7 @@
       <param name="line-color"    value="##SingleGraph" />
       <param name="maxline-style" value="##SingleGraphMax" />
       <param name="maxline-color" value="##SingleGraphMax" />
-    </view>    
+    </view>
 
     <!-- health icon image -->
     <view name="health">

@@ -67,3 +67,10 @@ TODO: remove ConfigTree->getTimestamp
 Aliases are no longer supported
 
 
+Default parameters changed:
+    <param name="rrgraph-views">
+      last24h-small,last24h,lastweek,lastmonth,lastyear
+    </param>
+    <param name="collector-dispersed-timeoffset" value="yes"/>
+
+

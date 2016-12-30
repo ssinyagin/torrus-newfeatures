@@ -22,7 +22,8 @@ EXTRA_DIST = \
 	site-global.xml
 
 xmldir         = $(distxmldir)
-dist_xml_DATA  = defaults.xml snmp-defs.xml cdef-collector-defs.xml
+dist_xml_DATA  = \
+	defaults.xml default-root.xml snmp-defs.xml cdef-collector-defs.xml
 
 vendordir      = $(distxmldir)/vendor
 dist_vendor_DATA = \

@@ -43,6 +43,7 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
 @SED@ \
     -e "s,\@FIND\@,@FIND@,g" \
     -e "s,\@PERL\@,@PERL@,g" \
+    -e "s,\@GIT\@,@GIT@,g" \
     -e "s,\@RM\@,@RM@,g" \
     -e "s,\@SHELL\@,@SHELL@,g" \
     -e "s,\@VERSION\@,@VERSION@,g" \

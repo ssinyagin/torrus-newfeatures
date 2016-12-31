@@ -1288,7 +1288,7 @@ sub updateAgentConfigs
     if( $new_commit_id eq $old_commit_id )
     {
         Verbose('Nothing is changed in configtree, skipping the agents update');
-        return;
+        return 0;
     }
 
     my $old_tree = $ref->peel('tree');
@@ -1396,7 +1396,7 @@ sub updateAgentConfigs
         ($self->_agents_ref_name(), $self->{'repo'}, $new_commit, 1);
     Debug('Updated reference: ' . $self->_agents_ref_name());
     
-    return;
+    return $n_updated;
 }
 
 

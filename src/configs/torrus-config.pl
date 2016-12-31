@@ -25,6 +25,7 @@
 use lib(@perllibdirs@);
 
 $Torrus::Global::version        = '@VERSION@';
+$Torrus::Global::gitExec        = '@GIT@';
 $Torrus::Global::cfgDefsDir     = '@cfgdefdir@';
 $Torrus::Global::cfgSiteDir     = '@siteconfdir@';
 $Torrus::Global::pkgbindir      = '@pkgbindir@';
@@ -82,6 +83,12 @@ $Torrus::ConfigTree::readerRemoteRepo = undef;
 $Torrus::ConfigTree::remoteName = 'torrus_remote';
 
 $Torrus::ConfigTree::objCacheSize = 2048;
+
+# Git garbage collector will be launched by XML compiler if number of
+# updated collector or monitor leaves exceeds this number
+$Torrus::ConfigTree::gitGcThreshold = 1000;
+
+
 
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;

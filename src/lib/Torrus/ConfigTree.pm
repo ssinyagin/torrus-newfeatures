@@ -129,19 +129,23 @@ sub _init_extcache
     my $self = shift;
     my $commit = shift;
 
-    my $memcached_prefix = $Torrus::Global::memcachedPrefix .
-        $self->{'treename'} . ':' . substr($commit, 0, 4) . ':';
-
-    if( defined($self->{'extcache'}) )
+    if( $Torrus::ConfigTree::useMemcached )
     {
-        $self->{'extcache'}->disconnect_all();
+        my $memcached_prefix = $Torrus::Global::memcachedPrefix .
+            $self->{'treename'} . ':' . substr($commit, 0, 4) . ':';
+
+        if( defined($self->{'extcache'}) )
+        {
+            $self->{'extcache'}->disconnect_all();
+        }
+
+        $self->{'extcache'} =
+            new Cache::Memcached::Fast({
+                servers => [{ 'address' => $Torrus::Global::memcachedServer,
+                              'noreply' => 1 }],
+                namespace => $memcached_prefix});
     }
-    
-    $self->{'extcache'} =
-        new Cache::Memcached::Fast({
-            servers => [{ 'address' => $Torrus::Global::memcachedServer,
-                          'noreply' => 1 }],
-            namespace => $memcached_prefix});
+
     return;
 }
 
@@ -330,7 +334,7 @@ sub gotoHead
     $self->{'gittree'} = $commit->tree();
 
     $self->_init_extcache($head);
-    
+
     return 1;
 }
 
@@ -628,7 +632,7 @@ sub getNodeParam
     }
 
     my $cachekey;
-    if( $Torrus::ConfigTree::useMemcachedForParams )
+    if( $Torrus::ConfigTree::useMemcached )
     {
         $cachekey = 'np:' . $token . ':' . $param;
         my $cacheval = $self->{'extcache'}->get($cachekey);
@@ -648,7 +652,7 @@ sub getNodeParam
 
     $value = $self->retrieveNodeParam( $token, $param );
 
-    if( $Torrus::ConfigTree::useMemcachedForParams )
+    if( $Torrus::ConfigTree::useMemcached )
     {
         if( defined( $value ) )
         {

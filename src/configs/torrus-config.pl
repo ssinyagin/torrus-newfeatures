@@ -58,6 +58,14 @@ $Torrus::Global::memcachedServer = '127.0.0.1:11211';
 # unique per Torrus instance within the same memcached server.
 $Torrus::Global::memcachedPrefix = 'torrus:';
 
+# By default, we do not use Memcached to store calculated object params,
+# as it slows down the compiler because of network delays. This can be
+# useful to turn on in some occasions.
+$Torrus::ConfigTree::useMemcached = 0;
+
+# Renderer output may be stored in Memcached for better multi-user performance
+$Torrus::Renderer::useMemcached = 0;
+
 
 # if true, push to the specified repo
 $Torrus::ConfigTree::writerPush = 0;
@@ -74,11 +82,6 @@ $Torrus::ConfigTree::readerRemoteRepo = undef;
 $Torrus::ConfigTree::remoteName = 'torrus_remote';
 
 $Torrus::ConfigTree::objCacheSize = 2048;
-
-# By default, we do not use Memcached to store calculated object params,
-# as it slows down the compiler because of network delays. This can be
-# useful to turn on in some occasions.
-$Torrus::ConfigTree::useMemcachedForParams = 0;
 
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;

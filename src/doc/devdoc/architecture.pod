@@ -449,10 +449,11 @@ Count of MIB failures per SNMP host.
 
 =head2 Memcached data
 
-Memcached stores various kinds of temporary data for quick access. Each
-key in the below list is prepended by a prefix specific to this Torrus
-installation ("torrus:" by default), tree name, and the 4-symbol commit
-ID of the configuration tree, separated by colons.
+Optionally, Memcached is used to store various kinds of temporary data
+for quick access. Each key in the below list is prepended by a prefix
+specific to this Torrus installation ("torrus:" by default), tree name,
+and the 4-symbol commit ID of the configuration tree, separated by
+colons.
 
 =over 4
 
@@ -460,8 +461,7 @@ ID of the configuration tree, separated by colons.
   parameter for a given node token or view. The value is a concatenation
   of status character and the parameter value. The status character is
   C<U> for undefined parameter, and C<D> for a parameter with
-  value. This cache is turned off by default, as it's adding a delay. It
-  might be needed in some circumstances.
+  value. This cache is turned off by default, as it's adding a delay.
 
 =item * C<rm:I<TOKEN>:I<VNAME>> -- renderer cache metadata for specified
   token and view name. The value is of the form

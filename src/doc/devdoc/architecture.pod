@@ -129,6 +129,18 @@ C<I<TREE>_I<DAEMON>_I<INSTANCE>>. Each such branch contains only the
 information and parameters needed by the agent, so that the agent
 process can start and update its data as fast as possible.
 
+A Git reference C<refs/heads/I<TREE>_agents_ref> is used to indicate the
+commit in C<I<TREE>_configtree> branch that corresponds to the current
+heads in agent branches. This reference is moved when the agent branches
+are updated.
+
+The C<I<TREE>_agent_tokens> branch is used to store the information
+which agent branches have which tokens. It is needed for deleting tokens
+from agent branches when they are deleted from configtree branch. The
+branch contains two-level 256-way directory hierarchy, for every token,
+and the JSON files contain JSON arrays with agent branch names where a
+particular token is used.
+
 The C<I<TREE>_configtree> branch has subdirectories as follows. The
 directories C<nodes> and C<children> contain JSON files named after the
 node tokens, arranged into two-level 256-way tree structure. For

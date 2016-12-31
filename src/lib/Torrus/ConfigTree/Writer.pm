@@ -66,13 +66,21 @@ sub new
 
     # set up the configtree branch
     {
-        my ($repo, $branch, $index) =
+        my ($repo, $branch, $index, $created_top) =
             $self->_setup_repo_writing($self->{'branch'});
             
         $self->{'repo'} = $repo;
         $self->{'previous_commit'} = $branch->peel('commit');
         $self->{'gitindex'} = $index;
 
+        if( defined($created_top) )
+        {
+            Git::Raw::Reference->create
+                ($self->_agents_ref_name(),
+                 $repo, $created_top);
+        }
+        
+        
         # This points to the last commit, and we're writing a new tree with the
         # help of index
         delete $self->{'gittree'};
@@ -126,7 +134,9 @@ sub _setup_repo_writing
 
     my $repo = Git::Raw::Repository->open($self->{'repodir'});
     my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
-        
+
+    my $created_top;
+    
     if( not defined($branch) )
     {
         # This is a fresh repo, create the configtree branch
@@ -137,7 +147,7 @@ sub _setup_repo_writing
         my $refname = 'refs/heads/' . $branchname;
         my $commit = $repo->commit("Initial empty commit in $branchname" ,
                                    $me, $me, [], $tree, $refname);
-    
+        $created_top = $commit;
         $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
         die('expected a branch') unless defined($branch);
     }
@@ -148,7 +158,7 @@ sub _setup_repo_writing
     my $tree = $branch->peel('tree');
     $index->read_tree($tree);
 
-    return ($repo, $branch, $index);
+    return ($repo, $branch, $index, $created_top);
 }
     
 
@@ -161,6 +171,12 @@ sub _signature
          $Torrus::ConfigTree::writerAuthorEmail);
 }
 
+
+sub _agents_ref_name
+{
+    my $self = shift;
+    return 'refs/heads/' . $self->treeName() . '_agents_ref';
+}
 
 sub _node_read
 {
@@ -1233,7 +1249,10 @@ sub updateAgentConfigs
 {
     my $self = shift;
 
-    return if $self->{'notning_changed_in_config'};
+    my $refname = $self->_agents_ref_name();
+    my $ref = Git::Raw::Reference->lookup($refname, $self->{'repo'});
+    die("Cannot find reference $refname in Git repository")
+        unless defined($ref);
     
     my $repos = {};
     my @branchnames;
@@ -1250,37 +1269,78 @@ sub updateAgentConfigs
     
     foreach my $branchname (@branchnames)
     {
-        my $repo = Git::Raw::Repository->open($self->{'repodir'});
-
-        my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
-        if( not defined($branch) )
-        {
-            Debug("Creating a new branch $branchname");
-            # This is a fresh repo, create the agent branch
-            my $builder = Git::Raw::Tree::Builder->new($repo);
-            $builder->clear();
-            my $tree = $builder->write();
-            my $me = $self->_signature();
-            my $refname = 'refs/heads/' . $branchname;
-            my $commit = $repo->commit("Initial empty commit in $branchname" ,
-                                       $me, $me, [], $tree, $refname);
-
-            $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
-            die('expected a branch') unless defined($branch);
-        }
-        
-        my $index = Git::Raw::Index->new();
-        $repo->index($index);
-        
-        my $tree = $branch->peel('tree');
-        $index->read_tree($tree);
-
+        my ($repo) =
+            $self->_setup_repo_writing($branchname);
         $repos->{$branchname} = $repo;
     }
 
-    Debug('Collecting node parameters and poulating indexes');
-    $self->_walk_nodes_for_agent_configs($repos, undef);
+    my $agent_tokens_branch = $self->treeName() . '_agent_tokens';
+    my ($repo_agent_tokens) = $self->_setup_repo_writing($agent_tokens_branch);
+    $self->{'repo_agent_tokens'} = $repo_agent_tokens;
 
+    my $old_commit_id = $ref->peel('commit')->id();
+    # Debug('Old commit in ' . $self->{'branch'} . ': ' . $old_commit_id);
+    
+    my $new_commit_id = $self->{'redis'}->hget(
+        $self->{'redis_prefix'} . 'githeads', $self->{'branch'});
+    # Debug('New commit: ' . $new_commit_id);
+
+    if( $new_commit_id eq $old_commit_id )
+    {
+        Verbose('Nothing is changed in configtree, skipping the agents update');
+        return;
+    }
+
+    my $old_tree = $ref->peel('tree');
+    my $new_commit = Git::Raw::Commit->lookup($self->{'repo'}, $new_commit_id);
+    my $new_tree = $new_commit->tree();
+    
+    my $n_updated = 0;
+    my $n_deleted = 0;
+
+    my $diff = $old_tree->diff(
+        {'tree' => $new_tree,
+         'skip_binary_check' => 1,
+         'enable_fast_untracked_dirs' => 1,
+        });
+        
+    my @deltas = $diff->deltas();
+    foreach my $delta (@deltas)
+    {
+        my $path = $delta->new_file()->path();
+        if( $path =~ /^nodes\/(.+)/ )
+        {
+            my $sha_file = $1;
+            my $token = join('', split('/', $sha_file));
+            
+            if( $delta->status() eq 'deleted')
+            {
+                my $ab_entry = $repo_agent_tokens->index()->find($sha_file);
+                if( defined($ab_entry) )
+                {
+                    $n_deleted++;
+                    
+                    my $agent_branches =
+                        $self->{'json'}->decode($ab_entry->blob()->content());
+                    
+                    foreach my $branchname (@{$agent_branches})
+                    {
+                        $repos->{$branchname}->index()->remove($sha_file);
+                    }
+                    
+                    $repo_agent_tokens->index()->remove($sha_file);
+                }
+            }
+            else
+            {
+                $n_updated += $self->_write_agent_configs($repos, $token);
+            }
+        }
+    }
+
+    Verbose
+        ("Updated: $n_updated, Deleted: $n_deleted tokens");
+    
     foreach my $branchname (@branchnames)
     {
         Debug("Writing a commit in $branchname");
@@ -1306,100 +1366,137 @@ sub updateAgentConfigs
         }
         else
         {
-            Debug('Nothing changed in ' . $branchname .
-                  ', skipping the commit');
+            Debug('Nothing changed in ' . $branchname);
         }
     }
+
+    Debug("Writing a commit in $agent_tokens_branch");
+    {
+        my $branch = Git::Raw::Branch->lookup
+            ($repo_agent_tokens, $agent_tokens_branch, 1);
+        my $parent = $branch->peel('commit');
+        my $me = $self->_signature();
+
+        my $tree = $repo_agent_tokens->index()->write_tree();
+
+        if( $tree->id() ne $parent->tree()->id() )
+        {
+            my $commit = $repo_agent_tokens->commit
+                (scalar(localtime(time())),
+                 $me, $me, [$parent], $tree, $branch->name());
+            Debug('Wrote ' . $commit->id());
+        }
+        else
+        {
+            Debug('Nothing changed in ' . $agent_tokens_branch);
+        }
+    }
+
+    Git::Raw::Reference->create
+        ($self->_agents_ref_name(), $self->{'repo'}, $new_commit, 1);
+    Debug('Updated reference: ' . $self->_agents_ref_name());
     
     return;
 }
+
+
+
     
+
+sub _write_agent_configs
+{
+    my $self = shift;
+    my $repos = shift;
+    my $token = shift;
+
+    if( not $self->isLeaf($token) )
+    {
+        my $count = 0;
+        foreach my $ctoken ( $self->getChildren($token) )
+        {
+            $count += $self->_write_agent_configs($repos, $ctoken);
+        }
+        return $count;
+    }
+
+    my @branches;
+    
+    my $dsType = $self->getNodeParam($token, 'ds-type');
+    if( $dsType eq 'collector' )
+    {
+        my $instance = $self->getNodeParam($token, 'collector-instance');
+        
+        my $params = {'path' => $self->path($token)};
+        foreach my $param (
+            'collector-timeoffset',
+            'collector-period',
+            'collector-type',
+            'storage-type',
+            'transform-value',
+            'collector-scale',
+            'value-map')
+        {
+            my $val = $self->getNodeParam($token, $param);
+            if( defined($val) )
+            {
+                $params->{$param} = $val;
+            }
+        }
+        
+        $self->_fetch_collector_params($token, $params);
+
+        my $branchname = $self->_agent_branch_name('collector', $instance);
+        $self->_write_agent_params($repos, $token, $branchname, $params);
+        push( @branches, $branchname );
+    }
+
+    if( $dsType ne 'rrd-multigraph' )
+    {
+        # monitor
+        my $mlist = $self->getNodeParam($token, 'monitor');
+        if( defined $mlist )
+        {
+            my $params = {'path' => $self->path($token),
+                          'monitor' => $mlist};
+            
+            foreach my $param ('monitor-period',
+                               'monitor-timeoffset')
+            {
+                $params->{$param} = $self->getNodeParam($token, $param);
+            }
+            
+            my $branchname = $self->_agent_branch_name('monitor', 0);
+            $self->_write_agent_params($repos, $token, $branchname, $params);
+            push( @branches, $branchname );
+        }
+    }
+
+    if( scalar(@branches) > 0 )
+    {
+        $self->{'repo_agent_tokens'}->index()->add_frombuffer
+            ($self->_sha_file($token),
+             $self->{'json'}->encode(\@branches));
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
 sub _write_agent_params
 {
     my $self = shift;
     my $repos = shift;
     my $token = shift;
-    my $agent = shift;
-    my $instance = shift;
+    my $branchname = shift;
     my $params = shift;
 
-    my $index =
-        $repos->{$self->_agent_branch_name($agent, $instance)}->index();
-
+    my $index = $repos->{$branchname}->index();
     $index->add_frombuffer($self->_sha_file($token),
                            $self->{'json'}->encode($params));
     return;
-}
-
-    
-
-sub _walk_nodes_for_agent_configs
-{
-    my $self = shift;
-    my $repos = shift;
-    my $token = shift;
-
-    if( not defined( $token ) )
-    {
-        $token = $self->token('/');
-    }
-
-    if( $self->isLeaf($token) )
-    {
-        my $dsType = $self->getNodeParam($token, 'ds-type');
-        if( $dsType eq 'collector' )
-        {
-            my $instance = $self->getNodeParam($token, 'collector-instance');
-            
-            my $params = {};
-            foreach my $param (
-                'collector-timeoffset',
-                'collector-period',
-                'collector-type',
-                'storage-type',
-                'transform-value',
-                'collector-scale',
-                'value-map')
-            {
-                my $val = $self->getNodeParam($token, $param);
-                if( defined($val) )
-                {
-                    $params->{$param} = $val;
-                }
-            }
-
-            $self->_fetch_collector_params($token, $params);
-                
-            $self->_write_agent_params($repos, $token,
-                                       'collector', $instance, $params);
-        }
-
-        if( $dsType ne 'rrd-multigraph' )
-        {
-            # monitor
-            my $mlist = $self->getNodeParam($token, 'monitor');
-            if( defined $mlist )
-            {
-                my $params = {'monitor' => $mlist};
-                
-                foreach my $param ('monitor-period',
-                                   'monitor-timeoffset')
-                {
-                    $params->{$param} = $self->getNodeParam($token, $param);
-                }
-
-                $self->_write_agent_params($repos, $token,
-                                           'monitor', 0, $params);
-            }
-        }
-    }
-    else
-    {
-        foreach my $ctoken ( $self->getChildren($token) )
-        {
-            $self->_walk_nodes_for_agent_configs($repos, $ctoken);
-        }
-    }
 }
 
 

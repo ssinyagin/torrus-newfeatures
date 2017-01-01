@@ -109,7 +109,8 @@ sub new
     
     $self->{'srcfiles'} = {};
     $self->{'srcfiles_seen'} = {};
-
+    $self->{'srcfiles_updated'} = {};
+    
     $self->{'srcrefs'} = $self->_read_json('srcrefs');
     $self->{'srcrefs'} = {} unless defined $self->{'srcrefs'};
 
@@ -634,7 +635,24 @@ sub isTrueVar
 }
 
 
+# returns arrayref of topmost tokens that were affected by the current update
+sub tokensUpdated
+{
+    my $self = shift;
 
+    my $tokens = {};
+
+    foreach my $srcfile (keys %{$self->{'srcfiles_updated'}})
+    {
+        foreach my $token (keys %{$self->{'srcrefs'}{$srcfile}})
+        {
+            $tokens->{$token} = 1;
+        }
+    }
+
+    return [keys %{$tokens}];
+}
+    
 
 
 sub commitConfig
@@ -664,8 +682,20 @@ sub commitConfig
     $self->_write_json('srcglobaldeps', $self->{'srcglobaldeps'});
     $self->_write_json('paramprops', $self->{'paramprop'});
 
-    my $ok = $self->_post_process_nodes();
+    $self->{'n_postprocessed_nodes'} = 0;
+    $self->{'postprocessed_tokens'} = {};
+
+    my $updated = $self->tokensUpdated();
+    my $ok = 1;
+    foreach my $token (@{$updated})
+    {
+        $ok = $self->_post_process_nodes($token) ? $ok : 0;
+    }
+    
     return($ok) unless $ok;
+
+    Verbose('Finished post-processing of ' . $self->{'n_postprocessed_nodes'} .
+            ' nodes');
     
     # Propagate view inherited parameters
     $self->{'viewParamsProcessed'} = {};
@@ -777,13 +807,17 @@ sub _post_process_nodes
     my $self = shift;
     my $token = shift;
 
-    my $ok = 1;
 
-    if( not defined( $token ) )
+    if( $self->{'postprocessed_tokens'}{$token} )
     {
-        $token = $self->token('/');
+        return 1;
     }
 
+    $self->{'postprocessed_tokens'}{$token} = 1;
+    $self->{'n_postprocessed_nodes'}++;
+    
+    my $ok = 1;
+    
     my $path = $self->path($token);
     
     my $nodeid = $self->getNodeParam( $token, 'nodeid', 1 );
@@ -1160,7 +1194,23 @@ sub deleteNode
     my $token = shift;
 
     my $node = $self->_node_read($token);
-    
+
+    my $nodeid = $self->getNodeParam( $token, 'nodeid', 1 );
+    if( defined($nodeid) )
+    {
+        my $nodeid_sha = sha1_hex($nodeid);
+        $self->{'gitindex'}->remove('nodeid/' . $self->_sha_file($nodeid_sha));
+
+        my $pos = 0;
+        while( ($pos = index($nodeid, '//', $pos)) >= 0 )
+        {
+            my $prefix = substr($nodeid, 0, $pos);
+            my $dir = $self->_nodeidpx_sha_dir($prefix);
+            $self->{'gitindex'}->remove($dir . '/' . $nodeid_sha);
+            $pos+=2;
+        }
+    }
+        
     my $parent = $node->{'parent'};
     my $iamsubtree = $node->{'is_subtree'};
     
@@ -1210,10 +1260,8 @@ sub validate
 
     my $ok = 1;
 
-    if( not $self->{'-NoDSRebuild'} )
-    {
-        $ok = Torrus::ConfigTree::Validator::validateNodes($self);
-    }
+    $ok = Torrus::ConfigTree::Validator::validateNodes($self);
+    
     $ok = Torrus::ConfigTree::Validator::validateViews($self) ? $ok:0;
     $ok = Torrus::ConfigTree::Validator::validateMonitors($self) ? $ok:0;
     $ok = Torrus::ConfigTree::Validator::validateTokensets($self) ? $ok:0;

@@ -159,17 +159,30 @@ foreach my $mod ( @Torrus::Validator::loadLeafValidators )
 sub validateNodes
 {
     my $config_tree = shift;
-    my $token = $config_tree->token('/');
 
-    if( defined($token) )
+    my $tokenlist;
+    if( $config_tree->can('tokensUpdated') )
     {
-        return validateNode($config_tree, $token);
+        $tokenlist = $config_tree->tokensUpdated();
     }
     else
     {
-        Error("The datasource tree is empty");
-        return 0;
+        $tokenlist = [ $config_tree->token('/') ];
     }
+
+    my $ok = 1;
+    $config_tree->{'n_validated_nodes'} = 0;
+    $config_tree->{'validated_tokens'} = {};
+    
+    foreach my $token (@{$tokenlist})
+    {
+        $ok = validateNode($config_tree, $token) ? $ok:0;
+    }
+
+    Verbose('Finished validation on ' . $config_tree->{'n_validated_nodes'} .
+            ' leaves');
+    
+    return $ok;
 }
 
 sub validateNode
@@ -179,8 +192,17 @@ sub validateNode
 
     my $ok = 1;
 
+    if( $config_tree->{'validated_tokens'}{$token} )
+    {
+        return 1;
+    }
+
+    $config_tree->{'validated_tokens'}{$token} = 1;
+    
     if( $config_tree->isLeaf($token) )
     {
+        $config_tree->{'n_validated_nodes'}++;
+        
         # Verify the default view
         my $view = $config_tree->getNodeParam( $token, 'default-leaf-view' );
         if( not defined( $view ) )

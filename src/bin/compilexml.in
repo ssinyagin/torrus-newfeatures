@@ -132,17 +132,20 @@ foreach my $tree ( @trees )
         $ok = 0;
     }
 
-    if( $no_validation )
+    if( $ok )
     {
-        Verbose('Skipping data validation...');
-    }
-    else
-    {
-        Verbose('Data validation...');
-        if( not $compiler->validate() )
+        if( $no_validation )
         {
-            Error('Errors found during validation process');
-            $ok = 0;
+            Verbose('Skipping data validation...');
+        }
+        else
+        {
+            Verbose('Data validation...');
+            if( not $compiler->validate() )
+            {
+                Error('Errors found during validation process');
+                $ok = 0;
+            }
         }
     }
                              

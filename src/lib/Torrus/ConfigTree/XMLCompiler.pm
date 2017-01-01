@@ -124,6 +124,7 @@ sub compile
         $self->deleteSrcFile($filename);
 
         $self->{'srcfiles'}{$filename} = 1;
+        $self->{'srcfiles_updated'}{$filename} = 1;
         
         $self->{'current_srcfile'} = $filename;
 

@@ -748,7 +748,6 @@ sub commitConfig
             Git::Raw::Branch->lookup($self->{'repo'}, $self->{'branch'}, 1);
         my $commit = $branch->peel('commit');
         $self->{'gittree'} = $commit->tree();
-        $self->_init_extcache($commit);
     }
     
     $self->{'is_writing'} = undef;

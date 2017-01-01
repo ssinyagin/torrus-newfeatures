@@ -52,22 +52,6 @@ $Torrus::Global::redisServer = '127.0.0.1:6379';
 $Torrus::Global::redisPrefix = 'torrus:';
 
 
-# By default, local memcached server is used
-$Torrus::Global::memcachedServer = '127.0.0.1:11211';
-
-# All keys in memcached are prepended with this prefix.  It should be
-# unique per Torrus instance within the same memcached server.
-$Torrus::Global::memcachedPrefix = 'torrus:';
-
-# By default, we do not use Memcached to store calculated object params,
-# as it slows down the compiler because of network delays. This can be
-# useful to turn on in some occasions.
-$Torrus::ConfigTree::useMemcached = 0;
-
-# Renderer output may be stored in Memcached for better multi-user performance
-$Torrus::Renderer::useMemcached = 0;
-
-
 # if true, push to the specified repo
 $Torrus::ConfigTree::writerPush = 0;
 $Torrus::ConfigTree::writerRemoteRepo = undef;

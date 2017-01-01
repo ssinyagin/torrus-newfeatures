@@ -10,7 +10,6 @@ Perl version 5.8.9 or higher.
 New perl modules required:
   Redis
   Redis::DistLock
-  Cache::Memcached::Fast
   Git::Raw (version 0.69 or higher)
   Digest::SHA
   Cache::Ref
@@ -30,8 +29,6 @@ New variables:
 New software daemon required:
   redis
 
-Optional software daemon:
-  memcached version 1.2.5 or higher
 
 
 

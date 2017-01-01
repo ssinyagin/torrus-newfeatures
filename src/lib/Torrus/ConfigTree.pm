@@ -24,7 +24,6 @@ use warnings;
 
 use Redis;
 use Redis::DistLock;
-use Cache::Memcached::Fast;
 use Git::Raw;
 use JSON;
 use File::Path qw(make_path);
@@ -124,30 +123,6 @@ sub _read_paramprops
 }
 
 
-sub _init_extcache
-{
-    my $self = shift;
-    my $commit = shift;
-
-    if( $Torrus::ConfigTree::useMemcached )
-    {
-        my $memcached_prefix = $Torrus::Global::memcachedPrefix .
-            $self->{'treename'} . ':' . substr($commit, 0, 4) . ':';
-
-        if( defined($self->{'extcache'}) )
-        {
-            $self->{'extcache'}->disconnect_all();
-        }
-
-        $self->{'extcache'} =
-            new Cache::Memcached::Fast({
-                servers => [{ 'address' => $Torrus::Global::memcachedServer,
-                              'noreply' => 1 }],
-                namespace => $memcached_prefix});
-    }
-
-    return;
-}
 
 
 
@@ -332,8 +307,6 @@ sub gotoHead
     die("Cannot lookup commit $head") unless defined($commit);
 
     $self->{'gittree'} = $commit->tree();
-
-    $self->_init_extcache($head);
 
     return 1;
 }
@@ -631,40 +604,7 @@ sub getNodeParam
         return $self->retrieveNodeParam( $token, $param );
     }
 
-    my $cachekey;
-    if( $Torrus::ConfigTree::useMemcached )
-    {
-        $cachekey = 'np:' . $token . ':' . $param;
-        my $cacheval = $self->{'extcache'}->get($cachekey);
-        if( defined( $cacheval ) )
-        {
-            my $status = substr( $cacheval, 0, 1 );
-            if( $status eq 'U' )
-            {
-                return undef;
-            }
-            else
-            {
-                return substr( $cacheval, 1 );
-            }
-        }
-    }
-
-    $value = $self->retrieveNodeParam( $token, $param );
-
-    if( $Torrus::ConfigTree::useMemcached )
-    {
-        if( defined( $value ) )
-        {
-            $self->{'extcache'}->set( $cachekey, 'D'.$value );
-        }
-        else
-        {
-            $self->{'extcache'}->set( $cachekey, 'U' );
-        }
-    }
-
-    return $value;
+    return $self->retrieveNodeParam( $token, $param );
 }
 
 

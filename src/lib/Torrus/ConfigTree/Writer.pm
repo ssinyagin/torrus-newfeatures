@@ -1291,6 +1291,8 @@ sub updateAgentConfigs
         return 0;
     }
 
+    $self->{'token_updated'} = {};
+    
     my $old_tree = $ref->peel('tree');
     my $new_commit = Git::Raw::Commit->lookup($self->{'repo'}, $new_commit_id);
     my $new_tree = $new_commit->tree();
@@ -1339,7 +1341,7 @@ sub updateAgentConfigs
     }
 
     Verbose
-        ("Updated: $n_updated, Deleted: $n_deleted tokens");
+        ("Updated: $n_updated, Deleted: $n_deleted leaves");
     
     foreach my $branchname (@branchnames)
     {
@@ -1409,6 +1411,11 @@ sub _write_agent_configs
     my $repos = shift;
     my $token = shift;
 
+    if( $self->{'token_updated'}{$token} )
+    {
+        return 0;
+    }
+
     if( not $self->isLeaf($token) )
     {
         my $count = 0;
@@ -1416,9 +1423,11 @@ sub _write_agent_configs
         {
             $count += $self->_write_agent_configs($repos, $ctoken);
         }
+        
+        $self->{'token_updated'}{$token} = 1;
         return $count;
     }
-
+        
     my @branches;
     
     my $dsType = $self->getNodeParam($token, 'ds-type');
@@ -1471,6 +1480,8 @@ sub _write_agent_configs
         }
     }
 
+    $self->{'token_updated'}{$token} = 1;
+    
     if( scalar(@branches) > 0 )
     {
         $self->{'repo_agent_tokens'}->index()->add_frombuffer

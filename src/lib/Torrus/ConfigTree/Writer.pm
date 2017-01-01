@@ -1302,7 +1302,7 @@ sub updateAgentConfigs
     my $diff = $old_tree->diff(
         {'tree' => $new_tree,
          'flags' => {
-             'exact_match_only' => 1,
+             'skip_binary_check' => 1,
          },
         });
         

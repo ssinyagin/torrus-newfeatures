@@ -1302,8 +1302,9 @@ sub updateAgentConfigs
 
     my $diff = $old_tree->diff(
         {'tree' => $new_tree,
-         'skip_binary_check' => 1,
-         'enable_fast_untracked_dirs' => 1,
+         'flags' => {
+             'exact_match_only' => 1,
+         },
         });
         
     my @deltas = $diff->deltas();

@@ -154,13 +154,12 @@ foreach my $tree ( @trees )
     if( $ok )
     {
         Verbose('Updating agent configurations');
-        if( $compiler->updateAgentConfigs() >=
-            $Torrus::ConfigTree::gitGcThreshold )
-        {
-            system(sprintf('cd %s; %s gc',
-                           $Torrus::Global::gitRepoDir,
-                           $Torrus::Global::gitExec));
-        }
+        $compiler->updateAgentConfigs();
+
+        # Update "objects/info/packs" and "info/refs" needed by dumb server
+        system(sprintf('cd %s; %s update-server-info',
+                       $Torrus::Global::gitRepoDir,
+                       $Torrus::Global::gitExec));
     }
 
     $global_ok = $ok ? $global_ok:0;

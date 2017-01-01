@@ -64,6 +64,8 @@ sub new
     
     bless $self, $class;
 
+    $self->{'packdir'} = $self->{'repodir'} . '/objects/pack';
+    
     # set up the configtree branch
     {
         my ($repo, $branch, $index, $created_top) =
@@ -134,6 +136,10 @@ sub _setup_repo_writing
     my $branchname = shift;
 
     my $repo = Git::Raw::Repository->open($self->{'repodir'});
+    my $mempack = Git::Raw::Mempack->new;
+    $repo->odb->add_backend($mempack, 99);
+    $self->{'mempack'}{$branchname} = $mempack;
+
     my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
 
     my $created_top;
@@ -148,6 +154,7 @@ sub _setup_repo_writing
         my $refname = 'refs/heads/' . $branchname;
         my $commit = $repo->commit("Initial empty commit in $branchname" ,
                                    $me, $me, [], $tree, $refname);
+        $self->_create_packfile($repo, $branchname);
         $created_top = $commit;
         $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
         die('expected a branch') unless defined($branch);
@@ -163,7 +170,22 @@ sub _setup_repo_writing
 }
     
 
+sub _create_packfile
+{
+    my $self = shift;
+    my $repo = shift;
+    my $branchname = shift;
 
+    my $tp = Git::Raw::TransferProgress->new();
+    my $indexer = Git::Raw::Indexer->new($self->{'packdir'}, $repo->odb());
+    $indexer->append($self->{'mempack'}{$branchname}->dump($repo), $tp);
+    $indexer->commit($tp);
+    $self->{'mempack'}{$branchname}->reset;
+    return;
+}
+
+    
+        
 
 sub _signature
 {
@@ -721,7 +743,8 @@ sub commitConfig
             my $commit = $self->{'srcrepo'}->commit
                 (scalar(localtime(time())),
                  $me, $me, [$parent], $tree, $branch->name());
-        
+            $self->_create_packfile($self->{'srcrepo'}, $branchname);
+
             $new_src_commit = $commit->id();
             Debug('Wrote ' . $commit->id());
         }
@@ -751,7 +774,8 @@ sub commitConfig
             my $commit = $self->{'repo'}->commit
                 (scalar(localtime(time())),
                  $me, $me, [$parent], $tree, $branch->name());
-            
+            $self->_create_packfile($self->{'repo'}, $branchname);
+
             $self->{'new_commit'} = $commit->id();
             Debug('Wrote ' . $commit->id());
         }
@@ -1407,6 +1431,8 @@ sub updateAgentConfigs
             my $commit = $repo->commit
                 (scalar(localtime(time())),
                  $me, $me, [$parent], $tree, $branch->name());
+            $self->_create_packfile($repo, $branchname);
+
             Debug('Wrote ' . $commit->id());
 
             $self->{'redis'}->hset
@@ -1434,6 +1460,8 @@ sub updateAgentConfigs
             my $commit = $repo_agent_tokens->commit
                 (scalar(localtime(time())),
                  $me, $me, [$parent], $tree, $branch->name());
+            $self->_create_packfile($repo_agent_tokens, $agent_tokens_branch);
+
             Debug('Wrote ' . $commit->id());
         }
         else

@@ -149,8 +149,10 @@ if( $report_runtime )
            'varname' => 'RRDQueue' },
 
          { 'label'   => 'Raw Queue',
-           'varname' => 'RawQueue' }
+           'varname' => 'RawQueue' },
 
+         { 'label'   => 'Objects',
+           'varname' => 'Objects' },
          );
 
     my @counterFormats =

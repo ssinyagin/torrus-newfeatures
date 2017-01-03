@@ -419,6 +419,9 @@ sub run
             }
         }
     }
+
+    $self->setStatValue('Objects', scalar(keys %{$self->{'targets'}}));
+    
     return;
 }
 

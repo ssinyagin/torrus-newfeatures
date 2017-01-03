@@ -35,7 +35,7 @@ my %rrd_graph_opts =
      'end'    => '--end',
      'width'  => '--width',
      'height' => '--height',
-     'imgformat' => '--imgformat', 
+     'imgformat' => '--imgformat',
      'border' => '--border',
     );
 
@@ -55,9 +55,9 @@ sub prepare_rrgraph_args
     my $token = shift;
     my $view = shift;
     my $opt = shift;
-    
+
     $opt = {} unless defined($opt);
-    
+
     my $obj = {'args' => {}, 'dname' => 'A'};
 
     foreach my $arrayName ( @arg_arrays )
@@ -73,7 +73,7 @@ sub prepare_rrgraph_args
           $self->rrd_make_graph_opts( $config_tree, $token, $view ) );
 
     my $dstype = $config_tree->getNodeParam($token, 'ds-type');
-        
+
     if( $dstype eq 'rrd-multigraph' )
     {
         $self->rrd_make_multigraph( $config_tree, $token, $view, $obj );
@@ -82,7 +82,7 @@ sub prepare_rrgraph_args
     {
         my $showmax = 0;
         my $max_dname = $obj->{'dname'} . '_Max';
-        
+
         my $leaftype = $config_tree->getNodeParam($token, 'leaf-type');
 
         # Handle DEFs and CDEFs
@@ -92,7 +92,7 @@ sub prepare_rrgraph_args
             my $defstring =
                 $self->rrd_make_def( $config_tree, $token, $obj->{'dname'} );
             return(undef) unless defined($defstring);
-            
+
             push( @{$obj->{'args'}{'defs'}}, $defstring );
 
             if( $self->rrd_check_hw( $config_tree, $token, $view ) )
@@ -111,7 +111,7 @@ sub prepare_rrgraph_args
                         $self->rrd_make_def( $config_tree, $token,
                                              $max_dname, 'MAX',
                                              {'step' => $step});
-                    
+
                     push( @{$obj->{'args'}{'defs'}}, $maxdef );
                     $showmax = 1;
                 }
@@ -123,18 +123,18 @@ sub prepare_rrgraph_args
             push( @{$obj->{'args'}{'defs'}},
                   $self->rrd_make_cdef($config_tree, $token,
                                        $obj->{'dname'}, $expr) );
-            
+
             if( $self->rrd_if_showmax($config_tree, $token, $view) )
             {
                 my $step =
                     $self->rrd_maxline_step( $config_tree, $view );
-                
-                push( @{$obj->{'args'}{'defs'}}, 
+
+                push( @{$obj->{'args'}{'defs'}},
                       $self->rrd_make_cdef( $config_tree, $token,
                                             $max_dname, $expr,
                                             {'force_function' => 'MAX',
                                              'step' => $step} ) );
-                
+
                 $showmax = 1;
             }
         }
@@ -150,7 +150,7 @@ sub prepare_rrgraph_args
         {
             $self->rrd_make_maxline( $max_dname, $config_tree,
                                      $token, $view, $obj );
-        }            
+        }
     }
 
     return(undef) if $obj->{'error'};
@@ -194,7 +194,7 @@ sub render_rrgraph
     my ($args, $obj) =
         $self->prepare_rrgraph_args($config_tree, $token, $view);
     Debug("RRDs::graph arguments: " . join(' ', @{$args}));
-    
+
     # localize the TZ enviromennt for the child process
     {
         my $tz = $self->{'options'}->{'variables'}->{'TZ'};
@@ -208,7 +208,7 @@ sub render_rrgraph
         {
             $ENV{'TZ'} = $tz;
         }
-        
+
         &RRDs::graph( $outfile, @{$args} );
     }
 
@@ -225,7 +225,7 @@ sub render_rrgraph
     {
         $mimetype = 'image/png';
     }
-            
+
     return( $config_tree->getOtherParam($view, 'expires')+time(), $mimetype );
 }
 
@@ -291,7 +291,8 @@ sub render_rrprint
         return undef;
     }
 
-    foreach my $cf ( split(',', $config_tree->getOtherParam($view, 'print-cf')) )
+    foreach my $cf
+        ( split(',', $config_tree->getOtherParam($view, 'print-cf')) )
     {
         push( @arg_print, sprintf( 'PRINT:%s:%s:%%le', $dname, $cf ) );
     }
@@ -310,13 +311,13 @@ sub render_rrprint
         {
             $tz = $ENV{'TZ'};
         }
-        
+
         local $ENV{'TZ'};
         if( defined($tz) )
         {
             $ENV{'TZ'} = $tz;
         }
-        
+
         ($printout, undef, undef) = RRDs::graph('/dev/null', @args);
     }
 
@@ -340,7 +341,8 @@ sub render_rrprint
         $fh->close();
     }
 
-    return( $config_tree->getOtherParam($view, 'expires')+time(), 'text/plain' );
+    return( $config_tree->getOtherParam($view, 'expires')+time(),
+            'text/plain' );
 }
 
 
@@ -360,7 +362,7 @@ sub rrd_make_multigraph
     $obj->{'dname'} = $dsNames[0];
 
     my $showmax = $self->rrd_if_showmax($config_tree, $token, $view);
-        
+
     # Analyze the drawing order
     my %dsOrder;
     foreach my $dname ( @dsNames )
@@ -370,10 +372,10 @@ sub rrd_make_multigraph
     }
 
     my $disable_legend = $config_tree->getOtherParam($view, 'disable-legend');
-    
+
     $disable_legend =
         (defined($disable_legend) and $disable_legend eq 'yes') ? 1:0;
-    
+
     # make DEFs and Line instructions
 
     my $do_gprint = 0;
@@ -411,7 +413,7 @@ sub rrd_make_multigraph
 
         my $legend = '';
         my $ds_expr;
-        
+
         if( $dograph or $gprint_this )
         {
             $ds_expr = $config_tree->getNodeParam($token, 'ds-expr-'.$dname);
@@ -422,9 +424,9 @@ sub rrd_make_multigraph
                 $obj->{'error'} = 1;
                 next;
             }
-            
+
             push( @{$obj->{'args'}{'defs'}}, @cdefs );
-            
+
             $legend =
                 $config_tree->getNodeParam($token, 'graph-legend-'.$dname);
             if( defined( $legend ) )
@@ -436,7 +438,7 @@ sub rrd_make_multigraph
                 $legend = '';
             }
         }
-            
+
         if( $gprint_this )
         {
             $self->rrd_make_gprint( $dname, $legend,
@@ -453,17 +455,17 @@ sub rrd_make_multigraph
             # to print the label
             $legend = '';
         }
-        
+
         if( $dograph )
         {
             my $linestyle =
                 $self->mkline( $config_tree->getNodeParam
                                ($token, 'line-style-'.$dname) );
-            
+
             my $linecolor =
                 $self->mkcolor( $config_tree->getNodeParam
                                 ($token, 'line-color-'.$dname) );
-            
+
             my $alpha =
                 $config_tree->getNodeParam($token, 'line-alpha-'.$dname);
             if( defined( $alpha ) )
@@ -481,22 +483,22 @@ sub rrd_make_multigraph
             {
                 $stack = '';
             }
-                
+
             if( $showmax and ($stack eq '') )
             {
                 my $max_dname = $dname . '_Max';
-                
+
                 my $p_maxlinestyle =
                     $config_tree->getNodeParam($token,
                                                'maxline-style-'.$dname);
-                
+
                 my $p_maxlinecolor =
                     $config_tree->getNodeParam($token,
                                                'maxline-color-'.$dname);
 
                 my $step =
                     $self->rrd_maxline_step( $config_tree, $view );
-                    
+
                 if( defined($p_maxlinestyle) and defined($p_maxlinecolor) )
                 {
                     my @cdefs =
@@ -509,7 +511,7 @@ sub rrd_make_multigraph
                         $obj->{'error'} = 1;
                         next;
                     }
-            
+
                     push( @{$obj->{'args'}{'defs'}}, @cdefs );
 
                     my $max_linestyle = $self->mkline( $p_maxlinestyle );
@@ -518,7 +520,7 @@ sub rrd_make_multigraph
                     {
                         $max_linecolor .= $alpha;
                     }
-                    
+
                     push( @{$obj->{'args'}{'line'}},
                           sprintf( '%s:%s%s',
                                    $max_linestyle,
@@ -552,7 +554,7 @@ sub rrd_check_hw
     {
         my $viewHW = $config_tree->getOtherParam($view, 'rrd-hwpredict');
         my $varNoHW = $self->{'options'}->{'variables'}->{'NOHW'};
-        
+
         if( (not defined($viewHW) or $viewHW ne 'disabled') and
             (not $varNoHW) )
         {
@@ -582,7 +584,7 @@ sub rrd_make_holtwinters
                                       $dname . 'dev', 'DEVPREDICT' );
     return() unless defined($defstring);
     push( @{$obj->{'args'}{'defs'}}, $defstring );
-    
+
     # Upper boundary definition
     push( @{$obj->{'args'}{'defs'}},
           sprintf( 'CDEF:%supper=%spred,%sdev,2,*,+',
@@ -596,7 +598,7 @@ sub rrd_make_holtwinters
     # Failures definition
     $defstring = $self->rrd_make_def( $config_tree, $token,
                                       $dname . 'fail', 'FAILURES' );
-    return() unless defined($defstring);    
+    return() unless defined($defstring);
     push( @{$obj->{'args'}{'defs'}}, $defstring );
 
     # Generate H-W Boundary Lines
@@ -642,7 +644,7 @@ sub rrd_make_graphline
     my $obj = shift;
 
     my $legend;
-    
+
     my $disable_legend = $config_tree->getOtherParam($view, 'disable-legend');
     if( not defined($disable_legend) or $disable_legend ne 'yes' )
     {
@@ -657,13 +659,13 @@ sub rrd_make_graphline
     {
         $legend = '';
     }
-    
+
     my $styleval = $config_tree->getNodeParam($token, 'line-style');
     if( not defined($styleval)  )
     {
         $styleval = $config_tree->getOtherParam($view, 'line-style');
     }
-    
+
     my $linestyle = $self->mkline( $styleval );
 
     my $colorval = $config_tree->getNodeParam($token, 'line-color');
@@ -671,7 +673,7 @@ sub rrd_make_graphline
     {
         $colorval = $config_tree->getOtherParam($view, 'line-color');
     }
-    
+
     my $linecolor = $self->mkcolor( $colorval );
 
     if( $self->rrd_if_gprint( $config_tree, $token ) )
@@ -689,7 +691,7 @@ sub rrd_make_graphline
     {
         push( @{$obj->{'args'}{'line'}}, 'COMMENT:\l' );
     }
-    
+
     return;
 }
 
@@ -704,7 +706,7 @@ sub rrd_make_maxline
     my $obj = shift;
 
     my $legend;
-    
+
     my $disable_legend = $config_tree->getOtherParam($view, 'disable-legend');
     if( not defined($disable_legend) or $disable_legend ne 'yes' )
     {
@@ -723,13 +725,13 @@ sub rrd_make_maxline
     {
         $legend = 'Max ' . $legend;
     }
-    
+
     my $styleval = $config_tree->getNodeParam($token, 'maxline-style');
     if( not defined($styleval)  )
     {
         $styleval = $config_tree->getOtherParam($view, 'maxline-style');
     }
-    
+
     my $linestyle = $self->mkline( $styleval );
 
     my $colorval = $config_tree->getNodeParam($token, 'maxline-color');
@@ -737,7 +739,7 @@ sub rrd_make_maxline
     {
         $colorval = $config_tree->getOtherParam($view, 'maxline-color');
     }
-    
+
     my $linecolor = $self->mkcolor( $colorval );
 
     if( $self->rrd_if_gprint( $config_tree, $token ) )
@@ -776,11 +778,12 @@ sub rrd_make_hrules
             if( defined( $value ) )
             {
                 my $style =
-                    $config_tree->getOtherParam($view, 'hrule-color-'.$hruleName);
+                    $config_tree->getOtherParam($view,
+                                                'hrule-color-'.$hruleName);
 
                 my $color = $self->mkcolor( $style );
                 my $line = $self->mkline( $style );
-                
+
                 my $legend =
                     $config_tree->getNodeParam($token,
                                                'hrule-legend-'.$hruleName);
@@ -821,14 +824,14 @@ sub rrd_make_decorations
             $decor->{$order} = {'def' => [], 'line' => ''};
 
             my $style =
-                $self->mkline( $config_tree->
-                               getOtherParam($view, 'dec-style-' . $decorName) );
+                $self->mkline($config_tree->
+                              getOtherParam($view, 'dec-style-' . $decorName));
             my $color =
-                $self->mkcolor( $config_tree->
-                                getOtherParam($view, 'dec-color-' . $decorName) );
+                $self->mkcolor($config_tree->
+                               getOtherParam($view, 'dec-color-' . $decorName));
             my $expr = $config_tree->
                 getOtherParam($view, 'dec-expr-' . $decorName);
-            
+
             my @cdefs =
                 $self->rrd_make_cdef( $config_tree, $token, $decorName,
                                       $obj->{'dname'} . ',POP,' . $expr );
@@ -872,12 +875,12 @@ sub rrd_make_opts
     {
         my $value =
             $self->{'options'}->{'variables'}->{'G' . $param};
-        
+
         if( not defined( $value ) )
         {
             $value = $config_tree->getOtherParam( $view, $param );
         }
-        
+
         if( defined( $value ) )
         {
             if( ( $param eq 'start' or $param eq 'end' ) and
@@ -906,7 +909,7 @@ sub rrd_make_opts
                     $obj->{'mimetype'} = $mime_type{$value};
                 }
             }
-            
+
             push( @args, $opthash->{$param}, $value );
         }
     }
@@ -935,7 +938,7 @@ sub rrd_make_graph_opts
     my $view = shift;
 
     my @args;
-    
+
     my $graph_log = $config_tree->getNodeParam($token, 'graph-logarithmic');
     if( defined($graph_log) and $graph_log eq 'yes' )
     {
@@ -969,7 +972,8 @@ sub rrd_make_graph_opts
     my $ignore_limits = $config_tree->getOtherParam($view, 'ignore-limits');
     if( not defined($ignore_limits) or $ignore_limits ne 'yes' )
     {
-        my $ignore_lower = $config_tree->getOtherParam($view, 'ignore-lower-limit');
+        my $ignore_lower =
+            $config_tree->getOtherParam($view, 'ignore-lower-limit');
         if( not defined($ignore_lower) or $ignore_lower ne 'yes' )
         {
             my $limit =
@@ -980,7 +984,8 @@ sub rrd_make_graph_opts
             }
         }
 
-        my $ignore_upper = $config_tree->getOtherParam($view, 'ignore-upper-limit');
+        my $ignore_upper =
+            $config_tree->getOtherParam($view, 'ignore-upper-limit');
         if( not defined($ignore_upper) or $ignore_upper ne 'yes' )
         {
             my $limit =
@@ -1002,12 +1007,12 @@ sub rrd_make_graph_opts
     # take colors from view and URL params
     my $colorval =
         $self->{'options'}->{'variables'}->{'Gcolors'};
-    
+
     if( not defined( $colorval ) )
     {
         $colorval = $config_tree->getOtherParam( $view, 'graph-colors' );
     }
-        
+
     if( defined( $colorval ) )
     {
         my @values = split( /:/, $colorval );
@@ -1038,7 +1043,7 @@ sub rrd_make_graph_opts
                 }
             }
         }
-        
+
     }
 
     if( scalar( @Torrus::Renderer::graphExtraArgs ) > 0 )
@@ -1077,7 +1082,7 @@ sub rrd_make_def
 
     my $def_options = '';
     my $step = $config_tree->getNodeParam($token, 'graph-step');
-    
+
     if( defined($opts) and defined($opts->{'step'}) )
     {
         $step = $opts->{'step'};
@@ -1087,7 +1092,7 @@ sub rrd_make_def
     {
         $def_options .= ':step=' . $step;
     }
-    
+
     return sprintf( 'DEF:%s=%s:%s:%s%s',
                     $dname, $rrdfile, $ds, $cf, $def_options );
 }
@@ -1118,7 +1123,7 @@ sub rrd_make_cdef
     {
         $step = $opts->{'step'};
     }
-    
+
     # We will name the DEFs as $dname.sprintf('%.2d', $ds_couter++);
     my $ds_couter = 1;
 
@@ -1144,7 +1149,7 @@ sub rrd_make_cdef
         {
             $cf = $function;
         }
-        
+
         my $leaf = ($noderef ne '') ?
             $config_tree->getRelative($token, $noderef) : $token;
 
@@ -1165,11 +1170,11 @@ sub rrd_make_cdef
         }
         return $varname;
     };
-    
+
     $expr = $rpn->translate( $expr, $callback );
     return() unless $ok;
     push( @args, sprintf( 'CDEF:%s=%s', $dname, $expr ) );
-    
+
     return @args;
 }
 
@@ -1224,7 +1229,7 @@ sub rrd_maxline_step
     my $config_tree = shift;
     my $view = shift;
 
-    my $step = $config_tree->getOtherParam($view, 'maxline-step');    
+    my $step = $config_tree->getOtherParam($view, 'maxline-step');
     if( not defined($step) )
     {
         $step = 86400;
@@ -1239,9 +1244,9 @@ sub rrd_maxline_step
 
     return $step;
 }
-    
 
-    
+
+
 
 sub rrd_make_gprint
 {
@@ -1261,7 +1266,8 @@ sub rrd_make_gprint
         foreach my $gprintVal ( split(',', $gprintValues ) )
         {
             my $format =
-                $config_tree->getOtherParam($view, 'gprint-format-' . $gprintVal);
+                $config_tree->getOtherParam($view,
+                                            'gprint-format-' . $gprintVal);
             push( @args, 'GPRINT:' . $vname . ':' . $format );
         }
     }
@@ -1269,7 +1275,7 @@ sub rrd_make_gprint
     push( @{$obj->{'args'}{'line'}}, @args );
     return;
 }
-            
+
 
 sub rrd_make_gprint_header
 {
@@ -1291,14 +1297,14 @@ sub rrd_make_gprint_header
     }
     return;
 }
-       
+
 
 sub mkcolor
 {
     my $self = shift;
     my $color = shift;
 
-    my $alpha;    
+    my $alpha;
     my $recursionLimit = 10;
 
     while( $color =~ /^\#\#(\S+)$/ )
@@ -1328,7 +1334,7 @@ sub mkcolor
     }
 
     $alpha = '' unless defined($alpha);
-    
+
     return ($color . $alpha);
 }
 

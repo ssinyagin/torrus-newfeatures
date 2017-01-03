@@ -290,11 +290,12 @@ reading.
   from previous runs of Monitor, with the keys and values as described
   below.
 
-=item * C<scheduler_stats> is a hash which stores the runtime statistics
-  of Scheduler tasks. Each key is of structure
-  C<I<TASKNAME>:I<PERIOD>:I<OFFSET>>:I<VARIABLE>>, and the value is a
-  number representing the current value of the variable.  Depending on
-  variable purpose, the number is floating point or integer.
+=item * C<scheduler_stats:I<TREE>> is a hash which stores the runtime
+  statistics of Scheduler tasks. Each key is of structure
+  C<I<TYPE>:I<TASKNAME>:I<INSTANCE>:I<PERIOD>:I<OFFSET>>#I<VARIABLE>>,
+  and the value is a number representing the current value of the
+  variable.  Depending on variable purpose, the number is floating point
+  or integer.
 
 =item * C<serviceid_params> is a hash containing properties for each
   Service ID (exported collector information, usually stored in an SQL

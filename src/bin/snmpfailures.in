@@ -26,7 +26,6 @@ use Getopt::Long;
 use JSON;
     
 use Torrus::SiteConfig;
-use Torrus::DB;
 use Torrus::Log;
 use Torrus::SNMP_Failures;
 
@@ -62,8 +61,6 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 
 
 my $out = {};
-
-&Torrus::DB::setSafeSignalHandlers();
 
 my $nInstances = Torrus::SiteConfig::agentInstances( $tree, 'collector' );
 for( my $instance = 0; $instance < $nInstances; $instance++ )

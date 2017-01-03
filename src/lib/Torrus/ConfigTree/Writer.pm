@@ -332,9 +332,13 @@ sub setOtherParam
 
     if( $self->getParamProperty( $param, 'remspace' ) )
     {
-        $value =~ s/\s+//go;
+        $value =~ s/\s+//sgo;
     }
-
+    elsif( $self->getParamProperty( $param, 'squashspace' ) )
+    {
+        $value =~ s/\s+/ /sgo;
+    }
+    
     my $oldval = $self->{'editing'}{'params'}{$param};
     if( not defined($oldval) or $oldval ne $value )
     {
@@ -457,6 +461,10 @@ sub setNodeParam
     if( $self->getParamProperty( $param, 'remspace' ) )
     {
         $value =~ s/\s+//go;
+    }
+    elsif( $self->getParamProperty( $param, 'squashspace' ) )
+    {
+        $value =~ s/\s+/ /sgo;
     }
 
     my $oldval = $self->{'editing'}{'params'}{$param};
@@ -1601,6 +1609,20 @@ sub _fetch_collector_params
     }
 
     my @maps = ( $Torrus::Collector::params{$type} );
+
+    my $storage_types = $params->{'storage-type'};
+    foreach my $storage_type ( split( ',', $storage_types ) )
+    {
+        if( not $Torrus::Collector::storageTypes{$storage_type} )
+        {
+            Error('Unknown storage type: ' . $storage_type);
+        }
+        else
+        {
+            push(@maps,
+                 $Torrus::Collector::params{$storage_type . '-storage'});
+        }
+    }
 
     while( scalar( @maps ) > 0 )
     {

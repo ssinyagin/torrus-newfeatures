@@ -195,8 +195,6 @@ sub initTargetAttributes
     my $collector = shift;
     my $token = shift;
 
-    &Torrus::DB::checkInterrupted();
-
     my $tref = $collector->tokenData( $token );
     my $cref = $collector->collectorData( 'snmp' );
 
@@ -698,8 +696,6 @@ sub mapLookupCallback
     my $hosthash = shift;
     my $map = shift;
 
-    &Torrus::DB::checkInterrupted();
-    
     Debug('Received mapping PDU from ' . $hosthash);
 
     my $result = $session->var_bind_list();
@@ -962,8 +958,6 @@ sub runCollector
             push( @batch, pop( @hosts ) );
         }
 
-        &Torrus::DB::checkInterrupted();
-
         my @sessions;
 
         foreach my $hosthash ( @batch )
@@ -990,8 +984,6 @@ sub runCollector
             
             my $session =
                 openNonblockingSession( $collector, $reptoken, $hosthash );
-            
-            &Torrus::DB::checkInterrupted();
             
             if( not defined($session) )
             {
@@ -1063,7 +1055,6 @@ sub runCollector
             }
         }
         
-        &Torrus::DB::checkInterrupted();
         start_snmp_dispatcher();
     }
     return;
@@ -1093,8 +1084,6 @@ sub callback
     my $pdu_tokens = shift;
     my $hosthash = shift;
 
-    &Torrus::DB::checkInterrupted();
-    
     my $cref = $collector->collectorData( 'snmp' );
 
     Debug('SNMP Callback executed for ' . $hosthash);
@@ -1263,8 +1252,6 @@ sub postProcess
         {
             if( $expire <= $now and not $mapLookupScheduled{$maphash} )
             {
-                &Torrus::DB::checkInterrupted();
-
                 my ( $hosthash, $map ) = split( /\#/o, $maphash );
 
                 if( $unreachableHostDeleted{$hosthash} )
@@ -1306,8 +1293,6 @@ sub postProcess
     
     foreach my $token ( keys %{$cref->{'needsRemapping'}} )
     {
-        &Torrus::DB::checkInterrupted();
-
         delete $cref->{'needsRemapping'}{$token};
         if( not Torrus::Collector::SNMP::initTargetAttributes
             ( $collector, $token ) )

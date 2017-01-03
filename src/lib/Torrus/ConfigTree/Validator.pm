@@ -80,7 +80,6 @@ our %collector_params =
                  'bytes' => undef }}},
      'collector-period'      => undef,
      'collector-timeoffset'  => undef,
-     '+collector-scale'      => undef,
      '+collector-dispersed-timeoffset' => {
          'no' => undef,
          'yes' => undef }

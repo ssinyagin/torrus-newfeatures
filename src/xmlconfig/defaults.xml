@@ -55,6 +55,9 @@
     <prop param="value-map"          prop="remspace" value="1"/>
     <prop param="health-status-nodeid"  prop="remspace" value="1"/>
 
+    <!-- Parameters where repeting space is replaced with single space -->
+    <prop param="rrd-create-rra"     prop="squashspace" value="1"/>
+    
     <!-- Parameters which need to be expanded accorrding
          to $defs and %paramrefs% -->
 

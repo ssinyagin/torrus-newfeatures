@@ -26,6 +26,7 @@ use strict;
 use warnings;
 
 use Digest::MD5 qw(md5_hex);
+use Redis;
 
 use Torrus::Log;
 
@@ -42,23 +43,13 @@ sub new
     die() if ( not defined($options{'-Tree'}) or
                not defined($options{'-Instance'}) );
 
-    $self->{'db_failures'} =
-        new Torrus::DB( 'snmp_failures_' . $options{'-Instance'},
-                        -Subdir => $self->{'options'}{'-Tree'},
-                        -Btree => 1,
-                        -WriteAccess => $options{'-WriteAccess'} );
-
+    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis_hname'} =
+        $Torrus::Global::redisPrefix . 'snmp_failures:' . $options{'-Tree'};
+    
     $self->{'counters'} = ['unreachable', 'deleted', 'mib_errors'];
     
-    return( defined( $self->{'db_failures'} ) ? $self:undef );
-}
-
-
-sub DESTROY
-{
-    my $self = shift;    
-    $self->{'db_failures'}->closeNow();
-    return;
+    return $self;
 }
 
 
@@ -67,11 +58,11 @@ sub init
 {
     my $self = shift;
 
-    $self->{'db_failures'}->trunc();
+    $self->{'redis'}->del($self->{'redis_hname'});
     
     foreach my $c ( @{$self->{'counters'}} )
     {
-        $self->{'db_failures'}->put('c:' . $c, 0);
+        $self->{'redis'}->hset($self->{'redis_hname'}, 'c:' . $c, 0);
     }
     return;
 }
@@ -84,8 +75,8 @@ sub host_failure
     my $type = shift;
     my $hosthash = shift;
 
-    $self->{'db_failures'}->put('h:' . $hosthash,
-                                $type . ':' . time());
+    $self->{'redis'}->hset($self->{'redis_hname'}, 'h:' . $hosthash,
+                           $type . ':' . time());
     return;
 }
 
@@ -95,7 +86,8 @@ sub is_host_available
     my $self = shift;    
     my $hosthash = shift;
 
-    return( not defined($self->{'db_failures'}->get('h:' . $hosthash)) );
+    return( not defined($self->{'redis'}->hget($self->{'redis_hname'},
+                                               'h:' . $hosthash)) );
 }
 
 
@@ -105,7 +97,7 @@ sub set_counter
     my $type = shift;
     my $count = shift;
 
-    $self->{'db_failures'}->put('c:' . $type, $count);
+    $self->{'redis'}->hset($self->{'redis_hname'}, 'c:' . $type, $count);
     return;
 }
     
@@ -115,7 +107,7 @@ sub remove_host
     my $self = shift;    
     my $hosthash = shift;
 
-    $self->{'db_failures'}->del('h:' . $hosthash);
+    $self->{'redis'}->hdel($self->{'redis_hname'}, 'h:' . $hosthash);
     return;
 }
 
@@ -126,15 +118,18 @@ sub mib_error
     my $hosthash = shift;
     my $path = shift;
 
-    my $count = $self->{'db_failures'}->get('M:' . $hosthash);
+    my $redis = $self->{'redis'};
+    my $hname = $self->{'redis_hname'};
+    
+    my $count = $redis->hget($hname, 'M:' . $hosthash);
     $count = 0 unless defined($count);
 
-    $self->{'db_failures'}->put('m:' . md5_hex($path) . ':' . $hosthash,
-                                $path . ':' . time());    
-    $self->{'db_failures'}->put('M:' . $hosthash, $count + 1);
+    $redis->hset($hname, 'm:' . md5_hex($path) . ':' . $hosthash,
+                 $path . ':' . time());    
+    $redis->hset($hname, 'M:' . $hosthash, $count + 1);
 
-    my $global_count = $self->{'db_failures'}->get('c:mib_errors');
-    $self->{'db_failures'}->put('c:mib_errors', $global_count + 1);
+    my $global_count = $redis->hget($hname, 'c:mib_errors');
+    $redis->hset($hname, 'c:mib_errors', $global_count + 1);
     return;
 }
 
@@ -146,6 +141,9 @@ sub read
     my $out = shift;
     my %options = @_;
 
+    my $redis = $self->{'redis'};
+    my $hname = $self->{'redis_hname'};
+    
     foreach my $c ( @{$self->{'counters'}} )
     {
         if( not defined( $out->{'total_' . $c} ) )
@@ -153,8 +151,7 @@ sub read
             $out->{'total_' . $c} = 0;
         }
         
-        $out->{'total_' . $c} += 
-            $self->{'db_failures'}->get('c:' . $c);
+        $out->{'total_' . $c} += $redis->hget($hname, 'c:' . $c);
 
         if( $options{'-details'} and
             not defined( $out->{'detail_' . $c} ) )
@@ -163,13 +160,14 @@ sub read
         }
     }
 
-    &Torrus::DB::checkInterrupted();
-        
     if( $options{'-details'} )
     {
-        my $cursor = $self->{'db_failures'}->cursor();
-        while( my ($key, $val) = $self->{'db_failures'}->next($cursor) )
+        my $all = $redis->hgetall($hname);
+        while( scalar(@{$all}) > 0 )
         {
+            my $key = shift @{$all};
+            my $val = shift @{$all};
+            
             if( $key =~ /^h:(.+)$/o )
             {
                 my $hosthash = $1;
@@ -203,11 +201,7 @@ sub read
                 
                 $out->{'detail_mib_errors'}{$hosthash}{'count'} += $count;
             }
-            
-            &Torrus::DB::checkInterrupted();
         }
-        
-        $self->{'db_failures'}->c_close($cursor);
     }
     return;
 }

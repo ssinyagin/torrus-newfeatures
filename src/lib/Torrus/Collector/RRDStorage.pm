@@ -156,8 +156,6 @@ sub storeData
     {
         while( my ($filename, $tokens) = each %{$sref->{'byfile'}} )
         {
-            &Torrus::DB::checkInterrupted();
-            
             if( not -e $filename )
             {
                 createRRD( $collector, $sref, $filename, $tokens );
@@ -308,8 +306,6 @@ sub createRRD
     my @OPT = ( sprintf( '--start=%d', $start ),
                 sprintf( '--step=%d', $step ) );
 
-    &Torrus::DB::checkInterrupted();
-    
     Debug("Creating RRD $filename: " . join(" ", @OPT, @DS, @RRA));
 
     semaphoreDown();
@@ -355,8 +351,6 @@ sub updateRRD
                 $ref->{$1} = 1;
             }
         }
-        
-        &Torrus::DB::checkInterrupted();
     }
 
     # First we compare the sets of datasources in our memory and in RRD file
@@ -427,8 +421,6 @@ sub updateRRD
         return;
     }
 
-    &Torrus::DB::checkInterrupted();
-
     # Build the arguments for RRDs::update.
     my $template = '';
     my $values;
@@ -495,8 +487,6 @@ sub updateRRD
     my @cmd = ( "--template=" . $template,
                 sprintf("%d%s", $avg_ts, $values) );
 
-    &Torrus::DB::checkInterrupted();
-
     if( $threadsInUse )
     {
         # Process errors from RRD update thread
@@ -533,7 +523,6 @@ sub updateRRD
 # A background thread that updates RRD files
 sub rrdUpdateThread
 {
-    &Torrus::DB::setSafeSignalHandlers();
     &Torrus::Log::setTID( threads->tid() );
     
     my $cmdlist;
@@ -541,8 +530,6 @@ sub rrdUpdateThread
     
     while(1)
     {
-        &Torrus::DB::checkInterrupted();
-        
         $cmdlist = $thrUpdateQueue->dequeue();
         
         if( isDebug )

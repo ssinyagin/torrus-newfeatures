@@ -24,7 +24,7 @@ package Torrus::SchedulerInfo;
 use strict;
 use warnings;
 
-use Torrus::DB;
+use Redis;
 use Torrus::Log;
 
 sub new
@@ -38,22 +38,13 @@ sub new
 
     die() if not defined( $options{'-Tree'} );
 
-    $self->{'db_stats'} =
-        new Torrus::DB( 'scheduler_stats',
-                      -Subdir => $self->{'options'}{'-Tree'},
-                      -Btree => 1,
-                      -WriteAccess => $options{'-WriteAccess'} );
+    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis_hname'} =
+        $Torrus::Global::redisPrefix . 'scheduler_stats:' . $options{'-Tree'};
 
-    return( defined( $self->{'db_stats'} ) ? $self:undef );
+    return $self;
 }
 
-
-sub DESTROY
-{
-    my $self = shift;
-    delete $self->{'db_stats'};
-    return;
-}
 
 
 sub readStats
@@ -62,16 +53,18 @@ sub readStats
 
     my $stats = {};
 
-    my $cursor = $self->{'db_stats'}->cursor();
-    while( my ($key, $value) = $self->{'db_stats'}->next($cursor) )
+    my $all = $self->{'redis'}->hgetall($self->{'redis_hname'});
+    while( scalar(@{$all}) > 0 )
     {
+        my $key = shift @{$all};
+        my $value = shift @{$all};
+        
         my( $id, $variable ) = split( '#', $key );
         if( defined( $id ) and defined( $variable ) )
         {
             $stats->{$id}{$variable} = $value;
         }
     }
-    $self->{'db_stats'}->c_close($cursor);
 
     return $stats;
 }
@@ -84,7 +77,8 @@ sub setValue
     my $variable = shift;
     my $value = shift;
 
-    $self->{'db_stats'}->put( join('#', $id, $variable), $value );
+    $self->{'redis'}->hset($self->{'redis_hname'},
+                           join('#', $id, $variable), $value );
     return;
 }
 
@@ -94,7 +88,8 @@ sub getValue
     my $id = shift;
     my $variable = shift;
     
-    return $self->{'db_stats'}->get( join('#', $id, $variable) );
+    return $self->{'redis'}->hget($self->{'redis_hname'},
+                                  join('#', $id, $variable));
 }
 
 
@@ -103,17 +98,19 @@ sub clearStats
     my $self = shift;
     my $id = shift;
 
-    my $cursor = $self->{'db_stats'}->cursor( -Write => 1 );
-    while( my ($key, $value) = $self->{'db_stats'}->next($cursor) )
+    my $all = $self->{'redis'}->hgetall($self->{'redis_hname'});
+    while( scalar(@{$all}) > 0 )
     {
+        my $key = shift @{$all};
+        my $value = shift @{$all};
+        
         my( $db_id, $variable ) = split( '#', $key );
         if( defined( $db_id ) and defined( $variable ) and
             $id eq $db_id )
         {
-            $self->{'db_stats'}->c_del( $cursor );
+            $self->{'redis'}->hdel($self->{'redis_hname'}, $key);
         }
     }
-    $self->{'db_stats'}->c_close($cursor);
     return;
 }
 
@@ -121,7 +118,7 @@ sub clearStats
 sub clearAll
 {
     my $self = shift;
-    $self->{'db_stats'}->trunc();
+    $self->{'redis'}->del($self->{'redis_hname'});
     return;
 }
 

@@ -96,7 +96,7 @@ $Torrus::Collector::exclusiveStartupLock = 1;
 # By default, run 3 full collector cycles immediately at start. This
 # allows all SNMP name->index maps to be fetched and used ASAP
 # The 3rd cycle is needed for cbQoS to fetch its mappings
-$Torrus::Collector::fastCycles = 3;
+$Torrus::Collector::fastCycles = 0;
 
 # SO_RCVBUF, the receiving buffer size of the SNMP collector socket.
 # Should be large enough to sustain the traffic bursts, and should be

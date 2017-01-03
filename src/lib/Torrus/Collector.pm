@@ -109,25 +109,24 @@ sub new
 sub addTarget
 {
     my $self = shift;
-    my $config_tree = shift;
     my $token = shift;
+    my $params = shift;
 
     my $ok = 1;
-    $self->{'targets'}{$token}{'path'} = $config_tree->path($token);
 
-    my $collector_type = $config_tree->getNodeParam($token, 'collector-type');
+    $self->{'targets'}{$token}{'params'} = $params;
+
+    my $collector_type = $self->param($token, 'collector-type');
     if( not $collectorTypes{$collector_type} )
     {
         Error('Unknown collector type: ' . $collector_type);
         return;
     }
 
-    $self->fetchParams($config_tree, $token, $collector_type);
-
     $self->{'targets'}{$token}{'type'} = $collector_type;
     $self->{'types_in_use'}{$collector_type} = 1;
     
-    my $storage_types = $config_tree->getNodeParam($token, 'storage-type');
+    my $storage_types = $self->param($token, 'storage-type');
     foreach my $storage_type ( split( ',', $storage_types ) )
     {
         if( not $Torrus::Collector::storageTypes{$storage_type} )
@@ -144,27 +143,26 @@ sub addTarget
             push( @{$self->{'targets'}{$token}{'storage-types'}},
                   $storage_type );
             
-            $self->fetchParams($config_tree, $token, $storage_string);
             $self->{'storage_in_use'}{$storage_type} = 1;
         }
     }
 
     # If specified, store the value transformation code
-    my $code = $config_tree->getNodeParam($token, 'transform-value');
+    my $code = $self->param($token, 'transform-value');
     if( defined $code )
     {
         $self->{'targets'}{$token}{'transform'} = $code;
     }
     
     # If specified, store the scale RPN
-    my $scalerpn = $config_tree->getNodeParam($token, 'collector-scale');
+    my $scalerpn = $self->param($token, 'collector-scale');
     if( defined $scalerpn )
     {
         $self->{'targets'}{$token}{'scalerpn'} = $scalerpn;
     }
     
     # If specified, store the value map
-    my $valueMap = $config_tree->getNodeParam($token, 'value-map');
+    my $valueMap = $self->param($token, 'value-map');
     if( defined $valueMap and length($valueMap) > 0 )
     {
         my $map = {};
@@ -176,7 +174,7 @@ sub addTarget
         $self->{'targets'}{$token}{'value-map'} = $map;
     }
 
-    # Initialize local token, collectpor, and storage data
+    # Initialize local token, collector, and storage data
     if( not defined $self->{'targets'}{$token}{'local'} )
     {
         $self->{'targets'}{$token}{'local'} = {};
@@ -211,95 +209,6 @@ sub addTarget
 }
 
 
-sub fetchParams
-{
-    my $self = shift;
-    my $config_tree = shift;
-    my $token = shift;
-    my $type = shift;
-
-    if( not defined( $Torrus::Collector::params{$type} ) )
-    {
-        Error("\%Torrus::Collector::params does not have member $type");
-        return;
-    }
-
-    my $ref = \$self->{'targets'}{$token}{'params'};
-
-    my @maps = ( $Torrus::Collector::params{$type} );
-
-    while( scalar( @maps ) > 0 )
-    {
-        &Torrus::DB::checkInterrupted();
-        
-        my @next_maps = ();
-        foreach my $map ( @maps )
-        {
-            foreach my $param ( keys %{$map} )
-            {
-                my $value = $config_tree->getNodeParam( $token, $param );
-
-                if( ref( $map->{$param} ) )
-                {
-                    if( defined $value )
-                    {
-                        if( exists $map->{$param}->{$value} )
-                        {
-                            if( defined $map->{$param}->{$value} )
-                            {
-                                push( @next_maps,
-                                      $map->{$param}->{$value} );
-                            }
-                        }
-                        else
-                        {
-                            Error("Parameter $param has unknown value: " .
-                                  $value . " in " . $self->path($token));
-                        }
-                    }
-                }
-                else
-                {
-                    if( not defined $value )
-                    {
-                        # We know the default value
-                        $value = $map->{$param};
-                    }
-                }
-                # Finally store the value
-                if( defined $value )
-                {
-                    $$ref->{$param} = $value;
-                }
-            }
-        }
-        @maps = @next_maps;
-    }
-    return;
-}
-
-
-sub fetchMoreParams
-{
-    my $self = shift;
-    my $config_tree = shift;
-    my $token = shift;
-    my @params = @_;
-
-    &Torrus::DB::checkInterrupted();
-
-    my $ref = \$self->{'targets'}{$token}{'params'};
-
-    foreach my $param ( @params )
-    {
-        my $value = $config_tree->getNodeParam( $token, $param );
-        if( defined $value )
-        {
-            $$ref->{$param} = $value;
-        }
-    }
-    return;
-}
 
 
 sub param
@@ -359,7 +268,7 @@ sub path
     my $self = shift;
     my $token = shift;
 
-    return $self->{'targets'}{$token}{'path'};
+    return $self->{'targets'}{$token}{'params'}{'path'};
 }
 
 sub listCollectorTargets
@@ -398,8 +307,6 @@ sub deleteTarget
 {
     my $self = shift;
     my $token = shift;
-
-    &Torrus::DB::checkInterrupted();
 
     Info('Deleting target: ' . $self->path($token));
     
@@ -454,14 +361,11 @@ sub run
     {
         next unless $self->{'types_in_use'}{$collector_type};
 
-        &Torrus::DB::checkInterrupted();
-        
         if( $Torrus::Collector::needsConfigTree
             {$collector_type}{'runCollector'} )
         {
             $self->{'config_tree'} =
-                new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
-                                        -Wait => 1 );
+                new Torrus::ConfigTree( -TreeName => $self->{'tree_name'} );
         }
         
         &{$Torrus::Collector::runCollector{$collector_type}}
@@ -476,8 +380,6 @@ sub run
     while( my ($storage_type, $ref) = each %{$self->{'storage'}} )
     {
         next unless $self->{'storage_in_use'}{$storage_type};
-        
-        &Torrus::DB::checkInterrupted();
         
         if( $Torrus::Collector::needsConfigTree
             {$storage_type}{'storeData'} )
@@ -501,8 +403,6 @@ sub run
         
         if( ref( $Torrus::Collector::postProcess{$collector_type} ) )
         {
-            &Torrus::DB::checkInterrupted();
-            
             if( $Torrus::Collector::needsConfigTree
                 {$collector_type}{'postProcess'} )
             {

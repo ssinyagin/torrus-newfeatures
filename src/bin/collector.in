@@ -171,9 +171,6 @@ if( not $nodaemon and not $runonce )
 
 Torrus::Collector::initThreads();
 
-&Torrus::DB::setSafeSignalHandlers();
-
-
 Info(sprintf("Torrus version %s", '@VERSION@'));
 Info(sprintf("%s started for tree %s, instance #%d", $0, $tree, $instance));
 Info(sprintf("Process ID %d", $$));
@@ -194,6 +191,17 @@ if( $runalways or $Torrus::Collector::runAlways )
     $options{'-RunAlways'} = 1;
 }
 
+foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
+{
+    if( ref($Torrus::Collector::initCollectorGlobals{
+        $collector_type}) )
+    {
+        &{$Torrus::Collector::initCollectorGlobals{
+            $collector_type}}($tree, $instance);
+        
+        Verbose('Initialized collector globals for type: ' . $collector_type);
+    }
+}
 
 my $scheduler = new Torrus::CollectorScheduler( %options );
 $scheduler->run();

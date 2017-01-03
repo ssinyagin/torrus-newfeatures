@@ -106,7 +106,7 @@
     <!-- Defaults being used by other graphs -->
     <view name="default-rrgraph">
       <param name="view-type"     value="rrgraph" />
-      <param name="expires"       value="300" />
+      <param name="expires"       value="60" />
       <param name="start"         value="-24h" />
       <param name="end"           value="now" />
       <param name="width"         value="500" />
@@ -236,7 +236,7 @@
          Use the specified HTML file as a template with special tags in it -->
     <view name="default-rrd-html">
       <param name="view-type"     value="html" />
-      <param name="expires"       value="300" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="default-rrd.html" />
       <view name="longterm-rrd-html">
         <param name="longterm" value="1" />
@@ -247,34 +247,34 @@
     <!-- This is the HTML page for tree browsing -->
     <view name="default-dir-html">
       <param name="view-type"     value="html" />
-      <param name="expires"       value="3600" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="default-dir.html" />
     </view>
 
     <!-- This shows the leaves of the subtree -->
     <view name="expanded-dir-html">
       <param name="view-type"     value="html" />
-      <param name="expires"       value="300" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="expanded-dir.html" />
     </view>
 
     <!-- This shows overview subleaves (previousely InOutBps) -->
     <view name="overview-subleaves-html">
       <param name="view-type"     value="html" />
-      <param name="expires"       value="300" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="overview-subleaves.html" />
     </view>
 
     <!-- This all subtrees and leaves recureively -->
     <view name="recursive-dir-html">
       <param name="view-type"     value="html" />
-      <param name="expires"       value="3600" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="default-recursivedir.html" />
     </view>
 
     <view name="rrd-print-daily">
       <param name="view-type"     value="rrprint" />
-      <param name="expires"       value="300" />
+      <param name="expires"       value="60" />
       <param name="start"         value="-24h" />
       <param name="end"           value="now" />
       <param name="print-cf"      value="MIN,AVERAGE,MAX" />
@@ -282,7 +282,7 @@
 
     <view name="rrd-print-last">
       <param name="view-type"     value="rrprint" />
-      <param name="expires"       value="300" />
+      <param name="expires"       value="60" />
       <param name="start"         value="-1h" />
       <param name="end"           value="now" />
       <param name="print-cf"      value="LAST" />
@@ -304,33 +304,33 @@
     <!-- This is the HTML page for displaying the help message -->
     <view name="helptext-html">
       <param name="view-type"     value="html" />
-      <param name="expires"       value="3600" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="default-helptext.html" />
     </view>
 
     <view name="adminfo">
       <param name="view-type"     value="adminfo" />
-      <param name="expires"       value="3600" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="adminfo.html" />
     </view>
 
     <view name="search">
       <param name="view-type"     value="html" />
-      <param name="expires"       value="3600" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="search.html" />
     </view>
 
     <!-- minimalistic view for iframe embedding -->
     <view name="iframe-rrd">
       <param name="view-type"     value="html" />
-      <param name="expires"       value="300" />
+      <param name="expires"       value="60" />
       <param name="html-template" value="iframe-rrd.html" />
     </view>
 
     <!-- RPC calls -->
     <view name="rpc">
       <param name="view-type"     value="rpc" />
-      <param name="expires"       value="300" />
+      <param name="expires"       value="60" />
       <!-- TIMESERIES needs line styles -->
       <param name="line-style"    value="##SingleGraph" />
       <param name="line-color"    value="##SingleGraph" />

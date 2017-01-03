@@ -137,6 +137,8 @@ if( not $nodaemon and not $runonce )
     &Proc::Daemon::Init();
     umask 0017; # Proc::Daemon::Init sets the mask to all-writable
 
+    setup_sighandlers();
+    
     # now we're forked, save the PID file for the END block
     $pidfile = $pidfilename;
 
@@ -212,6 +214,26 @@ if( not $options{'-RunOnce'} )
 }
 
 exit;
+
+
+sub setup_sighandlers
+{
+    $SIG{'HUP'} = sub {
+        Warn('Received SIGHUP. Stopping the process.');
+        exit;
+    };
+
+    $SIG{'TERM'} = sub {
+        Warn('Received SIGTERM. Stopping the process.');
+        exit;
+    };
+
+    $SIG{'INT'} = sub {
+        Warn('Received SIGINT. Stopping the process');
+        exit;
+    };
+};    
+
 
 
 END

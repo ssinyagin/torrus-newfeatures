@@ -23,16 +23,8 @@
          IF isLeaf(child);
            hasLeaves = hasLeaves + 1;
          ELSE;
-           IF isAlias(child);
-             thisIsAlias = 1;
-             urlTitle=' TITLE="Symbolic link to ' _ path(isAlias(child)) _'"';
-             IF isLeaf(isAlias(child));
-               hasLeaves = hasLeaves + 1;
-             END;
-           ELSE;
-             hasSubtrees = 1;
-             urlTitle = '';
-           END;
+           hasSubtrees = 1;
+           urlTitle = '';
          END;
 %]
 <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
@@ -40,11 +32,9 @@
       [% IF displayHealth and nodeParam(child,'has-health-status',1) == 'yes' %]
              <IMG CLASS="Health" SRC="[%url(child,healthView)%]">
       [% END %]
-      [% thisIsAlias ? '<EM CLASS="Alias">':'';
-         hidden ? '<EM CLASS="ShowHidden">':'' %]
+      [% hidden ? '<EM CLASS="ShowHidden">':'' %]
       <A HREF="[%url(child)%]"[%urlTitle%]>[% nodeName(child) %]</A>
-      [% hidden ? '</EM>':'';
-         thisIsAlias ? '</EM>':''; %]
+      [% hidden ? '</EM>':'' %]
     </SPAN>
        [% IF comment %]
     <SPAN CLASS="NodeDescr">

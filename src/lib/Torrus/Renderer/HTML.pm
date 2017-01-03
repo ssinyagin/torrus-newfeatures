@@ -70,7 +70,6 @@ sub render_html
         'nodeExists' => sub { return $config_tree->nodeExists($_[0]); },
         'children'   => sub { return $config_tree->getChildren($_[0]); },
         'isLeaf'     => sub { return $config_tree->isLeaf($_[0]); },
-        'isAlias'    => sub { return 0 },
         'sortTokens' => sub { return $self->sortTokens($config_tree,
                                                        $_[0]); },
         'nodeName'   => sub { return $self->nodeName($config_tree, $_[0]); },

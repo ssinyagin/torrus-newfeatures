@@ -46,9 +46,9 @@ sub render_html
     my $view = shift;
     my $outfile = shift;
 
-    my $tmplfile = $config_tree->getParam($view, 'html-template');
+    my $tmplfile = $config_tree->getOtherParam($view, 'html-template');
 
-    my $expires = $config_tree->getParam($view, 'expires');
+    my $expires = $config_tree->getOtherParam($view, 'expires');
     
     # Create the Template Toolkit processor once, and reuse
     # it in subsequent render() calls
@@ -70,13 +70,13 @@ sub render_html
         'nodeExists' => sub { return $config_tree->nodeExists($_[0]); },
         'children'   => sub { return $config_tree->getChildren($_[0]); },
         'isLeaf'     => sub { return $config_tree->isLeaf($_[0]); },
-        'isAlias'    => sub { return $config_tree->isAlias($_[0]); },
+        'isAlias'    => sub { return 0 },
         'sortTokens' => sub { return $self->sortTokens($config_tree,
                                                        $_[0]); },
         'nodeName'   => sub { return $self->nodeName($config_tree, $_[0]); },
         'parent'     => sub { return $config_tree->getParent($_[0]); },
         'nodeParam'  => sub { return $config_tree->getNodeParam(@_); },
-        'param'      => sub { return $config_tree->getParam(@_); },
+        'param'      => sub { return $config_tree->getOtherParam(@_); },
         'url'        => sub { return $self->makeURL($config_tree, @_); },
         'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
                               return undef;},

@@ -133,7 +133,7 @@ sub render_health
         }
     }
 
-    my $imgfile = $config_tree->getParam($view, $status . '-img');
+    my $imgfile = $config_tree->getOtherParam($view, $status . '-img');
     # if relative path, the icon is in our default dir
     if( $imgfile !~ /^\// )
     {
@@ -147,7 +147,7 @@ sub render_health
     }
 
     copy($imgfile, $outfile);
-    my $expires = $config_tree->getParam($view, 'expires');
+    my $expires = $config_tree->getOtherParam($view, 'expires');
     return ($expires+$t_end, 'image/png');
     
     return;

@@ -22,7 +22,6 @@ package Torrus::ACL;
 use strict;
 use warnings;
 
-use Torrus::DB;
 use Torrus::Log;
 
 
@@ -46,6 +45,8 @@ sub new
     {
         die($@);
     }
+
+    return $self;
 
     my $writing = $options{'-WriteAccess'};
 

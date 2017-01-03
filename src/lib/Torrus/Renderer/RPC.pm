@@ -144,7 +144,7 @@ sub render_rpc
     print $fh $json->encode($result);
     $fh->close;
 
-    my $expires = $config_tree->getParam($view, 'expires');
+    my $expires = $config_tree->getOtherParam($view, 'expires');
 
     return ($expires+time(), 'application/json');
 }

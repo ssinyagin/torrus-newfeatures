@@ -26,6 +26,7 @@ use Torrus::Log;
 
 use Template;
 use URI::Escape;
+use File::Temp qw(tempfile);
 
 # All our methods are imported by Torrus::Renderer;
 
@@ -39,23 +40,10 @@ sub renderUserLogin
         $self->{'options'} = \%new_options;
     }
 
-    my($t_render, $t_expires, $filename, $mime_type);
+    my ($fh, $filename) = tempfile();
+    $fh->close();
 
-    my $cachekey = $self->cacheKey( 'LOGINSCREEN' );
-
-    ($t_render, $t_expires, $filename, $mime_type) =
-        $self->getCache( $cachekey );
-
-    # We don't check the expiration time for login screen
-    if( not defined( $filename ) )
-    {
-        $filename = Torrus::Renderer::newCacheFileName( $cachekey );
-    }
-
-    my $outfile = $Torrus::Global::cacheDir.'/'.$filename;
-
-    $t_expires = time();
-    $mime_type = $Torrus::Renderer::LoginScreen::mimeType;
+    my $mime_type = $Torrus::Renderer::LoginScreen::mimeType;
     my $tmplfile = $Torrus::Renderer::LoginScreen::template;
 
     # Create the Template Toolkit processor once, and reuse
@@ -95,7 +83,7 @@ sub renderUserLogin
         $ttvars->{$opt} = $val;
     }
 
-    my $result = $self->{'tt'}->process( $tmplfile, $ttvars, $outfile );
+    my $result = $self->{'tt'}->process( $tmplfile, $ttvars, $filename );
 
     undef $ttvars;
 
@@ -107,8 +95,7 @@ sub renderUserLogin
     }
     else
     {
-        $self->setCache($cachekey, time(), $t_expires, $filename, $mime_type);
-        @ret = ($outfile, $mime_type, $t_expires - time());
+        @ret = ($filename, $mime_type, 0);
     }
 
     $self->{'options'} = undef;   
@@ -127,37 +114,17 @@ sub renderTreeChooser
         $self->{'options'} = \%new_options;
     }
 
-    my($t_render, $t_expires, $filename, $mime_type);
-
     my $uid = '';
     if( $self->{'options'}->{'uid'} )
     {
         $uid = $self->{'options'}->{'uid'};
     }
 
-    my $cachekey = $self->cacheKey( $uid . ':' . 'TREECHOOSER' );
+    my ($fh, $filename) = tempfile();
+    $fh->close();
 
-    ($t_render, $t_expires, $filename, $mime_type) =
-        $self->getCache( $cachekey );
-
-    if( defined( $filename ) )
-    {
-        if( $t_expires >= time() )
-        {
-            return ($Torrus::Global::cacheDir.'/'.$filename,
-                    $mime_type, $t_expires - time());
-        }
-        # Else reuse the old filename
-    }
-    else
-    {
-        $filename = Torrus::Renderer::newCacheFileName( $cachekey );
-    }
-
-    my $outfile = $Torrus::Global::cacheDir.'/'.$filename;
-
-    $t_expires = time() + $Torrus::Renderer::Chooser::expires;
-    $mime_type = $Torrus::Renderer::Chooser::mimeType;
+    my $t_expires = time() + $Torrus::Renderer::Chooser::expires;
+    my $mime_type = $Torrus::Renderer::Chooser::mimeType;
     
     my $tmplfile;
     if( defined( $self->{'options'}{'variables'}{'SEARCH'} ) and
@@ -216,7 +183,7 @@ sub renderTreeChooser
         $ttvars->{$opt} = $val;
     }
 
-    my $result = $self->{'tt'}->process( $tmplfile, $ttvars, $outfile );
+    my $result = $self->{'tt'}->process( $tmplfile, $ttvars, $filename );
 
     undef $ttvars;
 
@@ -228,8 +195,7 @@ sub renderTreeChooser
     }
     else
     {
-        $self->setCache($cachekey, time(), $t_expires, $filename, $mime_type);
-        @ret = ($outfile, $mime_type, $t_expires - time());
+        @ret = ($filename, $mime_type, $t_expires - time());
     }
 
     $self->{'options'} = undef;   

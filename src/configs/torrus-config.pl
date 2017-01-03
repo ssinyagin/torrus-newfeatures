@@ -250,7 +250,7 @@ $Torrus::Renderer::uriEscapeExceptions = '^A-Za-z0-9-._~/:';
 
 # The page that lets you choose the tree from the list
 $Torrus::Renderer::Chooser::mimeType = 'text/html; charset=UTF-8';
-$Torrus::Renderer::Chooser::expires = '300';
+$Torrus::Renderer::Chooser::expires = '60';
 $Torrus::Renderer::Chooser::template = 'default-chooser.html';
 $Torrus::Renderer::Chooser::searchTemplate = 'globalsearch.html';
 

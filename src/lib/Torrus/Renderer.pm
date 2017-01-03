@@ -20,11 +20,9 @@ package Torrus::Renderer;
 use strict;
 use warnings;
 
-use Digest::MD5 qw(md5_hex);
+use File::Temp qw(tempfile);
 
-use Torrus::DB;
 use Torrus::ConfigTree;
-use Torrus::TimeStamp;
 use Torrus::RPN;
 use Torrus::Log;
 use Torrus::SiteConfig;
@@ -48,27 +46,7 @@ sub new
 {
     my $self = {};
     my $class = shift;
-    bless $self, $class;
-
-    if( not defined $Torrus::Global::cacheDir )
-    {
-        Error('$Torrus::Global::cacheDir must be defined');
-        return undef;
-    }
-    elsif( not -d $Torrus::Global::cacheDir )
-    {
-        Error("No such directory: $Torrus::Global::cacheDir");
-        return undef;
-    }
-
-    $self->{'db'} = new Torrus::DB('render_cache', -WriteAccess => 1);
-    if( not defined( $self->{'db'} ) )
-    {
-        return undef;
-    }
-
-    srand( time() * $$ );
-    
+    bless $self, $class;    
     return $self;
 }
 
@@ -92,18 +70,10 @@ sub render
         $self->{'options'} = \%new_options;
     }
 
-    $self->checkAndClearCache( $config_tree );
-
-    my($t_render, $t_expires, $filename, $mime_type);
-
     my $tree = $config_tree->treeName();
 
     if( not $config_tree->isTset($token) )
     {
-        if( my $alias = $config_tree->isAlias($token) )
-        {
-            $token = $alias;
-        }
         if( not defined( $config_tree->path($token) ) )
         {
             Error("No such token: $token");
@@ -119,33 +89,13 @@ sub render
         $uid = $self->{'options'}->{'uid'};
     }
 
-    my $cachekey = $self->cacheKey( $uid . ':' . $tree . ':' .
-                                    $token . ':' . $view );
+    my $method = 'render_' . $config_tree->getOtherParam($view, 'view-type');
 
-    ($t_render, $t_expires, $filename, $mime_type) =
-        $self->getCache( $cachekey );
-
-    my $not_in_cache = 0;
+    my ($fh, $filename) = tempfile();
+    $fh->close();
     
-    if( not defined( $filename ) )
-    {
-        $filename = Torrus::Renderer::newCacheFileName( $cachekey );
-        $not_in_cache = 1;
-    }
-
-    my $cachefile = $Torrus::Global::cacheDir.'/'.$filename;
-
-    if( ( not $not_in_cache ) and
-        -f $cachefile and
-        $t_expires >= time() )
-    {
-        return ($cachefile, $mime_type, $t_expires - time());
-    }
-
-    my $method = 'render_' . $config_tree->getParam($view, 'view-type');
-
-    ($t_expires, $mime_type) =
-        $self->$method( $config_tree, $token, $view, $cachefile );
+    my ($t_expires, $mime_type) =
+        $self->$method( $config_tree, $token, $view, $filename );
 
     if( %new_options )
     {
@@ -155,112 +105,19 @@ sub render
     my @ret;
     if( defined($t_expires) and defined($mime_type) )
     {
-        $self->setCache($cachekey, time(), $t_expires, $filename, $mime_type);
-        @ret = ($cachefile, $mime_type, $t_expires - time());
+        @ret = ($filename, $mime_type, $t_expires - time());
+    }
+    else
+    {
+        unlink $filename;
     }
 
     return @ret;
 }
 
 
-sub cacheKey
-{
-    my $self = shift;
-    my $keystring = shift;
-
-    if( ref( $self->{'options'}->{'variables'} ) )
-    {
-        foreach my $name ( sort keys %{$self->{'options'}->{'variables'}} )
-        {
-            my $val = $self->{'options'}->{'variables'}->{$name};
-            $keystring .= ':' . $name . '=' . $val;
-        }
-    }
-    return $keystring;
-}
 
 
-sub getCache
-{
-    my $self = shift;
-    my $keystring = shift;
-
-    my $cacheval = $self->{'db'}->get( $keystring );
-
-    if( defined($cacheval) )
-    {
-        return split(':', $cacheval);
-    }
-    else
-    {
-        return undef;
-    }
-}
-
-
-sub setCache
-{
-    my $self = shift;
-    my $keystring = shift;
-    my $t_render = shift;
-    my $t_expires = shift;
-    my $filename = shift;
-    my $mime_type = shift;
-
-    $self->{'db'}->put( $keystring,
-                        join(':',
-                             ($t_render, $t_expires, $filename, $mime_type)));
-    return;
-}
-
-
-
-sub checkAndClearCache
-{
-    my $self = shift;
-    my $config_tree = shift;
-
-    my $tree = $config_tree->treeName();
-
-    Torrus::TimeStamp::init();
-    my $known_ts = Torrus::TimeStamp::get($tree . ':renderer_cache');
-    my $actual_ts = $config_tree->getTimestamp();
-    if( $actual_ts >= $known_ts or
-        time() >= $known_ts + $Torrus::Renderer::cacheMaxAge )
-    {
-        $self->clearcache();
-        Torrus::TimeStamp::setNow($tree . ':renderer_cache');
-    }
-    Torrus::TimeStamp::release();
-    return;
-}
-
-
-sub clearcache
-{
-    my $self = shift;
-
-    Debug('Clearing renderer cache');
-    my $cursor = $self->{'db'}->cursor( -Write => 1 );
-    sleep(1);
-    while( my ($key, $val) = $self->{'db'}->next( $cursor ) )
-    {
-        my($t_render, $t_expires, $filename, $mime_type) =  split(':', $val);
-
-        unlink $Torrus::Global::cacheDir.'/'.$filename;
-        $self->{'db'}->c_del( $cursor );
-    }
-    $self->{'db'}->c_close($cursor);
-    Debug('Renderer cache cleared');
-    return;
-}
-
-
-sub newCacheFileName
-{
-    my $cachekey = shift;
-    return sprintf('%s_%.5d', md5_hex($cachekey), rand(1e5));
-}
 
 sub xmlnormalize
 {

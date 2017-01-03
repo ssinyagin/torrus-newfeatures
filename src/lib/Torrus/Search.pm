@@ -23,7 +23,6 @@ package Torrus::Search;
 use strict;
 use warnings;
 
-use Torrus::DB;
 use Torrus::Log;
 
 sub new

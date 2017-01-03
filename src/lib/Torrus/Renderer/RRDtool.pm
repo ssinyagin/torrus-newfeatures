@@ -226,7 +226,7 @@ sub render_rrgraph
         $mimetype = 'image/png';
     }
             
-    return( $config_tree->getParam($view, 'expires')+time(), $mimetype );
+    return( $config_tree->getOtherParam($view, 'expires')+time(), $mimetype );
 }
 
 
@@ -291,7 +291,7 @@ sub render_rrprint
         return undef;
     }
 
-    foreach my $cf ( split(',', $config_tree->getParam($view, 'print-cf')) )
+    foreach my $cf ( split(',', $config_tree->getOtherParam($view, 'print-cf')) )
     {
         push( @arg_print, sprintf( 'PRINT:%s:%s:%%le', $dname, $cf ) );
     }
@@ -340,7 +340,7 @@ sub render_rrprint
         $fh->close();
     }
 
-    return( $config_tree->getParam($view, 'expires')+time(), 'text/plain' );
+    return( $config_tree->getOtherParam($view, 'expires')+time(), 'text/plain' );
 }
 
 
@@ -369,7 +369,8 @@ sub rrd_make_multigraph
         $dsOrder{$dname} = defined( $order ) ? $order : 100;
     }
 
-    my $disable_legend = $config_tree->getParam($view, 'disable-legend');    
+    my $disable_legend = $config_tree->getOtherParam($view, 'disable-legend');
+    
     $disable_legend =
         (defined($disable_legend) and $disable_legend eq 'yes') ? 1:0;
     
@@ -549,7 +550,7 @@ sub rrd_check_hw
     my $nodeHW = $config_tree->getNodeParam($token, 'rrd-hwpredict');
     if( defined($nodeHW) and $nodeHW eq 'enabled' )
     {
-        my $viewHW = $config_tree->getParam($view, 'rrd-hwpredict');
+        my $viewHW = $config_tree->getOtherParam($view, 'rrd-hwpredict');
         my $varNoHW = $self->{'options'}->{'variables'}->{'NOHW'};
         
         if( (not defined($viewHW) or $viewHW ne 'disabled') and
@@ -601,11 +602,11 @@ sub rrd_make_holtwinters
     # Generate H-W Boundary Lines
 
     # Boundary style
-    my $hw_bndr_style = $config_tree->getParam($view, 'hw-bndr-style');
+    my $hw_bndr_style = $config_tree->getOtherParam($view, 'hw-bndr-style');
     $hw_bndr_style = 'LINE1' unless defined $hw_bndr_style;
     $hw_bndr_style = $self->mkline( $hw_bndr_style );
 
-    my $hw_bndr_color = $config_tree->getParam($view, 'hw-bndr-color');
+    my $hw_bndr_color = $config_tree->getOtherParam($view, 'hw-bndr-color');
     $hw_bndr_color = '#FF0000' unless defined $hw_bndr_color;
     $hw_bndr_color = $self->mkcolor( $hw_bndr_color );
 
@@ -619,7 +620,7 @@ sub rrd_make_holtwinters
 
     # Failures Tick
 
-    my $hw_fail_color = $config_tree->getParam($view, 'hw-fail-color');
+    my $hw_fail_color = $config_tree->getOtherParam($view, 'hw-fail-color');
     $hw_fail_color = '#FFFFA0' unless defined $hw_fail_color;
     $hw_fail_color = $self->mkcolor( $hw_fail_color );
 
@@ -642,7 +643,7 @@ sub rrd_make_graphline
 
     my $legend;
     
-    my $disable_legend = $config_tree->getParam($view, 'disable-legend');
+    my $disable_legend = $config_tree->getOtherParam($view, 'disable-legend');
     if( not defined($disable_legend) or $disable_legend ne 'yes' )
     {
         $legend = $config_tree->getNodeParam($token, 'graph-legend');
@@ -660,7 +661,7 @@ sub rrd_make_graphline
     my $styleval = $config_tree->getNodeParam($token, 'line-style');
     if( not defined($styleval)  )
     {
-        $styleval = $config_tree->getParam($view, 'line-style');
+        $styleval = $config_tree->getOtherParam($view, 'line-style');
     }
     
     my $linestyle = $self->mkline( $styleval );
@@ -668,7 +669,7 @@ sub rrd_make_graphline
     my $colorval = $config_tree->getNodeParam($token, 'line-color');
     if( not defined($colorval) )
     {
-        $colorval = $config_tree->getParam($view, 'line-color');
+        $colorval = $config_tree->getOtherParam($view, 'line-color');
     }
     
     my $linecolor = $self->mkcolor( $colorval );
@@ -704,7 +705,7 @@ sub rrd_make_maxline
 
     my $legend;
     
-    my $disable_legend = $config_tree->getParam($view, 'disable-legend');
+    my $disable_legend = $config_tree->getOtherParam($view, 'disable-legend');
     if( not defined($disable_legend) or $disable_legend ne 'yes' )
     {
         $legend = $config_tree->getNodeParam($token, 'graph-legend');
@@ -726,7 +727,7 @@ sub rrd_make_maxline
     my $styleval = $config_tree->getNodeParam($token, 'maxline-style');
     if( not defined($styleval)  )
     {
-        $styleval = $config_tree->getParam($view, 'maxline-style');
+        $styleval = $config_tree->getOtherParam($view, 'maxline-style');
     }
     
     my $linestyle = $self->mkline( $styleval );
@@ -734,7 +735,7 @@ sub rrd_make_maxline
     my $colorval = $config_tree->getNodeParam($token, 'maxline-color');
     if( not defined($colorval) )
     {
-        $colorval = $config_tree->getParam($view, 'maxline-color');
+        $colorval = $config_tree->getOtherParam($view, 'maxline-color');
     }
     
     my $linecolor = $self->mkcolor( $colorval );
@@ -762,20 +763,20 @@ sub rrd_make_hrules
     my $view = shift;
     my $obj = shift;
 
-    my $hrulesList = $config_tree->getParam($view, 'hrules');
+    my $hrulesList = $config_tree->getOtherParam($view, 'hrules');
     if( defined( $hrulesList ) )
     {
         foreach my $hruleName ( split(',', $hrulesList ) )
         {
             # The presence of this parameter is checked by Validator
             my $valueParam =
-                $config_tree->getParam( $view, 'hrule-value-'.$hruleName );
+                $config_tree->getOtherParam( $view, 'hrule-value-'.$hruleName );
             my $value = $config_tree->getNodeParam( $token, $valueParam );
 
             if( defined( $value ) )
             {
                 my $style =
-                    $config_tree->getParam($view, 'hrule-color-'.$hruleName);
+                    $config_tree->getOtherParam($view, 'hrule-color-'.$hruleName);
 
                 my $color = $self->mkcolor( $style );
                 my $line = $self->mkline( $style );
@@ -806,7 +807,7 @@ sub rrd_make_decorations
     my $view = shift;
     my $obj = shift;
 
-    my $decorList = $config_tree->getParam($view, 'decorations');
+    my $decorList = $config_tree->getOtherParam($view, 'decorations');
     my $ignore_decor =
         $config_tree->getNodeParam($token, 'graph-ignore-decorations');
     if( defined( $decorList ) and
@@ -816,17 +817,17 @@ sub rrd_make_decorations
         foreach my $decorName ( split(',', $decorList ) )
         {
             my $order =
-                $config_tree->getParam($view, 'dec-order-' . $decorName);
+                $config_tree->getOtherParam($view, 'dec-order-' . $decorName);
             $decor->{$order} = {'def' => [], 'line' => ''};
 
             my $style =
                 $self->mkline( $config_tree->
-                               getParam($view, 'dec-style-' . $decorName) );
+                               getOtherParam($view, 'dec-style-' . $decorName) );
             my $color =
                 $self->mkcolor( $config_tree->
-                                getParam($view, 'dec-color-' . $decorName) );
+                                getOtherParam($view, 'dec-color-' . $decorName) );
             my $expr = $config_tree->
-                getParam($view, 'dec-expr-' . $decorName);
+                getOtherParam($view, 'dec-expr-' . $decorName);
             
             my @cdefs =
                 $self->rrd_make_cdef( $config_tree, $token, $decorName,
@@ -874,7 +875,7 @@ sub rrd_make_opts
         
         if( not defined( $value ) )
         {
-            $value = $config_tree->getParam( $view, $param );
+            $value = $config_tree->getOtherParam( $view, $param );
         }
         
         if( defined( $value ) )
@@ -910,7 +911,7 @@ sub rrd_make_opts
         }
     }
 
-    my $params = $config_tree->getParam($view, 'rrd-params');
+    my $params = $config_tree->getOtherParam($view, 'rrd-params');
     if( defined( $params ) )
     {
         push( @args, split('\s+', $params) );
@@ -942,7 +943,7 @@ sub rrd_make_graph_opts
     }
 
     my $disable_title =
-        $config_tree->getParam($view, 'disable-title');
+        $config_tree->getOtherParam($view, 'disable-title');
     if( not defined( $disable_title ) or $disable_title ne 'yes' )
     {
         my $title = $config_tree->getNodeParam($token, 'graph-title');
@@ -954,7 +955,7 @@ sub rrd_make_graph_opts
     }
 
     my $disable_vlabel =
-        $config_tree->getParam($view, 'disable-vertical-label');
+        $config_tree->getOtherParam($view, 'disable-vertical-label');
     if( not defined( $disable_vlabel ) or $disable_vlabel ne 'yes' )
     {
         my $vertical_label =
@@ -965,10 +966,10 @@ sub rrd_make_graph_opts
         }
     }
 
-    my $ignore_limits = $config_tree->getParam($view, 'ignore-limits');
+    my $ignore_limits = $config_tree->getOtherParam($view, 'ignore-limits');
     if( not defined($ignore_limits) or $ignore_limits ne 'yes' )
     {
-        my $ignore_lower = $config_tree->getParam($view, 'ignore-lower-limit');
+        my $ignore_lower = $config_tree->getOtherParam($view, 'ignore-lower-limit');
         if( not defined($ignore_lower) or $ignore_lower ne 'yes' )
         {
             my $limit =
@@ -979,7 +980,7 @@ sub rrd_make_graph_opts
             }
         }
 
-        my $ignore_upper = $config_tree->getParam($view, 'ignore-upper-limit');
+        my $ignore_upper = $config_tree->getOtherParam($view, 'ignore-upper-limit');
         if( not defined($ignore_upper) or $ignore_upper ne 'yes' )
         {
             my $limit =
@@ -1004,7 +1005,7 @@ sub rrd_make_graph_opts
     
     if( not defined( $colorval ) )
     {
-        $colorval = $config_tree->getParam( $view, 'graph-colors' );
+        $colorval = $config_tree->getOtherParam( $view, 'graph-colors' );
     }
         
     if( defined( $colorval ) )
@@ -1207,7 +1208,7 @@ sub rrd_if_showmax
         return 1;
     }
 
-    my $enable = $config_tree->getParam($view, 'draw-maxline');
+    my $enable = $config_tree->getOtherParam($view, 'draw-maxline');
     if( defined($enable) and $enable eq 'yes' )
     {
         return 1;
@@ -1223,7 +1224,7 @@ sub rrd_maxline_step
     my $config_tree = shift;
     my $view = shift;
 
-    my $step = $config_tree->getParam($view, 'maxline-step');    
+    my $step = $config_tree->getOtherParam($view, 'maxline-step');    
     if( not defined($step) )
     {
         $step = 86400;
@@ -1254,13 +1255,13 @@ sub rrd_make_gprint
 
     my @args = ();
 
-    my $gprintValues = $config_tree->getParam($view, 'gprint-values');
+    my $gprintValues = $config_tree->getOtherParam($view, 'gprint-values');
     if( defined( $gprintValues ) )
     {
         foreach my $gprintVal ( split(',', $gprintValues ) )
         {
             my $format =
-                $config_tree->getParam($view, 'gprint-format-' . $gprintVal);
+                $config_tree->getOtherParam($view, 'gprint-format-' . $gprintVal);
             push( @args, 'GPRINT:' . $vname . ':' . $format );
         }
     }
@@ -1278,10 +1279,10 @@ sub rrd_make_gprint_header
     my $view = shift;
     my $obj = shift;
 
-    my $gprintValues = $config_tree->getParam($view, 'gprint-values');
+    my $gprintValues = $config_tree->getOtherParam($view, 'gprint-values');
     if( defined( $gprintValues ) )
     {
-        my $gprintHeader = $config_tree->getParam($view, 'gprint-header');
+        my $gprintHeader = $config_tree->getOtherParam($view, 'gprint-header');
         if( defined( $gprintHeader ) )
         {
             push( @{$obj->{'args'}{'line'}},

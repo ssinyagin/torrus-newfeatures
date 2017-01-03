@@ -30,7 +30,6 @@ pkgbin_SCRIPTS = \
 	bdbinfo			\
 	buildsearchdb		\
 	cleanup   		\
-	clearcache   		\
 	collector    		\
 	compilexml   		\
 	configinfo		\
@@ -65,7 +64,6 @@ EXTRA_DIST = \
 	action_snmpv1trap.in    \
 	bdbinfo.in		\
 	buildsearchdb.in	\
-	clearcache.in   	\
 	cleanup.in		\
 	collector.in    	\
 	compilexml.in   	\
@@ -116,9 +114,6 @@ bdbinfo: bdbinfo.in
 
 cleanup: cleanup.in
 	$(SUBST) cleanup.in > cleanup
-
-clearcache: clearcache.in
-	$(SUBST) clearcache.in > clearcache
 
 collector: collector.in
 	$(SUBST) collector.in > collector

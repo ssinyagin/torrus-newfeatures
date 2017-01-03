@@ -38,14 +38,10 @@ use Torrus::ACL;
 
 ## Torrus::CGI->process($q)
 ## Expects a CGI object as input
-## In case of an error, the DB environment would
-## be uncleaned after do_process().
-## Here we explicitly clean it up
 sub process
 {
     my($class, $q) = @_;
     $class->do_process($q);
-    &Torrus::DB::cleanupEnvironment();    
     return;
 }
 
@@ -369,7 +365,6 @@ sub do_process
     }
 
     undef $renderer;
-    &Torrus::DB::cleanupEnvironment();
 
     if( defined( $options{'acl'} ) )
     {
@@ -399,6 +394,7 @@ sub do_process
                 print( $buffer );
             }
             $fh->close();
+            unlink $fname;
         }
         else
         {
@@ -407,10 +403,7 @@ sub do_process
     }
     else
     {
-        return report_error($q, "Renderer returned error.\n" .
-                            "Probably wrong directory permissions or " .
-                            "directory missing:\n" .
-                            $Torrus::Global::cacheDir);            
+        return report_error($q, "Renderer returned error.\n");     
     }
     
     if( not $Torrus::Renderer::globalDebug )

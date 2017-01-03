@@ -32,10 +32,80 @@ sub new
     my $proto = shift;
     my %options = @_;
     my $class = ref($proto) || $proto;
-    $options{'-WriteAccess'} = 1;
     my $self  = $class->SUPER::new( %options );
     bless $self, $class;
     return $self;
+}
+
+
+sub _users_list_read
+{
+    my $self = shift;
+    my $key = shift;
+    my $val = shift;
+
+    my $list = $self->_users_get($key);
+    $list = '' unless defined($list);
+    my $hash = {};
+    foreach my $member (split(',', $list))
+    {
+        $hash->{$member} = 1;
+    }
+    return $hash;
+}
+
+
+sub _users_list_add
+{
+    my $self = shift;
+    my $key = shift;
+    my $val = shift;
+
+    my $hash = $self->_users_list_read($key);
+    $hash->{$val} = 1;
+    $self->_users_set($key, join(',', sort keys %{$hash}));
+    return;
+}
+
+sub _users_list_del
+{
+    my $self = shift;
+    my $key = shift;
+    my $val = shift;
+
+    my $hash = $self->_users_list_read($key);
+    delete $hash->{$val};
+    $self->_users_set($key, join(',', sort keys %{$hash}));
+    return;
+}
+
+
+sub _users_set
+{
+    my $self = shift;
+    my $key = shift;
+    my $val = shift;
+
+    return $self->{'redis'}->hset($self->{'users_hname'}, $key, $val);
+}
+
+sub _users_del
+{
+    my $self = shift;
+    my $key = shift;
+
+    return $self->{'redis'}->hdel($self->{'users_hname'}, $key);
+}
+
+
+sub _users_list_search
+{
+    my $self = shift;
+    my $key = shift;
+    my $val = shift;
+    
+    my $hash = $self->_users_list_read($key);
+    return defined($hash->{$val});
 }
 
 
@@ -59,13 +129,14 @@ sub addGroups
         }
         else
         {
-            $self->{'db_users'}->addToList( 'G:', $group );
+            $self->_users_list_add('G:', $group);
             $self->setGroupModified( $group );
             Info('Group added: ' . $group);
         }
     }
     return $ok;
 }
+
 
 sub deleteGroups
 {
@@ -80,20 +151,22 @@ sub deleteGroups
             my $members = $self->listGroupMembers( $group );
             foreach my $uid ( @{$members} )
             {
-                $self->{'db_users'}->delFromList( 'gm:' . $uid, $group );
+                $self->_users_list_del( 'gm:' . $uid, $group );
             }
-            $self->{'db_users'}->delFromList( 'G:', $group );
+            $self->_users_list_del( 'G:', $group );
 
-            my $cursor = $self->{'db_acl'}->cursor( -Write => 1 );
-            while( my ($key, $val) = $self->{'db_acl'}->next( $cursor ) )
+            my $all = $self->{'redis'}->hgetall($self->{'acl_hname'});
+            while( scalar(@{$all}) > 0 )
             {
+                my $key = shift @{$all};
+                my $val = shift @{$all};
+
                 my( $dbgroup, $object, $privilege ) = split( ':', $key );
                 if( $dbgroup eq $group )
                 {
-                    $self->{'db_acl'}->c_del( $cursor );
+                    $self->{'redis'}->hdel($key);
                 }
             }
-            $self->{'db_acl'}->c_close($cursor);
             Info('Group deleted: ' . $group);
         }
         else
@@ -111,7 +184,7 @@ sub groupExists
     my $self = shift;
     my $group = shift;
 
-    return $self->{'db_users'}->searchList( 'G:', $group );
+    return $self->_users_list_search( 'G:', $group );
 }
 
 
@@ -119,9 +192,8 @@ sub listGroups
 {
     my $self = shift;
 
-    my $list = $self->{'db_users'}->get( 'G:' );
-
-    return (defined($list) ? split( ',', $list ) : ());
+    my $hash = $self->_users_list_read('G:');
+    return sort keys %{$hash};
 }
 
 
@@ -132,9 +204,12 @@ sub listGroupMembers
 
     my $members = [];
 
-    my $cursor = $self->{'db_users'}->cursor();
-    while( my ($key, $val) = $self->{'db_users'}->next( $cursor ) )
+    my $all = $self->{'redis'}->hgetall($self->{'users_hname'});
+    while( scalar(@{$all}) > 0 )
     {
+        my $key = shift @{$all};
+        my $val = shift @{$all};
+
         my( $selector, $uid ) = split(':', $key);
         if( $selector eq 'gm' )
         {
@@ -145,8 +220,7 @@ sub listGroupMembers
             }
         }
     }
-    $self->{'db_users'}->c_close($cursor);
-    return $members;
+    return [sort @{$members}];
 }
 
 
@@ -165,7 +239,7 @@ sub addUserToGroups
             {
                 if( not grep {$group eq $_} $self->memberOf( $uid ) )
                 {
-                    $self->{'db_users'}->addToList( 'gm:' . $uid, $group );
+                    $self->_users_list_add( 'gm:' . $uid, $group );
                     $self->setGroupModified( $group );
                     Info('Added ' . $uid . ' to group ' . $group);
                 }
@@ -209,7 +283,7 @@ sub delUserFromGroups
             {
                 if( grep {$group eq $_} $self->memberOf( $uid ) )
                 {
-                    $self->{'db_users'}->delFromList( 'gm:' . $uid, $group );
+                    $self->_users_list_del( 'gm:' . $uid, $group );
                     $self->setGroupModified( $group );
                     Info('Deleted ' . $uid . ' from group ' . $group);
                 }
@@ -277,24 +351,28 @@ sub userExists
     return( defined( $dbuid ) and ( $dbuid eq $uid ) );
 }
 
+
 sub listUsers
 {
     my $self = shift;
 
     my @ret;
 
-    my $cursor = $self->{'db_users'}->cursor();
-    while( my ($key, $val) = $self->{'db_users'}->next( $cursor ) )
+    my $all = $self->{'redis'}->hgetall($self->{'users_hname'});
+    while( scalar(@{$all}) > 0 )
     {
+        my $key = shift @{$all};
+        my $val = shift @{$all};
+        
         my( $selector, $uid, $attr ) = split(':', $key);
         if( $selector eq 'ua' and $attr eq 'uid' )
         {
             push( @ret, $uid );
         }
     }
-    $self->{'db_users'}->c_close($cursor);
-    return @ret;
+    return sort @ret;
 }
+
 
 sub setUserAttribute
 {
@@ -311,8 +389,8 @@ sub setUserAttribute
     }
     else
     {
-        $self->{'db_users'}->put( 'ua:' . $uid . ':' . $attr, $val );
-        $self->{'db_users'}->addToList( 'uA:' . $uid, $attr );
+        $self->_users_set( 'ua:' . $uid . ':' . $attr, $val );
+        $self->_users_list_add( 'uA:' . $uid, $attr );
         if( $attr ne 'modified' )
         {
             $self->setUserModified( $uid );
@@ -331,8 +409,8 @@ sub delUserAttribute
 
     foreach my $attr ( @attrs )
     {
-        $self->{'db_users'}->del( 'ua:' . $uid . ':' . $attr );
-        $self->{'db_users'}->delFromList( 'uA:' . $uid, $attr );
+        $self->_users_del( 'ua:' . $uid . ':' . $attr );
+        $self->_users_list_del( 'uA:' . $uid, $attr );
         $self->setUserModified( $uid );
         Debug('Deleted ' . $attr . ' from ' . $uid);
     }
@@ -367,14 +445,14 @@ sub setUserModified
     return;
 }
 
+
 sub listUserAttributes
 {
     my $self = shift;
     my $uid = shift;
 
-    my $list = $self->{'db_users'}->get( 'uA:' . $uid );
-
-    return (defined($list) ? split( ',', $list ) : ());
+    my $hash = $self->_users_list_read( 'uA:' . $uid );
+    return sort keys %{$hash};
 }
 
 
@@ -418,17 +496,19 @@ sub deleteUser
     my $ok = 1;
     if( $self->userExists( $uid ) )
     {
-        my $cursor = $self->{'db_users'}->cursor( -Write => 1 );
-        while( my ($key, $val) = $self->{'db_users'}->next( $cursor ) )
+        my $all = $self->{'redis'}->hgetall($self->{'users_hname'});
+        while( scalar(@{$all}) > 0 )
         {
+            my $key = shift @{$all};
+            my $val = shift @{$all};
+
             my( $selector, $dbuid ) = split(':', $key);
             if( ( $selector eq 'gm' or $selector eq 'ua' ) and
                 $dbuid eq $uid )
             {
-                $self->{'db_users'}->c_del( $cursor );
+                $self->_users_del($key);
             }
         }
-        $self->{'db_users'}->c_close($cursor);
         Info('User deleted: ' . $uid);
     }
     else
@@ -455,8 +535,8 @@ sub setGroupAttribute
     }
     else
     {
-        $self->{'db_users'}->put( 'ga:' . $group . ':' . $attr, $val );
-        $self->{'db_users'}->addToList( 'gA:' . $group, $attr );
+        $self->_users_set( 'ga:' . $group . ':' . $attr, $val );
+        $self->_users_list_add( 'gA:' . $group, $attr );
         if( $attr ne 'modified' )
         {
             $self->setGroupModified( $group );
@@ -472,8 +552,8 @@ sub listGroupAttributes
     my $self = shift;
     my $group = shift;
     
-    my $list = $self->{'db_users'}->get( 'gA:' . $group );
-    return (defined($list) ? split( ',', $list ) : ());
+    my $hash = $self->_users_list_read( 'gA:' . $group );
+    return sort keys %{$hash};
 }
 
 
@@ -499,7 +579,8 @@ sub setPrivilege
     my $ok = 1;
     if( $self->groupExists( $group ) )
     {
-        $self->{'db_acl'}->put( $group.':'.$object.':'.$privilege, 1 );
+        $self->{'redis'}->hset($self->{'acl_hname'},
+                               $group.':'.$object.':'.$privilege, 1 );
         $self->setGroupModified( $group );
         Info('Privilege ' . $privilege . ' for object ' . $object .
              ' set for group ' . $group);
@@ -525,9 +606,9 @@ sub clearPrivilege
     if( $self->groupExists( $group ) )
     {
         my $key = $group.':'.$object.':'.$privilege;
-        if( $self->{'db_acl'}->get( $key ) )
+        if( $self->{'redis'}->hget($self->{'acl_hname'}, $key) )
         {
-            $self->{'db_acl'}->del( $key );
+            $self->{'redis'}->hdel($self->{'acl_hname'}, $key);
             $self->setGroupModified( $group );
             Info('Privilege ' . $privilege . ' for object ' . $object .
                  ' revoked from group ' . $group);
@@ -550,16 +631,18 @@ sub listPrivileges
 
     my $ret = {};
 
-    my $cursor = $self->{'db_acl'}->cursor();
-    while( my ($key, $val) = $self->{'db_acl'}->next( $cursor ) )
+    my $all = $self->{'redis'}->hgetall($self->{'acl_hname'});
+    while( scalar(@{$all}) > 0 )
     {
+        my $key = shift @{$all};
+        my $val = shift @{$all};
+        
         my( $dbgroup, $object, $privilege ) = split( ':', $key );
         if( $dbgroup eq $group )
         {
             $ret->{$object}{$privilege} = 1;
         }
     }
-    $self->{'db_acl'}->c_close($cursor);
 
     return $ret;
 }
@@ -569,12 +652,13 @@ sub clearConfig
 {
     my $self = shift;
 
-    $self->{'db_acl'}->trunc();
-    $self->{'db_users'}->trunc();
+    $self->{'redis'}->del($self->{'acl_hname'});
+    $self->{'redis'}->del($self->{'users_hname'});
 
     Info('Cleared the ACL configuration');
     return 1;
 }
+
 
 sub exportACL
 {
@@ -596,6 +680,7 @@ sub exportACL
         return $ok;
     }
 }
+
 
 sub importACL
 {

@@ -355,7 +355,7 @@ List of all groups
 
 =over 4
 
-=item * C<u:I<GROUP>:I<OBJECT>:I<PRIVILEGE>> => C<1>
+=item * C<I<GROUP>:I<OBJECT>:I<PRIVILEGE>> => C<1>
 
 The entry exists if and only if the group members have this privilege
 over the object given. Most common privilege is C<DisplayTree>, where

@@ -22,6 +22,7 @@ package Torrus::ACL;
 use strict;
 use warnings;
 
+use Redis;
 use Torrus::Log;
 
 
@@ -46,31 +47,20 @@ sub new
         die($@);
     }
 
-    return $self;
-
-    my $writing = $options{'-WriteAccess'};
-
-    $self->{'db_users'} = new Torrus::DB('users', -WriteAccess => $writing );
-    defined( $self->{'db_users'} ) or return( undef );
-
-    $self->{'db_acl'} = new Torrus::DB('acl', -WriteAccess => $writing );
-    defined( $self->{'db_acl'} ) or return( undef );
-
-    $self->{'is_writing'} = $writing;
+    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'users_hname'} = $Torrus::Global::redisPrefix . 'users';
+    $self->{'acl_hname'} = $Torrus::Global::redisPrefix . 'acl';
 
     return $self;
 }
 
 
-sub DESTROY
+sub _users_get
 {
     my $self = shift;
+    my $key = shift;
 
-    Debug('Destroying ACL object');
-
-    delete $self->{'db_users'};
-    delete $self->{'db_acl'};
-    return;
+    return $self->{'redis'}->hget($self->{'users_hname'}, $key);
 }
 
 
@@ -83,7 +73,8 @@ sub hasPrivilege
 
     foreach my $group ( $self->memberOf( $uid ) )
     {
-        if( $self->{'db_acl'}->get( $group.':'.$object.':'.$privilege ) )
+        if( $self->{'redis'}->hget($self->{'acl_hname'},
+                                   $group.':'.$object.':'.$privilege ) )
         {
             Debug('User ' . $uid . ' has privilege ' . $privilege .
                   ' for ' . $object);
@@ -107,7 +98,7 @@ sub memberOf
     my $self = shift;
     my $uid = shift;
 
-    my $glist = $self->{'db_users'}->get( 'gm:' . $uid );
+    my $glist = $self->_users_get('gm:' . $uid);
     return( defined( $glist ) ? split(',', $glist) : () );
 }
 
@@ -139,7 +130,7 @@ sub userAttribute
     my $uid = shift;
     my $attr = shift;
 
-    return $self->{'db_users'}->get( 'ua:' . $uid . ':' . $attr );
+    return $self->_users_get('ua:' . $uid . ':' . $attr);
 }
 
 
@@ -149,7 +140,7 @@ sub groupAttribute
     my $group = shift;
     my $attr = shift;
 
-    return $self->{'db_users'}->get( 'ga:' . $group . ':' . $attr );
+    return $self->_users_get('ga:' . $group . ':' . $attr);
 }
 
 

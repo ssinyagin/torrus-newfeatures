@@ -61,7 +61,6 @@ foreach my $arg ( @ARGV )
         $creator .= "\'" . $arg . "\'\\\n";
     }
 }
-$creator .= "\n On " . scalar(localtime(time));
 
 my $opts_ok = GetOptions
     (

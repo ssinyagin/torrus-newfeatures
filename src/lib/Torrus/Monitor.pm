@@ -128,6 +128,8 @@ sub run
     
     $self->{'redis'}->quit();
     delete $self->{'redis'};
+
+    $self->setStatValue('Objects', scalar(keys %{$self->{'targets'}}));
     
     return;
 }

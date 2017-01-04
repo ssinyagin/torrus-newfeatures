@@ -27,7 +27,6 @@ pkgbin_SCRIPTS = \
 	action_printemail    	\
 	action_snmptrap      	\
 	action_snmpv1trap    	\
-	bdbinfo			\
 	buildsearchdb		\
 	cleanup   		\
 	collector    		\
@@ -62,7 +61,6 @@ EXTRA_DIST = \
 	action_printemail.in    \
 	action_snmptrap.in      \
 	action_snmpv1trap.in    \
-	bdbinfo.in		\
 	buildsearchdb.in	\
 	cleanup.in		\
 	collector.in    	\
@@ -108,9 +106,6 @@ action_snmpv1trap: action_snmpv1trap.in
 
 buildsearchdb: buildsearchdb.in
 	$(SUBST) buildsearchdb.in > buildsearchdb
-
-bdbinfo: bdbinfo.in
-	$(SUBST) bdbinfo.in > bdbinfo
 
 cleanup: cleanup.in
 	$(SUBST) cleanup.in > cleanup

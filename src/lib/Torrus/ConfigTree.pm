@@ -821,9 +821,13 @@ sub searchNodeidPrefix
     my $ret = [];
     foreach my $entry ($dir_tree->entries())
     {
+        my $nodeid_sha = $entry->name();
+        my $nodeid_entry =
+            $self->{'gittree'}->entry_bypath(
+                'nodeid/' . $self->_sha_file($nodeid_sha));
         push(@{$ret},
              $self->{'json'}->decode(
-                 $entry->object()->content()));
+                 $nodeid_entry->object()->content()));
     }
 
     return $ret;
@@ -861,7 +865,7 @@ sub searchNodeidSubstring
 
                 my $data = $self->{'json'}->decode($l3blob->content());
 
-                if( index($data->[0], $substring) > 0 )
+                if( index($data->[0], $substring) >= 0 )
                 {
                     push(@{$ret}, $data);
                 }

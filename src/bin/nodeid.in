@@ -93,8 +93,6 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
 }
 
 
-&Torrus::DB::setSafeSignalHandlers();
-
 {
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
     if( not defined($config_tree) )

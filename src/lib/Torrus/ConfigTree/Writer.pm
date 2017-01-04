@@ -1367,6 +1367,19 @@ sub updateAgentConfigs
     if( $new_commit_id eq $old_commit_id )
     {
         Verbose('Nothing is changed in configtree, skipping the agents update');
+        # Make sure that Redis has up to date commit ID.
+        foreach my $branchname (@branchnames)
+        {
+            my $repo = $repos->{$branchname};
+            my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
+            my $commit = $branch->peel('commit');
+            
+            $self->{'redis'}->hset
+                ($self->{'redis_prefix'} . 'githeads',
+                 $branchname,
+                 $commit->id());
+        }
+        
         return 0;
     }
 

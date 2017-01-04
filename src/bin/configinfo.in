@@ -22,25 +22,16 @@ use strict;
 use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
-use BerkeleyDB;
-
 use Torrus::ConfigTree;
-use Torrus::TimeStamp;
 use Torrus::SiteConfig;
 use Torrus::Log;
 
 exit(1) unless Torrus::SiteConfig::verify();
 
-&Torrus::DB::setSafeSignalHandlers();
-
-Torrus::TimeStamp::init();
-
 my @tree_names = Torrus::SiteConfig::listTreeNames();
 
 
 printf("Torrus version %s\n", '@VERSION@');
-printf("%s\n", DB_VERSION_STRING);
-printf("BerkeleyDB.pm version %s\n", $BerkeleyDB::VERSION);
 printf("\n");
 
 printf("Datasource trees: %d\n", scalar( @tree_names ) );
@@ -49,8 +40,6 @@ printf("\n");
 
 foreach my $tree ( @tree_names )
 {
-    &Torrus::DB::checkInterrupted();
-    
     printf("Tree: %s\n", $tree );
 
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
@@ -64,7 +53,7 @@ foreach my $tree ( @tree_names )
         foreach my $name ( 'leaves', 'collectorLeaves', 'monitorLeaves',
                            'holtwintersLeaves', 'subtrees',
                            'maxSubtreePath', 'maxSubtreeSize', 'views',
-                           'monitors', 'actions', 'compiled' )
+                           'monitors', 'actions' )
         {
             $stats->{$name} = 0;
         }
@@ -82,8 +71,6 @@ foreach my $tree ( @tree_names )
         printf("Views: %d\n",                 $stats->{'views'} );
         printf("Monitors: %d\n",              $stats->{'monitors'} );
         printf("Actions: %d\n",               $stats->{'actions'} );
-        printf("Last compiled: %s\n",
-               scalar(localtime($stats->{'compiled'})));
         printf("\n");
     }
 }
@@ -94,8 +81,6 @@ sub collectStats
     my $config_tree = shift;
     my $stats = shift;
     my $token = shift;
-
-    &Torrus::DB::checkInterrupted();
 
     if( not defined( $token ) )
     {
@@ -156,8 +141,6 @@ sub collectOtherStats
     $n = scalar( $config_tree->getActionNames() );
     $stats->{'actions'} = $n if defined( $n );
 
-    $n = $config_tree->getTimestamp();
-    $stats->{'compiled'} = $n if defined( $n );
     return;
 }
 

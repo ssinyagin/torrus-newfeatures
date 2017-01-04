@@ -22,9 +22,8 @@ Removed variables:
   cachedir
   dbhome
 
-New variables:
-  writerwd
-  readerwd
+New variable:
+  gitrepodir
   
 New software daemon required:
   redis

@@ -24,165 +24,72 @@ use strict;
 use warnings;
 use base 'Torrus::Scheduler';
 
-use Torrus::ConfigTree;
+use Torrus::AgentConfig;
 use Torrus::Log;
-use Torrus::TimeStamp;
 
 sub beforeRun
 {
     my $self = shift;
 
     my $tree = $self->treeName();
-    my $config_tree = new Torrus::ConfigTree(-TreeName => $tree, -Wait => 1);
-    if( not defined( $config_tree ) )
-    {
-        return undef;
-    }
-
+    my $instance = 0;
     my $data = $self->data();
 
-    # Prepare the list of tokens, sorted by period and offset,
-    # from config tree or from cache.
+    my $cb_updated = sub {
+        my $token = shift;
+        my $params = shift;
 
-    my $need_new_tasks = 0;
+        my $period = $params->{'monitor-period'};
+        my $offset = $params->{'monitor-timeoffset'};
+        my $monitor = $data->{'task'}{$period}{$offset};
 
-    Torrus::TimeStamp::init();
-    my $known_ts = Torrus::TimeStamp::get($tree . ':monitor_cache');
-    my $actual_ts = $config_tree->getTimestamp();
-    if( $actual_ts >= $known_ts )
-    {
-        if( defined($self->{'delay'}) and $self->{'delay'} > 0 )
+        if( not defined($monitor) )
         {
-            Info(sprintf('Delaying for %d seconds', $self->{'delay'}));
-            sleep( $self->{'delay'} );
+            $monitor =
+                new Torrus::Monitor( -Period => $period,
+                                     -Offset => $offset,
+                                     -TreeName => $tree,
+                                     -Instance => $instance );
+            
+            $data->{'task'}{$period}{$offset} = $monitor;
+            $self->addTask($monitor);
         }
 
-        Info("Rebuilding monitor cache");
-        Debug("Config TS: $actual_ts, Monitor TS: $known_ts");
+        $monitor->addTarget( $token, $params );
+        $data->{'agent'}{$token} = $monitor;
+    };
 
-        delete $data->{'targets'};
-        $need_new_tasks = 1;
+    my $cb_deleted = sub {
+        my $token = shift;
 
-        $data->{'db_tokens'} = new Torrus::DB( 'monitor_tokens',
-                                               -Subdir => $tree,
-                                               -WriteAccess => 1,
-                                               -Truncate    => 1 );
-        $self->cacheMonitors( $config_tree, $config_tree->token('/') );
-        # explicitly close, since we don't need it often, and sometimes
-        # open it in read-only mode
-        $data->{'db_tokens'}->closeNow();
-        delete $data->{'db_tokens'};
+        my $monitor = $data->{'agent'}{$token};
+        $monitor->deleteTarget($token);
+        delete $data->{'agent'}{$token};
+    };
 
-        # Set the timestamp
-        &Torrus::TimeStamp::setNow($tree . ':monitor_cache');
-    }
-    Torrus::TimeStamp::release();
-
-    &Torrus::DB::checkInterrupted();
-
-    if( not $need_new_tasks and not defined $data->{'targets'} )
+    my $ts_before_update = time();
+    my $updated = 0;
+    if( not defined($data->{'agent_config'}) )
     {
-        $need_new_tasks = 1;
-
-        $data->{'db_tokens'} = new Torrus::DB('monitor_tokens',
-                                              -Subdir => $tree);
-        my $cursor = $data->{'db_tokens'}->cursor();
-        while( my ($token, $schedule) = $data->{'db_tokens'}->next($cursor) )
-        {
-            my ($period, $offset, $mlist) = split(':', $schedule);
-            if( not exists( $data->{'targets'}{$period}{$offset} ) )
-            {
-                $data->{'targets'}{$period}{$offset} = [];
-            }
-            push( @{$data->{'targets'}{$period}{$offset}}, $token );
-            $data->{'mlist'}{$token} = [];
-            push( @{$data->{'mlist'}{$token}}, split(',', $mlist) );
-        }
-        $data->{'db_tokens'}->c_close($cursor);
-        undef $cursor;
-        $data->{'db_tokens'}->closeNow();
-        delete $data->{'db_tokens'};
+        $data->{'agent_config'} =
+            new Torrus::AgentConfig($tree, 'monitor', $instance);
+        
+        $data->{'agent_config'}->readAll($cb_updated);
+        $updated = 1;
     }
-
-    &Torrus::DB::checkInterrupted();
-
-    # Now fill in Scheduler's task list, if needed
-
-    if( $need_new_tasks )
+    else
     {
-        Verbose("Initializing tasks");
-        my $init_start = time();
-        $self->flushTasks();
-
-        foreach my $period ( keys %{$data->{'targets'}} )
-        {
-            foreach my $offset ( keys %{$data->{'targets'}{$period}} )
-            {
-                my $monitor = new Torrus::Monitor( -Period => $period,
-                                                   -Offset => $offset,
-                                                   -TreeName => $tree,
-                                                   -SchedData => $data );
-
-                foreach my $token ( @{$data->{'targets'}{$period}{$offset}} )
-                {
-                    &Torrus::DB::checkInterrupted();
-                    
-                    $monitor->addTarget( $config_tree, $token );
-                }
-
-                $self->addTask( $monitor );
-            }
-        }
-        Verbose(sprintf("Tasks initialization finished in %d seconds",
-                        time() - $init_start));
+        $updated = 
+            $data->{'agent_config'}->readUpdates($cb_updated, $cb_deleted);
     }
 
-    Verbose("Monitor initialized");
+    if( $updated )
+    {
+        Verbose(sprintf("Updated tasks in %d seconds",
+                        time() - $ts_before_update));
+    }
 
     return 1;
-}
-
-
-sub cacheMonitors
-{
-    my $self = shift;
-    my $config_tree = shift;
-    my $ptoken = shift;
-
-    my $data = $self->data();
-
-    foreach my $ctoken ( $config_tree->getChildren( $ptoken ) )
-    {
-        &Torrus::DB::checkInterrupted();
-
-        if( $config_tree->isSubtree( $ctoken ) )
-        {
-            $self->cacheMonitors( $config_tree, $ctoken );
-        }
-        elsif( $config_tree->isLeaf( $ctoken ) and
-               ( $config_tree->getNodeParam($ctoken, 'ds-type') ne
-                 'rrd-multigraph') )
-        {
-            my $mlist = $config_tree->getNodeParam( $ctoken, 'monitor' );
-            if( defined $mlist )
-            {
-                my $period = sprintf('%d',
-                                     $config_tree->getNodeParam
-                                     ( $ctoken, 'monitor-period' ) );
-                my $offset = sprintf('%d',
-                                     $config_tree->getNodeParam
-                                     ( $ctoken, 'monitor-timeoffset' ) );
-                
-                $data->{'db_tokens'}->put( $ctoken,
-                                           $period.':'.$offset.':'.$mlist );
-                
-                push( @{$data->{'targets'}{$period}{$offset}}, $ctoken );
-                $data->{'mlist'}{$ctoken} = [];
-                push( @{$data->{'mlist'}{$ctoken}}, split(',', $mlist) );
-            }
-        }
-    }
-    return;
 }
 
 

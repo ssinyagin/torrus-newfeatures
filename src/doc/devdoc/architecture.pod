@@ -286,9 +286,9 @@ reading.
 =item * C<acl> -- a hash containing the access privileges for groups, as
   described below.
 
-=item * C<monitor_alarms> is a hash that keeps alarm status information
-  from previous runs of Monitor, with the keys and values as described
-  below.
+=item * C<monitor_alarms:I<TREE>> is a hash that keeps alarm status
+  information from previous runs of Monitor, with the keys and values as
+  described below.
 
 =item * C<scheduler_stats:I<TREE>> is a hash which stores the runtime
   statistics of Scheduler tasks. Each key is of structure

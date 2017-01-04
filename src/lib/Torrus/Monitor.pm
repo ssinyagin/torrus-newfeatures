@@ -21,11 +21,11 @@ use strict;
 use warnings;
 use base 'Torrus::Scheduler::PeriodicTask';
 
-use Torrus::DB;
 use Torrus::ConfigTree;
 use Torrus::DataAccess;
-use Torrus::TimeStamp;
 use Torrus::Log;
+
+use Redis;
 
 
 sub new
@@ -44,8 +44,10 @@ sub new
 
 
     $self->{'tree_name'} = $options{'-TreeName'};
-    $self->{'sched_data'} = $options{'-SchedData'};
-    
+
+    $self->{'redis_hname'} =
+        $Torrus::Global::redisPrefix . 'monitor_alarms:' . $options{'-Tree'};
+
     return $self;
 }
 
@@ -53,17 +55,28 @@ sub new
 sub addTarget
 {
     my $self = shift;
-    my $config_tree = shift;
     my $token = shift;
+    my $params = shift;
 
-    if( not defined( $self->{'targets'} ) )
-    {
-        $self->{'targets'} = [];
-    }
-    push( @{$self->{'targets'}}, $token );
+    $self->{'targets'}{$token} = {
+        'path' => $params->{'path'},
+        'mlist' => [split(',', $params->{'monitor'})],
+    };
+
     return;
 }
 
+
+sub deleteTarget
+{
+    my $self = shift;
+    my $token = shift;
+
+    Info('Deleting target: ' . $self->{'targets'}{$token}{'path'});
+    
+    delete $self->{'targets'}{$token};
+    return;
+}
 
 
 
@@ -72,32 +85,25 @@ sub run
     my $self = shift;
     
     my $config_tree =
-        new Torrus::ConfigTree( -TreeName => $self->{'tree_name'},
-                                -Wait => 1 );
+        new Torrus::ConfigTree( -TreeName => $self->{'tree_name'} );
     if( not defined( $config_tree ) )
     {
         return;
     }
 
     my $da = new Torrus::DataAccess;
-    
-    $self->{'db_alarms'} = new Torrus::DB('monitor_alarms',
-                                          -Subdir => $self->{'tree_name'},
-                                          -WriteAccess => 1);
 
-    foreach my $token ( @{$self->{'targets'}} )
+    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+
+    foreach my $token ( keys %{$self->{'targets'}} )
     {
-        &Torrus::DB::checkInterrupted();
-        
-        my $mlist = $self->{'sched_data'}{'mlist'}{$token};
-        
-        foreach my $mname ( @{$mlist} )
+        foreach my $mname ( @{$self->{'targets'}{$token}{'mlist'}} )
         {
             my $obj = { 'token' => $token, 'mname' => $mname };
 
             $obj->{'da'} = $da;
             
-            my $mtype = $config_tree->getParam($mname, 'monitor-type');
+            my $mtype = $config_tree->getOtherParam($mname, 'monitor-type');
             $obj->{'mtype'} = $mtype;
             
             my $method = 'check_' . $mtype;
@@ -120,7 +126,9 @@ sub run
 
     $self->cleanupExpired();
     
-    delete $self->{'db_alarms'};
+    $self->{'redis'}->quit();
+    delete $self->{'redis'};
+    
     return;
 }
 
@@ -152,7 +160,7 @@ sub check_expression
     my $mname = $obj->{'mname'};
 
     # Timezone manipulation that would affect TOD function in RPN
-    my $tz = $config_tree->getParam($mname,'time-zone');
+    my $tz = $config_tree->getOtherParam($mname,'time-zone');
     if( not defined($tz) )
     {
         $tz = $ENV{'TZ'};
@@ -166,7 +174,7 @@ sub check_expression
     
     my $t_end = undef;
     my $t_start = undef;
-    my $timespan = $config_tree->getParam($mname,'time-span');
+    my $timespan = $config_tree->getOtherParam($mname,'time-span');
     if( defined($timespan) and $timespan > 0 )
     {
         $t_end = 'LAST';
@@ -177,10 +185,10 @@ sub check_expression
         $obj->{'da'}->read($config_tree, $token, $t_end, $t_start);
     $value = 'UNKN' unless defined($value);
     
-    my $expr = $value . ',' . $config_tree->getParam($mname,'rpn-expr');
+    my $expr = $value . ',' . $config_tree->getOtherParam($mname,'rpn-expr');
     $expr = $self->substitute_vars( $config_tree, $obj, $expr );
 
-    my $display_expr = $config_tree->getParam($mname,'display-rpn-expr');
+    my $display_expr = $config_tree->getOtherParam($mname,'display-rpn-expr');
     if( defined( $display_expr ) )
     {
         $display_expr =
@@ -270,9 +278,10 @@ sub setAlarm
     my $alarm = $obj->{'alarm'};
     my $timestamp = $obj->{'timestamp'};
 
-    my $key = $mname . ':' . $config_tree->path($token);
+    my $key = $mname . ':' . $token;
     
-    my $prev_values = $self->{'db_alarms'}->get( $key );
+    my $prev_values =
+        $self->{'redis'}->hget($self->{'redis_hname'}, $key );
     
     my ($t_set, $t_expires, $prev_status, $t_last_change);
     $t_expires = 0;    
@@ -293,7 +302,7 @@ sub setAlarm
     }
 
     my @escalation_times;
-    my $esc = $config_tree->getParam($mname, 'escalations');
+    my $esc = $config_tree->getOtherParam($mname, 'escalations');
     if( defined($esc) )
     {
         @escalation_times = split(',', $esc);
@@ -330,14 +339,14 @@ sub setAlarm
         if( $prev_status )
         {
             $t_expires = $t_last_change +
-                $config_tree->getParam($mname, 'expires');
+                $config_tree->getOtherParam($mname, 'expires');
             $event = 'clear';
         }
         else
         {
             if( $t_expires > 0 and time() > $t_expires )
             {
-                $self->{'db_alarms'}->del( $key );
+                $self->{'redis'}->hdel($self->{'redis_hname'}, $key);
                 $event = 'forget';
             }
         }
@@ -385,12 +394,13 @@ sub setAlarm
 
         if( $event ne 'forget' )
         {
-            $self->{'db_alarms'}->put( $key,
-                                       join(':', ($t_set,
-                                                  $t_expires,
-                                                  ($alarm ? 1:0),
-                                                  $t_last_change,
-                                                  keys %escalation_state)) );
+            $self->{'redis'}->hset($self->{'redis_hname'},
+                                   $key,
+                                   join(':', ($t_set,
+                                              $t_expires,
+                                              ($alarm ? 1:0),
+                                              $t_last_change,
+                                              keys %escalation_state)) );
         }
     }
     return;
@@ -406,14 +416,12 @@ sub run_actions
     my $mname = $obj->{'mname'};
 
     foreach my $aname
-        (split(',', $config_tree->getParam($mname, 'action')))
+        (split(',', $config_tree->getOtherParam($mname, 'action')))
     {
-        &Torrus::DB::checkInterrupted();
-        
         Info(sprintf('Running action %s for event %s in monitor %s',
                      $aname, $obj->{'event'}, $obj->{'mname'}));
         my $method = 'run_event_' .
-            $config_tree->getParam($aname, 'action-type');
+            $config_tree->getOtherParam($aname, 'action-type');
         $self->$method( $config_tree, $aname, $obj );
     }
 }
@@ -426,11 +434,12 @@ sub cleanupExpired
 {
     my $self = shift;
 
-    &Torrus::DB::checkInterrupted();
-    
-    my $cursor = $self->{'db_alarms'}->cursor(-Write => 1);
-    while( my ($key, $timers) = $self->{'db_alarms'}->next($cursor) )
+    my $all = $self->{'redis'}->hgetall($self->{'redis_hname'});
+    while( scalar(@{$all}) > 0 )
     {
+        my $key = shift @{$all};
+        my $timers = shift @{$all};
+
         my ($t_set, $t_expires, $prev_status, $t_last_change) =
             split(':', $timers);
         
@@ -438,16 +447,14 @@ sub cleanupExpired
             time() > ( $t_last_change + $Torrus::Monitor::alarmTimeout ) and
             ( (not $t_expires) or (time() > $t_expires) ) )
         {            
-            my ($mname, $path) = split(':', $key);
+            my ($mname, $token) = split(':', $key);
             
             Info('Cleaned up an orphaned alarm: monitor=' . $mname .
-                 ', path=' . $path);
-            $self->{'db_alarms'}->c_del( $cursor );            
+                 ', token=' . $token);
+            $self->{'redis'}->hdel($self->{'redis_hname'}, $key);
         }
     }
-    $self->{'db_alarms'}->c_close($cursor);
-    
-    &Torrus::DB::checkInterrupted();
+
     return;
 }
     
@@ -474,7 +481,7 @@ sub run_event_tset
     }
     else
     {
-        my $esc = $config_tree->getParam($aname, 'on-escalations');
+        my $esc = $config_tree->getOtherParam($aname, 'on-escalations');
         if( defined($esc) )
         {
             if( $event eq 'escalate' )
@@ -497,7 +504,7 @@ sub run_event_tset
 
     if( $add or $remove )
     {
-        my $tset = 'S'.$config_tree->getParam($aname, 'tset-name');
+        my $tset = 'S'.$config_tree->getOtherParam($aname, 'tset-name');
         my $path = $config_tree->path($token);
         
         if( $add )
@@ -527,7 +534,7 @@ sub run_event_exec
     my $event = $obj->{'event'};
     my $mname = $obj->{'mname'};
 
-    my $launch_when = $config_tree->getParam($aname, 'launch-when');
+    my $launch_when = $config_tree->getOtherParam($aname, 'launch-when');
     if( not defined $launch_when )
     {
         $launch_when = 'set,escalate';
@@ -535,7 +542,7 @@ sub run_event_exec
 
     if( grep {$event eq $_} split(',', $launch_when) )
     {
-        my $cmd = $config_tree->getParam($aname, 'command');
+        my $cmd = $config_tree->getOtherParam($aname, 'command');
         $cmd =~ s/\&gt\;/\>/;
         $cmd =~ s/\&lt\;/\</;
 
@@ -569,14 +576,15 @@ sub run_event_exec
         $ENV{'TORRUS_EVENT'}     = $event;
         $ENV{'TORRUS_ESCALATION'} = $obj->{'escalation'};
         $ENV{'TORRUS_MONITOR'}   = $mname;
-        $ENV{'TORRUS_MCOMMENT'}  = $config_tree->getParam($mname, 'comment');
+        $ENV{'TORRUS_MCOMMENT'}  =
+            $config_tree->getOtherParam($mname, 'comment');
         $ENV{'TORRUS_TSTAMP'}    = $obj->{'timestamp'};
 
         if( defined( $obj->{'display_value'} ) )
         {
             $ENV{'TORRUS_VALUE'} = $obj->{'display_value'};
 
-            my $format = $config_tree->getParam($mname, 'display-format');
+            my $format = $config_tree->getOtherParam($mname, 'display-format');
             if( not defined( $format ) )
             {
                 $format = '%.2f';
@@ -586,14 +594,14 @@ sub run_event_exec
                 sprintf( $format, $obj->{'display_value'} );
         }
 
-        my $severity = $config_tree->getParam($mname, 'severity');
+        my $severity = $config_tree->getOtherParam($mname, 'severity');
         if( defined( $severity ) )
         {
             $ENV{'TORRUS_SEVERITY'} = $severity;
         }
         
         my $setenv_params =
-            $config_tree->getParam($aname, 'setenv-params');
+            $config_tree->getOtherParam($aname, 'setenv-params');
 
         if( defined( $setenv_params ) )
         {
@@ -618,7 +626,7 @@ sub run_event_exec
         }
 
         my $setenv_dataexpr =
-            $config_tree->getParam($aname, 'setenv-dataexpr');
+            $config_tree->getOtherParam($aname, 'setenv-dataexpr');
 
         if( defined( $setenv_dataexpr ) )
         {
@@ -627,7 +635,7 @@ sub run_event_exec
             foreach my $pair ( split( ',', $setenv_dataexpr ) )
             {
                 my ($env, $param) = split( '=', $pair );
-                my $expr = $config_tree->getParam($aname, $param);
+                my $expr = $config_tree->getOtherParam($aname, $param);
                 my ($value, $timestamp) =
                     $obj->{'da'}->read_RPN( $config_tree, $token, $expr );
                 my $envName = 'TORRUS_'.$env;

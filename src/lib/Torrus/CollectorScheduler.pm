@@ -59,15 +59,15 @@ sub beforeRun
         }
 
         $collector->addTarget( $token, $params );
-        $data->{'token'}{$token} = $collector;
+        $data->{'agent'}{$token} = $collector;
     };
 
     my $cb_deleted = sub {
         my $token = shift;
 
-        my $collector = $data->{'token'}{$token};
+        my $collector = $data->{'agent'}{$token};
         $collector->deleteTarget($token);
-        delete $data->{'token'}{$token};
+        delete $data->{'agent'}{$token};
     };
 
     my $ts_before_update = time();

@@ -26,6 +26,8 @@ use Torrus::SiteConfig;
 use Torrus::ConfigTree;
 use Torrus::Log;
 
+use Redis;
+
 exit(1) unless Torrus::SiteConfig::verify();
 
 our @trees;
@@ -69,9 +71,6 @@ elsif( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-
-&Torrus::DB::setSafeSignalHandlers();
-
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
 foreach my $tree ( @trees )
@@ -82,8 +81,6 @@ foreach my $tree ( @trees )
         exit(1);
     }
 
-    &Torrus::DB::checkInterrupted();
-    
     Verbose("Flushing alarms and tokensets for the tree: $tree");
 
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree,
@@ -93,24 +90,10 @@ foreach my $tree ( @trees )
         next;
     }
 
-    my $db = new Torrus::DB('monitor_alarms',
-                            -Subdir => $tree,
-                            -WriteAccess => 1);
-
-
-    my $cursor = $db->cursor(-Write => 1);
-    while( my ($key, $timers) = $db->next($cursor) )
-    {
-        Debug('Deleting alarm: ' . $key);        
-        $db->c_del( $cursor );            
+    my $hname = $Torrus::Global::redisPrefix . 'monitor_alarms:' . $tree;
+    my $redis = Redis->new(server => $Torrus::Global::redisServer);
+    $redis->del($hname);
         
-    }
-    $db->c_close($cursor);
-    undef $cursor;
-    undef $db;
-    
-    &Torrus::DB::checkInterrupted();
-
     foreach my $ts ( $config_tree->getTsets() )
     {
         Debug('Processing tokenset: ' . $ts);
@@ -127,9 +110,8 @@ foreach my $tree ( @trees )
             }
         }
     }
-
+    
     undef $config_tree;
-    &Torrus::DB::cleanupEnvironment();
 }
 
 exit;

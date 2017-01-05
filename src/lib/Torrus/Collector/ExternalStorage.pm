@@ -284,8 +284,6 @@ sub storeData
     my $collector = shift;
     my $sref = shift;
 
-    &Torrus::DB::checkInterrupted();
-
     return unless defined($sref->{'values'});
     
     my $nTokens = scalar( keys %{$sref->{'values'}} );
@@ -301,8 +299,6 @@ sub storeData
     
     while( my($token, $valuetriple) = each( %{$sref->{'values'}} ) )
     {
-        &Torrus::DB::checkInterrupted();
-        
         my( $value, $timestamp, $interval ) = @{$valuetriple};
         my $serviceid =
             $collector->param($token, 'ext-service-id');

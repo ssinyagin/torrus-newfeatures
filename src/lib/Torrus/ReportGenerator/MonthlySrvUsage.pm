@@ -67,12 +67,8 @@ sub generate
     my $srvIDs = $self->{'srvexport'}->getServiceIDs();
     foreach my $serviceid ( @{$srvIDs} )
     {
-        &Torrus::DB::checkInterrupted();
-        
         my $data = $self->{'srvexport'}->getIntervalData
             ( $self->{'StartDate'}, $self->{'EndDate'}, $serviceid );
-
-        &Torrus::DB::checkInterrupted();
 
         next if scalar( @{$data} ) == 0;
         Debug('MonthlySrvUsage: Generating report for ' . $serviceid);
@@ -111,8 +107,6 @@ sub generate
             }
         }
 
-        &Torrus::DB::checkInterrupted();
-
         # Set undefined values to zero and calculate the average
 
         my $sum = Math::BigFloat->new(0);
@@ -129,8 +123,6 @@ sub generate
                 $sum += $aligned[$pos];
             }
         }
-
-        &Torrus::DB::checkInterrupted();
 
         my $avgVal = $sum / $nDatapoints;
 
@@ -195,8 +187,6 @@ sub generate
             'value'     => $volume,
             'units'     => $volumeUnits });
     }
-
-    &Torrus::DB::checkInterrupted();
 
     $self->{'backend'}->finalize( $self->{'reportId'} );
     return;

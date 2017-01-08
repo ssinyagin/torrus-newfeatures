@@ -31,7 +31,7 @@ use Getopt::Long;
 
 use Torrus::Log;
 use Torrus::Monitor;
-use Torrus::MonitorScheduler;
+use Torrus::AgentScheduler;
 use Torrus::SiteConfig;
 
 exit(1) unless Torrus::SiteConfig::verify();
@@ -161,8 +161,10 @@ if( $delay > 0 )
 my %options =
     (
      '-ProcessName' => $process_name,
+     '-AgentName'   => 'monitor',
      '-Tree'      => $tree,
-     );
+     '-Instance'    => 0
+    );
 if( $runonce )
 {
     $options{'-RunOnce'} = 1;
@@ -172,8 +174,10 @@ if( $runalways or $Torrus::Monitor::runAlways )
     $options{'-RunAlways'} = 1;
 }
 
-my $scheduler = new Torrus::MonitorScheduler( %options );
-$scheduler->run();
+eval {
+    my $scheduler = new Torrus::AgentScheduler( %options );
+    $scheduler->run();
+};
 
 if( not $options{'-RunOnce'} )
 {

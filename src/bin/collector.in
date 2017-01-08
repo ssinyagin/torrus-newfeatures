@@ -33,7 +33,7 @@ use Getopt::Long;
 use Torrus::Log;
 use Torrus::ConfigTree;
 use Torrus::Collector;
-use Torrus::CollectorScheduler;
+use Torrus::AgentScheduler;
 use Torrus::SiteConfig;
 
 exit(1) unless Torrus::SiteConfig::verify();
@@ -180,6 +180,7 @@ Info(sprintf("Process ID %d", $$));
 my %options =
     (
      '-ProcessName' => $process_name,
+     '-AgentName'   => 'collector',
      '-Tree'        => $tree,
      '-Instance'    => $instance
      );
@@ -194,7 +195,6 @@ if( $runalways or $Torrus::Collector::runAlways )
 }
 
 eval {
-
     foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
     {
         if( ref($Torrus::Collector::initCollectorGlobals{
@@ -208,7 +208,7 @@ eval {
         }
     }
     
-    my $scheduler = new Torrus::CollectorScheduler( %options );
+    my $scheduler = new Torrus::AgentScheduler( %options );
     $scheduler->run();
 };
 

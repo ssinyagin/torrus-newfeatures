@@ -135,7 +135,7 @@ The C<I<TREE>_agent_tokens> branch is used to store the information
 which agent branches have which tokens. It is needed for deleting tokens
 from agent branches when they are deleted from configtree branch. The
 branch contains two-level 256-way directory hierarchy, for every token,
-and the JSON files contain JSON arrays with agent branch names where a
+and the JSON files contain arrays with agent branch names where a
 particular token is used.
 
 The C<I<TREE>_configtree> branch has subdirectories as follows. The
@@ -245,6 +245,30 @@ by the daemon. These files are populated by the XML compiler after the
 tree is processed.
 
 
+An optional C<searchdb> branch is used for indexing the node parameters
+in order to provide the search in GUI. It consists of the following
+directories:
+
+=over 4
+
+=item * C<words/I<TREE>/> contains subdirectories named after search
+  keywords. These directories contain zero-length files named after node
+  token IDs for nodes matching those keywords.
+
+=item * C<wordsglobal/> is the same as above, but for global search.
+
+=item * C<tokens/> is a two-level 256-way hierarchy of directories based
+  on token ID's. These directories contain zero-length files named after
+  keywords.
+
+=item * C<configtree_ref/> is a directory containing files named after
+  the config tree names. Each file is a JSON scalar indicating the
+  commit ID in corresponding configtree branch.
+
+=back
+
+
+    
 
 =head2 Redis database
 

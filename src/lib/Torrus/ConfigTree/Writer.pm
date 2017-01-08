@@ -31,7 +31,10 @@ use Torrus::Log;
 use Torrus::Collector;
 use Torrus::SiteConfig;
 use Torrus::ServiceID;
-    
+
+use Git::ObjectStore;
+use Git::Raw;
+
 use Digest::MD5 qw(md5); # needed as hash function
 use POSIX; # we use ceil() from here
 use Digest::SHA qw(sha1_hex);
@@ -61,137 +64,44 @@ sub new
     {
         return undef;
     }
-    
+
     bless $self, $class;
 
-    $self->{'packdir'} = $self->{'repodir'} . '/objects/pack';
-    
-    # set up the configtree branch
+    my $init_commit = $self->{'store'}->created_init_commit();
+    if( defined($init_commit) )
     {
-        my ($repo, $branch, $index, $created_top) =
-            $self->_setup_repo_writing($self->{'branch'});
-            
-        $self->{'repo'} = $repo;
-        $self->{'previous_commit'} = $branch->peel('commit');
-        $self->{'gitindex'} = $index;
-
-        if( defined($created_top) )
-        {
-            Git::Raw::Reference->create
-                ($self->_agents_ref_name(),
-                 $repo, $created_top);
-        }
-        
-        
-        # This points to the last commit, and we're writing a new tree with the
-        # help of index
-        delete $self->{'gittree'};
+        Git::Raw::Reference->create
+            ($self->_agents_ref_name(),
+             $self->{'store'}->repo(), $init_commit);
     }
 
     # set up the srcfiles branch
-    {
-        $self->{'srcbranch'} = $self->treeName() . '_srcfiles';
-        my ($repo, $branch, $index) =
-            $self->_setup_repo_writing($self->{'srcbranch'});
-        
-        $self->{'srcrepo'} = $repo;
-        $self->{'srcindex'} = $index;
+    $self->{'srcstore'} =
+        new Git::ObjectStore(
+            'repodir' => $self->{'repodir'},
+            'branchname' => $self->treeName() . '_srcfiles',
+            'writer' => 1,
+            %{$self->{'store_author'}});
 
-        my $prev_commit = $self->_read_json('srcrev');
-        $prev_commit = '' unless defined($prev_commit);
-        $self->{'src_previous_commit'} = $prev_commit;
-    }
-    
+
     $self->{'viewparent'} = {};
 
     $self->{'collectorInstances'} =
         Torrus::SiteConfig::agentInstances( $self->treeName(), 'collector' );
 
     $self->{'is_writing'} = 1;
-    
+
     $self->{'srcfiles'} = {};
     $self->{'srcfiles_seen'} = {};
     $self->{'srcfiles_updated'} = {};
-    
+
     $self->{'srcrefs'} = $self->_read_json('srcrefs');
     $self->{'srcrefs'} = {} unless defined $self->{'srcrefs'};
 
     $self->{'srcglobaldeps'} = $self->_read_json('srcglobaldeps');
     $self->{'srcglobaldeps'} = {} unless defined $self->{'srcglobaldeps'};
 
-    $self->_read_paramprops();
-
     return $self;
-}
-
-
-sub DESTROY
-{
-    my $self = shift;
-}
-
-sub _setup_repo_writing
-{
-    my $self = shift;
-    my $branchname = shift;
-
-    my $repo = Git::Raw::Repository->open($self->{'repodir'});
-    my $mempack = Git::Raw::Mempack->new;
-    $repo->odb->add_backend($mempack, 99);
-    $self->{'mempack'}{$branchname} = $mempack;
-
-    my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
-
-    my $created_top;
-    
-    if( not defined($branch) )
-    {
-        # This is a fresh repo, create the configtree branch
-        my $builder = Git::Raw::Tree::Builder->new($repo);
-        $builder->clear();
-        my $tree = $builder->write();
-        my $me = $self->_signature();
-        my $refname = 'refs/heads/' . $branchname;
-        my $commit = $repo->commit("Initial empty commit in $branchname" ,
-                                   $me, $me, [], $tree, $refname);
-        $self->_create_packfile($repo, $branchname);
-        $created_top = $commit;
-        $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
-        die('expected a branch') unless defined($branch);
-    }
-    
-    my $index = Git::Raw::Index->new();
-    $repo->index($index);
-            
-    my $tree = $branch->peel('tree');
-    $index->read_tree($tree);
-
-    return ($repo, $branch, $index, $created_top);
-}
-    
-
-sub _create_packfile
-{
-    my $self = shift;
-    my $repo = shift;
-    my $branchname = shift;
-
-    my $tp = Git::Raw::TransferProgress->new();
-    my $indexer = Git::Raw::Indexer->new($self->{'packdir'}, $repo->odb());
-    $indexer->append($self->{'mempack'}{$branchname}->dump($repo), $tp);
-    $indexer->commit($tp);
-    $self->{'mempack'}{$branchname}->reset;
-    return;
-}
-
-    
-        
-
-sub _signature
-{
-    return Git::Raw::Signature->now
-        ($Torrus::ConfigTree::writerAuthorName,
-         $Torrus::ConfigTree::writerAuthorEmail);
 }
 
 
@@ -243,7 +153,7 @@ sub _agent_branch_name
     my $self = shift;
     my $agent = shift;
     my $instance = shift;
-    
+
     return $self->{'treename'} . '_' .
         $self->_agent_instance_name($agent, $instance);
 }
@@ -254,9 +164,8 @@ sub _write_json
     my $self = shift;
     my $filename = shift;
     my $data = shift;
-    
-    $self->{'gitindex'}->add_frombuffer
-        ($filename, $self->{'json'}->encode($data));
+
+    $self->{'store'}->write_file($filename, $self->{'json'}->encode($data));
     return;
 }
 
@@ -288,7 +197,7 @@ sub addOtherObject
     $self->editOther($name);
     return;
 }
-    
+
 
 sub endEditingOthers
 {
@@ -299,7 +208,7 @@ sub endEditingOthers
     delete $self->{'others_list'};
     return;
 }
-    
+
 
 sub editOther
 {
@@ -316,10 +225,10 @@ sub editOther
     {
         $obj = {'params' => {}};
     }
-    
+
     $self->{'editing'} = $obj;
     $self->{'editing_name'} = $name;
-    
+
     return;
 }
 
@@ -338,21 +247,21 @@ sub setOtherParam
     {
         $value =~ s/\s+/ /sgo;
     }
-    
+
     my $oldval = $self->{'editing'}{'params'}{$param};
     if( not defined($oldval) or $oldval ne $value )
     {
         $self->{'editing'}{'params'}{$param} = $value;
         $self->{'editing_dirty'} = 1;
     }
-    
+
     return;
 }
 
 sub commitOther
 {
     my $self  = shift;
-    
+
     if( not defined($self->{'editing'}) )
     {
         die('setOtherParam() called before editOther()');
@@ -384,7 +293,7 @@ sub editNode
     my $path  = shift;
 
     my $token = $self->token($path, 1);
-    
+
     if( defined($self->{'editing'}) )
     {
         if( $self->{'editing_node'} eq $token )
@@ -414,7 +323,7 @@ sub editNode
             my $parent_path = substr($path, 0, $slashpos+1);
             $parent_token = $self->token($parent_path, 1);
             my $parent_node = $self->_node_read($parent_token);
-            
+
             if( not defined($parent_node) or
                 not $parent_node->{'children'}->{$token} )
             {
@@ -425,7 +334,7 @@ sub editNode
                 $self->commitNode();
             }
         }
-        
+
         $node = {
             'is_subtree' => $is_subtree,
             'parent' => $parent_token,
@@ -433,7 +342,7 @@ sub editNode
             'params' => {},
             'vars' => {},
         };
-        
+
         if( $is_subtree )
         {
             $node->{'children'} = {};
@@ -443,10 +352,10 @@ sub editNode
         $self->{'editing_dirty'} = 1;
         $self->{'objcache'}->set($token => $node);
     }
-    
+
     $self->{'editing'} = $node;
     $self->{'editing_node'} = $token;
-    
+
     return $token;
 }
 
@@ -473,7 +382,7 @@ sub setNodeParam
         $self->{'editing'}{'params'}{$param} = $value;
         $self->{'editing_dirty'} = 1;
     }
-    
+
     return;
 }
 
@@ -486,7 +395,7 @@ sub setVar
     my $token = shift;
     my $name = shift;
     my $value = shift;
-    
+
     $self->{'setvar'}{$token}{$name} = $value;
 
     my $oldval = $self->{'editing'}{'vars'}{$name};
@@ -503,7 +412,7 @@ sub setVar
 sub commitNode
 {
     my $self  = shift;
-    
+
     if( not defined($self->{'editing'}) )
     {
         die('setOtherParam() called before editOther()');
@@ -516,7 +425,7 @@ sub commitNode
     if( $self->{'editing_dirty'} or $self->{'editing_dirty_children'} )
     {
         my $sha_file = $self->_sha_file($self->{'editing_node'});
-    
+
         if( $self->{'editing_dirty'} )
         {
             my $data = {
@@ -537,27 +446,27 @@ sub commitNode
             foreach my $srcfile (keys %{$self->{'srcfiles'}})
             {
                 my $src_found;
-                
+
                 if( defined($data->{'src'}) and $data->{'src'}{$srcfile} )
                 {
                     $src_found = 1;
                 }
-                
+
                 my $ancestor;
                 if( not $src_found )
                 {
                     $ancestor = $data->{'parent'};
                 }
-                
+
                 while( not $src_found and $ancestor ne '' )
                 {
                     my $node = $self->_node_read($ancestor);
-            
+
                     if( defined($node->{'src'}) and $node->{'src'}{$srcfile} )
                     {
                         $src_found = 1;
                     }
-                    
+
                     $ancestor = $node->{'parent'};
                 }
 
@@ -569,7 +478,7 @@ sub commitNode
                     $self->{'srcrefs'}{$srcfile}{$self->{'editing_node'}} = 1;
                 }
             }
-            
+
             $self->_write_json('nodes/' . $sha_file, $data);
         }
 
@@ -579,7 +488,7 @@ sub commitNode
                                $self->{'editing'}{'children'});
         }
     }
-    
+
     delete $self->{'editing'};
     delete $self->{'editing_node'};
     delete $self->{'editing_dirty'};
@@ -640,14 +549,14 @@ sub isTrueVar
     my $name = shift;
 
     my $ret = 0;
-    
+
     while( $token ne '' and
            not defined($self->{'setvar'}{$token}{$name}) )
     {
         my $node = $self->_node_read($token);
         $token = $node->{'parent'};
     }
-    
+
     if( $token ne '' )
     {
         my $value = $self->{'setvar'}{$token}{$name};
@@ -660,7 +569,7 @@ sub isTrueVar
             }
         }
     }
-    
+
     return $ret;
 }
 
@@ -682,7 +591,7 @@ sub tokensUpdated
 
     return [keys %{$tokens}];
 }
-    
+
 
 
 sub commitConfig
@@ -703,7 +612,7 @@ sub commitConfig
         {
             Verbose("$filename was removed from source configuration");
             $self->deleteSrcFile($filename);
-            $self->{'srcindex'}->remove($filename);
+            $self->{'srcstore'}->delete_file($filename);
         }
     }
 
@@ -721,12 +630,12 @@ sub commitConfig
     {
         $ok = $self->_post_process_nodes($token) ? $ok : 0;
     }
-    
+
     return($ok) unless $ok;
 
     Verbose('Finished post-processing of ' . $self->{'n_postprocessed_nodes'} .
             ' nodes');
-    
+
     # Propagate view inherited parameters
     $self->{'viewParamsProcessed'} = {};
     foreach my $vname ( $self->getViewNames() )
@@ -734,87 +643,39 @@ sub commitConfig
         $self->_propagate_view_params( $vname );
     }
 
-    my $new_src_commit = '';
-    
+    my $src_changed = $self->{'srcstore'}->create_commit_and_packfile();
+
+    if( $src_changed )
     {
-        my $branchname = $self->{'srcbranch'};
-        Debug("Writing a commit in branch: $branchname");
+        my $src_commit_id = $self->{'srcstore'}->current_commit_id();
+        Debug('Wrote ' . $src_commit_id . ' in ' .
+              $self->treeName() . '_srcfiles');
 
-        my $branch =
-            Git::Raw::Branch->lookup($self->{'srcrepo'}, $branchname, 1);
-        my $parent = $branch->peel('commit');
-        my $tree = $self->{'srcindex'}->write_tree();
-
-        if( $tree->id() ne $parent->tree()->id() )
-        {
-            my $me = $self->_signature();
-            my $commit = $self->{'srcrepo'}->commit
-                (scalar(localtime(time())),
-                 $me, $me, [$parent], $tree, $branch->name());
-            $self->_create_packfile($self->{'srcrepo'}, $branchname);
-
-            $new_src_commit = $commit->id();
-            Debug('Wrote ' . $commit->id());
-        }
-        else
-        {
-            Verbose("Nothing is changed in branch $branchname");
-            $new_src_commit = $parent;
-        }
-    }
-
-    if( $new_src_commit ne $self->{'src_previous_commit'} )
-    {
         Debug("Something is changed in source files");
-        
-        $self->_write_json('srcrev', $new_src_commit);
-        
-        my $branchname = $self->{'branch'};
-        Debug("Writing a commit in branch: $branchname");
-        my $branch = Git::Raw::Branch->lookup($self->{'repo'}, $branchname, 1);
-        my $parent = $branch->peel('commit');
-    
-        my $tree = $self->{'gitindex'}->write_tree();
 
-        if( $tree->id() ne $parent->tree()->id() )
-        {
-            my $me = $self->_signature();
-            my $commit = $self->{'repo'}->commit
-                (scalar(localtime(time())),
-                 $me, $me, [$parent], $tree, $branch->name());
-            $self->_create_packfile($self->{'repo'}, $branchname);
+        $self->_write_json('srcrev', $self->{'srcstore'}->current_commit_id());
 
-            $self->{'new_commit'} = $commit->id();
-            Debug('Wrote ' . $commit->id());
-        }
-        else
-        {
-            $self->{'notning_changed_in_config'} = 1;
-            Verbose("Nothing is changed in branch $branchname");
-        }
+        $self->{'config_updated'} =
+            $self->{'store'}->create_commit_and_packfile();
     }
-    else
+
+    if( $self->{'config_updated'} )
     {
-        $self->{'notning_changed_in_config'} = 1;
+        $self->{'new_commit'} = $self->{'store'}->current_commit_id();
+        Debug('Wrote ' . $self->{'new_commit'} . ' in ' . $self->{'branch'});
     }
-    
-    delete $self->{'gitindex'};
-    
-    # release the index memory, as it may be quite large
-    my $index = Git::Raw::Index->new();
-    $self->{'repo'}->index($index);
 
-    # get the latest commit tree
-    {
-        my $branch =
-            Git::Raw::Branch->lookup($self->{'repo'}, $self->{'branch'}, 1);
-        my $commit = $branch->peel('commit');
-        $self->{'gittree'} = $commit->tree();
-    }
-    
+    # replace the writer store object with reader and release the index memory
+    delete $self->{'store'};
+
+    $self->{'store'} = new Git::ObjectStore(
+        'repodir' => $self->{'repodir'},
+        'branchname' => $self->{'branch'},
+        %{$self->{'store_author'}});
+
     $self->{'is_writing'} = undef;
 
-    if( not $self->{'notning_changed_in_config'} )
+    if( $self->{'config_updated'} )
     {
         # clean up tokenset members if their nodes were removed
         foreach my $ts ( $self->getTsets() )
@@ -847,11 +708,11 @@ sub _post_process_nodes
 
     $self->{'postprocessed_tokens'}{$token} = 1;
     $self->{'n_postprocessed_nodes'}++;
-    
+
     my $ok = 1;
-    
+
     my $path = $self->path($token);
-    
+
     my $nodeid = $self->getNodeParam( $token, 'nodeid', 1 );
     if( defined( $nodeid ) )
     {
@@ -874,19 +735,18 @@ sub _post_process_nodes
         {
             $self->_write_json($sha_file, [$nodeid, $token]);
 
+            # write the nodeid prefix search index
             my $pos = 0;
             while( ($pos = index($nodeid, '//', $pos)) >= 0 )
             {
                 my $prefix = substr($nodeid, 0, $pos);
                 my $dir = $self->_nodeidpx_sha_dir($prefix);
-                $self->{'gitindex'}->add_frombuffer(
-                    $dir . '/' . $nodeid_sha, '');
+                $self->{'store'}->write_file($dir . '/' . $nodeid_sha, '');
                 $pos+=2;
             }
         }
     }
 
-    
     if( $self->isLeaf($token) )
     {
         # Process static tokenset members
@@ -920,7 +780,7 @@ sub _post_process_nodes
 
                 my @dsNames =
                     split(/,/o, $self->getNodeParam($token, 'ds-names') );
-                
+
                 foreach my $dname ( @dsNames )
                 {
                     foreach my $param ( 'ds-expr-', 'graph-legend-' )
@@ -958,10 +818,10 @@ sub _post_process_nodes
                 my $oldOffset =
                     $self->getNodeParam($token, 'collector-timeoffset');
                 my $newOffset = $oldOffset;
-                
+
                 my $period =
                     $self->getNodeParam($token, 'collector-period');
-                
+
                 if( $nInstances > 1 )
                 {
                     my $hashString =
@@ -973,20 +833,20 @@ sub _post_process_nodes
                               'in ' . $self->path( $token ));
                         $hashString = '';
                     }
-                    
+
                     $instance =
                         unpack( 'N', md5( $hashString ) ) % $nInstances;
-                }          
+                }
 
                 $self->setNodeParam( 'collector-instance', $instance );
-                
+
                 my $dispersed =
                     $self->getNodeParam($token,
                                         'collector-dispersed-timeoffset');
                 if( defined( $dispersed ) and $dispersed eq 'yes' )
                 {
                     # Process dispersed collector offsets
-                    
+
                     my %p;
                     foreach my $param ( 'collector-timeoffset-min',
                                         'collector-timeoffset-max',
@@ -1022,7 +882,7 @@ sub _post_process_nodes
                             my $step = $p{'collector-timeoffset-step'};
                             my $hashString =
                                 $p{'collector-timeoffset-hashstring'};
-                            
+
                             my $bucketSize = ceil(($max-$min)/$step);
                             $newOffset =
                                 $min
@@ -1036,11 +896,11 @@ sub _post_process_nodes
                 }
                 else
                 {
-                    $newOffset += $instance * ceil($period/$nInstances); 
-                } 
+                    $newOffset += $instance * ceil($period/$nInstances);
+                }
 
                 $newOffset %= $period;
-                
+
                 if( $newOffset != $oldOffset )
                 {
                     $self->setNodeParam('collector-timeoffset', $newOffset );
@@ -1066,7 +926,7 @@ sub _post_process_nodes
                         {
                             $srvTrees = $self->treeName();
                         }
-                                                
+
                         my $serviceid =
                             $self->getNodeParam($token, 'ext-service-id');
 
@@ -1116,12 +976,12 @@ sub _post_process_nodes
                                     $self->getNodeParam
                                     ($token, 'ext-service-units')
                                 };
-                            
+
                             $srvIdParams->add( $serviceid, $params );
                         }
                     }
                 }
-                
+
                 $self->commitNode();
             }
         }
@@ -1129,7 +989,7 @@ sub _post_process_nodes
         {
             Error("Mandatory parameter 'ds-type' is not defined for $path");
             $ok = 0;
-        }            
+        }
     }
     else
     {
@@ -1138,7 +998,7 @@ sub _post_process_nodes
             $ok = $self->_post_process_nodes( $ctoken ) ? $ok:0;
         }
     }
-    
+
     return $ok;
 }
 
@@ -1161,7 +1021,7 @@ sub _propagate_view_params
         $self->_propagate_view_params( $parent );
 
         $self->editOther($vname);
-        
+
         my $parentParams = $self->getOtherParams($parent);
         foreach my $param ( keys %{$parentParams} )
         {
@@ -1186,16 +1046,7 @@ sub addSrcFile
     my $filename = shift;
     my $blobref = shift;
 
-    my $prev_blob_id = '';
-    if( my $entry = $self->{'srcindex'}->find($filename) )
-    {
-        $prev_blob_id = $entry->blob()->id();
-    }
-    
-    my $entry = $self->{'srcindex'}->add_frombuffer($filename, $blobref);
-    my $new_blob_id = $entry->blob()->id();
-
-    return( $new_blob_id ne $prev_blob_id );
+    return $self->{'srcstore'}->write_and_check($filename, $blobref);
 }
 
 
@@ -1206,7 +1057,7 @@ sub deleteSrcFile
 
     return unless defined($self->{'srcrefs'}{$filename});
     Debug("Deleting dependencies of $filename");
-    
+
     foreach my $token (sort keys %{$self->{'srcrefs'}{$filename}})
     {
         Debug('Deleting recursively: ' . $self->path($token));
@@ -1215,7 +1066,6 @@ sub deleteSrcFile
 
     delete $self->{'srcrefs'}{$filename};
     delete $self->{'srcglobaldeps'}{$filename};
-
     return;
 }
 
@@ -1231,21 +1081,22 @@ sub deleteNode
     if( defined($nodeid) )
     {
         my $nodeid_sha = sha1_hex($nodeid);
-        $self->{'gitindex'}->remove('nodeid/' . $self->_sha_file($nodeid_sha));
+        $self->{'store'}->delete_file(
+            'nodeid/' . $self->_sha_file($nodeid_sha));
 
         my $pos = 0;
         while( ($pos = index($nodeid, '//', $pos)) >= 0 )
         {
             my $prefix = substr($nodeid, 0, $pos);
             my $dir = $self->_nodeidpx_sha_dir($prefix);
-            $self->{'gitindex'}->remove($dir . '/' . $nodeid_sha);
+            $self->{'store'}->delete_file($dir . '/' . $nodeid_sha);
             $pos+=2;
         }
     }
-        
+
     my $parent = $node->{'parent'};
     my $iamsubtree = $node->{'is_subtree'};
-    
+
     if( $iamsubtree )
     {
         foreach my $ctoken ( $self->getChildren($token) )
@@ -1261,14 +1112,14 @@ sub deleteNode
             delete $self->{'srcrefs'}{$srcfile}{$token};
         }
     }
-    
+
     my $sha_file = $self->_sha_file($token);
-    $self->{'gitindex'}->remove('nodes/' . $sha_file);
+    $self->{'store'}->delete_file('nodes/' . $sha_file);
     $self->{'objcache'}->remove($token);
 
     if( $iamsubtree )
     {
-        $self->{'gitindex'}->remove('children/' . $sha_file);
+        $self->{'store'}->delete_file('children/' . $sha_file);
     }
 
     # remove ourselves from parent's list of children
@@ -1279,7 +1130,7 @@ sub deleteNode
         $self->{'editing_dirty_children'} = 1;
         $self->commitNode();
     }
-    
+
     return;
 }
 
@@ -1288,12 +1139,12 @@ sub validate
 {
     my $self = shift;
 
-    return 1 if $self->{'notning_changed_in_config'};
+    return 1 unless $self->{'config_updated'};
 
     my $ok = 1;
 
     $ok = Torrus::ConfigTree::Validator::validateNodes($self);
-    
+
     $ok = Torrus::ConfigTree::Validator::validateViews($self) ? $ok:0;
     $ok = Torrus::ConfigTree::Validator::validateMonitors($self) ? $ok:0;
     $ok = Torrus::ConfigTree::Validator::validateTokensets($self) ? $ok:0;
@@ -1307,7 +1158,7 @@ sub finalize
     my $self = shift;
     my $status = shift;
 
-    if( $status and not $self->{'notning_changed_in_config'} )
+    if( $status and $self->{'config_updated'} )
     {
         $self->{'redis'}->hset
             ($self->{'redis_prefix'} . 'githeads',
@@ -1317,7 +1168,7 @@ sub finalize
         $self->{'redis'}->publish
             ($self->{'redis_prefix'} . 'treecommits:' . $self->treeName(),
              $self->{'new_commit'});
-                
+
         Verbose('Configuration has compiled successfully');
     }
     return;
@@ -1329,11 +1180,11 @@ sub updateAgentConfigs
     my $self = shift;
 
     my $refname = $self->_agents_ref_name();
-    my $ref = Git::Raw::Reference->lookup($refname, $self->{'repo'});
+    my $ref = Git::Raw::Reference->lookup($refname, $self->{'store'}->repo());
     die("Cannot find reference $refname in Git repository")
         unless defined($ref);
-    
-    my $repos = {};
+
+    my $stores = {};
     my @branchnames;
 
     for( my $inst = 0; $inst < $self->{'collectorInstances'}; $inst++ )
@@ -1343,25 +1194,30 @@ sub updateAgentConfigs
 
     push(@branchnames, $self->_agent_branch_name('monitor', 0));
 
-    # open repo objects for every agent branch, and initialize in-memory
-    # indexes for writing
-    
+    # open ObjectStore writer objects for every agent branch
+
     foreach my $branchname (@branchnames)
     {
-        my ($repo) =
-            $self->_setup_repo_writing($branchname);
-        $repos->{$branchname} = $repo;
+        $stores->{$branchname} =
+            new Git::ObjectStore(
+                'repodir' => $self->{'repodir'},
+                'branchname' => $branchname,
+                'writer' => 1,
+                %{$self->{'store_author'}});
     }
 
     my $agent_tokens_branch = $self->treeName() . '_agent_tokens';
-    my ($repo_agent_tokens) = $self->_setup_repo_writing($agent_tokens_branch);
-    $self->{'repo_agent_tokens'} = $repo_agent_tokens;
+    $self->{'agent_tokens_store'} =
+        new Git::ObjectStore(
+            'repodir' => $self->{'repodir'},
+            'branchname' => $agent_tokens_branch,
+            'writer' => 1,
+            %{$self->{'store_author'}});
 
     my $old_commit_id = $ref->peel('commit')->id();
     # Debug('Old commit in ' . $self->{'branch'} . ': ' . $old_commit_id);
-    
-    my $new_commit_id = $self->{'redis'}->hget(
-        $self->{'redis_prefix'} . 'githeads', $self->{'branch'});
+
+    my $new_commit_id = $self->currentCommit();
     # Debug('New commit: ' . $new_commit_id);
 
     if( $new_commit_id eq $old_commit_id )
@@ -1370,96 +1226,66 @@ sub updateAgentConfigs
         # Make sure that Redis has up to date commit ID.
         foreach my $branchname (@branchnames)
         {
-            my $repo = $repos->{$branchname};
-            my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
-            my $commit = $branch->peel('commit');
-            
             $self->{'redis'}->hset
                 ($self->{'redis_prefix'} . 'githeads',
                  $branchname,
-                 $commit->id());
+                 $stores->{$branchname}->current_commit_id());
         }
-        
+
         return 0;
     }
 
     $self->{'token_updated'} = {};
-    
-    my $old_tree = $ref->peel('tree');
-    my $new_commit = Git::Raw::Commit->lookup($self->{'repo'}, $new_commit_id);
-    my $new_tree = $new_commit->tree();
-    
+
     my $n_updated = 0;
     my $n_deleted = 0;
 
-    my $diff = $old_tree->diff(
-        {'tree' => $new_tree,
-         'flags' => {
-             'skip_binary_check' => 1,
-         },
-        });
-        
-    my @deltas = $diff->deltas();
-    foreach my $delta (@deltas)
-    {
-        my $path = $delta->new_file()->path();
+    my $cb_updated = sub {
+        my ($path, $data) = @_;
         if( $path =~ /^nodes\/(.+)/ )
         {
             my $sha_file = $1;
             my $token = join('', split('/', $sha_file));
-            
-            if( $delta->status() eq 'deleted')
+            $n_updated += $self->_write_agent_configs($stores, $token);
+        }
+    };
+
+    my $cb_deleted = sub {
+        my ($path) = @_;
+
+        if( $path =~ /^nodes\/(.+)/ )
+        {
+            my $sha_file = $1;
+            my $token = join('', split('/', $sha_file));
+            my $ab_content =
+                $self->{'agent_tokens_store'}->read_file($sha_file);
+            if( defined($ab_content) )
             {
-                my $ab_entry = $repo_agent_tokens->index()->find($sha_file);
-                if( defined($ab_entry) )
+                $n_deleted++;
+                my $agent_branches = $self->{'json'}->decode($ab_content);
+                foreach my $branchname (@{$agent_branches})
                 {
-                    $n_deleted++;
-                    
-                    my $agent_branches =
-                        $self->{'json'}->decode($ab_entry->blob()->content());
-                    
-                    foreach my $branchname (@{$agent_branches})
-                    {
-                        $repos->{$branchname}->index()->remove($sha_file);
-                    }
-                    
-                    $repo_agent_tokens->index()->remove($sha_file);
+                    $stores->{$branchname}->delete_file($sha_file);
                 }
-            }
-            else
-            {
-                $n_updated += $self->_write_agent_configs($repos, $token);
+
+                $self->{'agent_tokens_store'}->delete_file($sha_file);
             }
         }
-    }
+    };
 
-    Verbose
-        ("Updated: $n_updated, Deleted: $n_deleted leaves");
-    
+    $self->{'store'}->read_updates($old_commit_id, $cb_updated, $cb_deleted);
+    Verbose("Updated: $n_updated, Deleted: $n_deleted leaf nodes");
+
     foreach my $branchname (@branchnames)
     {
-        Debug("Writing a commit in $branchname");
-        
-        my $repo = $repos->{$branchname};
-        my $branch = Git::Raw::Branch->lookup($repo, $branchname, 1);
-        my $parent = $branch->peel('commit');
-        my $me = $self->_signature();
-
-        my $tree = $repo->index()->write_tree();
-
-        if( $tree->id() ne $parent->tree()->id() )
+        if( $stores->{$branchname}->create_commit_and_packfile() )
         {
-            my $commit = $repo->commit
-                (scalar(localtime(time())),
-                 $me, $me, [$parent], $tree, $branch->name());
-            $self->_create_packfile($repo, $branchname);
-
-            Debug('Wrote ' . $commit->id());
-
+            my $commit_id = $stores->{$branchname}->current_commit_id();
+            Debug('Wrote ' . $commit_id . ' in ' . $branchname);
             $self->{'redis'}->hset
                 ($self->{'redis_prefix'} . 'githeads',
                  $branchname,
-                 $commit->id());
+                 $commit_id);
         }
         else
         {
@@ -1467,45 +1293,33 @@ sub updateAgentConfigs
         }
     }
 
-    Debug("Writing a commit in $agent_tokens_branch");
+    if( $self->{'agent_tokens_store'}->create_commit_and_packfile() )
     {
-        my $branch = Git::Raw::Branch->lookup
-            ($repo_agent_tokens, $agent_tokens_branch, 1);
-        my $parent = $branch->peel('commit');
-        my $me = $self->_signature();
-
-        my $tree = $repo_agent_tokens->index()->write_tree();
-
-        if( $tree->id() ne $parent->tree()->id() )
-        {
-            my $commit = $repo_agent_tokens->commit
-                (scalar(localtime(time())),
-                 $me, $me, [$parent], $tree, $branch->name());
-            $self->_create_packfile($repo_agent_tokens, $agent_tokens_branch);
-
-            Debug('Wrote ' . $commit->id());
-        }
-        else
-        {
-            Debug('Nothing changed in ' . $agent_tokens_branch);
-        }
+        my $commit_id = $self->{'agent_tokens_store'}->current_commit_id();
+        Debug('Wrote ' . $commit_id . ' in ' . $agent_tokens_branch);
+    }
+    else
+    {
+        Debug('Nothing changed in ' . $agent_tokens_branch);
     }
 
-    Git::Raw::Reference->create
-        ($self->_agents_ref_name(), $self->{'repo'}, $new_commit, 1);
+    my $repo = $self->{'store'}->repo();
+    my $new_commit = Git::Raw::Commit->lookup($repo, $new_commit_id);
+    Git::Raw::Reference->create(
+        $self->_agents_ref_name(), $repo, $new_commit, 1);
     Debug('Updated reference: ' . $self->_agents_ref_name());
-    
-    return $n_updated;
+
+    return;
 }
 
 
 
-    
+
 
 sub _write_agent_configs
 {
     my $self = shift;
-    my $repos = shift;
+    my $stores = shift;
     my $token = shift;
 
     if( $self->{'token_updated'}{$token} )
@@ -1518,20 +1332,21 @@ sub _write_agent_configs
         my $count = 0;
         foreach my $ctoken ( $self->getChildren($token) )
         {
-            $count += $self->_write_agent_configs($repos, $ctoken);
+            $count += $self->_write_agent_configs($stores, $ctoken);
         }
-        
+
         $self->{'token_updated'}{$token} = 1;
         return $count;
     }
-        
+
+    my $sha_file = $self->_sha_file($token);
     my @branches;
-    
+
     my $dsType = $self->getNodeParam($token, 'ds-type');
     if( $dsType eq 'collector' )
     {
         my $instance = $self->getNodeParam($token, 'collector-instance');
-        
+
         my $params = {'path' => $self->path($token)};
         foreach my $param (
             'collector-timeoffset',
@@ -1548,11 +1363,12 @@ sub _write_agent_configs
                 $params->{$param} = $val;
             }
         }
-        
+
         $self->_fetch_collector_params($token, $params);
 
         my $branchname = $self->_agent_branch_name('collector', $instance);
-        $self->_write_agent_params($repos, $token, $branchname, $params);
+        $stores->{$branchname}->write_file(
+            $sha_file,  $self->{'json'}->encode($params));
         push( @branches, $branchname );
     }
 
@@ -1564,48 +1380,58 @@ sub _write_agent_configs
         {
             my $params = {'path' => $self->path($token),
                           'monitor' => $mlist};
-            
+
             foreach my $param ('monitor-period',
                                'monitor-timeoffset')
             {
                 $params->{$param} = $self->getNodeParam($token, $param);
             }
-            
+
             my $branchname = $self->_agent_branch_name('monitor', 0);
-            $self->_write_agent_params($repos, $token, $branchname, $params);
+            $stores->{$branchname}->write_file(
+                $sha_file,  $self->{'json'}->encode($params));
             push( @branches, $branchname );
         }
     }
 
     $self->{'token_updated'}{$token} = 1;
-    
+
+    # compare the new list of branches with the old one, and delete from
+    # old branches if needed
+
+    my @old_branches;
+
+    my $ab_content = $self->{'agent_tokens_store'}->read_file($sha_file);
+    if( defined($ab_content) )
+    {
+        my $agent_branches = $self->{'json'}->decode($ab_content);
+        @old_branches = @{$agent_branches};
+    }
+
+    foreach my $branchname (@old_branches)
+    {
+        if( not grep {$_ eq $branchname} @branches )
+        {
+            $stores->{$branchname}->delete_file($sha_file);
+        }
+    }
+
     if( scalar(@branches) > 0 )
     {
-        $self->{'repo_agent_tokens'}->index()->add_frombuffer
-            ($self->_sha_file($token),
-             $self->{'json'}->encode(\@branches));
+        $self->{'agent_tokens_store'}->write_file(
+            $sha_file, $self->{'json'}->encode(\@branches));
         return 1;
     }
     else
     {
+        if( defined($ab_content) )
+        {
+            $self->{'agent_tokens_store'}->delete_file($sha_file);
+        }
         return 0;
     }
 }
 
-
-sub _write_agent_params
-{
-    my $self = shift;
-    my $repos = shift;
-    my $token = shift;
-    my $branchname = shift;
-    my $params = shift;
-
-    my $index = $repos->{$branchname}->index();
-    $index->add_frombuffer($self->_sha_file($token),
-                           $self->{'json'}->encode($params));
-    return;
-}
 
 
 sub _fetch_collector_params
@@ -1682,7 +1508,7 @@ sub _fetch_collector_params
         }
         @maps = @next_maps;
     }
-    
+
     return;
 }
 

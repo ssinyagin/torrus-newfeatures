@@ -23,7 +23,7 @@ use strict;
 use warnings;
 
 use Redis;
-use Git::Raw;
+use Git::ObjectStore;
 use JSON;
 
 use Torrus::Log;
@@ -44,8 +44,6 @@ sub new
 
     $self->{'repodir'} = $Torrus::Global::gitRepoDir;
     $self->{'branch'} = sprintf('%s_%s_%.4x', $treename, $agent, $instance);
-
-    $self->{'repo'} = Git::Raw::Repository->open($self->{'repodir'});
     
     $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_prefix'} = $Torrus::Global::redisPrefix;
@@ -55,13 +53,86 @@ sub new
 }
 
 
+sub _lock_repodir
+{
+    my $self = shift;
 
+    if( not defined($self->{'distlock'}) )
+    {
+        $self->{'distlock'} = Redis::DistLock->new
+            ( servers => [$Torrus::Global::redisServer] );
+    }
+
+    Debug('Acquiring a lock for ' . $self->{'repodir'});
+    my $lock =
+        $self->{'distlock'}->lock($self->{'redis_prefix'} .
+                                  'gitlock:' . $self->{'repodir'},
+                                  7200);
+    if( not defined($lock) )
+    {
+        die('Failed to acquire a lock for ' . $self->{'repodir'});
+    }
+
+    $self->{'mutex'} = $lock;
+    return;
+}
+
+
+sub _unlock_repodir
+{
+    my $self = shift;
+
+    Debug('Releasing the lock for ' . $self->{'repodir'});
+
+    $self->{'distlock'}->release($self->{'mutex'});
+    delete $self->{'mutex'};
+    return;
+}
+
+
+sub _store
+{
+    my $self = shift;
+    
+    $self->_lock_repodir();
+    
+    my $store = new Git::ObjectStore(
+        'repodir' => $self->{'repodir'},
+        'branchname' => $self->{'branch'},
+        'goto' => $self->{'current_head'});
+
+    $self->_unlock_repodir();
+
+    return $store;
+}
+
+
+sub needsFlush
+{
+    my $self = shift;
+
+    if( not defined($self->{'current_head'}) )
+    {
+        return 1;
+    }
+    else
+    {
+        eval { $self->_store() };
+        if( $@ )
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+        
+    
 sub readAll
 {
     my $self = shift;
-    my $cb_updated = shift;
+    my $cb_token_updated = shift;
 
-    my $n_updated = 0;
     my $informed_not_ready;
 
     my $head;
@@ -81,40 +152,22 @@ sub readAll
         }
     }
 
-    my $commit = Git::Raw::Commit->lookup($self->{'repo'}, $head);
-    die("Cannot lookup commit $head") unless defined($commit);
-    my $tree = $commit->tree();
-
-    foreach my $l1entry ($tree->entries())
-    {
-        my $l1name = $l1entry->name();
-        my $l1tree = $l1entry->object();
-        die('Expected a tree object') unless $l1tree->is_tree();
-
-        foreach my $l2entry ($l1tree->entries())
-        {
-            my $l2name = $l2entry->name();
-            my $l2tree = $l2entry->object();
-            die('Expected a tree object') unless $l2tree->is_tree();
-
-            foreach my $l3entry ($l2tree->entries())
-            {
-                my $l3name = $l3entry->name();
-                my $l3blob = $l3entry->object();
-                die('Expected a blob object') unless $l3blob->is_blob();
-                
-                my $token = $l1name . $l2name . $l3name;
-                my $data = $self->{'json'}->decode($l3blob->content());
-                &{$cb_updated}($token, $data);
-                $n_updated++
-            }
-        }
-    }
-
-    Debug('Read ' . $n_updated . ' entries from ' . $self->{'branch'});
+    Debug('Reading all entries in ' . $self->{'branch'});
     
     $self->{'current_head'} = $head;
-    $self->{'current_tree'} = $tree;
+    my $n_updated = 0;
+    my $store = $self->_store();
+    
+    my $cb_read = sub {
+        my ($path, $data) = @_;
+        my $token = join('', split('/', $path));
+        &{$cb_token_updated}($token, $self->{'json'}->decode($data));
+        $n_updated++
+    };
+    
+    $store->recursive_read('', $cb_read);
+
+    Debug('Read ' . $n_updated . ' entries from ' . $self->{'branch'});
     
     return;
 }
@@ -123,8 +176,8 @@ sub readAll
 sub readUpdates
 {
     my $self = shift;
-    my $cb_updated = shift;
-    my $cb_deleted = shift;
+    my $cb_token_updated = shift;
+    my $cb_token_deleted = shift;
 
     if( not defined($self->{'current_head'}) )
     {
@@ -144,45 +197,29 @@ sub readUpdates
         return 0;
     }
 
+    my $old_head = $self->{'current_head'};
+    $self->{'current_head'} = $head;
+    my $store = $self->_store();
+    
     my $n_updated = 0;
     my $n_deleted = 0;
 
-    Debug('Reading new entries in ' . $self->{'branch'});
-    my $commit = Git::Raw::Commit->lookup($self->{'repo'}, $head);
-    die("Cannot lookup commit $head") unless defined($commit);
-    my $tree = $commit->tree();
-
-    my $diff = $self->{'current_tree'}->diff(
-        {'tree' => $tree,
-         'flags' => {
-             'skip_binary_check' => 1,
-         },
-        });
-        
-    my @deltas = $diff->deltas();
-    foreach my $delta (@deltas)
-    {
-        my $path = $delta->new_file()->path();
+    my $cb_updated = sub {
+        my ($path, $data) = @_;
         my $token = join('', split('/', $path));
-        
-        if( $delta->status() eq 'deleted')
-        {
-            &{$cb_deleted}($token);
-            $n_deleted++;
-        }
-        else
-        {
-            my $entry = $tree->entry_bypath($path);
-            my $blob = $entry->object();
-            die('Expected a blob object') unless $blob->is_blob();
-            my $data = $self->{'json'}->decode($blob->content());
-            &{$cb_updated}($token, $data);
-            $n_updated++;
-        }
-    }
+        &{$cb_token_updated}($token, $self->{'json'}->decode($data));
+        $n_updated++
+    };
+    
+    my $cb_deleted = sub {
+        my ($path) = @_;
+        my $token = join('', split('/', $path));
+        &{$cb_token_deleted}($token);
+        $n_deleted++
+    };
 
-    $self->{'current_head'} = $head;
-    $self->{'current_tree'} = $tree;
+    Debug('Reading new entries in ' . $self->{'branch'});
+    $store->read_updates($old_head, $cb_updated, $cb_deleted);
 
     Debug("Updated: $n_updated, Deleted: $n_deleted entries");
     return 1;

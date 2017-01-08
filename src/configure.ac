@@ -102,7 +102,7 @@ if test "$enable_pkgonly" != yes; then
    fi
 
    for module in 'Redis' 'Redis::DistLock' \
-                 'Git::Raw' \
+                 'Git::Raw' 'Git::ObjectStore' \
                  'Cache::Ref' \
                  'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \

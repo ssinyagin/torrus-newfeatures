@@ -24,7 +24,7 @@ use warnings;
 
 use Redis;
 use Redis::DistLock;
-use Git::Raw;
+use Git::ObjectStore;
 use JSON;
 use File::Path qw(make_path);
 use Digest::SHA qw(sha1_hex);
@@ -52,77 +52,42 @@ sub new
 
     $self->{'json'} = JSON->new->canonical(1)->allow_nonref(1);
 
-    my $repodir = $Torrus::Global::gitRepoDir;
-    if( defined($options{'-RepoDir'}) )
-    {
-        $repodir = $options{'-RepoDir'};
-    }
+    $self->{'repodir'} = $Torrus::Global::gitRepoDir;
 
-    $self->{'repodir'} = $repodir;
+    $self->{'store_author'} = {
+        'author_name'  => $Torrus::ConfigTree::writerAuthorName,
+        'author_email' => $Torrus::ConfigTree::writerAuthorEmail,
+    };
+
     $self->{'branch'} = $treename . '_configtree';
+    
+    my %store_args = (
+        'repodir' => $self->{'repodir'},
+        'branchname' => $self->{'branch'},
+        );
 
-    if( not -e $repodir . '/config' )
+    if( $self->{'iamwriter'} )
     {
-        $self->_lock_repodir();
-        if( not -e $repodir . '/config' )
-        {
-            Debug("Initializing the Git repository in $repodir");
-            my $repo = Git::Raw::Repository->init($repodir, 1);
-            my $remote_url;
-
-            if( $self->{'iamwriter'} )
-            {
-                if( $Torrus::ConfigTree::writerPush )
-                {
-                    $remote_url = $Torrus::ConfigTree::writerRemoteRepo;
-                }
-            }
-            else
-            {
-                if( $Torrus::ConfigTree::readerPull )
-                {
-                    $remote_url = $Torrus::ConfigTree::readerRemoteRepo;
-                }
-            }
-
-            if( defined($remote_url) )
-            {
-                Git::Raw::Remote->create($repo,
-                                         $Torrus::ConfigTree::remoteName,
-                                         $remote_url);
-            }
-        }
-        $self->_unlock_repodir();
+        $store_args{'writer'} = 1;
     }
-
-    if( not $self->{'iamwriter'} )
+    else
     {
-        if( not $self->gotoHead() )
-        {
-            # could not retrieve the head commit
-            # the writer has not yet written its branch
-            return undef;
-        }
-
-        $self->_read_paramprops();
+        $store_args{'goto'} = $self->currentCommit();
     }
-
+            
+    $self->_lock_repodir();
+    $self->{'store'} = new Git::ObjectStore(
+        %store_args, %{$self->{'store_author'}});
+    $self->_unlock_repodir();
+    
+    $self->{'paramprop'} = $self->_read_json('paramprops');
+    $self->{'paramprop'} = {} unless defined($self->{'paramprop'});
+    
     $self->{'objcache'} = Cache::Ref::CART->new
         ( size => $Torrus::ConfigTree::objCacheSize );
 
     return $self;
 }
-
-
-sub _read_paramprops
-{
-    my $self = shift;
-    $self->{'paramprop'} = $self->_read_json('paramprops');
-    $self->{'paramprop'} = {} unless defined($self->{'paramprop'});
-    return;
-}
-
-
 
 
 
@@ -175,31 +140,7 @@ sub _read_file
 {
     my $self = shift;
     my $filename = shift;
-
-    if( defined($self->{'gitindex'}) )
-    {
-        my $entry = $self->{'gitindex'}->find($filename);
-        if( defined($entry) )
-        {
-            return $entry->blob()->content();
-        }
-        else
-        {
-            return undef;
-        }
-    }
-    else
-    {
-        my $entry = $self->{'gittree'}->entry_bypath($filename);
-        if( defined($entry) )
-        {
-            return $entry->object()->content();
-        }
-        else
-        {
-            return undef;
-        }
-    }
+    return $self->{'store'}->read_file($filename);
 }
 
 
@@ -275,42 +216,16 @@ sub _node_file_exists
 {
     my $self = shift;
     my $token = shift;
-
-    my $filename = 'nodes/' . $self->_sha_file($token);
-
-    if( defined($self->{'gitindex'}) )
-    {
-        return defined($self->{'gitindex'}->find($filename));
-    }
-    else
-    {
-        return defined($self->{'gittree'}->entry_bypath($filename));
-    }
+    return $self->{'store'}->file_exists('nodes/' . $self->_sha_file($token));
 }
 
 
-sub gotoHead
+sub currentCommit
 {
     my $self = shift;
-
-    my $head = $self->{'redis'}->hget(
+    return $self->{'redis'}->hget(
         $self->{'redis_prefix'} . 'githeads', $self->{'branch'});
-
-    return 0 unless defined($head);
-
-    if( not defined($self->{'repo'}) )
-    {
-        $self->{'repo'} = Git::Raw::Repository->open($self->{'repodir'});
-    }
-
-    my $commit = Git::Raw::Commit->lookup($self->{'repo'}, $head);
-    die("Cannot lookup commit $head") unless defined($commit);
-
-    $self->{'gittree'} = $commit->tree();
-
-    return 1;
 }
-
 
 
 
@@ -348,6 +263,7 @@ sub token
         return undef;
     }
 }
+
 
 sub path
 {
@@ -812,24 +728,27 @@ sub searchNodeidPrefix
     $prefix =~ s/\/\/$//; # remove trailing separator if any
     my $dir = $self->_nodeidpx_sha_dir($prefix);
 
-    my $tree_entry = $self->{'gittree'}->entry_bypath($dir);
-    return undef unless defined($tree_entry);
+    return unless $self->{'store'}->file_exists($dir);
 
-    my $dir_tree = $tree_entry->object();
-    die('Expected a tree object') unless $dir_tree->is_tree();
+    my @nodeid_sha;
+    
+    my $cb_read = sub {
+        my ($path, $data) = @_;
+        my $name = substr($path, rindex($path, '/')+1);
+        push(@nodeid_sha, $name);
+    };
 
+    $self->{'store'}->recursive_read($dir, $cb_read);
+        
     my $ret = [];
-    foreach my $entry ($dir_tree->entries())
+    foreach my $sha (@nodeid_sha)
     {
-        my $nodeid_sha = $entry->name();
-        my $nodeid_entry =
-            $self->{'gittree'}->entry_bypath(
-                'nodeid/' . $self->_sha_file($nodeid_sha));
-        push(@{$ret},
-             $self->{'json'}->decode(
-                 $nodeid_entry->object()->content()));
+        my $datafile = 'nodeid/' . $self->_sha_file($sha);
+        my $content = $self->{'store'}->read_file($datafile);
+        die("Cannot read $datafile") unless defined($content);
+        push(@{$ret}, $self->{'json'}->decode($content));
     }
-
+    
     return $ret;
 }
 
@@ -841,38 +760,17 @@ sub searchNodeidSubstring
     my $self = shift;
     my $substring = shift;
 
-    my $top_entry = $self->{'gittree'}->entry_bypath('nodeid');
-    die('Cannot find nodeid/ tree entry') unless defined($top_entry);
-
-    my $top_tree = $top_entry->object();
-    die('Expected a tree object') unless $top_tree->is_tree();
-
     my $ret = [];
-    foreach my $l1entry ($top_tree->entries())
-    {
-        my $l1tree = $l1entry->object();
-        die('Expected a tree object') unless $l1tree->is_tree();
-
-        foreach my $l2entry ($l1tree->entries())
+    my $cb_read = sub {
+        my ($path, $data) = @_;
+        my $decoded = $self->{'json'}->decode($data);
+        if( index($decoded->[0], $substring) >= 0 )
         {
-            my $l2tree = $l2entry->object();
-            die('Expected a tree object') unless $l2tree->is_tree();
-
-            foreach my $l3entry ($l2tree->entries())
-            {
-                my $l3blob = $l3entry->object();
-                die('Expected a blob object') unless $l3blob->is_blob();
-
-                my $data = $self->{'json'}->decode($l3blob->content());
-
-                if( index($data->[0], $substring) >= 0 )
-                {
-                    push(@{$ret}, $data);
-                }
-            }
+            push(@{$ret}, $decoded);
         }
-    }
-
+    };
+    
+    $self->{'store'}->recursive_read('nodeid', $cb_read);
     return $ret;
 }
 
@@ -1114,17 +1012,14 @@ sub getDefinitionNames
     my $self = shift;
 
     my @ret;
-    my $tree_entry = $self->{'gittree'}->entry_bypath('definitions');
-    return undef unless defined($tree_entry);
+    
+    my $cb_read = sub {
+        my ($path, $data) = @_;
+        my $name = substr($path, rindex($path, '/')+1);
+        push(@ret, $name);
+    };
 
-    my $dir_tree = $tree_entry->object();
-    die('Expected a tree object') unless $dir_tree->is_tree();
-
-    foreach my $entry ($dir_tree->entries())
-    {
-        push(@ret, $entry->name());
-    }
-
+    $self->{'store'}->recursive_read('definitions', $cb_read);
     return @ret;
 }
 

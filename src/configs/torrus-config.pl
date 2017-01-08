@@ -51,20 +51,8 @@ $Torrus::Global::redisServer = '127.0.0.1:6379';
 # database.
 $Torrus::Global::redisPrefix = 'torrus:';
 
-
-# if true, push to the specified repo
-$Torrus::ConfigTree::writerPush = 0;
-$Torrus::ConfigTree::writerRemoteRepo = undef;
-
 $Torrus::ConfigTree::writerAuthorName = 'Torrus Compiler';
 $Torrus::ConfigTree::writerAuthorEmail = 'torrus@localhost';
-
-
-# if true, push to the specified repo
-$Torrus::ConfigTree::readerPull = 0;
-$Torrus::ConfigTree::readerRemoteRepo = undef;
-
-$Torrus::ConfigTree::remoteName = 'torrus_remote';
 
 $Torrus::ConfigTree::objCacheSize = 2048;
 

@@ -29,7 +29,6 @@ use base 'Torrus::Scheduler';
 use Torrus::AgentConfig;
 use Torrus::Log;
 
-
 sub beforeRun
 {
     my $self = shift;
@@ -44,7 +43,17 @@ sub beforeRun
 
         my $period = $params->{'collector-period'};
         my $offset = $params->{'collector-timeoffset'};
-        my $collector = $data->{'task'}{$period}{$offset};
+
+        my $old_collector = $data->{'token_agent'}{$token};
+        if( defined($old_collector) and
+            ($old_collector->period() != $period or
+             $old_collector->offset() != $offset) )
+        {
+            $old_collector->deleteTarget($token);
+            delete $data->{'token_agent'}{$token};
+        }
+        
+        my $collector = $data->{'task_agent'}{$period}{$offset};
 
         if( not defined($collector) )
         {
@@ -54,20 +63,20 @@ sub beforeRun
                                        -TreeName => $tree,
                                        -Instance => $instance );
             
-            $data->{'task'}{$period}{$offset} = $collector;
+            $data->{'task_agent'}{$period}{$offset} = $collector;
             $self->addTask($collector);
         }
 
         $collector->addTarget( $token, $params );
-        $data->{'agent'}{$token} = $collector;
+        $data->{'token_agent'}{$token} = $collector;
     };
 
     my $cb_deleted = sub {
         my $token = shift;
 
-        my $collector = $data->{'agent'}{$token};
+        my $collector = $data->{'token_agent'}{$token};
         $collector->deleteTarget($token);
-        delete $data->{'agent'}{$token};
+        delete $data->{'token_agent'}{$token};
     };
 
     my $ts_before_update = time();
@@ -76,7 +85,13 @@ sub beforeRun
     {
         $data->{'agent_config'} =
             new Torrus::AgentConfig($tree, 'collector', $instance);
+    }
 
+    if( $data->{'agent_config'}->needsFlush() )
+    {
+        $data->{'task_agent'} = {};
+        $data->{'token_agent'} = {};
+        $self->flushTasks();
         $data->{'agent_config'}->readAll($cb_updated);
         $updated = 1;
     }

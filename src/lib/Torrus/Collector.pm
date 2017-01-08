@@ -114,6 +114,11 @@ sub addTarget
 
     my $ok = 1;
 
+    if( exists($self->{'targets'}{$token}) )
+    {
+        $self->deleteTarget($token);
+    }
+    
     $self->{'targets'}{$token}{'params'} = $params;
 
     my $collector_type = $self->param($token, 'collector-type');
@@ -126,6 +131,7 @@ sub addTarget
     $self->{'targets'}{$token}{'type'} = $collector_type;
     $self->{'types_in_use'}{$collector_type} = 1;
     
+    $self->{'targets'}{$token}{'storage-types'} = [];
     my $storage_types = $self->param($token, 'storage-type');
     foreach my $storage_type ( split( ',', $storage_types ) )
     {
@@ -136,13 +142,8 @@ sub addTarget
         else
         {
             my $storage_string = $storage_type . '-storage';
-            if( not exists( $self->{'targets'}{$token}{'storage-types'} ) )
-            {
-                $self->{'targets'}{$token}{'storage-types'} = [];
-            }
             push( @{$self->{'targets'}{$token}{'storage-types'}},
                   $storage_type );
-            
             $self->{'storage_in_use'}{$storage_type} = 1;
         }
     }
@@ -175,15 +176,12 @@ sub addTarget
     }
 
     # Initialize local token, collector, and storage data
-    if( not defined $self->{'targets'}{$token}{'local'} )
-    {
-        $self->{'targets'}{$token}{'local'} = {};
-    }
-
+    $self->{'targets'}{$token}{'local'} = {};
+    
     if( ref( $Torrus::Collector::initTarget{$collector_type} ) )
     {
-        $ok = &{$Torrus::Collector::initTarget{$collector_type}}($self,
-                                                                 $token);
+        $ok = &{$Torrus::Collector::initTarget{$collector_type}}(
+            $self, $token);
     }
 
     if( $ok )
@@ -308,7 +306,7 @@ sub deleteTarget
     my $self = shift;
     my $token = shift;
 
-    Info('Deleting target: ' . $self->path($token));
+    Debug('Deleting target: ' . $self->path($token));
     
     if( ref( $self->{'targets'}{$token}{'deleteProc'} ) )
     {

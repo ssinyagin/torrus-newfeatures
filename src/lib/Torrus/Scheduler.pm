@@ -87,8 +87,7 @@ sub addTask
 
     if( not defined $when )
     {
-        # If not specified, run immediately
-        $when = time() - 1;
+        $when = $task->whenNext();
     }
     $self->storeTask( $task, $when );
     $self->{'stats'}->clearStats( $task->id() );

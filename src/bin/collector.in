@@ -193,20 +193,29 @@ if( $runalways or $Torrus::Collector::runAlways )
     $options{'-RunAlways'} = 1;
 }
 
-foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
-{
-    if( ref($Torrus::Collector::initCollectorGlobals{
-        $collector_type}) )
-    {
-        &{$Torrus::Collector::initCollectorGlobals{
-            $collector_type}}($tree, $instance);
-        
-        Verbose('Initialized collector globals for type: ' . $collector_type);
-    }
-}
+eval {
 
-my $scheduler = new Torrus::CollectorScheduler( %options );
-$scheduler->run();
+    foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
+    {
+        if( ref($Torrus::Collector::initCollectorGlobals{
+            $collector_type}) )
+        {
+            &{$Torrus::Collector::initCollectorGlobals{
+                $collector_type}}($tree, $instance);
+            
+            Verbose('Initialized collector globals for type: ' .
+                    $collector_type);
+        }
+    }
+    
+    my $scheduler = new Torrus::CollectorScheduler( %options );
+    $scheduler->run();
+};
+
+if( $@ )
+{
+    Error('Fatal error, exiting: ' . $@);
+}
 
 if( not $options{'-RunOnce'} )
 {

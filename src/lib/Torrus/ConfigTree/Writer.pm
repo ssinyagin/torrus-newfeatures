@@ -67,14 +67,6 @@ sub new
 
     bless $self, $class;
 
-    my $init_commit = $self->{'store'}->created_init_commit();
-    if( defined($init_commit) )
-    {
-        Git::Raw::Reference->create
-            ($self->_agents_ref_name(),
-             $self->{'store'}->repo(), $init_commit);
-    }
-
     # set up the srcfiles branch
     $self->{'srcstore'} =
         new Git::ObjectStore(
@@ -1179,11 +1171,6 @@ sub updateAgentConfigs
 {
     my $self = shift;
 
-    my $refname = $self->_agents_ref_name();
-    my $ref = Git::Raw::Reference->lookup($refname, $self->{'store'}->repo());
-    die("Cannot find reference $refname in Git repository")
-        unless defined($ref);
-
     my $stores = {};
     my @branchnames;
 
@@ -1214,7 +1201,14 @@ sub updateAgentConfigs
             'writer' => 1,
             %{$self->{'store_author'}});
 
-    my $old_commit_id = $ref->peel('commit')->id();
+    my $refname = $self->_agents_ref_name();
+    my $ref = Git::Raw::Reference->lookup($refname, $self->{'store'}->repo());
+
+    my $old_commit_id = '';
+    if( defined($ref) )
+    {
+        $old_commit_id = $ref->peel('commit')->id();
+    }
     # Debug('Old commit in ' . $self->{'branch'} . ': ' . $old_commit_id);
 
     my $new_commit_id = $self->currentCommit();
@@ -1241,39 +1235,26 @@ sub updateAgentConfigs
     my $n_deleted = 0;
 
     my $cb_updated = sub {
-        my ($path, $data) = @_;
-        if( $path =~ /^nodes\/(.+)/ )
-        {
-            my $sha_file = $1;
-            my $token = join('', split('/', $sha_file));
-            $n_updated += $self->_write_agent_configs($stores, $token);
-        }
+        $n_updated += $self->_write_agent_configs($stores, $_[0]);
     };
 
     my $cb_deleted = sub {
-        my ($path) = @_;
-
-        if( $path =~ /^nodes\/(.+)/ )
+        my $sha_file = $self->_sha_file($_[0]);
+        my $ab_content = $self->{'agent_tokens_store'}->read_file($sha_file);
+        if( defined($ab_content) )
         {
-            my $sha_file = $1;
-            my $token = join('', split('/', $sha_file));
-            my $ab_content =
-                $self->{'agent_tokens_store'}->read_file($sha_file);
-            if( defined($ab_content) )
+            $n_deleted++;
+            my $agent_branches = $self->{'json'}->decode($ab_content);
+            foreach my $branchname (@{$agent_branches})
             {
-                $n_deleted++;
-                my $agent_branches = $self->{'json'}->decode($ab_content);
-                foreach my $branchname (@{$agent_branches})
-                {
-                    $stores->{$branchname}->delete_file($sha_file);
-                }
-
-                $self->{'agent_tokens_store'}->delete_file($sha_file);
+                $stores->{$branchname}->delete_file($sha_file);
             }
-        }
+            
+            $self->{'agent_tokens_store'}->delete_file($sha_file);
+        }    
     };
 
-    $self->{'store'}->read_updates($old_commit_id, $cb_updated, $cb_deleted);
+    $self->getUpdates($old_commit_id, $cb_updated, $cb_deleted);
     Verbose("Updated: $n_updated, Deleted: $n_deleted leaf nodes");
 
     foreach my $branchname (@branchnames)

@@ -10,8 +10,8 @@ Perl version 5.8.9 or higher.
 New perl modules required:
   Redis
   Redis::DistLock
-  Git::Raw (version 0.69 or higher)
-  Git::ObjectStore
+  Git::Raw (version 0.71 or higher)
+  Git::ObjectStore (version 0.004 or higher)
   Digest::SHA
   Cache::Ref
 

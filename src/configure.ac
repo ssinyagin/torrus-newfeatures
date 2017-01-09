@@ -116,12 +116,12 @@ if test "$enable_pkgonly" != yes; then
      fi
    done
 
-   AC_MSG_CHECKING([if Git::Raw is version 0.69 or higher])
+   AC_MSG_CHECKING([if Git::Raw is version 0.71 or higher])
    if ${PERL} ${PERLOPTS} -e \
-     'use Git::Raw; exit($Git::Raw::VERSION >= 0.69 ? 0:1)'; then
+     'use Git::Raw; exit($Git::Raw::VERSION >= 0.71 ? 0:1)'; then
      AC_MSG_RESULT([Ok])
    else
-     AC_MSG_ERROR([Git::Raw version 0.69 or higher is required]);
+     AC_MSG_ERROR([Git::Raw version 0.71 or higher is required]);
    fi
 
 #  Check if Perl threads can be used.

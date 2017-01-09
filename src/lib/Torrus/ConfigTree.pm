@@ -1043,6 +1043,57 @@ sub getSrcFiles
 
 
 
+sub getUpdates
+{
+    my $self = shift;
+    my $old_commit_id = shift;
+    my $cb_token_updated = shift;
+    my $cb_token_deleted = shift;
+
+    my $cb_updated = sub {
+        my $token = $self->_token_from_path($_[0]);
+        if( defined($token) )
+        {
+            &{$cb_token_updated}($token);
+        }
+    };
+
+    my $cb_deleted = sub {
+        my $token = $self->_token_from_path($_[0]);
+        if( defined($token) )
+        {
+            &{$cb_token_deleted}($token);
+        }
+    };
+
+    if( defined($old_commit_id) and $old_commit_id ne '' )
+    {
+        $self->{'store'}->read_updates(
+            $old_commit_id, $cb_updated, $cb_deleted, 1);
+    }
+    else
+    {
+        $self->{'store'}->recursive_read('nodes', $cb_updated, 1);
+    }
+}
+
+
+sub _token_from_path
+{
+    my $self = shift;
+    my $path = shift;
+
+    if( $path =~ /^nodes\/(.+)/o )
+    {
+        my $token = $1;
+        $token =~ s/\///og;
+        return $token;
+    }
+    return undef;
+}
+            
+
+
 1;
 
 

@@ -373,6 +373,7 @@ sub setNodeParam
     {
         $self->{'editing'}{'params'}{$param} = $value;
         $self->{'editing_dirty'} = 1;
+        $self->{'editing_dirty_params'} = 1;
     }
 
     return;
@@ -395,6 +396,7 @@ sub setVar
     {
         $self->{'editing'}{'vars'}{$name} = $value;
         $self->{'editing_dirty'} = 1;
+        $self->{'editing_dirty_params'} = 1;
     }
 
     return;
@@ -428,46 +430,51 @@ sub commitNode
                 'vars' => $self->{'editing'}{'vars'},
             };
 
-            # find the topmost ancestor that is affected by each source file
-
-            if( defined($self->{'editing'}{'src'}) )
+            if( $self->{'editing_dirty_params'} )
             {
-                $data->{'src'} = $self->{'editing'}{'src'};
-            }
+                # find the topmost ancestor that is affected by each source file
 
-            foreach my $srcfile (keys %{$self->{'srcfiles'}})
-            {
-                my $src_found;
-
-                if( defined($data->{'src'}) and $data->{'src'}{$srcfile} )
+                if( defined($self->{'editing'}{'src'}) )
                 {
-                    $src_found = 1;
+                    $data->{'src'} = $self->{'editing'}{'src'};
                 }
 
-                my $ancestor;
-                if( not $src_found )
+                foreach my $srcfile (keys %{$self->{'srcfiles'}})
                 {
-                    $ancestor = $data->{'parent'};
-                }
+                    my $src_found;
 
-                while( not $src_found and $ancestor ne '' )
-                {
-                    my $node = $self->_node_read($ancestor);
-
-                    if( defined($node->{'src'}) and $node->{'src'}{$srcfile} )
+                    if( defined($data->{'src'}) and $data->{'src'}{$srcfile} )
                     {
                         $src_found = 1;
                     }
+                    
+                    my $ancestor;
+                    if( not $src_found )
+                    {
+                        $ancestor = $data->{'parent'};
+                    }
 
-                    $ancestor = $node->{'parent'};
-                }
-
-                if( not $src_found )
-                {
-                    $data->{'src'}{$srcfile} = 1;
-                    # this is for the object cache
-                    $self->{'editing'}{'src'}{$srcfile} = 1;
-                    $self->{'srcrefs'}{$srcfile}{$self->{'editing_node'}} = 1;
+                    while( not $src_found and $ancestor ne '' )
+                    {
+                        my $node = $self->_node_read($ancestor);
+                        
+                        if( defined($node->{'src'}) and
+                            $node->{'src'}{$srcfile} )
+                        {
+                            $src_found = 1;
+                        }
+                        
+                        $ancestor = $node->{'parent'};
+                    }
+                    
+                    if( not $src_found )
+                    {
+                        $data->{'src'}{$srcfile} = 1;
+                        # this is for the object cache
+                        $self->{'editing'}{'src'}{$srcfile} = 1;
+                        $self->{'srcrefs'}{$srcfile}{
+                            $self->{'editing_node'}} = 1;
+                    }
                 }
             }
 
@@ -484,6 +491,7 @@ sub commitNode
     delete $self->{'editing'};
     delete $self->{'editing_node'};
     delete $self->{'editing_dirty'};
+    delete $self->{'editing_dirty_params'};
     delete $self->{'editing_dirty_children'};
     return;
 }

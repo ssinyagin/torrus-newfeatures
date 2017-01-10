@@ -251,11 +251,13 @@ directories:
 
 =over 4
 
-=item * C<words/I<TREE>/> contains subdirectories named after search
-  keywords. These directories contain zero-length files named after node
-  token IDs for nodes matching those keywords.
+=item * C<words/I<TREE>/> contains zero-length files in the following
+  hierarchy: C<I<KEYWORD>/I<TOKEN>/I<PARAM>>. If a keyword is matched in
+  the subtree or leaf name, the file name is C<__NODENAME__>.
 
-=item * C<wordsglobal/> is the same as above, but for global search.
+=item * C<wordsglobal/> is the same as above, but for global search. In
+  addition, a file called C<__TREENAME__> contains a JSON scalar with
+  the tree name where this token is defined.
 
 =item * C<tokens/> is a two-level 256-way hierarchy of directories based
   on token ID's. These directories contain zero-length files named after

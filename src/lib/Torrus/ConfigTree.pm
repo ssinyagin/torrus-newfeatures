@@ -1068,8 +1068,11 @@ sub getUpdates
 
     if( defined($old_commit_id) and $old_commit_id ne '' )
     {
-        $self->{'store'}->read_updates(
-            $old_commit_id, $cb_updated, $cb_deleted, 1);
+        if( $old_commit_id ne $self->currentCommit() )
+        {
+            $self->{'store'}->read_updates(
+                $old_commit_id, $cb_updated, $cb_deleted, 1);
+        }
     }
     else
     {

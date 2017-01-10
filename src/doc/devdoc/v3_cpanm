@@ -1,0 +1,11 @@
+for m in \
+Redis \
+Redis::DistLock \
+Git::Raw \
+Git::ObjectStore \
+Digest::SHA \
+Cache::Ref \
+; do
+    cpanm --notest $m
+done
+

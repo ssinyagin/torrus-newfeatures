@@ -76,9 +76,19 @@ sub new
     }
             
     $self->_lock_repodir();
-    $self->{'store'} = new Git::ObjectStore(
-        %store_args, %{$self->{'store_author'}});
+    eval {
+        $self->{'store'} = new Git::ObjectStore(
+            %store_args, %{$self->{'store_author'}});
+    };
+    if( $@ )
+    {
+        my $msg = $@;
+        $self->_unlock_repodir();
+        die($msg);
+    }
+
     $self->_unlock_repodir();
+    
     
     $self->{'paramprop'} = $self->_read_json('paramprops');
     $self->{'paramprop'} = {} unless defined($self->{'paramprop'});

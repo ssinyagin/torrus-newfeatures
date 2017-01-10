@@ -510,18 +510,32 @@ sub doSearch
     my $config_tree = shift;
     my $string = shift;
     
-
     my $tree = $config_tree->treeName();
-    
     my $sr = new Torrus::Search;
-    $sr->openTree( $tree );
-    my $result = $sr->searchPrefix( $string, $tree );
-    $sr->closeTree( $tree );
+    my $result = $sr->searchTree( $string, $tree );
 
-    my $ret = [];
-    push( @{$ret}, sort {$a->[0] cmp $b->[0]} @{$result} );
-    
-    return $ret;
+    my $unsorted = [];
+    foreach my $token (keys %{$result})
+    {
+        my $data = {
+            'token' => $token,
+            'path' => $config_tree->path($token),
+            'match' => {},
+        };
+
+        foreach my $param (keys %{$result->{$token}})
+        {
+            if( $param ne '__NODENAME__' )
+            {
+                $data->{'match'}{$param} =
+                    $config_tree->getNodeParam($token, $param);
+            }
+        }
+
+        push(@{$unsorted}, $data);
+    }
+
+    return [sort {$a->{'path'} cmp $b->{'path'}} @{$unsorted}];
 }
 
 

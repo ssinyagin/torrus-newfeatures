@@ -24,122 +24,79 @@ use strict;
 use warnings;
 
 use Torrus::Log;
+use Git::ObjectStore;
+use JSON;
 
 sub new
 {
     my $class = shift;
-    my %options = @_;
     my $self = {};
     bless $self, $class;
 
-    %{$self->{'options'}} = %options;
+    $self->{'store'} = new Git::ObjectStore(
+        'repodir' => $Torrus::Global::gitRepoDir,
+        'branchname' => 'searchdb');
 
+    $self->{'json'} = JSON->new->canonical(1)->allow_nonref(1);
+    
     return $self;
 }
 
 
-sub openTree
+
+sub searchTree
 {
     my $self = shift;
+    my $substring = lc( shift );
     my $tree = shift;
 
-    my $db = new Torrus::DB
-        ( 'searchwords',
-          -Subdir => $tree,
-          -Btree => 1,
-          -Duplicates => 1,
-          -WriteAccess => $self->{'options'}{'-WriteAccess'},
-          -Truncate => $self->{'options'}{'-WriteAccess'} );
+    my $ret = {};
 
-    $self->{'db_treewords'}{$tree} = $db;
-    return;
-}
-
-
-sub closeTree
-{
-    my $self = shift;
-    my $tree = shift;
-
-    $self->{'db_treewords'}{$tree}->closeNow();
-    return;
-}
-
-
-sub openGlobal
-{
-    my $self = shift;
-
-    my $db = new Torrus::DB
-        ( 'globsearchwords',
-          -Btree => 1,
-          -Duplicates => 1,
-          -WriteAccess => $self->{'options'}{'-WriteAccess'},
-          -Truncate => $self->{'options'}{'-WriteAccess'} );
-
-    $self->{'db_globwords'} = $db;    
-    return;
-}
-
-
-sub storeKeyword
-{
-    my $self = shift;
-    my $tree = shift;
-    my $keyword = lc( shift );
-    my $path = shift;
-    my $param = shift;
-
-    my $val = $path;
-    if( defined( $param ) )
-    {
-        $val .= ':' . $param;
-    }
-
-    my $lookupkey = join( ':', $tree, $keyword, $val );    
-    if( not $self->{'stored'}{$lookupkey} )
-    {
-        $self->{'db_treewords'}{$tree}->put( $keyword, $val );
-        if( defined( $self->{'db_globwords'} ) )
+    my $cb_read = sub {
+        my ($dummy, $xtree, $word, $token, $param) = split('/', $_[0]);
+        if( index($word, $substring) >= 0 )
         {
-            $self->{'db_globwords'}->put( $keyword, join(':', $tree, $val) );
+            $ret->{$token}{$param} = 1;
         }
+    };
 
-        $self->{'stored'}{$lookupkey} = 1;
-    }
-    return;
-}
-
-sub searchPrefix
-{
-    my $self = shift;
-    my $prefix = lc( shift );
-    my $tree = shift;
-
-    my $db = defined( $tree ) ?
-        $self->{'db_treewords'}{$tree} : $self->{'db_globwords'};
-
-    my $result = $db->searchPrefix( $prefix );
-
-    my $ret = [];
-    
-    if( defined( $result ) )
-    {
-        foreach my $pair ( @{$result} )
-        {
-            my $retstrings = [];
-            push( @{$retstrings}, split(':', $pair->[1]) );
-            push( @{$ret}, $retstrings );
-        }
-    }
+    $self->{'store'}->recursive_read('words/' . $tree, $cb_read, 1);
 
     return $ret;
 }
-    
-    
 
 
-    
+sub searchGlobal
+{
+    my $self = shift;
+    my $substring = lc( shift );
+
+    my $ret = {};
+
+    my $cb_read = sub {
+        my ($dummy, $word, $token, $param) = split('/', $_[0]);
+        my $content = $_[1];
+        
+        if( index($word, $substring) >= 0 )
+        {
+            if( $param eq '__TREENAME__' )
+            {
+                $ret->{$token}{$param} = $self->{'json'}->decode($content);
+            }
+            else
+            {
+                $ret->{$token}{$param} = 1;
+            }
+        }
+    };
+
+    $self->{'store'}->recursive_read('wordsglobal', $cb_read);
+
+    return $ret;
+}
+
+
+
 1;
 
 

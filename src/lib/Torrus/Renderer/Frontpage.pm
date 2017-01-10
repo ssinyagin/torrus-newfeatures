@@ -154,8 +154,8 @@ sub renderTreeChooser
                                 Torrus::SiteConfig::treeDescription($_[0]) }
         ,
         'url'  => sub { return $Torrus::Renderer::rendererURL . '/' . $_[0] },
-        'pathUrl'  => sub { return $Torrus::Renderer::rendererURL . '/' .
-                                $_[0] . '?path=' . $_[1] },
+        'tokenUrl'  => sub { return $Torrus::Renderer::rendererURL . '/' .
+                                $_[0] . '?token=' . $_[1] },
         'plainURL'   => $Torrus::Renderer::plainURL,
         'clearVar'   => sub { delete $self->{'options'}{'variables'}{$_[0]};
                               return undef;},
@@ -207,7 +207,7 @@ sub renderTreeChooser
 sub mayGlobalSearch
 {
     my $self = shift;
-    
+
     return ( $Torrus::Renderer::globalSearchEnabled and
              ( not $Torrus::CGI::authorizeUsers or
                ( $self->hasPrivilege( '*', 'GlobalSearch' ) ) ) );
@@ -219,27 +219,43 @@ sub doGlobalSearch
     my $string = shift;
     
     my $sr = new Torrus::Search;
-    $sr->openGlobal();
-    my $result = $sr->searchPrefix( $string );
+    my $result = $sr->searchGlobal( $string );
 
-    my $sorted = [];
-    push( @{$sorted}, sort {$a->[0] cmp $b->[0]} @{$result} );
-
-    # remove duplicating entries
-    my %seen;
-    my $ret = [];
+    my %cf;
     
-    foreach my $element ( @{$sorted} )
+    my $unsorted = [];
+    foreach my $token (keys %{$result})
     {
-        my $str = join( ':', $element->[0], $element->[1] );
-        if( not $seen{$str} )
+        my $tree = $result->{$token}{'__TREENAME__'};
+        die('Undefined __TREENAME__ for ' . $token) unless defined($tree);
+
+        my $config_tree = $cf{$tree};
+        if( not defined($config_tree) )
         {
-            $seen{$str} = 1;
-            push( @{$ret}, $element );
+            $config_tree = $cf{$tree} =
+                new Torrus::ConfigTree( -TreeName => $tree );
         }
-    }
         
-    return $ret;
+        my $data = {
+            'token' => $token,
+            'tree' => $tree,
+            'path' => $config_tree->path($token),
+            'match' => {},
+        };
+
+        foreach my $param (keys %{$result->{$token}})
+        {
+            if( $param !~ /^__/o )
+            {
+                $data->{'match'}{$param} =
+                    $config_tree->getNodeParam($token, $param);
+            }
+        }
+
+        push(@{$unsorted}, $data);
+    }
+
+    return [sort {$a->{'path'} cmp $b->{'path'}} @{$unsorted}];
 }
 
 

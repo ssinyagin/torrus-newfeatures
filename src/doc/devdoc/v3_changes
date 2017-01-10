@@ -47,8 +47,6 @@ Removed config:
   $Torrus::Global::ConfigReadersWaitPeriod
 
 Changed defaults:
-  $Torrus::Renderer::searchEnabled = 0; # until search service is built
-  $Torrus::Renderer::globalSearchEnabled = 0;
   $Torrus::Collector::fastCycles = 0;
 
 New config:

@@ -256,11 +256,11 @@ $Torrus::Renderer::hwGraphLegend = 0;
 $Torrus::Renderer::displayReports = 0;
 
 # Allow tree searching. 
-$Torrus::Renderer::searchEnabled = 0;
+$Torrus::Renderer::searchEnabled = 1;
 
 # Allow global searching across the trees. If the user authentication
 # is enabled, the user should have rights DisplayTree and GlobalSearch for '*'
-$Torrus::Renderer::globalSearchEnabled = 0;
+$Torrus::Renderer::globalSearchEnabled = 1;
 
 # Set to true if you want JSON to be pretty and canonical (needs extra
 # CPU cycles)

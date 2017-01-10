@@ -210,7 +210,7 @@ sub sha_file
 sub store_keyword
 {
     my $tree = shift;
-    my $word = shift;
+    my $word = lc(shift);
     my $token = shift;
     my $param = shift;
 

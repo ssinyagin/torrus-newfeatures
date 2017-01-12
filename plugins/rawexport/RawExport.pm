@@ -185,8 +185,6 @@ sub storeData
     
     while( my ($filename, $tokens) = each %{$sref->{'byfile'}} )
     {
-        &Torrus::DB::checkInterrupted();
-
         my $filejob = &threads::shared::share({});
         
         $filejob->{'filename'} = $filename;
@@ -199,8 +197,6 @@ sub storeData
         {
             if( exists( $sref->{'values'}{$token} ) )
             {
-                &Torrus::DB::checkInterrupted();
-                
                 my $rowentry = &threads::shared::share({});
 
                 my ( $value, $timestamp ) = @{$sref->{'values'}{$token}};
@@ -299,13 +295,10 @@ sub storeData
 
 sub rawUpdateThread
 {
-    &Torrus::DB::setSafeSignalHandlers();
     &Torrus::Log::setTID( threads->tid() );
     
     while(1)
     {
-        &Torrus::DB::checkInterrupted();
-
         my $filejob = $thrUpdateQueue->dequeue();
 
         my $fname = time2str( $filejob->{'filename'}, time() );
@@ -339,8 +332,6 @@ sub rawUpdateThread
                                   $rowentry->{'rowid'},
                                   $rowentry->{'value'} ),
                             "\n");
-            
-            &Torrus::DB::checkInterrupted();
         }
 
         $rawout->close();

@@ -546,7 +546,7 @@ sub rrdUpdateThread
 
         if( $err )
         {
-            Error('ERROR updating' . $cmdlist->[0] . ': ' . $err);
+            Error('ERROR updating ' . $cmdlist->[0] . ': ' . $err);
             $thrErrorsQueue->enqueue( $cmdlist->[0] );
         }
     }

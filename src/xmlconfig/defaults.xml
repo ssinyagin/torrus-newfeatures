@@ -345,6 +345,7 @@
       <param name="good-img"      value="good.png" />
       <param name="warning-img"   value="warning.png" />
       <param name="critical-img"  value="critical.png" />
+      <param name="unknown-img"   value="unknown.png" />
       <param name="mime-type"     value="image/png" />
     </view>
 

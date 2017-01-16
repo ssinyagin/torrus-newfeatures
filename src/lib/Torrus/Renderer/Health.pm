@@ -36,13 +36,18 @@ sub render_health
     my $view = shift;
     my $outfile = shift;
 
+    my $err = sub {
+        return $self->_render_health_error(
+            $config_tree, $token, $view, $outfile);
+    };
+            
     my $has_health = $config_tree->getNodeParam($token, 'has-health-status', 1);
     if( not defined($has_health) or $has_health ne 'yes' )
     {
         my $path = $config_tree->path($token);
         Error($path .
               ': has-health-status is not set to yes, cannot display health');
-        return undef;
+        return &{$err};
     }
 
     my $health_nodeid =
@@ -52,7 +57,7 @@ sub render_health
         my $path = $config_tree->path($token);
         Error($path .
               ': health-status-nodeid is not defined, cannot display health');
-        return undef;
+        return &{$err};
     }
 
     my $health_token = $config_tree->getNodeByNodeid($health_nodeid);
@@ -62,14 +67,14 @@ sub render_health
         Error($path .
               ': health-status-nodeid points to an undefined nodeid, ' .
               'cannot display health');
-        return undef;
+        return &{$err};
     }
 
     if( not $config_tree->isLeaf($health_token) )
     {
         my $path = $config_tree->path($health_token);
         Error($path . ' is referred for health status, but is not a leaf');
-        return undef;        
+        return &{$err};
     }
     
     my $leaftype = $config_tree->getNodeParam($health_token, 'leaf-type');
@@ -78,7 +83,7 @@ sub render_health
         my $path = $config_tree->path($health_token);
         Error($path .
               ' is referred for health status, but is not of type rrd-def');
-        return undef;
+        return &{$err};
     }
 
     my $t_end = time();
@@ -99,6 +104,7 @@ sub render_health
               $config_tree, $health_token, $view,
               {'start' => '--start', 'end' => '--end'} ) );
 
+    
     push( @args,
           $self->rrd_make_def($config_tree, $health_token, 'Aavg', 'AVERAGE') );
 
@@ -107,23 +113,21 @@ sub render_health
     # Info('RRDs::graphv arguments: ' . join(' ', @args));
 
     my $r = RRDs::graphv('-', @args);
-
     my $ERR=RRDs::error;
     if( $ERR )
     {
         Error('RRD::graphv returned error: ' . $ERR);
-        return undef;
+        return &{$err};
     }
 
+    my $status = 'good';
     my $value = $r->{'print[0]'};
-    
     # Info("health value: " . $value);
     
-    my $status = 'good';
     if( $value < $config_tree->getNodeParam($token, 'health-level-good') )
     {
-        if( $value < $config_tree->getNodeParam($token,
-                                                'health-level-warning') )
+        if( $value < $config_tree->getNodeParam(
+                $token, 'health-level-warning') )
         {
             $status = 'critical';
         }
@@ -132,7 +136,7 @@ sub render_health
             $status = 'warning';
         }
     }
-
+    
     my $imgfile = $config_tree->getOtherParam($view, $status . '-img');
     # if relative path, the icon is in our default dir
     if( $imgfile !~ /^\// )
@@ -149,10 +153,40 @@ sub render_health
     copy($imgfile, $outfile);
     my $expires = $config_tree->getOtherParam($view, 'expires');
     return ($expires+$t_end, 'image/png');
-    
-    return;
 }
 
+
+sub _render_health_error
+{
+    my $self = shift;
+    my $config_tree = shift;
+    my $token = shift;
+    my $view = shift;
+    my $outfile = shift;
+    
+    my $status = 'unknown';
+
+    my $imgfile = $config_tree->getOtherParam($view, $status . '-img');
+    if( not defined($imgfile) )
+    {
+        return undef;
+    }
+    # if relative path, the icon is in our default dir
+    if( $imgfile !~ /^\// )
+    {
+        $imgfile = $Torrus::Global::healthIconsDir . '/' . $imgfile;
+    }
+
+    if( not -r $imgfile )
+    {
+        Error("Cannot read the health icon file: " . $imgfile);
+        return undef;
+    }
+
+    copy($imgfile, $outfile);
+    my $expires = $config_tree->getOtherParam($view, 'expires');
+    return ($expires+time(), 'image/png');
+}    
 
 1;
 

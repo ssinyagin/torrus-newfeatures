@@ -167,6 +167,11 @@ sub prepare_rrgraph_args
     # We're all set
 
     my $args = [];
+    if( defined($Torrus::Global::RRDCachedSock) )
+    {
+        push( @{$args}, "--daemon=unix:" . $Torrus::Global::RRDCachedSock );
+    }
+
     foreach my $arrayName ( @arg_arrays )
     {
         push( @{$args}, @{$obj->{'args'}{$arrayName}} );

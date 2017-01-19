@@ -487,6 +487,11 @@ sub updateRRD
     my @cmd = ( "--template=" . $template,
                 sprintf("%d%s", $avg_ts, $values) );
 
+    if( defined($Torrus::Global::RRDCachedSock) ) 
+    {
+        push( @cmd, "--daemon=unix:" . $Torrus::Global::RRDCachedSock );
+    }
+
     if( $threadsInUse )
     {
         # Process errors from RRD update thread

@@ -56,6 +56,8 @@ $Torrus::ConfigTree::writerAuthorEmail = 'torrus@localhost';
 
 $Torrus::ConfigTree::objCacheSize = 2048;
 
+#rrdcached support can be enabled by specifying the path of rrdcached socket
+#$Torrus::Global::RRDCachedSock = '/var/rrdtool/rrdcached/rrdcached.sock';
 
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;

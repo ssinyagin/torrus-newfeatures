@@ -164,8 +164,12 @@ is stored as C<b7/ba/0d88a0b14a4e6c3c61f5446aa619a537098f>.
 =item * C<srcrev>: A file containing a JSON scalar referring to the
   commit in XML sources.
 
-=item * C<srcfiles>: A file containing a JSON hash with source XML files
-  as keys and "1" as values.
+=item * C<srcincludes>: A file containing a JSON hash with source XML
+  files as keys and arrays of included file names as values. The order
+  in the array is the same as the order of "include" statements in the
+  XML file. The key C<__ROOT__> indicates the XML files where the
+  compilation started. Every source XML file is listed here, and those
+  which do not include other files, have empty arrays.
 
 =item * C<nodeid/>: two-level 256-way directory structure. Each file is
   a SHA-1 digest of I<nodeid> value. The content of the file is a JSON

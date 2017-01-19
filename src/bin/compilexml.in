@@ -109,15 +109,7 @@ foreach my $tree ( @trees )
     push( @xmlFiles, Torrus::SiteConfig::listXmlFiles( $tree ) );
     push( @xmlFiles, @Torrus::Global::xmlAlwaysIncludeLast );
 
-    foreach my $xmlfile ( @xmlFiles )
-    {
-        if( not $compiler->compile( $xmlfile ) )
-        {
-            Error($xmlfile . ' compiled with errors'); $ok = 0;
-        }
-    }
-
-    if( not $ok )
+    if( not $compiler->compile_files( \@xmlFiles ) )
     {
         Error("Errors found during XML compilation in the tree named \"" .
               $tree . "\"");

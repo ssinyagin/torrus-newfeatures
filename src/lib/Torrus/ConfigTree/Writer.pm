@@ -83,8 +83,8 @@ sub new
 
     $self->{'is_writing'} = 1;
 
-    $self->{'srcfiles'} = {};
-    $self->{'srcfiles_seen'} = {};
+    $self->{'srcfiles_processing_now'} = {};
+    $self->{'srcfiles_processed'} = {};
     $self->{'srcfiles_updated'} = {};
 
     $self->{'srcrefs'} = $self->_read_json('srcrefs');
@@ -93,6 +93,9 @@ sub new
     $self->{'srcglobaldeps'} = $self->_read_json('srcglobaldeps');
     $self->{'srcglobaldeps'} = {} unless defined $self->{'srcglobaldeps'};
 
+    $self->{'srcincludes'} = $self->_read_json('srcincludes');
+    $self->{'srcincludes'} = {} unless defined $self->{'srcincludes'};
+    
     return $self;
 }
 
@@ -439,7 +442,7 @@ sub commitNode
                     $data->{'src'} = $self->{'editing'}{'src'};
                 }
 
-                foreach my $srcfile (keys %{$self->{'srcfiles'}})
+                foreach my $srcfile (keys %{$self->{'srcfiles_processing_now'}})
                 {
                     my $src_found;
 
@@ -574,24 +577,6 @@ sub isTrueVar
 }
 
 
-# returns arrayref of topmost tokens that were affected by the current update
-sub tokensUpdated
-{
-    my $self = shift;
-
-    my $tokens = {};
-
-    foreach my $srcfile (keys %{$self->{'srcfiles_updated'}})
-    {
-        foreach my $token (keys %{$self->{'srcrefs'}{$srcfile}})
-        {
-            $tokens->{$token} = 1;
-        }
-    }
-
-    return [keys %{$tokens}];
-}
-
 
 
 sub commitConfig
@@ -602,36 +587,33 @@ sub commitConfig
     $self->setNodeParam('tree-name', $self->treeName());
     $self->commitNode();
 
-    # Detect source files which were removed
-    my $old_srcfiles = $self->_read_json('srcfiles');
-    $old_srcfiles = {} unless defined($old_srcfiles);
-
-    foreach my $filename (sort keys %{$old_srcfiles})
-    {
-        if( not $self->{'srcfiles_seen'}{$filename} )
-        {
-            Verbose("$filename was removed from source configuration");
-            $self->deleteSrcFile($filename);
-            $self->{'srcstore'}->delete_file($filename);
-        }
-    }
-
-    $self->_write_json('srcfiles', $self->{'srcfiles_seen'});
     $self->_write_json('srcrefs', $self->{'srcrefs'});
     $self->_write_json('srcglobaldeps', $self->{'srcglobaldeps'});
+    $self->_write_json('srcincludes', $self->{'srcincludes'});
     $self->_write_json('paramprops', $self->{'paramprop'});
 
     $self->{'n_postprocessed_nodes'} = 0;
     $self->{'postprocessed_tokens'} = {};
 
-    my $updated = $self->tokensUpdated();
-    my $ok = 1;
-    foreach my $token (@{$updated})
+    my %updated_tokens;
+    foreach my $srcfile (@{$self->{'srcfiles_rebuild_list'}})
     {
-        $ok = $self->_post_process_nodes($token) ? $ok : 0;
+        if( defined($self->{'srcrefs'}{$srcfile}) )
+        {
+            foreach my $token (keys %{$self->{'srcrefs'}{$srcfile}})
+            {
+                $updated_tokens{$token} = 1;
+            }
+        }
     }
-
-    return($ok) unless $ok;
+        
+    foreach my $token (keys %updated_tokens)
+    {
+        if( not $self->_post_process_nodes($token) )
+        {
+            return 0;
+        }
+    }
 
     Verbose('Finished post-processing of ' . $self->{'n_postprocessed_nodes'} .
             ' nodes');
@@ -665,6 +647,9 @@ sub commitConfig
         Debug('Wrote ' . $self->{'new_commit'} . ' in ' . $self->{'branch'});
     }
 
+    # release memory
+    delete $self->{'srcstore'};
+    
     # replace the writer store object with reader and release the index memory
     delete $self->{'store'};
 
@@ -690,7 +675,7 @@ sub commitConfig
         }
     }
 
-    return $ok;
+    return 1;
 }
 
 
@@ -699,7 +684,6 @@ sub _post_process_nodes
 {
     my $self = shift;
     my $token = shift;
-
 
     if( $self->{'postprocessed_tokens'}{$token} )
     {
@@ -1040,17 +1024,127 @@ sub _propagate_view_params
 }
 
 
+sub startSrcFileProcessing
+{
+    my $self = shift;
+    my $filename = shift;
+    $self->{'srcfiles_processing_now'}{$filename} = 1;
+    return;
+}
+
+sub endSrcFileProcessing
+{
+    my $self = shift;
+    my $filename = shift;
+    delete $self->{'srcfiles_processing_now'}{$filename};
+    return;
+}
+
+    
 sub addSrcFile
 {
     my $self = shift;
     my $filename = shift;
     my $blobref = shift;
 
-    return $self->{'srcstore'}->write_and_check($filename, $blobref);
+    my $file_changed =
+        $self->{'srcstore'}->write_and_check($filename, $blobref);
+    if( $file_changed )
+    {
+        $self->{'srcfiles_updated'}{$filename} = 1;
+    }
+
+    if( not defined($self->{'srcincludes'}{$filename}) )
+    {
+        $self->{'srcincludes'}{$filename} = [];
+    }
+    
+    $self->{'srcfiles_processed'}{$filename} = 1;
+    
+    return $file_changed;
 }
 
 
-sub deleteSrcFile
+sub setSrcGlobalDep
+{
+    my $self = shift;
+    my $filename = shift;
+    $self->{'srcglobaldeps'}{$filename} = 1;
+    return;
+}
+
+
+
+sub readSrcFile
+{
+    my $self = shift;
+    my $filename = shift;
+    return $self->{'srcstore'}->read_file($filename);
+}
+
+
+sub clearSrcIncludes
+{
+    my $self = shift;
+    my $filename = shift;
+    $self->{'srcincludes'}{$filename} = [];
+    return;
+}
+    
+
+sub addSrcInclude
+{
+    my $self = shift;
+    my $filename = shift;
+    my $include = shift;
+
+    push(@{$self->{'srcincludes'}{$filename}}, $include);
+    return;
+}
+
+
+sub analyzeSrcUpdates
+{
+    my $self = shift;
+
+    $self->{'srcfiles_rebuild'} = {};
+
+    # Detect source files which were removed
+    foreach my $filename (sort keys %{$self->{'srcincludes'}})
+    {
+        if( $filename ne '__ROOT__' and
+            not $self->{'srcfiles_processed'}{$filename} )
+        {
+            Verbose("$filename was removed from source configuration");
+            $self->_mark_related_srcfiles_dirty($filename);
+            $self->_delete_dependent_nodes($filename);
+            $self->{'srcstore'}->delete_file($filename);
+        }
+    }
+    
+    # step 1: find additional files that need to be re-compiled
+    foreach my $filename (@{$self->{'srcincludes'}{'__ROOT__'}})
+    {
+        $self->_analyze_updates($filename);
+    }
+
+    # step 2: build an ordered list of files to recompile
+    $self->{'srcfiles_rebuild_list'} = [];    
+    foreach my $filename (@{$self->{'srcincludes'}{'__ROOT__'}})
+    {
+        $self->_compose_rebuild_list($filename);
+    }
+
+    foreach my $filename (@{$self->{'srcfiles_rebuild_list'}})
+    {
+        $self->_delete_dependent_nodes($filename);
+    }
+        
+    return $self->{'srcfiles_rebuild_list'};
+}
+
+
+sub _delete_dependent_nodes
 {
     my $self = shift;
     my $filename = shift;
@@ -1068,6 +1162,116 @@ sub deleteSrcFile
     delete $self->{'srcglobaldeps'}{$filename};
     return;
 }
+
+
+sub _analyze_updates
+{
+    my $self = shift;
+    my $filename = shift;
+
+    if( $self->{'srcfiles_updated'}{$filename} )
+    {
+        if( $self->{'srcglobaldeps'}{$filename} )
+        {
+            Debug("A global dependency file has changed ($filename), " .
+                  "rebuilding the whole tree");
+            $self->{'rebuild_all'} = 1;
+            return;
+        }
+        
+        $self->{'srcfiles_rebuild'}{$filename} = 1;
+        $self->_mark_related_srcfiles_dirty($filename);
+    }
+
+    if( defined($self->{'srcincludes'}{$filename}) )
+    {
+        foreach my $incfile (@{$self->{'srcincludes'}{$filename}})
+        {
+            $self->_analyze_updates($incfile);
+        }
+    }
+    
+    return;
+}
+
+
+sub _mark_related_srcfiles_dirty
+{
+    my $self = shift;
+    my $filename = shift;
+
+    # find dependent tokens and mark their src files as dirty
+    if( defined($self->{'srcrefs'}{$filename}) )
+    {
+        my @tokens = keys %{$self->{'srcrefs'}{$filename}};
+        while( scalar(@tokens) > 0 )
+        {
+            my $token = pop(@tokens);
+            foreach my $srcfile ($self->getSrcFiles($token))
+            {
+                # only those that were pre-processed
+                if( $self->{'srcfiles_processed'}{$filename} )
+                {
+                    $self->{'srcfiles_rebuild'}{$srcfile} = 1;
+                }
+            }
+            
+            my $parent = $self->getParent($token);
+            if( defined($parent) )
+            {
+                push(@tokens, $parent);
+            }
+        }
+    }
+    return;
+}
+    
+
+
+sub _compose_rebuild_list
+{
+    my $self = shift;
+    my $filename = shift;
+
+    if( $self->{'srcglobaldeps'}{$filename} )
+    {
+        unshift(@{$self->{'srcfiles_rebuild_list'}}, $filename);
+    }
+    elsif( $self->{'rebuild_all'} or
+           $self->{'srcfiles_rebuild'}{$filename} )
+    {
+        push(@{$self->{'srcfiles_rebuild_list'}}, $filename);
+    }
+    
+    if( defined($self->{'srcincludes'}{$filename}) )
+    {
+        foreach my $incfile (@{$self->{'srcincludes'}{$filename}})
+        {
+            $self->_compose_rebuild_list($incfile);
+        }
+    }
+    
+    return;
+}
+        
+
+
+
+sub getSrcIncludes
+{
+    my $self = shift;
+    my $filename = shift;
+    if( defined($self->{'srcincludes'}{$filename}) )
+    {
+        return @{$self->{'srcincludes'}{$filename}};
+    }
+    else
+    {
+        return ();
+    }
+}
+
+
 
 
 sub deleteNode
@@ -1139,7 +1343,19 @@ sub validate
 {
     my $self = shift;
 
-    return 1 unless $self->{'config_updated'};
+    if( not $self->{'config_updated'} )
+    {
+        if( defined( $self->currentCommit() ) )
+        {
+            return 1;
+        }
+        else
+        {
+            Error('Source files did not change, and previous ' .
+                  'validation failed');
+            return 0; 
+        }
+    }            
 
     my $ok = 1;
 

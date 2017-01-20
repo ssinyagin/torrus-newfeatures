@@ -159,21 +159,11 @@ sub validateNodes
 {
     my $config_tree = shift;
 
-    my $tokenlist;
-    if( $config_tree->can('tokensUpdated') )
-    {
-        $tokenlist = $config_tree->tokensUpdated();
-    }
-    else
-    {
-        $tokenlist = [ $config_tree->token('/') ];
-    }
-
     my $ok = 1;
     $config_tree->{'n_validated_nodes'} = 0;
     $config_tree->{'validated_tokens'} = {};
     
-    foreach my $token (@{$tokenlist})
+    foreach my $token (keys %{$config_tree->{'updated_tokens'}})
     {
         $ok = validateNode($config_tree, $token) ? $ok:0;
     }

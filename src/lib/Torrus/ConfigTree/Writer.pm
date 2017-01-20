@@ -595,19 +595,19 @@ sub commitConfig
     $self->{'n_postprocessed_nodes'} = 0;
     $self->{'postprocessed_tokens'} = {};
 
-    my %updated_tokens;
+    $self->{'updated_tokens'} = {};
     foreach my $srcfile (@{$self->{'srcfiles_rebuild_list'}})
     {
         if( defined($self->{'srcrefs'}{$srcfile}) )
         {
             foreach my $token (keys %{$self->{'srcrefs'}{$srcfile}})
             {
-                $updated_tokens{$token} = 1;
+                $self->{'updated_tokens'}{$token} = 1;
             }
         }
     }
         
-    foreach my $token (keys %updated_tokens)
+    foreach my $token (keys %{$self->{'updated_tokens'}})
     {
         if( not $self->_post_process_nodes($token) )
         {
@@ -1119,6 +1119,7 @@ sub analyzeSrcUpdates
             $self->_mark_related_srcfiles_dirty($filename);
             $self->_delete_dependent_nodes($filename);
             $self->{'srcstore'}->delete_file($filename);
+            delete $self->{'srcincludes'}{$filename};
         }
     }
     
@@ -1135,11 +1136,19 @@ sub analyzeSrcUpdates
         $self->_compose_rebuild_list($filename);
     }
 
+    # we delete the nodes that depend on rebuilt source files. Those
+    # nodes may also be dependent on other source files, so we collect
+    # them here
+    $self->{'srcfiles_dirty_on_deletion'} = {};
+    
     foreach my $filename (@{$self->{'srcfiles_rebuild_list'}})
     {
         $self->_delete_dependent_nodes($filename);
     }
-        
+
+    push(@{$self->{'srcfiles_rebuild_list'}},
+         sort keys %{$self->{'srcfiles_dirty_on_deletion'}});
+    
     return $self->{'srcfiles_rebuild_list'};
 }
 
@@ -1155,7 +1164,7 @@ sub _delete_dependent_nodes
     foreach my $token (sort keys %{$self->{'srcrefs'}{$filename}})
     {
         Debug('Deleting recursively: ' . $self->path($token));
-        $self->deleteNode($token);
+        $self->_delete_node($token);
     }
 
     delete $self->{'srcrefs'}{$filename};
@@ -1203,23 +1212,16 @@ sub _mark_related_srcfiles_dirty
     # find dependent tokens and mark their src files as dirty
     if( defined($self->{'srcrefs'}{$filename}) )
     {
-        my @tokens = keys %{$self->{'srcrefs'}{$filename}};
-        while( scalar(@tokens) > 0 )
+        foreach my $token (keys %{$self->{'srcrefs'}{$filename}})
         {
-            my $token = pop(@tokens);
             foreach my $srcfile ($self->getSrcFiles($token))
             {
                 # only those that were pre-processed
                 if( $self->{'srcfiles_processed'}{$filename} )
                 {
+                    Debug('Marking file dirty: ' . $srcfile);
                     $self->{'srcfiles_rebuild'}{$srcfile} = 1;
                 }
-            }
-            
-            my $parent = $self->getParent($token);
-            if( defined($parent) )
-            {
-                push(@tokens, $parent);
             }
         }
     }
@@ -1274,7 +1276,7 @@ sub getSrcIncludes
 
 
 
-sub deleteNode
+sub _delete_node
 {
     my $self = shift;
     my $token = shift;
@@ -1305,7 +1307,7 @@ sub deleteNode
     {
         foreach my $ctoken ( $self->getChildren($token) )
         {
-            $self->deleteNode($ctoken);
+            $self->_delete_node($ctoken);
         }
     }
 
@@ -1314,6 +1316,10 @@ sub deleteNode
         foreach my $srcfile (keys %{$node->{'src'}})
         {
             delete $self->{'srcrefs'}{$srcfile}{$token};
+            if( not $self->{'srcfiles_rebuild'}{$srcfile} )
+            {
+                $self->{'srcfiles_dirty_on_deletion'}{$srcfile} = 1;
+            }
         }
     }
 

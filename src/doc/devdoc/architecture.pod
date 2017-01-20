@@ -224,7 +224,8 @@ keys and values:
 
 =item * C<src>: optional hash of source XML file names as keys and "1"
   as values. It's only defined on the topmost node that is affected by a
-  given XML.
+  given XML. If an XML file updates a previously defined node, the
+  C<src> content is copied from the nearest parent where it's defined.
 
 =back
 

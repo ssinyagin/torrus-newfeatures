@@ -95,7 +95,7 @@ sub new
 
     $self->{'srcincludes'} = $self->_read_json('srcincludes');
     $self->{'srcincludes'} = {} unless defined $self->{'srcincludes'};
-    
+
     return $self;
 }
 
@@ -347,6 +347,10 @@ sub editNode
         $self->{'editing_dirty'} = 1;
         $self->{'objcache'}->set($token => $node);
     }
+    else
+    {
+        $self->{'updating_node'} = 1;
+    }
 
     $self->{'editing'} = $node;
     $self->{'editing_node'} = $token;
@@ -450,7 +454,7 @@ sub commitNode
                     {
                         $src_found = 1;
                     }
-                    
+
                     my $ancestor;
                     if( not $src_found )
                     {
@@ -460,23 +464,65 @@ sub commitNode
                     while( not $src_found and $ancestor ne '' )
                     {
                         my $node = $self->_node_read($ancestor);
-                        
+
                         if( defined($node->{'src'}) and
                             $node->{'src'}{$srcfile} )
                         {
                             $src_found = 1;
                         }
-                        
+
                         $ancestor = $node->{'parent'};
                     }
-                    
+
                     if( not $src_found )
                     {
+                        my $had_src_before = defined($data->{'src'});
+
                         $data->{'src'}{$srcfile} = 1;
-                        # this is for the object cache
-                        $self->{'editing'}{'src'}{$srcfile} = 1;
                         $self->{'srcrefs'}{$srcfile}{
                             $self->{'editing_node'}} = 1;
+
+                        if( not $had_src_before )
+                        {
+                            # this is for the object cache
+                            $self->{'editing'}{'src'}{$srcfile} = 1;
+                        }
+
+                        if( $self->{'updating_node'} )
+                        {
+                            # this srcfile is updating a previously
+                            # defined node. Now we find a nearest parent
+                            # with source references and copy them here.
+
+                            if( not $had_src_before )
+                            {
+                                $ancestor = $data->{'parent'};
+                                my $found_ancestor_with_src;
+                                while( not defined($found_ancestor_with_src)
+                                       and $ancestor ne '' )
+                                {
+                                    my $node = $self->_node_read($ancestor);
+                                    if( defined($node->{'src'}) )
+                                    {
+                                        $found_ancestor_with_src = $node;
+                                    }
+                                    $ancestor = $node->{'parent'};
+                                }
+
+                                if( defined($found_ancestor_with_src) )
+                                {
+                                    foreach my $ancsrc
+                                        (keys %{$found_ancestor_with_src->
+                                                {'src'}})
+                                    {
+                                        $data->{'src'}{$ancsrc} = 1;
+                                        $self->{'srcrefs'}{$ancsrc}{
+                                            $self->{'editing_node'}} = 1;
+                                        $self->{'editing'}{'src'}{$ancsrc} = 1;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -496,6 +542,7 @@ sub commitNode
     delete $self->{'editing_dirty'};
     delete $self->{'editing_dirty_params'};
     delete $self->{'editing_dirty_children'};
+    delete $self->{'updating_node'};
     return;
 }
 
@@ -606,7 +653,7 @@ sub commitConfig
             }
         }
     }
-        
+
     foreach my $token (keys %{$self->{'updated_tokens'}})
     {
         if( not $self->_post_process_nodes($token) )
@@ -649,7 +696,7 @@ sub commitConfig
 
     # release memory
     delete $self->{'srcstore'};
-    
+
     # replace the writer store object with reader and release the index memory
     delete $self->{'store'};
 
@@ -1040,7 +1087,7 @@ sub endSrcFileProcessing
     return;
 }
 
-    
+
 sub addSrcFile
 {
     my $self = shift;
@@ -1058,9 +1105,9 @@ sub addSrcFile
     {
         $self->{'srcincludes'}{$filename} = [];
     }
-    
+
     $self->{'srcfiles_processed'}{$filename} = 1;
-    
+
     return $file_changed;
 }
 
@@ -1090,7 +1137,7 @@ sub clearSrcIncludes
     $self->{'srcincludes'}{$filename} = [];
     return;
 }
-    
+
 
 sub addSrcInclude
 {
@@ -1106,14 +1153,14 @@ sub addSrcInclude
 sub analyzeSrcUpdates
 {
     my $self = shift;
-    
+
     $self->{'srcfiles_rebuild'} = {};
 
     # we delete the nodes that depend on rebuilt source files. Those
     # nodes may also be dependent on other source files, so we collect
     # them here
     $self->{'srcfiles_dirty_on_deletion'} = {};
-    
+
     # Detect source files which were removed
     foreach my $filename (sort keys %{$self->{'srcincludes'}})
     {
@@ -1127,7 +1174,7 @@ sub analyzeSrcUpdates
             delete $self->{'srcincludes'}{$filename};
         }
     }
-    
+
     # step 1: find additional files that need to be re-compiled
     foreach my $filename (@{$self->{'srcincludes'}{'__ROOT__'}})
     {
@@ -1135,12 +1182,12 @@ sub analyzeSrcUpdates
     }
 
     # step 2: build an ordered list of files to recompile
-    $self->{'srcfiles_rebuild_list'} = [];    
+    $self->{'srcfiles_rebuild_list'} = [];
     foreach my $filename (@{$self->{'srcincludes'}{'__ROOT__'}})
     {
         $self->_compose_rebuild_list($filename);
     }
-    
+
     foreach my $filename (@{$self->{'srcfiles_rebuild_list'}})
     {
         $self->_delete_dependent_nodes($filename);
@@ -1148,7 +1195,7 @@ sub analyzeSrcUpdates
 
     push(@{$self->{'srcfiles_rebuild_list'}},
          sort keys %{$self->{'srcfiles_dirty_on_deletion'}});
-    
+
     return $self->{'srcfiles_rebuild_list'};
 }
 
@@ -1187,7 +1234,7 @@ sub _analyze_updates
             $self->{'rebuild_all'} = 1;
             return;
         }
-        
+
         $self->{'srcfiles_rebuild'}{$filename} = 1;
         $self->_mark_related_srcfiles_dirty($filename);
     }
@@ -1199,7 +1246,7 @@ sub _analyze_updates
             $self->_analyze_updates($incfile);
         }
     }
-    
+
     return;
 }
 
@@ -1227,7 +1274,7 @@ sub _mark_related_srcfiles_dirty
     }
     return;
 }
-    
+
 
 
 sub _compose_rebuild_list
@@ -1244,7 +1291,7 @@ sub _compose_rebuild_list
     {
         push(@{$self->{'srcfiles_rebuild_list'}}, $filename);
     }
-    
+
     if( defined($self->{'srcincludes'}{$filename}) )
     {
         foreach my $incfile (@{$self->{'srcincludes'}{$filename}})
@@ -1252,10 +1299,10 @@ sub _compose_rebuild_list
             $self->_compose_rebuild_list($incfile);
         }
     }
-    
+
     return;
 }
-        
+
 
 
 
@@ -1361,9 +1408,9 @@ sub validate
         {
             Error('Source files did not change, and previous ' .
                   'validation failed');
-            return 0; 
+            return 0;
         }
-    }            
+    }
 
     my $ok = 1;
 
@@ -1481,9 +1528,9 @@ sub updateAgentConfigs
             {
                 $stores->{$branchname}->delete_file($sha_file);
             }
-            
+
             $self->{'agent_tokens_store'}->delete_file($sha_file);
-        }    
+        }
     };
 
     $self->getUpdates($old_commit_id, $cb_updated, $cb_deleted);

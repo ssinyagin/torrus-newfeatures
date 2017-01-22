@@ -1112,6 +1112,7 @@ sub addSrcFile
 }
 
 
+
 sub setSrcGlobalDep
 {
     my $self = shift;
@@ -1182,21 +1183,20 @@ sub analyzeSrcUpdates
     }
 
     # step 2: build an ordered list of files to recompile
-    $self->{'srcfiles_rebuild_list'} = [];
+    my $rebuild_list = [];
     foreach my $filename (@{$self->{'srcincludes'}{'__ROOT__'}})
     {
-        $self->_compose_rebuild_list($filename);
+        push( @{$rebuild_list}, $self->_compose_rebuild_list($filename) );
     }
 
-    foreach my $filename (@{$self->{'srcfiles_rebuild_list'}})
+    foreach my $filename (@{$rebuild_list})
     {
         $self->_delete_dependent_nodes($filename);
     }
 
-    push(@{$self->{'srcfiles_rebuild_list'}},
-         sort keys %{$self->{'srcfiles_dirty_on_deletion'}});
-
-    return $self->{'srcfiles_rebuild_list'};
+    push(@{$rebuild_list}, sort keys %{$self->{'srcfiles_dirty_on_deletion'}});
+    $self->{'srcfiles_rebuild_list'} = $rebuild_list;
+    return $rebuild_list;
 }
 
 
@@ -1215,7 +1215,6 @@ sub _delete_dependent_nodes
     }
 
     delete $self->{'srcrefs'}{$filename};
-    delete $self->{'srcglobaldeps'}{$filename};
     return;
 }
 
@@ -1227,16 +1226,34 @@ sub _analyze_updates
 
     if( $self->{'srcfiles_updated'}{$filename} )
     {
-        if( $self->{'srcglobaldeps'}{$filename} )
-        {
-            Debug("A global dependency file has changed ($filename), " .
-                  "rebuilding the whole tree");
-            $self->{'rebuild_all'} = 1;
-            return;
-        }
-
         $self->{'srcfiles_rebuild'}{$filename} = 1;
         $self->_mark_related_srcfiles_dirty($filename);
+
+        if( $self->{'srcglobaldeps'}{$filename} )
+        {
+            # this file contains global definitions and templates.
+            # Mark dirty all the files which include this one
+
+            my %deps = ($filename => 1);
+            while(1)
+            {
+                my $found = 0;
+                foreach my $xfile (keys %{$self->{'srcincludes'}})
+                {
+                    foreach my $yfile (@{$self->{'srcincludes'}{$xfile}})
+                    {
+                        if( grep {$yfile eq $_} keys %deps and
+                            not $deps{$xfile} )
+                        {
+                            $deps{$xfile} = 1;
+                            $self->{'srcfiles_rebuild'}{$xfile} = 1;
+                            $found = 1;
+                        }
+                    }
+                }
+                last unless $found;
+            }
+        }
     }
 
     if( defined($self->{'srcincludes'}{$filename}) )
@@ -1249,6 +1266,10 @@ sub _analyze_updates
 
     return;
 }
+
+
+    
+
 
 
 sub _mark_related_srcfiles_dirty
@@ -1282,27 +1303,53 @@ sub _compose_rebuild_list
     my $self = shift;
     my $filename = shift;
 
-    if( $self->{'srcglobaldeps'}{$filename} )
-    {
-        unshift(@{$self->{'srcfiles_rebuild_list'}}, $filename);
-    }
-    elsif( $self->{'rebuild_all'} or
-           $self->{'srcfiles_rebuild'}{$filename} )
-    {
-        push(@{$self->{'srcfiles_rebuild_list'}}, $filename);
-    }
-
+    my @ret;
+    
     if( defined($self->{'srcincludes'}{$filename}) )
     {
         foreach my $incfile (@{$self->{'srcincludes'}{$filename}})
         {
-            $self->_compose_rebuild_list($incfile);
+            push(@ret, $self->_compose_rebuild_list($incfile));
         }
     }
 
-    return;
+    if( $self->{'srcfiles_rebuild'}{$filename} )
+    {
+        # add all templates and definitions in the rebuild list
+        my @includes = $self->_get_all_includes($filename);
+        foreach my $incfile (@includes)
+        {
+            if( $self->{'srcglobaldeps'}{$incfile} )
+            {
+                push(@ret, $incfile);
+            }
+        }
+        
+        push(@ret, $filename);
+    }
+    
+    return @ret;
 }
 
+
+sub _get_all_includes
+{
+    my $self = shift;
+    my $filename = shift;
+
+    my @ret;
+    
+    if( defined($self->{'srcincludes'}{$filename}) )
+    {
+        foreach my $incfile (@{$self->{'srcincludes'}{$filename}})
+        {
+            push(@ret, $self->_get_all_includes($incfile));
+            push(@ret, $incfile);
+        }
+    }
+
+    return @ret;
+}
 
 
 

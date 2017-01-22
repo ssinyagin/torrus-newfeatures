@@ -362,9 +362,6 @@ sub compile_ds
 
     foreach my $template ( $ds_node->getChildrenByTagName('template') )
     {
-        # Whenever there's a temlate, we mark the file as global dependency
-        $self->{'srcglobaldeps'}{$self->{'current_srcfile'}} = 1;
-        
         my $name = $template->getAttribute('name');
         if( not $name )
         {

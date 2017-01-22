@@ -158,8 +158,8 @@ is stored as C<b7/ba/0d88a0b14a4e6c3c61f5446aa619a537098f>.
   value is "1".
 
 =item * C<srcglobaldeps>: a JSON hash representing the XML source files
-  which, if changed, enforce a full rebuild of the tree
-  configuration. The keys are file names, and values are "1".
+  which define parameter properties, definitions, or templates. The keys
+  are file names, and values are "1".
 
 =item * C<srcrev>: A file containing a JSON scalar referring to the
   commit in XML sources.

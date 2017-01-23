@@ -78,11 +78,6 @@ $Torrus::Monitor::useSyslog = 1;
 $Torrus::Collector::runAlways = 0;
 $Torrus::Monitor::runAlways = 0;
 
-# By default, there's an exclusive lock that allows only one collector
-# process to initialize at a time. This reduces the concurrency and
-# usually optimizes the initialization of multiple collector processes.
-$Torrus::Collector::exclusiveStartupLock = 1;
-
 # By default, run 3 full collector cycles immediately at start. This
 # allows all SNMP name->index maps to be fetched and used ASAP
 # The 3rd cycle is needed for cbQoS to fetch its mappings

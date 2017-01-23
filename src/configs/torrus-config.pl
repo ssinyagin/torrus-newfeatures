@@ -65,6 +65,11 @@ $Torrus::Global::RRDTimestampTolerance = 15;
 # Syslog facility for collector and monitor daemons
 $Torrus::Log::syslogFacility = 'local0';
 
+# Defaults used by launcher
+$Torrus::Collector::default_cmdopts = '';
+$Torrus::Monitor::default_cmdopts = '--delay=10';
+$Torrus::Launcher::default_stop_timeout = 30;
+
 # When true, daemon logging is sent to syslog instead of logfile.
 $Torrus::Collector::useSyslog = 1;
 $Torrus::Monitor::useSyslog = 1;

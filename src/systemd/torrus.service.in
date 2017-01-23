@@ -1,0 +1,18 @@
+[Unit]
+Description=Torrus collector and monitor daemons
+
+[Service]
+Type=forking
+ExecStart=@pkgbindir@/launcher --cmd=start
+ExecStop=@pkgbindir@/launcher --cmd=stop
+GuessMainPID=false
+TimeoutSec=45s
+Restart=no
+KillMode=control-group
+User=root
+Group=daemon
+
+
+
+[Install]
+WantedBy=multi-user.target

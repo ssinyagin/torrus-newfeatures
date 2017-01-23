@@ -193,8 +193,13 @@ fi
 # Set the var/db and var/cache ownership
 
 AC_ARG_VAR(var_user,  [[TORRUS_USER] Owner of writable directories])
+if test -z "$var_user"; then var_user='${torrus_user}'; fi
+
 AC_ARG_VAR(var_group, [[torrus] Group of writable directories])
+if test -z "$var_group"; then var_group='torrus'; fi
+
 AC_ARG_VAR(var_mode,  [[775] Mode of writable directories])
+if test -z "$var_mode"; then var_mode='775'; fi
 
 AC_ARG_ENABLE(varperm,
         [AC_HELP_STRING(--disable-varperm,

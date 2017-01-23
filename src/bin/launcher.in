@@ -315,6 +315,9 @@ sub switch_uid
         exit(1);
     }
 
+    # this is needed by libgit to search for .gitconfig
+    $ENV{'HOME'} = $Torrus::Global::cfgSiteDir;
+    
     Verbose("Switched user to " .
             scalar(getpwuid(getuid())) . ':' . scalar(getgrgid(getgid())));
 }

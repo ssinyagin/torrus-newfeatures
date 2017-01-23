@@ -29,6 +29,7 @@ New software daemon required:
   redis
 
 
+Variables var_user, var_group, var_mode are set in configure script
 
 
 torrus-config.pl
@@ -44,21 +45,19 @@ Removed config:
   $Torrus::Global::ConfigReadyTimeout
   $Torrus::Global::ConfigReadyRetryPeriod
   $Torrus::Global::ConfigReadersWaitPeriod
+  $Torrus::Collector::exclusiveStartupLock
 
 Changed defaults:
   $Torrus::Collector::fastCycles = 0;
 
 New config:
-  $Torrus::Global::writerWD
-  $Torrus::Global::readerWD
   $Torrus::Global::redisServer
   $Torrus::Global::redisPrefix
-
+  $Torrus::ConfigTree::objCacheSize
+  $Torrus::Global::RRDCachedSock
 
 Torrus::ConfigTree
 ==================
-
-TODO: remove ConfigTree->getTimestamp
 
 Aliases are no longer supported
 
@@ -68,5 +67,11 @@ Default parameters changed:
       last24h-small,last24h,lastweek,lastmonth,lastyear
     </param>
     <param name="collector-dispersed-timeoffset" value="yes"/>
+
+
+Systemd service:
+  cp systemd/torrus.service /lib/systemd/system/
+  cp systemd/torrus.tmpfile /usr/lib/tmpfiles.d/torrus.conf
+  systemctl enable torrus
 
 

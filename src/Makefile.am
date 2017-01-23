@@ -19,16 +19,22 @@
 
 SUBDIRS = . bin configs doc examples lib sup xmlconfig
 
+SUBST = @abs_top_builddir@/setup_tools/substvars.sh
+
 EXTRA_DIST = \
 	setup_tools/Bundle/Torrus.pm \
 	setup_tools/replace_rrfw.sh \
 	setup_tools/configure_fhs \
-	setup_tools/check_perlthreading.pl
+	setup_tools/check_perlthreading.pl \
+	systemd/torrus.service.in \
+	systemd/torrus.tmpfile.in
 
 noinst_SCRIPTS = \
 	setup_tools/substvars.sh \
 	setup_tools/mkvardir.sh \
-	init.d/torrus
+	init.d/torrus \
+	systemd/torrus.service \
+	systemd/torrus.tmpfile
 
 tmpldir = @tmpldir@
 dist_tmpl_DATA = \
@@ -55,6 +61,9 @@ dist_tmpl_DATA = \
 	templates/email-alarm.txt
 
 
+CLEANFILES = \
+	systemd/torrus.service \
+	systemd/torrus.tmpfile
 
 scriptsdir  = @scriptsdir@
 dist_scripts_DATA = scripts/rrdup_notify.sh
@@ -62,9 +71,14 @@ dist_scripts_DATA = scripts/rrdup_notify.sh
 xmlscriptsdir  = @scriptsdir@/xml
 dist_xmlscripts_DATA = scripts/xml/extract-skeleton.xsl
 
-
 discoverydir = @sitedir@/discovery
 dist_discovery_DATA = discovery/README
+
+systemd/torrus.service: systemd/torrus.service.in
+	$(SUBST) systemd/torrus.service.in > systemd/torrus.service
+
+systemd/torrus.tmpfile: systemd/torrus.tmpfile.in
+	$(SUBST) systemd/torrus.tmpfile.in > systemd/torrus.tmpfile
 
 mkvardir=@abs_top_builddir@/setup_tools/mkvardir.sh
 

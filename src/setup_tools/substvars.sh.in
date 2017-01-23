@@ -40,6 +40,8 @@ email_siteconfig_pl=@siteconfdir@/email-siteconfig.pl
 devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
 notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
 
+torrus_user=@torrus_user@
+
 @SED@ \
     -e "s,\@FIND\@,@FIND@,g" \
     -e "s,\@PERL\@,@PERL@,g" \
@@ -85,6 +87,8 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
     -e "s,\@torrus_config_pl\@,$torrus_config_pl,g" \
     -e "s,\@torrus_siteconfig_pl\@,$torrus_siteconfig_pl,g" \
     -e "s,\@torrus_user\@,@torrus_user@,g" \
+    -e "s,\@var_user\@,@var_user@,g" \
+    -e "s,\@var_group\@,@var_group@,g" \
     -e "s,\@webplaindir\@,@webplaindir@,g" \
     -e "s,\@gitrepodir\@,@gitrepodir@,g" \
     $1

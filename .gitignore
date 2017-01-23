@@ -258,6 +258,10 @@
 # /src/init.d/
 /src/init.d/torrus
 
+# /src/systemd/
+/src/systemd/torrus.service
+/src/systemd/torrus.tmpfile
+
 # /src/lib/
 /src/lib/Makefile
 /src/lib/Makefile.in

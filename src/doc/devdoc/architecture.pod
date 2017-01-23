@@ -291,11 +291,10 @@ reading.
 
 =over 4
 
-=item * C<gitlock:I<REPOPATH>> -- this key is used for the mutex that
-  protects a local Git repository during pulls or init. Each consumer
-  process that intends to make the pull, should acquire this mutex, then
-  check again the latest coommit in its branch, and pull if it's not the
-  latest one.
+=item * C<gitlock:I<REPOPATH>> -- this key is used as a mutex that
+  protects a local Git repository from simultaneous initialization by
+  multiple processes. Before accessing the repository in writer mode,
+  the writer sets this Redis key to the current UNIX timestamp.
 
 =item * C<githeads> -- this is a hash containing commit numbers written
   by the compiler. The keys are branch names, and the values are the Git

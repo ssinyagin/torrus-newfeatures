@@ -22,8 +22,7 @@ package Torrus::ConfigTree;
 use strict;
 use warnings;
 
-use Redis;
-use Redis::DistLock;
+use Torrus::Redis;
 use Git::ObjectStore;
 use JSON;
 use File::Path qw(make_path);
@@ -47,7 +46,8 @@ sub new
 
     $self->{'iamwriter'} = $options{'-WriteAccess'} ? 1:0;
 
-    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis'} =
+        Torrus::Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_prefix'} = $Torrus::Global::redisPrefix;
 
     $self->{'json'} = JSON->new->canonical(1)->allow_nonref(1);
@@ -69,12 +69,14 @@ sub new
     if( $self->{'iamwriter'} )
     {
         $store_args{'writer'} = 1;
+        $self->{'gitlock'} =
+            $self->{'redis_prefix'} . 'gitlock:' . $self->{'repodir'};
     }
     else
     {
         $store_args{'goto'} = $self->currentCommit();
     }
-            
+        
     $self->_lock_repodir();
     eval {
         $self->{'store'} = new Git::ObjectStore(
@@ -105,23 +107,23 @@ sub _lock_repodir
 {
     my $self = shift;
 
-    if( not defined($self->{'distlock'}) )
+    if( $self->{'iamwriter'} )
     {
-        $self->{'distlock'} = Redis::DistLock->new
-            ( servers => [$Torrus::Global::redisServer] );
+        Debug('Acquiring a lock for ' . $self->{'repodir'});
+        my $timeout = time() + 15;
+        while( not $self->{'redis'}->set($self->{'gitlock'}, time(),
+                                         'EX', 10, 'NX')
+               and time() <= $timeout )
+        {
+            sleep 1;
+        }
+
+        if( time() > $timeout )
+        {
+            die('Failed to acquire a lock for ' . $self->{'repodir'});
+        }
     }
 
-    Debug('Acquiring a lock for ' . $self->{'repodir'});
-    my $lock =
-        $self->{'distlock'}->lock($self->{'redis_prefix'} .
-                                  'gitlock:' . $self->{'repodir'},
-                                  7200);
-    if( not defined($lock) )
-    {
-        die('Failed to acquire a lock for ' . $self->{'repodir'});
-    }
-
-    $self->{'mutex'} = $lock;
     return;
 }
 
@@ -130,10 +132,11 @@ sub _unlock_repodir
 {
     my $self = shift;
 
-    Debug('Releasing the lock for ' . $self->{'repodir'});
-
-    $self->{'distlock'}->release($self->{'mutex'});
-    delete $self->{'mutex'};
+    if( $self->{'iamwriter'} )
+    {
+        Debug('Releasing the lock for ' . $self->{'repodir'});
+        $self->{'redis'}->del($self->{'gitlock'});
+    }
     return;
 }
 

@@ -101,12 +101,12 @@ if test "$enable_pkgonly" != yes; then
      AC_MSG_ERROR([Git executable is required])
    fi
 
-   for module in 'Redis' 'Redis::DistLock' \
-                 'Git::Raw' 'Git::ObjectStore' \
+   for module in 'Redis::Fast' \
+                 'Git::Raw 0.72' 'Git::ObjectStore 0.005' \
                  'Cache::Ref' \
                  'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \
-                 'Date::Parse' 'JSON'
+                 'Date::Parse' 'JSON' 'JSON::XS'
    do
      AC_MSG_CHECKING([presence of $module])
      if ${PERL} ${PERLOPTS} -e 'use '$module 2>/dev/null; then
@@ -115,14 +115,6 @@ if test "$enable_pkgonly" != yes; then
          AC_MSG_ERROR([Perl cannot find $module]);
      fi
    done
-
-   AC_MSG_CHECKING([if Git::Raw is version 0.71 or higher])
-   if ${PERL} ${PERLOPTS} -e \
-     'use Git::Raw; exit($Git::Raw::VERSION >= 0.71 ? 0:1)'; then
-     AC_MSG_RESULT([Ok])
-   else
-     AC_MSG_ERROR([Git::Raw version 0.71 or higher is required]);
-   fi
 
 #  Check if Perl threads can be used.
 #  Requirements are: perl 5.8.9 with threads compiled,

@@ -8,10 +8,9 @@ Renamed "perllib" to "lib".
 Perl version 5.8.9 or higher.
 
 New perl modules required:
-  Redis
-  Redis::DistLock
-  Git::Raw (version 0.71 or higher)
-  Git::ObjectStore (version 0.004 or higher)
+  Redis::Fast
+  Git::Raw (version 0.72 or higher)
+  Git::ObjectStore (version 0.005 or higher)
   Digest::SHA
   Cache::Ref
 

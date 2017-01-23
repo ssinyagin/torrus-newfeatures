@@ -24,7 +24,7 @@ package Torrus::SchedulerInfo;
 use strict;
 use warnings;
 
-use Redis;
+use Torrus::Redis;
 use Torrus::Log;
 
 sub new
@@ -38,7 +38,8 @@ sub new
 
     die() if not defined( $options{'-Tree'} );
 
-    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis'} =
+        Torrus::Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_hname'} =
         $Torrus::Global::redisPrefix . 'scheduler_stats:' . $options{'-Tree'};
 

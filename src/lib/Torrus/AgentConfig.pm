@@ -22,7 +22,7 @@ package Torrus::AgentConfig;
 use strict;
 use warnings;
 
-use Redis;
+use Torrus::Redis;
 use Git::ObjectStore;
 use JSON;
 
@@ -45,7 +45,8 @@ sub new
     $self->{'repodir'} = $Torrus::Global::gitRepoDir;
     $self->{'branch'} = sprintf('%s_%s_%.4x', $treename, $agent, $instance);
     
-    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis'} =
+        Torrus::Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_prefix'} = $Torrus::Global::redisPrefix;
 
     $self->{'json'} = JSON->new->allow_nonref(1);
@@ -53,55 +54,16 @@ sub new
 }
 
 
-sub _lock_repodir
-{
-    my $self = shift;
-
-    if( not defined($self->{'distlock'}) )
-    {
-        $self->{'distlock'} = Redis::DistLock->new
-            ( servers => [$Torrus::Global::redisServer] );
-    }
-
-    Debug('Acquiring a lock for ' . $self->{'repodir'});
-    my $lock =
-        $self->{'distlock'}->lock($self->{'redis_prefix'} .
-                                  'gitlock:' . $self->{'repodir'},
-                                  7200);
-    if( not defined($lock) )
-    {
-        die('Failed to acquire a lock for ' . $self->{'repodir'});
-    }
-
-    $self->{'mutex'} = $lock;
-    return;
-}
-
-
-sub _unlock_repodir
-{
-    my $self = shift;
-
-    Debug('Releasing the lock for ' . $self->{'repodir'});
-
-    $self->{'distlock'}->release($self->{'mutex'});
-    delete $self->{'mutex'};
-    return;
-}
 
 
 sub _store
 {
     my $self = shift;
     
-    $self->_lock_repodir();
-    
     my $store = new Git::ObjectStore(
         'repodir' => $self->{'repodir'},
         'branchname' => $self->{'branch'},
         'goto' => $self->{'current_head'});
-
-    $self->_unlock_repodir();
 
     return $store;
 }

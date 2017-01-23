@@ -25,7 +25,7 @@ use Torrus::ConfigTree;
 use Torrus::DataAccess;
 use Torrus::Log;
 
-use Redis;
+use Torrus::Redis;
 
 
 sub new
@@ -93,7 +93,8 @@ sub run
 
     my $da = new Torrus::DataAccess;
 
-    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis'} =
+        Torrus::Redis->new(server => $Torrus::Global::redisServer);
 
     foreach my $token ( keys %{$self->{'targets'}} )
     {

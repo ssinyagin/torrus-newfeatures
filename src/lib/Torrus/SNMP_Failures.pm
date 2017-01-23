@@ -26,7 +26,7 @@ use strict;
 use warnings;
 
 use Digest::MD5 qw(md5_hex);
-use Redis;
+use Torrus::Redis;
 
 use Torrus::Log;
 
@@ -43,7 +43,8 @@ sub new
     die() if ( not defined($options{'-Tree'}) or
                not defined($options{'-Instance'}) );
 
-    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis'} =
+        Torrus::Redis->new(server => $Torrus::Global::redisServer);
     $self->{'redis_hname'} =
         $Torrus::Global::redisPrefix . 'snmp_failures:' . $options{'-Tree'};
     

@@ -22,7 +22,7 @@ package Torrus::ACL;
 use strict;
 use warnings;
 
-use Redis;
+use Torrus::Redis;
 use Torrus::Log;
 
 
@@ -47,7 +47,8 @@ sub new
         die($@);
     }
 
-    $self->{'redis'} = Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'redis'} =
+        Torrus::Redis->new(server => $Torrus::Global::redisServer);
     $self->{'users_hname'} = $Torrus::Global::redisPrefix . 'users';
     $self->{'acl_hname'} = $Torrus::Global::redisPrefix . 'acl';
 

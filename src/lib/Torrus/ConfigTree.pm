@@ -98,6 +98,8 @@ sub new
     $self->{'objcache'} = Cache::Ref::CART->new
         ( size => $Torrus::ConfigTree::objCacheSize );
 
+    $self->{'defs'} = {};
+    
     return $self;
 }
 
@@ -1017,8 +1019,16 @@ sub getDefinition
     my $self = shift;
     my $name = shift;
 
-    return $self->_read_json('definitions/' . $name);
+    my $def = $self->{'defs'}{$name};
+    if( not defined($def) )
+    {
+        $def = $self->_read_json('definitions/' . $name);
+        $self->{'defs'}{$name} = $def;
+    }
+            
+    return $def;
 }
+
 
 sub getDefinitionNames
 {

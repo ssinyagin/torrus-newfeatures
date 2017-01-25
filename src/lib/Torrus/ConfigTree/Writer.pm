@@ -1177,18 +1177,12 @@ sub analyzeSrcUpdates
     }
 
     # step 1: find additional files that need to be re-compiled
-    foreach my $filename (@{$self->{'srcincludes'}{'__ROOT__'}})
-    {
-        $self->_analyze_updates($filename);
-    }
-
+    $self->_analyze_updates('__ROOT__');
+    
     # step 2: build an ordered list of files to recompile
     my $rebuild_list = [];
-    foreach my $filename (@{$self->{'srcincludes'}{'__ROOT__'}})
-    {
-        push( @{$rebuild_list}, $self->_compose_rebuild_list($filename) );
-    }
-
+    push( @{$rebuild_list}, $self->_compose_rebuild_list('__ROOT__') );
+    
     foreach my $filename (@{$rebuild_list})
     {
         $self->_delete_dependent_nodes($filename);
@@ -1210,8 +1204,12 @@ sub _delete_dependent_nodes
 
     foreach my $token (sort keys %{$self->{'srcrefs'}{$filename}})
     {
-        Debug('Deleting recursively: ' . $self->path($token));
-        $self->_delete_node($token);
+        # we might have deleted this node already
+        if( $self->tokenExists($token) )
+        {
+            Debug('Deleting recursively: ' . $self->path($token));
+            $self->_delete_node($token);
+        }
     }
 
     delete $self->{'srcrefs'}{$filename};
@@ -1224,34 +1222,28 @@ sub _analyze_updates
     my $self = shift;
     my $filename = shift;
 
-    if( $self->{'srcfiles_updated'}{$filename} )
+    if( $self->{'srcfiles_updated'}{$filename} and
+        not $self->{'srcfiles_rebuild'}{$filename} )
     {
         $self->{'srcfiles_rebuild'}{$filename} = 1;
         $self->_mark_related_srcfiles_dirty($filename);
 
         if( $self->{'srcglobaldeps'}{$filename} )
         {
+            Debug("A global dependency file updated: $filename");
             # this file contains global definitions and templates.
             # Mark dirty all the files which include this one
 
-            my %deps = ($filename => 1);
-            while(1)
+            foreach my $xfile (keys %{$self->{'srcincludes'}})
             {
-                my $found = 0;
-                foreach my $xfile (keys %{$self->{'srcincludes'}})
+                foreach my $yfile (@{$self->{'srcincludes'}{$xfile}})
                 {
-                    foreach my $yfile (@{$self->{'srcincludes'}{$xfile}})
+                    if( $yfile eq $filename )
                     {
-                        if( grep {$yfile eq $_} keys %deps and
-                            not $deps{$xfile} )
-                        {
-                            $deps{$xfile} = 1;
-                            $self->{'srcfiles_rebuild'}{$xfile} = 1;
-                            $found = 1;
-                        }
+                        $self->{'srcfiles_rebuild'}{$xfile} = 1;
+                        Debug("$xfile is dependent on $filename");
                     }
                 }
-                last unless $found;
             }
         }
     }
@@ -1285,7 +1277,8 @@ sub _mark_related_srcfiles_dirty
             foreach my $srcfile ($self->getSrcFiles($token))
             {
                 # only those that were pre-processed
-                if( $self->{'srcfiles_processed'}{$srcfile} )
+                if( $self->{'srcfiles_processed'}{$srcfile} and
+                    not $self->{'srcfiles_rebuild'}{$srcfile} )
                 {
                     Debug('Marking file dirty: ' . $srcfile);
                     $self->{'srcfiles_rebuild'}{$srcfile} = 1;
@@ -1324,8 +1317,11 @@ sub _compose_rebuild_list
                 push(@ret, $incfile);
             }
         }
-        
-        push(@ret, $filename);
+
+        if( $filename ne '__ROOT__' )
+        {
+            push(@ret, $filename);
+        }
     }
     
     return @ret;

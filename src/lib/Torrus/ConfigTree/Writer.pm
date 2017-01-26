@@ -1157,11 +1157,6 @@ sub analyzeSrcUpdates
 
     $self->{'srcfiles_rebuild'} = {};
 
-    # we delete the nodes that depend on rebuilt source files. Those
-    # nodes may also be dependent on other source files, so we collect
-    # them here
-    $self->{'srcfiles_dirty_on_deletion'} = {};
-
     # Detect source files which were removed
     foreach my $filename (sort keys %{$self->{'srcincludes'}})
     {
@@ -1188,7 +1183,11 @@ sub analyzeSrcUpdates
         $self->_delete_dependent_nodes($filename);
     }
 
-    push(@{$rebuild_list}, sort keys %{$self->{'srcfiles_dirty_on_deletion'}});
+    # _delete_dependent_nodes may mark additional files dirty, so
+    # compose the list once again
+    $rebuild_list = [];
+    push( @{$rebuild_list}, $self->_compose_rebuild_list('__ROOT__') );
+    
     $self->{'srcfiles_rebuild_list'} = $rebuild_list;
     return $rebuild_list;
 }
@@ -1409,8 +1408,8 @@ sub _delete_node
             if( not $self->{'srcfiles_rebuild'}{$srcfile} and
                 $self->{'srcfiles_processed'}{$srcfile} )
             {
-                Debug('Adding to srcfiles_dirty_on_deletion: ' . $srcfile);
-                $self->{'srcfiles_dirty_on_deletion'}{$srcfile} = 1;
+                Debug('Adding to srcfiles_rebuild: ' . $srcfile);
+                $self->{'srcfiles_rebuild'}{$srcfile} = 1;
             }
         }
     }

@@ -148,6 +148,13 @@ foreach my $tree ( @trees )
         Verbose('Updating agent configurations');
         $compiler->updateAgentConfigs();
 
+        # Garbage collector is needed because of this:
+        # https://github.com/libgit2/libgit2/issues/4093
+        Verbose('Running Git garbage collector...');
+        system(sprintf('cd %s; %s gc',
+                       $Torrus::Global::gitRepoDir,
+                       $Torrus::Global::gitExec));
+        
         # Update "objects/info/packs" and "info/refs" needed by dumb server
         system(sprintf('cd %s; %s update-server-info',
                        $Torrus::Global::gitRepoDir,

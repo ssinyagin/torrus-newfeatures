@@ -40,38 +40,6 @@ use Math::BigInt;
 # Register the collector type
 $Torrus::Collector::collectorTypes{'snmp'} = 1;
 
-
-# List of needed parameters and default values
-
-$Torrus::Collector::params{'snmp'} = {
-    'snmp-ipversion'    => undef,
-    'snmp-transport'    => undef,
-    'snmp-version'      => undef,
-    'snmp-port'         => undef,
-    'snmp-community'    => undef,
-    'snmp-username'     => undef,
-    'snmp-contextname'  => undef,
-    'snmp-authkey'      => undef,
-    'snmp-authpassword' => undef,
-    'snmp-authprotocol' => 'md5',
-    'snmp-privkey'      => undef,
-    'snmp-privpassword' => undef,
-    'snmp-privprotocol' => 'des',
-    'snmp-timeout'      => undef,
-    'snmp-retries'      => undef,
-    'domain-name'       => undef,
-    'snmp-host'         => undef,
-    'snmp-localaddr'    => undef,
-    'snmp-localport'    => undef,
-    'snmp-object'       => undef,
-    'snmp-oids-per-pdu' => undef,
-    'snmp-object-type'  => 'OTHER',
-    'snmp-check-sysuptime' => 'yes',
-    'snmp-max-msg-size' => undef,
-    'snmp-maxrepetitions' => 10,
-    'snmp-ignore-mib-errors' => undef,
-    };
-
 my $sysUpTime = '1.3.6.1.2.1.1.3.0';
 
 # Hosts that are running SNMPv1. We do not reresh maps on them, as
@@ -1312,14 +1280,8 @@ $Torrus::Collector::collectorTypes{'snmp-reachable'} = 2;
 
 # List of needed parameters and default values
 
-$Torrus::Collector::params{'snmp-reachable'} = {
-    'snmp-version'      => undef,
-    'snmp-port'         => undef,
-    'snmp-community'    => undef,
-    'snmp-username'     => undef,
-    'domain-name'       => undef,
-    'snmp-host'         => undef,
-};
+$Torrus::Collector::params{'snmp-reachable'} =
+    \%Torrus::Collector::SNMP_Params::reachable_validatorLeafparams;
 
 
 # This is first executed per target

@@ -91,6 +91,14 @@ our %requiredLeafParams =
 sub initValidatorLeafParams
 {
     my $hashref = shift;
+
+    # Copy parameters from SNMP collector
+    while(my($key, $val) =
+          each %{$hashref->{'ds-type'}{'collector'}{'collector-type'}{'snmp'}})
+    {
+        $requiredLeafParams{$key} = $val;
+    }
+    
     $hashref->{'ds-type'}{'collector'}{'collector-type'}{'cisco-cbqos'} =
         \%requiredLeafParams;
 }

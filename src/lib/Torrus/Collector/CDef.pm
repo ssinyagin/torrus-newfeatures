@@ -37,7 +37,6 @@ use Torrus::Collector::RRDStorage;
 $Torrus::Collector::collectorTypes{'cdef'} = 1;
 
 # List of needed parameters and default values
-$Torrus::Collector::params{'cdef'} = \%Torrus::Collector::CDef_Params::params;
 $Torrus::Collector::initTarget{'cdef'} = \&Torrus::Collector::CDef::initTarget;
 
 

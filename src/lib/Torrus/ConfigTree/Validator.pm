@@ -65,16 +65,29 @@ our %collector_params =
                                                         'ABSOLUTE' => undef },
                                 'rrd-create-rra'         => undef,
                                 'rrd-create-heartbeat'   => undef,
+                                'rrd-create-min'  => undef,
+                                'rrd-create-max'  => undef,
                                 '+rrd-hwpredict'         => {
                                     'enabled' => {
+                                        'rrd-create-hw-alpha' => undef,
+                                        'rrd-create-hw-beta'  => undef,
+                                        'rrd-create-hw-gamma' => undef,
+                                        'rrd-create-hw-winlen' => undef,
+                                        'rrd-create-hw-failth' => undef,
+                                        'rrd-create-hw-season' => undef,
                                         'rrd-create-hw-rralen' => undef},
                                     'disabled' => undef,
                                 }}}},
          'ext' => {
              'ext-dstype' => {
                  'GAUGE' => undef,
-                 'COUNTER32' => undef,
-                 'COUNTER64' => undef },
+                 'COUNTER32' => {
+                     '+ext-counter-max' => undef,
+                 },
+                 'COUNTER64' => {
+                     '+ext-counter-max' => undef,
+                 },
+             },
              'ext-service-id' => undef,
              '+ext-service-units' => {
                  'bytes' => undef }}},
@@ -214,9 +227,9 @@ sub validateNode
         }
 
         # Verify parameters
-        $ok = validateInstanceParams($config_tree, $token,
-                                     'node', \%leaf_params);
-
+        $ok = defined($config_tree->getInstanceParamsByMap(
+                          $token, 'node', \%leaf_params));
+        
         if( $ok )
         {
             my $rrviewslist =
@@ -428,7 +441,7 @@ sub validateNode
             {
                 $ok = validateRPN( $token, $expr, $config_tree ) ? $ok : 0;
             }
-            # Otherwise already reported by  validateInstanceParams()
+            # Otherwise already reported by getInstanceParamsByMap()
         }
         elsif($dsType eq 'collector' and
               $config_tree->getNodeParam( $token, 'collector-type' ) eq 'snmp')
@@ -575,8 +588,8 @@ sub validateViews
 
     foreach my $view ($config_tree->getViewNames())
     {
-        $ok = validateInstanceParams($config_tree, $view,
-                                     'view', \%view_params) ? $ok:0;
+        $ok = defined($config_tree->getInstanceParamsByMap(
+                          $view, 'view', \%view_params)) ? $ok:0;
         if( $ok and $config_tree->getOtherParam($view, 'view-type')
             eq 'rrgraph' )
         {
@@ -725,8 +738,8 @@ sub validateMonitors
 
     foreach my $action ($config_tree->getActionNames())
     {        
-        $ok = validateInstanceParams($config_tree, $action,
-                                     'action', \%action_params) ? $ok:0;
+        $ok = defined($config_tree->getInstanceParamsByMap(
+                          $action, 'action', \%action_params)) ? $ok:0;
         my $atype = $config_tree->getOtherParam($action, 'action-type');
         if( $atype eq 'tset' )
         {
@@ -740,7 +753,7 @@ sub validateMonitors
                     $ok = 0;
                 }
             }
-            # Otherwise the error is already reported by validateInstanceParams
+            # Otherwise the error is already reported by getInstanceParamsByMap
         }
         elsif( $atype eq 'exec' )
         {
@@ -807,8 +820,8 @@ sub validateMonitors
 
     foreach my $monitor ($config_tree->getMonitorNames())
     {
-        $ok = validateInstanceParams($config_tree, $monitor,
-                                     'monitor', \%monitor_params) ? $ok:0;
+        $ok = defined($config_tree->getInstanceParamsByMap(
+                          $monitor, 'monitor', \%monitor_params)) ? $ok:0;
         
         my $alist = $config_tree->getOtherParam( $monitor, 'action' );
         foreach my $action ( split(',', $alist ) )
@@ -888,111 +901,6 @@ sub validateTokensets
 
 
 
-sub validateInstanceParams
-{
-    my $config_tree = shift;
-    my $inst_name = shift;
-    my $inst_type = shift;
-    my $mapref = shift;
-
-    # Debug("Validating $inst_type $inst_name");
-
-    my $ok = 1;
-    my @namemaps = ($mapref);
-
-    while( $ok and scalar(@namemaps) > 0 )
-    {
-        my @next_namemaps = ();
-
-        foreach my $namemap (@namemaps)
-        {
-            foreach my $paramkey (keys %{$namemap})
-            {
-                # Debug("Checking param: $pname");
-
-                my $pname = $paramkey;
-                my $mandatory = 1;
-                if( $pname =~ s/^\+//o )
-                {
-                    $mandatory = 0;
-                }
-
-                my $listval = 0;
-                if( $pname =~ s/^\@//o )
-                {
-                    $listval = 1;
-                }
-                
-                my $pvalue =
-                    $config_tree->getInstanceParam($inst_type,
-                                                   $inst_name, $pname);
-
-                my @pvalues;
-                if( $listval )
-                {
-                    @pvalues = split(',', $pvalue);
-                }
-                else
-                {
-                    @pvalues = ( $pvalue );
-                }
-                
-                if( not defined( $pvalue ) )
-                {
-                    if( $mandatory )
-                    {
-                        my $msg;
-                        if( $inst_type eq 'node' )
-                        {
-                            $msg = $config_tree->path( $inst_name );
-                        }
-                        else
-                        {
-                            $msg = "$inst_type $inst_name";
-                        }
-                        Error("Mandatory parameter $pname is not ".
-                              "defined for $msg");
-                        $ok = 0;
-                    }
-                }
-                else
-                {
-                    if( ref( $namemap->{$paramkey} ) )
-                    {
-                        foreach my $pval ( @pvalues )
-                        {
-                            if( exists $namemap->{$paramkey}->{$pval} )
-                            {
-                                if( defined $namemap->{$paramkey}->{$pval} )
-                                {
-                                    push( @next_namemaps,
-                                          $namemap->{$paramkey}->{$pval} );
-                                }
-                            }
-                            else
-                            {
-                                my $msg;
-                                if( $inst_type eq 'node' )
-                                {
-                                    $msg = $config_tree->path( $inst_name );
-                                }
-                                else
-                                {
-                                    $msg = "$inst_type $inst_name";
-                                }
-                                Error("Parameter $pname has ".
-                                      "unknown value: $pval for $msg");
-                                $ok = 0;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        @namemaps = @next_namemaps;
-    }
-    return $ok;
-}
 
 
 

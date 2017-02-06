@@ -40,30 +40,6 @@ our $conflictRRDPath;
 $Torrus::Collector::storageTypes{'rrd'} = 1;
 
 
-# List of needed parameters and default values
-
-$Torrus::Collector::params{'rrd-storage'} = {
-    'data-dir' => undef,
-    'data-file' => undef,
-    'rrd-create-rra' => undef,
-    'rrd-create-heartbeat' => undef,
-    'rrd-create-min'  => 'U',
-    'rrd-create-max'  => 'U',
-    'rrd-hwpredict'   => {
-        'enabled' => {
-            'rrd-create-hw-alpha' => 0.1,
-            'rrd-create-hw-beta'  => 0.0035,
-            'rrd-create-hw-gamma' => 0.1,
-            'rrd-create-hw-winlen' => 9,
-            'rrd-create-hw-failth' => 6,
-            'rrd-create-hw-season' => 288,
-            'rrd-create-hw-rralen' => undef },
-        'disabled' => undef },
-    'rrd-create-dstype' => undef,
-    'rrd-ds' => undef
-    };
-
-
 $Torrus::Collector::initThreadsHandlers{'rrd-storage'} =
     \&Torrus::Collector::RRDStorage::initThreads;
 

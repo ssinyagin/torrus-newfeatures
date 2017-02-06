@@ -28,9 +28,9 @@ use warnings;
 use base 'Torrus::ConfigTree';
 
 use Torrus::Log;
-use Torrus::Collector;
 use Torrus::SiteConfig;
 use Torrus::ServiceID;
+use Torrus::ConfigTree::Validator;
 
 use Git::ObjectStore;
 use Git::Raw;
@@ -1742,75 +1742,18 @@ sub _fetch_collector_params
     my $token = shift;
     my $params = shift;
 
-    my $type = $params->{'collector-type'};
-
-    if( not defined( $Torrus::Collector::params{$type} ) )
+    my $r = $self->getInstanceParamsByMap(
+        $token, 'node', \%Torrus::ConfigTree::Validator::collector_params);
+    if( not defined($r) )
     {
-        die("\%Torrus::Collector::params does not have member $type");
+        die("Failure while retrieving agent configuration");
     }
 
-    my @maps = ( $Torrus::Collector::params{$type} );
-
-    my $storage_types = $params->{'storage-type'};
-    foreach my $storage_type ( split( ',', $storage_types ) )
+    while(my($key, $value) = each %{$r})
     {
-        if( not $Torrus::Collector::storageTypes{$storage_type} )
-        {
-            Error('Unknown storage type: ' . $storage_type);
-        }
-        else
-        {
-            push(@maps,
-                 $Torrus::Collector::params{$storage_type . '-storage'});
-        }
+        $params->{$key} = $value;
     }
-
-    while( scalar( @maps ) > 0 )
-    {
-        my @next_maps = ();
-        foreach my $map ( @maps )
-        {
-            foreach my $param ( keys %{$map} )
-            {
-                my $value = $self->getNodeParam( $token, $param );
-
-                if( ref( $map->{$param} ) )
-                {
-                    if( defined $value )
-                    {
-                        if( exists $map->{$param}->{$value} )
-                        {
-                            if( defined $map->{$param}->{$value} )
-                            {
-                                push( @next_maps,
-                                      $map->{$param}->{$value} );
-                            }
-                        }
-                        else
-                        {
-                            Error("Parameter $param has unknown value: " .
-                                  $value . " in " . $self->path($token));
-                        }
-                    }
-                }
-                else
-                {
-                    if( not defined $value )
-                    {
-                        # We know the default value
-                        $value = $map->{$param};
-                    }
-                }
-                # Finally store the value
-                if( defined $value )
-                {
-                    $params->{$param} = $value;
-                }
-            }
-        }
-        @maps = @next_maps;
-    }
-
+    
     return;
 }
 

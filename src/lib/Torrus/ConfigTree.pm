@@ -848,6 +848,116 @@ sub getInstanceParam
 }
 
 
+sub getInstanceParamsByMap
+{
+    my $self = shift;
+    my $inst_name = shift;
+    my $inst_type = shift;
+    my $mapref = shift;
+
+    # Debug("Retrieving params for $inst_type $inst_name");
+
+    my $ret = {};
+    my @namemaps = ($mapref);
+
+    while( scalar(@namemaps) > 0 )
+    {
+        my @next_namemaps = ();
+
+        foreach my $namemap (@namemaps)
+        {
+            foreach my $paramkey (keys %{$namemap})
+            {
+                # Debug("Checking param: $pname");
+
+                my $pname = $paramkey;
+                my $mandatory = 1;
+                if( $pname =~ s/^\+//o )
+                {
+                    $mandatory = 0;
+                }
+
+                my $listval = 0;
+                if( $pname =~ s/^\@//o )
+                {
+                    $listval = 1;
+                }
+                
+                my $pvalue =
+                    $self->getInstanceParam($inst_type, $inst_name, $pname);
+
+                my @pvalues;
+                if( $listval )
+                {
+                    @pvalues = split(',', $pvalue);
+                }
+                else
+                {
+                    @pvalues = ( $pvalue );
+                }
+                
+                if( not defined( $pvalue ) )
+                {
+                    if( $mandatory )
+                    {
+                        my $msg;
+                        if( $inst_type eq 'node' )
+                        {
+                            $msg = $self->path( $inst_name );
+                        }
+                        else
+                        {
+                            $msg = "$inst_type $inst_name";
+                        }
+                        Error("Mandatory parameter $pname is not ".
+                              "defined for $msg");
+                        return undef;
+                    }
+                }
+                else
+                {
+                    if( ref( $namemap->{$paramkey} ) )
+                    {
+                        foreach my $pval ( @pvalues )
+                        {
+                            if( exists $namemap->{$paramkey}->{$pval} )
+                            {
+                                if( defined $namemap->{$paramkey}->{$pval} )
+                                {
+                                    push( @next_namemaps,
+                                          $namemap->{$paramkey}->{$pval} );
+                                }
+                            }
+                            else
+                            {
+                                my $msg;
+                                if( $inst_type eq 'node' )
+                                {
+                                    $msg = $self->path( $inst_name );
+                                }
+                                else
+                                {
+                                    $msg = "$inst_type $inst_name";
+                                }
+                                Error("Parameter $pname has ".
+                                      "unknown value: $pval for $msg");
+                                return undef;
+                            }
+                        }
+                    }
+
+                    $ret->{$pname} = $pvalue;
+                }
+            }
+        }
+        @namemaps = @next_namemaps;
+    }
+    
+    return $ret;
+}
+
+
+
 sub _other_object_names
 {
     my $self = shift;

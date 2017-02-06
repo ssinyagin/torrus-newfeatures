@@ -23,7 +23,7 @@ use warnings;
 ###  Initialize the configuration validator with module-specific parameters
 ###  Moved to a separate module to speed up the compiler initialization
 
-my %validatorLeafParams =
+our %validatorLeafParams =
     (
      'snmp-ipversion'     => {'4'   => undef, '6'   => undef},
      'snmp-transport'     => {'udp' => undef, 'tcp' => undef},
@@ -62,7 +62,7 @@ my %validatorLeafParams =
      );
 
 # collector type: snmp-reachable
-my %reachable_validatorLeafparams =
+our %reachable_validatorLeafparams =
     (
      'snmp-host'          => undef,
      'snmp-port'          => undef,

@@ -48,21 +48,6 @@ our $backendCloseSession;
 $Torrus::Collector::storageTypes{'ext'} = 1;
 
 
-# List of needed parameters and default values
-
-$Torrus::Collector::params{'ext-storage'} = {
-    'ext-dstype' => {
-        'GAUGE' => undef,
-        'COUNTER32' => {
-            'ext-counter-max' => undef},
-        'COUNTER64' => {
-            'ext-counter-max' => undef}},
-    'ext-service-id' => undef
-    };
-
-
-
-
 $Torrus::Collector::initTarget{'ext-storage'} =
     \&Torrus::Collector::ExternalStorage::initTarget;
 

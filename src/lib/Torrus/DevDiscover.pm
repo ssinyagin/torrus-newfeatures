@@ -422,7 +422,15 @@ sub discover
     }
 
     my @devtypes = sort {
-        $reg->{$a}{'sequence'} <=> $reg->{$b}{'sequence'}
+        my $x = $reg->{$a}{'sequence'} <=> $reg->{$b}{'sequence'};
+        if( $x == 0 )
+        {
+            return $a cmp $b;
+        }
+        else
+        {
+            return $x;
+        }
     } $devdetails->getDevTypes();
     $data->{'param'}{'devdiscover-devtypes'} = join(',', @devtypes);
 

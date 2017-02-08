@@ -825,9 +825,7 @@ sub _post_process_nodes
                             {
                                 $newValue =~ s/\s+//go;
                             }
-                            $newValue =
-                                $self->expandSubstitutions( $token, $dsParam,
-                                                            $newValue );
+                            
                             if( $newValue ne $value )
                             {
                                 $self->setNodeParam( $dsParam, $newValue );

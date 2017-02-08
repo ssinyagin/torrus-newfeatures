@@ -201,6 +201,10 @@ sub _node_read
             $ret->{'children'} = $children;
         }
 
+        $ret->{'xparams'} = {}; #expanded params
+        $ret->{'uparams'} = {}; #undefined params
+        
+        
         $self->{'objcache'}->set($token => $ret);
     }
 
@@ -375,51 +379,45 @@ sub _read_node_param
 }
 
 
-sub retrieveNodeParam
+sub _retrieve_node_param
 {
     my $self = shift;
     my $token = shift;
     my $param = shift;
 
-    # walk up the tree and save the grandparent's value at parent's cache
-
-    my $value;
-    my $currtoken = $token;
-    my @ancestors;
-    my $walked = 0;
-
-    while( not defined($value) and defined($currtoken) )
+    my $node = $self->{'objcache'}->get($token);
+    if( defined($node) and defined($node->{'uparams'}{$param}) )
     {
-        $value = $self->_read_node_param( $currtoken, $param );
-        if( not defined $value )
+        return undef;
+    }
+    
+    my $value = $self->_read_node_param( $token, $param );
+    if( not defined($value) )
+    {
+        my $parent = $self->getParent($token);
+        if( defined($parent) )
         {
-            if( $walked )
-            {
-                push( @ancestors, $currtoken );
-            }
-            else
-            {
-                $walked = 1;
-            }
-            # walk up to the parent
-            $currtoken = $self->getParent($currtoken);
+            $value = $self->_retrieve_node_param($parent, $param);
         }
     }
 
-    foreach my $ancestor ( @ancestors )
+    if( defined($node) )
     {
-        my $node = $self->{'objcache'}->get($ancestor);
-        if( defined($node) )
+        if( defined($value) )
         {
             $node->{'params'}{$param} = $value;
         }
+        else
+        {
+            $node->{'uparams'}{$param} = 1;
+        }
     }
-
-    return $self->expandNodeParam( $token, $param, $value );
+        
+    return $value;
 }
 
 
-sub expandNodeParam
+sub _expand_node_param
 {
     my $self = shift;
     my $token = shift;
@@ -430,13 +428,13 @@ sub expandNodeParam
     # are expanded by the Writer post-processing
     if( defined $value and $self->getParamProperty( $param, 'expand' ) )
     {
-        $value = $self->expandSubstitutions( $token, $param, $value );
+        $value = $self->_expand_substitutions( $token, $param, $value );
     }
     return $value;
 }
 
 
-sub expandSubstitutions
+sub _expand_substitutions
 {
     my $self = shift;
     my $token = shift;
@@ -523,19 +521,34 @@ sub getNodeParam
     my $param = shift;
     my $noclimb = shift;
 
+    my $node = $self->_node_read($token);
+    if( not defined($node) )
+    {
+        return undef;
+    }
+
+    if( defined($node->{'xparams'}{$param}) )
+    {
+        return $node->{'xparams'}{$param};
+    }
+
     my $value;
     if( $noclimb )
     {
-        $value = $self->_read_node_param( $token, $param );
-        return $self->expandNodeParam( $token, $param, $value );
+        $value = $node->{'params'}{$param};
     }
-
-    if( $self->{'is_writing'} )
+    else
     {
-        return $self->retrieveNodeParam( $token, $param );
+        $value = $self->_retrieve_node_param( $token, $param );
     }
 
-    return $self->retrieveNodeParam( $token, $param );
+    if( defined($value) )
+    {
+        $value = $self->_expand_node_param( $token, $param, $value );
+        $node->{'xparams'}{$param} = $value;
+    }
+        
+    return $value;
 }
 
 

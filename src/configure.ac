@@ -102,7 +102,7 @@ if test "$enable_pkgonly" != yes; then
    fi
 
    for module in 'Redis::Fast' \
-                 'Git::Raw 0.72' 'Git::ObjectStore 0.005' \
+                 'Git::Raw 0.72' 'Git::ObjectStore 0.007' \
                  'Cache::Ref' \
                  'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \

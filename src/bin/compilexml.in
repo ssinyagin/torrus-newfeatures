@@ -55,8 +55,7 @@ if( not $opts_ok or not (scalar(@trees) or $all_trees) or
     "  --tree=NAME     tree name(s) to compile\n",
     "  --all           compile all trees\n",
     "  --noval         disable parameter validation\n",
-    "  --force         force the compiler even if anoother " .
-        "compiler process is probably running\n",
+    "  --force         force re-processing of all XML files\n",
     "  --debug         set the log level to debug\n",
     "  --verbose       set the log level to info\n",
     "  --help          this help message\n";
@@ -95,7 +94,7 @@ foreach my $tree ( @trees )
     my $ok = 1;
     my $compiler =
         new Torrus::ConfigTree::XMLCompiler( -TreeName => $tree,
-                                             -ForceWriter => $force );
+                                             -ForceRebuild => $force );
     if( not defined( $compiler ) )
     {
         Error('Cannot initialize compiler for tree ' . $tree . '. Exiting');

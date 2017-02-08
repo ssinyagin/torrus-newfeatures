@@ -67,6 +67,11 @@ sub new
 
     bless $self, $class;
 
+    if( $options{'-ForceRebuild'} )
+    {
+        $self->{'force_rebuild'} = 1;
+    }
+    
     # set up the srcfiles branch
     $self->{'srcstore'} =
         new Git::ObjectStore(
@@ -1219,7 +1224,8 @@ sub _analyze_updates
     my $self = shift;
     my $filename = shift;
 
-    if( $self->{'srcfiles_updated'}{$filename} and
+    if( ($self->{'srcfiles_updated'}{$filename} or $self->{'force_rebuild'})
+        and
         not $self->{'srcfiles_rebuild'}{$filename} )
     {
         $self->{'srcfiles_rebuild'}{$filename} = 1;

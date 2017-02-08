@@ -89,7 +89,6 @@ dist_examples_DATA = \
 	examples/generic-netsnmp.xml \
 	examples/hpux.xml \
 	examples/monitors.xml \
-	examples/multigraph.xml \
 	examples/rainbow-schema.xml \
 	examples/servers.data \
 	examples/servers.tmpl

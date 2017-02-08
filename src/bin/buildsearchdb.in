@@ -73,6 +73,13 @@ my $store = new Git::ObjectStore(
     'author_name'  => $Torrus::ConfigTree::writerAuthorName,
     'author_email' => $Torrus::ConfigTree::writerAuthorEmail);
 
+if( $store->created_init_commit() )
+{
+    # we need to write mempack with initial commit, so that the reader
+    # can point to the top of the branch
+    $store->write_packfile();
+}
+
 # in order to delete entries, we need to read them recursively, and that
 # requires a read-only store object
 my $store_read = new Git::ObjectStore(

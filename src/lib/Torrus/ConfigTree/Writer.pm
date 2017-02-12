@@ -67,11 +67,17 @@ sub new
 
     bless $self, $class;
 
-    if( $options{'-ForceRebuild'} )
+    if( $self->{'store'}->created_init_commit() )
+    {
+        # The configtree branch is newly created. Cleanup Redis information.
+        $self->_remove_githead();
+    }
+
+    if( $options{'-ForceRebuild'} or not defined($self->currentCommit()) )
     {
         $self->{'force_rebuild'} = 1;
     }
-    
+
     # set up the srcfiles branch
     $self->{'srcstore'} =
         new Git::ObjectStore(
@@ -693,9 +699,13 @@ sub commitConfig
             $self->{'store'}->create_commit_and_packfile();
     }
 
-    if( $self->{'config_updated'} )
+    if( $self->{'config_updated'} or $self->{'force_rebuild'} )
     {
         $self->{'new_commit'} = $self->{'store'}->current_commit_id();
+    }
+
+    if( $self->{'config_updated'} )
+    {
         Debug('Wrote ' . $self->{'new_commit'} . ' in ' . $self->{'branch'});
     }
 
@@ -1444,18 +1454,14 @@ sub validate
 {
     my $self = shift;
 
-    if( not $self->{'config_updated'} )
+    my $prev_commit = $self->currentCommit();
+    if( defined($prev_commit) and
+        not $self->{'config_updated'} and
+        not $self->{'force_rebuild'} )
     {
-        if( defined( $self->currentCommit() ) )
-        {
-            return 1;
-        }
-        else
-        {
-            Error('Source files did not change, and previous ' .
-                  'validation failed');
-            return 0;
-        }
+        Debug('Nothing is changed and configuration was validated ' .
+              'previously. Skipping the validation');
+        return 1;
     }
 
     my $ok = 1;
@@ -1475,19 +1481,43 @@ sub finalize
     my $self = shift;
     my $status = shift;
 
-    if( $status and $self->{'config_updated'} )
+    if( $status )
     {
-        $self->{'redis'}->hset
-            ($self->{'redis_prefix'} . 'githeads',
-             $self->{'branch'},
-             $self->{'new_commit'});
-
-        $self->{'redis'}->publish
-            ($self->{'redis_prefix'} . 'treecommits:' . $self->treeName(),
-             $self->{'new_commit'});
-
-        Verbose('Configuration has compiled successfully');
+        if( $self->{'config_updated'} or $self->{'force_rebuild'} )
+        {
+            $self->{'redis'}->hset
+                ($self->{'redis_prefix'} . 'githeads',
+                 $self->{'branch'},
+                 $self->{'new_commit'});
+            
+            $self->{'redis'}->publish
+                ($self->{'redis_prefix'} . 'treecommits:' . $self->treeName(),
+                 $self->{'new_commit'});
+            
+            Verbose('Configuration has compiled successfully');
+        }
     }
+    else
+    {
+        my $prev_commit = $self->currentCommit();
+        if( defined($prev_commit) and $prev_commit eq $self->{'new_commit'} )
+        {
+            Error('This configuration was previously successfully validated, ' .
+                  'but now it is invalid. As a result, there is no valid ' .
+                  'configuration at all, and some processes may need a ' .
+                  'restart.');
+            $self->_remove_githead();
+        }
+    }
+    return;
+}
+
+
+sub _remove_githead
+{
+    my $self = shift;
+    $self->{'redis'}->hdel
+        ($self->{'redis_prefix'} . 'githeads', $self->{'branch'});
     return;
 }
 

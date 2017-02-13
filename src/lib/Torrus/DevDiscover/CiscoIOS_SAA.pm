@@ -252,6 +252,8 @@ sub discover
                     $value = &{$intrp->{'translate'}}( $value );
                 }
 
+                next unless defined($value);
+                
                 if( ( defined( $intrp->{'ignore-numeric'} ) and
                       $value == $intrp->{'ignore-numeric'} )
                     or

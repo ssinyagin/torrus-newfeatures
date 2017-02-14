@@ -851,7 +851,8 @@ sub _post_process_nodes
 
                 $self->commitNode();
             }
-            elsif( $dsType eq 'collector' )
+            elsif( $dsType eq 'collector' and
+                   $self->{'collectorInstances'} > 0 )
             {
                 $self->editNode($path);
 
@@ -1534,8 +1535,17 @@ sub updateAgentConfigs
         push(@branchnames, $self->_agent_branch_name('collector', $inst));
     }
 
-    push(@branchnames, $self->_agent_branch_name('monitor', 0));
+    if( Torrus::SiteConfig::mayRunMonitor($self->treeName()) )
+    {
+        push(@branchnames, $self->_agent_branch_name('monitor', 0));
+    }
 
+    if( scalar(@branchnames) == 0 )
+    {
+        Debug('This tree does not run any agents');
+        return;
+    }
+    
     # open ObjectStore writer objects for every agent branch
 
     foreach my $branchname (@branchnames)

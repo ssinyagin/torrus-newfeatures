@@ -46,7 +46,7 @@ sub new
     $self->{'tree_name'} = $options{'-TreeName'};
 
     $self->{'redis_hname'} =
-        $Torrus::Global::redisPrefix . 'monitor_alarms:' . $options{'-Tree'};
+        $Torrus::Global::redisPrefix . 'monitor_alarms:' . $self->{'tree_name'};
 
     return $self;
 }

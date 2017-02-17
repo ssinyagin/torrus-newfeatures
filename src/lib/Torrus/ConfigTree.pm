@@ -1115,7 +1115,7 @@ sub tsetAddMember
     my $token = shift;
     my $origin = shift;
 
-    $self->{'redis'}->hget($self->{'redis_prefix'} . 'tset:' .
+    $self->{'redis'}->hset($self->{'redis_prefix'} . 'tset:' .
                            $self->treeName() . ':' . $tset,
                            $token,
                            $origin);

@@ -1570,7 +1570,7 @@ sub updateAgentConfigs
     my $ref = Git::Raw::Reference->lookup($refname, $self->{'store'}->repo());
 
     my $old_commit_id = '';
-    if( defined($ref) )
+    if( defined($ref) and not $self->{'force_rebuild'} )
     {
         $old_commit_id = $ref->peel('commit')->id();
     }

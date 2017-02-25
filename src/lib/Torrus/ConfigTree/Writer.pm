@@ -1718,7 +1718,8 @@ sub _write_agent_configs
         push( @branches, $branchname );
     }
 
-    if( $dsType ne 'rrd-multigraph' )
+    if( $dsType ne 'rrd-multigraph' and
+        Torrus::SiteConfig::mayRunMonitor($self->treeName()) )
     {
         # monitor
         my $mlist = $self->getNodeParam($token, 'monitor');

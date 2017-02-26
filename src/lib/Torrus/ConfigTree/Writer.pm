@@ -392,6 +392,10 @@ sub setNodeParam
         $self->{'editing'}{'params'}{$param} = $value;
         $self->{'editing_dirty'} = 1;
         $self->{'editing_dirty_params'} = 1;
+
+        # flush cached values
+        $self->{'editing'}{'xparams'} = {};
+        $self->{'editing'}{'uparams'} = {};
     }
 
     return;
@@ -440,10 +444,6 @@ sub commitNode
 
         if( $self->{'editing_dirty'} )
         {
-            # flush cached values
-            $self->{'editing'}{'xparams'} = {};
-            $self->{'editing'}{'uparams'} = {};
-
             my $data = {
                 'is_subtree' => $self->{'editing'}{'is_subtree'},
                 'parent' => $self->{'editing'}{'parent'},

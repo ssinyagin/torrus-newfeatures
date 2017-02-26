@@ -440,6 +440,10 @@ sub commitNode
 
         if( $self->{'editing_dirty'} )
         {
+            # flush cached values
+            $self->{'editing'}{'xparams'} = {};
+            $self->{'editing'}{'uparams'} = {};
+
             my $data = {
                 'is_subtree' => $self->{'editing'}{'is_subtree'},
                 'parent' => $self->{'editing'}{'parent'},

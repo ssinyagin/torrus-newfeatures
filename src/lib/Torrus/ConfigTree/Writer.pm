@@ -392,10 +392,6 @@ sub setNodeParam
         $self->{'editing'}{'params'}{$param} = $value;
         $self->{'editing_dirty'} = 1;
         $self->{'editing_dirty_params'} = 1;
-
-        # flush cached values
-        $self->{'editing'}{'xparams'} = {};
-        $self->{'editing'}{'uparams'} = {};
     }
 
     return;

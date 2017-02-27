@@ -407,7 +407,7 @@ sub _retrieve_node_param
         {
             $node->{'params'}{$param} = $value;
         }
-        else
+        elsif( not $self->{'iamwriter'} )
         {
             $node->{'uparams'}{$param} = 1;
         }
@@ -545,7 +545,10 @@ sub getNodeParam
     if( defined($value) )
     {
         $value = $self->_expand_node_param( $token, $param, $value );
-        $node->{'xparams'}{$param} = $value;
+        if( not $self->{'iamwriter'} )
+        {
+            $node->{'xparams'}{$param} = $value;
+        }
     }
         
     return $value;

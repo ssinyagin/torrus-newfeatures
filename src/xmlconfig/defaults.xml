@@ -52,6 +52,7 @@
     <prop param="tokenset-member"    prop="remspace" value="1"/>
     <prop param="value-map"          prop="remspace" value="1"/>
     <prop param="health-status-nodeid"  prop="remspace" value="1"/>
+    <prop param="ext-service-trees"  prop="remspace" value="1"/>
 
     <!-- Parameters where repeting space is replaced with single space -->
     <prop param="rrd-create-rra"     prop="squashspace" value="1"/>

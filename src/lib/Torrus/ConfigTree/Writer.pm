@@ -45,12 +45,7 @@ our %multigraph_remove_space =
     ('ds-expr-' => 1,
      'graph-legend-' => 0);
 
-
-# instance of Torrus::ServiceID object, if needed
-my $srvIdParams;
-
-# tree names where we initialized service IDs
-my %srvIdInitialized;
+my $srvIdParams = new Torrus::ServiceID;
 
 
 sub new
@@ -107,6 +102,8 @@ sub new
     $self->{'srcincludes'} = $self->_read_json('srcincludes');
     $self->{'srcincludes'} = {} unless defined $self->{'srcincludes'};
 
+    $self->{'serviceid_tokens'} = $srvIdParams->getAllTokens();
+    
     return $self;
 }
 
@@ -875,7 +872,7 @@ sub _post_process_nodes
                     if( not defined( $hashString ) )
                     {
                         Error('collector-instance-hashstring is not defined ' .
-                              'in ' . $self->path( $token ));
+                              'in ' . $path);
                         $hashString = '';
                     }
 
@@ -902,7 +899,7 @@ sub _post_process_nodes
                         if( not defined( $val ) )
                         {
                             Error('Mandatory parameter ' . $param . ' is not '.
-                                  ' defined in ' . $self->path( $token ));
+                                  ' defined in ' . $path);
                             $ok = 0;
                         }
                         else
@@ -918,8 +915,7 @@ sub _post_process_nodes
                         if( $max < $min )
                         {
                             Error('collector-timeoffset-max is less than ' .
-                                  'collector-timeoffset-min in ' .
-                                  $self->path( $token ));
+                                  'collector-timeoffset-min in ' . $path);
                             $ok = 0;
                         }
                         else
@@ -957,17 +953,10 @@ sub _post_process_nodes
                 {
                     if( $stype eq 'ext' )
                     {
-                        if( not defined( $srvIdParams ) )
-                        {
-                            $srvIdParams =
-                                new Torrus::ServiceID( -WriteAccess => 1 );
-                        }
-
                         my $srvTrees =
                             $self->getNodeParam($token, 'ext-service-trees');
 
-                        if( not defined( $srvTrees ) or
-                            length( $srvTrees ) == 0 )
+                        if( not defined($srvTrees) or $srvTrees eq '' )
                         {
                             $srvTrees = $self->treeName();
                         }
@@ -980,49 +969,28 @@ sub _post_process_nodes
                             if( not Torrus::SiteConfig::treeExists($srvTree) )
                             {
                                 Error
-                                    ('Error processing ext-service-trees' .
-                                     'for ' . $self->path( $token ) .
-                                     ': tree ' . $srvTree .
+                                    ('Error processing ext-service-trees ' .
+                                     'for ' . $path . ': tree ' . $srvTree .
                                      ' does not exist');
                                 $ok = 0;
-                            }
-                            else
-                            {
-                                if( not $srvIdInitialized{$srvTree} )
-                                {
-                                    $srvIdParams->cleanAllForTree
-                                        ( $srvTree );
-                                    $srvIdInitialized{$srvTree} = 1;
-                                }
-                                else
-                                {
-                                    if( $srvIdParams->idExists( $serviceid,
-                                                                $srvTree ) )
-                                    {
-                                        Error('Duplicate ServiceID: ' .
-                                              $serviceid . ' in tree ' .
-                                              $srvTree);
-                                        $ok = 0;
-                                    }
-                                }
                             }
                         }
 
                         if( $ok )
                         {
-                            # sorry for ackward Emacs auto-indent
+                            my $dstype =
+                                $self->getNodeParam($token, 'ext-dstype');
+                            my $units =
+                                $self->getNodeParam($token,
+                                                    'ext-service-units');
                             my $params = {
                                 'trees' => $srvTrees,
                                 'token' => $token,
-                                'dstype' =>
-                                    $self->getNodeParam($token,
-                                                        'ext-dstype'),
-                                    'units' =>
-                                    $self->getNodeParam
-                                    ($token, 'ext-service-units')
-                                };
+                                'dstype' => $dstype,
+                                'units' => $units,
+                            };
 
-                            $srvIdParams->add( $serviceid, $params );
+                            $ok = $srvIdParams->set( $serviceid, $params );
                         }
                     }
                 }
@@ -1447,6 +1415,11 @@ sub _delete_node
         $self->commitNode();
     }
 
+    if( defined($self->{'serviceid_tokens'}{$token}) )
+    {
+        $srvIdParams->tokenDeleted($token);
+    }
+    
     return;
 }
 

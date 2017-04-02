@@ -329,7 +329,12 @@ reading.
 
 =item * C<serviceid_params> is a hash containing properties for each
   Service ID (exported collector information, usually stored in an SQL
-  database) as described below.
+  database). The keys are Service IDs, and values are JSON hashes
+  describing the properties. Known parameters are: C<trees>, C<token>,
+  C<dstype>, C<units>.
+
+=item * C<serviceid_tokens> is a hash with tokens as keys and Service ID
+  as values.
 
 =item * C<snmp_failures:I<TREE>> -- a hash listing SNMP failures in the
   collector, as described below.

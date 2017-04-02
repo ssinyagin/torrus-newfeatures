@@ -24,100 +24,115 @@ use strict;
 use warnings;
 
 use Torrus::Log;
+use Torrus::Redis;
+use JSON;
 
 
 sub new
 {
     my $self = {};
     my $class = shift;
-    my %options = @_;
     bless $self, $class;
 
-    my $writing = $options{'-WriteAccess'};
-
-    $self->{'db_params'} =
-        new Torrus::DB( 'serviceid_params',
-                        -Btree => 1,
-                        -WriteAccess => $writing );
-    defined( $self->{'db_params'} ) or return( undef );
-
-    $self->{'is_writing'} = $writing;
-
+    $self->{'json'} = JSON->new->canonical(1)->allow_nonref(1);
+    
+    $self->{'redis'} =
+        Torrus::Redis->new(server => $Torrus::Global::redisServer);
+    $self->{'params_hname'} =
+        $Torrus::Global::redisPrefix . 'serviceid_params';
+    $self->{'tokens_hname'} =
+        $Torrus::Global::redisPrefix . 'serviceid_tokens';
+    
     return $self;
 }
-
-
-sub DESTROY
-{
-    my $self = shift;
-    Debug('Destroyed ServiceID object');
-    delete $self->{'db_params'};
-    return;
-}
-
 
 
 sub idExists
 {
     my $self = shift;
     my $serviceid = shift;
-    my $tree = shift;
+    return defined($self->{'redis'}->hget($self->{'params_hname'},
+                                          $serviceid));
+}
 
-    if( defined($tree) )
-    {
-        return $self->{'db_params'}->searchList( 't:'.$tree, $serviceid );
-    }
 
-    return $self->{'db_params'}->searchList( 'a:', $serviceid );
-}    
-    
-
-sub add
+sub set
 {
     my $self = shift;
     my $serviceid = shift;
-    my $parameters = shift;
+    my $params = shift;
 
-    $self->{'db_params'}->addToList( 'a:', $serviceid );
-    
-    my $trees = $parameters->{'trees'};
+    my $redis = $self->{'redis'};
+    my $old_params = $redis->hget($self->{'params_hname'}, $serviceid);
 
-    foreach my $tree ( split(/\s*,\s*/o, $trees) )
+    if( defined($old_params) )
     {
-        $self->{'db_params'}->addToList( 't:'.$tree, $serviceid );
+        $old_params = $self->{'json'}->decode($old_params);
+        if(defined($old_params->{'token'}) )
+        {
+            Error('Cannot set new parameters for ServiceID ' . $serviceid .
+                  ' while it is assigned to token ' . $old_params->{'token'});
+            return 0;
+        }
     }
 
-    foreach my $param ( keys %{$parameters} )
+    $redis->hset($self->{'params_hname'}, $serviceid,
+                 $self->{'json'}->encode($params));
+
+    if( defined($params->{'token'}) )
     {
-        my $val = $parameters->{$param};
+        $redis->hset($self->{'tokens_hname'}, $params->{'token'},
+                     $serviceid);
+    }
         
-        if( defined( $val ) and length( $val ) > 0 )
-        {
-            $self->{'db_params'}->put( 'p:'.$serviceid.':'.$param, $val );
-            $self->{'db_params'}->addToList( 'P:'.$serviceid, $param );
-        }
+    return 1;
+}
+
+
+sub tokenDeleted
+{
+    my $self = shift;
+    my $token = shift;
+
+    my $redis = $self->{'redis'};
+    
+    my $serviceid = $redis->hget($self->{'tokens_hname'}, $token);
+    if( defined($serviceid) )
+    {
+        my $params = $self->{'json'}->decode(
+            $redis->hget($self->{'params_hname'}, $serviceid));
+        delete $params->{'token'};
+        
+        $redis->hset($self->{'params_hname'}, $serviceid,
+                     $self->{'json'}->encode($params));
+        $redis->hdel($self->{'tokens_hname'}, $token);
     }
     return;
 }
+        
 
+sub getAllTokens
+{
+    my $self = shift;
+    return { $self->{'redis'}->hgetall($self->{'tokens_hname'}) };
+}
+             
+    
 
 sub getParams
 {
     my $self = shift;
     my $serviceid = shift;
 
-    my $ret = {};
-    my $plist = $self->{'db_params'}->get( 'P:'.$serviceid );
-    if( defined($plist) )
+    my $params = $self->{'redis'}->hget($self->{'params_hname'}, $serviceid);
+
+    if( defined($params) )
     {
-        foreach my $param ( split(',', $plist ) )
-        {
-            $ret->{$param} =
-                $self->{'db_params'}->get( 'p:'.$serviceid.':'.$param );
-        }
-    }    
-    return $ret;
-}    
+        return $self->{'json'}->decode($params);
+    }
+
+    return {};
+}
 
 
 sub getAllForTree
@@ -126,56 +141,20 @@ sub getAllForTree
     my $tree = shift;
 
     my $ret = [];
-    my $idlist = $self->{'db_params'}->get('t:'.$tree);
-    if( defined( $idlist ) )
+    my %all = $self->{'redis'}->hgetall($self->{'params_hname'});
+
+    foreach my $serviceid (sort keys %all)
     {
-        push( @{$ret}, split( ',', $idlist ) );
+        my $params = $self->{'json'}->decode($all{$serviceid});
+        if( defined($params->{'trees'}) and
+            grep {$_ eq $tree} split(',', $params->{'trees'}) )
+        {
+            push( @{$ret}, $serviceid);
+        }
     }
     return $ret;
 }
 
-
-sub cleanAllForTree
-{
-    my $self = shift;
-    my $tree = shift;
-
-    my $idlist = $self->{'db_params'}->get('t:'.$tree);
-    if( defined( $idlist ) )
-    {
-        foreach my $serviceid ( split( ',', $idlist ) )
-        {
-            # A ServiceID may belong to several trees.
-            # delete it from all other trees.
-
-            my $srvTrees =
-                $self->{'db_params'}->get( 'p:'.$serviceid.':trees' );
-            
-            foreach my $srvTree ( split(/\s*,\s*/o, $srvTrees) )
-            {
-                if( $srvTree ne $tree )
-                {
-                    $self->{'db_params'}->delFromList( 't:'.$srvTree,
-                                                       $serviceid );
-                }
-            }            
-            
-            $self->{'db_params'}->delFromList( 'a:', $serviceid );
-            
-            my $plist = $self->{'db_params'}->get( 'P:'.$serviceid );
-
-            foreach my $param ( split(',', $plist ) )
-            {
-                $self->{'db_params'}->del( 'p:'.$serviceid.':'.$param );
-            }
-
-            $self->{'db_params'}->del( 'P:'.$serviceid );
-            
-        }
-        $self->{'db_params'}->deleteList('t:'.$tree);
-    }
-    return;
-}
 
             
             

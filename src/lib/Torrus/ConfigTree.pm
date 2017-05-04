@@ -599,8 +599,14 @@ sub getParent
     my $self = shift;
     my $token = shift;
 
+    if( $self->isTset($token) )
+    {
+        return undef;
+    }
+
     my $node = $self->_node_read($token);
     my $parent = $node->{'parent'};
+    
     if( $parent eq '' )
     {
         return undef;

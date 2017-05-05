@@ -237,8 +237,13 @@ sub buildConfig
         }
 
         my @templates =
-            ('RFC2790_HOST_RESOURCES::hr-system-performance-subtree',
-             'RFC2790_HOST_RESOURCES::hr-system-uptime');
+            ('RFC2790_HOST_RESOURCES::hr-system-performance-subtree');
+
+        unless( $devdetails->paramEnabled('RFC2790_HOST_RESOURCES::suppress-uptime') )
+        {
+            push( @templates, 'RFC2790_HOST_RESOURCES::hr-system-uptime' );
+        };
+
         if( $devdetails->hasCap('hrSystemNumUsers') )
         {
             push( @templates, 'RFC2790_HOST_RESOURCES::hr-system-num-users' );

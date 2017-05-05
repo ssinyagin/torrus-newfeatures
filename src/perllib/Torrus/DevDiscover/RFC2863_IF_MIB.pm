@@ -148,6 +148,7 @@ sub discover
             {
                 $interface->{'ifSpeed'} = $speed;
                 $interface->{'NormalizedSpeed'} = $speed;
+                $interface->{'ifSpeedMonitoring'} = 1;
             }
         }
     }
@@ -196,6 +197,7 @@ sub discover
                 {
                     $interface->{'NormalizedSpeed'} = $hspeed * 1000000;
                 }
+                $interface->{'ifSpeedMonitoring'} = 1;
             }
         }
 
@@ -1198,6 +1200,10 @@ sub buildConfig
                                               $summary, $intfNode );
                 }
             }
+        } else {
+            Debug('Excluding interface: ' .
+                  $interface->{$data->{'nameref'}{'ifReferenceName'}});
+            delete $data->{'interfaces'}{$ifIndex};
         }
     }
     

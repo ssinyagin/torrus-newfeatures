@@ -38,16 +38,19 @@
 
 
 <definitions>
+
   <!-- IF-MIB:ifTable  -->
   <def name="ifDescr"           value="1.3.6.1.2.1.2.2.1.2" />
   <def name="ifSpeed"           value="1.3.6.1.2.1.2.2.1.5" />
   <def name="ifPhysAddress"     value="1.3.6.1.2.1.2.2.1.6" />
   <def name="ifInOctets"        value="1.3.6.1.2.1.2.2.1.10" />
   <def name="ifInUcastPkts"     value="1.3.6.1.2.1.2.2.1.11" />
+  <def name="ifInNUcastPkts"    value="1.3.6.1.2.1.2.2.1.12" />
   <def name="ifInDiscards"      value="1.3.6.1.2.1.2.2.1.13" />
   <def name="ifInErrors"        value="1.3.6.1.2.1.2.2.1.14" />
   <def name="ifOutOctets"       value="1.3.6.1.2.1.2.2.1.16" />
   <def name="ifOutUcastPkts"    value="1.3.6.1.2.1.2.2.1.17" />
+  <def name="ifOutNUcastPkts"   value="1.3.6.1.2.1.2.2.1.18" />
   <def name="ifOutDiscards"     value="1.3.6.1.2.1.2.2.1.19" />
   <def name="ifOutErrors"       value="1.3.6.1.2.1.2.2.1.20" />
 
@@ -58,7 +61,15 @@
   <def name="ifHCOutOctets"     value="1.3.6.1.2.1.31.1.1.1.10" />
   <def name="ifHCOutUcastPkts"  value="1.3.6.1.2.1.31.1.1.1.11" />
   <def name="ifHighSpeed"       value="1.3.6.1.2.1.31.1.1.1.15" />
-  
+  <def name="ifInMulticastPkts"   value="1.3.6.1.2.1.31.1.1.1.2" />
+  <def name="ifInBroadcastPkts"   value="1.3.6.1.2.1.31.1.1.1.3" />
+  <def name="ifOutMulticastPkts"  value="1.3.6.1.2.1.31.1.1.1.4" />
+  <def name="ifOutBroadcastPkts"  value="1.3.6.1.2.1.31.1.1.1.5" />
+  <def name="ifHCInMulticastPkts"   value="1.3.6.1.2.1.31.1.1.1.8" />
+  <def name="ifHCInBroadcastPkts"   value="1.3.6.1.2.1.31.1.1.1.9" />
+  <def name="ifHCOutMulticastPkts"  value="1.3.6.1.2.1.31.1.1.1.12" />
+  <def name="ifHCOutBroadcastPkts"  value="1.3.6.1.2.1.31.1.1.1.13" />
+
   <!-- RFC1213-MIB:ipAddrTable -->
   <def name="ipAdEntIfIndex"   value="1.3.6.1.2.1.4.20.1.2" />
 
@@ -111,6 +122,21 @@
     <param name="overview-page-title-errors"
            value="Interface errors"/>
 
+    <param name="overview-subleave-name-packets"  value="InOut_Packets"/>
+    <param name="overview-shortcut-text-packets"  value="All packets"/>
+    <param name="overview-shortcut-title-packets" value="Show all interface packets on one page"/>
+    <param name="overview-page-title-packets"     value="Interface packets"/>
+
+    <param name="overview-subleave-name-mpackets"  value="InOut_MPackets"/>
+    <param name="overview-shortcut-text-mpackets"  value="All multicast packets"/>
+    <param name="overview-shortcut-title-mpackets" value="Show all interface multicast packets on one page"/>
+    <param name="overview-page-title-mpackets"     value="Interface packets"/>
+
+    <param name="overview-subleave-name-bpackets"  value="InOut_BPackets"/>
+    <param name="overview-shortcut-text-bpackets"  value="All broadcast packets"/>
+    <param name="overview-shortcut-title-bpackets" value="Show all interface broadcast packets on one page"/>
+    <param name="overview-page-title-bpackets"     value="Interface packets"/>
+
     <param name="overview-subleave-name-bandwidth"
            value="Bandwidth_Usage"/>
     <param name="overview-shortcut-text-bandwidth"
@@ -119,7 +145,7 @@
            value="Show all bandwidth usage on one page"/>
     <param name="overview-page-title-bandwidth"
            value="Bandwidth usage"/>
-           
+
     <param name="descriptive-nickname" value="%system-id%:%interface-name%"/>
     <param name="data-file" value="%system-id%_%interface-nick%_if-mib.rrd" />
     <param name="graph-title" value="%descriptive-nickname%" />
@@ -218,6 +244,29 @@
       <param name="graph-lower-limit" value="0" />
       <param name="precedence"        value="880" />
       <param name="nodeid"            value="%nodeid-interface%//outpackets"/>
+    </leaf>
+
+    <leaf name="InOut_Packets">
+      <param name="comment" value="Input and Output packets per second graphs" />
+      <param name="vertical-label"   value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="rrd-hwpredict"    value="disabled" />
+      <param name="precedence"       value="1000" />
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="in,out" />
+
+      <param name="ds-expr-in"       value="{Packets_In}" />
+      <param name="graph-legend-in"  value="Packets per second in" />
+      <param name="line-style-in"    value="##BpsIn" />
+      <param name="line-color-in"    value="##BpsIn" />
+      <param name="line-order-in"    value="1" />
+                                                                            
+      <param name="ds-expr-out"      value="{Packets_Out}" />
+      <param name="graph-legend-out" value="Packets per second out" />
+      <param name="line-style-out"   value="##BpsOut" />
+      <param name="line-color-out"   value="##BpsOut" />
+      <param name="line-order-out"   value="2" />
+                                                                                                          
     </leaf>
   </template>
 
@@ -321,6 +370,123 @@
     </leaf>
   </template>
 
+  <template name="iftable-mucast-packets">
+    <leaf name="Packets_In_Multi">
+      <param name="snmp-object"       value="$ifInMulticastPkts.%ifindex-map%" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-multicast.rrd" />
+      <param name="rrd-ds"            value="ifHCInMPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER32" />
+      <param name="comment" value="Input multicast packet counter for the interface" />
+      <param name="graph-legend"      value="Packets in" />
+      <param name="vertical-label"    value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="890" />
+      <param name="nodeid"            value="%nodeid-interface%//inmulti"/>
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="Packets_Out_Multi">
+      <param name="snmp-object"   value="$ifOutMulticastPkts.%ifindex-map%" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-multicast.rrd" />
+      <param name="rrd-ds"            value="ifHCOutMPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER32" />
+      <param name="comment" value="Output multicast packet counter for the interface" />
+      <param name="graph-legend"      value="Packets out" />
+      <param name="vertical-label"    value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="880" />
+      <param name="nodeid"            value="%nodeid-interface%//outmulti"/>
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="InOut_MPackets">
+      <param name="comment" value="Input and Output multicast packets per second graphs" />
+      <param name="vertical-label"   value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="rrd-hwpredict"    value="disabled" />
+      <param name="precedence"       value="1000" />
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="in,out" />
+
+      <param name="ds-expr-in"       value="{Packets_In_Multi}" />
+      <param name="graph-legend-in"  value="Packets per second in" />
+      <param name="line-style-in"    value="##BpsIn" />
+      <param name="line-color-in"    value="##BpsIn" />
+      <param name="line-order-in"    value="1" />
+
+      <param name="ds-expr-out"      value="{Packets_Out_Multi}" />
+      <param name="graph-legend-out" value="Packets per second out" />
+      <param name="line-style-out"   value="##BpsOut" />
+      <param name="line-color-out"   value="##BpsOut" />
+      <param name="line-order-out"   value="2" />
+      <param name="nodeid"            value="%nodeid-interface%//inoutmulti"/>
+    </leaf>
+
+  </template>
+
+  <template name="iftable-brdcast-packets">
+    <leaf name="Packets_In_Brd">
+      <param name="snmp-object"       value="$ifInBroadcastPkts.%ifindex-map%" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-brdcst.rrd" />
+      <param name="rrd-ds"            value="ifHCInBPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER32" />
+      <param name="comment" value="Input broadcast packet counter for the interface" />
+      <param name="graph-legend"      value="Packets in" />
+      <param name="vertical-label"    value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="890" />
+      <param name="nodeid"            value="%nodeid-interface%//inbrdcst"/>
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="Packets_Out_Brd">
+      <param name="snmp-object"   value="$ifOutBroadcastPkts.%ifindex-map%" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-brdcst.rrd" />
+      <param name="rrd-ds"            value="ifHCOutBPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER32" />
+      <param name="comment" value="Output broadcast packet counter for the interface" />
+      <param name="graph-legend"      value="Packets out" />
+      <param name="vertical-label"    value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="880" />
+      <param name="nodeid"            value="%nodeid-interface%//outbrdcst"/>
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="InOut_BPackets">
+      <param name="comment" value="Input and Output broadcast packets per second graphs" />
+      <param name="vertical-label"   value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="rrd-hwpredict"    value="disabled" />
+      <param name="precedence"       value="1000" />
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="in,out" />
+
+      <param name="ds-expr-in"       value="{Packets_In_Brd}" />
+      <param name="graph-legend-in"  value="Packets per second in" />
+      <param name="line-style-in"    value="##BpsIn" />
+      <param name="line-color-in"    value="##BpsIn" />
+      <param name="line-order-in"    value="1" />
+
+      <param name="ds-expr-out"      value="{Packets_Out_Brd}" />
+      <param name="graph-legend-out" value="Packets per second out" />
+      <param name="line-style-out"   value="##BpsOut" />
+      <param name="line-color-out"   value="##BpsOut" />
+      <param name="line-order-out"   value="2" />
+
+      <param name="nodeid"            value="%nodeid-interface%//inoutbrdcst"/>
+
+    </leaf>
+  </template>
+
   <!-- =====  64-bit counters ===== -->
   
   <template name="ifxtable-hcoctets">
@@ -414,9 +580,29 @@
       <param name="precedence"        value="880" />
       <param name="nodeid"            value="%nodeid-interface%//outpackets"/>
     </leaf>
+
+    <leaf name="InOut_Packets">
+      <param name="comment" value="Input and Output packets per second graphs" />
+      <param name="vertical-label"   value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="rrd-hwpredict"    value="disabled" />
+      <param name="precedence"       value="1000" />
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="in,out" />
+      <param name="ds-expr-in"       value="{Packets_In}" />
+      <param name="graph-legend-in"  value="Packets per second in" />
+      <param name="line-style-in"    value="##BpsIn" />
+      <param name="line-color-in"    value="##BpsIn" />
+      <param name="line-order-in"    value="1" />
+      <param name="ds-expr-out"      value="{Packets_Out}" />
+      <param name="graph-legend-out" value="Packets per second out" />
+      <param name="line-style-out"   value="##BpsOut" />
+      <param name="line-color-out"   value="##BpsOut" />
+      <param name="line-order-out"   value="2" />
+    </leaf>
+
   </template>
 
-  
   <template name="iftable-ifhighspeed">
     <leaf name="Speed">
       <param name="snmp-object"       value="$ifHighSpeed.%ifindex-map%" />
@@ -505,7 +691,139 @@
     </leaf>
   </template>
 
-  
+  <template name="ifxtable-hcmucast-packets">
+    <leaf name="Packets_In_Multi">
+      <param name="snmp-object"       value="$ifHCInMulticastPkts.%ifindex-map%" />
+      <param name="snmp-object-type"  value="COUNTER64" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-multi.rrd" />
+      <param name="rrd-ds"            value="ifHCInMPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER64" />
+      <param name="ext-counter-max"   value="1e15"/>
+      <param name="rrd-create-max"    value="1e15"/>
+      <param name="comment" value="Input multicast packet counter for the interface" />
+      <param name="graph-legend"      value="Packets in" />
+      <param name="vertical-label"    value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="890" />
+      <param name="nodeid"            value="%nodeid-interface%//inmulti"/>
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="Packets_Out_Multi">
+      <param name="snmp-object"   value="$ifHCOutMulticastPkts.%ifindex-map%" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-multi.rrd" />
+      <param name="snmp-object-type"  value="COUNTER64" />
+      <param name="rrd-ds"            value="ifHCOutMPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER64" />
+      <param name="rrd-create-max"    value="1e15"/>
+      <param name="ext-counter-max"   value="1e15"/>
+      <param name="comment" value="Output multicast packet counter for the interface" />
+      <param name="nodeid"            value="%nodeid-interface%//outmulti"/>
+      <param name="graph-legend"      value="Packets out" />
+      <param name="vertical-label"    value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="880" />
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="InOut_MPackets">
+      <param name="comment" value="Input and Output multicast packets per second graphs" />
+      <param name="vertical-label"   value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="rrd-hwpredict"    value="disabled" />
+      <param name="precedence"       value="1000" />
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="in,out" />
+
+      <param name="ds-expr-in"       value="{Packets_In_Multi}" />
+      <param name="graph-legend-in"  value="Packets per second in" />
+      <param name="line-style-in"    value="##BpsIn" />
+      <param name="line-color-in"    value="##BpsIn" />
+      <param name="line-order-in"    value="1" />
+
+      <param name="ds-expr-out"      value="{Packets_Out_Multi}" />
+      <param name="graph-legend-out" value="Packets per second out" />
+      <param name="line-style-out"   value="##BpsOut" />
+      <param name="line-color-out"   value="##BpsOut" />
+      <param name="line-order-out"   value="2" />
+
+      <param name="nodeid"            value="%nodeid-interface%//inoutmulti"/>
+    </leaf>
+
+  </template>
+
+  <template name="ifxtable-hcbrdcast-packets">
+    <leaf name="Packets_In_Brd">
+      <apply-template name="rfc2863-ifmib-hostlevel"/>
+      <param name="snmp-object"       value="$ifHCInBroadcastPkts.%ifindex-map%" />
+      <param name="snmp-object-type"  value="COUNTER64" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-brdcst.rrd" />
+      <param name="rrd-ds"            value="ifHCInBPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER64" />
+      <param name="ext-counter-max"   value="1e15"/>
+      <param name="rrd-create-max"    value="1e15"/>
+      <param name="comment" value="Input broadcast packet counter for the interface" />
+      <param name="graph-legend"      value="Packets in" />
+      <param name="vertical-label"    value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="890" />
+      <param name="nodeid"            value="%nodeid-interface%//inbrdcst"/>
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="Packets_Out_Brd">
+      <apply-template name="rfc2863-ifmib-hostlevel"/>
+      <param name="snmp-object"   value="$ifHCOutBroadcastPkts.%ifindex-map%" />
+      <param name="snmp-object-type"  value="COUNTER64" />
+      <param name="data-file"
+        value="%system-id%_%interface-nick%_if-brdcst.rrd" />
+      <param name="rrd-ds"            value="ifHCOutBPkts" />
+      <param name="rrd-create-dstype" value="COUNTER" />
+      <param name="ext-dstype"        value="COUNTER64" />
+      <param name="rrd-create-max"    value="1e15"/>
+      <param name="ext-counter-max"   value="1e15"/>
+      <param name="comment" value="Output broadcast packet counter for the interface" />
+      <param name="nodeid"            value="%nodeid-interface%//outbrdcst"/>
+      <param name="graph-legend"      value="Packets out" />
+      <param name="vertical-label"    value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="precedence"        value="880" />
+      <param name="nodeid"            value="%nodeid-interface%//outbrdcst"/>
+      <param name="hidden" value="yes" />
+    </leaf>
+
+    <leaf name="InOut_BPackets">
+      <param name="comment" value="Input and Output broadcast packets per second graphs" />
+      <param name="vertical-label"   value="pps" />
+      <param name="graph-lower-limit" value="0" />
+      <param name="rrd-hwpredict"    value="disabled" />
+      <param name="precedence"       value="1000" />
+      <param name="ds-type"          value="rrd-multigraph" />
+      <param name="ds-names"         value="in,out" />
+
+      <param name="ds-expr-in"       value="{Packets_In_Brd}" />
+      <param name="graph-legend-in"  value="Packets per second in" />
+      <param name="line-style-in"    value="##BpsIn" />
+      <param name="line-color-in"    value="##BpsIn" />
+      <param name="line-order-in"    value="1" />
+
+      <param name="ds-expr-out"      value="{Packets_Out_Brd}" />
+      <param name="graph-legend-out" value="Packets per second out" />
+      <param name="line-style-out"   value="##BpsOut" />
+      <param name="line-color-out"   value="##BpsOut" />
+      <param name="line-order-out"   value="2" />
+
+      <param name="nodeid"            value="%nodeid-interface%//inoutbrdcst"/>
+    </leaf>
+  </template>
+
+
   <!-- ********************************************************************
 
   Templates for read-only access to RRD files

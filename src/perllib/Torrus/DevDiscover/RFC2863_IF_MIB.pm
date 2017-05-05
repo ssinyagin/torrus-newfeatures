@@ -22,7 +22,7 @@ package Torrus::DevDiscover::RFC2863_IF_MIB;
 
 use strict;
 use warnings;
-
+use Data::Dumper;
 use Torrus::Log;
 
 
@@ -46,10 +46,12 @@ our %oiddef =
      'ifOperStatus'     => '1.3.6.1.2.1.2.2.1.8',
      'ifInOctets'       => '1.3.6.1.2.1.2.2.1.10',
      'ifInUcastPkts'    => '1.3.6.1.2.1.2.2.1.11',
+     'ifInNUcastPkts'   => '1.3.6.1.2.1.2.2.1.12',
      'ifInDiscards'     => '1.3.6.1.2.1.2.2.1.13',
      'ifInErrors'       => '1.3.6.1.2.1.2.2.1.14',
      'ifOutOctets'      => '1.3.6.1.2.1.2.2.1.16',
      'ifOutUcastPkts'   => '1.3.6.1.2.1.2.2.1.17',
+     'ifOutNUcastPkts'  => '1.3.6.1.2.1.2.2.1.18',
      'ifOutDiscards'    => '1.3.6.1.2.1.2.2.1.19',
      'ifOutErrors'      => '1.3.6.1.2.1.2.2.1.20',
      'ifXTable'         => '1.3.6.1.2.1.31.1.1',
@@ -58,11 +60,23 @@ our %oiddef =
      'ifHCInUcastPkts'  => '1.3.6.1.2.1.31.1.1.1.7',
      'ifHCOutOctets'    => '1.3.6.1.2.1.31.1.1.1.10',
      'ifHCOutUcastPkts' => '1.3.6.1.2.1.31.1.1.1.11',
-     'ifHighSpeed'      => '1.3.6.1.2.1.31.1.1.1.15',     
-     'ifAlias'          => '1.3.6.1.2.1.31.1.1.1.18'
+     'ifHighSpeed'      => '1.3.6.1.2.1.31.1.1.1.15',
+     'ifAlias'          => '1.3.6.1.2.1.31.1.1.1.18',
+     'ifInMulticastPkts'  => '1.3.6.1.2.1.31.1.1.1.2',
+     'ifInBroadcastPkts'  => '1.3.6.1.2.1.31.1.1.1.3',
+     'ifOutMulticastPkts' => '1.3.6.1.2.1.31.1.1.1.4',
+     'ifOutBroadcastPkts' => '1.3.6.1.2.1.31.1.1.1.5',
+     'ifHCInMulticastPkts'   => '1.3.6.1.2.1.31.1.1.1.8',
+     'ifHCInBroadcastPkts'   => '1.3.6.1.2.1.31.1.1.1.9',
+     'ifHCOutMulticastPkts'  => '1.3.6.1.2.1.31.1.1.1.12',
+     'ifHCOutBroadcastPkts'  => '1.3.6.1.2.1.31.1.1.1.13'
      );
 
+our $includeBroadcastPackets;
 
+our $includeMulticastPackets;
+
+our $PacketsSummary;
 
 # Just curious, are there any devices without ifTable?
 sub checkdevtype
@@ -406,6 +420,16 @@ sub discover
     
     ## Explore counters available for each interface
 
+    my $includeBroadcast = ( $includeBroadcastPackets or
+        ( $devdetails->paramEnabled('RFC2863_IF_MIB::include-broadcast-packets')
+        or
+        $devdetails->hasCap('includeBroadcastPackets')));
+
+    my $includeMulticast = ( $includeMulticastPackets or
+        ( $devdetails->paramEnabled('RFC2863_IF_MIB::include-multicast-packets')
+        or
+        $devdetails->hasCap('includeMulticastPackets')));
+
     my $ifInOctets      = $dd->walkSnmpTable('ifInOctets');
     my $ifOutOctets     = $dd->walkSnmpTable('ifOutOctets');
     my $ifInUcastPkts   = $dd->walkSnmpTable('ifInUcastPkts');
@@ -414,6 +438,22 @@ sub discover
     my $ifOutDiscards   = $dd->walkSnmpTable('ifOutDiscards');
     my $ifInErrors      = $dd->walkSnmpTable('ifInErrors');
     my $ifOutErrors     = $dd->walkSnmpTable('ifOutErrors');
+
+    my $ifInBroadcastPkts  = {};
+    my $ifOutBroadcastPkts = {};
+    my $ifInMulticastPkts  = {};
+    my $ifOutMulticastPkts = {};
+
+    if ($includeBroadcast)
+	{
+         $ifInBroadcastPkts  = $dd->walkSnmpTable('ifInBroadcastPkts');
+         $ifOutBroadcastPkts = $dd->walkSnmpTable('ifOutBroadcastPkts');
+	}
+     if ($includeMulticast)
+       	{
+       	$ifInMulticastPkts  = $dd->walkSnmpTable('ifInMulticastPkts');
+       	$ifOutMulticastPkts = $dd->walkSnmpTable('ifOutMulticastPkts');
+       	}
 
     my $suppressHCCounters =
         ($devdetails->paramEnabled('RFC2863_IF_MIB::suppress-hc-counters')
@@ -424,6 +464,10 @@ sub discover
     my $ifHCOutOctets    = {};
     my $ifHCInUcastPkts  = {};
     my $ifHCOutUcastPkts = {};
+    my $ifHCInMulticastPkts  = {};
+    my $ifHCOutMulticastPkts = {};
+    my $ifHCInBroadcastPkts  = {};
+    my $ifHCOutBroadcastPkts = {};
 
     if( not $suppressHCCounters )
     {
@@ -431,7 +475,18 @@ sub discover
         $ifHCOutOctets    = $dd->walkSnmpTable('ifHCOutOctets');
         $ifHCInUcastPkts  = $dd->walkSnmpTable('ifHCInUcastPkts');
         $ifHCOutUcastPkts = $dd->walkSnmpTable('ifHCOutUcastPkts');
+        if ($includeBroadcast)
+            {
+            $ifHCInBroadcastPkts  = $dd->walkSnmpTable('ifHCInBroadcastPkts');
+            $ifHCOutBroadcastPkts = $dd->walkSnmpTable('ifHCOutBroadcastPkts');
+            }
+        if ($includeMulticast)
+            {
+            $ifHCInMulticastPkts  = $dd->walkSnmpTable('ifHCInMulticastPkts');
+            $ifHCOutMulticastPkts = $dd->walkSnmpTable('ifHCOutMulticastPkts');
+            }
     }
+
 
     while( my ($ifIndex, $interface) = each %{$data->{'interfaces'}} )
     {
@@ -467,6 +522,18 @@ sub discover
             $interface->{'hasOutErrors'} = 1;
         }
 
+        if( defined($ifInMulticastPkts->{$ifIndex}) and
+            defined($ifOutMulticastPkts->{$ifIndex}) )
+        {
+            $interface->{'hasMulticast'} = 1;
+        }
+
+        if( defined($ifInBroadcastPkts->{$ifIndex}) and
+            defined($ifOutBroadcastPkts->{$ifIndex}) )
+        {
+            $interface->{'hasBroadcast'} = 1;
+        }
+
         # A well-known bug in Cisco IOS: HC counters are implemented,
         # but always zero. Catch it here if possible.
 
@@ -498,6 +565,18 @@ sub discover
             {
                 $interface->{'hasHCUcastPkts'} = 1;
             }
+        
+            if( defined($ifHCInMulticastPkts->{$ifIndex}) and
+	        defined($ifHCOutMulticastPkts->{$ifIndex}) )
+    	    {
+        	$interface->{'hasHCMulticast'} = 1;
+    	    }
+
+            if( defined($ifHCInBroadcastPkts->{$ifIndex}) and
+	        defined($ifHCOutBroadcastPkts->{$ifIndex}) )
+    	    {
+        	$interface->{'hasHCBroadcast'} = 1;
+    	    }
         }
     }
 
@@ -841,11 +920,47 @@ sub buildConfig
         $subtreeParams->{'comment'} = $subtreeComment;
     }
 
+    my $overview_shortcuts = 'traffic,errors';
+
     if( $bandwidthUsageActive )
     {
-        $subtreeParams->{'overview-shortcuts'} = 'traffic,errors,bandwidth';
+        $overview_shortcuts = $overview_shortcuts . ',bandwidth';
+        $subtreeParams->{'overview-shortcuts'} = $overview_shortcuts;
     }
-    
+
+    my $includeBroadcast = ( $includeBroadcastPackets or 
+        ( $devdetails->paramEnabled('RFC2863_IF_MIB::include-broadcast-packets')
+        or
+        $devdetails->hasCap('includeBroadcastPackets')));
+
+    if( $includeBroadcast )
+    {
+        $overview_shortcuts = $overview_shortcuts . ',bpackets';
+        $subtreeParams->{'overview-shortcuts'} = $overview_shortcuts;
+    }
+
+    my $includeMulticast = ( $includeMulticastPackets or 
+        ( $devdetails->paramEnabled('RFC2863_IF_MIB::include-multicast-packets')
+        or
+        $devdetails->hasCap('includeMulticastPackets')));
+
+    if( $includeMulticast )
+    {
+        $overview_shortcuts = $overview_shortcuts . ',mpackets';
+        $subtreeParams->{'overview-shortcuts'} = $overview_shortcuts;
+    }
+
+    my $PSummary = ( $PacketsSummary or
+        ( $devdetails->paramEnabled('RFC2863_IF_MIB::packets-summary')
+        or 
+        $devdetails->hasCap('PacketsSummary')));
+
+    if( $PSummary )
+    {
+        $overview_shortcuts = $overview_shortcuts . ',packets';
+        $subtreeParams->{'overview-shortcuts'} = $overview_shortcuts;
+    }
+
     my $countersNode =
         $cb->addSubtree( $devNode, $subtreeName, $subtreeParams,
                          ['RFC2863_IF_MIB::rfc2863-ifmib-subtree'] );
@@ -953,11 +1068,15 @@ sub buildConfig
             if( $interface->{'hasHCUcastPkts'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::ifxtable-hcucast-packets' );
+                push( @templates, 'RFC2863_IF_MIB::ifxtable-hcmucast-packets' ) if ($interface->{'hasHCMulticast'});
+                push( @templates, 'RFC2863_IF_MIB::ifxtable-hcbrdcast-packets' ) if ($interface->{'hasHCBroadcast'});
                 $has_someting = 1;
             }
             elsif( $interface->{'hasUcastPkts'} )
             {
                 push( @templates, 'RFC2863_IF_MIB::iftable-ucast-packets' );
+                push( @templates, 'RFC2863_IF_MIB::iftable-mucast-packets' ) if ($interface->{'hasMulticast'});
+                push( @templates, 'RFC2863_IF_MIB::iftable-brdcast-packets' ) if ($interface->{'hasBroadcast'});
                 $has_someting = 1;
             }
 

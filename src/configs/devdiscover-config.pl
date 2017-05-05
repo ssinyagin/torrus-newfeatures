@@ -214,7 +214,23 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'name'   => 'interface-bandwidth-usage-ifspeed',
          'source' => 'generic/rfc2863.if-mib.xml'
          },
-
+  'RFC2863_IF_MIB::ifxtable-hcmucast-packets' => {
+         'name'   => 'ifxtable-hcmucast-packets',
+         'source' => 'generic/rfc2863.if-mib.xml'
+         },
+     'RFC2863_IF_MIB::ifxtable-hcbrdcast-packets' => {
+         'name'   => 'ifxtable-hcbrdcast-packets',
+         'source' => 'generic/rfc2863.if-mib.xml'
+         },
+     'RFC2863_IF_MIB::iftable-mucast-packets' => {
+         'name'   => 'iftable-mucast-packets',
+         'source' => 'generic/rfc2863.if-mib.xml'
+         },
+     'RFC2863_IF_MIB::iftable-brdcast-packets' => {
+         'name'   => 'iftable-brdcast-packets',
+         'source' => 'generic/rfc2863.if-mib.xml'
+         },
+		 
      #### RDBMS MIB
      'RFC1697_RDBMS::rdbms-dbtable' => {
          'name'     => 'rdbms-dbtable',
@@ -1596,6 +1612,18 @@ $Torrus::DevDiscover::RFC2790_HOST_RESOURCES::storageGraphTop = 105;
 
 # Where to draw the hi-mark line in Host Resources Storage, percentage
 $Torrus::DevDiscover::RFC2790_HOST_RESOURCES::storageHiMark = 100;
+
+##########################
+# RFC2863_IF_MIB parameters
+
+# Include broadcast packets
+$Torrus::DevDiscover::RFC2863_IF_MIB::includeBroadcastPackets = 0;
+
+# Include multicast packets
+$Torrus::DevDiscover::RFC2863_IF_MIB::includeMulticastPackets = 0;
+
+# Show packets summary graph
+$Torrus::DevDiscover::RFC2863_IF_MIB::PacketsSummary = 0;
 
 
 ##########################

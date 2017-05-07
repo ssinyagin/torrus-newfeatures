@@ -32,21 +32,10 @@
 Torrus should easily run on any UNIX-like operation system, as long as the
 required components are provided.
 
-If the OS mounts F</var/run> directory to a temporary filesystem, C<piddir>
-variable must point to a path on a persistent storage. Alternatively
-C<piddir> can point to F</var/run> itself. The default path is
-F</var/run/torrus>, and temporary filesystems do not preserve subdirectories
-after a system reboot. 
-
-Note to B<VmWare> users: as recommended by Gord Philpott, Linux kernel for
-guest machine needs to be compiled with the following feature enabled:
-C<Character devices ---E<gt> Enhanced Real Time Clock Support>.
-For other guest operating systems (e.g. FreeBSD), in order to let the
-Torrus collector and monitor run properly, you need to add the following
-lines to your F<torrus-siteconfig.pl>:
-
-  $Torrus::Scheduler::maxSleepTime = 15;
-  $Torrus::Scheduler::ignoreClockSkew = 1;
+If the OS mounts F</var/run> directory to a temporary filesystem, you
+need t make sure that C<piddir> (F</var/run/torrus> by default) is
+always available. If yur OS uses Systemd, the Trrus distribution
+supplies a tmpfile file for that.
 
 It is recommended to use Tobi Oetiker's SDBS tool available at
 E<lt>https://github.com/oetiker/sdbsE<gt>. The tool compiles all Torrus
@@ -55,31 +44,18 @@ prerequisites from sources, and guarantees the version compatibility.
 
 =item * Perl
 
-Perl version C<5.8.1> or higher is required. B<Version C<5.8.0> is not
-recommended> because of memory access bugs and unpredictable behaviour.
-Perl interpreter should be in PATH environment variable when
+Perl version C<5.8.9> or higher is required. Perl multithreading must be
+enabled. Perl interpreter should be in PATH environment variable when
 running C<./configure>, otherwise use
 
   ./configure PERL=/path/to/perl
 
-Torrus also supports Perl multithreading in Device Discovery engine and
-in the Collector. Minimum requirements are as follows: Perl version 5.8.8
-or higher, C<threads> module version 1.41 or higher, C<threads::shared> module
-version 1.03 or higher. Older versions had bugs that were leading to
-severe memory leaks and instability. After installing Perl 5.8.8,
-you need to upgrade the C<threads> and C<threads::shared> modules manually
-from CPAN. If any of the requirements is not met, the installer will
-automatically disable the threads support in Torrus.
 
 =item * RRDtool
 
 Round Robin Database Tool is available at:
 E<lt>http://oss.oetiker.ch/rrdtool/E<gt>.
 
-The version that is coming with Debian and Ubuntu packages has shown
-some instability in Torrus WebUI -- most probably because of the bugs in
-graphical libraries that it uses. It is recommended to compile the
-tested versions with SDBS instead of using precompiled packages.
 
 =item * libxml2
 
@@ -88,44 +64,11 @@ project E<lt>http://www.gnome.orgE<gt>,
 available as a standalone package.
 Versions C<2.4.23> and above were tested.
 
-=item * Berkeley DB version 4.2.52 or later
-
-There are two distinct packages with slightly conflicting names:
-The Berkeley DB from Sleepycat Software E<lt>http://www.sleepycat.comE<gt>,
-and C<BerkeleyDB> Perl module available from CPAN. We will always refer
-the latter as I<BerkeleyDB Perl module>.
-
-The Berkeley DB database engine is used for all data storage.
-Versions C<4.2.52> and above are recommended.
-Older versions of Berkeley DB had problems with database integrity
-in concurrent usage. By default, it installs
-into F</usr/local/BerkeleyDB.4.2/>.
-
-Unfortunately, the BerkeleyDB Perl module cannot always find the include and
-library files in that directory. Thus either configure Berkeley DB
-with the option C<--prefix=/usr/local>, or you need to edit
-F<config.in> in BerkeleyDB Perl module distribution.
 
 =item * HTTP Server
 
-Torrus requires an HTTP server. It is compatible with the following
-combinations:
-
-=over 8
-
-=item * lighttpd, ngnix or Apache with FastCGI
-
-=item * Apache 1.3 with mod_perl 1.0 (not recommended and soon to be dropped)
-
-=item * Apache 2.x with mod_perl 2.0 (not recommended and soon to be dropped)
-
-=back
-
-FastCGI is supported in Torrus version 1.0.9 or higher. It is the preferred
-way of using Torrus, more stable than mod_perl.
-
-B<Note:> Starting from Torrus version 1.0.9, C<libapreq2> is no longer
-required.
+Torrus requires an HTTP server with FastCGI support for its front-end
+UI. Typically Apache with mod_fcgid would be used.
 
 See I<Torrus Web Interface Reference> for details on HTTP server configuration.
 

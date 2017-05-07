@@ -26,9 +26,7 @@ EXTRA_DIST = \
 	notify-siteconfig.pl \
 	snmptrap-siteconfig.pl \
 	torrus-config.pl \
-	torrus-siteconfig.pl \
-	webmux.pl \
-	webmux2.pl
+	torrus-siteconfig.pl
 
 DISTCLEANFILES = instvars
 

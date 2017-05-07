@@ -106,7 +106,7 @@ if test "$enable_pkgonly" != yes; then
                  'Cache::Ref' \
                  'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \
-                 'Date::Parse' 'JSON' 'JSON::XS'
+                 'Date::Parse' 'JSON' 'JSON::XS' 'FCGI'
    do
      AC_MSG_CHECKING([presence of $module])
      if ${PERL} ${PERLOPTS} -e "use $module" 2>/dev/null; then

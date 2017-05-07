@@ -13,6 +13,7 @@ New perl modules required:
   Git::ObjectStore (version 0.005 or higher)
   Digest::SHA
   Cache::Ref
+  FCGI
 
 Perl modules not needed:
   BerkeleyDB
@@ -30,6 +31,8 @@ New software daemon required:
 
 
 Variables var_user, var_group, var_mode are set in configure script
+
+Apache mod_perl handlers are removed
 
 
 torrus-config.pl

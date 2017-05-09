@@ -198,6 +198,11 @@ sub render_rrgraph
 
     my ($args, $obj) =
         $self->prepare_rrgraph_args($config_tree, $token, $view);
+    if( not defined($args) )
+    {
+        return undef;
+    }    
+    
     Debug("RRDs::graph arguments: " . join(' ', @{$args}));
 
     # localize the TZ enviromennt for the child process

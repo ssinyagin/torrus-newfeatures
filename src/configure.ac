@@ -50,7 +50,7 @@ AC_SUBST(enable_pkgonly)
 AC_ARG_ENABLE(threads,
         [AC_HELP_STRING([--disable-threads],
                         [Disable Perl threads usage])])
-        
+
 perllibdirs="\'\${perllibdir}\'"
 
 PERLOPTS=
@@ -115,18 +115,18 @@ if test "$enable_pkgonly" != yes; then
 #  Check if Perl threads can be used.
 #  Requirements are: perl 5.8.8 with threads compiled,
 #  threads ver. 1.41 or higher, threads::shared ver. 1.03 or higher
-   
+
    perlithreads=1
    if test x"$enable_threads" = xno; then
-     perlithreads=0     
+     perlithreads=0
    else
-   
+
      AC_MSG_CHECKING([if Perl version is 5.8.8 or higher])
      if ${PERL} ${PERLOPTS} -e 'use 5.8.8' 2>/dev/null; then
        AC_MSG_RESULT([Ok])
      else
        perlithreads=0
-     fi       
+     fi
 
      if test ${perlithreads} -eq 1; then
        AC_MSG_CHECKING([threading support in Perl])
@@ -137,7 +137,7 @@ if test "$enable_pkgonly" != yes; then
        fi
      fi
 
-     if test ${perlithreads} -eq 1; then     
+     if test ${perlithreads} -eq 1; then
        AC_MSG_CHECKING([if threads module version is 1.41 or higher])
        if ${PERL} ${PERLOPTS} -e \
          'use threads; exit($threads::VERSION >= 1.41 ? 0:1)'; then
@@ -147,23 +147,23 @@ if test "$enable_pkgonly" != yes; then
        fi
      fi
 
-     if test ${perlithreads} -eq 1; then  
+     if test ${perlithreads} -eq 1; then
        AC_MSG_CHECKING([if threads::shared module version is 1.03 or higher])
        if ${PERL} ${PERLOPTS} -e \
          'use threads; use threads::shared;
           exit($threads::shared::VERSION >= 1.03 ? 0:1)'; then
            AC_MSG_RESULT([Ok])
-       else         
+       else
            perlithreads=0
        fi
      fi
-     
-     if test ${perlithreads} -eq 0; then  
+
+     if test ${perlithreads} -eq 0; then
        AC_MSG_RESULT([No. Multithreading will not be used.])
      fi
-          
+
    fi
-   AC_SUBST(perlithreads, [${perlithreads}])   
+   AC_SUBST(perlithreads, [${perlithreads}])
 fi
 
 AC_ARG_VAR(torrus_user,  [[torrus] UID to run the daemons])
@@ -186,7 +186,7 @@ if test "$enable_pkgonly" != yes; then
         AC_MSG_RESULT([Ok])
     fi
 fi
-   
+
 
 # Set the var/db and var/cache ownership
 
@@ -241,7 +241,7 @@ AC_ARG_VAR(plugwrapperdir, [[PLUGINSDIR/wrapper]])
 if test -z "$plugwrapperdir"; then
    plugwrapperdir='${pluginsdir}/wrapper'; fi
 
-      
+
 AC_ARG_VAR(scriptsdir, [[PKGHOME/scripts] Script files])
 if test -z "$scriptsdir"; then
    scriptsdir='${pkghome}/scripts'; fi
@@ -294,7 +294,7 @@ if test -z "$piddir"; then
 AC_ARG_VAR(varprefix, [[/var/torrus] Common prefix for runtime data])
 if test -z "$varprefix"; then
    varprefix='/var/torrus'; fi
-   
+
 AC_ARG_VAR(cachedir, [[VARPREFIX/cache] Renderer cache])
 if test -z "$cachedir"; then
    cachedir='${varprefix}/cache'; fi
@@ -331,15 +331,15 @@ AC_ARG_VAR(defrrddir, [[/srv/torrus/collector_rrd] Default RRD storage path])
 if test -z "$defrrddir"; then
    defrrddir='/srv/torrus/collector_rrd'; fi
 
-   
+
 AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
 AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])
 AC_CONFIG_FILES([examples/Makefile perllib/Makefile])
 AC_CONFIG_FILES([sup/Makefile xmlconfig/Makefile])
-                                    
-AC_CONFIG_FILES([setup_tools/substvars.sh],[chmod +x setup_tools/substvars.sh])
-AC_CONFIG_FILES([setup_tools/mkvardir.sh], [chmod +x setup_tools/mkvardir.sh])
-AC_CONFIG_FILES([init.d/torrus], [chmod +x init.d/torrus])
+
+AC_CONFIG_FILES([setup_tools/substvars.sh],[chmodx setup_tools/substvars.sh])
+AC_CONFIG_FILES([setup_tools/mkvardir.sh], [chmodx setup_tools/mkvardir.sh])
+AC_CONFIG_FILES([init.d/torrus], [chmodx init.d/torrus])
 
 AC_SUBST(VERSION)
 

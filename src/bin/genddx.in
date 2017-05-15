@@ -30,6 +30,10 @@ use IO::File;
 
 use Torrus::Log;
 
+# Hidden parameter for debugging
+my $debug = 0;
+my $verbose = 0;
+
 our $outFormatVersion = '1.0';
 
 our @hosts = ();
@@ -38,6 +42,7 @@ our $hostfile;
 our %globalParams =
     (
      'output-file'         => 'routers.xml',
+     'output-bundle'       => '',
      'domain-name'         => '',
      'host-subtree'        => '/Routers',
      'snmp-port'           => '161',
@@ -73,6 +78,7 @@ my $ok = GetOptions(
                     'hostfile=s'  => \$hostfile,
                     'out=s'       => \$outfile,
                     'discout=s'   => \$globalParams{'output-file'},
+                    'bundle=s'    => \$globalParams{'output-bundle'},
                     'domain=s'    => \$globalParams{'domain-name'},
                     'version=s'   => \$globalParams{'snmp-version'},
                     'community=s' => \$globalParams{'snmp-community'},
@@ -82,6 +88,8 @@ my $ok = GetOptions(
                     'subtree=s'   => \$globalParams{'host-subtree'},
                     'holtwinters' => \$globalParams{'rrd-hwpredict'},
                     'datadir=s'   => \$globalParams{'data-dir'},
+                    'verbose'     => \$verbose,
+                    'debug'       => \$debug,
                     );
 
 if( not $ok or
@@ -98,6 +106,9 @@ if( not $ok or
 
     " --discout=filename      discovery output file\n",
     "      [", $globalParams{'output-file'}, "]\n",
+
+    " --bundle=filename       output-bundle file\n",
+    "      [", $globalParams{'output-bundle'}, "]\n",
 
     " --domain=domain         optional DNS domain name\n",
 
@@ -129,6 +140,19 @@ if( not $ok or
     "Output file is placed into " . $Torrus::Global::discoveryDir,
     "\n if no path is given.\n";
     exit 1;
+}
+
+if( $debug )
+{
+    use Data::Dumper;
+
+    Torrus::Log::setLevel('debug');
+}
+elsif( $verbose )
+{
+    use Data::Dumper;
+
+    Torrus::Log::setLevel('verbose');
 }
 
 # Place the output file in discovery directory if the path is not given
@@ -195,6 +219,8 @@ $doc->setDocumentElement( $root );
     $root->appendChild( $creatorNode );
 }
 
+
+
 createParamsDom( \%globalParams, $doc, $root );
 
 
@@ -214,6 +240,19 @@ foreach my $host ( @hosts )
     if( $devname ne $host )
     {
         $hostParams{'symbolic-name'} = $devname;
+    }
+
+    if (exists $globalParams{'output-bundle'} ) {
+      if ($globalParams{'output-bundle'} ne '') {
+        Debug("Adding output-file paramter to host " . $host . "entry and remove it globally...");
+        $hostParams{'output-file'} = $host . '.xml';
+
+        delete $globalParams{'output-file'};
+      }
+      else {
+        Debug("Removing output-bundle entry from global parameters default...");
+        delete $globalParams{'output-bundle'};
+      }
     }
 
     createParamsDom( \%hostParams, $doc, $hostNode );

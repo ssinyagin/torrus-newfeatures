@@ -30,10 +30,19 @@ pkghome=@pkghome@
 cmddir=@pkgbindir@
 piddir=@piddir@
 sitedir=@sitedir@
+torrususer=@torrus_user@
 
 . @cfgdefdir@/initscript.conf
 if test -f @siteconfdir@/initscript.siteconf; then
   . @siteconfdir@/initscript.siteconf
+fi
+
+if test ! -d ${piddir}; then
+  install --owner ${torrususer} --directory ${piddir}
+fi
+
+if test `ls -ld ${piddir} | awk 'NR==1 {print $3}'` != ${torrususer}; then
+  chown ${torrususer} ${piddir}
 fi
 
 START_ARGS="--cmd=start"

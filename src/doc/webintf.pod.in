@@ -26,6 +26,31 @@
 
 Torrus WebUI supports FastCGI as a server engine.
 
+
+=head3 Apache 2.x with mod_fcgid
+
+The following example assumes that F</opt/pm/share/www> contains F<index.html>
+which redirects the client to C</torrus>.
+
+ <VirtualHost *:80>
+  DocumentRoot "/opt/pm/share/www"
+  ServerName test01.torrus.net
+  ScriptAlias /torrus "/opt/pm/torrus/bin/torrus.fcgi"
+  FcgidMaxProcessesPerClass 10
+  FcgidMaxRequestsPerProcess 100
+  <Location />
+   Options Indexes
+   Require all granted
+  </Location>
+  <Location /torrus>    
+    Options       +ExecCGI
+    Order         Allow,Deny
+    Allow         from all
+  </Location>
+ </VirtualHost>
+
+
+    
 =head3 lighttpd with FastCGI handler
 
 Add user "lighttpd" to group "torrus" (this depends on the user name that is
@@ -56,24 +81,6 @@ starts with "tor" would result in Torrus display:
 
 
 
-
-=head3 Apache 2.0.x with FastCGI handler
-
-The following is an example of a virtual host with four FastCGI child processes
-
-
-    <VirtualHost *:80>
-     DocumentRoot "/var/www/vhosts/test01.torrus.net"
-     ServerName test01.torrus.net
-     AddHandler fastcgi-script fcgi
-     FastCgiServer   @pkgbindir@/torrus.fcgi \
-        -processes 4
-     ScriptAlias /torrus "@pkgbindir@/torrus.fcgi"
-    <Location /torrus>
-        Order           Allow,Deny
-        Allow           from all
-    </Location>
-    </VirtualHost>
 
 
 
@@ -361,4 +368,4 @@ represents the data as specified by the RPC call.
 
 =head1 Author
 
-Copyright (c) 2002-2011 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
+Copyright (c) 2002-2017 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>

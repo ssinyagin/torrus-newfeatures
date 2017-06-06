@@ -77,67 +77,32 @@ See I<Torrus Web Interface Reference> for details on HTTP server configuration.
 The Perl modules required are listed below. They are all available at
 CPAN E<lt>http://www.cpan.orgE<gt>.
 Some of them require other modules to be installed.
-You can install all required modules with the following command,
-executed from within the distribution directory:
 
-  perl -I `pwd`/setup_tools -MCPAN -e 'install Bundle::Torrus'
+Provided that you have C<cpanminus> installed on your system, the
+following command executed from within the distribution directory will
+install all needed modules:
+
+  sh setup_tools/cpanm_install_modules.sh
+
+Modules required by Torrus:
 
 =over 8
 
-=item * XML::LibXML
-
-This is a Perl interface for libxml2, providing DOM standards compliant
-interface. It is recommended that you use version C<1.54_3> or higher.
-
-=item * BerkeleyDB perl module
-
-Perl interface to the database software.
-Version C<0.19> or higher is required.
-
-=item * Template-Toolkit
-
-This is a powerful set of tools for text template processing.
-Torrus uses it for HTML files output.
-See also the project homepage: E<lt>http://www.template-toolkit.orgE<gt>
-
-=item * Proc::Daemon
-
-Daemon invocation routines.
-
-=item * Net::SNMP
-
-SNMP queries and traps interface. Version C<4.0.3> or higher is required.
-I<Note>: Torrus versions prior to 1.0.9 are incompatible with Net::SNMP
-version 6.0.0. You may need to downgrate the module to 5.2.0.
-
-=item * URI::Escape
-
-Escape and unescape unsafe characters
-
-=item * Apache (mod_perl version 1.0)
-
-Mod_perl is a Perl runtime environment integrated into Apache HTTP server.
-
-=item * Apache::Session
-
-User session tracking helper
-
-=item * Date::Parse and Date::Format
-
-Module for parsing the user input for date and time.
-
+=item * Redis::Fast
+=item * Git::Raw
+=item * Git::ObjectStore
+=item * Digest::SHA
+=item * Cache::Ref
 =item * JSON
-
-JSON data format support
-
-=back
-
-
-=item * HTTP Browser requirements
-
-The HTTP browser must be compatible with I<HTML 4.01 Strict> and I<CSS2>
-specifications. The tests were made with the following browsers:
-IE 5.5, Opera 6.12B1/Solaris, Opera 7.03/Win2K, Netscape 7.02.
+=item * JSON::XS
+=item * XML::LibXML
+=item * Template
+=item * Proc::Daemon
+=item * Net::SNMP
+=item * URI::Escape
+=item * Apache::Session
+=item * Date::Parse
+=item * FCGI
 
 =back
 

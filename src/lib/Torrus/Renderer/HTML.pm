@@ -333,6 +333,7 @@ sub rrPrint
             chomp(my $values = <$fh>);
             @ret = split(':', $values);
             $fh->close();
+            unlink $fname;
         }
     }
     return @ret;

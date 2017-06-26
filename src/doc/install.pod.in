@@ -141,10 +141,10 @@ Modules required by Torrus:
   cd sdbs
   PREFIX=/opt/pm/thirdparty ./build_perl5-current.sh
   PREFIX=/opt/pm/thirdparty ./build_rrdtool-current.sh
-  
+
   echo 'PATH=/opt/pm/thirdparty/bin:/opt/pm/bin:$PATH; export PATH' \
     >/etc/profile.d/torrus_path.sh
-  
+
   logout
   #login again
 
@@ -166,7 +166,7 @@ Modules required by Torrus:
   cp systemd/torrus.service /lib/systemd/system/
   cp systemd/torrus.tmpfile /usr/lib/tmpfiles.d/torrus.conf
   systemctl enable torrus
-    
+
   # install plugins as necessary
   cd ../plugins/cbqos/
   autoreconf
@@ -208,7 +208,7 @@ Modules required by Torrus:
   mkdir -p /srv/torrus/collector_rrd
   chown torrus:torrus /srv/torrus/collector_rrd
   chmod g+s /srv/torrus/collector_rrd
-    
+
 
 =head2 Installation Procedure (in detail)
 

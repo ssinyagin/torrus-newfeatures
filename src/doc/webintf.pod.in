@@ -42,7 +42,7 @@ which redirects the client to C</torrus>.
    Options Indexes
    Require all granted
   </Location>
-  <Location /torrus>    
+  <Location /torrus>
     Options       +ExecCGI
     Order         Allow,Deny
     Allow         from all
@@ -50,7 +50,7 @@ which redirects the client to C</torrus>.
  </VirtualHost>
 
 
-    
+
 =head3 lighttpd with FastCGI handler
 
 Add user "lighttpd" to group "torrus" (this depends on the user name that is

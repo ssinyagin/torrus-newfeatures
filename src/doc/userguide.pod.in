@@ -29,28 +29,26 @@ The steps below will explain you how to make the thing running.
 B<Install Torrus>. Follow the I<Torrus Installation Instructions> document,
 all prerequisits and necessary steps are described there.
 
-B<What is where>. The executables reside in 
-F<@pkgbindir@/>. You normally don't need to access this
-directory, because the commandline wrapper, C<torrus>, is installed
-in a usual execution path (F<@bindir@>).
-All site-specific behaviour is controlled by
-configuration files in F<@siteconfdir@/>.
-Usually you need to change F<torrus-siteconfig.pl> only. In this file, you
-must list your XML configuration sources. The datasource trees configuration
-is read out of XML files. They are searched in several directories,
-normally F<@distxmldir@/> and F<@sitexmldir@/>. The first one contains
-files that come with Torrus distribution, and the second one is for your local
-site-specific XML files. Global site-specific XML configuration parameters
-may be defined in F<site-global.xml>.
-XML configuration is compiled into internal database representation
-by C<torrus compilexml> command. The database itself is resided in
-F<@dbhome@/>, and must be writable by your Apache server
-(normally the installer takes care of it). It is safe to re-compile the
-configuration while the Torrus daemons are running.
+B<What is where>. The executables reside in F<@pkgbindir@/>. You
+normally don't need to access this directory, because the commandline
+wrapper, C<torrus>, is installed in a usual execution path
+(F<@bindir@>).  All site-specific behaviour is controlled by
+configuration files in F<@siteconfdir@/>.  Usually you need to change
+F<torrus-siteconfig.pl> only. In this file, you must list your XML
+configuration sources. The datasource trees configuration is read out of
+XML files. They are searched in several directories, normally
+F<@distxmldir@/> and F<@sitexmldir@/>. The first one contains files that
+come with Torrus distribution, and the second one is for your local
+site-specific XML files. Global site-specific XML configuration
+parameters may be defined in F<site-global.xml>.  XML configuration is
+compiled into internal database representation by C<torrus compilexml>
+command. The database itself is a Git repository, and it is resided in
+F<@gitrepodir@/>. It is safe to re-compile the configuration while the
+Torrus daemons are running.
 
 B<The datasource trees>. Torrus configuration consists of a number of I<trees>.
-Each tree is independent from the others. A tree may run one Collector and
-one Monitor process. Also the web interface access control lists
+Each tree is independent from the others. A tree may run multple Collector and
+one Monitor processes. Also the web interface access control lists
 differentiate the user rights by datasource trees.
 
 B<Inside the tree>. A tree defines the hierarchy of Torrus datasources.
@@ -70,22 +68,26 @@ B<Trees configuration>. The trees are defined in F<torrus-siteconfig.pl>.
 See I<Torrus Installation Instructions> for a basic example of tree
 configuration.
 
-B<Round-robin databases>. Currently only one type of data storage is
-supported: Round-robin database (RRD) files. See I<RRDtool> manuals
-for more details. Each leaf represents a datasource stored in an
-RRD file. Of course, several leaves may refer to different datasources within
-the same RRD file. Even more, more than one leaf may refer to the same
-datasource within an RRD file. RRD files are created and updated either by
-C<collector>, or by some other external programs.
+B<Round-robin databases>. RRDtool is the primary type of storage for the
+collector data. Each leaf represents a datasource stored in an RRD
+file. Of course, several leaves may refer to different datasources
+within the same RRD file. Even more, more than one leaf may refer to the
+same datasource within an RRD file. RRD files are created and updated
+either by C<collector>, or by some other external programs.
 
-B<Define the targets>. If you only want to collect SNMP counters
-from some network devices' interfaces, there's a couple of tools
-called C<torrus genddx> and C<torrus devdisover>.
-The first one creates a basic discovery instructions file, and the second
-one uses the discovery instructions to explore the SNMP device capabilities
-and information: interface names, input/output counters,
-CPU and memory usage, temperature sensors (for Cisco devices), and many
-other vendor-specific statistics sources.
+B<Define the targets>. If you only want to collect some standard SNMP
+counters from network devices, there are tools called C<torrus genddx>
+and C<torrus devdisover>.
+
+C<torrus genddx> creates a basic discovery instructions file, and it's
+designed to be run only once for an initial DDX file. Further on, you
+etither edit the DDX files manually, or generate them by some other
+tools.
+
+C<torrus devdisover> uses the discovery instructions to explore the SNMP
+device capabilities and information: interface names, input/output
+counters, CPU and memory usage, temperature sensors, and many other
+vendor-specific statistics sources.
 
 Torrus is much more than just an SNMP collector. So, when you decide
 to use it in a more advanced way, you will have to read the whole bit of
@@ -136,12 +138,12 @@ B<Note:> the C<genddx> utility is designed as a one-time helper, so
 that you create your basic discovery instructions files from scratch.
 Further on, the discovery files should be maintained separately.
 
-Another useful utility is called C<ttproclist>. It can be used to generate 
+Another useful utility is called C<ttproclist>. It can be used to generate
 a DDX file from a template and a list of SNMP hosts. It is very useful if
 you want to monitor many devices of similar type or function.
 
 You can also define a I<bundle> file in your DDX file. C<Genddx> will
-create it after all devices would discovered, and it will contain 
+create it after all devices would discovered, and it will contain
 E<lt>includeE<gt> statements for all XML files. This makes it practical to
 use one XML file per SNMP host, and use the bundle file for inclusion
 in the tree configuration.
@@ -161,7 +163,7 @@ There is a configuration statement that allows you to include other
 XML files into configuration, thus giving you a big flexibility
 in building the data hierarchies.
 
-B<Compile the configuration>. After the XML configuration is prepared, 
+B<Compile the configuration>. After the XML configuration is prepared,
 you need to execute the compiler:
 
   torrus compile --tree=treename --verbose
@@ -176,7 +178,7 @@ It will also tell you if there's any error in your configuration.
 B<Build the search database>. The search database is updated by executing
 the following command:
 
-  torrus bs --global --verbose
+  torrus bs --all --verbose
 
 For users that are allowed to display all the trees, you can enable the
 global search across all trees:
@@ -192,11 +194,7 @@ Without additional options, the collector will fork as a daemon
 process, and write only error messages in its log file,
 F<@logdir@/collector.treename.log>.
 
-There is a file that is created by C<./configure>, called F<init.d/torrus>.
-You may place it into a directory where your system looks for startup scripts
-(F</etc/init.d/> on Solaris and some Linuxes, F</usr/local/etc/rc.d/>
-on FreeBSD). Probably you need to rename and edit the script before using.
-Note that it also executes another daemon, C<monitor>.
+See the Torrus installation guide for details about startup scripts.
 
 The C<monitor> daemon is used for monitoring the thresholds in the
 data files. For more details, see the I<Torrus XML configuration guide>,
@@ -238,6 +236,153 @@ be added to previously defined ones.
 
 B<Templates>. Some pieces of configuration may be written as templates,
 and then re-used in multiple places.
+
+B<Incremental compiler>. Subsequent running of C<torrus compile --tree=treename --verbose
+
+For most of the processes that you run within Torrus, you need to specify
+the tree name with C<--tree> option. Some programs accept C<--all> option,
+which causes them to process all existing trees.
+With C<--verbose> option, the compiler tells you about the files being
+processed, and about some other actions that may take quite a long time.
+It will also tell you if there's any error in your configuration.
+
+B<Build the search database>. The search database is updated by executing
+the following command:
+
+  torrus bs --all --verbose
+
+For users that are allowed to display all the trees, you can enable the
+global search across all trees:
+
+  torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'
+
+B<Launch the collector>. Assuming that compilation went smoothly,
+you may now launch the data collector:
+
+  torrus collector --tree=treename
+
+Without additional options, the collector will fork as a daemon
+process, and write only error messages in its log file,
+F<@logdir@/collector.treename.log>.
+
+See the Torrus installation guide for details about startup scripts.
+
+The C<monitor> daemon is used for monitoring the thresholds in the
+data files. For more details, see the I<Torrus XML configuration guide>,
+in the section about monitor definitions.
+
+B<Define the ACLs>. By default, user authentication is enabled in the web
+interface. You can change this by setting
+C<$Torrus::CGI::authorizeUsers = 0> in your F<torrus-siteconfig.pl>.
+In order to get use of user authentication, you need to create I<groups>
+and I<user> accounts. Each user belongs to one or more groups, and each group
+has access to a set of datasource trees. See
+I<Torrus Installation Instructions> for a basic example.
+
+B<Browse with your browser>. Provided that you followed the
+installation guide to the end, and your HTTP server is running,
+your Torrus hierarchy must be visible  with your favorite web browser.
+
+
+=head2 Configuration guidelines
+
+In complete detail, the XML configuration is described in
+I<Torrus XML Configuration Guide>. The guidelines below will help
+you to read that document.
+
+B<Tree structure>. The tree structure is defined by the structure of
+C<E<lt>subtreeE<gt>> and C<E<lt>leafE<gt>> XML elements. The rule is simple:
+child XML elements of a C<E<lt>subtreeE<gt>> element define the child
+nodes in the configuration tree.
+
+B<Parameters>. Each node has a number of parameters. They are defined
+by C<E<lt>paramE<gt>> XML element. Parameters are inherited:
+the child node has all its parent's parameters, some of which may be
+overridden.
+
+B<Additive configuration>. The whole XML configuration is additive.
+It means that you may define your subtree several times across
+your XML configuration, and the new parameters and child nodes will
+be added to previously defined ones.
+
+B<Templates>. Some pieces of configuration may be written as templates,
+and then re-used in multiple places.
+
+B<Incremental compiler>. Subsequent running of C<torrus compile --tree=treename --verbose
+
+For most of the processes that you run within Torrus, you need to specify
+the tree name with C<--tree> option. Some programs accept C<--all> option,
+which causes them to process all existing trees.
+With C<--verbose> option, the compiler tells you about the files being
+processed, and about some other actions that may take quite a long time.
+It will also tell you if there's any error in your configuration.
+
+B<Build the search database>. The search database is updated by executing
+the following command:
+
+  torrus bs --all --verbose
+
+For users that are allowed to display all the trees, you can enable the
+global search across all trees:
+
+  torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'
+
+B<Launch the collector>. Assuming that compilation went smoothly,
+you may now launch the data collector:
+
+  torrus collector --tree=treename
+
+Without additional options, the collector will fork as a daemon
+process, and write only error messages in its log file,
+F<@logdir@/collector.treename.log>.
+
+See the Torrus installation guide for details about startup scripts.
+
+The C<monitor> daemon is used for monitoring the thresholds in the
+data files. For more details, see the I<Torrus XML configuration guide>,
+in the section about monitor definitions.
+
+B<Define the ACLs>. By default, user authentication is enabled in the web
+interface. You can change this by setting
+C<$Torrus::CGI::authorizeUsers = 0> in your F<torrus-siteconfig.pl>.
+In order to get use of user authentication, you need to create I<groups>
+and I<user> accounts. Each user belongs to one or more groups, and each group
+has access to a set of datasource trees. See
+I<Torrus Installation Instructions> for a basic example.
+
+B<Browse with your browser>. Provided that you followed the
+installation guide to the end, and your HTTP server is running,
+your Torrus hierarchy must be visible  with your favorite web browser.
+
+
+=head2 Configuration guidelines
+
+In complete detail, the XML configuration is described in
+I<Torrus XML Configuration Guide>. The guidelines below will help
+you to read that document.
+
+B<Tree structure>. The tree structure is defined by the structure of
+C<E<lt>subtreeE<gt>> and C<E<lt>leafE<gt>> XML elements. The rule is simple:
+child XML elements of a C<E<lt>subtreeE<gt>> element define the child
+nodes in the configuration tree.
+
+B<Parameters>. Each node has a number of parameters. They are defined
+by C<E<lt>paramE<gt>> XML element. Parameters are inherited:
+the child node has all its parent's parameters, some of which may be
+overridden.
+
+B<Additive configuration>. The whole XML configuration is additive.
+It means that you may define your subtree several times across
+your XML configuration, and the new parameters and child nodes will
+be added to previously defined ones.
+
+B<Templates>. Some pieces of configuration may be written as templates,
+and then re-used in multiple places.
+
+B<Incremental compiler>. Subsequent running of C<torrus compile> will
+only process changed files, so the compilation time will be much
+shorter. Also the collector will pick up the changes incrementally, so
+that its schedule is not disturbed by re-initialization.
 
 The C<configsnapshot> utility generates one large XML file back from
 the compiled configuration. Its main purpose is backup of the configuration,
@@ -341,17 +486,9 @@ For each customer, group the connection by geographical location.
 
 =back
 
-Torrus provides three different ways for organising your datasources:
+Torrus provides two different ways for organising your datasources:
 
 =over 4
-
-=item * Aliases.
-
-With C<E<lt>aliasE<gt>> statement, you can add symbolic names to your
-nodes. If the new alias is defined as a reference to non-existing subtree,
-the new subtrees are created. Alias is only a symbolic link: when you click
-to the alias name in your browser, Torrus redirects it to the real datasource
-in its normal subtree. See the example in I<Torrus XML Configuration Guide>.
 
 =item * ds-type=rrd-file
 
@@ -390,91 +527,6 @@ are put by two in a row.
 
 =back
 
-
-=head3 Amending autogenerated XML files with XUpdate
-
-Sometimes there is a need to modify the configuration generated by
-C<devdiscover>. Modifying the generated XML files by hand would not be
-a good option: it would need some manual work every time you update
-your hardware setup. A better approach would be to have the tools
-that would automate such configuration update.
-
-One of the possibilities for such automation would be XSLT
-E<lt>http://www.w3.org/TR/xsltE<gt>. But it's rather
-complicated task to use XSLT for slight changes in XML files.
-
-A good approach has been made by XUpdate Working Group
-E<lt>http://www.xmldb.org/xupdate/E<gt>. Their Working Draft document
-describes a language for XML editing commands. It allows to perform
-small updates to an existing XML document, like insertion of elements,
-updating of existing elements, or deleting. The only drawback is
-that the specification hasn't been updated since September 2000,
-and it contains some unclear statements, which make it difficult to
-implement compatible applications. In addition, there has been
-not enough efforts to adopt XUpdate as a W3C standard.
-However, this is the only kind-of-a-standard language for such tasks as
-XML editing commands.
-
-Thanks to Petr Pajas, there is an XUpdate implementaytion in Perl.
-C<XML::XUpdate::LibXML> module is available at CPAN, and it installs
-a small commandline utility, C<xupdate>. In addition, Petr has created
-a set of utilities integrated into a single shell wrapper:
-E<lt>http://xsh.sourceforge.netE<gt>. It is very useful for many different
-things, such as XPath expressions testing, and many others.
-
-A typical XUpdate instructions file would looke like follows:
-
- <?xml version="1.0"?>
- <xupdate:modifications version="1.0"
-                        xmlns:xupdate="http://www.xmldb.org/xupdate">
-
- <!-- Insert additional creator-info after the last one -->
- <xupdate:insert-after
-   select="/configuration/creator-info[not(following-sibling::creator-info)]">
-   <creator-info>
-     This file was modified with XUpdate script setmonitor.xupdate.xml
-   </creator-info>
- </xupdate:insert-after>
-
- <!-- For every ifError leaf, set the monitor -->
- <xupdate:append select="//subtree[apply-template[@name='iftable-errors']]">
-   <xupdate:element name="subtree">
-    <xupdate:attribute name="name">ifErrors</xupdate:attribute>
-     <param name="monitor" value="check-iferrors"/>
-   </xupdate:element>
- </xupdate:append>
-
- </xupdate:modifications>
-
-This example is part of Torrus distribution, and the file is named
-F<examples/setmonitor.xupdate.xml>. Your commands to apply these XUpdate
-instructions would be like
-
-  torrus devdiscover --in=routers.ddx --out=routers.xml
-
-  cd @sitexmldir@
-  xupdate -j @exmpdir@/setmonitor.xupdate.xml \
-    routers.xml > routers1.xml
-
-More XUpdate examples will be included in the future.
-
-
-=head3 Extracting the configuration skeleton
-
-Another aproach to amending the autogenerated confguration is as follows.
-
-Torrus distribution has a special-purpose XSLT template,
-F<extract-skeleton.xsl>, designed to strip all parameters and template
-applications from a given XML configuration, and leave the tree structure
-only. Given that F<routers.xml> is some autogenerated configuration,
-you may run
-
-  xsltproc @scriptsdir@/xml/extract-skeleton.xsl routers.xml  | \
-    xmllint --format --output routers-skeleton.xml -
-
-You can add your changes to the new file, F<routers-skeleton.xml>, and add
-it to your Torrus configuration. These changes may be performed manually
-or by means of XUpdate technique described above.
 
 
 =head3 Automating XML generation
@@ -591,7 +643,7 @@ subdirectories here: F<etc>, F<htdocs>, and F<var>.
 
 =item * F</usr/testtorrus/home>
 
-This is the installation directory of Torrus. 
+This is the installation directory of Torrus.
 
 =item * F</usr/testtorrus/etc>
 
@@ -615,8 +667,8 @@ Distribution files will be stored and unpacked here.
 =item * Installation procedure
 
   cd /usr/testtorrus/src
-  gzip -dc torrus-1.0.0.tar.gz | tar xvf -
-  cd torrus-1.0.0
+  gzip -dc torrus-X.X.tar.gz | tar xvf -
+  cd torrus-X.X
   ./configure pkghome=/usr/testtorrus/home \
     sitedir=/usr/testtorrus/etc \
     logdir=/usr/testtorrus/var/log \
@@ -633,114 +685,9 @@ C<data-dir> is set to F</usr/testtorrus/collector_rrd>.
 
 =item * Apache configuration
 
-We reuse the same binaries and libraries as the main installation of Apache,
-but the daemon is launched with our special configuration.
-We assume that Apache is pre-configured for mod_perl. SSL support is not
-included in this example, but it's quite straightforward to implement
-if you need it.
+An additional virtual host section can be added to the production Apache
+server, and ScriptAlias should point to the proper location.
 
-Create a copy of F<httpd.conf> and place it in F</usr/testtorrus/apache/etc>.
-With a text editor, replace the configutration options with the values
-given below:
-
-  # Leave server root as it was in the original config. Apache uses
-  # it for modules loading
-  ServerRoot "/usr/local"
-
-  # make sure that everything that apache writes
-  # goes into our directories
-  PidFile /usr/testtorrus/apache/var/httpd.pid
-  ScoreBoardFile /usr/testtorrus/apache/var/httpd.scoreboard
-
-  # Optional: limit the memory and CPU impact
-  MinSpareServers 2
-  MaxSpareServers 5
-  StartServers 3
-  MaxClients 10
-
-  # We open our HTTP service on TCP port 8123. Choose other
-  # port if this one is occupied
-  Port 8123
-
-  # Not really necessary, but you might want to use it someday
-  DocumentRoot "/usr/testtorrus/apache/htdocs"
-
-  # Find the Directory options for the old htdocs, and
-  # replace the path if you changed DocumentRoot above
-  <Directory "/usr/testtorrus/apache/htdocs">
-  ... some default stuff here ...
-  </Directory>
-
-  # Make sure the logs are written where we expect them to.
-  ErrorLog /usr/testtorrus/apache/var/httpd-error.log
-  CustomLog /usr/testtorrus/apache/var/httpd-access.log combined
-
-  # TCP port number as above
-  NameVirtualHost *:8123
-
-  # Quite standard virtual server configuration. Replace fake
-  # domain names with your real ones.
-  <VirtualHost *:8123>
-    ServerAdmin root@myserver.com
-    DocumentRoot /usr/testtorrus/home/web
-    ServerName torrus.myserver.com
-    CustomLog /usr/testtorrus/apache/var/torrus.myserver.com.log "combined"
-    PerlModule Apache::PerlRun
-    PerlRequire "/usr/testtorrus/home/conf_defaults/webmux.pl"
-    Alias /plain/ "/usr/testtorrus/home/sup/webplain"
-    <Location />
-      SetHandler perl-script
-      PerlHandler Torrus::ApacheHandler
-    </Location>
-    <Location /plain/>
-      SetHandler default-handler
-      Options None
-    </Location>
-  </VirtualHost>
-
-=item * Apache startup script
-
-Save the following script as F</usr/testtorrus/apache/testtorrus.sh>:
-
-  #!/bin/sh
-  case "$1" in
-  start)
-    /usr/local/sbin/httpd -f /usr/testtorrus/apache/etc/httpd.conf && \
-    echo 'apache started'
-    ;;
-  stop)
-    [ -r  /usr/testtorrus/apache/var/httpd.pid  ] && \
-    kill `cat /usr/testtorrus/apache/var/httpd.pid` && \
-    echo 'apache stopped'
-    ;;
-  *)
-    echo "Usage: `basename $0` {start|stop}" >&2
-    ;;
-  esac
-  exit 0
-
-=back
-
-
-=head3 Changing the default short graph
-
-The default small graph in overviews and tokenset listings shows last 6 hours
-of data. It might be more convenient for you to graph last 24 hours,
-or even longer. To do so, you only need to change one parameter,
-C<rrgraph-views>. You may change it on the top of the datasource tree, or
-even only for some parts of the tree.
-
-In F<defaults.xml>, there's a view defiition called C<last24h-small>. It is
-exactly the same size as the 6-hours' C<short> view, but it shows 24-hour
-graph. Somewhere in Torrus configuration, you may have:
-
-  <datasources>
-    <param name="rrgraph-views">
-      last24h-small,last24h,lastweek,lastmonth,lastyear
-    </param>
-  </datasources>
-
-The best place for this would be F<site-global.xml>.
 
 
 =head3 Watching the collector failures
@@ -765,7 +712,7 @@ you might want to amend the script, in order to avoid too large email messages.
 =head3 Viewing external RRD files
 
 Some external program may create its own RRD files, and you
-may want to display and monitor them in Torrus. 
+may want to display and monitor them in Torrus.
 
 Also some collector-generated RRDs may become outdated -- for example, after
 a module is removed from a router, and the interface counters not
@@ -816,7 +763,7 @@ by device type; by service type; etc...
 
 For some devices, the collector may issue the following error messages:
 
- [27-May-2004 10:15:17*] SNMP Error for XX.XX.XX.XX:161:public: Received 
+ [27-May-2004 10:15:17*] SNMP Error for XX.XX.XX.XX:161:public: Received
  tooBig(1) error-status at error-index 0
 
 For better performance, SNMP collector sends several SNMP requests in one
@@ -829,72 +776,8 @@ C<snmp-oids-per-pdu>, and it may be set in the discovery input XML or
 in Torrus configuration XML. The default value is 40, and setting it to 10
 generally works.
 
-=head3 Database lock troubleshooting
-
-It may happen sometimes, that a process accessing Torrus database
-terminates incorrectly, and the database becomes blocked.
-A typical symptom of this is that the command
-C<torrus compilexml --all --verbose>
-does not print anything and stays running forever, occupying zero
-percent of CPU.
-
-The nice, and the preferred way to solve the problem is
-to use C<db_recover> utility from BerkeleyDB package.
-The brutal way is just to remove the databases and re-compile
-all the configuration. I<Note:> The ACL database is not automatically
-backed up, and you need to take care of its backup before deleting
-the contents of the database.
-
-  ## The nice way uses BerkeleyDB db_recover
-  ## (might be located in /usr/local/BerkeleyDB.4.1/bin/)
-  /etc/init.d/apache stop
-  /etc/init.d/torrus stop
-  db_recover -h @dbhome@
-  torrus compilexml --verbose --all
-  /etc/init.d/torrus start
-  /etc/init.d/apache start
-
-  ## The brutal way
-  /etc/init.d/apache stop
-  /etc/init.d/torrus stop
-  cd @dbhome@
-  rm -r *
-  torrus compilexml --verbose
-  /etc/init.d/torrus start
-  /etc/init.d/apache start
-
-
-=head3 Gaps in the graphs after re-compiling the tree
-
-Starting from Torrus release 1.0.9, the collector tries to refresh its
-SNMP name-to-index mappings soon after the re-compilation of the tree. This is
-done in order to catch up faster with new physical or logical
-interfaces on the network devices.
-
-By default, the collector schedules the refresh of its maps randomly within
-1800 seconds (controlled by C<$Torrus::Collector::SNMP::mapsUpdateInterval>).
-
-In some occasions, this period is too short and needs an increase in
-F<torrus-siteconfig.pl>. Possible causes are:
-
-=over 4
-
-=item *
-
-longer collecting period (15 minutes instead of 5)
-
-=item *
-
-too many devices in the tree
-
-=item *
-
-devices are too slow-responding or network latency is too big
-
-=back
-
 
 
 =head1 Author
 
-Copyright (c) 2002-2011 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
+Copyright (c) 2002-2017 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>

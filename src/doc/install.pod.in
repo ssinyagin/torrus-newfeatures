@@ -34,8 +34,8 @@ required components are provided.
 
 If the OS mounts F</var/run> directory to a temporary filesystem, you
 need t make sure that C<piddir> (F</var/run/torrus> by default) is
-always available. If yur OS uses Systemd, the Trrus distribution
-supplies a tmpfile file for that.
+always available. If your OS uses Systemd, the Trrus distribution
+supplies a I<tmpfile> file for that.
 
 It is recommended to use Tobi Oetiker's SDBS tool available at
 E<lt>https://github.com/oetiker/sdbsE<gt>. The tool compiles all Torrus
@@ -56,6 +56,11 @@ running C<./configure>, otherwise use
 Round Robin Database Tool is available at:
 E<lt>http://oss.oetiker.ch/rrdtool/E<gt>.
 
+=item * Redis
+
+A Redis database server is required for Torrus. By default Torrus is
+configured to connect to port 6379 on 127.0.0.1, but this can be changed
+in site configuration.
 
 =item * libxml2
 
@@ -63,7 +68,6 @@ libxml2 is the XML parser library from Gnome
 project E<lt>http://www.gnome.orgE<gt>,
 available as a standalone package.
 Versions C<2.4.23> and above were tested.
-
 
 =item * HTTP Server
 
@@ -123,8 +127,90 @@ Modules required by Torrus:
 =back
 
 
+=head2 Quick Installation with SDBS
 
-=head2 Installation Procedure
+  # This works in Debian or Ubuntu.
+  # You need to install corresponding packages in orther systems
+  apt-get update && apt-get install -y git gcc g++ make automake \
+    libtool apache2 libapache2-mod-fcgid pkg-config xz-utils bzip2
+
+  mkdir -p /opt/pm/src
+  cd /opt/pm/src
+
+  git clone https://github.com/oetiker/sdbs.git
+  cd sdbs
+  PREFIX=/opt/pm/thirdparty ./build_perl5-current.sh
+  PREFIX=/opt/pm/thirdparty ./build_rrdtool-current.sh
+  
+  echo 'PATH=/opt/pm/thirdparty/bin:/opt/pm/bin:$PATH; export PATH' \
+    >/etc/profile.d/torrus_path.sh
+  
+  logout
+  #login again
+
+  # Watch out the group name, your OS may have a different group name for
+  # Apache (this here works for Debian or Ubuntu)
+  useradd -rU torrus
+  usermod  -aG torrus www-data
+
+  # Currently Torrus Version 3 is in its own branch
+  cd /opt/pm/src/
+  git clone -b v3 https://github.com/ssinyagin/torrus-newfeatures.git
+  cd torrus-newfeatures/src
+  sh setup_tools/cpanm_install_modules.sh
+  autoreconf
+  ./configure --prefix=/opt/pm piddir=/var/torrus/run
+  make install
+
+  # systemd unit files
+  cp systemd/torrus.service /lib/systemd/system/
+  cp systemd/torrus.tmpfile /usr/lib/tmpfiles.d/torrus.conf
+  systemctl enable torrus
+    
+  # install plugins as necessary
+  cd ../plugins/cbqos/
+  autoreconf
+  torrus install_plugin .
+
+  mkdir /opt/pm/share/www
+  vi /opt/pm/share/www/index.html
+  === cut ===
+  <html>
+  <head>
+  <title>redirect page</title>
+  <META http-equiv="Refresh" CONTENT="0; URL=/torrus/">
+  </head>
+  <body></body>
+  </html>
+  === cut ===
+
+  vi >/etc/apache2/sites-available/200-torrus.domain.com.conf
+  === cut ===
+  <VirtualHost *:80>
+   DocumentRoot "/opt/pm/share/www"
+   ServerName torrus.domain.com
+   ScriptAlias /torrus "/opt/pm/torrus/bin/torrus.fcgi"
+   FcgidMaxProcessesPerClass 10
+   FcgidMaxRequestsPerProcess 100
+   <Location />
+     Options Indexes
+     Require all granted
+   </Location>
+   <Location /torrus>
+      Options       +ExecCGI
+   </Location>
+  </VirtualHost>
+  === cut ===
+
+  a2ensite 200-torrus.domain.com
+  systemctl restart apache2
+
+  mkdir -p /srv/torrus/collector_rrd
+  chown torrus:torrus /srv/torrus/collector_rrd
+  chmod g+s /srv/torrus/collector_rrd
+    
+
+=head2 Installation Procedure (in detail)
 
 Create the group C<torrus> and a user C<torrus>. The user should be a member of
 this group.
@@ -193,12 +279,6 @@ Default values for operating systems other than Cygwin are: I<var_user=torrus>,
 I<var_group=torrus>, I<var_mode=775>. Setgid bit is set by default for these
 directories.
 
-If available, you may place these directories on a fast media, for example,
-a robust disk array. Changing the C<varprefix> variable would be generally
-enough, for example:
-
-  ./configure varprefix=/vol1/torrus_var
-
 Attention for the systems that have F</var/run> in a temporary
 directory. By default, Torrus installer creates a directory
 F</var/run/torrus> to store the daemon PID files. After the server
@@ -209,8 +289,8 @@ the ./configure arguments.
 
 =head2 Logging
 
-As of Torrus version 2.02, the collector and monitor daemons send their
-logs to a local SYSLOG server in "local0" facility by default.
+The collector and monitor daemons send their logs to a local SYSLOG
+server in "local0" facility by default.
 
 The SYSLOG facility can be altered in F<torrus-siteconfig.pl>:
 
@@ -223,7 +303,7 @@ would not rotate the logs on SIGHUP:
   $Torrus::Collector::useSyslog = 0;
   $Torrus::Monitor::useSyslog = 0;
 
-If your system policy does not allow to use the system SYSKLOG daemon,
+If your system policy does not allow using the system SYSLOG daemon,
 you can run your own (rsyslogd is recommended) and attach it to a UNIX
 socket. In this case, the following statement in siteconfig would direct
 all logging to an alternative SYSLOG socket:
@@ -291,12 +371,6 @@ all logging to an alternative SYSLOG socket:
 
   @piddir@
         Daemon PID files
-
-  @cachedir@
-        Renderer cache
-
-  @dbhome@
-        Berkeley DB home
 
   @seslockdir@
   @sesstordir@
@@ -427,9 +501,6 @@ this variable.
 
 =head2 Apache HTTP server configuration
 
-Torrus web interface is designed to run under mod_perl environment
-(E<lt>http://perl.apache.orgE<gt>).
-
 See the I<Torrus Web Interface Reference> document for detailed instructions on
 Apache configuration.
 
@@ -462,20 +533,44 @@ F<cleanup> script in a cron job, once per day:
 
 =head2 Startup script
 
-The Torrus distriubution provides a startup script which you can install in
-the init scripts directory (/etc/init.d on most Unixes or /usr/local/etc/rc.d/
-on FreeBSD). The script C<torrus> is created during the installation
-process in the subdirectory <init.d> of the distribution directory.
+The Torrus distriubution provides a System V init script which you
+can install in the init scripts directory (/etc/init.d on most Unixes or
+/usr/local/etc/rc.d/ on FreeBSD). The script C<torrus> is created during
+the installation process in the subdirectory <init.d> of the
+distribution directory.
 
 The init script reads some parameters from F<@cfgdefdir@/initscript.conf>,
 and F<@siteconfdir@/initscript.siteconf> if the latter exists.
 By default, it makes the monitor daemons sleep for 20 minutes when
 they are launched simultaneously with collector daemons.
 
+Also Torrus distribution comes with Systemd and Tmpfiles files, so if
+the OS has Systemd in place, System V init files should not be used. See
+the quick installation section (above) for more details.
 
-=head2 Upgrade Procedure
 
-Follow these instructions when upgrading from previous Torrus release.
+
+=head2 Upgrading from Torrus version 2.x
+
+Torrus 3.x is using a completely different back-end for its data
+structures: the old Torrus was using BerkeleyDB, while the new one uses
+a Git repository. Also run-time data is kept in a Redis database
+instance.
+
+Torrus 3.0 is fully compatible with XML configuration and
+F<torrus-siteconfig.pl> statements of Torrus 2.0.
+
+The best approach in upgrading from version 2 is to delete the old
+database and cache directories (or simply everything in F</var/torrus>),
+and also the Torrus scripts and libraries (F</opt/pm/torrus> if you used
+F</opt/pm> as a prefix). Then, run the installation procedure and
+execute the XML compiler, and Torrus should be ready to run.
+
+
+
+=head2 Upgrading within version 3.x
+
+Follow these instructions when upgrading from previous Torrus version.
 
 In the previous distribution directory, look up the F<config.log> file.
 It contains the configure options that you used in previous installation.
@@ -484,8 +579,8 @@ Unpack the new release distribution.
 
 Run C<./configure> with the same options you used before.
 
-Stop the collector and monitor processes
-(usually by C</etc/init.d/torrus stop>).
+Stop the collector and monitor processes (usually by
+C</etc/init.d/torrus stop> or C<systemctl stop torrus>).
 
 Stop Apache process.
 
@@ -496,47 +591,36 @@ Start the collector and monitor processes.
 Start Apache process.
 
 Also it is recommended to re-compile your XML configuration.
-If you prefer not to do this, it's recommended that you clear the
-Web interface cache both in your browser and in Torrus:
-
-  torrus clearcache
 
 
 =head2 Plugins
 
-As of Torrus version 2.01, plugins inherit a new release numbering
-scheme: a plugin release version is a 3-component number, where the
-first two numbers are the Torrus release version that is compatible with
-this plugin.
+Plugin packages inherit a release numbering scheme as follows: a plugin
+release version is a 3-component number, where the first two numbers are
+the Torrus release version that is compatible with this plugin.
 
 
 =head2 Planning the disk space
 
 In a typical Torrus setup, there are two disk space consuming entities:
-the RRDtool data storage and the Berkeley DB database.
+the RRDtool data storage and the Git repository for configuration data.
 
 RRDtool data files (or RRD's) are used to store the values that are gathered
 by the collector daemons. These are the most intensively updated files,
 so the disk speed is important here. If possible, it is better to spread
 the RRD files across several physical disks.
 
-Berkeley DB database is used to keep all the configuratiuon data
-for your datasource trees, and it also keeps some live status information.
-It's intensively updated during XML compilation only.
-During normal Torrus working cycle, there are only few updates, not
-very critical in time. The database is read quite intensively during
-collector initialization, but usually it's the CPU speed that causes
-more delay.
+The Git repository is used to keep all the configuratiuon data for your
+datasource trees, and it also keeps some live status information.  It's
+updated during XML compilation only.  During normal Torrus working
+cycle, there are only read operations. The database is read quite
+intensively during collector initialization, but usually it's the CPU
+speed that causes more delay.
 
-For a typical Torrus installation with standard RRD creation parameters,
-the rough estimation is as follows: the Berkeley DB database occupies
-from 10 to 13 KB per collector datasource, and the RRD storage takes
-approximately 80 to 85 KB per datasource.
+The Git repository needs double the space it occupies between the
+compilations. The compiler runs the garbage collector at the end of its
+work, and all unnecessary data is deleted.
 
-For a medium-sized system, few hundred megabytes for the Berkeley DB database
-and several gigabytes for RRD storage would be sufficient. Larger systems
-require a thorough design and staging work. See I<Torrus Scalability Guide>
-for more details.
 
 =head2 Network performance tuning
 
@@ -554,4 +638,4 @@ and its comments in F<torrus-config.pl> for more details.
 
 =head1 Author
 
-Copyright (c) 2002-2012 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
+Copyright (c) 2002-2017 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>

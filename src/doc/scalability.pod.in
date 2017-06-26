@@ -85,15 +85,8 @@ should be enough to hold all the neccessary data, including the disk cache.
 For example, for 60'000 counters this gives 1'757 MB, thus 2 GB of server RAM
 should be enough.
 
-In addition, Apache with mod_perl occupies 20-30 MB RAM per process, so
-few hundred extra megabytes of RAM would be good to have.
-
 
 =head3 Disk storage
-
-It is not recommended to use IDE disks. They are not designed for
-continuous and intensive use. As experienced by Christian Schnidrig,
-IDE disks don't live long under such load.
 
 It is recommended to reduce the number of RRD files by grouping
 the datasources. This reduces dramatically the number of read and write
@@ -125,71 +118,6 @@ See the manuals for your operating system  for more details.
 
 
 =head2 Torrus Configuration Recommendatations
-
-=head3 BerkeleyDB configuration tuniung
-
-When using lots of collectors and/or lots of HTTP processes, it is
-important to increase the size of BerkeleyDB lock region.
-The command
-
-  db_stat -h @dbhome@ -c
-
-would show you the current number of locks and lockers, and their maximum
-quantities during the database history.
-The maximum numbers of lock objects and lockers can be tuned by creating the
-file F<DB_CONFIG> in the database home directory, F<@dbhome@>.
-The following settings would work fine with about 20 collector processes
-and 5 HTTP daemon processes:
-
-   set_lk_max_lockers	6000
-   set_lk_max_locks	3000
-
-It is also recommended to increase the cache size from default 256KB to some
-bigger amount. Especially if the database has to hold large Torrus trees
-(hundreds or thousands monitored devices). The following line in
-F<DB_CONFIG> sets the cache size to 16MB:
-
-   set_cachesize        0 16777216 1
-
-After updating F<DB_CONFIG>, stop all Torrus processes,
-including HTTP server, then run
-
-  db_recover -h @dbhome@
-
-Then start the processes again. Futher info is available at:
-
-=over 4
-
-=item * General access method configuration (BDB Reference)
-
-http://tinyurl.com/ybymk7t
-
-=item * DB_CONFIG configuration file (BDB Reference)
-
-http://tinyurl.com/y9qjodv
-
-=item * Configuring locking: sizing the system (BDB Reference)
-
-http://tinyurl.com/ya6dtww
-
-=item * C API reference
-
-http://tinyurl.com/yczgnab
-
-=back
-
-
-=head3 XML compilation time
-
-For large datasource trees, XML compilation may take dozens of minutes,
-if not hours. Other processes are not suspended during the compilation, and
-they use the previous configuration version.
-
-For debugging and testing, it is recommended to create a new tree,
-separate from large production trees. That would save you a lot of time and
-would allow you to see the result of changes quickly.
-
-
 
 =head3 Collector schedule tuning
 
@@ -250,7 +178,7 @@ physical servers.
 Several Torrus (backend) servers which run collectors
 and store RRD files in the local storage, shared by NFS.
 The frontend server runs the Web interface, and probably some monitor
-processes, accessing the data files by NFS.
+processes, accessing the data files via NFS.
 
 It is possible to organize the directory structure so that each data file
 would be seen at the same path on every server. Then you can keep identical
@@ -268,6 +196,6 @@ it is preferred that at least 50% of average CPU time is idle.
 
 =head1 Authors
 
-Copyright (c) 2004-2005 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
+Copyright (c) 2004-2017 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
 
 Copyright (c) 2004 Christian Schnidrig E<lt>christian.schnidrig@bluewin.chE<gt>

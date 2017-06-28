@@ -15,7 +15,7 @@
 [% results = searchResults( global.SearchString );
    counter = 0;
 
-   FOREACH entry = results;
+   FOREACH entry IN results;
 
     counter = counter + 1;
     IF counter % 2 == 0;
@@ -26,10 +26,14 @@
 
 %]
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
-    <SPAN CLASS="NodeName">[%entry.0%]:
-    <A HREF="[%pathUrl(entry.0, entry.1)%]">
-    [% entry.1 %]</A>
-    </SPAN>
+    <SPAN CLASS="NodeName">[%entry.tree%]:
+    <A HREF="[%tokenUrl(entry.tree, entry.token)%]">
+    [% entry.path %]</A></SPAN>
+    [% FOREACH param IN entry.match.keys %]
+      <SPAN CLASS="NodeDescr">
+        [% param _ ': ' _ xmlnorm(entry.match.$param) %]
+      </SPAN>
+    [% END %]
   </DIV>
 [% END %]
 </DIV>

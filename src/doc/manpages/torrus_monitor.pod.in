@@ -29,10 +29,8 @@ B<torrus monitor> --tree=I<TREENAME> [I<options...>]
 =head1 DESCRIPTION
 
 This command starts the Monitor process for the tree I<TREENAME>. By
-default it forks into a daemon, sets the log output file to
-F<@logdir@/monitor.TREENAME.log>, performs one monitoring cycle, and
-sleeps until the next cycle is scheduled. In daemon mode the log file
-can be reopened by sending it a SIGHUP signal.
+default it forks into a daemon, and sleeps until the next cycle in its
+schedule.
 
 =head1 OPTIONS
 
@@ -75,10 +73,6 @@ Displays a help message.
 =item F<@siteconfdir@/torrus-siteconfig.pl>
 
 Torrus site configuration script.
-
-=item F<@logdir@/monitor.TREENAME.log>
-
-Monitor's log for the tree I<TREENAME>.
 
 =back
 

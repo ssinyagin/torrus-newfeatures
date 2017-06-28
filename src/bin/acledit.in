@@ -149,10 +149,6 @@ elsif( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-# We set the signal handlers, but we actually don't react on
-# signals, because the acledit is a fast utility
-&Torrus::DB::setSafeSignalHandlers();
-
 Verbose(sprintf("Torrus version %s", '@VERSION@'));
 
 my $aclEdit = new Torrus::ACL::Edit;

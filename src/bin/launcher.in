@@ -40,10 +40,10 @@ my %commands =
 
 my $cmd;
 my $user = '@torrus_user@';
-my $collector_opts = '';
-my $monitor_opts = '';
+my $collector_opts = $Torrus::Collector::default_cmdopts;
+my $monitor_opts = $Torrus::Monitor::default_cmdopts;
 my $force;
-my $timeout = 30;
+my $timeout = $Torrus::Launcher::default_stop_timeout;
 my $verbose;
 my $help_needed;
 
@@ -315,6 +315,9 @@ sub switch_uid
         exit(1);
     }
 
+    # this is needed by libgit to search for .gitconfig
+    $ENV{'HOME'} = $Torrus::Global::cfgSiteDir;
+    
     Verbose("Switched user to " .
             scalar(getpwuid(getuid())) . ':' . scalar(getgrgid(getgid())));
 }

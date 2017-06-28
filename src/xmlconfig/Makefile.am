@@ -22,7 +22,8 @@ EXTRA_DIST = \
 	site-global.xml
 
 xmldir         = $(distxmldir)
-dist_xml_DATA  = defaults.xml snmp-defs.xml cdef-collector-defs.xml
+dist_xml_DATA  = \
+	defaults.xml snmp-defs.xml cdef-collector-defs.xml
 
 vendordir      = $(distxmldir)/vendor
 dist_vendor_DATA = \
@@ -88,7 +89,6 @@ dist_examples_DATA = \
 	examples/generic-netsnmp.xml \
 	examples/hpux.xml \
 	examples/monitors.xml \
-	examples/multigraph.xml \
 	examples/rainbow-schema.xml \
 	examples/servers.data \
 	examples/servers.tmpl

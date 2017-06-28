@@ -38,9 +38,8 @@ if( $Torrus::Renderer::globalDebug )
 
 
 # The FCGI handler process exits after a while and lets FCGI re-spawn
-# the process.  This way there's less chance of DB becoming corrupted
-# The limits are randomized, so that multiple FCGI processes don't stop
-# at the same time
+# the process. The limits are randomized, so that multiple FCGI
+# processes don't stop at the same time
 
 my $max_req_count = $Torrus::FCGI::maxRequests +
     rand($Torrus::FCGI::maxRequestsRandomFactor);

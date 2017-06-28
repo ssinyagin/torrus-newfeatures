@@ -40,16 +40,17 @@ email_siteconfig_pl=@siteconfdir@/email-siteconfig.pl
 devdiscover_siteconfig_pl=@siteconfdir@/devdiscover-siteconfig.pl
 notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
 
+torrus_user=@torrus_user@
+
 @SED@ \
     -e "s,\@FIND\@,@FIND@,g" \
     -e "s,\@PERL\@,@PERL@,g" \
+    -e "s,\@GIT\@,@GIT@,g" \
     -e "s,\@RM\@,@RM@,g" \
     -e "s,\@SHELL\@,@SHELL@,g" \
     -e "s,\@VERSION\@,@VERSION@,g" \
     -e "s,\@bindir\@,@bindir@,g" \
-    -e "s,\@cachedir\@,@cachedir@,g" \
     -e "s,\@cfgdefdir\@,@cfgdefdir@,g" \
-    -e "s,\@dbhome\@,@dbhome@,g" \
     -e "s,\@defrrddir\@,@defrrddir@,g" \
     -e "s,\@devdiscover_config_pl\@,$devdiscover_config_pl,g" \
     -e "s,\@devdiscover_siteconfig_pl\@,$devdiscover_siteconfig_pl,g" \
@@ -62,7 +63,6 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
     -e "s,\@mansec_misc\@,@mansec_misc@,g" \
     -e "s,\@mansec_usercmd\@,@mansec_usercmd@,g" \
     -e "s,\@notify_siteconfig_pl\@,$notify_siteconfig_pl,g" \
-    -e "s,\@perlithreads\@,@perlithreads@,g" \
     -e "s,\@perllibdir\@,@perllibdir@,g" \
     -e "s,\@perllibdirs\@,@perllibdirs@,g" \
     -e "s,\@piddir\@,@piddir@,g" \
@@ -87,7 +87,10 @@ notify_siteconfig_pl=@siteconfdir@/notify-siteconfig.pl
     -e "s,\@torrus_config_pl\@,$torrus_config_pl,g" \
     -e "s,\@torrus_siteconfig_pl\@,$torrus_siteconfig_pl,g" \
     -e "s,\@torrus_user\@,@torrus_user@,g" \
+    -e "s,\@var_user\@,@var_user@,g" \
+    -e "s,\@var_group\@,@var_group@,g" \
     -e "s,\@webplaindir\@,@webplaindir@,g" \
+    -e "s,\@gitrepodir\@,@gitrepodir@,g" \
     $1
 
 # Local Variables:

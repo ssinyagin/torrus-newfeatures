@@ -14,20 +14,14 @@
        IF nodeParam(child,'hidden') == 'yes';
          hidden = 1;
        END;
-       IF isAlias(child);
-         thisIsAlias = 1;
-         urlTitle = 'Symbolic link to ' _ path(isAlias(child));
-       ELSE;
-         urlTitle = nodeParam(child,'comment',1);
-       END;
+       urlTitle = nodeParam(child,'comment',1);
        IF not hidden or variables.SHOWHIDDEN; %]
 <DIV CLASS="RecursiveListRow">
   <SPAN CLASS="NodeName">
-    [% thisIsAlias ? '<EM CLASS="Alias">':'';
-       hidden ? '<EM CLASS="ShowHidden">':'' %]
+    [% hidden ? '<EM CLASS="ShowHidden">':'' %]
     <A HREF="[%url(child)%]"
        TITLE="[%urlTitle%]">[% nodeName(child) %]</A>
-    [% hidden ? '</EM>':'';  thisIsAlias ? '</EM>':''; %]
+    [% hidden ? '</EM>':'' %]
   </SPAN>
   [% INCLUDE recursiveChildren token=child %]
 </DIV>

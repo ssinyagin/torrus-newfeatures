@@ -31,7 +31,7 @@ use Getopt::Long;
 
 use Torrus::Log;
 use Torrus::Monitor;
-use Torrus::MonitorScheduler;
+use Torrus::AgentScheduler;
 use Torrus::SiteConfig;
 
 exit(1) unless Torrus::SiteConfig::verify();
@@ -118,6 +118,8 @@ if( not $nodaemon and not $runonce )
     &Proc::Daemon::Init();
     umask 0017; # Proc::Daemon::Init sets the mask to all-writable
 
+    setup_sighandlers();
+
     # now we're forked, save the PID file for the END block
     $pidfile = $pidfilename;
     
@@ -150,24 +152,19 @@ Info(sprintf("Torrus version %s", '@VERSION@'));
 Info(sprintf("%s started for tree %s", $0, $tree));
 Info(sprintf("Process ID %d", $$));
 
-$SIG{'HUP'} = sub {
-    Warn('Received SIGHUP. Stopping the process.');
-    exit(1);
-};
-
 if( $delay > 0 )
 {
     Info(sprintf('Delaying for %d minutes', $delay));
     sleep($delay * 60);
 }
 
-&Torrus::DB::setSafeSignalHandlers();
-
 my %options =
     (
      '-ProcessName' => $process_name,
+     '-AgentName'   => 'monitor',
      '-Tree'      => $tree,
-     );
+     '-Instance'    => 0
+    );
 if( $runonce )
 {
     $options{'-RunOnce'} = 1;
@@ -177,8 +174,10 @@ if( $runalways or $Torrus::Monitor::runAlways )
     $options{'-RunAlways'} = 1;
 }
 
-my $scheduler = new Torrus::MonitorScheduler( %options );
-$scheduler->run();
+eval {
+    my $scheduler = new Torrus::AgentScheduler( %options );
+    $scheduler->run();
+};
 
 if( not $options{'-RunOnce'} )
 {
@@ -187,6 +186,25 @@ if( not $options{'-RunOnce'} )
 }
 
 exit;
+
+
+sub setup_sighandlers
+{
+    $SIG{'HUP'} = sub {
+        Warn('Received SIGHUP. Stopping the process.');
+        exit;
+    };
+
+    $SIG{'TERM'} = sub {
+        Warn('Received SIGTERM. Stopping the process.');
+        exit;
+    };
+
+    $SIG{'INT'} = sub {
+        Warn('Received SIGINT. Stopping the process');
+        exit;
+    };
+};    
 
 
 END

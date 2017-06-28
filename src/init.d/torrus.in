@@ -44,18 +44,6 @@ if test x"${TORRUS_USER}" != x; then
   STOP_ARGS=${STOP_ARGS}' --user='${TORRUS_USER}
 fi
 
-if test x"${TORRUS_COLLECTOR_CMDOPTS}" != x; then
-  START_ARGS=${START_ARGS}' --copts="'${TORRUS_COLLECTOR_CMDOPTS}'"'
-fi
-
-if test x"${TORRUS_MONITOR_CMDOPTS}" != x; then
-  START_ARGS=${START_ARGS}' --mopts="'${TORRUS_MONITOR_CMDOPTS}'"'
-fi
-
-if test x"${TORRUS_STOP_TIMEOUT}" != x; then
-  STOP_ARGS=${STOP_ARGS}' --timeout='${TORRUS_STOP_TIMEOUT}
-fi
-
 
 start_daemons () {
   ${cmddir}/launcher ${START_ARGS} 2>&1 | tee -a @logdir@/launcher_start.log

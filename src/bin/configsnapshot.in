@@ -94,8 +94,6 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
     exit 1;
 }
 
-&Torrus::DB::setSafeSignalHandlers();
-
 my $filter_match = sub {return $_[0] == $filter_value};
 
 if(defined($filter_param))
@@ -151,17 +149,13 @@ sub collect_monitors
 
     foreach my $action ( $config_tree->getActionNames() )
     {
-        &Torrus::DB::checkInterrupted();
-        
-        my $params = $config_tree->getParams( $action );
+        my $params = $config_tree->getOtherParams( $action );
         $cb->addMonitorAction( $monitorsNode, $action, $params );
     }
 
     foreach my $monitor ( $config_tree->getMonitorNames() )
     {
-        &Torrus::DB::checkInterrupted();
-        
-        my $params = $config_tree->getParams( $monitor );
+        my $params = $config_tree->getOtherParams( $monitor );
         $cb->addMonitor( $monitorsNode, $monitor, $params );
     }
     return;
@@ -176,9 +170,7 @@ sub collect_tokensets
 
     foreach my $tset ( $config_tree->getTsets() )
     {
-        &Torrus::DB::checkInterrupted();
-        
-        my $params = $config_tree->getParams( $tset );
+        my $params = $config_tree->getOtherParams( $tset );
         my $name = $tset;
         $name =~ s/^S//;
         $cb->addTokenset( $tsetsNode, $name, $params );
@@ -196,16 +188,12 @@ sub collect_definitions
 
     foreach my $defName ( sort $config_tree->getDefinitionNames() )
     {
-        &Torrus::DB::checkInterrupted();
-
         my $value = $config_tree->getDefinition( $defName );
         $cb->addDefinition( $definitionsNode, $defName, $value );
     }
 
     my $propsNode = $cb->startParamProps();
     my $props = $config_tree->getParamProperties();
-
-    &Torrus::DB::checkInterrupted();
 
     foreach my $prop ( sort keys %{$props} )
     {
@@ -228,10 +216,7 @@ sub collect_datasources
     
     my $topNode = $cb->getTopSubtree();
     my $topToken = $config_tree->token('/');
-    
-    my $params = prepare_params( $config_tree, $topToken );
-    $cb->addParams( $topNode, $params );
-
+            
     if( defined($filter_param) )
     {
         $filterTokens{$topToken} = apply_filter( $config_tree, $topToken );
@@ -252,8 +237,6 @@ sub apply_filter
     
     foreach my $ctoken ( $config_tree->getChildren( $token ) )
     {
-        &Torrus::DB::checkInterrupted();
-        
         if( $config_tree->isSubtree( $ctoken ) )
         {
             $filterTokens{$token} += apply_filter( $config_tree, $ctoken );
@@ -280,35 +263,43 @@ sub collect_subtrees
     my $cb = shift;
     my $token = shift;
     my $parentNode = shift;
-    
-    foreach my $ctoken ( $config_tree->getChildren( $token ) )
+
+    if( defined($filter_param) and not $filterTokens{$token} )
     {
-        &Torrus::DB::checkInterrupted();
+        return;
+    }
+
+    my $params = prepare_params($config_tree, $token);
+    my $nodeName = $config_tree->nodeName( $config_tree->path($token) );
+    my $isSubtree = $config_tree->isSubtree($token);
+
+    my $curNode;
+    if( $isSubtree )
+    {
+        $curNode = $cb->addSubtree( $parentNode, $nodeName, $params );
+    }
+    else
+    {
+        $curNode = $cb->addLeaf( $parentNode, $nodeName, $params );
+    }
         
-        if( not defined($filter_param) or $filterTokens{$ctoken} )
+    my @srcfiles = $config_tree->getSrcFiles($token);
+    if( scalar(@srcfiles) )
+    {
+        $cb->addComment($curNode, 'src: ' . join(',', @srcfiles));
+    }
+    
+    $cb->addComment($curNode, 'token: ' . $token);
+
+    
+    if( $isSubtree )
+    {
+        foreach my $ctoken ( $config_tree->getChildren( $token ) )
         {
-            my $childName =
-                $config_tree->nodeName( $config_tree->path($ctoken) );
-            my $params = prepare_params( $config_tree, $ctoken );
-        
-            if( $config_tree->isSubtree( $ctoken ) )
-            {
-                my $subtreeNode =
-                    $cb->addSubtree( $parentNode, $childName, $params );
-                collect_subtrees( $config_tree, $cb, $ctoken, $subtreeNode );
-            }
-            elsif( $config_tree->isLeaf( $ctoken ) )
-            {
-                $cb->addLeaf( $parentNode, $childName, $params );
-            }
-            
-            foreach my $aliasToken ( $config_tree->getAliases( $ctoken ) )
-            {
-                $cb->addAlias( $parentNode,
-                               $config_tree->path( $aliasToken ) );
-            }
+            collect_subtrees( $config_tree, $cb, $ctoken, $curNode );
         }
     }
+
     return;
 }
 
@@ -318,7 +309,7 @@ sub prepare_params
     my $config_tree = shift;
     my $token = shift;
     
-    my $params = $config_tree->getParams( $token, 1 );
+    my $params = $config_tree->getNodeParams($token);
 
     # Remove linebreaks
     while( my( $param, $value ) = each %{$params} )

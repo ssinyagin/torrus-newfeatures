@@ -32,7 +32,6 @@ exit(1) unless Torrus::SiteConfig::verify();
 
 our @trees;
 our $all_trees;
-our $no_ds;
 our $no_validation;
 our $force;
 
@@ -42,7 +41,6 @@ our $help_needed;
 
 my $opts_ok = GetOptions ('tree=s'   => \@trees,
                           'all'      => \$all_trees,
-                          'nods'     => \$no_ds,
                           'noval'    => \$no_validation,
                           'force'    => \$force,
                           'debug'    => \$debug,
@@ -56,10 +54,8 @@ if( not $opts_ok or not (scalar(@trees) or $all_trees) or
     "Options:\n",
     "  --tree=NAME     tree name(s) to compile\n",
     "  --all           compile all trees\n",
-    "  --nods          compile non-datasource configuration only\n",
     "  --noval         disable parameter validation\n",
-    "  --force         force the compiler even if anoother " .
-        "compiler process is probably running\n",
+    "  --force         force re-processing of all XML files\n",
     "  --debug         set the log level to debug\n",
     "  --verbose       set the log level to info\n",
     "  --help          this help message\n";
@@ -81,8 +77,6 @@ elsif( $verbose )
 }
 
 
-&Torrus::DB::setSafeSignalHandlers();
-
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
 our $global_ok = 1;
@@ -95,15 +89,12 @@ foreach my $tree ( @trees )
         exit(1);
     }
 
-    &Torrus::DB::checkInterrupted();
-    
     Verbose("Compiling tree: $tree");
 
     my $ok = 1;
     my $compiler =
         new Torrus::ConfigTree::XMLCompiler( -TreeName => $tree,
-                                             -NoDSRebuild => $no_ds,
-                                             -ForceWriter => $force );
+                                             -ForceRebuild => $force );
     if( not defined( $compiler ) )
     {
         Error('Cannot initialize compiler for tree ' . $tree . '. Exiting');
@@ -117,15 +108,7 @@ foreach my $tree ( @trees )
     push( @xmlFiles, Torrus::SiteConfig::listXmlFiles( $tree ) );
     push( @xmlFiles, @Torrus::Global::xmlAlwaysIncludeLast );
 
-    foreach my $xmlfile ( @xmlFiles )
-    {
-        if( not $compiler->compile( $xmlfile ) )
-        {
-            Error($xmlfile . ' compiled with errors'); $ok = 0;
-        }
-    }
-
-    if( not $ok )
+    if( not $compiler->compile_files( \@xmlFiles ) )
     {
         Error("Errors found during XML compilation in the tree named \"" .
               $tree . "\"");
@@ -133,71 +116,52 @@ foreach my $tree ( @trees )
         last;
     }
 
-    Verbose('Data post-processing...');
-    if( not $compiler->postProcess() )
+    Verbose('Preparing a commit...');
+    if( not $compiler->commitConfig() )
     {
         Error('Errors found during post-processing');
         $ok = 0;
     }
 
-    if( $no_validation )
+    if( $ok )
     {
-        Verbose('Skipping data validation...');
-    }
-    else
-    {
-        Verbose('Data validation...');
-        if( not $compiler->validate() )
+        if( $no_validation )
         {
-            Error('Errors found during validation process');
-            $ok = 0;
+            Verbose('Skipping data validation...');
         }
-    }
-
-    &Torrus::DB::checkInterrupted();
-    
-    # Preserve the dynamic tokenset members
-    if( not $compiler->{'first_time_created'} )
-    {
-        my $oldConfig = new Torrus::ConfigTree( -TreeName => $tree );
-        if( defined( $oldConfig ) )
+        else
         {
-            foreach my $ts ( $oldConfig->getTsets() )
+            Verbose('Data validation...');
+            if( not $compiler->validate() )
             {
-                if( $compiler->tsetExists( $ts ) )
-                {
-                    foreach my $member ( $oldConfig->tsetMembers( $ts ) )
-                    {
-                        my $origin =
-                            $oldConfig->tsetMemberOrigin( $ts, $member );
-                        if( defined( $origin ) and $origin ne 'static' )
-                        {
-                            my $path = $oldConfig->path($member);
-                            if( $compiler->nodeExists( $path ) )
-                            {
-                                my $token = $compiler->token( $path );
-                                $compiler->tsetAddMember
-                                    ( $ts, $token, $origin );
-                                Verbose('Preserved dynamic tokenset member: ' .
-                                        $path . ' in ' . $ts);
-                            }
-                        }
-                    }
-                }
+                Error('Errors found during validation process');
+                $ok = 0;
             }
         }
-
-        undef $oldConfig;
     }
-                    
-    &Torrus::DB::checkInterrupted();
                              
     $compiler->finalize( $ok );
-    undef $compiler;
-    &Torrus::DB::cleanupEnvironment();
+
+    if( $ok )
+    {
+        Verbose('Updating agent configurations');
+        $compiler->updateAgentConfigs();
+    }
 
     $global_ok = $ok ? $global_ok:0;
 }
+
+# Garbage collector is needed because of this:
+# https://github.com/libgit2/libgit2/issues/4093
+Verbose('Running Git garbage collector...');
+system(sprintf('cd %s; %s gc',
+               $Torrus::Global::gitRepoDir,
+               $Torrus::Global::gitExec));
+
+# Update "objects/info/packs" and "info/refs" needed by dumb server
+system(sprintf('cd %s; %s update-server-info',
+               $Torrus::Global::gitRepoDir,
+               $Torrus::Global::gitExec));
 
 exit($global_ok ? 0:1);
 

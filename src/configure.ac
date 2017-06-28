@@ -18,7 +18,7 @@
 #
 
 
-AC_INIT([torrus],[2.10dev],[ssinyagin@users.sourceforge.net])
+AC_INIT([torrus],[3.00dev],[ssinyagin@users.sourceforge.net])
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
@@ -34,6 +34,7 @@ AC_PATH_PROG(SED, sed, no)
 AC_PATH_PROG(FIND, find, no)
 AC_PATH_PROG(RM, rm, no)
 AC_PATH_PROG(SLEEP, sleep, no)
+AC_PATH_PROG(GIT, git, no)
 
 
 # This will generate doc pages from POD sources
@@ -47,10 +48,6 @@ AC_ARG_ENABLE(pkgonly,
                         [Skip all checking])])
 AC_SUBST(enable_pkgonly)
 
-AC_ARG_ENABLE(threads,
-        [AC_HELP_STRING([--disable-threads],
-                        [Disable Perl threads usage])])
-        
 perllibdirs="\'\${perllibdir}\'"
 
 PERLOPTS=
@@ -100,12 +97,19 @@ AC_SUBST(perllibdirs, [${perllibdirs}])
 
 if test "$enable_pkgonly" != yes; then
 
-   for module in 'BerkeleyDB' 'XML::LibXML' 'Template' \
+   if test ${GIT} = no; then
+     AC_MSG_ERROR([Git executable is required])
+   fi
+
+   for module in 'Redis::Fast' \
+                 'Git::Raw 0.72' 'Git::ObjectStore 0.007' \
+                 'Cache::Ref' \
+                 'XML::LibXML' 'Template' \
                  'Proc::Daemon' 'Net::SNMP' 'URI::Escape' 'Apache::Session' \
-                 'Date::Parse' 'JSON'
+                 'Date::Parse' 'JSON' 'JSON::XS' 'FCGI'
    do
      AC_MSG_CHECKING([presence of $module])
-     if ${PERL} ${PERLOPTS} -e 'use '$module 2>/dev/null; then
+     if ${PERL} ${PERLOPTS} -e "use $module" 2>/dev/null; then
          AC_MSG_RESULT([Ok])
      else
          AC_MSG_ERROR([Perl cannot find $module]);
@@ -113,57 +117,55 @@ if test "$enable_pkgonly" != yes; then
    done
 
 #  Check if Perl threads can be used.
-#  Requirements are: perl 5.8.8 with threads compiled,
+#  Requirements are: perl 5.8.9 with threads compiled,
 #  threads ver. 1.41 or higher, threads::shared ver. 1.03 or higher
-   
+
    perlithreads=1
-   if test x"$enable_threads" = xno; then
-     perlithreads=0     
+
+   AC_MSG_CHECKING([if Perl version is 5.8.9 or higher])
+   if ${PERL} ${PERLOPTS} -e 'use 5.8.9' 2>/dev/null; then
+     AC_MSG_RESULT([Ok])
    else
-   
-     AC_MSG_CHECKING([if Perl version is 5.8.8 or higher])
-     if ${PERL} ${PERLOPTS} -e 'use 5.8.8' 2>/dev/null; then
+     perlithreads=0
+     AC_MSG_RESULT([no])
+   fi
+
+   if test ${perlithreads} -eq 1; then
+     AC_MSG_CHECKING([threading support in Perl])
+     if ${PERL} ${PERLOPTS} -e 'use threads' 2>/dev/null; then
        AC_MSG_RESULT([Ok])
      else
        perlithreads=0
-     fi       
-
-     if test ${perlithreads} -eq 1; then
-       AC_MSG_CHECKING([threading support in Perl])
-       if ${PERL} ${PERLOPTS} -e 'use threads' 2>/dev/null; then
-         AC_MSG_RESULT([Ok])
-       else
-         perlithreads=0
-       fi
+       AC_MSG_RESULT([no])
      fi
-
-     if test ${perlithreads} -eq 1; then     
-       AC_MSG_CHECKING([if threads module version is 1.41 or higher])
-       if ${PERL} ${PERLOPTS} -e \
-         'use threads; exit($threads::VERSION >= 1.41 ? 0:1)'; then
-           AC_MSG_RESULT([Ok])
-       else
-           perlithreads=0
-       fi
-     fi
-
-     if test ${perlithreads} -eq 1; then  
-       AC_MSG_CHECKING([if threads::shared module version is 1.03 or higher])
-       if ${PERL} ${PERLOPTS} -e \
-         'use threads; use threads::shared;
-          exit($threads::shared::VERSION >= 1.03 ? 0:1)'; then
-           AC_MSG_RESULT([Ok])
-       else         
-           perlithreads=0
-       fi
-     fi
-     
-     if test ${perlithreads} -eq 0; then  
-       AC_MSG_RESULT([No. Multithreading will not be used.])
-     fi
-          
    fi
-   AC_SUBST(perlithreads, [${perlithreads}])   
+
+   if test ${perlithreads} -eq 1; then
+     AC_MSG_CHECKING([if threads module version is 1.41 or higher])
+     if ${PERL} ${PERLOPTS} -e \
+       'use threads; exit($threads::VERSION >= 1.41 ? 0:1)'; then
+         AC_MSG_RESULT([Ok])
+     else
+       perlithreads=0
+       AC_MSG_RESULT([no])
+     fi
+   fi
+
+   if test ${perlithreads} -eq 1; then
+     AC_MSG_CHECKING([if threads::shared module version is 1.03 or higher])
+     if ${PERL} ${PERLOPTS} -e \
+       'use threads; use threads::shared;
+        exit($threads::shared::VERSION >= 1.03 ? 0:1)'; then
+         AC_MSG_RESULT([Ok])
+     else
+       perlithreads=0
+       AC_MSG_RESULT([no])
+     fi
+   fi
+
+   if test ${perlithreads} -eq 0; then
+     AC_MSG_ERROR([Perl multithreading is disabled or modules are too old])
+   fi
 fi
 
 AC_ARG_VAR(torrus_user,  [[torrus] UID to run the daemons])
@@ -186,17 +188,22 @@ if test "$enable_pkgonly" != yes; then
         AC_MSG_RESULT([Ok])
     fi
 fi
-   
+
 
 # Set the var/db and var/cache ownership
 
-AC_ARG_VAR(var_user,  [[TORRUS_USER] Owner of db and cache directories])
-AC_ARG_VAR(var_group, [[torrus] Group of db and cache directories])
-AC_ARG_VAR(var_mode,  [[775] Mode of db and cache directories])
+AC_ARG_VAR(var_user,  [[TORRUS_USER] Owner of writable directories])
+if test -z "$var_user"; then var_user='${torrus_user}'; fi
+
+AC_ARG_VAR(var_group, [[torrus] Group of writable directories])
+if test -z "$var_group"; then var_group='torrus'; fi
+
+AC_ARG_VAR(var_mode,  [[775] Mode of writable directories])
+if test -z "$var_mode"; then var_mode='775'; fi
 
 AC_ARG_ENABLE(varperm,
         [AC_HELP_STRING(--disable-varperm,
-        Disable db and cache access rights tuning)],
+        Disable directory access rights tuning)],
         [],
         [enable_varperm="yes"])
 AC_SUBST(enable_varperm)
@@ -223,7 +230,7 @@ if test -z "$exmpdir"; then
 
 AC_ARG_VAR(perllibdir,  [[PKGHOME/perllib] Torrus Perl libraries])
 if test -z "$perllibdir"; then
-   perllibdir='${pkghome}/perllib'; fi
+   perllibdir='${pkghome}/lib'; fi
 
 AC_ARG_VAR(pluginsdir,   [[PKGHOME/plugins] Plugin configurations])
 if test -z "$pluginsdir"; then
@@ -241,7 +248,6 @@ AC_ARG_VAR(plugwrapperdir, [[PLUGINSDIR/wrapper]])
 if test -z "$plugwrapperdir"; then
    plugwrapperdir='${pluginsdir}/wrapper'; fi
 
-      
 AC_ARG_VAR(scriptsdir, [[PKGHOME/scripts] Script files])
 if test -z "$scriptsdir"; then
    scriptsdir='${pkghome}/scripts'; fi
@@ -294,14 +300,10 @@ if test -z "$piddir"; then
 AC_ARG_VAR(varprefix, [[/var/torrus] Common prefix for runtime data])
 if test -z "$varprefix"; then
    varprefix='/var/torrus'; fi
-   
-AC_ARG_VAR(cachedir, [[VARPREFIX/cache] Renderer cache])
-if test -z "$cachedir"; then
-   cachedir='${varprefix}/cache'; fi
 
-AC_ARG_VAR(dbhome, [[VARPREFIX/db] Berkeley DB files])
-if test -z "$dbhome"; then
-   dbhome='${varprefix}/db'; fi
+AC_ARG_VAR(gitrepodir, [[VARPREFIX/gitrepo] git repository dir])
+if test -z "$gitrepodir"; then
+   gitrepodir='${varprefix}/gitrepo'; fi
 
 AC_ARG_VAR(reportsdir, [[VARPREFIX/reports] Reports output])
 if test -z "$reportsdir"; then
@@ -331,12 +333,12 @@ AC_ARG_VAR(defrrddir, [[/srv/torrus/collector_rrd] Default RRD storage path])
 if test -z "$defrrddir"; then
    defrrddir='/srv/torrus/collector_rrd'; fi
 
-   
+
 AC_CONFIG_FILES([Makefile bin/Makefile configs/Makefile])
 AC_CONFIG_FILES([doc/Makefile doc/manpages/Makefile])
-AC_CONFIG_FILES([examples/Makefile perllib/Makefile])
+AC_CONFIG_FILES([examples/Makefile lib/Makefile])
 AC_CONFIG_FILES([sup/Makefile xmlconfig/Makefile])
-                                    
+
 AC_CONFIG_FILES([setup_tools/substvars.sh],[chmod +x setup_tools/substvars.sh])
 AC_CONFIG_FILES([setup_tools/mkvardir.sh], [chmod +x setup_tools/mkvardir.sh])
 AC_CONFIG_FILES([init.d/torrus], [chmod +x init.d/torrus])

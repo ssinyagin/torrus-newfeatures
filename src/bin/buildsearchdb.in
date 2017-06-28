@@ -22,16 +22,16 @@ use warnings;
 BEGIN { require '@torrus_config_pl@'; }
 
 use Getopt::Long;
+use Git::ObjectStore;
+use JSON;
 
 use Torrus::ConfigTree;
-use Torrus::Search;
 use Torrus::SiteConfig;
 use Torrus::Log;
 
 exit(1) unless Torrus::SiteConfig::verify();
 
 my @trees;
-my $build_global;
 my $all_trees;
 
 my $verbose;
@@ -39,26 +39,19 @@ my $help_needed;
 
 my $ok = GetOptions ('tree=s'   => \@trees,
                      'all'      => \$all_trees,
-                     'global'   => \$build_global,
                      'verbose'  => \$verbose,
                      'help'     => \$help_needed);
 
-if( not $ok or not (scalar(@trees) or $all_trees or $build_global) or
+if( not $ok or not (scalar(@trees) or $all_trees ) or
     $help_needed or scalar(@ARGV) > 0 )
 {
     print STDERR "Usage: $0 --tree=NAME [options...]\n",
     "Options:\n",
     "  --tree=NAME     rebuild search DB for a tree\n",
     "  --all           rebuild search DB for all trees\n",
-    "  --global        rebuild global search DB\n",
     "  --verbose       print extra information\n",
     "  --help          this help message\n";
     exit 1;
-}
-
-if( $build_global )
-{
-    $all_trees = 1;
 }
 
 if( $all_trees )
@@ -71,16 +64,30 @@ if( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-&Torrus::DB::setSafeSignalHandlers();
-
 Verbose(sprintf('Torrus version %s', '@VERSION@'));
 
-my $search = new Torrus::Search( -WriteAccess => 1 );
+my $store = new Git::ObjectStore(
+    'repodir' => $Torrus::Global::gitRepoDir,
+    'branchname' => 'searchdb',
+    'writer' => 1,
+    'author_name'  => $Torrus::ConfigTree::writerAuthorName,
+    'author_email' => $Torrus::ConfigTree::writerAuthorEmail);
 
-if( $build_global )
+if( $store->created_init_commit() )
 {
-    $search->openGlobal();
+    # we need to write mempack with initial commit, so that the reader
+    # can point to the top of the branch
+    $store->write_packfile();
 }
+
+# in order to delete entries, we need to read them recursively, and that
+# requires a read-only store object
+my $store_read = new Git::ObjectStore(
+    'repodir' => $Torrus::Global::gitRepoDir,
+    'branchname' => 'searchdb');
+
+
+my $json = JSON->new->canonical(1)->allow_nonref(1);
 
 foreach my $tree ( @trees )
 {
@@ -90,8 +97,6 @@ foreach my $tree ( @trees )
         exit(1);
     }
     
-    &Torrus::DB::checkInterrupted();
-    
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
     if( not defined($config_tree) )
     {
@@ -100,89 +105,105 @@ foreach my $tree ( @trees )
     }
     
     Verbose("Processing the tree: $tree");
+
+    my $old_commit_id;
+    my $old_ref_json = $store->read_file('configtree_ref/' . $tree);
+    if( defined($old_ref_json) )
+    {
+        $old_commit_id = $json->decode($old_ref_json);
+    }
         
-    $search->openTree( $tree );
-    
-    walkSubtree( $config_tree, $config_tree->token('/') );
-    
-    $search->closeTree( $tree );
-    $config_tree = undef;
+    my $n_updated = 0;
+    my $n_indexed = 0;
+    my $n_deleted = 0;
+    my $n_unindexed = 0;
+
+    my $cb_updated = sub {
+        delete_token($config_tree, $_[0]);
+        $n_indexed += index_token($config_tree, $_[0]);
+        $n_updated++;
+    };
+
+    my $cb_deleted = sub {
+        $n_unindexed += delete_token($config_tree, $_[0]);
+        $n_deleted++;
+    };
+
+    $config_tree->getUpdates($old_commit_id, $cb_updated, $cb_deleted);
+    Verbose("Updated: $n_updated, Deleted: $n_deleted nodes");
+    Verbose("Indexed: $n_indexed, Unindexed: $n_unindexed nodes");
+
+    $store->write_file('configtree_ref/' . $tree,
+                       $json->encode($config_tree->currentCommit()));    
+
+    $store->create_commit_and_packfile();
 }
+
+# Garbage collector is needed because of this:
+# https://github.com/libgit2/libgit2/issues/4093
+Verbose('Running Git garbage collector...');
+system(sprintf('cd %s; %s gc',
+               $Torrus::Global::gitRepoDir,
+               $Torrus::Global::gitExec));
 
 exit(0);
 
 
-sub walkSubtree
+sub index_token
 {
     my $config_tree = shift;
-    my $ptoken = shift;
+    my $token = shift;
+
+    my $is_searchable = $config_tree->getNodeParam( $token, 'searchable', 1 );
+    if( not defined($is_searchable) or $is_searchable ne 'yes' )
+    {
+        return 0;
+    }
 
     my $tree = $config_tree->treeName();
+    my $path = $config_tree->path( $token );
+    my $nodeName = $config_tree->nodeName( $path );
+    split_and_store( $tree, $nodeName, $token );
     
-    foreach my $token ( $config_tree->getChildren( $ptoken ) )
+    my $params = $config_tree->getNodeParams( $token );
+    while( my( $param, $value ) = each %{$params} )
     {
-        &Torrus::DB::checkInterrupted();
-        
-        if( $config_tree->isSubtree( $token ) )
+        if( $config_tree->getParamProperty( $param, 'search' ) )
         {
-            walkSubtree( $config_tree, $token );
-        }
-
-        my $isSearchable =
-            $config_tree->getNodeParam( $token, 'searchable', 1 );
-        if( defined( $isSearchable ) and $isSearchable eq 'yes' )
-        {
-            my $path = $config_tree->path( $token );
-            
-            my $nodeName = $config_tree->nodeName( $path );
-            splitAndStore( $tree, $nodeName, $path );
-            
-            my $params = $config_tree->getParams( $token, 1 );
-            while( my( $param, $value ) = each %{$params} )
-            {
-                if( $config_tree->getParamProperty( $param, 'search' ) )
-                {
-                    splitAndStore( $tree, $value, $path, $param );
-                }
-            }
+            split_and_store( $tree, $value, $token, $param );
         }
     }
-    return;
+    
+    return 1;
 }
 
 
-sub splitAndStore
+sub split_and_store
 {
     my $tree = shift;
     my $value = shift;
-    my $path = shift;
+    my $token = shift;
     my $param = shift;
 
-    if( length( $value ) > 0 )
+    # split the value into words
+    my @words = split( /[^a-zA-Z0-9-_]+/mso, $value );
+    if( scalar( @words ) > 0 )
     {
-        # split the value into words
-        my @words = split( /[^a-zA-Z0-9-_]+/mso, $value );
-        if( scalar( @words ) > 0 )
+        foreach my $word ( @words )
         {
-            foreach my $word ( @words )
+            if( length( $word ) > 1 )
             {
-                if( length( $word ) > 1 )
+                store_keyword( $tree, $word, $token, $param );
+                
+                # Split the word by underscores and dashes
+                my @subwords = split( /[-_]+/o, $word );
+                if( scalar( @subwords ) > 1 )
                 {
-                    $search->storeKeyword( $tree, $word, $path, $param );
-                    
-                    # Split the word by underscores and dashes
-                    my @subwords = split( /[-_]+/o, $word );
-                    if( scalar( @subwords ) > 1 )
+                    foreach my $subword ( @subwords )
                     {
-                        foreach my $subword ( @subwords )
+                        if( length( $subword ) > 1 )
                         {
-                            if( length( $subword ) > 1 )
-                            {
-                                $search->storeKeyword( $tree,
-                                                       $subword,
-                                                       $path,
-                                                       $param );
-                            }
+                            store_keyword( $tree, $subword, $token, $param );
                         }
                     }
                 }
@@ -192,6 +213,78 @@ sub splitAndStore
     return;
 }
 
+
+sub sha_file
+{
+    my $sha = shift;
+    return join('/', substr($sha, 0, 2), substr($sha, 2, 2), substr($sha, 4));
+}
+
+
+sub store_keyword
+{
+    my $tree = shift;
+    my $word = lc(shift);
+    my $token = shift;
+    my $param = shift;
+
+    if( not defined($param) )
+    {
+        $param = '__NODENAME__';
+    }
+
+    my $subpath = $word . '/' . $token . '/' . $param;
+    $store->write_file('words/' . $tree . '/' . $subpath, '');
+    $store->write_file('wordsglobal/' . $subpath, '');
+    $store->write_file('wordsglobal/' . $word . '/' . $token . '/__TREENAME__',
+                       $json->encode($tree));
+    $store->write_file('tokens/' . sha_file($token) . '/' . $word, '');
+    return;
+}
+
+
+sub delete_token
+{
+    my $config_tree = shift;
+    my $token = shift;
+
+    my $sha_file = sha_file($token);
+    my $tree = $config_tree->treeName();
+
+    if( not $store_read->file_exists('tokens/' . $sha_file) )
+    {
+        return 0;
+    }
+    
+    my @words;
+
+    my $cb_words = sub {
+        my $path = $_[0];
+        push(@words, substr($path, rindex($path, '/')+1));
+    };
+        
+    $store_read->recursive_read('tokens/' . $sha_file, $cb_words);
+
+    foreach my $word (@words)
+    {
+        my @files;
+
+        my $cb_files = sub { push(@files, $_[0]); };
+
+        my $subpath = '/' . $word . '/' . $token;
+        $store_read->recursive_read('words/' . $tree . $subpath, $cb_files );
+        $store_read->recursive_read('wordsglobal' . $subpath, $cb_files );
+        
+        foreach my $file (@files)
+        {
+            $store->delete_file($file);
+        }
+        
+        $store->delete_file('tokens/' . $sha_file . '/' . $word);
+    }
+
+    return 1;
+}
 
 
 # Local Variables:

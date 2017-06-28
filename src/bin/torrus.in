@@ -28,7 +28,6 @@ cmd=$1
 commands="acl=acledit acledit=acledit \
           bs=buildsearchdb buildsearchdb=buildsearchdb \
           cleanup=cleanup \
-          clc=clearcache clearcache=clearcache \
           collector=collector \
           compile=compilexml compilexml=compilexml \
           configinfo=configinfo ci=configinfo \

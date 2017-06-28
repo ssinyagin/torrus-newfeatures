@@ -100,8 +100,6 @@ elsif( $verbose )
     Torrus::Log::setLevel('verbose');
 }
 
-&Torrus::DB::setSafeSignalHandlers();
-
 if( $report )
 {
     my $class = $Torrus::ReportGenerator::modules{$report};
@@ -152,8 +150,6 @@ if( $genhtml or $genxlsx )
     {
         foreach my $tree ( @trees )
         {
-            &Torrus::DB::checkInterrupted();
-            
             my $options = {'Tree' => $tree};
 
             if( $all2tree )

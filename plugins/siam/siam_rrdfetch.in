@@ -122,14 +122,11 @@ foreach my $device (@{$devices})
 }
 
 
-&Torrus::DB::setSafeSignalHandlers();
-
 foreach my $tree ( sort keys %tree_devices )
 {
     my $devices = $tree_devices{$tree};
     Verbose('Tree ' . $tree . ': ' . scalar(@{$devices}) . ' devices');
     
-    &Torrus::DB::checkInterrupted();
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree );
     if( not defined($config_tree) )
     {
@@ -139,8 +136,6 @@ foreach my $tree ( sort keys %tree_devices )
 
     foreach my $devobj (@{$devices})
     {
-        &Torrus::DB::checkInterrupted();
-
         my $svcunits = $devobj->get_all_service_units();
         foreach my $unit ( @{$svcunits} )
         {
@@ -151,7 +146,6 @@ foreach my $tree ( sort keys %tree_devices )
             {
                 if( $el->attr('siam.svcdata.driver') eq 'Torrus.TimeSeries')
                 {
-                    &Torrus::DB::checkInterrupted();
                     fetch_data($config_tree, $el);
                 }
             }
@@ -163,7 +157,6 @@ foreach my $tree ( sort keys %tree_devices )
     }
 
     $config_tree = undef;
-    &Torrus::DB::cleanupEnvironment();
 }
 
 $siam->disconnect();

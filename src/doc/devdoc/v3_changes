@@ -1,0 +1,80 @@
+configure.ac
+============
+
+Perl threads are required (they were optional for v2).
+
+Renamed "perllib" to "lib".
+
+Perl version 5.8.9 or higher.
+
+New perl modules required:
+  Redis::Fast
+  Git::Raw (version 0.72 or higher)
+  Git::ObjectStore (version 0.005 or higher)
+  Digest::SHA
+  Cache::Ref
+  FCGI
+
+Perl modules not needed:
+  BerkeleyDB
+
+Removed variables:
+  perlithreads
+  cachedir
+  dbhome
+
+New variable:
+  gitrepodir
+  
+New software daemon required:
+  redis
+
+
+Variables var_user, var_group, var_mode are set in configure script
+
+Apache mod_perl handlers are removed
+
+
+torrus-config.pl
+================
+
+Removed config:
+  $Torrus::Global::threadsEnabled
+  $Torrus::Collector::RRDStorage::useThreads
+  $Torrus::Global::cacheDir
+  $Torrus::Renderer::cacheMaxAge
+  $Torrus::Global::dbHome
+  $Torrus::DB::dbSub
+  $Torrus::Global::ConfigReadyTimeout
+  $Torrus::Global::ConfigReadyRetryPeriod
+  $Torrus::Global::ConfigReadersWaitPeriod
+  $Torrus::Collector::exclusiveStartupLock
+
+Changed defaults:
+  $Torrus::Collector::fastCycles = 0;
+
+New config:
+  $Torrus::Global::redisServer
+  $Torrus::Global::redisPrefix
+  $Torrus::ConfigTree::objCacheSize
+  $Torrus::Global::RRDCachedSock
+
+Torrus::ConfigTree
+==================
+
+Aliases are no longer supported
+
+
+Default parameters changed:
+    <param name="rrgraph-views">
+      last24h-small,last24h,lastweek,lastmonth,lastyear
+    </param>
+    <param name="collector-dispersed-timeoffset" value="yes"/>
+
+
+Systemd service:
+  cp systemd/torrus.service /lib/systemd/system/
+  cp systemd/torrus.tmpfile /usr/lib/tmpfiles.d/torrus.conf
+  systemctl enable torrus
+
+

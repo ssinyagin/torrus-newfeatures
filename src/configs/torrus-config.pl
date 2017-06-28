@@ -25,44 +25,50 @@
 use lib(@perllibdirs@);
 
 $Torrus::Global::version        = '@VERSION@';
+$Torrus::Global::gitExec        = '@GIT@';
 $Torrus::Global::cfgDefsDir     = '@cfgdefdir@';
 $Torrus::Global::cfgSiteDir     = '@siteconfdir@';
 $Torrus::Global::pkgbindir      = '@pkgbindir@';
-$Torrus::Global::dbHome         = '@dbhome@';
 $Torrus::Global::templateDirs   = ['@tmpluserdir@','@tmpldir@'];
 $Torrus::Global::stylingDir     = '@styldir@';
-$Torrus::Global::cacheDir       = '@cachedir@';
 $Torrus::Global::pidDir         = '@piddir@';
 $Torrus::Global::logDir         = '@logdir@';
 $Torrus::Global::reportsDir     = '@reportsdir@';
 $Torrus::Global::sesStoreDir    = '@sesstordir@';
 $Torrus::Global::sesLockDir     = '@seslockdir@';
 $Torrus::Global::webPlainDir    = '@webplaindir@';
-$Torrus::Global::healthIconsDir = $Torrus::Global::stylingDir;
-
+$Torrus::Global::gitRepoDir     = '@gitrepodir@';
 @Torrus::Global::xmlDirs        = ('@distxmldir@', '@sitexmldir@');
 
-$Torrus::Global::threadsEnabled  = '@perlithreads@';
+$Torrus::Global::healthIconsDir = $Torrus::Global::stylingDir;
 
-$Torrus::DB::dbSub              = 'sub';
 
-# How long we can wait till the configuration is ready, in seconds
-$Torrus::Global::ConfigReadyTimeout = 1800;
+# By default, local Redis server is used
+$Torrus::Global::redisServer = '127.0.0.1:6379';
 
-# How often we check if the configuration is ready, in seconds
-$Torrus::Global::ConfigReadyRetryPeriod = 30;
+# All keys and channel names in redis are prepended with this prefix.
+# It should be unique per Torrus instance within the same Redis
+# database.
+$Torrus::Global::redisPrefix = 'torrus:';
 
-# How long the compiler waits till readers finish, in seconds
-$Torrus::Global::ConfigReadersWaitTimeout = 180;
+$Torrus::ConfigTree::writerAuthorName = 'Torrus Compiler';
+$Torrus::ConfigTree::writerAuthorEmail = 'torrus@localhost';
 
-# How often compiler checks for readers to finish
-$Torrus::Global::ConfigReadersWaitPeriod = 5;
+$Torrus::ConfigTree::objCacheSize = 2048;
+
+#rrdcached support can be enabled by specifying the path of rrdcached socket
+#$Torrus::Global::RRDCachedSock = '/var/rrdtool/rrdcached/rrdcached.sock';
 
 # How much the timestamps can differ in one RRD file, in seconds
 $Torrus::Global::RRDTimestampTolerance = 15;
 
 # Syslog facility for collector and monitor daemons
 $Torrus::Log::syslogFacility = 'local0';
+
+# Defaults used by launcher
+$Torrus::Collector::default_cmdopts = '';
+$Torrus::Monitor::default_cmdopts = '--delay=10';
+$Torrus::Launcher::default_stop_timeout = 30;
 
 # When true, daemon logging is sent to syslog instead of logfile.
 $Torrus::Collector::useSyslog = 1;
@@ -77,15 +83,10 @@ $Torrus::Monitor::useSyslog = 1;
 $Torrus::Collector::runAlways = 0;
 $Torrus::Monitor::runAlways = 0;
 
-# By default, there's an exclusive lock that allows only one collector
-# process to initialize at a time. This reduces the concurrency and
-# usually optimizes the initialization of multiple collector processes.
-$Torrus::Collector::exclusiveStartupLock = 1;
-
 # By default, run 3 full collector cycles immediately at start. This
 # allows all SNMP name->index maps to be fetched and used ASAP
 # The 3rd cycle is needed for cbQoS to fetch its mappings
-$Torrus::Collector::fastCycles = 3;
+$Torrus::Collector::fastCycles = 0;
 
 # SO_RCVBUF, the receiving buffer size of the SNMP collector socket.
 # Should be large enough to sustain the traffic bursts, and should be
@@ -135,10 +136,6 @@ $Torrus::Collector::SNMP::mapsExpireCheckPeriod = 600;
 # There is a strange bug that with more than 400 sessions per SNMP
 # dispatcher some requests are not sent at all
 $Torrus::Collector::SNMP::maxSessionsPerDispatcher = 100;
-
-# When enabled, the collector starts a background thread that
-# writes to RRD files
-$Torrus::Collector::RRDStorage::useThreads = $Torrus::Global::threadsEnabled;
 
 # How many unwritten updates are allowed to stay in the queue
 $Torrus::Collector::RRDStorage::thrQueueLimit = 1000000;
@@ -243,12 +240,9 @@ $Torrus::Renderer::uriEscapeExceptions = '^A-Za-z0-9-._~/:';
 
 # The page that lets you choose the tree from the list
 $Torrus::Renderer::Chooser::mimeType = 'text/html; charset=UTF-8';
-$Torrus::Renderer::Chooser::expires = '300';
+$Torrus::Renderer::Chooser::expires = '60';
 $Torrus::Renderer::Chooser::template = 'default-chooser.html';
 $Torrus::Renderer::Chooser::searchTemplate = 'globalsearch.html';
-
-# We clean the renderer cache at least once a day
-$Torrus::Renderer::cacheMaxAge = 86400;
 
 # Some RRDtool versions may report errors on decorations
 $Torrus::Renderer::ignoreDecorations = 0;
@@ -263,7 +257,7 @@ $Torrus::Renderer::hwGraphLegend = 0;
 # When true, users may view service usage reports (requires SQL connection)
 $Torrus::Renderer::displayReports = 0;
 
-# Allow tree searching. The search DB should be built with buildsearchdb
+# Allow tree searching. 
 $Torrus::Renderer::searchEnabled = 1;
 
 # Allow global searching across the trees. If the user authentication

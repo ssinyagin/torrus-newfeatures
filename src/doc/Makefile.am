@@ -30,7 +30,6 @@ SRCPOD = \
 		nodeid_usage.pod.in \
 		reporting_setup.pod.in \
 		rpnexpr.pod.in \
-		rrfw_torrus_migration.pod.in \
 		scalability.pod.in \
 		snmpdiscovery.pod.in \
 		stylingprofile.pod.in \
@@ -44,7 +43,6 @@ POD_FILES = \
 		nodeid_usage.pod \
 		reporting_setup.pod \
 		rpnexpr.pod \
-		rrfw_torrus_migration.pod \
 		scalability.pod \
 		snmpdiscovery.pod \
 		stylingprofile.pod \
@@ -62,7 +60,6 @@ nodist_pkgdoc_DATA = \
 		nodeid_usage.txt \
 		reporting_setup.txt \
 		rpnexpr.txt \
-		rrfw_torrus_migration.txt \
 		scalability.txt \
 		snmpdiscovery.txt \
 		stylingprofile.txt \
@@ -77,10 +74,7 @@ devdocdir  = $(pkgdocdir)/devdoc
 dist_devdoc_DATA = \
 		devdoc/architecture.pod \
 		devdoc/devdiscover.pod \
-		devdoc/progstyle.pod \
-		devdoc/reqs.0.0.pod \
-		devdoc/reqs.0.1.pod \
-		devdoc/torrus_roadmap.pod
+		devdoc/progstyle.pod
 
 SUFFIXES = .pod.in .pod .txt
 

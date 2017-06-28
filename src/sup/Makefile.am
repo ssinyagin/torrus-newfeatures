@@ -32,7 +32,8 @@ dist_styl_DATA = \
 	styling/torrus-schema.pl \
 	styling/critical.png \
 	styling/good.png \
-	styling/warning.png
+	styling/warning.png \
+	styling/unknown.png
 
 
 webplaindir = @webplaindir@

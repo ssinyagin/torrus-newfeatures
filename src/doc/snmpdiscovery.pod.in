@@ -719,6 +719,10 @@ if set to C<yes>, disables processing of IF-MIB completely.
 Defines the child subtree name within host-level subtree where system CPU
 and memory statistics are located. Default: C<System_Performance>.
 
+=item * C<RFC2790_HOST_RESOURCES::suppress-uptime>
+
+If set to C<yes>, system uptime will not be collected and graphed.
+
 =item * C<RFC2670_DOCS_IF::upstreams-only>
 
 If set to C<yes>, only the DOCSIS upstream statistics are enabled, and

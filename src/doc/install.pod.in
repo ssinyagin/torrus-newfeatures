@@ -32,21 +32,10 @@
 Torrus should easily run on any UNIX-like operation system, as long as the
 required components are provided.
 
-If the OS mounts F</var/run> directory to a temporary filesystem, C<piddir>
-variable must point to a path on a persistent storage. Alternatively
-C<piddir> can point to F</var/run> itself. The default path is
-F</var/run/torrus>, and temporary filesystems do not preserve subdirectories
-after a system reboot. 
-
-Note to B<VmWare> users: as recommended by Gord Philpott, Linux kernel for
-guest machine needs to be compiled with the following feature enabled:
-C<Character devices ---E<gt> Enhanced Real Time Clock Support>.
-For other guest operating systems (e.g. FreeBSD), in order to let the
-Torrus collector and monitor run properly, you need to add the following
-lines to your F<torrus-siteconfig.pl>:
-
-  $Torrus::Scheduler::maxSleepTime = 15;
-  $Torrus::Scheduler::ignoreClockSkew = 1;
+If the OS mounts F</var/run> directory to a temporary filesystem, you
+need t make sure that C<piddir> (F</var/run/torrus> by default) is
+always available. If your OS uses Systemd, the Trrus distribution
+supplies a I<tmpfile> file for that.
 
 It is recommended to use Tobi Oetiker's SDBS tool available at
 E<lt>https://github.com/oetiker/sdbsE<gt>. The tool compiles all Torrus
@@ -55,31 +44,23 @@ prerequisites from sources, and guarantees the version compatibility.
 
 =item * Perl
 
-Perl version C<5.8.1> or higher is required. B<Version C<5.8.0> is not
-recommended> because of memory access bugs and unpredictable behaviour.
-Perl interpreter should be in PATH environment variable when
+Perl version C<5.8.9> or higher is required. Perl multithreading must be
+enabled. Perl interpreter should be in PATH environment variable when
 running C<./configure>, otherwise use
 
   ./configure PERL=/path/to/perl
 
-Torrus also supports Perl multithreading in Device Discovery engine and
-in the Collector. Minimum requirements are as follows: Perl version 5.8.8
-or higher, C<threads> module version 1.41 or higher, C<threads::shared> module
-version 1.03 or higher. Older versions had bugs that were leading to
-severe memory leaks and instability. After installing Perl 5.8.8,
-you need to upgrade the C<threads> and C<threads::shared> modules manually
-from CPAN. If any of the requirements is not met, the installer will
-automatically disable the threads support in Torrus.
 
 =item * RRDtool
 
 Round Robin Database Tool is available at:
 E<lt>http://oss.oetiker.ch/rrdtool/E<gt>.
 
-The version that is coming with Debian and Ubuntu packages has shown
-some instability in Torrus WebUI -- most probably because of the bugs in
-graphical libraries that it uses. It is recommended to compile the
-tested versions with SDBS instead of using precompiled packages.
+=item * Redis
+
+A Redis database server is required for Torrus. By default Torrus is
+configured to connect to port 6379 on 127.0.0.1, but this can be changed
+in site configuration.
 
 =item * libxml2
 
@@ -88,44 +69,10 @@ project E<lt>http://www.gnome.orgE<gt>,
 available as a standalone package.
 Versions C<2.4.23> and above were tested.
 
-=item * Berkeley DB version 4.2.52 or later
-
-There are two distinct packages with slightly conflicting names:
-The Berkeley DB from Sleepycat Software E<lt>http://www.sleepycat.comE<gt>,
-and C<BerkeleyDB> Perl module available from CPAN. We will always refer
-the latter as I<BerkeleyDB Perl module>.
-
-The Berkeley DB database engine is used for all data storage.
-Versions C<4.2.52> and above are recommended.
-Older versions of Berkeley DB had problems with database integrity
-in concurrent usage. By default, it installs
-into F</usr/local/BerkeleyDB.4.2/>.
-
-Unfortunately, the BerkeleyDB Perl module cannot always find the include and
-library files in that directory. Thus either configure Berkeley DB
-with the option C<--prefix=/usr/local>, or you need to edit
-F<config.in> in BerkeleyDB Perl module distribution.
-
 =item * HTTP Server
 
-Torrus requires an HTTP server. It is compatible with the following
-combinations:
-
-=over 8
-
-=item * lighttpd, ngnix or Apache with FastCGI
-
-=item * Apache 1.3 with mod_perl 1.0 (not recommended and soon to be dropped)
-
-=item * Apache 2.x with mod_perl 2.0 (not recommended and soon to be dropped)
-
-=back
-
-FastCGI is supported in Torrus version 1.0.9 or higher. It is the preferred
-way of using Torrus, more stable than mod_perl.
-
-B<Note:> Starting from Torrus version 1.0.9, C<libapreq2> is no longer
-required.
+Torrus requires an HTTP server with FastCGI support for its front-end
+UI. Typically Apache with mod_fcgid would be used.
 
 See I<Torrus Web Interface Reference> for details on HTTP server configuration.
 
@@ -134,74 +81,136 @@ See I<Torrus Web Interface Reference> for details on HTTP server configuration.
 The Perl modules required are listed below. They are all available at
 CPAN E<lt>http://www.cpan.orgE<gt>.
 Some of them require other modules to be installed.
-You can install all required modules with the following command,
-executed from within the distribution directory:
 
-  perl -I `pwd`/setup_tools -MCPAN -e 'install Bundle::Torrus'
+Provided that you have C<cpanminus> installed on your system, the
+following command executed from within the distribution directory will
+install all needed modules:
+
+  sh setup_tools/cpanm_install_modules.sh
+
+Modules required by Torrus:
 
 =over 8
 
-=item * XML::LibXML
+=item * Redis::Fast
 
-This is a Perl interface for libxml2, providing DOM standards compliant
-interface. It is recommended that you use version C<1.54_3> or higher.
+=item * Git::Raw
 
-=item * BerkeleyDB perl module
+=item * Git::ObjectStore
 
-Perl interface to the database software.
-Version C<0.19> or higher is required.
+=item * Digest::SHA
 
-=item * Template-Toolkit
-
-This is a powerful set of tools for text template processing.
-Torrus uses it for HTML files output.
-See also the project homepage: E<lt>http://www.template-toolkit.orgE<gt>
-
-=item * Proc::Daemon
-
-Daemon invocation routines.
-
-=item * Net::SNMP
-
-SNMP queries and traps interface. Version C<4.0.3> or higher is required.
-I<Note>: Torrus versions prior to 1.0.9 are incompatible with Net::SNMP
-version 6.0.0. You may need to downgrate the module to 5.2.0.
-
-=item * URI::Escape
-
-Escape and unescape unsafe characters
-
-=item * Apache (mod_perl version 1.0)
-
-Mod_perl is a Perl runtime environment integrated into Apache HTTP server.
-
-=item * Apache::Session
-
-User session tracking helper
-
-=item * Date::Parse and Date::Format
-
-Module for parsing the user input for date and time.
+=item * Cache::Ref
 
 =item * JSON
 
-JSON data format support
+=item * JSON::XS
+
+=item * XML::LibXML
+
+=item * Template
+
+=item * Proc::Daemon
+
+=item * Net::SNMP
+
+=item * URI::Escape
+
+=item * Apache::Session
+
+=item * Date::Parse
+
+=item * FCGI
+
+=back
 
 =back
 
 
-=item * HTTP Browser requirements
+=head2 Quick Installation with SDBS
 
-The HTTP browser must be compatible with I<HTML 4.01 Strict> and I<CSS2>
-specifications. The tests were made with the following browsers:
-IE 5.5, Opera 6.12B1/Solaris, Opera 7.03/Win2K, Netscape 7.02.
+  # This works in Debian or Ubuntu.
+  # You need to install corresponding packages in orther systems
+  apt-get update && apt-get install -y git gcc g++ make automake \
+    libtool apache2 libapache2-mod-fcgid pkg-config xz-utils bzip2
 
-=back
+  mkdir -p /opt/pm/src
+  cd /opt/pm/src
+
+  git clone https://github.com/oetiker/sdbs.git
+  cd sdbs
+  PREFIX=/opt/pm/thirdparty ./build_perl5-current.sh
+  PREFIX=/opt/pm/thirdparty ./build_rrdtool-current.sh
+
+  echo 'PATH=/opt/pm/thirdparty/bin:/opt/pm/bin:$PATH; export PATH' \
+    >/etc/profile.d/torrus_path.sh
+
+  logout
+  #login again
+
+  # Watch out the group name, your OS may have a different group name for
+  # Apache (this here works for Debian or Ubuntu)
+  useradd -rU torrus
+  usermod  -aG torrus www-data
+
+  # Currently Torrus Version 3 is in its own branch
+  cd /opt/pm/src/
+  git clone -b v3 https://github.com/ssinyagin/torrus-newfeatures.git
+  cd torrus-newfeatures/src
+  sh setup_tools/cpanm_install_modules.sh
+  autoreconf
+  ./configure --prefix=/opt/pm piddir=/var/torrus/run
+  make install
+
+  # systemd unit files
+  cp systemd/torrus.service /lib/systemd/system/
+  cp systemd/torrus.tmpfile /usr/lib/tmpfiles.d/torrus.conf
+  systemctl enable torrus
+
+  # install plugins as necessary
+  cd ../plugins/cbqos/
+  autoreconf
+  torrus install_plugin .
+
+  mkdir /opt/pm/share/www
+  vi /opt/pm/share/www/index.html
+  === cut ===
+  <html>
+  <head>
+  <title>redirect page</title>
+  <META http-equiv="Refresh" CONTENT="0; URL=/torrus/">
+  </head>
+  <body></body>
+  </html>
+  === cut ===
+
+  vi >/etc/apache2/sites-available/200-torrus.domain.com.conf
+  === cut ===
+  <VirtualHost *:80>
+   DocumentRoot "/opt/pm/share/www"
+   ServerName torrus.domain.com
+   ScriptAlias /torrus "/opt/pm/torrus/bin/torrus.fcgi"
+   FcgidMaxProcessesPerClass 10
+   FcgidMaxRequestsPerProcess 100
+   <Location />
+     Options Indexes
+     Require all granted
+   </Location>
+   <Location /torrus>
+      Options       +ExecCGI
+   </Location>
+  </VirtualHost>
+  === cut ===
+
+  a2ensite 200-torrus.domain.com
+  systemctl restart apache2
+
+  mkdir -p /srv/torrus/collector_rrd
+  chown torrus:torrus /srv/torrus/collector_rrd
+  chmod g+s /srv/torrus/collector_rrd
 
 
-
-
-=head2 Installation Procedure
+=head2 Installation Procedure (in detail)
 
 Create the group C<torrus> and a user C<torrus>. The user should be a member of
 this group.
@@ -270,12 +279,6 @@ Default values for operating systems other than Cygwin are: I<var_user=torrus>,
 I<var_group=torrus>, I<var_mode=775>. Setgid bit is set by default for these
 directories.
 
-If available, you may place these directories on a fast media, for example,
-a robust disk array. Changing the C<varprefix> variable would be generally
-enough, for example:
-
-  ./configure varprefix=/vol1/torrus_var
-
 Attention for the systems that have F</var/run> in a temporary
 directory. By default, Torrus installer creates a directory
 F</var/run/torrus> to store the daemon PID files. After the server
@@ -286,8 +289,8 @@ the ./configure arguments.
 
 =head2 Logging
 
-As of Torrus version 2.02, the collector and monitor daemons send their
-logs to a local SYSLOG server in "local0" facility by default.
+The collector and monitor daemons send their logs to a local SYSLOG
+server in "local0" facility by default.
 
 The SYSLOG facility can be altered in F<torrus-siteconfig.pl>:
 
@@ -300,7 +303,7 @@ would not rotate the logs on SIGHUP:
   $Torrus::Collector::useSyslog = 0;
   $Torrus::Monitor::useSyslog = 0;
 
-If your system policy does not allow to use the system SYSKLOG daemon,
+If your system policy does not allow using the system SYSLOG daemon,
 you can run your own (rsyslogd is recommended) and attach it to a UNIX
 socket. In this case, the following statement in siteconfig would direct
 all logging to an alternative SYSLOG socket:
@@ -369,12 +372,6 @@ all logging to an alternative SYSLOG socket:
   @piddir@
         Daemon PID files
 
-  @cachedir@
-        Renderer cache
-
-  @dbhome@
-        Berkeley DB home
-
   @seslockdir@
   @sesstordir@
         Web interface session files
@@ -402,7 +399,7 @@ files that are included in every tree, in the beginning or in the end of
 the XML files list. By default, this array consists of two files:
 F<defaults.xml> and F<site-global.xml>. The second one is resided in
 the user-configurable directory, and you can use it to override any
-default settings. 
+default settings.
 
 Example:
 
@@ -430,7 +427,7 @@ Files generated by C<devdiscover> usually contain I<include> statements
 which add the vendor-specific XML files to the compilation.
 
 Below follows a short description of some XML files that come with
-Torrus distribution. Only F<site-global.xml> is installed in the directory 
+Torrus distribution. Only F<site-global.xml> is installed in the directory
 for user-configurable files, all others are placed in the distribution
 directory.
 
@@ -504,9 +501,6 @@ this variable.
 
 =head2 Apache HTTP server configuration
 
-Torrus web interface is designed to run under mod_perl environment
-(E<lt>http://perl.apache.orgE<gt>).
-
 See the I<Torrus Web Interface Reference> document for detailed instructions on
 Apache configuration.
 
@@ -539,20 +533,44 @@ F<cleanup> script in a cron job, once per day:
 
 =head2 Startup script
 
-The Torrus distriubution provides a startup script which you can install in
-the init scripts directory (/etc/init.d on most Unixes or /usr/local/etc/rc.d/
-on FreeBSD). The script C<torrus> is created during the installation
-process in the subdirectory <init.d> of the distribution directory.
+The Torrus distriubution provides a System V init script which you
+can install in the init scripts directory (/etc/init.d on most Unixes or
+/usr/local/etc/rc.d/ on FreeBSD). The script C<torrus> is created during
+the installation process in the subdirectory <init.d> of the
+distribution directory.
 
 The init script reads some parameters from F<@cfgdefdir@/initscript.conf>,
 and F<@siteconfdir@/initscript.siteconf> if the latter exists.
 By default, it makes the monitor daemons sleep for 20 minutes when
 they are launched simultaneously with collector daemons.
 
+Also Torrus distribution comes with Systemd and Tmpfiles files, so if
+the OS has Systemd in place, System V init files should not be used. See
+the quick installation section (above) for more details.
 
-=head2 Upgrade Procedure
 
-Follow these instructions when upgrading from previous Torrus release.
+
+=head2 Upgrading from Torrus version 2.x
+
+Torrus 3.x is using a completely different back-end for its data
+structures: the old Torrus was using BerkeleyDB, while the new one uses
+a Git repository. Also run-time data is kept in a Redis database
+instance.
+
+Torrus 3.0 is fully compatible with XML configuration and
+F<torrus-siteconfig.pl> statements of Torrus 2.0.
+
+The best approach in upgrading from version 2 is to delete the old
+database and cache directories (or simply everything in F</var/torrus>),
+and also the Torrus scripts and libraries (F</opt/pm/torrus> if you used
+F</opt/pm> as a prefix). Then, run the installation procedure and
+execute the XML compiler, and Torrus should be ready to run.
+
+
+
+=head2 Upgrading within version 3.x
+
+Follow these instructions when upgrading from previous Torrus version.
 
 In the previous distribution directory, look up the F<config.log> file.
 It contains the configure options that you used in previous installation.
@@ -561,8 +579,8 @@ Unpack the new release distribution.
 
 Run C<./configure> with the same options you used before.
 
-Stop the collector and monitor processes
-(usually by C</etc/init.d/torrus stop>).
+Stop the collector and monitor processes (usually by
+C</etc/init.d/torrus stop> or C<systemctl stop torrus>).
 
 Stop Apache process.
 
@@ -573,47 +591,36 @@ Start the collector and monitor processes.
 Start Apache process.
 
 Also it is recommended to re-compile your XML configuration.
-If you prefer not to do this, it's recommended that you clear the
-Web interface cache both in your browser and in Torrus:
-
-  torrus clearcache
 
 
 =head2 Plugins
 
-As of Torrus version 2.01, plugins inherit a new release numbering
-scheme: a plugin release version is a 3-component number, where the
-first two numbers are the Torrus release version that is compatible with
-this plugin.
+Plugin packages inherit a release numbering scheme as follows: a plugin
+release version is a 3-component number, where the first two numbers are
+the Torrus release version that is compatible with this plugin.
 
 
 =head2 Planning the disk space
 
 In a typical Torrus setup, there are two disk space consuming entities:
-the RRDtool data storage and the Berkeley DB database.
+the RRDtool data storage and the Git repository for configuration data.
 
 RRDtool data files (or RRD's) are used to store the values that are gathered
 by the collector daemons. These are the most intensively updated files,
 so the disk speed is important here. If possible, it is better to spread
 the RRD files across several physical disks.
 
-Berkeley DB database is used to keep all the configuratiuon data
-for your datasource trees, and it also keeps some live status information.
-It's intensively updated during XML compilation only.
-During normal Torrus working cycle, there are only few updates, not
-very critical in time. The database is read quite intensively during
-collector initialization, but usually it's the CPU speed that causes
-more delay.
+The Git repository is used to keep all the configuratiuon data for your
+datasource trees, and it also keeps some live status information.  It's
+updated during XML compilation only.  During normal Torrus working
+cycle, there are only read operations. The database is read quite
+intensively during collector initialization, but usually it's the CPU
+speed that causes more delay.
 
-For a typical Torrus installation with standard RRD creation parameters,
-the rough estimation is as follows: the Berkeley DB database occupies
-from 10 to 13 KB per collector datasource, and the RRD storage takes
-approximately 80 to 85 KB per datasource.
+The Git repository needs double the space it occupies between the
+compilations. The compiler runs the garbage collector at the end of its
+work, and all unnecessary data is deleted.
 
-For a medium-sized system, few hundred megabytes for the Berkeley DB database
-and several gigabytes for RRD storage would be sufficient. Larger systems
-require a thorough design and staging work. See I<Torrus Scalability Guide>
-for more details.
 
 =head2 Network performance tuning
 
@@ -631,4 +638,4 @@ and its comments in F<torrus-config.pl> for more details.
 
 =head1 Author
 
-Copyright (c) 2002-2012 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
+Copyright (c) 2002-2017 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>

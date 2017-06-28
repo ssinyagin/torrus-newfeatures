@@ -10,7 +10,7 @@
 [% results = searchResults(global.SearchString);
    counter = 0;
 
-   FOREACH entry = results;
+   FOREACH entry IN results;
 
     counter = counter + 1;
     IF counter % 2 == 0;
@@ -18,17 +18,15 @@
     ELSE;
       evenRow = 0;
     END;
-
-    etoken = pathToken(entry.0);
-    NEXT UNLESS etoken;
 %]
   <DIV CLASS="[% evenRow ? 'ListRowEven' : 'ListRow' %]">
-    <SPAN CLASS="NodeName"><A HREF="[%url(etoken)%]">
-    [% entry.0 %]</A></SPAN>
-    <SPAN CLASS="NodeDescr">
-    [% IF entry.1; entry.1 _ ': ' _ xmlnorm(nodeParam(etoken, entry.1));
-    END %]
-    </SPAN>
+    <SPAN CLASS="NodeName"><A HREF="[%url(entry.token)%]">
+        [% entry.path %]</A></SPAN>
+    [% FOREACH param IN entry.match.keys %]
+      <SPAN CLASS="NodeDescr">
+        [% param _ ': ' _ xmlnorm(entry.match.$param) %]
+      </SPAN>
+    [% END %]
   </DIV>
 [% END %]
 </DIV>

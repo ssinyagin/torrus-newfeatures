@@ -258,9 +258,13 @@
 # /src/init.d/
 /src/init.d/torrus
 
-# /src/perllib/
-/src/perllib/Makefile
-/src/perllib/Makefile.in
+# /src/systemd/
+/src/systemd/torrus.service
+/src/systemd/torrus.tmpfile
+
+# /src/lib/
+/src/lib/Makefile
+/src/lib/Makefile.in
 
 # /src/scripts/
 /src/scripts/Makefile

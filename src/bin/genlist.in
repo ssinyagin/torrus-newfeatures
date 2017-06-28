@@ -81,8 +81,6 @@ if( not Torrus::SiteConfig::treeExists( $tree ) )
     exit 1;
 }
 
-&Torrus::DB::setSafeSignalHandlers();
-
 {
     my $config_tree = new Torrus::ConfigTree( -TreeName => $tree, -Wait => 1 );
     if( not defined( $config_tree ) )
@@ -134,8 +132,6 @@ sub pickup_data
 
     foreach my $ctoken ( $config_tree->getChildren( $token ) )
     {
-        &Torrus::DB::checkInterrupted();
-        
         if( $config_tree->isSubtree( $ctoken ) )
         {
             pickup_data( $config_tree, $ctoken, $listing, $listParams );

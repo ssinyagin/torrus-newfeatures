@@ -37,17 +37,6 @@ use Net::SNMP qw(:snmp);
 $Torrus::Collector::collectorTypes{'cisco-cbqos'} = 1;
 
 
-# List of needed parameters and default values
-
-$Torrus::Collector::params{'cisco-cbqos'} =
-    \%Torrus::Collector::Cisco_cbQoS_Params::requiredLeafParams;
-
-# Copy parameters from SNMP collector
-while( my($key, $val) = each %{$Torrus::Collector::params{'snmp'}} )
-{
-    $Torrus::Collector::params{'cisco-cbqos'}{$key} = $val;
-}
-
 my %oiddef =
     (
      # IF-MIB

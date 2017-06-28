@@ -33,7 +33,7 @@ use Getopt::Long;
 use Torrus::Log;
 use Torrus::ConfigTree;
 use Torrus::Collector;
-use Torrus::CollectorScheduler;
+use Torrus::AgentScheduler;
 use Torrus::SiteConfig;
 
 exit(1) unless Torrus::SiteConfig::verify();
@@ -82,7 +82,7 @@ if( not Torrus::SiteConfig::mayRunCollector( $tree ) )
     exit 1;
 }
 
-my $nInstances = Torrus::SiteConfig::collectorInstances( $tree );
+my $nInstances = Torrus::SiteConfig::agentInstances( $tree, 'collector' );
 
 if( $nInstances > 1 and not defined( $instance ) )
 {
@@ -137,6 +137,8 @@ if( not $nodaemon and not $runonce )
     &Proc::Daemon::Init();
     umask 0017; # Proc::Daemon::Init sets the mask to all-writable
 
+    setup_sighandlers();
+    
     # now we're forked, save the PID file for the END block
     $pidfile = $pidfilename;
 
@@ -171,9 +173,6 @@ if( not $nodaemon and not $runonce )
 
 Torrus::Collector::initThreads();
 
-&Torrus::DB::setSafeSignalHandlers();
-
-
 Info(sprintf("Torrus version %s", '@VERSION@'));
 Info(sprintf("%s started for tree %s, instance #%d", $0, $tree, $instance));
 Info(sprintf("Process ID %d", $$));
@@ -181,6 +180,7 @@ Info(sprintf("Process ID %d", $$));
 my %options =
     (
      '-ProcessName' => $process_name,
+     '-AgentName'   => 'collector',
      '-Tree'        => $tree,
      '-Instance'    => $instance
      );
@@ -194,9 +194,28 @@ if( $runalways or $Torrus::Collector::runAlways )
     $options{'-RunAlways'} = 1;
 }
 
+eval {
+    foreach my $collector_type ( keys %Torrus::Collector::collectorTypes )
+    {
+        if( ref($Torrus::Collector::initCollectorGlobals{
+            $collector_type}) )
+        {
+            &{$Torrus::Collector::initCollectorGlobals{
+                $collector_type}}($tree, $instance);
+            
+            Verbose('Initialized collector globals for type: ' .
+                    $collector_type);
+        }
+    }
+    
+    my $scheduler = new Torrus::AgentScheduler( %options );
+    $scheduler->run();
+};
 
-my $scheduler = new Torrus::CollectorScheduler( %options );
-$scheduler->run();
+if( $@ )
+{
+    Error('Fatal error, exiting: ' . $@);
+}
 
 if( not $options{'-RunOnce'} )
 {
@@ -204,6 +223,26 @@ if( not $options{'-RunOnce'} )
 }
 
 exit;
+
+
+sub setup_sighandlers
+{
+    $SIG{'HUP'} = sub {
+        Warn('Received SIGHUP. Stopping the process.');
+        exit;
+    };
+
+    $SIG{'TERM'} = sub {
+        Warn('Received SIGTERM. Stopping the process.');
+        exit;
+    };
+
+    $SIG{'INT'} = sub {
+        Warn('Received SIGINT. Stopping the process');
+        exit;
+    };
+};    
+
 
 
 END

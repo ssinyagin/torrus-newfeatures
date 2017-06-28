@@ -30,10 +30,8 @@ B<torrus compilexml> --tree=I<TREENAME> [I<options...>]
 
 This command compiles the Torrus's XML configuration for the tree
 I<TREENAME>. It does not require any other processes to be restarted
-after the configuration is changed. Renderer's cache is automatically
-flushed on on the next Renderer's run. Monitor automatically resets on
-the next monitoring cycle. All dynamic tokensets in the given tree are
-emptied.
+after the configuration is changed. The compiler processes the XML files
+in an incremental way: only the changes are processed.
 
 =head1 OPTIONS
 
@@ -42,10 +40,6 @@ emptied.
 =item B<--all>
 
 Instructs to compile configuration for all trees.
-
-=item B<--nods>
-
-Instructs to compile non-datasource configuration only.
 
 =item B<--noval>
 
@@ -56,11 +50,10 @@ Collector and Monitor in this case would be much longer.
 
 =item B<--force>
 
-Normally the compiler would fail to start if another compiler process
-is already running for the specific tree. In case of abnormal function,
-the running status of the previous pcompiler may stay in the database.
-This option forces the compiler to continue even if if sees the presence
-of another process.
+Normally the compiler looks for changes in XML files, and only processes
+the ones that differ from previous run. With force option, the compiler
+will consider all XML files as new, and process the whole configuration
+from scratch.
 
 =item B<--debug>
 

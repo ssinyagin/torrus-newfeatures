@@ -44,16 +44,6 @@ Build the indexes for a given tree.
 
 Builds the tree indexes for all trees.
 
-=item B<--global>
-
-Builds the global index for all trees and also the tree indexes for every
-tree. In order to use the global search database, the web user
-should have the permission to display all trees and also it should have
-the permission for GlobalSearch for all trees, for example:
-
-   torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'
-
-
 =item B<--verbose>
 
 Prints extra information

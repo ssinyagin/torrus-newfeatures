@@ -153,9 +153,8 @@ Modules required by Torrus:
   useradd -rU torrus
   usermod  -aG torrus www-data
 
-  # Currently Torrus Version 3 is in its own branch
   cd /opt/pm/src/
-  git clone -b v3 https://github.com/ssinyagin/torrus-newfeatures.git
+  git clone https://github.com/ssinyagin/torrus-newfeatures.git
   cd torrus-newfeatures/src
   sh setup_tools/cpanm_install_modules.sh
   autoreconf

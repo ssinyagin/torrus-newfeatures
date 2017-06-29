@@ -56,6 +56,11 @@ $Torrus::ConfigTree::writerAuthorEmail = 'torrus@localhost';
 
 $Torrus::ConfigTree::objCacheSize = 2048;
 
+# This is to prevent Git garbage collector from running while there is
+# a compiler process running (default: 12 hours).
+$Torrus::ConfigTree::writerTimeout = 86400;
+
+
 #rrdcached support can be enabled by specifying the path of rrdcached socket
 #$Torrus::Global::RRDCachedSock = '/var/rrdtool/rrdcached/rrdcached.sock';
 

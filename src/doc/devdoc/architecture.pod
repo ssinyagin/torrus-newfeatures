@@ -296,6 +296,13 @@ reading.
   multiple processes. Before accessing the repository in writer mode,
   the writer sets this Redis key to the current UNIX timestamp.
 
+=item * C<writer:I<REPOPATH>> -- this is a hash representing active
+  Torrus::ConfigTree::Writer objects. Each key is the process ID, and
+  values are the UNIX timestamps when the writer objects were
+  created. Entries older than 24 hours are automatically removed. This
+  hash aims to prevent Git garbage collector from running while there
+  are active compiler processes.
+
 =item * C<githeads> -- this is a hash containing commit numbers written
   by the compiler. The keys are branch names, and the values are the Git
   commit numbers of corresponding tops of the branches. The consumer

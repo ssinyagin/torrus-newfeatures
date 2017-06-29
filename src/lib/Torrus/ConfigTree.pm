@@ -104,6 +104,32 @@ sub new
 }
 
 
+sub running_writers_exist
+{
+    my $h = $Torrus::Global::redisPrefix . 'writer:' .
+        $Torrus::Global::gitRepoDir;
+    my $redis = Torrus::Redis->new(server => $Torrus::Global::redisServer);
+    my $r = $redis->hgetall($h);
+    if( defined($r) )
+    {
+        while( scalar(@{$r}) > 0 )
+        {
+            my $key = shift @{$r};
+            my $val = shift @{$r};
+
+            if( $val > time() - $Torrus::ConfigTree::writerTimeout )
+            {
+                return 1;
+            }
+            else
+            {
+                $redis->hdel($h, $key);
+            }
+        }
+    }
+    return 0;
+}
+
 
 sub _lock_repodir
 {

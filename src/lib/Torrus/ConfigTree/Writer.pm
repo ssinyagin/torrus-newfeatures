@@ -103,10 +103,22 @@ sub new
     $self->{'srcincludes'} = {} unless defined $self->{'srcincludes'};
 
     $self->{'serviceid_tokens'} = $srvIdParams->getAllTokens();
-    
+
+    $self->{'writerpidhash'} =
+        $self->{'redis_prefix'} . 'writer:' . $self->{'repodir'};
+    $self->{'writerpid'} = $$;
+    $self->{'redis'}->hset($self->{'writerpidhash'}, $self->{'writerpid'},
+                           time());
+        
     return $self;
 }
 
+sub DESTROY
+{
+    my $self = shift;
+    $self->{'redis'}->hdel($self->{'writerpidhash'}, $self->{'writerpid'});
+}
+    
 
 sub _agents_ref_name
 {

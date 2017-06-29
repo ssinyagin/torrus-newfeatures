@@ -237,7 +237,9 @@ be added to previously defined ones.
 B<Templates>. Some pieces of configuration may be written as templates,
 and then re-used in multiple places.
 
-B<Incremental compiler>. Subsequent running of C<torrus compile --tree=treename --verbose
+B<Incremental compiler>. Subsequent running of C<torrus compile> will
+only pricess the changes in XML files, thus saving the time if the
+configuration has only partially changed.
 
 For most of the processes that you run within Torrus, you need to specify
 the tree name with C<--tree> option. Some programs accept C<--all> option,
@@ -283,76 +285,6 @@ B<Browse with your browser>. Provided that you followed the
 installation guide to the end, and your HTTP server is running,
 your Torrus hierarchy must be visible  with your favorite web browser.
 
-
-=head2 Configuration guidelines
-
-In complete detail, the XML configuration is described in
-I<Torrus XML Configuration Guide>. The guidelines below will help
-you to read that document.
-
-B<Tree structure>. The tree structure is defined by the structure of
-C<E<lt>subtreeE<gt>> and C<E<lt>leafE<gt>> XML elements. The rule is simple:
-child XML elements of a C<E<lt>subtreeE<gt>> element define the child
-nodes in the configuration tree.
-
-B<Parameters>. Each node has a number of parameters. They are defined
-by C<E<lt>paramE<gt>> XML element. Parameters are inherited:
-the child node has all its parent's parameters, some of which may be
-overridden.
-
-B<Additive configuration>. The whole XML configuration is additive.
-It means that you may define your subtree several times across
-your XML configuration, and the new parameters and child nodes will
-be added to previously defined ones.
-
-B<Templates>. Some pieces of configuration may be written as templates,
-and then re-used in multiple places.
-
-B<Incremental compiler>. Subsequent running of C<torrus compile --tree=treename --verbose
-
-For most of the processes that you run within Torrus, you need to specify
-the tree name with C<--tree> option. Some programs accept C<--all> option,
-which causes them to process all existing trees.
-With C<--verbose> option, the compiler tells you about the files being
-processed, and about some other actions that may take quite a long time.
-It will also tell you if there's any error in your configuration.
-
-B<Build the search database>. The search database is updated by executing
-the following command:
-
-  torrus bs --all --verbose
-
-For users that are allowed to display all the trees, you can enable the
-global search across all trees:
-
-  torrus acledit --addgroup=staff --permit=GlobalSearch --for='*'
-
-B<Launch the collector>. Assuming that compilation went smoothly,
-you may now launch the data collector:
-
-  torrus collector --tree=treename
-
-Without additional options, the collector will fork as a daemon
-process, and write only error messages in its log file,
-F<@logdir@/collector.treename.log>.
-
-See the Torrus installation guide for details about startup scripts.
-
-The C<monitor> daemon is used for monitoring the thresholds in the
-data files. For more details, see the I<Torrus XML configuration guide>,
-in the section about monitor definitions.
-
-B<Define the ACLs>. By default, user authentication is enabled in the web
-interface. You can change this by setting
-C<$Torrus::CGI::authorizeUsers = 0> in your F<torrus-siteconfig.pl>.
-In order to get use of user authentication, you need to create I<groups>
-and I<user> accounts. Each user belongs to one or more groups, and each group
-has access to a set of datasource trees. See
-I<Torrus Installation Instructions> for a basic example.
-
-B<Browse with your browser>. Provided that you followed the
-installation guide to the end, and your HTTP server is running,
-your Torrus hierarchy must be visible  with your favorite web browser.
 
 
 =head2 Configuration guidelines
@@ -688,6 +620,7 @@ C<data-dir> is set to F</usr/testtorrus/collector_rrd>.
 An additional virtual host section can be added to the production Apache
 server, and ScriptAlias should point to the proper location.
 
+=back
 
 
 =head3 Watching the collector failures

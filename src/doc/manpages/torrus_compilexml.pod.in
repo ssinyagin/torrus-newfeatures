@@ -55,6 +55,13 @@ the ones that differ from previous run. With force option, the compiler
 will consider all XML files as new, and process the whole configuration
 from scratch.
 
+=item B<--nogc>
+
+Normally the Git garbage collector is launched after the compilation is
+complete. This option makes the compiler skip the GC run. This can be
+useful if multiple compiler processes are started in parallel for
+different trees.
+
 =item B<--debug>
 
 Sets the log level to debug.

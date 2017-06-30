@@ -33,12 +33,14 @@ exit(1) unless Torrus::SiteConfig::verify();
 
 my @trees;
 my $all_trees;
+my $nogc;
 
 my $verbose;
 my $help_needed;
 
 my $ok = GetOptions ('tree=s'   => \@trees,
                      'all'      => \$all_trees,
+                     'nogc'     => \$nogc,
                      'verbose'  => \$verbose,
                      'help'     => \$help_needed);
 
@@ -49,6 +51,7 @@ if( not $ok or not (scalar(@trees) or $all_trees ) or
     "Options:\n",
     "  --tree=NAME     rebuild search DB for a tree\n",
     "  --all           rebuild search DB for all trees\n",
+    "  --nogc          skip the Git garbage collector\n",
     "  --verbose       print extra information\n",
     "  --help          this help message\n";
     exit 1;
@@ -139,18 +142,21 @@ foreach my $tree ( @trees )
     $store->create_commit_and_packfile();
 }
 
-if( Torrus::ConfigTree::running_writers_exist() )
+if( not $nogc )
 {
-    Verbose('Skipping Git GC because compilers are running');
-}
-else
-{
-    # Garbage collector is needed because of this:
-    # https://github.com/libgit2/libgit2/issues/4093
-    Verbose('Running Git garbage collector...');
-    system(sprintf('cd %s; %s gc',
-                   $Torrus::Global::gitRepoDir,
-                   $Torrus::Global::gitExec));
+    if( Torrus::ConfigTree::running_writers_exist() )
+    {
+        Verbose('Skipping Git GC because compilers are running');
+    }
+    else
+    {
+        # Garbage collector is needed because of this:
+        # https://github.com/libgit2/libgit2/issues/4093
+        Verbose('Running Git garbage collector...');
+        system(sprintf('cd %s; %s gc',
+                       $Torrus::Global::gitRepoDir,
+                       $Torrus::Global::gitExec));
+    }
 }
 
 exit(0);

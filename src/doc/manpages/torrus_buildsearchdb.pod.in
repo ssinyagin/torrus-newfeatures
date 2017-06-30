@@ -44,6 +44,11 @@ Build the indexes for a given tree.
 
 Builds the tree indexes for all trees.
 
+=item B<--nogc>
+
+Normally the Git garbage collector is launched after the search database
+is updated. This option makes the builder skip the GC run.
+
 =item B<--verbose>
 
 Prints extra information
@@ -65,4 +70,3 @@ See more documentation at Torrus home page: http://torrus.org
 =head1 AUTHOR
 
 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
-

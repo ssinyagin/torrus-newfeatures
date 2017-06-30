@@ -34,6 +34,7 @@ our @trees;
 our $all_trees;
 our $no_validation;
 our $force;
+our $nogc;
 
 our $debug;
 our $verbose;
@@ -43,6 +44,7 @@ my $opts_ok = GetOptions ('tree=s'   => \@trees,
                           'all'      => \$all_trees,
                           'noval'    => \$no_validation,
                           'force'    => \$force,
+                          'nogc'     => \$nogc,
                           'debug'    => \$debug,
                           'verbose'  => \$verbose,
                           'help'     => \$help_needed);
@@ -56,6 +58,7 @@ if( not $opts_ok or not (scalar(@trees) or $all_trees) or
     "  --all           compile all trees\n",
     "  --noval         disable parameter validation\n",
     "  --force         force re-processing of all XML files\n",
+    "  --nogc          skip the Git garbage collector\n",
     "  --debug         set the log level to debug\n",
     "  --verbose       set the log level to info\n",
     "  --help          this help message\n";
@@ -151,23 +154,26 @@ foreach my $tree ( @trees )
     $global_ok = $ok ? $global_ok:0;
 }
 
-if( Torrus::ConfigTree::running_writers_exist() )
+if( not $nogc )
 {
-    Verbose('Skipping Git GC because compilers are running');
-}
-else
-{
-    # Garbage collector is needed because of this:
-    # https://github.com/libgit2/libgit2/issues/4093
-    Verbose('Running Git garbage collector...');
-    system(sprintf('cd %s; %s gc',
-                   $Torrus::Global::gitRepoDir,
-                   $Torrus::Global::gitExec));
-    
-    # Update "objects/info/packs" and "info/refs" needed by dumb server
-    system(sprintf('cd %s; %s update-server-info',
-                   $Torrus::Global::gitRepoDir,
-                   $Torrus::Global::gitExec));
+    if( Torrus::ConfigTree::running_writers_exist() )
+    {
+        Verbose('Skipping Git GC because compilers are running');
+    }
+    else
+    {
+        # Garbage collector is needed because of this:
+        # https://github.com/libgit2/libgit2/issues/4093
+        Verbose('Running Git garbage collector...');
+        system(sprintf('cd %s; %s gc',
+                       $Torrus::Global::gitRepoDir,
+                       $Torrus::Global::gitExec));
+        
+        # Update "objects/info/packs" and "info/refs" needed by dumb server
+        system(sprintf('cd %s; %s update-server-info',
+                       $Torrus::Global::gitRepoDir,
+                       $Torrus::Global::gitExec));
+    }
 }
 
 exit($global_ok ? 0:1);

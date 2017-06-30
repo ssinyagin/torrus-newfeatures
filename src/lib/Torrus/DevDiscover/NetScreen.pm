@@ -98,23 +98,20 @@ sub discover
     }
 
     my $result = $dd->retrieveSnmpOIDs('nsResSessMaxium');
-    if( defined($result) and $result->{'nsResSessMaxium'} > 0 )
+    if( defined($result) and defined(my $max = $result->{'nsResSessMaxium'}) )
     {
-        $devdetails->setCap('NetScreen::SessMax');
-
-        my $param = {};
-        my $max = $result->{'nsResSessMaxium'};
-
-        $param->{'hrule-value-max'} = $max;
-        $param->{'hrule-legend-max'} = 'Maximum Sessions';
-        # upper limit of graph is 5% higher than max sessions
-        $param->{'graph-upper-limit'} =
-            sprintf('%e', 
-                    ( $max * 5 / 100 ) + $max );
-        
-        $data->{'netScreenSessions'} = {
-            'param' => $param,
-        };        
+        if( $max ne '' and $max > 0 )
+        {
+            $devdetails->setCap('NetScreen::SessMax');
+            my $param = {};            
+            $param->{'hrule-value-max'} = $max;
+            $param->{'hrule-legend-max'} = 'Maximum Sessions';
+            # upper limit of graph is 5% higher than max sessions
+            $param->{'graph-upper-limit'} =
+                sprintf('%e', ( $max * 5 / 100 ) + $max );
+            
+            $data->{'netScreenSessions'} = {'param' => $param};
+        }
     }
 
     return 1;

@@ -13,6 +13,7 @@ for m in \
     URI::Escape \
     Apache::Session \
     Date::Parse \
+    CGI::Fast \
     FCGI \
 ;do
     cpanm --notest $m

@@ -153,7 +153,7 @@ foreach my $tree ( @trees )
 
 if( Torrus::ConfigTree::running_writers_exist() )
 {
-    Verbose('Not running Git garbage collector because compilers are running');
+    Verbose('Skipping Git GC because compilers are running');
 }
 else
 {

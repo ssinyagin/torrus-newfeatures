@@ -139,12 +139,19 @@ foreach my $tree ( @trees )
     $store->create_commit_and_packfile();
 }
 
-# Garbage collector is needed because of this:
-# https://github.com/libgit2/libgit2/issues/4093
-Verbose('Running Git garbage collector...');
-system(sprintf('cd %s; %s gc',
-               $Torrus::Global::gitRepoDir,
-               $Torrus::Global::gitExec));
+if( Torrus::ConfigTree::running_writers_exist() )
+{
+    Verbose('Skipping Git GC because compilers are running');
+}
+else
+{
+    # Garbage collector is needed because of this:
+    # https://github.com/libgit2/libgit2/issues/4093
+    Verbose('Running Git garbage collector...');
+    system(sprintf('cd %s; %s gc',
+                   $Torrus::Global::gitRepoDir,
+                   $Torrus::Global::gitExec));
+}
 
 exit(0);
 

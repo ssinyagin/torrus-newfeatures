@@ -53,7 +53,9 @@ Creates C<data-dir> directories.
 =item B<--limit>=I<REGEXP>
 
 Limits the discovery to the output files matching the regular expression
-I<REGEXP>.
+I<REGEXP>. If multiple B<--limit> options are given, the output file
+must match at least one of them to be processed. Bundle files will be
+written if all their member XML files are available.
 
 =item B<--forcebundle>
 

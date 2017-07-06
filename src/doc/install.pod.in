@@ -132,7 +132,8 @@ Modules required by Torrus:
   # This works in Debian or Ubuntu.
   # You need to install corresponding packages in orther systems
   apt-get update && apt-get install -y git gcc g++ make automake \
-    libtool apache2 libapache2-mod-fcgid pkg-config xz-utils bzip2
+    libtool apache2 libapache2-mod-fcgid pkg-config xz-utils bzip2 \
+    redis-server redis-tools
 
   mkdir -p /opt/pm/src
   cd /opt/pm/src

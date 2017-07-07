@@ -202,6 +202,22 @@ foreach my $infile ( @infiles )
     }
 }
 
+my @job;
+foreach my $outfile ( sort keys %{$perOutfileHostParams} )
+{
+    if( not matchLimitRe( $outfile ) )
+    {
+        next;
+    }
+
+    push(@job, $outfile);
+}
+
+# Do not start more threads than there are queued items
+if( $workerThreads > scalar(@job) )
+{
+    $workerThreads = scalar(@job);
+}
 
 # Start discovery
 my $jobQueue;
@@ -227,17 +243,12 @@ if( $workerThreads > 1 )
     $bundleDeletionQueue = new Thread::Queue;
     $confBuildSemaphore = new Thread::Semaphore;
 
-    # Enqueue the output filenames    
-    foreach my $outfile ( sort keys %{$perOutfileHostParams} )
+    # Enqueue the output filenames
+    foreach my $outfile ( @job )
     {
-        if( not matchLimitRe( $outfile ) )
-        {
-            next;
-        }
-
         $jobQueue->enqueue( $outfile );
     }
-
+    
     # Start the worker threads
     my @workers;
     foreach my $i ( 1..$workerThreads )
@@ -274,13 +285,8 @@ else
         &{$callback}();
     }
        
-    foreach my $outfile ( sort keys %{$perOutfileHostParams} )
+    foreach my $outfile ( @job )
     {
-        if( not matchLimitRe( $outfile ) )
-        {
-            next;
-        }
-        
         if( not doDiscover( $outfile ) )
         {
             removeFromBundle( $outfile );

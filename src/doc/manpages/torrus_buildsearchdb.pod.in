@@ -53,6 +53,10 @@ is updated. This option makes the builder skip the GC run.
 
 Prints extra information
 
+=item B<--debug>
+
+Prints debugging information
+
 =item B<--help>
 
 Displays a help message.

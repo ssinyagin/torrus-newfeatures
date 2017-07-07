@@ -68,6 +68,27 @@ $Torrus::SIAMDD::ifmib_search_svcc_pattern = '\{(\d+)\}';
 $Torrus::SIAMDD::ifmib_search_svcc_prefix = 'SC';
 
 
+#### siam_rebuild parameters ####
+
+$Torrus::SIAM::gitRepoDir = '@gitrepodir@';
+
+# The branch contains empty files in TREE/HOSTNAME structure
+$Torrus::SIAM::hostsBranchname = 'siam_hosts';
+
+# If the count of added devices is more than this number, perform a full
+# discovery
+$Torrus::SIAM::rebuild_max_devs = 20;
+
+# If the percentage of added devices is more that this level, perform a full
+# discovery
+$Torrus::SIAM::rebuild_max_percent = 30;
+
+# Devdiscover command options
+$Torrus::SIAM::rebuild_ddopts = '--forcebundle --fallback=7 --threads=20';
+
+# TRue if we execute buildsearchdb
+$Torrus::SIAM::rebuild_run_bs = 1;
+
 require '@siam_siteconfig_pl@';
 
 1;

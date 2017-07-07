@@ -302,8 +302,28 @@ used to access the torrus server and the given Torrus tree.
 =back
 
 
+=head2 siam_rebuild utility
+
+The C<siam_rebuild> command-line utility keeps track of new devices
+being added to SIAM database, and executes SNMP discovery and XML
+compilation for those devices only.
+
+Command-line arguments:
+
+  torrus siam_rebuild [options...]
+    Options:
+     --server=HOSTNAME       Torrus server to match in SIAM [tsrTORRUS02]
+     --full                  Full rediscovery of all devices
+     --pddx=PATH             Path to store DDX files
+     --pbundles=PATH         Path to store bundles XML
+     --pnodes=PATH           Path to store per-node XML
+     --prrd=PATH             RRD data storage path
+     --verbose               print extra information
+     --debug                 print debugging information
+
+    
 
 
 =head1 Author
 
-Copyright (c) 2011-2013 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>
+Copyright (c) 2011-2017 Stanislav Sinyagin E<lt>ssinyagin@k-open.comE<gt>

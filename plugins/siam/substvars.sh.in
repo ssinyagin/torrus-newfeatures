@@ -42,9 +42,7 @@ torrus_config_pl=@cfgdefdir@/torrus-config.pl
     -e "s,\@SHELL\@,@SHELL@,g" \
     -e "s,\@VERSION\@,@VERSION@,g" \
     -e "s,\@bindir\@,@bindir@,g" \
-    -e "s,\@cachedir\@,@cachedir@,g" \
     -e "s,\@cfgdefdir\@,@cfgdefdir@,g" \
-    -e "s,\@dbhome\@,@dbhome@,g" \
     -e "s,\@defrrddir\@,@defrrddir@,g" \
     -e "s,\@distxmldir\@,@distxmldir@,g" \
     -e "s,\@pkgdocdir\@,@pkgdocdir@,g" \
@@ -76,6 +74,7 @@ torrus_config_pl=@cfgdefdir@/torrus-config.pl
     -e "s,\@tmpluserdir\@,@tmpluserdir@,g" \
     -e "s,\@torrus_user\@,@torrus_user@,g" \
     -e "s,\@webplaindir\@,@webplaindir@,g" \
+    -e "s,\@gitrepodir\@,@gitrepodir@,g" \
     -e "s,\@siam_config_pl\@,$siam_config_pl,g" \
     -e "s,\@siam_siteconfig_pl\@,$siam_siteconfig_pl,g" \
     -e "s,\@torrus_config_pl\@,$torrus_config_pl,g" \

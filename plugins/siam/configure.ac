@@ -19,7 +19,7 @@
 
 # SIAM Torrus plugin Autoconf script
 
-AC_INIT(tp-siam, 2.07.01, ssinyagin@users.sourceforge.net)
+AC_INIT(tp-siam, 3.01.01, ssinyagin@users.sourceforge.net)
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)
@@ -56,7 +56,7 @@ if test "$enable_pkgonly" != yes; then
     AC_MSG_RESULT([Ok])
   fi
 
-  for module in 'YAML' 'SIAM'
+  for module in 'YAML' 'SIAM' 'Git::ObjectStore'
    do
      AC_MSG_CHECKING([presence of $module])
      if ${PERL} ${PERLOPTS} -e 'use '$module 2>/dev/null; then
@@ -94,8 +94,7 @@ AC_ARG_VAR(sitexmldir, [[SITEDIR/xmlconfig] Site XML configs])
 AC_ARG_VAR(logdir, [[/var/log/torrus] Log files])
 AC_ARG_VAR(piddir, [[/var/run/torrus] PID files])
 AC_ARG_VAR(varprefix, [[/var/torrus] Common prefix for runtime data])
-AC_ARG_VAR(cachedir, [[VARPREFIX/cache] Renderer cache])
-AC_ARG_VAR(dbhome, [[VARPREFIX/db] Berkeley DB files])
+AC_ARG_VAR(gitrepodir, [[VARPREFIX/gitrepo] git repository dir])
 AC_ARG_VAR(seslockdir, [[VARPREFIX/session_data/lock] Web session locks])
 AC_ARG_VAR(sesstordir, [[VARPREFIX/session_data/store] Web session storage])
 AC_ARG_VAR(wrapperdir, [[BINDIR] CLI wrapper])

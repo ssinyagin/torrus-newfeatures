@@ -1,0 +1,327 @@
+#!@PERL@
+#  Copyright (C) 2011-2012  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# Stanislav Sinyagin <ssinyagin@k-open.com>
+
+use strict;
+use warnings;
+
+BEGIN { require '@siam_config_pl@'; }
+
+
+use Getopt::Long;
+use Sys::Hostname;
+use Git::ObjectStore;
+
+use Torrus::SIAM;
+use Torrus::Log;
+
+my $bindir = '@pkgbindir@';
+
+my $server = hostname();
+
+my $full;
+
+my $ddx_path = $Torrus::SIAM::ddx_path;
+my $bundles_path = $Torrus::SIAM::bundles_path;
+my $nodes_path = $Torrus::SIAM::nodes_path;
+my $rrd_path = $Torrus::SIAM::rrd_path;
+
+my $debug = 0;
+my $verbose = 0;
+
+
+
+my $ok = GetOptions( 'server=s'    => \$server,
+                     'full'        => \$full,
+                     'pddx=s'      => \$ddx_path,
+                     'pbundles=s'  => \$bundles_path,
+                     'pnodes=s'    => \$nodes_path,
+                     'prrd=s'      => \$rrd_path,
+                     'verbose'     => \$verbose,
+                     'debug'       => \$debug );
+
+if( not $ok or scalar( @ARGV ) > 0 )
+{
+    print STDERR
+        ("Usage: $0 [options...]\n",
+         "Options:\n",
+         " --server=HOSTNAME       Torrus server to match in SIAM [" .
+         $server . "]\n",
+         " --full                  Full rediscovery of all devices\n" .
+         " --pddx=PATH             Path to store DDX files\n",
+         "    [" . $ddx_path . "]\n",
+         " --pbundles=PATH         Path to store bundles XML\n",
+         "    [" . $bundles_path . "]\n",
+         " --pnodes=PATH           Path to store per-node XML\n",
+         "    [" . $nodes_path . "]\n",
+         " --prrd=PATH             RRD data storage path\n",
+         "    [" . $rrd_path . "]\n",
+         " --verbose               print extra information\n",
+         " --debug                 print debugging information\n",
+         "\n");
+    exit 1;
+}
+
+my $logopt = ' ';
+
+if( $debug )
+{
+    Torrus::Log::setLevel('debug');
+    $logopt = ' --debug ';
+}
+elsif( $verbose )
+{
+    Torrus::Log::setLevel('verbose');
+    $logopt = ' --verbose ';
+}
+
+
+my $siam = Torrus::SIAM->open();
+exit(1) unless defined($siam);
+
+Verbose('Connected to SIAM');
+
+# Generate discovery files
+
+my $devices = $siam->get_contained_objects
+    ('SIAM::Device', {'match_attribute' => ['torrus.server', [$server]]});
+
+Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
+
+
+# Read device list from SIAM
+my %devs;
+foreach my $device (@{$devices})
+{
+    next unless $device->is_complete();
+    next unless $device->attr('snmp.managed');
+
+    my $tree = $device->attr('torrus.tree');
+    if( not defined($tree) )
+    {
+        Error('SIAM::Device "' . $device->id .
+              '" does not define "torrus.tree" attribute. Aborting.');
+        exit(1);
+    }
+
+    my $name = $device->attr('siam.device.name');
+    $devs{$tree}{$name} = 1;
+}
+
+$siam->disconnect();
+
+my $branch = $Torrus::SIAM::hostsBranchname;
+
+my %to_del_devs;
+my %old_devs;
+
+{
+    # this will die if the branch does not exist
+    my $store = eval {
+        new Git::ObjectStore(
+            'repodir' => $Torrus::SIAM::gitRepoDir,
+            'branchname' => $branch);
+    };
+
+    if( $@ )
+    {
+        Verbose('Could not read the branch ' . $branch . ': ' . $@);
+    }
+    else
+    {
+        my $cb_read = sub
+        {
+            my $fname = shift;
+            my ($tree, $device) = split(/\//, $fname);
+            $old_devs{$tree}{$device} = 1;
+            if( not $devs{$tree}{$device} )
+            {
+                $to_del_devs{$tree}{$device} = 1;
+            }
+        };
+
+        $store->recursive_read('', $cb_read, 1);
+    }
+}
+
+my %added_devs;
+foreach my $tree (keys %devs)
+{
+    foreach my $device (keys %{$devs{$tree}})
+    {
+        if( $full or not $old_devs{$tree}{$device} )
+        {
+            $added_devs{$tree}{$device} = 1;
+        }
+    }
+}
+
+
+my $trees_added = scalar(keys %added_devs);
+my $trees_deleted = scalar(keys %to_del_devs);
+if( $trees_added + $trees_deleted == 0 )
+{
+    Verbose('No devices added or deleted, exiting');
+    exit(0);
+}
+
+Verbose('New devices detected in ' . $trees_added . ' trees');
+
+my $cmd =
+    $bindir . '/siam_genddx' . $logopt .
+    '--server=' . $server . ' ' .
+    '--pddx="' . $ddx_path . '" ' .
+    '--pbundles="' . $bundles_path . '" ' .
+    '--pnodes="' . $nodes_path . '" ' .
+    '--prrd="' . $rrd_path . '"';
+Debug('Executing: ' . $cmd);
+my $r = system($cmd);
+if( $r != 0 )
+{
+    Error('Error executing ' . $cmd);
+    exit(1);
+}
+
+
+foreach my $tree (sort keys %added_devs)
+{
+    my $n_all_devs = scalar(keys %{$devs{$tree}});
+    my $n_new_devs = scalar(keys %{$added_devs{$tree}});
+
+    Verbose('Tree ' . $tree . ': ' . $n_new_devs . ' new devices');
+
+    my $full_redisc = 0;
+    if( $n_all_devs == 0 )
+    {
+       $full_redisc = 1;
+       Verbose('The tree ' . $tree . ' was empty. Running a full rediscovery');
+    }
+    elsif( $n_new_devs > $Torrus::SIAM::rebuild_max_devs )
+    {
+       $full_redisc = 1;
+       Verbose('Tree ' . $tree . ': more than ' .
+               $Torrus::SIAM::rebuild_max_devs .
+               ' new devices. Running a full rediscovery');
+    }
+    elsif( 100 * $n_new_devs / ($n_all_devs) >
+           $Torrus::SIAM::rebuild_max_percent )
+    {
+       $full_redisc = 1;
+       Verbose('Tree ' . $tree . ': more than ' .
+               $Torrus::SIAM::rebuild_max_percent .
+               '% new devices. Running a full rediscovery');
+    }
+
+    $cmd =
+        $bindir . '/devdiscover' . $logopt .
+        $ddx_path . 'siam-' . $tree . '.ddx ' .
+        $Torrus::SIAM::rebuild_ddopts;
+    
+    if( not $full_redisc )
+    {
+        foreach my $device (sort keys %{$added_devs{$tree}})
+        {
+            my $name = $device;
+            $name =~ s/\s/-/go;
+            $cmd .= ' --limit="' . $name . '"';
+        }        
+    }
+
+    Debug('Executing: ' . $cmd);
+    $r = system($cmd);
+    if( $r != 0 )
+    {
+        Error('Error executing ' . $cmd);
+        exit(1);
+    }
+
+    $cmd =
+        $bindir . '/compilexml' . $logopt .
+        '--tree=' . $tree;
+    
+    Debug('Executing: ' . $cmd);
+    $r = system($cmd);
+    if( $r != 0 )
+    {
+        Error('Error executing ' . $cmd);
+        exit(1);
+    }
+
+    if( $Torrus::SIAM::rebuild_run_bs )
+    {
+        $cmd =
+            $bindir . '/buildsearchdb' . $logopt .
+            '--tree=' . $tree;
+        
+        Debug('Executing: ' . $cmd);
+        $r = system($cmd);
+        if( $r != 0 )
+        {
+            Error('Error executing ' . $cmd);
+            exit(1);
+        }
+    }
+}
+
+Debug('Updating branch: ' . $branch);
+
+my $store = new Git::ObjectStore(
+    'repodir' => $Torrus::SIAM::gitRepoDir,
+    'branchname' => $branch,
+    'writer' => 1);
+
+my $c_added = 0;
+my $c_deleted = 0;
+
+foreach my $tree (keys %added_devs)
+{
+    foreach my $device (keys %{$added_devs{$tree}})
+    {
+        my $fname = $tree . '/' . $device;
+        $store->write_file($fname, '');
+        $c_added++;
+    }
+}
+
+foreach my $tree (keys %to_del_devs)
+{
+    foreach my $device (keys %{$to_del_devs{$tree}})
+    {
+        my $fname = $tree . '/' . $device;
+        $store->delete_file($fname);
+        $c_deleted++;
+    }
+}
+
+my $msg =  sprintf('added %d, deleted %d devices', $c_added, $c_deleted);
+Verbose($msg);
+$store->create_commit_and_packfile($msg);
+
+exit(0);
+
+
+
+
+
+# Local Variables:
+# mode: perl
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:
+
+

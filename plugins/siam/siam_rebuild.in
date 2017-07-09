@@ -35,6 +35,7 @@ my $bindir = '@pkgbindir@';
 my $server = hostname();
 
 my $full;
+my @force;
 
 my $ddx_path = $Torrus::SIAM::ddx_path;
 my $bundles_path = $Torrus::SIAM::bundles_path;
@@ -48,6 +49,7 @@ my $verbose = 0;
 
 my $ok = GetOptions( 'server=s'    => \$server,
                      'full'        => \$full,
+                     'force=s'     => \@force,
                      'pddx=s'      => \$ddx_path,
                      'pbundles=s'  => \$bundles_path,
                      'pnodes=s'    => \$nodes_path,
@@ -60,19 +62,20 @@ if( not $ok or scalar( @ARGV ) > 0 )
     print STDERR
         ("Usage: $0 [options...]\n",
          "Options:\n",
-         " --server=HOSTNAME       Torrus server to match in SIAM [" .
+         " --server=HOSTNAME    Torrus server to match in SIAM [" .
          $server . "]\n",
-         " --full                  Full rediscovery of all devices\n" .
-         " --pddx=PATH             Path to store DDX files\n",
+         " --full               Full rediscovery of all devices\n" .
+         " --force=RE           Force rediscovery of matching device names\n" .
+         " --pddx=PATH          Path to store DDX files\n",
          "    [" . $ddx_path . "]\n",
-         " --pbundles=PATH         Path to store bundles XML\n",
+         " --pbundles=PATH      Path to store bundles XML\n",
          "    [" . $bundles_path . "]\n",
-         " --pnodes=PATH           Path to store per-node XML\n",
+         " --pnodes=PATH        Path to store per-node XML\n",
          "    [" . $nodes_path . "]\n",
-         " --prrd=PATH             RRD data storage path\n",
+         " --prrd=PATH          RRD data storage path\n",
          "    [" . $rrd_path . "]\n",
-         " --verbose               print extra information\n",
-         " --debug                 print debugging information\n",
+         " --verbose            print extra information\n",
+         " --debug              print debugging information\n",
          "\n");
     exit 1;
 }
@@ -159,28 +162,45 @@ my %old_devs;
     }
 }
 
-my %added_devs;
+my %discover_devs;
 foreach my $tree (keys %devs)
 {
     foreach my $device (keys %{$devs{$tree}})
     {
+        my $discover = 0;
         if( $full or not $old_devs{$tree}{$device} )
         {
-            $added_devs{$tree}{$device} = 1;
+            $discover = 1;
+        }
+        else
+        {
+            foreach my $re (@force)
+            {
+                if( $device =~ $re )
+                {
+                    $discover = 1;
+                    last;
+                }
+            }
+        }
+
+        if( $discover )
+        {
+            $discover_devs{$tree}{$device} = 1;
         }
     }
 }
 
 
-my $trees_added = scalar(keys %added_devs);
+my $trees_discover = scalar(keys %discover_devs);
 my $trees_deleted = scalar(keys %to_del_devs);
-if( $trees_added + $trees_deleted == 0 )
+if( $trees_discover + $trees_deleted == 0 )
 {
-    Verbose('No devices added or deleted, exiting');
+    Verbose('Nothing to do, exiting');
     exit(0);
 }
 
-Verbose('New devices detected in ' . $trees_added . ' trees');
+Verbose('Devices for discovery detected in ' . $trees_discover . ' trees');
 
 my $cmd =
     $bindir . '/siam_genddx' . $logopt .
@@ -198,25 +218,26 @@ if( $r != 0 )
 }
 
 
-foreach my $tree (sort keys %added_devs)
+foreach my $tree (sort keys %discover_devs)
 {
     my $n_all_devs = scalar(keys %{$devs{$tree}});
-    my $n_new_devs = scalar(keys %{$added_devs{$tree}});
+    my $n_new_devs = scalar(keys %{$discover_devs{$tree}});
 
-    Verbose('Tree ' . $tree . ': ' . $n_new_devs . ' new devices');
+    Verbose('Tree ' . $tree . ': ' . $n_new_devs . ' devices to discover');
 
     my $full_redisc = 0;
     if( $n_all_devs == 0 )
     {
        $full_redisc = 1;
-       Verbose('The tree ' . $tree . ' was empty. Running a full rediscovery');
+       Verbose('The tree ' . $tree . ' was previously empty. ' .
+               'Running a full rediscovery');
     }
     elsif( $n_new_devs > $Torrus::SIAM::rebuild_max_devs )
     {
        $full_redisc = 1;
        Verbose('Tree ' . $tree . ': more than ' .
                $Torrus::SIAM::rebuild_max_devs .
-               ' new devices. Running a full rediscovery');
+               ' devices to discover. Running a full rediscovery');
     }
     elsif( 100 * $n_new_devs / ($n_all_devs) >
            $Torrus::SIAM::rebuild_max_percent )
@@ -224,7 +245,7 @@ foreach my $tree (sort keys %added_devs)
        $full_redisc = 1;
        Verbose('Tree ' . $tree . ': more than ' .
                $Torrus::SIAM::rebuild_max_percent .
-               '% new devices. Running a full rediscovery');
+               '% devices to discover. Running a full rediscovery');
     }
 
     $cmd =
@@ -234,7 +255,7 @@ foreach my $tree (sort keys %added_devs)
     
     if( not $full_redisc )
     {
-        foreach my $device (sort keys %{$added_devs{$tree}})
+        foreach my $device (sort keys %{$discover_devs{$tree}})
         {
             my $name = $device;
             $name =~ s/\s/-/go;
@@ -288,13 +309,16 @@ my $store = new Git::ObjectStore(
 my $c_added = 0;
 my $c_deleted = 0;
 
-foreach my $tree (keys %added_devs)
+foreach my $tree (keys %discover_devs)
 {
-    foreach my $device (keys %{$added_devs{$tree}})
+    foreach my $device (keys %{$discover_devs{$tree}})
     {
-        my $fname = $tree . '/' . $device;
-        $store->write_file($fname, '');
-        $c_added++;
+        if( not $old_devs{$tree}{$device} )
+        {
+            my $fname = $tree . '/' . $device;
+            $store->write_file($fname, '');
+            $c_added++;
+        }
     }
 }
 

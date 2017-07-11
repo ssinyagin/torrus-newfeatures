@@ -694,7 +694,7 @@ sub commitConfig
 
     my $src_changed = $self->{'srcstore'}->create_commit_and_packfile();
 
-    if( $src_changed )
+    if( $src_changed or $self->{'force_rebuild'} )
     {
         my $src_commit_id = $self->{'srcstore'}->current_commit_id();
         Debug('Wrote ' . $src_commit_id . ' in ' .
@@ -849,6 +849,10 @@ sub _post_process_nodes
                             {
                                 $newValue =~ s/\s+//go;
                             }
+
+                            $newValue =
+                                $self->_expand_substitutions
+                                ( $token, $dsParam, $newValue );
                             
                             if( $newValue ne $value )
                             {

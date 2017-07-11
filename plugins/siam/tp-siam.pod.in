@@ -314,6 +314,7 @@ Command-line arguments:
     Options:
      --server=HOSTNAME       Torrus server to match in SIAM [tsrTORRUS02]
      --full                  Full rediscovery of all devices
+     --force=RE              Force rediscovery of matching device names
      --pddx=PATH             Path to store DDX files
      --pbundles=PATH         Path to store bundles XML
      --pnodes=PATH           Path to store per-node XML
@@ -321,7 +322,9 @@ Command-line arguments:
      --verbose               print extra information
      --debug                 print debugging information
 
-    
+
+The utulity also checks if C<torrus.rediscover> is true, and enforces a
+rediscovery for such devices.
 
 
 =head1 Author

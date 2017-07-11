@@ -109,6 +109,7 @@ Verbose('Retrieved ' . scalar(@{$devices}) . ' devices from SIAM');
 
 # Read device list from SIAM
 my %devs;
+my %force_rediscover;
 foreach my $device (@{$devices})
 {
     next unless $device->is_complete();
@@ -124,6 +125,12 @@ foreach my $device (@{$devices})
 
     my $name = $device->attr('siam.device.name');
     $devs{$tree}{$name} = 1;
+
+    if( $device->attr('torrus.rediscover') )
+    {
+        Debug('Device ' . $name . ' has ' . 'torrus.rediscover=1');
+        $force_rediscover{$tree}{$name} = 1;
+    }
 }
 
 $siam->disconnect();
@@ -168,8 +175,18 @@ foreach my $tree (keys %devs)
     foreach my $device (keys %{$devs{$tree}})
     {
         my $discover = 0;
-        if( $full or not $old_devs{$tree}{$device} )
+        if( $full )
         {
+            $discover = 1;
+        }
+        elsif( not $old_devs{$tree}{$device} )
+        {
+            Debug('New device: ' . $device);
+            $discover = 1;
+        }
+        elsif($force_rediscover{$tree}{$device} )
+        {
+            Debug('Rediscovery forced by SIAM: ' . $device);
             $discover = 1;
         }
         else
@@ -178,6 +195,7 @@ foreach my $tree (keys %devs)
             {
                 if( $device =~ $re )
                 {
+                    Debug('Mathed --force option: ' . $device);
                     $discover = 1;
                     last;
                 }

@@ -22,8 +22,7 @@ SUBDIRS = . bin configs doc examples lib sup xmlconfig
 SUBST = @abs_top_builddir@/setup_tools/substvars.sh
 
 EXTRA_DIST = \
-	setup_tools/Bundle/Torrus.pm \
-	setup_tools/replace_rrfw.sh \
+	setup_tools/cpanm_install_modules.sh \
 	setup_tools/configure_fhs \
 	setup_tools/check_perlthreading.pl \
 	systemd/torrus.service.in \

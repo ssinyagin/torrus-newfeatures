@@ -1,5 +1,7 @@
 [Unit]
 Description=Torrus collector and monitor daemons
+Wants=redis-server.service
+After=redis-server.service
 
 [Service]
 Type=forking

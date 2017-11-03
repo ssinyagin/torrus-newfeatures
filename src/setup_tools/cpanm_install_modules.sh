@@ -15,6 +15,7 @@ for m in \
     Date::Parse \
     CGI::Fast \
     FCGI \
+    Excel::Writer::XLSX \
 ;do
     cpanm --notest $m
     if [ $? -ne 0 ]; then exit 1; fi

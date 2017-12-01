@@ -1,3 +1,9 @@
+2017-07-13  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* NEWS: Torrus Release 3.00
+
+	* Replaced BerkeleyDB with Git; incremental XML compiler
+
 2016-08-12  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* perllib/Torrus/ReportOutput/XLSX.pm: usage report renderer in

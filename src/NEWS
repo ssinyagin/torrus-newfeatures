@@ -1,3 +1,20 @@
+13-JUL-2017: Torrus release 3.00
+
+This release replaces the database back-end completely. Now instead of
+BerkeleyDB, it uses Git repository as data store. The XML compiler is
+now incremental, and also the collector updates itself
+incrementally. The file doc/devdoc/v3_changes contains details on
+changed software requirements and obsoleted modules.
+
+Also new in this release:
+
+-- Health status icons for device reachability
+
+-- Jitter statistics for Cisco SAA
+
+-- Traffic usage statistics are generated in Excel format
+
+
 17-FEB-2016: Torrus release 2.09
 
 In this release:

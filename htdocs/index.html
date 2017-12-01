@@ -6,7 +6,7 @@
 
 <body>
 
-<h1>Torrus: The Data Series Processing Framework</h1>
+<h1>Torrus</h1>
 
 <p>In short, Torrus is an alternative software platform to
 <a href="http://oss.oetiker.ch/mrtg/">MRTG</a>, 
@@ -18,16 +18,17 @@ flexibility and performance. We are able to poll
 
 
 <p>
-Torrus is designed to be the universal data series processing 
-framework. Its scalable hierarchical design, application-independent core,
-and highly customizable architecture make Torrus an attractive choice
-both for small installations and for big enterprise or carrier networks.
-Although most of our users deploy Torrus for SNMP monitoring, it might be
-useful for data series of any nature. Tobi Oetiker's RRDtool is used for
-data storage.
+Torrus is designed to be the universal data series processing
+framework. Its scalable hierarchical design, application-independent
+core, inremental configuration processing, and highly customizable
+architecture make Torrus an attractive choice both for small
+installations and for big enterprise or carrier networks.  Although most
+of our users deploy Torrus for SNMP monitoring, it might be useful for
+data series of any nature. Tobi Oetiker's RRDtool is used for data
+storage.
 </p>
 
-<p>
+<p style="display:none">
 See the <a href="http://demo.oetiker.torrus.net/"><strong>Torrus+SIAM+Extopus
 demo</strong></a> that illustrates the integration of Torrus with an ISP's
 service inventory and a customer self-service portal.
@@ -52,18 +53,19 @@ Currently Torrus consists of the following parts:
 <ul>
 
 <li>
-<strong>Configuration compiler and validator.</strong>
-It processes the XML configuration files and saves the configuration
-into a database.
+<strong>Configuration compiler and validator.</strong>  It processes the
+XML configuration files and saves the configuration into internal
+database. The compiler is incremental, and it only processes the XML
+files that have changed since last run.
 </li>
 
 <li>
-<strong>View renderer and the web interface.</strong>
-They generate HTML and the graphical representation of the datasources
-and provide user authentication and authorization.
-All generated output is controlled by the configuration parameters
-and templates.
-The users can easily create their own presentation of data series.
+<strong>User web interface.</strong> The web interface provides
+authentication and authorization, and it allows the user to navigate
+through the datasource tree, and see the grahs.  All generated output is
+controlled by configuration parameters and templates. Each graph image
+or HTML page has a persistent URL, so the output can easily be
+intergated into other interfaces.
 </li>
 
 <li>
@@ -71,17 +73,17 @@ The users can easily create their own presentation of data series.
 Thanks to David M. Town's
 <a href="http://search.cpan.org/search?module=Net::SNMP">
 Net::SNMP Perl module</a>, Torrus has got an extremely efficient SNMP
-data poller, with ability to poll dozens of thousands of SNMP variables
-from a single server. Modular collector core architecture allows
-further extension with new collector and storage types.
-Any datasource can have its own polling schedule.
+data poller, with ability to poll hundreds of thousands of SNMP objects
+from a single server. Modular collector core architecture allows further
+extension with new collector and storage types.  Any datasource can have
+its own polling schedule.
 </li>
 
 <li>
 <strong>SNMP Device Discovery Tool</strong>.
-<em>Devdiscover</em> is a new, modular, flexible, and expandable tool for
-automatic generation of Torrus configuration files. New device types
-and MIBs are easily added as independent Perl modules. Thanks to our
+<em>Devdiscover</em> is a modular, flexible, and expandable tool for
+automatic generation of Torrus configuration files. New device types and
+MIBs are easily added as independent Perl modules. Thanks to our
 contributors, the number of supported devices and vendors is constantly
 growing.
 </li>
@@ -220,18 +222,14 @@ Flexible hierarchical <em>configuration in XML</em> format. Multuiple XML
 files are processed additively.
 </li>
 <li>
-Externally generated RRD files can be automatically grouped,
-based on the filename regular expressions.
+<em>Git repository</em> as configuration back-end. All configuration is
+stored in a Git repository, and this allows incremental processing of
+configuration changes.
 </li>
 <li>
-Flexible representation of the data. One datasource may be displayed in
-multiple subtrees of the hierarchy. It allows you to group them at your
-convenience.
-</li>
-<li>
-<em>Aberrant behaviour detection</em> based on <em>Holt-Winters prediction</em>
-is fully supported (requires rrdtool version 1.1.x). See the
-references below for more information.
+<em>Aberrant behaviour detection</em> based on <em>Holt-Winters
+prediction</em> is fully supported. See the references below for more
+information.
 </li>
 <li>
 Support for <em>international</em> character sets (Latin1 and Unicode).
@@ -310,15 +308,7 @@ details)
 <ul>
 
 <li>
-Torrus was the new name for RRFW, the Round Robin Database
-Framework. The changes are summarized in the
-<a href="devdoc/torrus_roadmap.pod.html">transition roadmap</a>.
-Old RRFW documentation is available at
-<a href="http://rrfw.sourceforge.net/">RRFW home page</a>.
-</li>
-
-<li>
-Development of RRFW releases 0.0.1 to 0.0.7, as well as development and testing
+Development of releases 0.0.1 to 0.0.7, as well as development and testing
 of Cisco class-based QoS monitoring was sponsored by
 <a href="http://www.cablecom.ch/">Cablecom GmbH</a>
 Internet Core Routing Services Team.
@@ -439,6 +429,10 @@ Contributed in manpages creation. Maintainer of
 Bug reports and contributions for JunOS, Cisco SCE and other vendors discovery.
 </li>
 
+<li>
+<a href="mailto:jacquesg@cpan.org">Jacques Germishuys</a>.
+Helped developing the Git back-end for configuration tree.
+</li>
 
 </ul>
 
@@ -527,7 +521,7 @@ alt=
 
 </div>
 <hr>
-<p>Copyright &copy; 2002-2016 Stanislav Sinyagin
+<p>Copyright &copy; 2002-2017 Stanislav Sinyagin
 &lt;<a href="mailto:ssinyagin@k-open.com">ssinyagin@k-open.com</a>&gt;</p>
 <A href="http://sourceforge.net">
 <IMG src="http://sourceforge.net/sflogo.php?group_id=119282&amp;type=1"

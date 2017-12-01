@@ -291,7 +291,7 @@ foreach my $tree (sort keys %discover_devs)
 
     $cmd =
         $bindir . '/compilexml' . $logopt .
-        '--tree=' . $tree;
+        '--nogc --tree=' . $tree;
     
     Debug('Executing: ' . $cmd);
     $r = system($cmd);
@@ -305,7 +305,7 @@ foreach my $tree (sort keys %discover_devs)
     {
         $cmd =
             $bindir . '/buildsearchdb' . $logopt .
-            '--tree=' . $tree;
+            '--nogc --tree=' . $tree;
         
         Debug('Executing: ' . $cmd);
         $r = system($cmd);
@@ -353,6 +353,10 @@ foreach my $tree (keys %to_del_devs)
 my $msg =  sprintf('added %d, deleted %d devices', $c_added, $c_deleted);
 Verbose($msg);
 $store->create_commit_and_packfile($msg);
+
+Verbose('Running Git garbage collector...');
+system($bindir . '/gc');
+
 
 exit(0);
 

@@ -1,0 +1,55 @@
+#!@SHELL@
+#  Copyright (C) 2017  Stanislav Sinyagin
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# Stanislav Sinyagin <ssinyagin@k-open.com>
+#
+
+# disable Perl::Critic because this is not a Perl script
+## no critic
+
+# Garbage collector is needed because of this:
+# https://github.com/libgit2/libgit2/issues/4093
+
+
+cd @gitrepodir@
+
+if [ $? -ne 0 ]; then
+    echo "Could not find directory: @gitrepodir@" 1>&2
+    exit 1
+fi
+    
+@GIT@ gc
+
+if [ $? -ne 0 ]; then
+    echo "git gc retuirned error" 1>&2
+    exit 1
+fi
+
+@GIT@ update-server-info
+
+if [ $? -ne 0 ]; then
+    echo "git update-server-info retuirned error" 1>&2
+    exit 1
+fi
+
+exit 0
+
+# Local Variables:
+# mode: shell-script
+# indent-tabs-mode: nil
+# perl-indent-level: 4
+# End:

@@ -34,6 +34,7 @@ commands="acl=acledit acledit=acledit \
           snapshot=configsnapshot configsnapshot=configsnapshot \
           dd=devdiscover discover=devdiscover devdiscover=devdiscover \
           fm=flushmonitors flushmonitors=flushmonitors \
+          gc=gc \
           genddx=genddx \
           genlist=genlist \
           genreport=genreport report=genreport \

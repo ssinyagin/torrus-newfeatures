@@ -35,6 +35,7 @@ pkgbin_SCRIPTS = \
 	configsnapshot		\
 	devdiscover		\
 	flushmonitors		\
+	gc			\
 	genddx			\
 	genlist			\
 	genreport		\
@@ -69,6 +70,7 @@ EXTRA_DIST = \
 	configsnapshot.in	\
 	devdiscover.in		\
 	flushmonitors.in	\
+	gc.in			\
 	genddx.in		\
 	genlist.in		\
 	genreport.in		\
@@ -127,6 +129,9 @@ devdiscover: devdiscover.in
 
 flushmonitors: flushmonitors.in
 	$(SUBST) flushmonitors.in > flushmonitors
+
+gc: gc.in
+	$(SUBST) gc.in > gc
 
 genddx: genddx.in
 	$(SUBST) genddx.in > genddx

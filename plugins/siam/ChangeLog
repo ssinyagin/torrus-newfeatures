@@ -1,3 +1,7 @@
+2017-12-01  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
+
+	* siam_rebuild.in: run GIT garbage collector only once
+
 2016-03-14  Stanislav Sinyagin  <ssinyagin@users.sourceforge.net>
 
 	* Removed siam_genxml as incompatible with SIAM v1.x data model

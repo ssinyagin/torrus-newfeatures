@@ -1150,7 +1150,9 @@ my %cbQosValueTranslation =
          4 => 'atmPVC',
          5 => 'controlPlane',
          6 => 'vlanPort',
-         7 => 'evc' },
+         7 => 'evc',
+         # this value is not in officeial MIB, but ASR1000 IOS 16.5.1b uses it
+         8 => 'tunnel' }, 
 
      'cbQosPolicyDirection' => {
          1 => 'input',

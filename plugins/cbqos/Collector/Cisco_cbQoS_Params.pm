@@ -58,6 +58,7 @@ our %requiredLeafParams =
                  'evc'            => {
                      'cbqos-evc' => undef,
                  },
+                 'tunnel'  => undef,
              },
              
              'cbqos-object-type'            => {

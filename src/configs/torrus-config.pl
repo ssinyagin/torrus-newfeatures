@@ -88,9 +88,10 @@ $Torrus::Monitor::useSyslog = 1;
 $Torrus::Collector::runAlways = 0;
 $Torrus::Monitor::runAlways = 0;
 
-# By default, run 3 full collector cycles immediately at start. This
-# allows all SNMP name->index maps to be fetched and used ASAP
-# The 3rd cycle is needed for cbQoS to fetch its mappings
+# Setting this to 3 would set the collector to run 3 full collector
+# cycles immediately at start. This allows all SNMP name->index maps to
+# be fetched and used ASAP The 3rd cycle is needed for cbQoS to fetch
+# its mappings.
 $Torrus::Collector::fastCycles = 0;
 
 # SO_RCVBUF, the receiving buffer size of the SNMP collector socket.

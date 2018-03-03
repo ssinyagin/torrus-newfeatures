@@ -473,13 +473,12 @@ sub discover
                 $value = translateCbQoSValue( $value, $row );
                 $data->{'cbqos_objcfg'}{$objConfIndex}{$row} = $value;
             }
-            elsif( $mandatory{$row} and
-                   not $data->{'cbqos_persistent_indexing'})
+            elsif( $mandatory{$row} )
             {
                 Warn('Missing required configuration in: ' .
                      'cbQosConfigIndex=' . $objConfIndex . ', row=' . $row .
-                     '. It is recommended to use cbQoS MIB persistency ' .
-                     ' if possible');
+                     ' on ' . $devdetails->param('snmp-host') .
+                     '. The statistics will be disabled for collection.');
                 $data->{'cbqos_invalid_cfg'}{$objConfIndex} = 1;
                 $objType = 'DELETED';
             }

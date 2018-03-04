@@ -1356,32 +1356,36 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
 
 
      ##### Liebert
-     'Liebert::humidity-sensor' => {
-         'name'     => 'humidity-sensor',
+     'Liebert::envhumidity-subtree' => {
+         'name'     => 'envhumidity-subtree',
          'source'   => 'vendor/liebert.xml',
      },
-     'Liebert::humidity-subtree' => {
-         'name'     => 'humidity-subtree',
+     'Liebert::envhumidity-sensor-leaf' => {
+         'name'     => 'envhumidity-sensor-leaf',
          'source'   => 'vendor/liebert.xml',
      },
-     'Liebert::state-subtree' => {
-         'name'     => 'state-subtree',
+     'Liebert::envstate-subtree' => {
+         'name'     => 'envstate-subtree',
          'source'   => 'vendor/liebert.xml',
      },
-     'Liebert::state-capacity' => {
-         'name'     => 'state-capacity',
+     'Liebert::envstate-leaf' => {
+         'name'     => 'envstate-leaf',
          'source'   => 'vendor/liebert.xml',
      },
-     'Liebert::temperature-subtree' => {
-         'name'     => 'temperature-subtree',
+     'Liebert::envstatistics-subtree' => {
+         'name'     => 'envstatistics-subtree',
          'source'   => 'vendor/liebert.xml',
      },
-     'Liebert::temperature-sensor' => {
-         'name'     => 'temperature-sensor',
+     'Liebert::envstatistics-leaf' => {
+         'name'     => 'envstatistics-leaf',
          'source'   => 'vendor/liebert.xml',
      },
-     'Liebert::temperature-sensor-fahrenheit' => {
-         'name'     => 'temperature-sensor-fahrenheit',
+     'Liebert::envtemp-sensor-subtree' => {
+         'name'     => 'envtemp-sensor-subtree',
+         'source'   => 'vendor/liebert.xml',
+     },
+     'Liebert::envtemp-sensor-leaf' => {
+         'name'     => 'envtemp-sensor-leaf',
          'source'   => 'vendor/liebert.xml',
      },
 

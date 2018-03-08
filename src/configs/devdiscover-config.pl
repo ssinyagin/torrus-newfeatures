@@ -72,6 +72,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CiscoWLC',
      'Torrus::DevDiscover::CompaqCIM',
      'Torrus::DevDiscover::ComtechEFData',
+     'Torrus::DevDiscover::Denkovi',
      'Torrus::DevDiscover::EmpireSystemedge',
      'Torrus::DevDiscover::F5BigIp',
      'Torrus::DevDiscover::Fortinet',
@@ -861,6 +862,20 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'ComtechEFData::cdmip' => {
          'name'     => 'cdmip',
          'source'   => 'vendor/comtechefdata.xml',
+     },
+
+     #### Denkovi Electronics
+     'Denkovi::input-analog-subtree' => {
+         'name'     => 'input-analog-subtree',
+         'source'   => 'vendor/denkovi.xml',
+     },
+     'Denkovi::input-analog-value' => {
+         'name'     => 'input-analog-value',
+         'source'   => 'vendor/denkovi.xml',
+     },
+     'Denkovi::input-analog-value-subtree' => {
+         'name'     => 'input-analog-value-subtree',
+         'source'   => 'vendor/denkovi.xml',
      },
 
      #### Empire Sysedge

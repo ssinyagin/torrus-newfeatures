@@ -73,17 +73,24 @@ sub needsFlush
 {
     my $self = shift;
 
+    if( $self->{'redis'}->hget
+        ($self->{'redis_prefix'} . 'agent_flush', $self->{'branch'}) )
+    {
+        Info('Agent configuration flush is forced for ' . $self->{'branch'});
+        $self->{'redis'}->hdel
+            ($self->{'redis_prefix'} . 'agent_flush', $self->{'branch'});
+        return 1;
+    }
+    
     if( not defined($self->{'current_head'}) )
     {
         return 1;
     }
-    else
+    
+    eval { $self->_store() };
+    if( $@ )
     {
-        eval { $self->_store() };
-        if( $@ )
-        {
-            return 1;
-        }
+        return 1;
     }
 
     return 0;

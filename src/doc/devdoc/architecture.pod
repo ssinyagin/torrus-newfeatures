@@ -309,6 +309,10 @@ reading.
   process compares this with the current known commit and pulls the
   updates if needed.
 
+=item * C<agent_flush> -- a hash with branch names as keys and value of
+  1 indicating that a corresponding agent needs to re-read its full
+  configuration. The agent deletes the corresponding entry after reading.
+
 =item * C<tsets:I<TREE>> -- hash of tokenset names as keys and "1" as
   values.
 

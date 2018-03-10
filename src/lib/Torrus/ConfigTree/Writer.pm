@@ -1644,6 +1644,18 @@ sub updateAgentConfigs
         $self->_agents_ref_name(), $repo, $new_commit, 1);
     Debug('Updated reference: ' . $self->_agents_ref_name());
 
+    if( $self->{'force_rebuild'} )
+    {
+        # tell agents to flush their configs
+        foreach my $branchname (@branchnames)
+        {
+            $self->{'redis'}->hset
+                ($self->{'redis_prefix'} . 'agent_flush',
+                 $branchname, '1');
+            Debug('Forced agent flush for ' . $branchname);
+        }
+    }
+        
     return;
 }
 

@@ -34,7 +34,7 @@ required components are provided.
 
 If the OS mounts F</var/run> directory to a temporary filesystem, you
 need t make sure that C<piddir> (F</var/run/torrus> by default) is
-always available. If your OS uses Systemd, the Trrus distribution
+always available. If your OS uses Systemd, the Torrus distribution
 supplies a I<tmpfile> file for that.
 
 It is recommended to use Tobi Oetiker's SDBS tool available at
@@ -159,7 +159,7 @@ Modules required by Torrus:
   cd torrus-newfeatures/src
   sh setup_tools/cpanm_install_modules.sh
   autoreconf
-  ./configure --prefix=/opt/pm piddir=/var/torrus/run
+  ./configure --prefix=/opt/pm
   make install
 
   # systemd unit files

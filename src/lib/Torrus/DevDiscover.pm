@@ -865,7 +865,20 @@ sub oidBaseMatch
 }
 
 
-    
+##
+# Check bit value in BITS octet-string
+sub checkBit
+{
+    my $self = shift;
+    my $snmpvalue = shift;
+    my $bitno = shift;
+
+    # cut off 0x prefix
+    $snmpvalue =~ s/^0x//;
+    my $bstring = unpack('B*', pack('H*', $snmpvalue));
+    return int(substr($bstring, $bitno, 1));
+}
+
 
 
 1;

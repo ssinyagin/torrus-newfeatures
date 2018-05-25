@@ -64,9 +64,25 @@ my $lmTypeDef = {
 
 # bit flags and templates for LM measurements
 my $lmMeasuremens = {
+    'bForwardMinFlr'  => {
+        'bit' => 2,
+        'template' => 'MEF_SOAM_PM_MIB::mef-soam-lm-forward-min-flr',
+    },
+    'bForwardMaxFlr'  => {
+        'bit' => 3,
+        'template' => 'MEF_SOAM_PM_MIB::mef-soam-lm-forward-max-flr',
+    },
     'bForwardAvgFlr' => {
         'bit' => 4,
         'template' => 'MEF_SOAM_PM_MIB::mef-soam-lm-forward-avg-flr',
+    },
+    'bBackwardMinFlr' => {
+        'bit' => 7,
+        'template' => 'MEF_SOAM_PM_MIB::mef-soam-lm-backward-min-flr',
+    },
+    'bBackwardMaxFlr' => {
+        'bit' => 8,
+        'template' => 'MEF_SOAM_PM_MIB::mef-soam-lm-backward-max-flr',
     },
     'bBackwardAvgFlr' => {
         'bit' => 9,

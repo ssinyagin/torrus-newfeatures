@@ -72,6 +72,7 @@ genericdir    =  $(distxmldir)/generic
 dist_generic_DATA = \
 	generic/collector-periods.xml \
 	generic/monitors.xml \
+	generic/mef-soam-pm-mib.xml \
 	generic/rfc1628.ups.xml \
 	generic/rfc1697.rdbms.xml \
 	generic/rfc2662.adsl-line.xml \

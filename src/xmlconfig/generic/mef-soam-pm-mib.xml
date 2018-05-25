@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2013  Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+-->
+
+
+<!--
+   Metro Ethernet Forum MEF-SOAM-PM-MIB
+   SOAM measurement statistics
+-->
+
+<configuration>
+
+<definitions>
+  <def name="mefSoamLmCurrentStatsForwardMinFlr"
+       value="1.3.6.1.4.1.15007.1.3.1.2.4.1.7"/>
+  <def name="mefSoamLmCurrentStatsForwardMaxFlr"
+       value="1.3.6.1.4.1.15007.1.3.1.2.4.1.8"/>
+  <def name="mefSoamLmCurrentStatsForwardAvgFlr"
+       value="1.3.6.1.4.1.15007.1.3.1.2.4.1.9"/>
+  <def name="mefSoamLmCurrentStatsBackwardMinFlr"
+       value="1.3.6.1.4.1.15007.1.3.1.2.4.1.12"/>
+  <def name="mefSoamLmCurrentStatsBackwardMaxFlr"
+       value="1.3.6.1.4.1.15007.1.3.1.2.4.1.13"/>
+  <def name="mefSoamLmCurrentStatsBackwardAvgFlr"
+       value="1.3.6.1.4.1.15007.1.3.1.2.4.1.14"/>
+  <def name="mefSoamDmCurrentStatsFrameDelayTwoWayMin"
+       value="1.3.6.1.4.1.15007.1.3.1.3.4.1.5"/>
+  <def name="mefSoamDmCurrentStatsFrameDelayTwoWayMax"
+       value="1.3.6.1.4.1.15007.1.3.1.3.4.1.6"/>
+  <def name="mefSoamDmCurrentStatsFrameDelayTwoWayAvg"
+       value="1.3.6.1.4.1.15007.1.3.1.3.4.1.7"/>
+</definitions>
+
+<datasources>
+
+  <template name="mef-soam-leaf-common">
+    <param name="collector-timeoffset-hashstring"
+           value="%system-id%:%mef-soam-cfg-index%"/>  
+  </template>
+
+
+  <template name="mef-soam-lm-subtree">
+    <apply-template name="mef-soam-leaf-common"/>
+    <param name="data-file"
+           value="%system-id%_mef_soam_lm_%mef-soam-cfg-index%.rrd" />
+
+    <param name="collector-scale"    value="1000,/" />
+    <param name="vertical-label"      value="Percent" />
+    <param name="graph-lower-limit"   value="0" />
+  </template>
+
+  <template name="mef-soam-dm-subtree">
+    <apply-template name="mef-soam-leaf-common"/>
+    <param name="data-file"
+           value="%system-id%_mef_soam_dm_%mef-soam-cfg-index%.rrd" />
+    <param name="vertical-label"      value="Microseconds" />
+    <param name="graph-lower-limit"   value="0" />
+  </template>
+    
+  <template name="mef-soam-lm-forward-min-flr">
+    <leaf name="FwdFlrMin">
+      <param name="comment"
+           value="minimum one-way frame loss ratio in the forward direction" />
+      <param name="snmp-object"
+      value="$mefSoamLmCurrentStatsForwardMinFlr.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="FwdFlrMin" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//fwdflrmin"/>
+    </leaf>
+  </template>  
+
+  <template name="mef-soam-lm-forward-max-flr">
+    <leaf name="FwdFlrMax">
+      <param name="comment"
+           value="maximum one-way frame loss ratio in the forward direction" />
+      <param name="snmp-object"
+      value="$mefSoamLmCurrentStatsForwardMaxFlr.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="FwdFlrMax" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//fwdflrmax"/>
+    </leaf>
+  </template>  
+  
+  <template name="mef-soam-lm-forward-avg-flr">
+    <leaf name="FwdFlrAvg">
+      <param name="comment"
+           value="average one-way frame loss ratio in the forward direction" />
+      <param name="snmp-object"
+      value="$mefSoamLmCurrentStatsForwardAvgFlr.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="FwdFlrAvg" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//fwdflravg"/>
+    </leaf>
+  </template>  
+
+  
+  <template name="mef-soam-lm-backward-min-flr">
+    <leaf name="BckFlrMin">
+      <param name="comment"
+          value="minimum one-way frame loss ratio in the backward direction" />
+      <param name="snmp-object"
+      value="$mefSoamLmCurrentStatsBackwardMinFlr.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="BckFlrMin" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//bckflrmin"/>
+    </leaf>
+  </template>  
+
+  <template name="mef-soam-lm-backward-max-flr">
+    <leaf name="BckFlrMax">
+      <param name="comment"
+          value="maximum one-way frame loss ratio in the backward direction" />
+      <param name="snmp-object"
+      value="$mefSoamLmCurrentStatsBackwardMaxFlr.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="BckFlrMax" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//bckflrmax"/>
+    </leaf>
+  </template>  
+  
+  <template name="mef-soam-lm-backward-avg-flr">
+    <leaf name="BckFlrAvg">
+      <param name="comment"
+          value="average one-way frame loss ratio in the backward direction" />
+      <param name="snmp-object"
+      value="$mefSoamLmCurrentStatsBackwardAvgFlr.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="BckFlrAvg" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//bckflravg"/>
+    </leaf>
+  </template>  
+
+
+  <template name="mef-soam-dm-twoway-min">
+    <leaf name="TwowayDelayMin">
+      <param name="comment"
+           value="minimum two-way frame delay" />
+      <param name="snmp-object"
+      value="$mefSoamDmCurrentStatsFrameDelayTwoWayMin.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="TwMin" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//twowaymin"/>
+    </leaf>
+  </template>  
+
+  <template name="mef-soam-dm-twoway-max">
+    <leaf name="TwowayDelayMax">
+      <param name="comment"
+           value="maximum two-way frame delay" />
+      <param name="snmp-object"
+      value="$mefSoamDmCurrentStatsFrameDelayTwoWayMax.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="TwMax" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//twowaymax"/>
+    </leaf>
+  </template>  
+
+  <template name="mef-soam-dm-twoway-avg">
+    <leaf name="TwowayDelayAvg">
+      <param name="comment"
+           value="average two-way frame delay" />
+      <param name="snmp-object"
+      value="$mefSoamDmCurrentStatsFrameDelayTwoWayAvg.%mef-soam-cfg-index%"/>
+      <param name="rrd-ds"             value="TwAvg" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"      value="%mef-soam-nodeid%//twowayavg"/>
+    </leaf>
+  </template>  
+                
+</datasources>
+
+</configuration>

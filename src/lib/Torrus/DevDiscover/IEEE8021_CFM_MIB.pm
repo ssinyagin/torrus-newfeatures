@@ -26,7 +26,6 @@ use strict;
 use warnings;
 
 use Torrus::Log;
-use Data::Dumper;
 
 $Torrus::DevDiscover::registry{'IEEE8021_CFM_MIB'} = {
     'sequence'     => 100,
@@ -235,8 +234,6 @@ sub discover
         $data->{'dot1ag'}{$mdIndex}{'ma'}{$ma}{'mep'}{$mep} = $ref;
     }
     
-    Info(Dumper($data->{'dot1ag'}));
-
     return 1;
 }
 

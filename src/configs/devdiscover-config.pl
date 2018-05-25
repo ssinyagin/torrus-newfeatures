@@ -1406,6 +1406,52 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          'source'   => 'vendor/liebert.xml',
      },
 
+     ##### MEF_SOAM_PM_MIB
+     'MEF_SOAM_PM_MIB::mef-soam-lm-subtree' => {
+         'name'     => 'mef-soam-lm-subtree',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-dm-subtree' => {
+         'name'     => 'mef-soam-dm-subtree',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-lm-forward-min-flr' => {
+         'name'     => 'mef-soam-lm-forward-min-flr',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-lm-forward-max-flr' => {
+         'name'     => 'mef-soam-lm-forward-max-flr',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-lm-forward-avg-flr' => {
+         'name'     => 'mef-soam-lm-forward-avg-flr',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-lm-backward-min-flr' => {
+         'name'     => 'mef-soam-lm-backward-min-flr',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-lm-backward-max-flr' => {
+         'name'     => 'mef-soam-lm-backward-max-flr',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-lm-backward-avg-flr' => {
+         'name'     => 'mef-soam-lm-backward-avg-flr',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-dm-twoway-min' => {
+         'name'     => 'mef-soam-dm-twoway-min',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-dm-twoway-max' => {
+         'name'     => 'mef-soam-dm-twoway-max',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+     'MEF_SOAM_PM_MIB::mef-soam-dm-twoway-avg' => {
+         'name'     => 'mef-soam-dm-twoway-avg',
+         'source'   => 'generic/mef-soam-pm-mib.xml',
+     },
+
      
      ##### Ucd Snmp
      'UcdSnmp::ucdsnmp-memory-real' => {

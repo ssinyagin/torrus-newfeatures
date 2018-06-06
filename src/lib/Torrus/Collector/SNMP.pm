@@ -1278,12 +1278,6 @@ sub postProcess
 $Torrus::Collector::collectorTypes{'snmp-reachable'} = 2;
 
 
-# List of needed parameters and default values
-
-$Torrus::Collector::params{'snmp-reachable'} =
-    \%Torrus::Collector::SNMP_Params::reachable_validatorLeafparams;
-
-
 # This is first executed per target
 
 $Torrus::Collector::initTarget{'snmp-reachable'} = \&reachable_initTarget;

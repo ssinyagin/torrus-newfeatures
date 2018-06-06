@@ -913,15 +913,16 @@ sub runCollector
     # because of some strange bugs: with more than 400 sessions per
     # dispatcher, some requests are not sent out
 
+    my $maxsessions =
+        $Torrus::Collector::SNMP::maxSessionsPerDispatcher;
+
     my @hosts = keys %{$cref->{'activehosts'}};
     
     while( scalar(@mappingSessions) + scalar(@hosts) > 0 )
     {
         my @batch = ();
-        while( ( scalar(@mappingSessions) + scalar(@batch) <
-                 $Torrus::Collector::SNMP::maxSessionsPerDispatcher )
-               and
-               scalar(@hosts) > 0 )
+        while( (scalar(@mappingSessions) + scalar(@batch) < $maxsessions)
+               and scalar(@hosts) > 0 )
         {
             push( @batch, pop( @hosts ) );
         }

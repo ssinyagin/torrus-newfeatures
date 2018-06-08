@@ -341,7 +341,7 @@ sub buildConfig
         my $filePerSensor =
             $devdetails->paramEnabled('CiscoGeneric::file-per-sensor');
         
-        $subtreeParam->{'data-file'} = '%snmp-host%_sensors' .
+        $subtreeParam->{'data-file'} = '%system-id%_sensors' .
             ($filePerSensor ? '_%sensor-index%':'') .
             ($fahrenheit ? '_fahrenheit':'') . '.rrd';
 

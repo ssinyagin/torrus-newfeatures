@@ -765,15 +765,31 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
          },
      'CiscoIOS_SAA::cisco-saa-subtree' => {
          'name'   => 'cisco-saa-subtree',
-         'source' => 'vendor/cisco.ios.xml'
+         'source' => 'vendor/cisco.ios.saa.xml'
          },
      'CiscoIOS_SAA::cisco-rtt-echo-subtree' => {
          'name'   => 'cisco-rtt-echo-subtree',
-         'source' => 'vendor/cisco.ios.xml'
+         'source' => 'vendor/cisco.ios.saa.xml'
          },
      'CiscoIOS_SAA::cisco-rtt-jitter-subtree' => {
          'name'   => 'cisco-rtt-jitter-subtree',
-         'source' => 'vendor/cisco.ios.xml'
+         'source' => 'vendor/cisco.ios.saa.xml'
+         },
+     'CiscoIOS_SAA::cisco-saa-soam-lm-subtree' => {
+         'name'   => 'cisco-saa-soam-lm-subtree',
+         'source' => 'vendor/cisco.ios.saa.xml'
+         },
+     'CiscoIOS_SAA::cisco-saa-soam-lm' => {
+         'name'   => 'cisco-saa-soam-lm',
+         'source' => 'vendor/cisco.ios.saa.xml'
+         },
+     'CiscoIOS_SAA::cisco-saa-soam-dm-subtree' => {
+         'name'   => 'cisco-saa-soam-dm-subtree',
+         'source' => 'vendor/cisco.ios.saa.xml'
+         },
+     'CiscoIOS_SAA::cisco-saa-soam-dm' => {
+         'name'   => 'cisco-saa-soam-dm',
+         'source' => 'vendor/cisco.ios.saa.xml'
          },
      'CiscoFirewall::cisco-firewall-subtree' => {
          'name'   => 'cisco-firewall-subtree',

@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!--
+   Copyright (C) 2018  Stanislav Sinyagin
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+  Stanislav Sinyagin <ssinyagin@k-open.com>
+
+-->
+
+<!-- Cisco IOS specific definitions -->
+
+<configuration>
+
+<definitions>
+
+  <!-- CISCO-RTTMON-MIB -->
+  <def name="rttMonLatestRttOperCompletionTime"
+       value="1.3.6.1.4.1.9.9.42.1.2.10.1.1" />
+  <def name="rttMonLatestJitterOperAvgJitter"
+       value="1.3.6.1.4.1.9.9.42.1.5.2.1.46" />
+
+ <!-- CISCO-IPSLA-ETHERNET-MIB -->
+  <def name="ipslaEtherJAggMeasuredCmpletions"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.2"/>
+  <def name="ipslaEtherJAggMeasuredRTTMin"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.8"/>
+  <def name="ipslaEtherJAggMeasuredRTTMax"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.9"/>
+  <def name="ipslaEtherJAggMeasuredFrmLossSDs"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.34"/>
+  <def name="ipslaEtherJAggMeasuredFrmLssDSes"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.35"/>
+  <def name="ipslaEtherJAggMeasuredFrmOutSeqs"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.36"/>
+  <def name="ipslaEtherJAggMeasuredFrmMIAes"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.37"/>
+</definitions>
+
+<datasources>
+
+  <!-- Common definitions for SAA/RTTMON subtree -->
+  <template name="cisco-saa-subtree">
+    <param name="comment"      value="Cisco Service Assurance Agent"/>
+    <param name="precedence"   value="-400" />
+
+    <param name="has-overview-shortcuts"    value="yes"/>
+    <param name="overview-shortcuts"        value="rt"/>
+    <param name="overview-subleave-name-rt"    value="Results"/>
+    <param name="overview-shortcut-text-rt"
+           value="All response times"/>
+    <param name="overview-shortcut-title-rt"
+           value="Show all response time graphs in one page"/>
+    <param name="overview-page-title-rt"
+           value="Response Time Graphs"/>
+
+    <param name="rrd-hwpredict"     value="disabled" />
+  </template>
+
+  <!-- RTT Echo statitsics -->
+  <template name="cisco-rtt-echo-subtree">
+    <leaf name="Results">
+      <param name="snmp-object"
+             value="$rttMonLatestRttOperCompletionTime.%rtt-index%" />
+      <param name="rrd-ds"            value="complTime" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="data-file"
+             value="%system-id%_rtt_%rtt-index%.rrd" />
+      <param name="graph-title" value="%system-id% SAA RTT" />
+      <param name="graph-legend"      value="rtr %rtt-index%" />
+      <param name="vertical-label"    value="milliseconds" />
+      <param name="graph-lower-limit" value="0"/>
+      <param name="nodeid" value="sla//%nodeid-device%//%rtt-index%//rtt"/>
+    </leaf>
+  </template>
+
+  <!-- Jitter statitsics -->
+  <template name="cisco-rtt-jitter-subtree">
+    <leaf name="Results">
+      <param name="snmp-object"
+             value="$rttMonLatestJitterOperAvgJitter.%rtt-index%" />
+      <param name="rrd-ds"            value="avgJitter" />
+      <param name="rrd-create-dstype" value="GAUGE" />
+      <param name="data-file"
+             value="%system-id%_jitter_%rtt-index%.rrd" />
+      <param name="graph-title" value="%system-id% SAA Jitter" />
+      <param name="graph-legend"      value="rtr %rtt-index%" />
+      <param name="vertical-label"    value="milliseconds" />
+      <param name="graph-lower-limit" value="0"/>
+      <param name="nodeid" value="sla//%nodeid-device%//%rtt-index%//jitter"/>
+    </leaf>
+  </template>
+
+
+  <!-- CFM SOAM measurements -->
+
+  <template name="cisco-saa-soam-common">
+    <param name="collector-type" value="snmp-ts"/>
+    <param name="snmp-ts-ref-oid"
+           value="$ipslaEtherJAggMeasuredCmpletions.%rtt-index%"/>
+    <!-- sysUpTime is in hundreds of seconds -->
+    <param name="snmp-ts-unit-scale" value="100"/> 
+    <param name="collector-timeoffset-hashstring"
+           value="%system-id%:%rtt-index%"/>
+  </template>
+
+
+  <template name="cisco-saa-soam-lm-subtree">
+    <apply-template name="cisco-saa-soam-common"/>
+    <param name="data-file"
+           value="%system-id%_cisco_soam_lm_%rtt-index%.rrd" />
+    <param name="graph-lower-limit"   value="0" />
+    <param name="vertical-label"    value="frames" />
+  </template>
+
+  <template name="cisco-saa-soam-dm-subtree">
+    <apply-template name="cisco-saa-soam-common"/>
+    <param name="data-file"
+           value="%system-id%_cisco_soam_dm_%rtt-index%.rrd" />
+    <param name="graph-lower-limit"   value="0" />
+    <param name="vertical-label"    value="milliseconds" />
+  </template>
+
+  <template name="cisco-saa-soam-lm">
+    <leaf name="FrmLossSDs">
+      <param name="comment"
+          value="number of lost frames when sent from source to destination"/>
+      <param name="snmp-ts-column-oid"
+         value="$ipslaEtherJAggMeasuredFrmLossSDs.%rtt-index%"/>
+      <param name="rrd-ds"             value="FrmLossSDs" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"    value="%cisco-soam-nodeid%//frmlosssds"/>
+      <param name="precedence"   value="100" />
+    </leaf>
+    <leaf name="FrmLssDSes">
+      <param name="comment"
+          value="number of lost frames when sent from destination to source"/>
+      <param name="snmp-ts-column-oid"
+         value="$ipslaEtherJAggMeasuredFrmLssDSes.%rtt-index%"/>
+      <param name="rrd-ds"             value="FrmLssDSes" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"    value="%cisco-soam-nodeid%//frmlssdses"/>
+      <param name="precedence"   value="110" />
+    </leaf>
+    <leaf name="FrmOutSeqs">
+      <param name="comment"
+          value="number of frames arrived out of sequence"/>
+      <param name="snmp-ts-column-oid"
+         value="$ipslaEtherJAggMeasuredFrmOutSeqs.%rtt-index%"/>
+      <param name="rrd-ds"             value="FrmOutSeqs" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"    value="%cisco-soam-nodeid%//frmoutseqs"/>
+      <param name="precedence"   value="120" />
+    </leaf>
+    <leaf name="FrmMIAes">
+      <param name="comment"
+          value="number of frames arrived out of sequence"/>
+      <param name="snmp-ts-column-oid"
+         value="$ipslaEtherJAggMeasuredFrmMIAes.%rtt-index%"/>
+      <param name="rrd-ds"             value="FrmMIAes" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"    value="%cisco-soam-nodeid%//frmmiaes"/>
+      <param name="precedence"   value="130" />
+    </leaf>
+  </template>  
+  
+
+  <template name="cisco-saa-soam-dm">
+    <leaf name="RTTMin">
+      <param name="comment"
+          value="Minumum round-trip delay"/>
+      <param name="snmp-ts-column-oid"
+         value="$ipslaEtherJAggMeasuredRTTMin.%rtt-index%"/>
+      <param name="rrd-ds"             value="RTTMin" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"    value="%cisco-soam-nodeid%//rttmin"/>
+      <param name="precedence"   value="100" />
+    </leaf>
+    <leaf name="RTTMax">
+      <param name="comment"
+          value="Maxumum round-trip delay"/>
+      <param name="snmp-ts-column-oid"
+         value="$ipslaEtherJAggMeasuredRTTMax.%rtt-index%"/>
+      <param name="rrd-ds"             value="RTTMax" />
+      <param name="rrd-create-dstype"  value="GAUGE" />
+      <param name="nodeid"    value="%cisco-soam-nodeid%//rttmax"/>
+      <param name="precedence"   value="110" />
+    </leaf>
+  </template>  
+
+  
+</datasources>
+
+</configuration>

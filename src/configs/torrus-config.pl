@@ -293,12 +293,14 @@ $Torrus::Renderer::RPC::pretty_json = 0;
 @Torrus::Collector::loadModules =
     ( 'Torrus::Collector::SNMP',
       'Torrus::Collector::CDef',
+      'Torrus::Collector::SNMP_TS',
       'Torrus::Collector::RRDStorage' );
 
 # Configurable part of Validator
 @Torrus::Validator::loadLeafValidators =
     ( 'Torrus::Collector::SNMP_Params',
-      'Torrus::Collector::CDef_Params' );
+      'Torrus::Collector::CDef_Params',
+      'Torrus::Collector::SNMP_TS_Params',);
 
 # Configurable part of AdmInfo renderer
 @Torrus::Renderer::loadAdmInfo =

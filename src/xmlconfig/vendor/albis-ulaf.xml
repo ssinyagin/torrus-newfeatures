@@ -82,7 +82,7 @@
       value="$acceedSoamLmCurrentAvailStatsForwardAvailable.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="FwdAvail" />
       <param name="rrd-create-dstype"  value="COUNTER" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//fwdavail"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//fwdavail"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -93,7 +93,7 @@
       value="$acceedSoamLmCurrentAvailStatsBackwardAvailable.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="BckAvail" />
       <param name="rrd-create-dstype"  value="COUNTER" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//bckavail"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//bckavail"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -104,7 +104,7 @@
       value="$acceedSoamLmCurrentAvailStatsForwardUnavailable.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="FwdUnavail" />
       <param name="rrd-create-dstype"  value="COUNTER" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//fwdunavail"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//fwdunavail"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -115,7 +115,7 @@
       value="$acceedSoamLmCurrentAvailStatsBackwardUnavailable.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="BckUnavail" />
       <param name="rrd-create-dstype"  value="COUNTER" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//bckunavail"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//bckunavail"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -141,7 +141,7 @@
 
       <param name="vertical-label"      value="Percent" />
       <param name="graph-lower-limit"   value="0" />
-      <param name="nodeid" value="%accees-soam-nodeid%//availability"/>
+      <param name="nodeid" value="%acceed-soam-nodeid%//availability"/>
     </leaf>    
   </template>  
 
@@ -187,7 +187,7 @@
       value="$acceedSoamDmCurrentStatsFrameDelayTwoWayMin.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="TwoWayMin" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//twoway-min"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//twoway-min"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -198,7 +198,7 @@
       value="$acceedSoamDmCurrentStatsFrameDelayTwoWayMax.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="TwoWayMax" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//twoway-max"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//twoway-max"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -209,7 +209,7 @@
       value="$acceedSoamDmCurrentStatsFrameDelayTwoWayAvg.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="TwoWayAvg" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//twoway-avg"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//twoway-avg"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -239,7 +239,7 @@
             
       <param name="vertical-label"      value="Microseconds" />
       <param name="graph-lower-limit"   value="0" />
-      <param name="nodeid" value="%accees-soam-nodeid%//twoway"/>
+      <param name="nodeid" value="%acceed-soam-nodeid%//twoway"/>
     </leaf>    
 
 
@@ -250,7 +250,7 @@
       value="$acceedSoamDmCurrentStatsIfdvForwardMin.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="ForwardMin" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//forward-min"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//forward-min"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -261,7 +261,7 @@
       value="$acceedSoamDmCurrentStatsIfdvForwardMax.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="ForwardMax" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//forward-max"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//forward-max"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -272,7 +272,7 @@
       value="$acceedSoamDmCurrentStatsIfdvForwardAvg.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="ForwardAvg" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//forward-avg"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//forward-avg"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -302,7 +302,7 @@
 
       <param name="vertical-label"      value="Microseconds" />
       <param name="graph-lower-limit"   value="0" />
-      <param name="nodeid" value="%accees-soam-nodeid%//forward"/>
+      <param name="nodeid" value="%acceed-soam-nodeid%//forward"/>
     </leaf>    
     
 
@@ -313,7 +313,7 @@
       value="$acceedSoamDmCurrentStatsIfdvBackwardMin.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="BackwardMin" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//backward-min"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//backward-min"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -324,7 +324,7 @@
       value="$acceedSoamDmCurrentStatsIfdvBackwardMax.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="BackwardMax" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//backward-max"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//backward-max"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -335,7 +335,7 @@
       value="$acceedSoamDmCurrentStatsIfdvBackwardAvg.%acceed-soam-cfg-index%"/>
       <param name="rrd-ds"             value="BackwardAvg" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"      value="%accees-soam-nodeid%//backward-avg"/>
+      <param name="nodeid"      value="%acceed-soam-nodeid%//backward-avg"/>
       <param name="hidden"             value="yes" />
     </leaf>
 
@@ -365,7 +365,7 @@
             
       <param name="vertical-label"      value="Microseconds" />
       <param name="graph-lower-limit"   value="0" />
-      <param name="nodeid" value="%accees-soam-nodeid%//backward"/>
+      <param name="nodeid" value="%acceed-soam-nodeid%//backward"/>
     </leaf>    
             
   </template>  

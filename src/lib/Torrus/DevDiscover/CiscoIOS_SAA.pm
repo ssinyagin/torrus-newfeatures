@@ -31,7 +31,6 @@ use warnings;
 use Socket qw(inet_ntoa);
 use Torrus::Log;
 
-
 $Torrus::DevDiscover::registry{'CiscoIOS_SAA'} = {
     'sequence'     => 600,
     'checkdevtype' => \&checkdevtype,
@@ -305,6 +304,62 @@ sub discover
         $ref->{'param'}{'legend'} = $legend;
 
         my $type = $adminValues->{'rttMonCtrlAdminRttType'}{$rttIndex};
+
+        if( $type == 24 or $type == 23 )
+        {
+            $ref->{'nodeid-prefix'} =
+                'soam//%nodeid-device%' . '//' . $rttIndex;
+
+            my $mdname = $ref->{'param'}{'rtt-echo-target-mdname'};
+            if( not defined($mdname) )
+            {
+                Error('CFM measurement without MD Name: idx=' . $rttIndex);
+                next;
+            }
+        
+            my $md;
+            foreach my $mdidx (keys %{$data->{'dot1ag'}})
+            {
+                if( $data->{'dot1ag'}{$mdidx}{'name'} eq $mdname )
+                {
+                    $md = $mdidx;
+                    last;
+                }
+            }
+
+            if( not defined($md) )
+            {
+                Error('Cannot find IEEE8021-CFM-MIB MD: ' . $mdname);
+                next;
+            }
+
+            my $mddata = $data->{'dot1ag'}{$md};
+
+            my $maname = $ref->{'param'}{'rtt-echo-target-evc'};
+            my $ma;
+            foreach my $maidx (keys %{$mddata->{'ma'}})
+            {
+                if( $mddata->{'ma'}{$maidx}{'name'} eq $maname )
+                {
+                    $ma = $maidx;
+                    last;
+                }
+            }
+            
+            if( not defined($ma) )
+            {
+                Error('Cannot find IEEE8021-CFM-MIB MA: ' .
+                      join('.', $mdname, $maname));
+                next;
+            }
+
+            my $mep = $ref->{'param'}{'rtt-echo-source-mpid'};                
+            
+            $ref->{'md'} = $md;
+            $ref->{'ma'} = $ma;
+            $ref->{'mep'} = $mep;
+        }            
+        
         if( $type == 24 )
         {
             if( $devdetails->isDevType('IEEE8021_CFM_MIB') )
@@ -312,7 +367,6 @@ sub discover
                 $ref->{'templates'} =
                     ['CiscoIOS_SAA::cisco-saa-soam-lm'];
                 $data->{'cisco_soam_lmm'}{$rttIndex} = $ref;
-                
             }
             else
             {
@@ -339,7 +393,7 @@ sub discover
         else
         {
             $data->{'cisco_rtt'}{$rttIndex} = $ref;
-        }
+        }            
     }
 
     return 1;
@@ -429,54 +483,15 @@ sub buildSoamConfig
     foreach my $idx (sort keys %{$soamdata})
     {
         my $ref = $soamdata->{$idx};
+        my $md = $ref->{'md'};
+        my $ma = $ref->{'ma'};
+        my $mep = $ref->{'mep'};
 
-        my $mdname = $ref->{'param'}{'rtt-echo-target-mdname'};
-        if( not defined($mdname) )
-        {
-            Error('CFM measurement without MD Name: idx=' . $idx);
-            next;
-        }
-        
-        my $md;
-        foreach my $mdidx (keys %{$data->{'dot1ag'}})
-        {
-            if( $data->{'dot1ag'}{$mdidx}{'name'} eq $mdname )
-            {
-                $md = $mdidx;
-                last;
-            }
-        }
-
-        if( not defined($md) )
-        {
-            Error('Cannot find IEEE8021-CFM-MIB MD: ' . $mdname);
-            next;
-        }
 
         my $mddata = $data->{'dot1ag'}{$md};
-
-        my $maname = $ref->{'param'}{'rtt-echo-target-evc'};
-        my $ma;
-        foreach my $maidx (keys %{$data->{'dot1ag'}{$md}{'ma'}})
-        {
-            if( $data->{'dot1ag'}{$md}{'ma'}{$maidx}{'name'} eq $maname )
-            {
-                $ma = $maidx;
-                last;
-            }
-        }
+        my $madata = $mddata->{'ma'}{$ma};
         
-        if( not defined($ma) )
-        {
-            Error('Cannot find IEEE8021-CFM-MIB MA: ' .
-                  join('.', $mdname, $maname));
-            next;
-        }
-
-        my $madata = $data->{'dot1ag'}{$md}{'ma'}{$ma};
-        
-        my $mep = $ref->{'param'}{'rtt-echo-source-mpid'};                
-        my $mepdata = $data->{'dot1ag'}{$md}{'ma'}{$ma}{'mep'}{$mep};
+        my $mepdata = $madata->{'mep'}{$mep};
         if( not defined($mepdata) )
         {
             Error('Cannot find IEEE8021-CFM-MIB MEP: ' .
@@ -509,8 +524,7 @@ sub buildSoamConfig
         my $descr = $madata->{'name'} . ' ' . $mep . '->' . $targetmep;
         my $gtitle = '%system-id% ' . $descr;
         
-        my $nodeid = 'soam//%nodeid-device%' . '//' . $idx . '//' . 
-            $soamtypeshort;
+        my $nodeid = $ref->{'nodeid-prefix'} . '//' . $soamtypeshort;
 
         $ref->{'param'}{'node-display-name'} = $descr;
            
@@ -518,6 +532,8 @@ sub buildSoamConfig
         $ref->{'param'}{'cisco-soam-nodeid'} = $nodeid;
         $ref->{'param'}{'legend'} = $legend;
         $ref->{'param'}{'graph-title'} = $gtitle;
+        $ref->{'param'}{'soam-md-name'} = $mddata->{'name'};
+        $ref->{'param'}{'soam-ma-name'} = $madata->{'name'};
         
         my $subtreeName = $idx;
         

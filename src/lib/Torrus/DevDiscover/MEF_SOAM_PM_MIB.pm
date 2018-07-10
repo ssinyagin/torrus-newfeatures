@@ -220,6 +220,9 @@ sub discover
                 }
             }
 
+            $ref->{'nodeid-prefix'} =
+                'soam//%nodeid-device%' . '//' . $idx;
+
             if( scalar(@{$ref->{'templates'}}) > 0 )
             {
                 $data->{'mefSoamLm'}{$idx} = $ref;
@@ -304,6 +307,9 @@ sub discover
                 }
             }
 
+            $ref->{'nodeid-prefix'} =
+                'soam//%nodeid-device%' . '//' . $idx;
+            
             if( scalar(@{$ref->{'templates'}}) > 0 )
             {
                 $data->{'mefSoamDm'}{$idx} = $ref;
@@ -388,7 +394,7 @@ sub buildSoamConfig
             next;
         }
         
-        my $madata = $data->{'dot1ag'}{$md}{'ma'}{$ma};
+        my $madata = $mddata->{'ma'}{$ma};
         if( not defined($madata) )
         {
             Error('Cannot find IEEE8021-CFM-MIB MA: ' .
@@ -396,7 +402,7 @@ sub buildSoamConfig
             next;
         }
         
-        my $mepdata = $data->{'dot1ag'}{$md}{'ma'}{$ma}{'mep'}{$mep};
+        my $mepdata = $madata->{'mep'}{$mep};
         if( not defined($mepdata) )
         {
             Error('Cannot find IEEE8021-CFM-MIB MEP: ' .
@@ -427,11 +433,12 @@ sub buildSoamConfig
         my $descr = $madata->{'name'} . ' ' . $mep . '->' . $ref->{'target'};
         my $gtitle = '%system-id% ' . $descr;
         
-        my $nodeid = 'soam//%nodeid-device%' . '//' . $idx . '//' . 
-            $soamtypeshort;
+        my $nodeid = $ref->{'nodeid-prefix'} . '//' . $soamtypeshort;
              
         my $param = {
             'mef-soam-cfg-index' => $idx,
+            'soam-md-name' => $mddata->{'name'},
+            'soam-ma-name' => $madata->{'name'},
             'node-display-name' => $descr,
             'mef-mp-description' => $descr,
             'mef-soam-nodeid' => $nodeid,

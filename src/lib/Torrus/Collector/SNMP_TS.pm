@@ -128,7 +128,10 @@ sub initTargetAttributes
         }
 
         $cref->{'refoid_expanded'}{$hosthash}{$orig_refoid} = $refoid;
+    }
 
+    if( not defined($cref->{'refoid_scale'}{$hosthash}{$refoid}) )
+    {
         my $scale = $collector->param($token, 'snmp-ts-unit-scale');
         $scale = 1 unless defined($scale);
         $cref->{'refoid_scale'}{$hosthash}{$refoid} = $scale;

@@ -35,10 +35,10 @@
  <!-- CISCO-IPSLA-ETHERNET-MIB -->
   <def name="ipslaEtherJAggMeasuredCmpletions"
        value="1.3.6.1.4.1.9.9.585.1.2.1.1.2"/>
-  <def name="ipslaEtherJAggMeasuredRTTMin"
-       value="1.3.6.1.4.1.9.9.585.1.2.1.1.8"/>
-  <def name="ipslaEtherJAggMeasuredRTTMax"
-       value="1.3.6.1.4.1.9.9.585.1.2.1.1.9"/>
+  <def name="ipslaEtherJAggMeasuredNumRTTs"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.4"/>
+  <def name="ipslaEtherJAggMeasuredRTTSums"
+       value="1.3.6.1.4.1.9.9.585.1.2.1.1.5"/>
   <def name="ipslaEtherJAggMeasuredFrmLossSDs"
        value="1.3.6.1.4.1.9.9.585.1.2.1.1.34"/>
   <def name="ipslaEtherJAggMeasuredFrmLssDSes"
@@ -178,28 +178,39 @@
   
 
   <template name="cisco-saa-soam-dm">
-    <leaf name="RTTMin">
+    <leaf name="NumRTTs">
       <param name="comment"
-          value="Minumum round-trip delay"/>
+          value="Number of RTT measurements"/>
       <param name="snmp-ts-column-oid"
-         value="$ipslaEtherJAggMeasuredRTTMin.%rtt-index%"/>
-      <param name="rrd-ds"             value="RTTMin" />
+         value="$ipslaEtherJAggMeasuredNumRTTs.%rtt-index%"/>
+      <param name="rrd-ds"             value="NumRTTs" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"    value="%cisco-soam-nodeid%//rttmin"/>
-      <param name="precedence"   value="100" />
+      <param name="nodeid"    value="%cisco-soam-nodeid%//numrtt"/>
+      <param name="hidden"   value="yes" />
+      <param name="precedence"   value="50" />
     </leaf>
-    <leaf name="RTTMax">
+    <leaf name="RTTSums">
       <param name="comment"
-          value="Maxumum round-trip delay"/>
+          value="Sum of RTT delay measurements"/>
       <param name="snmp-ts-column-oid"
-         value="$ipslaEtherJAggMeasuredRTTMax.%rtt-index%"/>
-      <param name="rrd-ds"             value="RTTMax" />
+         value="$ipslaEtherJAggMeasuredRTTSums.%rtt-index%"/>
+      <param name="rrd-ds"             value="RTTSums" />
       <param name="rrd-create-dstype"  value="GAUGE" />
-      <param name="nodeid"    value="%cisco-soam-nodeid%//rttmax"/>
-      <param name="precedence"   value="110" />
+      <param name="nodeid"    value="%cisco-soam-nodeid%//rttsum"/>
+      <param name="hidden"   value="yes" />
+      <param name="precedence"   value="60" />
+    </leaf>
+    <leaf name="RTTAvg">
+      <param name="comment"
+         value="Average round-trip delay"/>
+      <param name="ds-type"        value="rrd-file"/>
+      <param name="leaf-type"      value="rrd-cdef"/>
+      <param name="rpn-expr"       value="{RTTSums},1000,*,{NumRTTs},/"/>
+      <param name="vertical-label" value="Microseconds" />
+      <param name="precedence"     value="70"/>
     </leaf>
   </template>  
-
+      
   
 </datasources>
 

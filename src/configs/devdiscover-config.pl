@@ -67,6 +67,7 @@ $Torrus::DevDiscover::timeFormat = '%d-%m-%Y %H:%M';
      'Torrus::DevDiscover::CiscoIOS_Docsis',
      'Torrus::DevDiscover::CiscoIOS_MacAccounting',
      'Torrus::DevDiscover::CiscoIOS_SAA',
+     'Torrus::DevDiscover::CiscoNCS2000',
      'Torrus::DevDiscover::CiscoSCE',
      'Torrus::DevDiscover::CiscoVDSL',
      'Torrus::DevDiscover::CiscoWLC',

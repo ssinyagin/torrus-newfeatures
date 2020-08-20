@@ -62,6 +62,12 @@ sub set
     my $serviceid = shift;
     my $params = shift;
 
+    if( not defined($params->{'token'}) )
+    {
+        Error('Cannot define ServiceID ' . $serviceid . ': missing token parameter');
+        return 0;
+    }
+              
     my $redis = $self->{'redis'};
     my $old_params = $redis->hget($self->{'params_hname'}, $serviceid);
 
@@ -70,21 +76,20 @@ sub set
         $old_params = $self->{'json'}->decode($old_params);
         if(defined($old_params->{'token'}) )
         {
-            Error('Cannot set new parameters for ServiceID ' . $serviceid .
-                  ' while it is assigned to token ' . $old_params->{'token'});
-            return 0;
+            Info('Redefining ServiceID ' . $serviceid .
+                 ' for token ' . $params->{'token'} .
+                 ' (old token: ' . $old_params->{'token'} . ')');
         }
-    }
 
+        $self->tokenDeleted($old_params->{'token'});
+    }
+    
     $redis->hset($self->{'params_hname'}, $serviceid,
                  $self->{'json'}->encode($params));
-
-    if( defined($params->{'token'}) )
-    {
-        $redis->hset($self->{'tokens_hname'}, $params->{'token'},
-                     $serviceid);
-    }
-        
+    
+    $redis->hset($self->{'tokens_hname'}, $params->{'token'},
+                 $serviceid);
+    
     return 1;
 }
 

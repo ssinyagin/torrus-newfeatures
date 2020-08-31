@@ -66,10 +66,9 @@ sub discover
             
     $data->{'param'}{'snmp-oids-per-pdu'} = 10;
     $data->{'nameref'}{'ifSubtreeName'} = 'ifDescrT';
-    $data->{'nameref'}{'ifReferenceName'} = 'ifName';
+    $data->{'nameref'}{'ifReferenceName'} = 'ifDescr';
     $data->{'nameref'}{'ifNick'} = 'ifName';
     $data->{'nameref'}{'ifNodeid'} = 'ifName';
-    $data->{'nameref'}{'ifComment'} = 'ifDescr';
     
     foreach my $ifIndex ( keys %{$data->{'interfaces'}})
     {

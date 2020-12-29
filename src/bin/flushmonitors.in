@@ -26,7 +26,7 @@ use Torrus::SiteConfig;
 use Torrus::ConfigTree;
 use Torrus::Log;
 
-use Redis;
+use Torrus::Redis;
 
 exit(1) unless Torrus::SiteConfig::verify();
 
@@ -91,7 +91,7 @@ foreach my $tree ( @trees )
     }
 
     my $hname = $Torrus::Global::redisPrefix . 'monitor_alarms:' . $tree;
-    my $redis = Redis->new(server => $Torrus::Global::redisServer);
+    my $redis = Torrus::Redis->new(server => $Torrus::Global::redisServer);
     $redis->del($hname);
         
     foreach my $ts ( $config_tree->getTsets() )

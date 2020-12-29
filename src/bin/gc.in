@@ -35,14 +35,14 @@ fi
 @GIT@ gc
 
 if [ $? -ne 0 ]; then
-    echo "git gc retuirned error" 1>&2
+    echo "git gc returned error" 1>&2
     exit 1
 fi
 
 @GIT@ update-server-info
 
 if [ $? -ne 0 ]; then
-    echo "git update-server-info retuirned error" 1>&2
+    echo "git update-server-info returned error" 1>&2
     exit 1
 fi
 

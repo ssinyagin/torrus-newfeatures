@@ -143,6 +143,9 @@ Modules required by Torrus:
   PREFIX=/opt/pm/thirdparty ./build_perl5-current.sh
   PREFIX=/opt/pm/thirdparty ./build_rrdtool-current.sh
 
+  echo "/opt/pm/thirdparty/lib64" >/etc/ld.so.conf.d/torrus.conf
+  ldconfig
+
   echo 'PATH=/opt/pm/thirdparty/bin:/opt/pm/bin:$PATH; export PATH' \
     >/etc/profile.d/torrus_path.sh
 
@@ -157,7 +160,7 @@ Modules required by Torrus:
   cd /opt/pm/src/
   git clone https://github.com/ssinyagin/torrus-newfeatures.git
   cd torrus-newfeatures/src
-  sh setup_tools/cpanm_install_modules.sh
+  OPENSSL_PREFIX=/opt/pm/thirdparty sh setup_tools/cpanm_install_modules.sh
   autoreconf
   ./configure --prefix=/opt/pm
   make install

@@ -133,7 +133,7 @@ Modules required by Torrus:
   # You need to install corresponding packages in orther systems
   apt-get update && apt-get install -y git gcc g++ make automake \
     libtool apache2 libapache2-mod-fcgid pkg-config xz-utils bzip2 \
-    redis-server redis-tools ttf-dejavu
+    redis-server redis-tools ttf-dejavu flex bison
 
   mkdir -p /opt/pm/src
   cd /opt/pm/src

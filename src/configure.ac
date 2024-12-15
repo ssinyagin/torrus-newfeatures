@@ -19,7 +19,7 @@
 
 
 AC_INIT([torrus],[3.01],[ssinyagin@users.sourceforge.net])
-AC_PREREQ([2.59])
+AC_PREREQ([2.71])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)
@@ -44,8 +44,7 @@ AC_PATH_PROG(POD2MAN, pod2man, no)
 AM_CONDITIONAL([POD2MAN_PRESENT], [test "$POD2MAN" != no])
 
 AC_ARG_ENABLE(pkgonly,
-        [AC_HELP_STRING([--enable-pkgonly],
-                        [Skip all checking])])
+        [AS_HELP_STRING([--enable-pkgonly],[Skip all checking])])
 AC_SUBST(enable_pkgonly)
 
 perllibdirs="\'\${perllibdir}\'"
@@ -87,7 +86,7 @@ test_rrdtool () {
 }
 
 AC_ARG_WITH(rrdtool,
-        [AC_HELP_STRING(--with-rrdtool=DIR,RRDTool location)],
+        [AS_HELP_STRING([--with-rrdtool=DIR],[RRDTool location])],
         test_rrdtool, find_rrdtool)
 
 AC_SUBST(perllibdirs, [${perllibdirs}])
@@ -202,8 +201,7 @@ AC_ARG_VAR(var_mode,  [[775] Mode of writable directories])
 if test -z "$var_mode"; then var_mode='775'; fi
 
 AC_ARG_ENABLE(varperm,
-        [AC_HELP_STRING(--disable-varperm,
-        Disable directory access rights tuning)],
+        [AS_HELP_STRING([--disable-varperm],[Disable directory access rights tuning])],
         [],
         [enable_varperm="yes"])
 AC_SUBST(enable_varperm)

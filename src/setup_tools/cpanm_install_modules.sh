@@ -1,4 +1,5 @@
 for m in \
+    IO::Socket::SSL \
     Redis::Fast \
     Git::Raw \
     Git::ObjectStore \
